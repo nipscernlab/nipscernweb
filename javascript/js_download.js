@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     document.getElementById("downloadBtn").addEventListener("click", function () {
-        const fileUrl = "https://github.com/nipscernlab/sapho/raw/main/Sapho_atual/Setup/inno/SAPHO.exe";
+        const fileUrl = "https://github.com/nipscernlab/websapho/raw/main/files/SAPHO.exe";
         const a = document.createElement("a");
         a.href = fileUrl;
         a.download = "SAPHO.exe";  // Name of the file after download
