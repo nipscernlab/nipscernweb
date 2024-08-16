@@ -1,0 +1,172 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+   font-family: "Sintony", sans-serif;
+   background: linear-gradient(135deg, #003366, #4b0082); /* Gradiente de fundo */
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   height: 100vh;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    border: 3px solid #003366; /* Adicionado um contorno de destaque */
+}
+
+.card h1 {
+    font-size: 2rem;
+    color: #003366; /* Título na cor base */
+    margin-bottom: 20px;
+}
+
+.card p {
+    font-size: 1rem;
+    color: #777;
+    margin-bottom: 30px;
+}
+
+button {
+    background-color: #FFD700; /* Cor base no botão */
+    color: #003366;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background-color: #FFC300; /* Cor mais clara ao passar o mouse */
+    transform: scale(1.05); /* Aumenta levemente o botão */
+}
+
+button:active {
+    background-color: #FFD700;
+    transform: scale(0.98); /* Efeito de clique */
+}
+
+header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+}
+
+.logo-link img {
+    height: 50px;
+    width: auto;
+}
+
+.icon-download img {
+    width: 120px; /* Ajuste o valor conforme necessário */
+    height: auto; /* Mantém a proporção da imagem */
+    margin-left: 80px; /* Ajuste o valor conforme necessário */
+    
+}
+
+
+.logo {
+    /* Outros estilos da logo */
+    transition: transform 0.3s ease; /* Adicione uma transição suave */
+    transform-origin: center; /* Define o ponto de transformação no centro */
+}
+
+.logo:hover {
+    transform: scale(1.10); /* Ajusta a escala ao passar o mouse */
+}
+
+
+/* Estilos para a barra de rolagem */
+::-webkit-scrollbar {
+  width: 10px; /* largura da barra de rolagem */
+}
+
+::-webkit-scrollbar-track {
+  background: black; /* cor de fundo da área de rastreamento da barra de rolagem */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* cor do controle deslizante da barra de rolagem */
+  border-radius: 0px; /* borda arredondada do controle deslizante */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* cor do controle deslizante quando hover */
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #0033a0;
+    padding: 15px 0;
+    text-align: center;
+    background-image: linear-gradient(135deg, #0033a0 0%, #0056b3 50%, #0033a0 100%);
+}
+
+.footer p {
+    margin: 0;
+}
+
+.footer a {
+    color: #ffd700;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer c {
+    color: #ffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #fff;
+}
+
+.footer img {
+    margin: 0 3px;
+    height: 22px !important;
+    margin-left: 3px;
+    vertical-align: text-bottom;
+}
+
+.footer a img {
+    padding: 0 3px;
+    height: 22px !important;
+    margin-left: 3px;
+    vertical-align: text-bottom;
+}
+
+@media screen and (max-width: 768px) {
+    .footer {
+        padding: 10px 0;
+    }
+}
+
+#license-link {
+    display: inline-block;
+}
+
+
+
