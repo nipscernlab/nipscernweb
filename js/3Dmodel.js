@@ -23,7 +23,7 @@ const loader = new GLTFLoader();
 // Load the file
 let model; // Store the loaded model
 loader.load(
-  `/nipscernwebtest/assets/model/scene.gltf`, // Ensure this path is correct
+  `/assets/model/scene.gltf`, // Ensure this path is correct
   function (gltf) {
     // If the file is loaded, add it to the scene
     model = gltf.scene; // Store the loaded model
