@@ -1,0 +1,430 @@
+/* Global Styles */
+ body {
+     font-family: Arial, sans-serif;
+     margin: 0;
+     padding: 0;
+     color: #333;
+}
+ .logo {
+     width: 4rem;
+     height: auto;
+}
+/* General styles for logo container to ensure responsiveness */
+ .logo-container {
+     display: flex;
+     justify-content: center;
+    /* Center logos */
+     flex-wrap: wrap;
+    /* Allow logos to wrap on smaller screens */
+     padding: 20px 40px;
+     margin-top: 40px;
+    /* Add some margin for spacing */
+}
+/* Logo styles */
+ .logo-home {
+     max-width: 100px;
+    /* Set a fixed width for logos */
+     height: auto;
+    /* Maintain aspect ratio */
+     margin: 20px 40px;
+    /* Space between logos */
+}
+/* Header Section */
+ header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 15px;
+     z-index: 9999;
+     background: rgba(0, 0, 0, 0.1);
+    /* Semi-transparent background */
+     backdrop-filter: blur(10px);
+    /* Blurring effect */
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Optional: add shadow to elevate the header */
+     border-bottom: 1px solid rgba(27, 33, 56, 0.1);
+    /* Soft border color */
+     position: fixed;
+    /* Fixed header */
+     width: 100%;
+    /* Full-width header */
+     top: -20px;
+}
+ header .logo img {
+     width: 100px;
+}
+ nav ul {
+     display: flex;
+     list-style: none;
+}
+ nav ul li {
+     margin: 0 15px;
+}
+ nav ul li a {
+     color: white;
+     text-decoration: none;
+}
+ nav ul li .dropdown-content {
+     display: none;
+     position: absolute;
+     background-color: #333;
+     padding: 10px;
+}
+ nav ul li:hover .dropdown-content {
+     display: block;
+}
+ .language-switcher {
+     padding: 5px;
+}
+/* Hero Section */
+ .hero {
+     background-image: url('hero-bg.jpg');
+     background-size: cover;
+     background-position: center;
+     color: white;
+     text-align: center;
+     padding: 100px 20px;
+}
+ .hero h1 {
+     font-size: 3rem;
+}
+ .hero .cta-buttons {
+     margin-top: 20px;
+}
+ .hero .btn {
+     background-color: #f5c000;
+     color: black;
+     padding: 10px 20px;
+     margin: 0 10px;
+     text-decoration: none;
+     border-radius: 5px;
+}
+ .text-5xl {
+     background: linear-gradient(135deg, #003366 10%, #c300ff 100%);
+     -webkit-background-clip: text;
+    /* For Safari */
+     -webkit-text-fill-color: transparent;
+    /* For Safari */
+     background-clip: text;
+     color: transparent;
+    /* Fallback color */
+     font-size: 3rem;
+    /* Assuming this is your desired font size for 5xl */
+     line-height: 1.3 !important;
+}
+ .text-xl {
+     background: linear-gradient(135deg, #003366 10%, #c300ff 100%);
+     -webkit-background-clip: text;
+    /* For Safari */
+     -webkit-text-fill-color: transparent;
+    /* For Safari */
+     background-clip: text;
+     color: transparent;
+    /* Fallback color */
+     font-size: 3rem;
+    /* Assuming this is your desired font size for 5xl */
+     opacity: 80%;
+}
+/* Research Section */
+ .current-research {
+     padding: 50px 20px;
+     background-color: #f4f4f4;
+}
+ .research-cards {
+     display: flex;
+     justify-content: space-around;
+}
+ .research-cards .card {
+     background-color: white;
+     padding: 20px;
+     border: 1px solid #ccc;
+     width: 30%;
+     text-align: center;
+}
+ .card a {
+     color: #003366;
+     text-decoration: none;
+}
+/* Featured Projects */
+ .featured-projects {
+     padding: 50px 20px;
+}
+ .featured-projects .project {
+     margin-bottom: 30px;
+}
+ .featured-projects .btn {
+     background-color: #003366;
+     color: white;
+     padding: 10px 20px;
+     text-decoration: none;
+}
+
+.sapho-logo {
+    background-color: #FAF2B0; /* SAPHO Logo */
+    padding: 10px;
+    border-radius: 5px;
+
+}
+
+.aura-ide {
+    background-color: #E8DAEF; /* AURA IDE */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.alice-logo {
+    background-color: #F8D7DA; /* ALICE */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.helvetia-logo {
+    background-color: #C8E6E5; /* Helvetia */
+    padding: 10px;
+    border-radius: 5px;
+    width: 60px;
+    height: auto;
+}
+
+.infinity-logo {
+    background-color: #FFE5E0; /* Infinity */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.cern-logo {
+    background-color: #E0F7FA; /* CERN */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+
+
+/* Collaboration */
+ .collaboration {
+     padding: 50px 20px;
+     background-color: #f4f4f4;
+}
+/* FAQ */
+ .faq {
+     padding: 50px 20px;
+}
+ .faq-item {
+     margin-bottom: 20px;
+}
+/* Contact Us */
+ .contact-us {
+     padding: 50px 20px;
+}
+ .contact-us form {
+     display: flex;
+     flex-direction: column;
+}
+ .contact-us form input, .contact-us form textarea {
+     margin-bottom: 10px;
+     padding: 10px;
+     border: 1px solid #ccc;
+}
+ .contact-us button {
+     padding: 10px;
+     background-color: #003366;
+     color: white;
+     border: none;
+}
+/* Footer */
+ footer {
+     background-color: #003366;
+     color: white;
+     text-align: center;
+     padding: 20px 0;
+}
+ footer .newsletter {
+     margin-top: 10px;
+}
+ footer .newsletter input {
+     padding: 10px;
+     margin-right: 10px;
+}
+/* Custom Colors for NIPSCERN */
+ :root {
+     --blue: #0055A4;
+     --gold-yellow: #FFCC33;
+     --light-gray: #f4f4f4;
+     --dark-blue: #003366;
+}
+ body {
+     font-family: 'Inter', sans-serif;
+}
+ .hero-bg {
+     background-image: url('hero-bg.jpg');
+     background-size: cover;
+     background-position: center;
+}
+ .btn-primary {
+     background-color: var(--gold-yellow);
+     color: black;
+     transition: background-color 0.3s ease-in-out;
+}
+ .btn-primary:hover {
+     background-color: var(--dark-blue);
+     color: white;
+}
+ .shadow-neumorphism {
+     box-shadow: 10px 10px 20px #aaaaaa, -10px -10px 20px #ffffff;
+}
+ .shadow-neumorphism {
+     transition: transform 0.2s ease;
+     background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    /* Light gradient background */
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    /* Neumorphism effect */
+}
+ .shadow-neumorphism:hover {
+     transform: translateY(-5px);
+    /* Slight lift on hover */
+     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+/* Scale up the card slightly on hover */
+ .shadow-neumorphism.p-6.bg-white.rounded-lg:hover {
+     transform: scale(1.05);
+    /* Increase size to 105% */
+     transition: transform 0.2s;
+    /* Smooth transition */
+     transition-duration: 0.5s;
+     transform-origin: center;
+    /* Scale from the center */
+}
+ [data-aos][data-aos][data-aos-duration="1200"], body[data-aos-duration="1200"] [data-aos] {
+     transition-duration: 0.5s;
+    /* Change to 1 second */
+}
+/* Custom Styles for the Header */
+ body {
+     font-family: 'Arial', sans-serif;
+}
+/* Background Animation */
+ .hero-bg {
+     background: linear-gradient(135deg, #00aaff 0%, #00ff99 100%);
+     position: relative;
+     overflow: hidden;
+}
+/* Animated Floating Effect for Buttons */
+ .btn-primary {
+     background-color: #0056b3;
+     color: white;
+     transition: transform 0.2s, background-color 0.2s;
+}
+ .btn-primary:hover {
+     background-color: #004494;
+     transform: translateY(-5px);
+}
+/* Header Background Animation */
+ header {
+     animation: slideDown 0.5s ease forwards;
+}
+ @keyframes slideDown {
+     from {
+         transform: translateY(-100%);
+         opacity: 0;
+    }
+     to {
+         transform: translateY(0);
+         opacity: 1;
+    }
+}
+/* Language Switcher */
+ .language-switcher select {
+     background-color: #0056b3;
+     color: white;
+     border-radius: 5px;
+     padding: 5px;
+     transition: background-color 0.2s;
+}
+ .language-switcher select:hover {
+     background-color: #004494;
+}
+/* Dropdown Menu */
+ .group:hover .absolute {
+     display: block;
+    /* Show on hover */
+}
+
+.flex-container {
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Vertically center align items */
+    
+}
+
+.icon-container {
+    display: flex; /* Ensure the icon can be centered properly */
+    align-items: center; /* Center the icon within its container */
+}
+
+.inline-icon {
+    width: 48px; /* Adjust the size as necessary */
+    height: 48px; /* Maintain aspect ratio */
+    margin-right: 20px; /* Space between icon and text */
+    margin-bottom: 45px; /* Space between icon and text */
+
+}
+
+
+ @keyframes blink {
+     0%, 100% {
+         opacity: 1;
+        /* Fully visible at the start and end */
+    }
+     50% {
+         opacity: 0;
+        /* Invisible at the midpoint */
+    }
+}
+/* Scroll Bar */
+ ::-webkit-scrollbar {
+     width: 10px 
+}
+ ::-webkit-scrollbar-track {
+     background: #000 
+}
+ ::-webkit-scrollbar-thumb {
+     background: #888;
+     border-radius: 0 
+}
+ ::-webkit-scrollbar-thumb:hover {
+     background: #555 
+}
+ @media (max-width: 768px) {
+     .logo-container {
+         flex-direction: column;
+        /* Stack logos vertically */
+         padding: 20px 40px;
+         align-items: center;
+        /* Center logos */
+    }
+     
+     .p-6 {
+     margin: 20px;
+    }
+     
+     nav {
+         flex-direction: column;
+        /* Stack navigation links */
+         align-items: baseline;
+        /* Center navigation */
+         margin-bottom: 40px;
+        /* Space below nav */
+    }
+     nav a {
+         margin: 6px 0;
+        /* Space between nav links */
+    }
+     .hero-bg {
+         padding: 20px 10px;
+        /* Adjust padding for smaller screens */
+    }
+     #projects-dropdown, #language-dropdown {
+         width: 90%;
+        /* Ensure dropdowns are not full width */
+    }
+}
+ 

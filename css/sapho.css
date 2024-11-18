@@ -1,0 +1,754 @@
+/* General Styles */
+ body {
+     font-family: 'Lato', sans-serif;
+     font-weight: 300;
+    /* Light for body text */
+     margin: 0;
+     padding: 0;
+     background-color: black; 
+     color: #FFDF80;
+     overflow-x: hidden; 
+}
+
+/* Collapsible Container Styles */
+.collapsible {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    border-radius: 8px;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+/* Each Item Styles */
+.collapsible li {
+    border-bottom: 1px solid #ddd;
+}
+
+.collapsible li:last-child {
+    border-bottom: none;
+}
+
+/* Header Styles */
+.collapsible-header {
+    background-color: #1B3A4B;
+    color: white;
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.collapsible-header:hover {
+    background-color: #FFC107;
+}
+
+/* Icon Styles */
+.collapsible-header .material-icons {
+    transition: transform 0.4s ease;
+}
+
+/* Body Styles */
+.collapsible-body {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.4s ease;
+    padding: 0 15px;
+    background-color: #FFF8E7;
+    color: #0A0F36;
+}
+
+.collapsible-body p {
+    padding: 15px 0;
+}
+
+/* Expanded Header */
+.collapsible-header.active {
+    background-color: #FFC107;
+}
+
+
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+h1, h2 {
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font:  2.5em/1.4 "roboto condensed";
+    margin-top: 50px;
+    font-weight: 700;
+    letter-spacing: 2px;
+
+}
+
+h1, .material-symbols-outlined.memory { 
+    font-size: 40px;
+    background-image: linear-gradient(90deg, 
+        #FFFACD 0%,    /* Goldenrod */
+        #FFD700 30%,   /* Gold */
+        #FFD700 50%,   /* Lemon Chiffon */
+        #FFFACD 70%,   /* Lemon Chiffon */
+        #FFD700 85%,   /* Papaya Whip */
+        #FFD700 100%   /* Papaya Whip */
+    );
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent;
+    background-size: 300%;
+    background-position: -100%;  
+    animation: animatedText 8s infinite alternate-reverse;
+    color: gold;
+}
+
+
+@keyframes animatedText {
+    to {
+        background-position: 100%; 
+    }
+}
+
+
+.hidden {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out; /* Smooth transition for opacity */
+}
+
+
+h2 {
+    font-size: 2.5rem;
+}
+
+.scroll-container {
+    display: flex;
+    justify-content: center; /* Center the 3D model */
+    align-items: center;
+    position: relative; /* Position relative for absolute children */
+    height: 100vh; /* Full height for scrolling effect */
+    background-color: transparent; /* Make it invisible */
+}
+
+.invisible-scroll {
+    position: absolute; /* Position absolute to overlap with the 3D model */
+    top: 0; /* Align to the top */
+    width: 150px; /* Width for the scroll area (adjust as needed) */
+    height: 100%; /* Full height to allow scrolling */
+    background-color: transparent; /* Make it invisible */
+    cursor: pointer; /* Show pointer cursor to indicate scrollable area */
+    z-index: 10; /* Higher z-index to bring it in front */
+}
+
+/* Positioning the left and right scroll areas */
+#leftScroll {
+    left: 0; /* Align to the left */
+}
+
+#rightScroll {
+    right: 0; /* Align to the right */
+}
+
+/* Optional: Add hover effect for visibility */
+.invisible-scroll:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Light hover effect */
+}
+
+.footer {
+    
+    background-color: #1B3A4B !important;
+}
+
+/* Navbar Links */
+ .nav-link {
+     font-family: 'Lato', sans-serif;
+     font-size: 1.2rem;
+     font-weight: 400;
+     color: #ffffff;
+}
+ .navbar {
+     padding: 1rem 2rem;
+     background-color: #1B3A4B;
+}
+
+#navbarNav {
+    display: none;
+}
+
+/* Animated underline effect */
+ .nav-link {
+     position: relative;
+    /* Ensure the link itself is positioned */
+     display: inline-block;
+    /* Make it an inline-block to respect the width of the text */
+     padding: 10px;
+    /* Add some padding if needed */
+}
+
+/* Pseudo-element for the underline */
+ .nav-link::after {
+     content: '';
+    /* Required for the pseudo-element to work */
+     position: absolute;
+    /* Position it relative to the nav-link */
+     left: 50%;
+    /* Center it horizontally */
+     bottom: 0;
+    /* Align it at the bottom */
+     width: 0;
+    /* Start with width 0 */
+     height: 2px;
+    /* Height of the underline */
+     background-color: gold;
+    /* Match the text color */
+     transition: width 0.3s ease, left 0.3s ease;
+    /* Smooth transition for width and position */
+}
+/* Show the underline only for the hovered nav-item */
+ .nav-item:hover .nav-link::after {
+     width: 80%;
+    /* Expand to full width on hover */
+     left: 10%;
+    /* Move to the left to align with the nav-item */
+}
+
+.logo i {
+    font-size: 2.5rem;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin-left: 20px;
+}
+
+.nav-links a {
+    color: white;
+    font-size: 1.2rem;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #ffcccb;
+}
+
+.custom-collapse {
+    overflow: hidden; /* Hide overflow when collapsing */
+    transition: height 0.5s ease; /* Smooth transition for height */
+}
+
+
+
+.burger {
+    display: none;
+    cursor: pointer;
+}
+
+.burger div {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 5px;
+    transition: 0.3s;
+}
+
+/* Title Section */
+.title-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    background-color: #000;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Hero Section */
+.hero {
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #FFDF00;
+    text-align: center;
+    background-image: url('/nipscernwebtest/assets/background/bg_sapho_wave_line.svg');
+    background-size: cover;
+    background-position: center;
+    
+}
+
+.hero .title {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.hero .subtitle {
+    font-size: 1.2rem;
+}
+
+.hero .cta-btn {
+    padding: 10px 20px;
+    background-color: #ffcccb;
+    border: none;
+    color: #000;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.hero .cta-btn:hover {
+    background-color: #ff9999;
+}
+
+/* Content Section */
+.content-section {
+    padding: 60px 40px;
+    background-color: #0D1B3A;
+}
+
+.content-section.bg-light {
+    background-color: #0D1B3A !important ;
+     
+}
+
+.bg-light {
+
+    background-color: #000 !important;
+}
+
+.content-section .content {
+    max-width: 800px;
+    margin: 0 auto;
+    
+}
+
+.content-section img {
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+
+.flow-image {
+    width: 90%;  /* Set your desired width here */
+    max-width: 700px;  /* Optional: set a max-width to prevent it from growing too large */
+}
+
+
+.video-loop {
+     width: 100%;
+    /* Adjust the width as needed */
+     border-radius: 15px;
+    /* Rounded corners */
+     border: 2px solid #FFDF00;
+    /* Crimson red border */
+     display: block;
+     margin: 20px auto;
+    /* Center the video */
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    /* Optional shadow for modern look */
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* Aspect ratio: 16:9 */
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    background: #000; /* Optional: gives a background in case the video doesn't load */
+    margin: 0 auto; /* Centers the video */
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px; /* Ensures the iframe's borders are rounded */
+    border: 2px solid #FFDF00;
+}
+
+.timeline {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.timeline h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.timeline ul {
+    list-style: none;
+}
+
+.timeline li {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+/* Media Section */
+.media-links {
+    list-style: none;
+    margin-top: 20px;
+}
+
+.media-links li {
+    margin-bottom: 10px;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+section {
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+
+.references {
+    list-style: none;
+    padding: 0;
+}
+
+.references li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.references a {
+    color: #FFDF80; /* CERN's blue */
+    text-decoration: none;
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+.references a:hover {
+    text-decoration: underline;
+    color: #fff;
+}
+
+.material-symbols-outlined {
+    font-size: 30px;
+    color: #FFDF00; /* Gold color for contrast */
+    vertical-align: middle;
+}
+
+.references li:hover .material-symbols-outlined {
+    color: #fff; /* Lighter gold on hover */
+    transition: color 0.3s ease;
+}
+
+
+.icon {
+    font-family: 'Material Icons';
+    vertical-align: middle;
+    color: #0033A0; /* CERN's blue */
+    font-size: 20px;
+}
+
+/* Style the button */
+#backToTopBtn {
+  display: none; /* Hidden by default */
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 99;
+  background-color: #0033A0;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.5s ease, background-color 0.3s ease; /* Smooth transition */
+}
+
+#backToTopBtn:hover {
+  background-color: #0056b3;
+}
+
+
+/* Light Mode Styles */
+ body.light-mode {
+     background-color: #FEF9F2 !important;
+    /* Light mode background */
+     color: #0033a0;
+    /* Light mode text color */
+}
+ body.light-mode .navbar {
+     background-color: #789DBC !important;
+    /* Light mode navbar */
+     color: #789DBC;
+    /* Light mode navbar text color */
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Add a shadow effect */
+}
+
+/* Content Section */
+ body.light-mode .content-section {
+    background-color: #FEF9F2 !important;
+}
+
+
+ body.light-mode .references a {
+    color: #0033A0;
+}
+
+body.light-mode .references li:hover .material-symbols-outlined {
+    color: #0033a0; /* Lighter gold on hover */
+    transition: color 0.3s ease;
+}
+
+
+ body.light-mode {
+    color: #0033A0;
+}
+
+
+body.light-mode .hero {
+     color: #FFD700;
+}
+
+/* Pseudo-element for the underline */
+ body.light-mode .nav-link::after {
+     background-color: #0033A0;
+    /* Match the text color */
+}
+ body.light-mode .nav-link {
+     color: #fff !important;
+    /* Light mode link color */
+}
+
+body.light-mode #container3D {
+
+    background-color: #FFE3E3;
+}
+
+/* Footer for light mode */
+ body.light-mode footer {
+     background-color: #789DBC !important;
+    /* Light mode footer */
+     color: black;
+    /* Light mode footer text */
+}
+
+
+@media (max-width: 768px) {
+    .hero .title {
+        font-size: 3rem;
+    }
+
+    .hero .subtitle {
+        font-size: 1.1rem;
+    }
+
+    .navbar .nav-links {
+        display: none;
+    }
+
+    .burger {
+        display: block;
+    }
+}
+
+/* Button Styles */
+.btn {
+    font-family: 'Lato', sans-serif;
+    font-weight: 500; /* Medium weight for visibility */
+    padding: 8px 18px; /* Comfortable padding for all buttons */
+    border-radius: 25px; /* Smooth rounded corners */
+    font-size: 1.0rem; /* Slightly smaller font size for consistency */
+    margin: 8px;
+    text-decoration: none;
+    color: #0033A0; /* Default text color */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Primary Button */
+.btn-primary {
+    background-color: #FFD700; /* Bright gold */
+    border: 2px solid #FFD700;
+    color: #0033A0; /* Dark blue text */
+}
+.btn-primary:hover {
+    background-color: #FAF0DC; /* Light gold on hover */
+    border-color: #FAF0DC;
+    color: #0033A0;
+}
+.btn-primary:active {
+    background-color: #B8860B; /* Dark gold */
+    border-color: #8B6914;
+    transform: scale(0.95); /* Scale down on click */
+    color: #0033A0;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background-color: #919aa1; /* Soft gray-blue */
+    border: 2px solid #919aa1;
+    color: #FAF0DC; /* Light gold text */
+}
+.btn-secondary:hover {
+    background-color: #5a6268; /* Darker gray-blue on hover */
+    border-color: #5a6268;
+    color: #FAF0DC;
+}
+.btn-secondary:active {
+    background-color: #3d464e; /* Even darker gray-blue on click */
+    border-color: #3d464e;
+    transform: scale(0.95); /* Scale down on click */
+    color: #FAF0DC;
+}
+
+/* Hover Effect for Both Buttons */
+.buttons .btn:hover {
+    transform: translateY(-2px); /* Subtle lift on hover */
+}
+
+/* Button Container for Proper Spacing */
+.buttons {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    align-items: center;
+    justify-content: flex-start; /* Align to the left */
+}
+
+.btn-circle {
+    width: 40px;  /* Set width and height to the same value */
+    height: 40px;
+    border-radius: 50%;  /* Makes the button circular */
+    padding: 0;  /* Remove extra padding for centering the icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;  /* Adjust icon size */
+}
+
+.btn-circle i {
+    margin: 0;  /* Center the icon within the circle */
+    color: #0033A0;  /* Icon color */
+}
+
+
+
+/* Table */
+.table-container {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #1B3A4B;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
+}
+
+table {
+    width: 100%;
+    max-width: 100%; /* Ensure the table doesn't exceed the container's width */
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 600px; /* Minimum width to maintain usability */
+}
+
+caption {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+th, td {
+    padding: 12px 15px;
+    color: #fff;
+}
+
+th {
+    background-color: transparent;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 14px;
+    border-bottom: 4px solid #FFDF00;
+}
+
+td {
+    font-size: 13px;
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #1e506b;
+}
+
+tbody tr:hover {
+    background-color: #1e506b;
+}
+
+td:nth-child(3),
+td:nth-child(4),
+td:nth-child(5) {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    th, td {
+        padding: 8px 10px;
+        font-size: 12px; /* Adjust font size for smaller screens */
+    }
+}
+
+
+
+.memory-icon {
+    position: relative; /* Keep it positioned absolutely */
+    left: 50%; /* Move to the center horizontally */
+    top: 50%; /* Move to the center vertically */
+    margin-top: 20px;
+    transform: translate(-50%, -50%); /* Offset by half of its size to center it */
+    font-size: 24px; /* Change the icon size here (adjust as needed) */
+}
+
+
+/* Smooth Transition for Background and Text */
+ body, .navbar, body.light-mode, body.dark-mode {
+     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+    height: 12px; /* Height of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #FFDF00; /* Thumb color */
+}
+
+::-webkit-scrollbar-track {
+    background: transparent; /* No background for the track */
+    border-radius: 6px; /* Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #FFFF00; /* Darker shade on hover */
+}
+

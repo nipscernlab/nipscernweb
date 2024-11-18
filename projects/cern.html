@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="google" content="notranslate">
+
+        <meta name="keywords" lang="en" content="sapho, cern, Scalable Architecture Processor for Hardware Optimization, ATLAS, AURA IDE, ALICE, compiler, cmm language, c+-, asm compiler, helvetia, Infinity Manager" />
+        <meta name="keywords" lang="pt"  content="sapho, cern, Processador de Arquitetura Escalável para Otimização de Hardware, ATLAS, AURA IDE, ALICE, compilador, linguagem cmm, c+-, compilador asm, helvetia, Infinity Manager" />
+        <meta name="keywords" lang="fr" content="sapho, cern, processeur d'architecture évolutive pour l'optimisation matérielle, ATLAS, AURA IDE, ALICE, compilateur, langage cmm, c+-, compilateur asm, helvetia, Infinity Manager" />
+        <meta name="keywords" lang="no" content="sapho, cern, skalerbar arkitekturprosessor for maskinvareoptimalisering, ATLAS, AURA IDE, ALICE, kompilator, cmm-språk, c+-, asm-kompilator, helvetia, Infinity Manager" />
+        <meta name="author" content="NIPSCERN" />
+        
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        
+        <meta name="description" lang="en" content="Explore a brief history of CERN, focusing on the ATLAS project and its groundbreaking discoveries. Learn how NIPSCERN contributes to cutting-edge research and technological advancements at CERN, highlighting key achievements in particle physics and their impact on our understanding of the universe." />
+        <meta name="description" lang="pt" content="Explore uma breve história do CERN, com foco no projeto ATLAS e suas descobertas inovadoras. Saiba como o NIPSCERN contribui para pesquisas de ponta e avanços tecnológicos no CERN, destacando as principais conquistas na física de partículas e seu impacto em nossa compreensão do universo." />
+        <meta name="description" lang="fr" content="Découvrez une brève histoire du CERN, en mettant l'accent sur le projet ATLAS et ses découvertes révolutionnaires. Découvrez comment le NIPSCERN contribue à la recherche de pointe et aux avancées technologiques du CERN, en mettant en lumière les principales réalisations de la physique des particules et leur impact sur notre compréhension de l'univers." />
+        <meta name="description" lang="no" content="Utforsk en kort historie om CERN, med fokus på ATLAS-prosjektet og dets banebrytende funn. Lær hvordan NIPSCERN bidrar til banebrytende forskning og teknologiske fremskritt ved CERN, og fremhever viktige prestasjoner innen partikkelfysikk og deres innvirkning på vår forståelse av universet." />
+        
+        <meta property="og:title" content="CERN History and ATLAS Project | NIPSCERN Lab" />
+        <meta property="og:description" content="Explore a brief history of CERN, focusing on the ATLAS project and its groundbreaking discoveries. Learn more now!" />
+        <meta property="og:image" content="/nipscernwebtest/assets/icons/icon_cern_atom-solid.svg" />
+        <meta property="og:url" content="https://nipscern.com" />
+        <meta property="og:type" content="website" />
+        
+        <link rel="apple-touch-icon" href="/nipscernwebtest/assets/icons/icon_cern_atom-solid.svg">
+        <meta name="msapplication-TileColor" content="#0033A0">
+        <meta name="theme-color" content="#0033A0">
+
+        
+        <title data-i18n="cern_title">CERN History and ATLAS Project | NIPSCERN Lab</title>
+        <link rel="icon" alt="Icon representing atom structure" href="/nipscernwebtest/assets/icons/icon_cern_atom-solid.svg" type="image/svg+xml" sizes="128x128" />
+
+         <!-- Google Fonts -->
+         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        
+        <!-- Bootstrap for layout -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- FontAwesome for icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+        <!-- Prism.js for syntax highlighting -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+
+        
+        <!-- AOS for animations -->
+        <link href="https://cdn.jsdelivr.net/npm/aos@next/dist/aos.css" rel="stylesheet">
+        
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/nipscernwebtest/css/cern.css">
+        <link rel="stylesheet" href="/nipscernwebtest/css/dark.css">
+        <link rel="stylesheet" href="/nipscernwebtest/css/footer.css">
+        
+        <!-- Custom JS -->
+        <script src="/nipscernwebtest/js/cern.js"></script>
+        <script src="/nipscernwebtest/js/schema.js"></script>
+    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container-fluid">
+                    <!-- Navbar Brand (Logo or Icon) -->
+                    <i alt="Cern Icon" class="fa-solid fa-atom cern-icon"></i>
+                    <!-- Toggler for Mobile Menu -->
+                    <button class="navbar-toggler custom-toggler" id="navbarToggler" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <!-- Collapsible Navbar Menu -->
+                    <div class="navbar-collapse custom-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="../index.html"><i class="fa-solid fa-house"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <a aria-label="History of CERN" data-i18n="cern_nav_history" class="nav-link" href="#cern">History of CERN</a>
+                            </li>
+                            <li class="nav-item">
+                                <a aria-label="ATLAS Project" data-i18n="cern_nav_atlas" class="nav-link" href="#atlas">ATLAS Project</a>
+                            </li>
+                            <li class="nav-item">
+                                <a aria-label="Media & Resources" data-i18n="cern_nav_media" class="nav-link" href="#media">Media &amp; Resources</a>
+                            </li>
+                            <li class="nav-item">
+                                <a aria-label="References" data-i18n="cern_nav_references" class="nav-link" href="#references">References</a>
+                            </li>
+                        </ul>
+                        
+                        <!-- Dark Mode Toggle Button -->
+                        <button class="theme-toggle" id="theme-toggle" title="Toggles light & dark" aria-label="auto" aria-live="polite">
+                            <svg class="sun-and-moon" aria-hidden="true">
+                                <mask class="moon" id="moon-mask">
+                                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                                    <circle cx="24" cy="10" r="6" fill="black" />
+                                </mask>
+                                <circle class="sun" cx="12" cy="12" r="6" mask="url(#moon-mask)" fill="currentColor" />
+                                <g class="sun-beams" stroke="currentColor">
+                                    <line x1="12" y1="1" x2="12" y2="3" />
+                                    <line x1="12" y1="21" x2="12" y2="23" />
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                    <line x1="1" y1="12" x2="3" y2="12" />
+                                    <line x1="21" y1="12" x2="23" y2="12" />
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                                </g>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <h1>
+                <i class="fa-solid fa-atom" style="font-size: 40px;"></i> <a data-i18n="cern_header_text">CERN History &amp; ATLAS Project</a>
+            </h1>
+            <p data-i18n="cern_subtitle" class="subtitle">Understanding the universe through particle physics.</p>
+        </section>
+        <div class="scroll-container">
+            <div class="invisible-scroll" id="leftScroll"></div>
+            <div id="container3D"></div>
+            <div class="invisible-scroll" id="rightScroll"></div>
+        </div>
+        <!-- History of CERN Section -->
+        <section class="content-section bg-light" id="cern">
+            <div class="content">
+                <h2><span class="material-symbols-outlined">
+                    timeline
+                    </span > <a data-i18n="cern_intro_text">History of CERN</a>
+                </h2>
+                <p data-i18n="cern_intro_cern">
+                    CERN, the European Organization for Nuclear Research, was founded in 1954 by 12 European countries in an effort to establish a world-class research facility to explore the mysteries of the universe. Today, it is one of the world’s largest and most respected centers for scientific research, with 23 member states and numerous global partnerships. CERN is primarily located in Geneva, Switzerland, with its facilities straddling the Franco-Swiss border.
+                </p>
+                <p data-i18n="cern_intro_mission">
+                    CERN's mission is to provide physicists with the necessary tools and infrastructure to conduct groundbreaking experiments in subatomic particle research, advancing our understanding of the universe. The organization has been at the forefront of several monumental scientific achievements.
+                </p>
+                <h3 data-i18n="cern_section_location_title">Location</h3>
+                <p data-i18n="cern_section_location">
+                    The main campus of CERN is located on the Franco-Swiss border, near Geneva, Switzerland. The Large Hadron Collider (LHC), the most famous of its particle accelerators, runs underground in a circular tunnel spanning 27 kilometers (17 miles), with parts of it in both Switzerland and France.
+                </p>
+                <img src="https://atlas.cern/sites/default/files/inline-images/Map_0.png" alt="LHC Location" class="responsive-img">
+                <p data-i18n="cern_section_image_lhc">
+                    Image: underground location of LHC and the four main experiments.
+                </p>
+                <br>
+                <h3 data-i18n="cern_section_achievements_title">Achievements</h3>
+                <p data-i18n="cern_section_achievements">
+                    CERN has contributed significantly to particle physics, not just through discoveries, but also through the development of technologies that impact society at large. One of CERN's most notable achievements is the construction of the Large Hadron Collider (LHC), the world's largest and most powerful particle accelerator, located 100 meters underground. The LHC has allowed scientists to conduct experiments that have expanded our understanding of particle physics and the forces governing the universe.
+                </p>
+                <img src="https://cds.cern.ch/record/2800984/files/CCC-v2022.png?subformat=icon-640" alt="CERN accelerator control center" class="responsive-img">
+                <p data-i18n="cern_section_image_ccc" class="image-description">Image: CERN's accelerator control center (CCC), where scientists monitor and control the operation of the Large Hadron Collider and other accelerators at the laboratory.</p>
+                <br>
+                <h3 data-i18n="cern_section_milestones_title">Key Milestones</h3>
+                <ul>
+                    <li><b>1954:</b> <a data-i18n="cern_milestone_1954">CERN is founded by 12 European countries.</a></li>
+                    <li><b>1989:</b> <a data-i18n="cern_milestone_1989">Tim Berners-Lee invents the World Wide Web at CERN to meet the demand for information sharing between physicists working in different parts of the world.</a></li>
+                    <li><b>2008:</b> <a data-i18n="cern_milestone_2008">the Large Hadron Collider (LHC), the world’s most powerful particle accelerator, begins operation.</a></li>
+                    <li><b>2012:</b> <a data-i18n="cern_milestone_2012">discovery of the Higgs boson particle, a milestone in particle physics that confirms the existence of the Higgs field, a key element in the Standard Model of particle physics.</a></li>
+                </ul>
+                <img src="https://hse.cern/sites/default/files/inline-images/ABOUT-CERN_OrganisationalStructure_EN_wide.png" alt="CERN Organizational Structure" class="responsive-img">
+                <p  data-i18n="cern_section_image_structure" class="image-description">Image: a diagram showing the organizational structure of CERN, highlighting its various departments and collaborations.</p>
+                <br>
+                <h3 data-i18n="cern_section_discoveries_title">Important Discoveries &amp; Experiments</h3>
+                <p data-i18n="cern_discovery_intro">
+                    CERN's discoveries have revolutionized our understanding of particle physics. Here are some of the most important experiments and findings:
+                </p>
+                <ul>
+                    <li>
+                        <b data-i18n="cern_discovery_higgs_title">The Higgs Boson Discovery (2012):</b> <a data-i18n="cern_discovery_higgs">one of the most famous experiments conducted at CERN was the search for the Higgs boson. This elusive particle was theorized to give mass to other particles. After decades of research, the Higgs boson was finally detected in 2012 by the ATLAS and CMS detectors at the LHC. This discovery earned scientists François Englert and Peter Higgs the Nobel Prize in Physics in 2013.</a>
+                    </li>
+                    <li>
+                        <b data-i18n="cern_discovery_web_title">The World Wide Web (1989):</b> <a data-i18n="cern_discovery_web">Tim Berners-Lee, a British scientist working at CERN, invented the World Wide Web as a means for researchers across the world to share and access data. This invention has since transformed communication, commerce, and global connectivity.</a>
+                    </li>
+                    <li>
+                        <b data-i18n="cern_discovery_antimatter_title">Antimatter Experiments:</b> <a data-i18n="cern_discovery_antimatter">CERN is also known for its research on antimatter. In 1995, CERN’s scientists created the first antihydrogen atoms. Understanding antimatter could lead to breakthroughs in fields ranging from energy to medical technology.</a>
+                    </li>
+                    <li>
+                        <b data-i18n="cern_discovery_quark_gluon_title">Quark-Gluon Plasma:</b> <a data-i18n="cern_discovery_quark_gluon">CERN's ALICE experiment has been instrumental in studying quark-gluon plasma, a state of matter thought to have existed just after the Big Bang. By colliding heavy ions at extreme energies, scientists at CERN recreate conditions similar to those at the birth of the universe.</a>
+                    </li>
+                </ul>
+                <br>
+                <h3 data-i18n="cern_section_curiosities_title">Curiosities about CERN</h3>
+                <ul>
+                    <li><b data-i18n="cern_curiosity_data_title">Data Processing:</b> <a data-i18n="cern_curiosity_data">CERN generates huge amounts of data, approximately 30 petabytes (30 million gigabytes) annually, which are processed by a global network of computing centers.</a></li>
+                    <li><b data-i18n="cern_curiosity_detector_title">The Atlas Detector:</b> <a data-i18n="cern_curiosity_detector"> the ATLAS detector at CERN is 45 meters long, 25 meters in diameter, and weighs as much as the Eiffel Tower!</a></li>
+                    <li><b data-i18n="cern_curiosity_collaboration_title">International Collaboration:</b> <a data-i18n="cern_curiosity_collaboration"> CERN employs scientists from more than 100 different nationalities, fostering a global environment for scientific progress.</a></li>
+                    <li><b data-i18n="cern_curiosity_black_holes_title">Black Hole Theories:</b> <a data-i18n="cern_curiosity_black_holes">some experiments at CERN have led to speculation about the potential to create micro black holes, although there is no risk to Earth, as such black holes would evaporate almost instantly.</a></li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- ATLAS Section -->
+        <section class="content-section" id="atlas">
+            <div class="content">
+                <h2><span class="material-symbols-outlined">
+                    public
+                    </span> <a data-i18n="cern_atlas_title">ATLAS Project</a>
+                </h2>
+                <p data-i18n="cern_atlas_experiment">
+                    The ATLAS experiment at CERN is one of the largest and most complex experiments ever constructed in particle physics. It is a general-purpose particle detector at the Large Hadron Collider (LHC), designed to explore the fundamental particles and forces that make up the universe. With a collaboration of thousands of scientists from all over the world, ATLAS is helping to answer some of the biggest questions in physics.
+                </p>
+                <p data-i18n="cern_atlas_discovery">
+                    ATLAS was instrumental in the discovery of the Higgs boson in 2012, a groundbreaking discovery that confirmed the existence of the Higgs field, a key component of the Standard Model of particle physics. Beyond the Higgs boson, ATLAS aims to detect a wide variety of phenomena, such as extra dimensions, supersymmetry, and particles that could explain the mysterious dark matter that makes up much of the universe.
+                </p>
+                <p data-i18n="cern_atlas_location">
+                    Located 100 meters underground, the ATLAS detector is 46 meters long, 25 meters in diameter, and weighs around 7,000 tons. Its vast size allows it to capture a wide range of particle interactions, providing researchers with invaluable data to further understand the subatomic world.
+                </p>
+                <br>
+                <h3 data-i18n="cern_atlas_nipscern_title">NIPSCERN's Contribution to ATLAS</h3>
+                <p data-i18n="cern_atlas_nipscern">
+                    The NIPSCERN Lab is actively involved in the ATLAS project. Researchers from the lab contribute to the analysis of the massive amounts of data generated by the particle collisions at the LHC. Using advanced computational tools and algorithms, NIPSCERN scientists help process and interpret the data, which is essential in identifying rare and significant particle interactions.
+                </p>
+                <img src="https://cds.cern.ch/record/1035456/files/0705021_04.jpg?subformat=icon-1440" alt="ATLAS experiment detector at CERN" class="responsive-img">
+                <p data-i18n="cern_atlas_experiment_image" class="image-description">Image: a view of the ATLAS experiment’s immense particle detector during construction at CERN. The detector spans 46 meters in length and is responsible for capturing data from high-energy particle collisions at the LHC.</p>
+                <br>
+                <h3 data-i18n="cern_atlas_goal_title">Objectives of the ATLAS Project</h3>
+                <ul>
+                    <li><b data-i18n="cern_atlas_study_title">Study the Higgs Boson:</b> <a data-i18n="cern_atlas_study">following the discovery of the Higgs boson, ATLAS continues to study its properties in more detail to better understand how particles acquire mass.</a></li>
+                    <li><b data-i18n="cern_atlas_search_title">Search for Dark Matter:</b> <a data-i18n="cern_atlas_search">one of ATLAS's most ambitious goals is to discover particles that could explain dark matter, an invisible form of matter that makes up roughly 27% of the universe.</a></li>
+                    <li><b data-i18n="cern_atlas_susy_title">Investigate Supersymmetry (SUSY):</b> <a data-i18n="cern_atlas_susy">ATLAS searches for evidence of supersymmetry, a theory that extends the Standard Model by predicting the existence of partner particles for every known particle, which could help solve mysteries like dark matter and unify forces.</a></li>
+                    <li><b data-i18n="cern_atlas_string_title">Explore Extra Dimensions:</b> <a data-i18n="cern_atlas_string">the experiment looks for signs of extra spatial dimensions, which theories like string theory suggest may exist beyond the three spatial dimensions we perceive.</a></li>
+                </ul>
+                <br>
+                <h3  data-i18n="cern_discovery_title">Significant Discoveries and Research Areas</h3>
+                <p data-i18n="cern_discovery_subtitle">
+                    In addition to the Higgs boson, ATLAS has produced significant insights in many areas of particle physics. Here are some notable contributions:
+                </p>
+                <ul>
+                    <li><b data-i18n="cern_measurement_title">Precision Measurements:</b> <a data-i18n="cern_measurement">ATLAS has made precise measurements of Standard Model processes, such as the production of W and Z bosons, which help refine our understanding of fundamental forces.</a></li>
+                    <li><b data-i18n="cern_quark_title">Top Quark Studies:</b> <a data-i18n="cern_quark">ATLAS has provided key data on the top quark, the heaviest known elementary particle, which plays a crucial role in testing the Standard Model.</a></li>
+                    <li><b data-i18n="cern_model_title">New Physics Beyond the Standard Model:</b> <a data-i18n="cern_model">ATLAS continues to explore potential new particles and forces beyond the Standard Model, such as hypothetical particles related to dark matter or exotic forms of matter like quark-gluon plasma.</a></li>
+                </ul>
+                <img src="https://atlas.cern/sites/default/files/2024-04/ATLAS-Wboson-production-v2-banner_0.jpg" alt="ATLAS Detector capturing particle collision data" class="responsive-img">
+                <p data-i18n="cern_discovery_image">Image: ATLAS provides first measurement of the W-boson width at the LHC.</p>
+                <h3 data-i18n="cern_facts_title">Interesting Facts about ATLAS</h3>
+                <ul>
+                    <li><b data-i18n="cern_scale_title">Scale of Collaboration:</b> <a data-i18n="cern_scale">ATLAS involves around 3,000 scientists from over 180 institutions in 38 countries, making it one of the most collaborative scientific projects in history.</a></li>
+                    <li><b data-i18n="cern_data_title">Data Volume:</b> <a data-i18n="cern_data">the ATLAS experiment produces a massive amount of data – over 10 petabytes per year, requiring advanced computing networks across the globe to process the information.</a></li>
+                    <li><b data-i18n="cern_detector_title">Complexity of the Detector:</b> <a data-i18n="cern_detector">ATLAS is composed of multiple layers of different types of detectors that measure various particle properties, including their paths, energy, and momentum.</a></li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Media Section -->
+        <section class="content-section" id="media">
+            <div class="content">
+                <h2><span class="material-symbols-outlined">
+                    slideshow
+                    </span> <a data-i18n="cern_media_resources">Media &amp; Resources</a>
+                </h2>
+                <div class="video-container">
+                    <iframe aria-label="Footage CERN" scrolling="no"  src="/nipscernwebtest/assets/videos/video_cern_CERN-FOOTAGE-2023-017-001-2160p.mp4" allowfullscreen></iframe>
+                </div>
+                <br>
+                <div class="video-container">
+                    <!-- Correct YouTube embed link format -->
+                    <iframe aria-label="What's Really Happening at CERN" width="600" height="338" src="https://www.youtube.com/embed/12kjiZMuN3Q" title="ATLAS Experiment Video" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <p data-i18n="cern_media_resources_subtitle">For more detailed insights into CERN's work, watch the videos above or explore additional articles and resources below.</p>
+            </div>
+        </section>
+        
+        <!-- References Section -->
+        <section class="content-section bg-light" id="references">
+            <div class="content">
+                <h2><span class="material-symbols-outlined">
+                    quick_reference_all
+                    </span> <a data-i18n="cern_media_references">References</a>
+                </h2>
+                <p data-i18n="cern_media_references_title">This page includes information from a variety of sources, offering both detailed insights and easy-to-understand resources about CERN and the ATLAS project:</p>
+                <ul class="references">
+                    <li><span class="material-symbols-outlined">captive_portal</span><a data-i18n="cern_media_references_cern" href="https://home.cern" target="_blank">CERN Official Website</a></li>
+                    <li><span class="material-symbols-outlined">article</span><a data-i18n="cern_media_references_atlas"  href="https://atlas.cern" target="_blank">ATLAS Experiment Overview</a></li>
+                    <li><span class="material-symbols-outlined">
+                        translate
+                        </span><a data-i18n="cern_media_references_wiki" href="https://en.wikipedia.org/wiki/CERN" target="_blank">Wikipedia - CERN</a>
+                    </li>
+                    <li><span class="material-symbols-outlined">article</span><a data-i18n="cern_media_references_nature" href="https://www.nature.com/articles/498281a" target="_blank">Nature Article on Higgs Discovery</a></li>
+                    <li><span class="material-symbols-outlined">
+                        translate
+                        </span><a data-i18n="cern_media_references_wiki_atlas" href="https://en.wikipedia.org/wiki/ATLAS_experiment" target="_blank">Wikipedia - ATLAS Experiment</a>
+                    </li>
+                    <li><span class="material-symbols-outlined">article</span><a data-i18n="cern_media_references_higgs" href="https://cds.cern.ch/record/2128859" target="_blank">CERN Document Server - Higgs Boson Discovery Paper</a></li>
+                    <li><span class="material-symbols-outlined">
+                        blur_on
+                        </span><a data-i18n="cern_media_references_model" href="https://home.cern/science/physics/standard-model" target="_blank">CERN - Standard Model of Particle Physics</a>
+                    </li>
+                    <li><span class="material-symbols-outlined">article</span><a data-i18n="cern_media_references_matter"  href="https://www.nature.com/articles/d41586-018-05546-2" target="_blank">Nature - The Hunt for Dark Matter</a></li>
+                    <li><span class="material-symbols-outlined">
+                        experiment
+                        </span><a data-i18n="cern_media_references_exp" href="https://home.cern/science/experiments" target="_blank">CERN Experiments Overview</a>
+                    </li>
+                    <li><span class="material-symbols-outlined">
+                        newspaper
+                        </span><a data-i18n="cern_media_references_magazine" href="https://cerncourier.com/cern-courier-magazine/" target="_blank">CERN Courier Magazine</a>
+                    </li>
+                </ul>
+            </div>
+            <button aria-label="Back Top Button" id="backToTopBtn">
+                <span class="material-symbols-outlined">navigation</span>
+            </button>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer text-center py-4">
+            <div class="supporters">
+                <a href="https://home.cern/" target="_blank" class="supporter cern-logo">
+                <img src="/nipscernwebtest/assets/icons/icon_home_CERN-Embleme.png" alt="CERN Logo">
+                </a>
+                <a href="https://www.ufjf.br/" target="_blank" class="supporter ufjf-logo">
+                <img src="/nipscernwebtest/assets/icons/icon_home_brasao_UFJF.png" alt="UFJF Logo">
+                </a>
+                <a href="https://cnpq.br/" target="_blank" class="supporter cnpq-logo">
+                <img src="/nipscernwebtest/assets/icons/icon_home_cnpq.svg" alt="CNPq Logo">
+                </a>
+            </div>
+            <p>NIPSCERN Lab.</p>
+            <p>
+                <a data-i18n="cern_license">Licensed under</a> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a>.
+            </p>
+        </footer>
+        
+          <!-- Bootstrap JS for dropdown and smooth scroll -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        
+        <!-- Include jQuery UI for easing -->
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        
+         <!-- Prism.js for Syntax Highlighting -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+        
+        <!-- AOS for animations -->
+        <script src="https://cdn.jsdelivr.net/npm/aos@next/dist/aos.js"></script>
+        <script>
+            AOS.init(); // Initialize AOS
+        </script>
+
+        <!-- 3D Model Script -->
+        <script type="module" src="/nipscernwebtest/js/3Dmodel.js"></script>
+        <script src="/nipscernwebtest/js/dark.js"></script>
+        <script src="/nipscernwebtest/js/top.js" ></script>
+
+    </body>
+</html>

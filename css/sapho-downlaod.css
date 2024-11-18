@@ -1,0 +1,172 @@
+body {
+    background-color: #0D1B3A;
+    color: #FFD700;
+    font-family: 'Lato', sans-serif;
+}
+
+.title {
+    margin-top: 1rem;
+    font: 2.5em/1.4 "Roboto Condensed";
+    letter-spacing: 2px;
+    color: gold;
+    font-weight: 900; /* Heavier font weight */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Adds depth */
+}
+
+
+.subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    color: #FAF0DC;
+}
+
+.back-icon {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #FFD700;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: transform 0.3s, color 0.3s; /* Add transition for transform and color */
+}
+
+.back-icon:hover {
+    color: #FAF0DC;
+    transform: translateX(-5px);
+}
+
+
+
+/* Button Styles */
+.btn {
+    font-family: 'Lato', sans-serif;
+    font-weight: 500; /* Medium weight for visibility */
+    padding: 8px 18px; /* Comfortable padding for all buttons */
+    border-radius: 25px; /* Smooth rounded corners */
+    font-size: 1.0rem; /* Slightly smaller font size for consistency */
+    margin: 8px;
+    text-decoration: none;
+    color: #0033A0; /* Default text color */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Primary Button */
+.btn-primary {
+    background-color: #FFD700; /* Bright gold */
+    border: 2px solid #FFD700;
+    color: #0033A0; /* Dark blue text */
+}
+.btn-primary:hover {
+    background-color: #FAF0DC; /* Light gold on hover */
+    border-color: #FAF0DC;
+    color: #0033A0;
+}
+.btn-primary:active {
+    background-color: #B8860B; /* Dark gold */
+    border-color: #8B6914;
+    transform: scale(0.95); /* Scale down on click */
+    color: #0033A0;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background-color: #919aa1; /* Soft gray-blue */
+    border: 2px solid #919aa1;
+    color: #FAF0DC; /* Light gold text */
+}
+.btn-secondary:hover {
+    background-color: #5a6268; /* Darker gray-blue on hover */
+    border-color: #5a6268;
+    color: #FAF0DC;
+}
+.btn-secondary:active {
+    background-color: #3d464e; /* Even darker gray-blue on click */
+    border-color: #3d464e;
+    transform: scale(0.95); /* Scale down on click */
+    color: #FAF0DC;
+}
+
+/* Hover Effect for Both Buttons */
+.buttons .btn:hover {
+    transform: translateY(-2px); /* Subtle lift on hover */
+}
+
+/* Button Container for Proper Spacing */
+.buttons {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    align-items: center;
+    justify-content: center; /* Align to the left */
+}
+
+.btn-circle {
+    width: 40px;  /* Set width and height to the same value */
+    height: 40px;
+    border-radius: 50%;  /* Makes the button circular */
+    padding: 0;  /* Remove extra padding for centering the icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;  /* Adjust icon size */
+}
+
+.btn-circle i {
+    margin: 0;  /* Center the icon within the circle */
+    color: #0033A0;  /* Icon color */
+}
+
+/* Base style for thank-you message, hidden initially */
+.thank-you-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    font-size: 1.5rem;
+    color: #FFD700;
+    background: linear-gradient(135deg, #1E2A38, #3C4A5A);
+    padding: 20px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    opacity: 0; /* Start invisible */
+    transition: opacity 0.6s ease, transform 0.6s ease; /* Smooth transitions */
+}
+
+/* Class to show the message smoothly */
+.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1); /* Scale up smoothly */
+}
+
+/* SVG icon styling */
+.svg-icon {
+    width: 60px;
+    height: 60px;
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+    height: 12px; /* Height of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #FFDF00; /* Thumb color */
+}
+
+::-webkit-scrollbar-track {
+    background: transparent; /* No background for the track */
+    border-radius: 6px; /* Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #FFFF00; /* Darker shade on hover */
+}
+
+/* Animation */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}

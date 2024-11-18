@@ -1,0 +1,82 @@
+.language-logo {
+     display: inline-flex;
+     vertical-align: middle;
+    /* Aligns the flag vertically with the text */
+     margin-right: 10px;
+    /* Space between the logo and the button */
+}
+/* Language Switcher */
+ .language-switcher select {
+     background-color: #0056b3;
+     color: white;
+     border-radius: 5px;
+     padding: 5px;
+     transition: background-color 0.2s;
+}
+ .language-switcher select:hover {
+     background-color: #004494;
+}
+/* Dropdown Menu */
+ .group:hover .absolute {
+     display: block;
+    /* Show on hover */
+}
+/* Dropdown Styling with Fade Animation */
+ #projects-dropdown {
+     opacity: 0;
+     transform: translateY(-10px);
+     transition: opacity 0.3s ease, transform 0.3s ease;
+     display: none;
+    /* Hidden by default */
+}
+ #projects-dropdown.active {
+     opacity: 1;
+     transform: translateY(0);
+     display: block;
+    /* Display when active */
+}
+/* Prevent flickering by keeping it visible when active */
+ nav .relative:hover #projects-dropdown {
+     display: block;
+}
+/* Language Dropdown Styles */
+ #language-dropdown {
+     display: none;
+    /* Initially hidden */
+     opacity: 0;
+     margin-left: 30px;
+     transform: translateY(-10px);
+     transition: opacity 0.3s ease, transform 0.3s ease;
+     z-index: 999999;
+}
+ #language-dropdown.show {
+     display: block;
+     opacity: 1;
+     transform: translateY(0);
+     margin-left: 30px;
+     z-index: 999999;
+}
+/* Button styles */
+ #language-button {
+     display: inline;
+     align-items: center;
+    /* Keep logo and text vertically aligned */
+     justify-content: flex-start;
+    /* Align items to the left */
+     cursor: pointer;
+     min-width: 150px;
+}
+/* Language dropdown links */
+ #language-dropdown a {
+     display: flex;
+     align-items: center;
+}
+ #language-dropdown a img {
+     width: 20px;
+     margin-right: 10px;
+}
+/* Animation fix */
+ .language-switcher:hover #language-dropdown {
+     display: block;
+}
+ 
