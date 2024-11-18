@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="google" content="notranslate">
+
+        <meta name="keywords" lang="en" content="sapho, cern, Scalable Architecture Processor for Hardware Optimization, ALICE, compiler" />
+        <meta name="keywords" lang="pt" content="sapho, cern, Processador de Arquitetura Escalável para Otimização de Hardware, ALICE, compilador" />
+        <meta name="keywords" lang="fr" content="sapho, cern, Processeur d'Architecture Évolutive pour l'Optimisation du Matériel, ALICE, compilateur" />
+        <meta name="keywords" lang="no" content="sapho, cern, Skalerbar Arkitekturprosessor for Maskinvareoptimalisering, ALICE, kompilator" />
+        
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+        <meta name="description" content="ALICE - Assembly Logical Instruction for C+- Engine, is an innovative ASM compiler optimized for C+- code, turning complex logic into instructions for scalable processors.">
+        <meta name="description" content="ALICE - Assembly Logical Instruction for C+- Engine, é um compilador ASM inovador otimizado para código C+-, transformando lógica complexa em instruções para processadores escaláveis.">
+        <meta name="description" content="ALICE - Assembly Logical Instruction for C+- Engine, est un compilateur ASM innovant optimisé pour le code C+-, transformant la logique complexe en instructions pour les processeurs évolutifs.">
+        <meta name="description" content="ALICE - Assembly Logical Instruction for C+- Engine, er en innovativ ASM-kompilator optimalisert for C+-kode, og gjør kompleks logikk til instruksjoner for skalerbare prosessorer.">
+        <meta property="og:title" content="ALICE - C+- Compiler" />
+        <meta property="og:description" content="ALICE - Assembly Logical Instruction for C+- Engine, is an innovative ASM compiler optimized for C+- code, turning complex logic into instructions for scalable processors." />
+        <meta property="og:image" content="/nipscernwebtest/assets/icons/icon_alice_star-of-life-solid.svg" />
+        <meta property="og:url" content="https://nipscern.com//projects//alice" />
+        <meta property="og:type" content="website" />
+        
+        
+        <link rel="icon" href="/nipscernwebtest/assets/icons/icon_alice_star-of-life-solid.svg" type="image/svg+xml" sizes="128x128" />
+        
+        <meta name="author" content="nipscern" />
+        <title data-i18n="alice_title">ALICE - Assembly Logical Instruction for C+- Engine | NIPSCERN Lab</title>
+        
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+        <!-- Bootstrap for layout and components -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- FontAwesome for icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+        <!-- Prism.js for syntax highlighting -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+
+        <!-- AOS for animations -->
+        <link href="https://cdn.jsdelivr.net/npm/aos@next/dist/aos.css" rel="stylesheet">
+
+        <!-- Custom Styles -->
+        <link rel="stylesheet" href="/nipscernwebtest/css/alice.css">
+        <link rel="stylesheet" href="/nipscernwebtest/css/dark.css">
+        <link rel="stylesheet" href="/nipscernwebtest/css/footer.css">
+
+    </head>
+    <body class="dark-mode">
+        <!-- Header with Dropdown Menu -->
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container-fluid">
+                    <!-- Navbar Brand (Logo or Icon) -->
+                    <i class="fa-solid fa-star-of-life" style="font-size: 40px; background: linear-gradient(45deg, #960018 20%, #960018 40%, #ffcccb 100%, #ffcccb 100%); -webkit-background-clip: text; color: transparent;"></i>
+                    <!-- Toggler for Mobile Menu -->
+                    <button class="navbar-toggler custom-toggler" id="navbarToggler" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <!-- Collapsible Navbar Menu -->
+                    <div class="navbar-collapse custom-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="../index.html"><i class="fa-solid fa-house"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <a data-i18n="alice_overview" class="nav-link" href="#overview">Overview</a>
+                            </li>
+                            <li class="nav-item">
+                                <a data-i18n="alice_compiler_flow" class="nav-link" href="#comp-flow">Compilation Flow</a>
+                            </li>
+                            <li class="nav-item">
+                                <a data-i18n="alice_video_diagram" class="nav-link" href="#video-diagram">Video &amp; Diagram</a>
+                            </li>
+                            <li class="nav-item">
+                                <a data-i18n="alice_documentation" class="nav-link" href="#docs">Documentation</a>
+                            </li>
+                        </ul>
+                        <!-- Dark Mode Toggle Button -->
+                        <button class="theme-toggle" id="theme-toggle" title="Toggles light & dark" aria-label="auto" aria-live="polite">
+                            <svg class="sun-and-moon" aria-hidden="true">
+                                <mask class="moon" id="moon-mask">
+                                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                                    <circle cx="24" cy="10" r="6" fill="black" />
+                                </mask>
+                                <circle class="sun" cx="12" cy="12" r="6" mask="url(#moon-mask)" fill="currentColor" />
+                                <g class="sun-beams" stroke="currentColor">
+                                    <line x1="12" y1="1" x2="12" y2="3" />
+                                    <line x1="12" y1="21" x2="12" y2="23" />
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                    <line x1="1" y1="12" x2="3" y2="12" />
+                                    <line x1="21" y1="12" x2="23" y2="12" />
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                                </g>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        
+        <!-- Section: Overview -->
+        <section id="overview" class="container text-center py-5">
+            <h1 data-i18n="alice_title_text" class="gradient-title">*ALICE: Assembly Logical Instruction for C+- Engine</h1>
+            <p data-i18n="alice_subtitle_text" class="lead">An innovative assembly engine optimized for C+- code, turning complex logic into optimized instructions for scalable processors.</p>
+            <div class="buttons mt-4">
+                <a href="https://github.com/chrysthofer/Alice" class="btn btn-primary">
+                <i class="fab fa-github"></i> GitHub
+                </a>
+                <a data-i18n="alice_documentation_text" href="#docs" class="btn btn-secondary">Go to Documentation</a>
+            </div>
+        </section>
+        <!-- Section: Compilation Flow -->
+        <section id="flow" class="container py-5">
+            <h2 data-i18n="alice_compiler_flow_text" class="text-center">Compilation Flow</h2>
+            <div class="flow-cards">
+                <div class="flow-card">
+                    <h3>Input: <code>test.cmm</code></h3>
+                    <p data-i18n="alice_input">Your source C+- code file, the starting point of the compilation process.</p>
+                </div>
+                <div class="flow-card">
+                    <h3>Tokenization: <code>lexer.l</code></h3>
+                    <p data-i18n="alice_token">Breaks down the input file into tokens (keywords, identifiers, etc.).</p>
+                </div>
+                <div class="flow-card">
+                    <h3>Parsing: <code>parser.y</code></h3>
+                    <p data-i18n="alice_parser">Analyzes token sequences based on grammar rules to create the syntax tree.</p>
+                </div>
+                <div class="flow-card">
+                    <h3><a data-i18n="alice_ast_construction_title">AST Construction:</a> <code>ast.c</code></h3>
+                    <p data-i18n="alice_ast_construction">Generates the Abstract Syntax Tree (AST) representing the program structure.</p>
+                </div>
+                <div class="flow-card">
+                    <h3><a data-i18n="alice_lexical_analysis_title">Generated Lexical Analysis:</a> <code>lex.yy.c</code></h3>
+                    <p data-i18n="alice_lexical_analysis">The output from the lexical analyzer based on the tokens.</p>
+                </div>
+                <div class="flow-card">
+                    <h3><a data-i18n="alice_parsing_title">Generated Parsing:</a> <code>parser.tab.c</code></h3>
+                    <p data-i18n="alice_parsing">Generated parsing logic, derived from the grammar rules.</p>
+                </div>
+                <div class="flow-card">
+                    <h3><a data-i18n="alice_handling_title">Include Handling:</a> <code>handle_include.c</code></h3>
+                    <p data-i18n="alice_handling">Handles all file includes specified within the source code.</p>
+                </div>
+                <div class="flow-card">
+                    <h3><a data-i18n="alice_output">Output:</a><code>test.asm</code></h3>
+                    <p data-i18n="alice_output_title">Final assembly code, ready to run on the processor.</p>
+                </div>
+            </div>
+            <br>
+            <p class="text-center"><a data-i18n="alice_flow_comp_title">The compilation transforms</a> <code>test.cmm</code> <a data-i18n="alice_flow_comp_inter">into</a> <code>test.asm</code> <a data-i18n="alice_flow_comp_final">through these sequential steps.</a></p>
+        </section>
+        
+        <!-- Compilation Flow Path -->
+        <!--This is the main container that contains the whole timeline.-->
+        <section id="comp-flow" class="design-section" responsive-section>
+            <div class="timeline">
+                <div class="timeline-empty">
+                </div>
+                <div class="timeline-middle">
+                    <div class="timeline-circle"></div>
+                </div>
+                <div class="timeline-component-tiny timeline-component timeline-content">
+                    <h3><i class="fas fa-file-code"></i> test.cmm</h3>
+                    <p data-i18n="alice_flow_input_file">This is the input file.</p>
+                    <pre class="language-c">
+int a = 5;
+int b = 10;
+int c = a + b;
+return c;
+    </pre>
+                    <span class="material-symbols-outlined"> manufacturing</span> <a data-i18n="alice_flow_exe">Which goes directly to myccompiler.exe</a>
+                </div>
+                <div class="timeline-component timeline-content">
+                    <h3><i class="material-symbols-outlined">
+                        scan
+                        </i>
+                        lexer.l
+                    </h3>
+                    <p data-i18n="alice_token_process">Here, the compiler starts tokenizing the text stream from test.cmm.</p>
+                    <!-- Card for lexer code -->
+                    <div class="code-card">
+                        <div class="code-box">
+                            <pre>
+                <code class="language-c">
+...
+digit             [0-9]
+letter            [a-zA-Z]
+identifier        {letter}({letter}|{digit})*
+number            -?{digit}+
+float_number      [0-9]*\.[0-9]+([eE][+-]?[0-9]+)?
+scientific_number [0-9]+(\.[0-9]*)?[eE][+-]?[0-9]+
+...
+
+"int"       { return INT;        }
+"="         { return ASSIGN;     }
+";"         { return SEMICOLON;  }
+...
+
+{identifier} {
+    yylval.sval = strdup(yytext);
+    return IDENTIFIER;
+}
+{number}    {
+    yylval.ival = atoi(yytext);
+    return NUMBER;
+}
+...
+                </code>
+            </pre>
+                        </div>
+                    </div>
+                    <br>
+                    <p data-i18n="alice_token_generated">Tokens: </p>
+                    <code>
+                    INT IDENTIFIER ASSIGN NUMBER SEMICOLON INT IDENTIFIER ASSIGN NUMBER SEMICOLON INT IDENTIFIER ASSIGN IDENTIFIER PLUS IDENTIFIER SEMICOLON
+                    </code>
+                </div>
+                <div class="timeline-middle">
+                    <div class="timeline-circle"></div>
+                </div>
+                <div class="timeline-empty">
+                </div>
+                <div class="timeline-empty">
+                </div>
+                <div class="timeline-middle">
+                    <div class="timeline-circle"></div>
+                </div>
+                <div class=" timeline-component timeline-content">
+                    <h3><img src="/nipscernwebtest/assets/icons/icon_alice_bison.svg" alt="Bison Icon" class="bison-icon">
+                        parser.y
+                    </h3>
+                    <p data-i18n="alice_token_stream">Next, the *ALICE compiler checks if the input stream of tokens is valid according to the grammar. </p>
+                    <!-- Card for parser code -->
+                    <div class="code-card">
+                        <div class="code-box">
+                            <pre>
+                <code class="language-c">
+                
+%token INT
+%token PLUS ASSIGN SEMICOLON
+%token sval IDENTIFIER
+%token ival NUMBER
+...
+
+stmt:
+    IDENTIFIER ASSIGN expr SEMICOLON   { $$ = create_node('=', NULL, $3, NULL, NULL, 0, 0.0, 0.0, $1);   }
+    | RETURN expr SEMICOLON            { $$ = create_node('R', $2, NULL, NULL, NULL, 0, 0.0, 0.0, NULL); }
+expr:
+    expr PLUS expr                     { $$ = create_node('+', $1, $3, NULL, NULL, 0, 0.0, 0.0, NULL);   }
+...
+                </code>
+            </pre>
+                        </div>
+                    </div>
+                    <br>
+                    <p data-i18n="alice_nodes">Several nodes are created by the 'create_node' function. In this example, five productions/reductions are made:</p>
+                    <code>
+                    decl: INT IDENTIFIER ASSIGN expr SEMICOLON { $$ = create_node('=', NULL, $4, NULL, NULL, 0, 0.0, 0.0, $2); } (3 times);<br><br>
+                    expr: expr PLUS expr { $$ = create_node('+', $1, $3, NULL, NULL, 0, 0.0, 0.0, NULL); }<br><br>
+                    stmt: RETURN expr SEMICOLON { $$ = create_node('R', $2, NULL, NULL, NULL, 0, 0.0, 0.0, NULL); }<br><br>
+                    decls: decls decl { $$ = create_node(';', $1, $2, NULL, NULL, 0, 0.0, 0.0, NULL); }<br><br>
+                    program: decls { $$ = create_node('RTN', $1, NULL, NULL, NULL, 0, 0.0, 0.0, NULL); generate_code_from_ast($$); }<br><br>
+                    </code>   
+                </div>
+                <div class="timeline-component timeline-content">
+                    <h3><img src="/nipscernwebtest/assets/icons/icon_alice_ast.svg" alt="AST Icon" class="ast-icon"> ast.c</h3>
+                    <p data-i18n="alice_asm_output">Finally, the *ALICE compiler generates the ASM output code based on the nodes created by the create_node function in the previous step.</p>
+                    <!-- Card for ast code -->
+                    <div class="code-card">
+                        <div class="code-box">
+                            <pre>
+                <code class="language-c">
+ASTNode *create_node(int type, ASTNode *left, ASTNode *right, ASTNode *back, ASTNode *forth, int ival, float fval, double dval, char *sval)
+{
+    ASTNode *node = (ASTNode *)malloc(sizeof(ASTNode));
+    node->type = type;
+    node->left = left;
+    node->right = right;
+    node->back = back;
+    node->forth = forth;
+    if (sval)
+    {
+        node->value.sval = strdup(sval);
+    }
+    else if (type == 'FL')
+    {
+        node->value.fval = fval;
+    }
+    else if (type == 'DB')
+    {
+        node->value.dval = dval;
+    }
+    else
+    {
+        node->value.ival = ival;
+    }
+    return node;
+}
+
+                </code>
+            </pre>
+                        </div>
+                    </div>
+                    <br>
+                    <p data-i18n="alice_nodes_title">Nodes: </p>
+                    <code>
+                    'N'   (2x)<br>
+                    '='   (3x)<br>
+                    'I'   (5x)<br>
+                    '+'   (1x)<br>
+                    'R'   (1x)<br>
+                    'RTN' (1x)<br>
+                    </code>
+                </div>
+                <div class="timeline-middle">
+                    <div class="timeline-circle"></div>
+                </div>
+                <div class="timeline-empty">
+                </div>
+                <div class="timeline-empty">
+                </div>
+                <div class="timeline-middle">
+                    <div class="timeline-circle"></div>
+                </div>
+                <div class="timeline-component-tiny timeline-component timeline-content">
+                    <h3><i class="fas fa-file-code"></i> test.asm</h3>
+                    <p data-i18n="alice_asm_output_text">This is the output file.</p>
+                    <code>
+                    LOAD 5<br>
+                    SET a<br>
+                    LOAD 10<br>
+                    SET b<br>
+                    LOAD a<br>
+                    ADD b<br>
+                    SET c<br>
+                    PLD c<br>
+                    RETURN<br>
+                    ROOT
+                    </code>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section: Videos -->
+        <section id="video-diagram" class="container py-5 text-center">
+            <h2 data-i18n="alice_video_example_title">Example Video</h2>
+            <video alt="ALICE Video Example" autoplay loop muted playsinline class="video-loop">
+                <source src="/nipscernwebtest/assets/videos/video_alice_action.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </section>
+        <!-- Section: Compilation Flow Diagram -->
+        <section id="compilation-flow" class="container py-5 text-center">
+            <h2 data-i18n="alice_diagram_flow_title">Compilation Flow Diagram</h2>
+            <div class="buttons mt-4">
+                <button data-i18n="alice_diagram_flow_button" id="toggle-diagram" class="btn btn-primary">Show Diagram</button>
+            </div>
+            <!-- SVG Diagram (Initially Hidden) -->
+            <div id="diagram-container" class="diagram-wrapper">
+                <img alt="Compilation Flow Diagram" src="/nipscernwebtest/assets/images/image_alice_diagram.png" class="responsive-svg" >
+            </div>
+        </section>
+        <section class="features" id="features">
+            <h2 data-i18n="alice_features_title" class="text-center text-4xl font-bold mb-8">Features</h2>
+            <div class="feature-list">
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500">
+                    <i class="material-symbols-outlined">bolt</i>
+                    <h3 data-i18n="alice_fast_compilation_title">Fast Compilation</h3>
+                    <p data-i18n="alice_fast_compilation">*ALICE compiles C+- code quickly and efficiently for optimized performance.</p>
+                </div>
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500" data-aos-delay="100">
+                    <i class="material-symbols-outlined">folder_open</i>
+                    <h3 data-i18n="alice_multi_file_title">Multi-file Support</h3>
+                    <p data-i18n="alice_multi_file">Compile multiple files at once with precise error tracking by line.</p>
+                </div>
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500" data-aos-delay="200">
+                    <i class="material-symbols-outlined">manufacturing</i>
+                    <h3 data-i18n="alice_stack_size_title">Custom Stack Size</h3>
+                    <p data-i18n="alice_stack-size">Adjustable stack size for faster processing and hardware optimization.</p>
+                </div>
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                    <i class="material-symbols-outlined">balance</i>
+                    <h3 data-i18n="alice_processor_title">Processor Choice</h3>
+                    <p data-i18n="alice_processor">Select between fixed-point or floating-point processor types.</p>
+                </div>
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500" data-aos-delay="400">
+                    <i class="material-symbols-outlined">code_blocks</i>
+                    <h3 data-i18n="alice_directive_title">Directive Management</h3>
+                    <p data-i18n="alice_directive">Supports a wide range of directives with customizable parameters.</p>
+                </div>
+            </div>
+        </section>
+        <section class="future-features" id="future-features">
+            <h2 data-i18n="alice_future_features" class="text-center text-4xl font-bold mb-8">Future Features</h2>
+            <div class="feature-list">
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500">
+                    <i class="material-symbols-outlined">lightbulb</i>
+                    <h3 data-i18n="alice_enhanced_error_title">Enhanced Error Reporting</h3>
+                    <p data-i18n="alice_enhanced_error">More detailed error and warning reports.</p>
+                </div>
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500" data-aos-delay="100">
+                    <i class="material-symbols-outlined">speed</i>
+                    <h3 data-i18n="alice_performance_optm_title">Performance Optimization</h3>
+                    <p data-i18n="alice_performance_optm">Faster compilation and built-in code optimization tips.</p>
+                </div>
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500" data-aos-delay="200">
+                    <i class="material-symbols-outlined">extension</i>
+                    <h3 data-i18n="alice_plugin_title">Plugin System</h3>
+                    <p data-i18n="alice_plugin">Support for add-ons and community-built tools.</p>
+                </div>
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                    <i class="material-symbols-outlined">trending_up</i>
+                    <h3 data-i18n="alice_stonks_title">Statistical Insights</h3>
+                    <p data-i18n="alice_stonks">Data-driven suggestions for code improvements.</p>
+                </div>
+                <div class="feature-item" data-aos="fade-up" data-aos-duration="500" data-aos-delay="400">
+                    <i class="material-symbols-outlined">security</i>
+                    <h3 data-i18n="alice_security_title">Security Enhancements</h3>
+                    <p data-i18n="alice_security">Improved reliability and security features.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section: Documentation -->
+        <section id="docs" class="container py-5 text-center">
+            <h2 data-i18n="alice_alice_documentation_title">ALICE Documentation</h2>
+            <p data-i18n="alice_alice_documentation">Find detailed information and guides about the ALICE Assembly Logical Instruction for C Engine.</p>
+            <div class="buttons mt-4"> <a data-i18n="alice_alice_documentation_button" href="#docs" href="#docs" class="btn btn-secondary">Read Documentation</a></div>
+        </section>
+        <button aria-label="Back Top Button" id="backToTopBtn">
+            <span class="material-symbols-outlined">navigation</span>
+        </button>
+        <!-- Footer -->
+        <footer class="footer text-center py-4">
+            <div class="supporters">
+                <a href="https://home.cern/" target="_blank" class="supporter cern-logo">
+                <img src="/nipscernwebtest/assets/icons/icon_home_CERN-Embleme.png" alt="CERN Logo">
+                </a>
+                <a href="https://www.ufjf.br/" target="_blank" class="supporter ufjf-logo">
+                <img src="/nipscernwebtest/assets/icons/icon_home_brasao_UFJF.png" alt="UFJF Logo">
+                </a>
+                <a href="https://cnpq.br/" target="_blank" class="supporter cnpq-logo">
+                <img src="/nipscernwebtest/assets/icons/icon_home_cnpq.svg" alt="CNPq Logo">
+                </a>
+            </div>
+            <p>NIPSCERN Lab.</p>
+            <p>
+                <a data-i18n="alice_alice_license">Licensed under</a> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a>.
+            </p>
+        </footer>
+        
+        <!-- jQuery (for Bootstrap compatibility and smooth scroll) -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- Bootstrap JS Bundle (includes Popper.js) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- jQuery UI for additional UI effects -->
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+        <!-- Prism.js for syntax highlighting -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+
+        <!-- AOS for animations -->
+        <script src="https://cdn.jsdelivr.net/npm/aos@next/dist/aos.js"></script>
+        <script>
+            AOS.init(); // Initialize AOS
+        </script>
+
+        <!-- Custom JavaScript -->
+        <script src="/nipscernwebtest/js/alice.js"></script>
+        <script src="/nipscernwebtest/js/dark.js"></script>
+        <script src="/nipscernwebtest/js/top.js"></script>
+    </body>
+</html>

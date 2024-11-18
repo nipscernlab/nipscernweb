@@ -1,0 +1,50 @@
+* {
+     outline: transparent;
+     -webkit-tap-highlight-color: transparent;
+}
+ #menu_checkbox {
+     display: none;
+}
+ label {
+     position: absolute;
+     top: 50%;
+     right: 0;
+     left: 0;
+     margin: 0 auto;
+     display: block;
+     width: 30px;
+     height: 30px;
+     transform: translateY(-50%);
+     transition: 0.3s ease transform;
+     cursor: pointer;
+     z-index: 9999;
+}
+ label div {
+     width: 5px;
+     height: 5px;
+     background-color: #004494;
+     margin-left: 0;
+     margin-bottom: 6px;
+     border-radius: 4px;
+     transition: 0.3s ease width, 0.3s ease margin-left, 0.3s ease margin-bottom, 0.3s ease background-color;
+}
+ label div:first-child {
+     width: 22px;
+}
+ label div:nth-child(2) {
+     width: 15px;
+}
+ label div:last-child {
+     width: 30px;
+     margin-bottom: 0;
+}
+ #menu_checkbox:checked + label {
+     transform: translateY(-50%) rotateZ(-90deg);
+}
+ #menu_checkbox:checked + label div {
+     width: 6px;
+     margin-left: 12px;
+     margin-bottom: 6px;
+     background-color: #ffc107;
+}
+ 

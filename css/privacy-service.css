@@ -1,0 +1,154 @@
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1c243c; /* Light gray background for a softer look */
+    color: #eecc6e; /* Dark gray text for better readability */
+    line-height: 1.6; /* Improved line height for better text readability */
+}
+
+
+h1, h2, h3 {
+    color: #eecc6e; /* Bright blue for headers */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+h1:hover, h2:hover, h3:hover {
+    color: #eb9405; /* Darker blue on hover */
+}
+
+header {
+    background-color: #2c344c; /* Deep blue for the header */
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.banner h1 {
+    font-family: "Roboto Slab", serif;
+    margin: 0;
+    font-size: 2.8rem; /* Larger title */
+    color: #eecc6e; /* White text */
+    animation: fadeIn 1s ease; /* Fade-in animation */
+}
+
+.content {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #2c344c; /* White background for the content area */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s; /* Animation on hover */
+}
+
+.content:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+}
+
+.content h2 {
+    font-size: 1.6rem;
+    border-bottom: 2px solid #007bff; /* Underline for subheading */
+    padding-bottom: 10px;
+    margin-top: 20px;
+}
+
+.content h3 {
+    margin-top: 20px;
+    font-size: 1.3rem; /* Slightly larger medium header */
+    transition: transform 0.3s; /* Animation on hover */
+}
+
+.content h3:hover {
+    transform: scale(1.01); /* Scale effect on hover */
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #343a40; /* Dark gray footer background */
+    color: #ffffff; /* White footer text */
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+    .banner h1 {
+        font-size: 2.4rem; /* Adjusted title size for mobile */
+    }
+
+    .content {
+        margin: 20px;
+        padding: 15px; /* Reduced padding for smaller screens */
+    }
+
+    .content h2 {
+        font-size: 1.4rem; /* Adjusted font size for smaller screens */
+    }
+
+    .content h3 {
+        font-size: 1.2rem; /* Adjusted font size for smaller screens */
+    }
+}
+
+.back-icon {
+    text-align: center;
+    padding: 20px;
+    display: inline-block;
+    margin-top: 1rem;
+    color: #FFD700;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: transform 0.3s, color 0.3s; /* Add transition for transform and color */
+}
+
+.back-icon:hover {
+    color: #FAF0DC;
+    transform: translateX(-5px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* Custom Scrollbar Styles */
+ ::-webkit-scrollbar {
+     width: 12px;
+    /* Width of the scrollbar */
+     height: 12px;
+    /* Height of the scrollbar */
+}
+ ::-webkit-scrollbar-thumb {
+     background-color: #960018;
+    /* Carmesin red for the thumb */
+    /* Rounded corners for the thumb */
+}
+ ::-webkit-scrollbar-track {
+     background: rgba(255, 255, 255, 0.2);
+    /* Light background for the track */
+     border-radius: 6px;
+    /* Rounded corners for the track */
+}
+ ::-webkit-scrollbar-thumb:hover {
+     background-color: #b22222;
+    /* Darker shade on hover */
+}
+/* Firefox scrollbar styles */
+ * {
+     scrollbar-width: thin;
+    /* Thin scrollbar */
+     scrollbar-color: #2c344c rgba(255, 255, 255, 0.2);
+    /* Thumb and track colors */
+}
