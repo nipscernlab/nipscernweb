@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Load translations from JSON file
 async function loadTranslations() {
-    const response = await fetch('../nipscernwebtest/projects/language.json');
+    const response = await fetch('../projects/language.json');
     return await response.json();
 }
 
