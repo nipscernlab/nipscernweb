@@ -1,0 +1,159 @@
+/* 1. Enable smooth scrolling */
+ html {
+     scroll-behavior: smooth;
+}
+/* 2. Make the navigation sticky and position it on the right */
+ main > nav {
+     position: fixed;
+     top: 2rem;
+     right: 0;
+     width: 15em;
+    /* Adjust width as needed */
+     align-self: start;
+     z-index: 9999;
+}
+/* ScrollSpy active styles */
+ .section-nav li.active > a {
+     color: #333;
+     font-weight: 500;
+}
+/* Sidebar Navigation */
+ .section-nav {
+     padding-left: 0;
+     border-left: none;
+    /* Remove left border */
+     border-right: 5px solid #efefef;
+    /* Add right border instead */
+     margin-right: 2rem;
+    /* Add space between the nav and content */
+     top: 6%;
+}
+ .section-nav a {
+     text-decoration: none;
+     display: block;
+     padding: .125rem 0;
+     color: #333;
+     transition: all 50ms ease-in-out;
+    /* Smooth transition */
+     padding: 10px 10px;
+     border-radius: 5px;
+}
+.section-nav a:focus {
+    text-decoration: none; /* Remove underline from links */
+
+}
+/** Poor man's reset **/
+ * {
+     box-sizing: border-box;
+}
+ html, body {
+     background: #fff;
+}
+ body {
+     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+ ol {
+     list-style: none;
+     margin: 0;
+     padding: 0;
+     background: rgba(0, 0, 0, 0.04);
+    /* Semi-transparent background */
+     backdrop-filter: blur(10px);
+    /* Blurring effect */
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Optional: add shadow to elevate the header */
+    /*border-bottom: 1px solid rgba(27, 33, 56, 0.1);
+     Soft border color */
+     transition: opacity 0.3s ease, transform 0.3s ease;
+    /* Smooth transition for fade out */
+     border-top-left-radius: 2%;
+     border-bottom-left-radius: 2%;
+}
+ li {
+     margin-left: 1rem;
+}
+/** Page layout **/
+ main {
+     display: grid;
+     grid-template-columns: 1fr 15em;
+    /* Adjust as needed */
+     max-width: 100em;
+     width: 90%;
+     margin: 0 auto;
+}
+/** Enlarge the sections for this demo **/
+ section {
+     padding-bottom: 20rem;
+}
+/* Button styles */
+ #menu_checkbox {
+     display: none;
+    /* Hide the actual checkbox */
+}
+/* Label styles (for the hamburger button) */
+ label[for="menu_checkbox"] {
+     cursor: pointer;
+     border: none;
+     position: fixed;
+    /* Fix the button to the top-left */
+     top: 4%;
+    /* Adjust the distance from the top */
+     left: 90%;
+    /* Adjust the distance from the left */
+     z-index: 10000;
+    /* Ensure it's on top of other elements */
+}
+ label[for="menu_checkbox"] div {
+}
+/* When the checkbox is checked, show the navigation */
+ #menu_checkbox:checked + label + .section-nav {
+     opacity: 1;
+    /* Fully visible */
+     transform: translateY(0);
+    /* Back to normal position */
+     visibility: visible;
+     backdrop-filter: blur(10px);
+    /* Enable blur when visible */
+}
+/* Transition back to hidden state */
+ #menu_checkbox:not(:checked) + label + .section-nav {
+     opacity: 0;
+     transform: translateY(-10px);
+    /* Move slightly up when hiding */
+     visibility: hidden;
+     backdrop-filter: blur(0px);
+    /* No blur when hidden */
+}
+/* Sidebar Navigation */
+ .section-nav {
+     opacity: 0;
+    /* Hidden initially */
+     transform: translateY(-10px);
+    /* Start slightly above */
+     transition: opacity 0.3s ease, transform 0.3s ease, backdrop-filter 0.3s ease;
+    /* Smooth fade-up effect */
+     visibility: hidden;
+    /* Ensure it's hidden initially */
+     backdrop-filter: blur(0px);
+    /* No blur initially */
+}
+/* Visible state */
+ .section-nav.visible {
+     opacity: 1;
+    /* Fully visible */
+     transform: translateY(0);
+    /* Back to normal position */
+     visibility: visible;
+     backdrop-filter: blur(10px);
+    /* Enable blur when visible */
+}
+/* Hidden state */
+ .section-nav.hidden {
+     opacity: 0;
+     transform: translateY(-10px);
+    /* Move slightly up when hiding */
+     visibility: hidden;
+     backdrop-filter: blur(0px);
+    /* No blur when hidden */
+}
+ 
