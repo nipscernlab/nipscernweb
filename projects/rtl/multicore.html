@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>RTL MultiCore Viewer - Visualizador Interativo de Arquiteturas</title>
+    <meta name="description" content="RTL MultiCore Viewer é um visualizador interativo de arquiteturas RTL multicore, ideal para análise de hardware e depuração de circuitos digitais.">
+    <meta name="keywords" content="RTL, MultiCore, Viewer, Visualizador, Arquitetura, Circuitos, Hardware, Digital, FPGA, ASIC, Processadores">
+    <meta name="author" content="Seu Nome ou Equipe">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="RTL MultiCore Viewer - Visualizador Interativo de Arquiteturas">
+    <meta property="og:description" content="Explore arquiteturas multicore em tempo real com o RTL MultiCore Viewer.">
+    <meta property="og:image" content="favicon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://seudominio.com">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RTL MultiCore Viewer - Visualizador Interativo de Arquiteturas">
+    <meta name="twitter:description" content="Explore arquiteturas multicore em tempo real com o RTL MultiCore Viewer.">
+    <meta name="twitter:image" content="favicon.png">
+    
+    <!-- Ícone do Site (Favicon) -->
+    <!-- Ícone do Site (Favicon) -->
+    <link rel="icon" type="image/png" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/svgs/solid/eye.svg">
+
+    <!-- Font Awesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2b1d0d;
+            --background: #f5f7fa;
+            --card: #ffffff;
+            --text: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .svg-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background-color: var(--card);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+        }
+
+        .svg-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+        }
+
+        .svg-wrapper svg {
+            max-width: 90%;
+            max-height: 90%;
+            transition: transform 0.3s ease;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.5);
+        }
+
+        .visible {
+            opacity: 1;
+            z-index: 10;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            background-color: var(--card);
+            border-radius: 8px;
+            margin-top: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .level-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 20;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .zoom-btn:hover {
+            background-color: #2980b9;
+            transform: scale(1.1);
+        }
+
+        .help-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .help-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .help-overlay h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .help-overlay ul {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .help-overlay li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .help-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 20;
+            background-color: var(--secondary);
+            width: 40px;
+            height: 40px;
+        }
+
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--background);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .transition-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .microscope-effect {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 5px solid var(--secondary);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            z-index: 30;
+            opacity: 0;
+            transition: opacity 0.3s;
+            overflow: hidden;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Carregando visualizador...</p>
+    </div>
+
+    <header>
+        <div class="title">
+            <i class="fa-solid fa-tv" style="font-size: 24px; color: white;"></i>
+            Visualizador Interativo de SVG
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="svg-container" id="svgContainer">
+            <!-- SVG layers will be loaded here -->
+            <div class="svg-wrapper visible" id="level1">
+                <!-- SVG 1 will be loaded here -->
+            </div>
+            <div class="svg-wrapper hidden" id="level2">
+                <!-- SVG 2 will be loaded here -->
+            </div>
+            <div class="svg-wrapper hidden" id="level3">
+                <!-- SVG 3 will be loaded here -->
+            </div>
+
+            <div class="level-indicator">
+<i class="fa-solid fa-circle-info"></i>
+                Nível 1: Somador
+            </div>
+
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomIn">
+<i class="fa-solid fa-magnifying-glass-plus"></i>
+                </button>
+                <button class="zoom-btn" id="zoomOut">
+<i class="fa-solid fa-magnifying-glass-minus"></i>
+                </button>
+            </div>
+
+            <div class="microscope-effect" id="microscope"></div>
+
+            <button class="zoom-btn help-btn" id="helpBtn">
+<i class="fa-solid fa-circle-question"></i>
+
+            </button>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="prevLevel">
+<i class="fa-solid fa-backward"></i>
+                Nível Anterior
+            </button>
+            <button class="btn" id="resetView">
+<i class="fa-solid fa-house"></i>
+
+                Visão Inicial
+            </button>
+            <button class="btn" id="nextLevel">
+<i class="fa-solid fa-forward"></i>
+                Próximo Nível
+            </button>
+        </div>
+
+        <div class="transition-overlay" id="transitionOverlay">
+            <div>Entrando no próximo nível...</div>
+        </div>
+
+        <div class="help-overlay" id="helpOverlay">
+            <h2>Como usar o visualizador</h2>
+            <ul>
+                <li>
+<i class="fa-solid fa-lock"></i>
+
+                    Clique no SVG para navegar para o próximo nível
+                </li>
+                <li>
+<i class="fa-solid fa-clock"></i>
+
+                    Use a roda do mouse para aumentar/diminuir o zoom
+                </li>
+                <li>
+<i class="fa-solid fa-up-down-left-right"></i>
+
+                    Clique e arraste para mover o SVG
+                </li>
+            </ul>
+            <button class="btn" id="closeHelpBtn">Entendi</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const svgContainer = document.getElementById('svgContainer');
+            const level1 = document.getElementById('level1');
+            const level2 = document.getElementById('level2');
+            const level3 = document.getElementById('level3');
+            const levelIndicator = document.querySelector('.level-indicator');
+            const prevLevelBtn = document.getElementById('prevLevel');
+            const nextLevelBtn = document.getElementById('nextLevel');
+            const resetViewBtn = document.getElementById('resetView');
+            const zoomInBtn = document.getElementById('zoomIn');
+            const zoomOutBtn = document.getElementById('zoomOut');
+            const helpBtn = document.getElementById('helpBtn');
+            const helpOverlay = document.getElementById('helpOverlay');
+            const closeHelpBtn = document.getElementById('closeHelpBtn');
+            const transitionOverlay = document.getElementById('transitionOverlay');
+            const microscope = document.getElementById('microscope');
+            const loading = document.querySelector('.loading');
+
+            // Configuration
+            const levels = [level1, level2, level3];
+            const levelNames = ['Nível 1: Somador', 'Nível 2: Circuito', 'Nível 3: Gates'];
+            let currentLevel = 0;
+            let scale = 1;
+            let translateX = 0;
+            let translateY = 0;
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+            let startTranslateX = 0;
+            let startTranslateY = 0;
+            let zoomThreshold = 3; // Zoom level at which we automatically go to next level
+
+            // Placeholder SVGs for testing (replace these with your actual SVGs)
+            const placeholderSVGs = [
+                '<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><rect x="50" y="20" width="100" height="60" fill="#3498db" stroke="#2c3e50" stroke-width="2"/><text x="100" y="55" text-anchor="middle" fill="white" font-size="14">Somador</text></svg>',
+                '<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"><rect x="50" y="20" width="200" height="160" fill="#3498db" stroke="#2c3e50" stroke-width="2"/><circle cx="100" cy="100" r="30" fill="#e74c3c" stroke="#2c3e50" stroke-width="2"/><circle cx="200" cy="100" r="30" fill="#e74c3c" stroke="#2c3e50" stroke-width="2"/><line x1="100" y1="130" x2="100" y2="160" stroke="#2c3e50" stroke-width="2"/><line x1="200" y1="130" x2="200" y2="160" stroke="#2c3e50" stroke-width="2"/><line x1="100" y1="160" x2="200" y2="160" stroke="#2c3e50" stroke-width="2"/><text x="150" y="105" text-anchor="middle" fill="white" font-size="14">Circuito</text></svg>',
+                '<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><rect x="50" y="50" width="300" height="200" fill="#3498db" stroke="#2c3e50" stroke-width="2"/><path d="M100,100 L150,100 L150,150 L200,150 L200,100 L250,100 L250,200 L100,200 Z" fill="#e74c3c" stroke="#2c3e50" stroke-width="2"/><text x="175" y="175" text-anchor="middle" fill="white" font-size="14">Gates</text></svg>'
+            ];
+
+            // Initialize the viewer
+            function init() {
+                // Load SVGs (in a real application, you would load your actual SVGs)
+                loadSVGs();
+
+                // Set up event listeners
+                setupEventListeners();
+
+                // Show initial level
+                updateLevelDisplay();
+
+                // Show welcome help overlay on first load
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    helpOverlay.classList.add('visible');
+                }, 1500);
+            }
+
+            // Load the SVGs into the containers
+            function loadSVGs() {
+                const svgFiles = ["ula.svg", "adder1bit.svg", "adder4bit.svg"];
+                const levels = [level1, level2, level3];
+
+                svgFiles.forEach((file, index) => {
+                    fetch(file)
+                        .then(response => response.text())
+                        .then(svgContent => {
+                            levels[index].innerHTML = svgContent;
+                        })
+                        .catch(error => console.error(`Erro ao carregar ${file}:`, error));
+                });
+            }
+
+
+            // Set up all event listeners
+            function setupEventListeners() {
+                // Navigation buttons
+                prevLevelBtn.addEventListener('click', goToPreviousLevel);
+                nextLevelBtn.addEventListener('click', goToNextLevel);
+                resetViewBtn.addEventListener('click', resetView);
+                zoomInBtn.addEventListener('click', () => adjustZoom(0.2));
+                zoomOutBtn.addEventListener('click', () => adjustZoom(-0.2));
+
+                // Container click for level navigation
+                svgContainer.addEventListener('click', handleContainerClick);
+
+                // Mouse wheel for zooming
+                svgContainer.addEventListener('wheel', handleWheel);
+
+                // Dragging
+                svgContainer.addEventListener('mousedown', startDrag);
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', endDrag);
+
+                // Touch events for mobile
+                svgContainer.addEventListener('touchstart', handleTouchStart);
+                svgContainer.addEventListener('touchmove', handleTouchMove);
+                svgContainer.addEventListener('touchend', handleTouchEnd);
+
+                // Help overlay
+                helpBtn.addEventListener('click', () => helpOverlay.classList.add('visible'));
+                closeHelpBtn.addEventListener('click', () => helpOverlay.classList.remove('visible'));
+            }
+
+            // Go to previous level
+            function goToPreviousLevel() {
+                if (currentLevel > 0) {
+                    playTransitionEffect('Voltando para o nível anterior...', () => {
+                        levels[currentLevel].classList.remove('visible');
+                        levels[currentLevel].classList.add('hidden');
+                        currentLevel--;
+                        levels[currentLevel].classList.remove('hidden');
+                        levels[currentLevel].classList.add('visible');
+                        resetTransformForLevel();
+                        updateLevelDisplay();
+                    });
+                }
+            }
+
+            // Go to next level
+            function goToNextLevel() {
+                if (currentLevel < levels.length - 1) {
+                    playTransitionEffect('Entrando no próximo nível...', () => {
+                        levels[currentLevel].classList.remove('visible');
+                        levels[currentLevel].classList.add('hidden');
+                        currentLevel++;
+                        levels[currentLevel].classList.remove('hidden');
+                        levels[currentLevel].classList.add('visible');
+                        resetTransformForLevel();
+                        updateLevelDisplay();
+                    });
+                }
+            }
+
+            // Reset the view
+            function resetView() {
+                resetTransformForLevel();
+            }
+
+            // Reset transform variables
+            function resetTransformForLevel() {
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                applyTransform();
+            }
+
+            // Update the level indicator
+            function updateLevelDisplay() {
+                levelIndicator.innerHTML = `
+<i class="fa-solid fa-circle-info"></i>
+                    ${levelNames[currentLevel]}
+                `;
+
+                // Update button states
+                prevLevelBtn.disabled = currentLevel === 0;
+                nextLevelBtn.disabled = currentLevel === levels.length - 1;
+            }
+
+            // Handle container click
+            function handleContainerClick(e) {
+                // Don't trigger if we're dragging
+                if (isDragging) return;
+
+                // If we're at the deepest level, don't do anything
+                if (currentLevel === levels.length - 1) return;
+
+                // Check if user clicked on an SVG element
+                const svgElement = e.target.closest('svg');
+                if (svgElement) {
+                    goToNextLevel();
+                }
+            }
+
+            // Handle mouse wheel for zooming
+            function handleWheel(e) {
+                e.preventDefault();
+                const delta = -Math.sign(e.deltaY) * 0.1;
+                adjustZoom(delta);
+            }
+
+            // Adjust zoom level
+            function adjustZoom(delta) {
+                const oldScale = scale;
+                scale = Math.max(0.5, Math.min(10, scale + delta));
+
+                // Get mouse position relative to container
+                const rect = svgContainer.getBoundingClientRect();
+                const mouseX = (event.clientX - rect.left) / oldScale;
+                const mouseY = (event.clientY - rect.top) / oldScale;
+
+                // Adjust translation to zoom around mouse position
+                translateX = translateX - mouseX * (scale - oldScale);
+                translateY = translateY - mouseY * (scale - oldScale);
+
+                applyTransform();
+
+                // Auto-advance to next level if we zoom past threshold
+                if (scale > zoomThreshold && currentLevel < levels.length - 1) {
+                    goToNextLevel();
+                }
+            }
+
+            // Start dragging
+            function startDrag(e) {
+                if (e.button !== 0) return; // Only left mouse button
+                
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startTranslateX = translateX;
+                startTranslateY = translateY;
+                
+                svgContainer.style.cursor = 'grabbing';
+                e.preventDefault();
+            }
+
+            // Drag
+            function drag(e) {
+                if (!isDragging) return;
+                
+                translateX = startTranslateX + (e.clientX - startX) / scale;
+                translateY = startTranslateY + (e.clientY - startY) / scale;
+                
+                applyTransform();
+                e.preventDefault();
+            }
+
+            // End dragging
+            function endDrag() {
+                isDragging = false;
+                svgContainer.style.cursor = 'pointer';
+            }
+
+            // Handle touch start for mobile
+            function handleTouchStart(e) {
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    startX = touch.clientX;
+                    startY = touch.clientY;
+                    startTranslateX = translateX;
+                    startTranslateY = translateY;
+                    isDragging = true;
+                } else if (e.touches.length === 2) {
+                    // Handle pinch gesture for zooming
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+                    initialPinchDistance = dist;
+                    initialScale = scale;
+                }
+                e.preventDefault();
+            }
+
+            // Handle touch move for mobile
+            function handleTouchMove(e) {
+                if (e.touches.length === 1 && isDragging) {
+                    const touch = e.touches[0];
+                    translateX = startTranslateX + (touch.clientX - startX) / scale;
+                    translateY = startTranslateY + (touch.clientY - startY) / scale;
+                    applyTransform();
+                } else if (e.touches.length === 2) {
+                    // Handle pinch gesture for zooming
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+                    const delta = dist / initialPinchDistance;
+                    scale = Math.max(0.5, Math.min(10, initialScale * delta));
+                    applyTransform();
+                }
+                e.preventDefault();
+            }
+
+            // Handle touch end for mobile
+            function handleTouchEnd(e) {
+                if (e.touches.length === 0) {
+                    isDragging = false;
+                }
+                e.preventDefault();
+            }
+
+            // Apply transform to the current SVG container
+            function applyTransform() {
+                const currentSvgWrapper = levels[currentLevel];
+                const svgElement = currentSvgWrapper.querySelector('svg');
+                
+                if (svgElement) {
+                    svgElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                }
+
+                // Show microscope effect at high zoom levels
+                if (scale > 2.5 && currentLevel < levels.length - 1) {
+                    microscope.style.display = 'block';
+                    microscope.style.opacity = Math.min(1, (scale - 2.5) / 2);
+                } else {
+                    microscope.style.display = 'none';
+                }
+            }
+
+            // Play transition effect between levels
+            function playTransitionEffect(message, callback) {
+                // Update message
+                transitionOverlay.innerHTML = `<div>${message}</div>`;
+                
+                // Show overlay
+                transitionOverlay.style.opacity = 1;
+                
+                // Hide after delay
+                setTimeout(() => {
+                    // Execute callback
+                    callback();
+                    
+                    // Hide overlay
+                    setTimeout(() => {
+                        transitionOverlay.style.opacity = 0;
+                    }, 500);
+                }, 800);
+            }
+
+            // Track mouse position for microscope effect
+            document.addEventListener('mousemove', (e) => {
+                if (scale > 2.5 && currentLevel < levels.length - 1) {
+                    const rect = svgContainer.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+
+                    microscope.style.left = `${mouseX - 150}px`; // 150 is half of microscope width
+                    microscope.style.top = `${mouseY - 150}px`; // 150 is half of microscope height
+                }
+            });
+
+            // Initialize the viewer
+            init();
+        });
+    </script>
+</body>
+</html>
