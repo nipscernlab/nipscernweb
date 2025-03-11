@@ -16,7 +16,7 @@
     <meta property="og:description" content="Explore arquiteturas multicore em tempo real com o RTL MultiCore Viewer.">
     <meta property="og:image" content="favicon.png">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://seudominio.com">
+    <meta property="og:url" content="https://nipscern.com">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
@@ -25,8 +25,7 @@
     <meta name="twitter:image" content="favicon.png">
     
     <!-- Ícone do Site (Favicon) -->
-    <!-- Ícone do Site (Favicon) -->
-    <link rel="icon" type="image/png" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/svgs/solid/eye.svg">
+    <link rel="icon" type="image/png" href="/projects/rtl/eye-solid.svg">
 
     <!-- Font Awesome para Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -527,35 +526,67 @@
                 closeHelpBtn.addEventListener('click', () => helpOverlay.classList.remove('visible'));
             }
 
-            // Go to previous level
-            function goToPreviousLevel() {
-                if (currentLevel > 0) {
-                    playTransitionEffect('Voltando para o nível anterior...', () => {
-                        levels[currentLevel].classList.remove('visible');
-                        levels[currentLevel].classList.add('hidden');
-                        currentLevel--;
-                        levels[currentLevel].classList.remove('hidden');
-                        levels[currentLevel].classList.add('visible');
-                        resetTransformForLevel();
-                        updateLevelDisplay();
-                    });
-                }
-            }
+            // Função para resetar transformações ao mudar de nível
+function resetTransformForLevel() {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    
+    // Garantir que a imagem seja centralizada
+    const svgWrapper = levels[currentLevel];
+    const svgElement = svgWrapper.querySelector('svg');
+    
+    if (svgElement) {
+        // Pequeno atraso para garantir que o SVG esteja renderizado
+        setTimeout(() => {
+            // Obter dimensões do container e do SVG
+            const containerRect = svgContainer.getBoundingClientRect();
+            const svgRect = svgElement.getBoundingClientRect();
+            
+            // Calcular centralização
+            const containerCenterX = containerRect.width / 2;
+            const containerCenterY = containerRect.height / 2;
+            const svgCenterX = svgRect.width / 2;
+            const svgCenterY = svgRect.height / 2;
+            
+            // Ajustar a translação para centralizar
+            translateX = containerCenterX - svgCenterX;
+            translateY = containerCenterY - svgCenterY;
+            
+            // Aplicar a transformação
+            applyTransform();
+        }, 100);
+    }
+}
+            
+   // Modificar as funções de transição de nível para garantir centralização
+function goToPreviousLevel() {
+    if (currentLevel > 0) {
+        playTransitionEffect('Voltando para o nível anterior...', () => {
+            levels[currentLevel].classList.remove('visible');
+            levels[currentLevel].classList.add('hidden');
+            currentLevel--;
+            levels[currentLevel].classList.remove('hidden');
+            levels[currentLevel].classList.add('visible');
+            resetTransformForLevel();
+            updateLevelDisplay();
+        });
+    }
+}
 
-            // Go to next level
-            function goToNextLevel() {
-                if (currentLevel < levels.length - 1) {
-                    playTransitionEffect('Entrando no próximo nível...', () => {
-                        levels[currentLevel].classList.remove('visible');
-                        levels[currentLevel].classList.add('hidden');
-                        currentLevel++;
-                        levels[currentLevel].classList.remove('hidden');
-                        levels[currentLevel].classList.add('visible');
-                        resetTransformForLevel();
-                        updateLevelDisplay();
-                    });
-                }
-            }
+function goToNextLevel() {
+    if (currentLevel < levels.length - 1) {
+        playTransitionEffect('Entrando no próximo nível...', () => {
+            levels[currentLevel].classList.remove('visible');
+            levels[currentLevel].classList.add('hidden');
+            currentLevel++;
+            levels[currentLevel].classList.remove('hidden');
+            levels[currentLevel].classList.add('visible');
+            resetTransformForLevel();
+            updateLevelDisplay();
+        });
+    }
+}
 
             // Reset the view
             function resetView() {
@@ -597,35 +628,66 @@
                 }
             }
 
-            // Handle mouse wheel for zooming
-            function handleWheel(e) {
-                e.preventDefault();
-                const delta = -Math.sign(e.deltaY) * 0.1;
-                adjustZoom(delta);
-            }
+            // Ajuste a função handleWheel para capturar a posição do mouse
+function handleWheel(e) {
+    e.preventDefault();
+    const delta = -Math.sign(e.deltaY) * 0.1;
+    
+    // Capturar a posição do mouse em relação ao container
+    const rect = svgContainer.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    adjustZoom(delta, mouseX, mouseY);
+}
 
-            // Adjust zoom level
-            function adjustZoom(delta) {
-                const oldScale = scale;
-                scale = Math.max(0.5, Math.min(10, scale + delta));
+/// Modificar a função adjustZoom para centralizar corretamente no mouse
+function adjustZoom(delta, mouseX, mouseY) {
+    const oldScale = scale;
+    const newScale = Math.max(0.5, Math.min(10, scale + delta));
+    
+    // Calcular o ponto sob o mouse antes do zoom
+    const mousePointXBeforeZoom = (mouseX - translateX) / oldScale;
+    const mousePointYBeforeZoom = (mouseY - translateY) / oldScale;
+    
+    // Definir a nova escala
+    scale = newScale;
+    
+    // Calcular os novos valores de translação para manter o ponto sob o cursor
+    // Adicionar um fator de compensação para equilibrar o deslocamento para a esquerda
+    const compensationFactor = 0.08; // Ajuste este valor conforme necessário
+    const xCompensation = delta > 0 ? compensationFactor * mouseX : -compensationFactor * mouseX;
+    
+    translateX = mouseX - mousePointXBeforeZoom * scale + xCompensation;
+    translateY = mouseY - mousePointYBeforeZoom * scale;
+    
+    applyTransform();
+    
+    // Auto-avançar para o próximo nível se o zoom passar do limite
+    if (scale > zoomThreshold && currentLevel < levels.length - 1) {
+        goToNextLevel();
+    }
+    
+    // Auto-retroceder para o nível anterior se o zoom for muito pequeno
+    if (scale < 0.7 && currentLevel > 0) {
+        goToPreviousLevel();
+    }
+}
 
-                // Get mouse position relative to container
-                const rect = svgContainer.getBoundingClientRect();
-                const mouseX = (event.clientX - rect.left) / oldScale;
-                const mouseY = (event.clientY - rect.top) / oldScale;
+// Atualizar as chamadas de adjustZoom nos botões de zoom
+zoomInBtn.addEventListener('click', () => {
+    const rect = svgContainer.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    adjustZoom(0.2, centerX, centerY);
+});
 
-                // Adjust translation to zoom around mouse position
-                translateX = translateX - mouseX * (scale - oldScale);
-                translateY = translateY - mouseY * (scale - oldScale);
-
-                applyTransform();
-
-                // Auto-advance to next level if we zoom past threshold
-                if (scale > zoomThreshold && currentLevel < levels.length - 1) {
-                    goToNextLevel();
-                }
-            }
-
+zoomOutBtn.addEventListener('click', () => {
+    const rect = svgContainer.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    adjustZoom(-0.2, centerX, centerY);
+});
             // Start dragging
             function startDrag(e) {
                 if (e.button !== 0) return; // Only left mouse button
