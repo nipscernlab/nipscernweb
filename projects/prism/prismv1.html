@@ -5,33 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVG Hover Info</title>
     <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <!-- Import fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        /* General styles */
+        /* Modern color scheme with CSS variables for easy modification */
+        :root {
+            /* Primary color palette */
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            --container-bg: rgba(30, 41, 59, 0.7);
+            --info-bg: rgba(30, 41, 59, 0.85);
+            --text-color: #f8fafc;
+            --highlight-color: #38bdf8;
+            --highlight-glow: rgba(56, 189, 248, 0.6);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            
+            /* Typography */
+            --font-primary: 'Poppins', sans-serif;
+            --font-secondary: 'Inter', sans-serif;
+            
+            /* Animation speeds */
+            --transition-fast: 0.2s;
+            --transition-normal: 0.3s;
+        }
+
+        /* Base styling */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: var(--font-primary);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            background: linear-gradient(to bottom, #1e1e1e, #2a2a2a);
-            color: white;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        /* Container for SVG */
+        h1 {
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 2rem;
+            color: var(--text-color);
+            letter-spacing: 0.5px;
+        }
+
+        /* SVG Container styling with modern glassmorphism effect */
         .svg-container {
             width: 80%;
             max-width: 800px;
             height: 60vh;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            background: var(--container-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0px 8px 32px var(--shadow-color);
+            transition: transform var(--transition-normal) ease-in-out, 
+                      box-shadow var(--transition-normal) ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .svg-container:hover {
+            transform: translateY(-8px);
+            box-shadow: 0px 12px 40px var(--shadow-color);
         }
 
         svg {
@@ -39,28 +86,84 @@
             height: 100%;
         }
 
-        /* Info Box */
-        #info {
-            margin-top: 20px;
-            padding: 15px;
-            width: 80%;
-            max-width: 800px;
-            min-height: 130px;
-            max-height: 150px; /* Evita crescimento excessivo */
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            font-size: 18px;
-            text-align: center;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-            overflow: hidden; /* Impede que o conteúdo ultrapasse a altura */
+        /* SVG element hover effects - only add highlight outline without changing size */
+        svg circle, svg rect, svg line, svg ellipse, svg polygon, svg polyline, svg text {
+            transition: filter var(--transition-fast) ease-in-out;
+            cursor: pointer;
         }
 
+        /* Highlight effect for each SVG element on hover - only glow effect, no scaling */
+        svg circle:hover, 
+        svg rect:hover, 
+        svg line:hover, 
+        svg ellipse:hover, 
+        svg polygon:hover, 
+        svg polyline:hover,
+        svg text:hover {
+            filter: drop-shadow(0 0 6px var(--highlight-glow));
+            /* No transform: scale() to keep original size */
+        }
+
+        /* Info Box styling */
+        #info {
+            margin-top: 25px;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            min-height: 300px;
+            background: var(--info-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 12px;
+            font-size: 18px;
+            font-family: var(--font-secondary);
+            text-align: center;
+            box-shadow: 0px 8px 24px var(--shadow-color);
+            opacity: 0.8;
+            transform: translateY(10px);
+            transition: opacity var(--transition-normal) ease-in-out, 
+                      transform var(--transition-normal) ease-in-out,
+                      box-shadow var(--transition-normal) ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #info.active {
+            opacity: 1;
+            transform: translateY(0);
+            box-shadow: 0px 10px 30px var(--shadow-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Highlighted Text styling */
         strong {
-            color: #ffcc00;
+            color: var(--highlight-color);
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .svg-container, #info {
+                width: 95%;
+            }
+            
+            #info {
+                font-size: 16px;
+                min-height: 150px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
+    <h1>Interactive SVG Elements</h1>
 
     <div class="svg-container">
         <svg id="meuSVG" viewBox="0 0 500 400">
@@ -87,24 +190,40 @@
         </svg>
     </div>
 
-    <div id="info">Hover over an SVG element to see details.</div>
+    <div id="info">Hover over an SVG element to see its details</div>
 
     <script>
-        document.getElementById("meuSVG").addEventListener("mouseover", function(event) {
+        // Get elements
+        const svgElement = document.getElementById("meuSVG");
+        const infoBox = document.getElementById("info");
+        
+        // Add event listeners for mouse interactions
+        svgElement.addEventListener("mouseover", handleElementHover);
+        svgElement.addEventListener("mouseleave", resetInfoBox);
+
+        // Handle hovering over SVG elements
+        function handleElementHover(event) {
             let element = event.target;
 
-            if (element instanceof SVGElement) {  // Check if it's an SVG element
+            // Check if it's an SVG element
+            if (element instanceof SVGElement && element.id) {  
+                // Add active class to info box for smooth animation
+                infoBox.classList.add("active");
+                
+                // Get element attributes
                 let id = element.id || "No ID";
                 let type = element.tagName;
                 let fillColor = element.getAttribute("fill") || "None";
                 let strokeColor = element.getAttribute("stroke") || "None";
                 let strokeWidth = element.getAttribute("stroke-width") || "0";
 
+                // Build the information text
                 let infoText = `<strong>Element:</strong> ${type} <br>`;
                 infoText += `<strong>ID:</strong> ${id} <br>`;
                 infoText += `<strong>Fill Color:</strong> ${fillColor} <br>`;
                 infoText += `<strong>Border:</strong> ${strokeColor} (Width: ${strokeWidth}px) <br>`;
 
+                // Add element-specific information based on its type
                 if (type === "circle") {
                     let cx = element.getAttribute("cx");
                     let cy = element.getAttribute("cy");
@@ -143,14 +262,21 @@
                     infoText += `<strong>Content:</strong> "${textContent}" <br>`;
                 }
 
-                document.getElementById("info").innerHTML = infoText;
+                // Update info box with generated text
+                infoBox.innerHTML = infoText;
             }
-        });
+        }
 
-        document.getElementById("meuSVG").addEventListener("mouseleave", function() {
-            document.getElementById("info").innerHTML = "Hover over an SVG element to see details.";
-        });
+        // Reset info box when mouse leaves SVG
+        function resetInfoBox() {
+            infoBox.classList.remove("active");
+            // Small delay before changing text to make transition smoother
+            setTimeout(() => {
+                if (!infoBox.classList.contains("active")) {
+                    infoBox.innerHTML = "Hover over an SVG element to see its details";
+                }
+            }, 300);
+        }
     </script>
-
 </body>
 </html>
