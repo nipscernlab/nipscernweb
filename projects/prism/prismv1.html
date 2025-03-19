@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Hover Info</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(to bottom, #1e1e1e, #2a2a2a);
+            color: white;
+        }
+
+        /* Container for SVG */
+        .svg-container {
+            width: 80%;
+            max-width: 800px;
+            height: 60vh;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Info Box */
+        #info {
+            margin-top: 20px;
+            padding: 15px;
+            width: 80%;
+            max-width: 800px;
+            min-height: 130px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        strong {
+            color: #ffcc00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="svg-container">
+        <svg id="meuSVG" viewBox="0 0 500 400">
+            <!-- Blue circle with red border -->
+            <circle id="circle1" cx="100" cy="100" r="50" fill="blue" stroke="red" stroke-width="3"/>
+
+            <!-- Green rectangle with black border -->
+            <rect id="rectangle1" x="150" y="50" width="80" height="80" fill="green" stroke="black" stroke-width="2"/>
+
+            <!-- Diagonal red line -->
+            <line id="line1" x1="10" y1="10" x2="200" y2="200" stroke="red" stroke-width="3"/>
+
+            <!-- Yellow ellipse with blue border -->
+            <ellipse id="ellipse1" cx="300" cy="100" rx="60" ry="40" fill="yellow" stroke="blue" stroke-width="3"/>
+
+            <!-- Orange triangle (polygon) with black border -->
+            <polygon id="polygon1" points="250,150 300,250 200,250" fill="orange" stroke="black" stroke-width="2"/>
+
+            <!-- Purple zig-zag polyline -->
+            <polyline id="polyline1" points="50,300 100,350 150,300 200,350 250,300" fill="none" stroke="purple" stroke-width="3"/>
+
+            <!-- Text inside the SVG -->
+            <text id="text1" x="50" y="380" font-size="20" fill="white">My SVG with multiple elements</text>
+        </svg>
+    </div>
+
+    <div id="info">Hover over an SVG element to see details.</div>
+
+    <script>
+        document.getElementById("meuSVG").addEventListener("mouseover", function(event) {
+            let element = event.target;
+
+            if (element instanceof SVGElement) {  // Check if it's an SVG element
+                let id = element.id || "No ID";
+                let type = element.tagName;
+                let fillColor = element.getAttribute("fill") || "None";
+                let strokeColor = element.getAttribute("stroke") || "None";
+                let strokeWidth = element.getAttribute("stroke-width") || "0";
+
+                let infoText = `<strong>Element:</strong> ${type} <br>`;
+                infoText += `<strong>ID:</strong> ${id} <br>`;
+                infoText += `<strong>Fill Color:</strong> ${fillColor} <br>`;
+                infoText += `<strong>Border:</strong> ${strokeColor} (Width: ${strokeWidth}px) <br>`;
+
+                if (type === "circle") {
+                    let cx = element.getAttribute("cx");
+                    let cy = element.getAttribute("cy");
+                    let radius = element.getAttribute("r");
+                    infoText += `<strong>Center:</strong> (${cx}, ${cy}) <br>`;
+                    infoText += `<strong>Radius:</strong> ${radius}px <br>`;
+                } else if (type === "rect") {
+                    let x = element.getAttribute("x");
+                    let y = element.getAttribute("y");
+                    let width = element.getAttribute("width");
+                    let height = element.getAttribute("height");
+                    infoText += `<strong>Position:</strong> (${x}, ${y}) <br>`;
+                    infoText += `<strong>Dimensions:</strong> ${width}x${height}px <br>`;
+                }
+
+                document.getElementById("info").innerHTML = infoText;
+            }
+        });
+
+        document.getElementById("meuSVG").addEventListener("mouseleave", function() {
+            document.getElementById("info").innerHTML = "Hover over an SVG element to see details.";
+        });
+    </script>
+
+</body>
+</html>
