@@ -45,11 +45,13 @@
             width: 80%;
             max-width: 800px;
             min-height: 130px;
+            max-height: 150px; /* Evita crescimento excessivo */
             background: rgba(255, 255, 255, 0.15);
             border-radius: 8px;
             font-size: 18px;
             text-align: center;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden; /* Impede que o conteúdo ultrapasse a altura */
         }
 
         strong {
@@ -115,6 +117,29 @@
                     let height = element.getAttribute("height");
                     infoText += `<strong>Position:</strong> (${x}, ${y}) <br>`;
                     infoText += `<strong>Dimensions:</strong> ${width}x${height}px <br>`;
+                } else if (type === "line") {
+                    let x1 = element.getAttribute("x1");
+                    let y1 = element.getAttribute("y1");
+                    let x2 = element.getAttribute("x2");
+                    let y2 = element.getAttribute("y2");
+                    infoText += `<strong>Start:</strong> (${x1}, ${y1}) <br>`;
+                    infoText += `<strong>End:</strong> (${x2}, ${y2}) <br>`;
+                } else if (type === "ellipse") {
+                    let cx = element.getAttribute("cx");
+                    let cy = element.getAttribute("cy");
+                    let rx = element.getAttribute("rx");
+                    let ry = element.getAttribute("ry");
+                    infoText += `<strong>Center:</strong> (${cx}, ${cy}) <br>`;
+                    infoText += `<strong>Radii:</strong> (${rx}px, ${ry}px) <br>`;
+                } else if (type === "polygon" || type === "polyline") {
+                    let points = element.getAttribute("points");
+                    infoText += `<strong>Points:</strong> ${points} <br>`;
+                } else if (type === "text") {
+                    let x = element.getAttribute("x");
+                    let y = element.getAttribute("y");
+                    let textContent = element.textContent.trim();
+                    infoText += `<strong>Position:</strong> (${x}, ${y}) <br>`;
+                    infoText += `<strong>Content:</strong> "${textContent}" <br>`;
                 }
 
                 document.getElementById("info").innerHTML = infoText;
