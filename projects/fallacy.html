@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' height='48px' viewBox='0 -960 960 960' width='48px' fill='%23634FA2'><path d='M230-160q-45 0-77.5-32.5T120-270q0-45 32.5-77.5T230-380q45 0 77.5 32.5T340-270q0 45-32.5 77.5T230-160Zm500 0q-45 0-77.5-32.5T620-270q0-45 32.5-77.5T730-380q46 0 78 32.5t32 77.5q0 45-32 77.5T730-160ZM480-580q-45 0-77.5-32.5T370-690q0-45 32.5-77.5T480-800q45 0 77.5 32.5T590-690q0 45-32.5 77.5T480-580Z'/></svg>">
+  <title>Logical Fallacies Guide</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      /* Color Schemes for Fallacy Categories */
+      --relevance-primary: #e74c3c;
+      --relevance-secondary: #f8d7da;
+      --relevance-text: #721c24;
+
+      --induction-primary: #3498db;
+      --induction-secondary: #d1ecf1;
+      --induction-text: #0c5460;
+
+      --presumption-primary: #f39c12;
+      --presumption-secondary: #fff3cd;
+      --presumption-text: #856404;
+
+      --ambiguity-primary: #9b59b6;
+      --ambiguity-secondary: #e2d9f3;
+      --ambiguity-text: #5a3973;
+
+      /* Font Variables */
+      --main-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --heading-font: 'Montserrat', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--main-font);
+      line-height: 1.6;
+      color: #333;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 2rem 0;
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-family: var(--heading-font);
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .search-container {
+      position: relative;
+      flex-grow: 1;
+      max-width: 400px;
+    }
+
+    .search-container input {
+      width: 100%;
+      padding: 12px 20px 12px 40px;
+      border: 2px solid #ddd;
+      border-radius: 30px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .search-container input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+    }
+
+    .search-container i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .filter-btn.active {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-all {
+      background-color: #2c3e50;
+      color: white;
+    }
+
+    .btn-relevance {
+      background-color: var(--relevance-primary);
+      color: white;
+    }
+
+    .btn-induction {
+      background-color: var(--induction-primary);
+      color: white;
+    }
+
+    .btn-presumption {
+      background-color: var(--presumption-primary);
+      color: white;
+    }
+
+    .btn-ambiguity {
+      background-color: var(--ambiguity-primary);
+      color: white;
+    }
+
+    .category-header {
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      color: white;
+    }
+
+    .category-header h2 {
+      font-family: var(--heading-font);
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .category-header p {
+      position: relative;
+      z-index: 2;
+      font-size: 1.1rem;
+    }
+
+    .category-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: 20px 20px;
+      background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 75%, transparent 75%, transparent);
+      z-index: 1;
+      opacity: 0.3;
+    }
+
+    .category-relevance {
+      background-color: var(--relevance-primary);
+    }
+
+    .category-induction {
+      background-color: var(--induction-primary);
+    }
+
+    .category-presumption {
+      background-color: var(--presumption-primary);
+    }
+
+    .category-ambiguity {
+      background-color: var(--ambiguity-primary);
+    }
+
+    .fallacies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 3rem;
+    }
+
+    .fallacy-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .fallacy-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      position: relative;
+    }
+
+    .card-header::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 15px;
+      right: 15px;
+      height: 2px;
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .fallacy-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .fallacy-relevance .fallacy-icon {
+      background-color: var(--relevance-primary);
+    }
+
+    .fallacy-induction .fallacy-icon {
+      background-color: var(--induction-primary);
+    }
+
+    .fallacy-presumption .fallacy-icon {
+      background-color: var(--presumption-primary);
+    }
+
+    .fallacy-ambiguity .fallacy-icon {
+      background-color: var(--ambiguity-primary);
+    }
+
+    .fallacy-title {
+      flex-grow: 1;
+    }
+
+    .fallacy-title h3 {
+      font-family: var(--heading-font);
+      margin-bottom: 5px;
+      font-size: 1.3rem;
+    }
+
+    .fallacy-title .fallacy-code {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .fallacy-definition {
+      margin-bottom: 15px;
+    }
+
+    .examples-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .examples-container {
+      flex-grow: 1;
+    }
+
+    .example {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .example::before {
+      content: '•';
+      position: absolute;
+      left: 15px;
+      color: #666;
+      font-size: 1.2rem;
+    }
+
+    .example:last-child {
+      margin-bottom: 0;
+    }
+
+    .fallacy-relevance .example {
+      background-color: var(--relevance-secondary);
+      color: var(--relevance-text);
+    }
+
+    .fallacy-induction .example {
+      background-color: var(--induction-secondary);
+      color: var(--induction-text);
+    }
+
+    .fallacy-presumption .example {
+      background-color: var(--presumption-secondary);
+      color: var(--presumption-text);
+    }
+
+    .fallacy-ambiguity .example {
+      background-color: var(--ambiguity-secondary);
+      color: var(--ambiguity-text);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding: 1rem 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .fallacies-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-container {
+        max-width: 100%;
+      }
+
+      .filter-buttons {
+        justify-content: center;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .category-header h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Toggle button for dark mode */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #2c3e50;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode header {
+      background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+    }
+
+    body.dark-mode .fallacy-card {
+      background-color: #1e1e1e;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-mode .card-header::after {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .example {
+      background-color: #2a2a2a;
+    }
+
+    body.dark-mode .fallacy-relevance .example {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #ff9999;
+    }
+
+    body.dark-mode .fallacy-induction .example {
+      background-color: rgba(52, 152, 219, 0.2);
+      color: #99ccff;
+    }
+
+    body.dark-mode .fallacy-presumption .example {
+      background-color: rgba(243, 156, 18, 0.2);
+      color: #ffcc99;
+    }
+
+    body.dark-mode .fallacy-ambiguity .example {
+      background-color: rgba(155, 89, 182, 0.2);
+      color: #d6b9e6;
+    }
+
+    body.dark-mode .search-container input {
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .search-container input:focus {
+      border-color: #3498db;
+    }
+
+    body.dark-mode .filter-btn {
+      opacity: 0.8;
+    }
+
+    body.dark-mode .filter-btn.active {
+      opacity: 1;
+    }
+
+    body.dark-mode footer {
+      color: #999;
+    }
+
+    /* Back to top button */
+    .back-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #3498db;
+      color: white;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+
+    .back-to-top:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <header id="top">
+    <div class="container">
+      <h1><i class="fas fa-exclamation-triangle"></i> Logical Fallacies Guide</h1>
+      <p class="subtitle">Understanding common errors in reasoning and argumentation</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="controls">
+      <div class="search-container">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Search fallacies...">
+      </div>
+      <div class="filter-buttons">
+        <button class="filter-btn btn-all active" data-filter="all">
+          <i class="fas fa-layer-group"></i> All
+        </button>
+        <button class="filter-btn btn-relevance" data-filter="relevance">
+          <i class="fas fa-random"></i> Relevance
+        </button>
+        <button class="filter-btn btn-induction" data-filter="induction">
+          <i class="fas fa-chart-line"></i> Induction
+        </button>
+        <button class="filter-btn btn-presumption" data-filter="presumption">
+          <i class="fas fa-question-circle"></i> Presumption
+        </button>
+        <button class="filter-btn btn-ambiguity" data-filter="ambiguity">
+          <i class="fas fa-language"></i> Ambiguity
+        </button>
+      </div>
+    </div>
+
+    <!-- Fallacies of Relevance -->
+    <section id="relevance" class="fallacy-section">
+      <div class="category-header category-relevance">
+        <h2><i class="fas fa-random"></i> Fallacies of Relevance</h2>
+        <p>In these fallacies, the premises are logically irrelevant to the conclusion but are presented in a way that makes them appear relevant.</p>
+      </div>
+
+      <div class="fallacies-grid">
+        <!-- Appeal to the Populace -->
+        <div class="fallacy-card fallacy-relevance" data-category="relevance" data-code="R1">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Appeal to the Populace</h3>
+              <div class="fallacy-code">Ad Populum (R1)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When correct reasoning is replaced by devices calculated to elicit emotional and nonrational support for the conclusion urged.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "Over 10 million Americans can't be wrong! Buy our product because it's the most popular in the country."
+              </div>
+              <div class="example">
+                "Everyone at school is wearing these shoes. If you want to fit in, you should get them too."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appeal to Emotion -->
+        <div class="fallacy-card fallacy-relevance" data-category="relevance" data-code="R2">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-heart"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Appeal to Emotion</h3>
+              <div class="fallacy-code">R2</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When correct reasoning is replaced by appeals to specific emotions, such as pity, pride, or envy.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "Look at these sad photos of polar bears. You must support our environmental policy or you don't care about these innocent animals."
+              </div>
+              <div class="example">
+                "As a proud American, you should buy American-made cars, regardless of their quality or price compared to foreign alternatives."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Red Herring -->
+        <div class="fallacy-card fallacy-relevance" data-category="relevance" data-code="R3">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-fish"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Red Herring</h3>
+              <div class="fallacy-code">R3</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When correct reasoning is manipulated by the introduction of some event or character that deliberately misleads the audience and thus hinders rational inference.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "Yes, our company had a data breach, but have you seen how much worse our competitor's customer service is?"
+              </div>
+              <div class="example">
+                "The senator is accused of misusing campaign funds, but let's remember his years of service to the community and how he helped build that children's hospital."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Straw Man -->
+        <div class="fallacy-card fallacy-relevance" data-category="relevance" data-code="R4">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fa-solid fa-wheat-awn"></i>   
+            </div>
+            <div class="fallacy-title">
+              <h3>Straw Man</h3>
+              <div class="fallacy-code">R4</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When correct reasoning is undermined by the deliberate misrepresentation of the opponent's position.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "People who support stricter gun regulations want to abolish the Second Amendment and take away all firearms from citizens."
+              </div>
+              <div class="example">
+                "You want to increase the minimum wage? So you want to destroy small businesses and create massive unemployment?"
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attack on the Person -->
+        <div class="fallacy-card fallacy-relevance" data-category="relevance" data-code="R5">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-user-slash"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Attack on the Person</h3>
+              <div class="fallacy-code">Ad Hominem (R5)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When correct reasoning about some issue is replaced by an attack upon the character or special circumstances of the opponent.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "We shouldn't listen to Dr. Smith's research on climate change because he once worked for an oil company."
+              </div>
+              <div class="example">
+                "The mayor's budget proposal can't be taken seriously. Did you know she filed for bankruptcy ten years ago?"
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appeal to Force -->
+        <div class="fallacy-card fallacy-relevance" data-category="relevance" data-code="R6">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-fist-raised"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Appeal to Force</h3>
+              <div class="fallacy-code">Ad Baculum (R6)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When reasoning is replaced by threats in the effort to win support or assent.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "You should agree with my proposal if you want to keep your job at this company."
+              </div>
+              <div class="example">
+                "Sign this contract now, or I'll make sure no one in this industry ever works with you again."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Missing the Point -->
+        <div class="fallacy-card fallacy-relevance" data-category="relevance" data-code="R7">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Missing the Point</h3>
+              <div class="fallacy-code">Ignoratio Elenchi (R7)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When correct reasoning is replaced by the mistaken refutation of a position that was not really at issue.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "We shouldn't invest in renewable energy because fossil fuels have created millions of jobs throughout history."
+              </div>
+              <div class="example">
+                "Why focus on reducing plastic waste when deforestation is destroying our planet's lungs?"
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fallacies of Defective Induction -->
+    <section id="induction" class="fallacy-section">
+      <div class="category-header category-induction">
+        <h2><i class="fas fa-chart-line"></i> Fallacies of Defective Induction</h2>
+        <p>In these fallacies, the premises may be relevant to the conclusion, but they are far too weak to support it.</p>
+      </div>
+
+      <div class="fallacies-grid">
+        <!-- Appeal to Ignorance -->
+        <div class="fallacy-card fallacy-induction" data-category="induction" data-code="D1">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-question"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Appeal to Ignorance</h3>
+              <div class="fallacy-code">Ad Ignorantiam (D1)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When it is argued that a proposition is true on the ground that it has not been proved false, or when it is argued that a proposition is false because it has not been proved true.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "Scientists haven't proven that UFOs don't exist, so they must be real."
+              </div>
+              <div class="example">
+                "There's no evidence that this supplement causes any harm, so it must be safe to consume."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appeal to Inappropriate Authority -->
+        <div class="fallacy-card fallacy-induction" data-category="induction" data-code="D2">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-crown"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Appeal to Inappropriate Authority</h3>
+              <div class="fallacy-code">Ad Verecundiam (D2)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When the premises of an argument appeal to the judgment of some person or persons who have no legitimate claim to authority in the matter at hand.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "This celebrity chef says this diet pill will help you lose weight, so it must work."
+              </div>
+              <div class="example">
+                "My favorite basketball player endorses this economic policy, so I think it's the right approach for our country."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- False Cause -->
+        <div class="fallacy-card fallacy-induction" data-category="induction" data-code="D3">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-link-slash"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>False Cause</h3>
+              <div class="fallacy-code">Non Causa Pro Causa (D3)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When one treats as the cause of a thing that which is not really the cause of that thing, often relying (as in the subtype post hoc ergo propter hoc) merely on the close temporal succession of two events.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "I wore my lucky socks and our team won the championship. My socks clearly brought good luck."
+              </div>
+              <div class="example">
+                "Crime rates went down after we installed streetlights in the neighborhood, so the streetlights must have reduced crime."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hasty Generalization -->
+        <div class="fallacy-card fallacy-induction" data-category="induction" data-code="D4">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-running"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Hasty Generalization</h3>
+              <div class="fallacy-code">Converse Accident (D4)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When one moves carelessly or too quickly from one or a very few instances to a broad or universal claim.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <!-- Continuing from Hasty Generalization -->
+              <div class="example">
+                "I know someone who went to that university and they couldn't find a job after graduating. That university must have poor job placement rates."
+              </div>
+              <div class="example">
+                "The first two customers who tried our new product loved it. This proves our product will be a massive market success."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fallacies of Presumption -->
+    <section id="presumption" class="fallacy-section">
+      <div class="category-header category-presumption">
+        <h2><i class="fas fa-question-circle"></i> Fallacies of Presumption</h2>
+        <p>In these fallacies, the mistake in argument arises from relying on some proposition that is assumed to be true but is without warrant and is false or dubious.</p>
+      </div>
+
+      <div class="fallacies-grid">
+        <!-- Accident -->
+        <div class="fallacy-card fallacy-presumption" data-category="presumption" data-code="P1">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-car-crash"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Accident</h3>
+              <div class="fallacy-code">P1</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When one mistakenly applies a generalization to an individual case that it does not properly govern.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "Freedom of speech is a right, therefore it should be legal to shout 'fire' in a crowded theater when there is no fire."
+              </div>
+              <div class="example">
+                "Cutting things is generally not a crime, so surgeons shouldn't be penalized for performing surgeries."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Complex Question -->
+        <div class="fallacy-card fallacy-presumption" data-category="presumption" data-code="P2">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-question"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Complex Question</h3>
+              <div class="fallacy-code">Plurium Interrogationum (P2)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When one argues by asking a question in such a way as to presuppose the truth of some assumption buried in that question.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "Have you stopped cheating on your taxes?" (This presupposes that you were cheating on your taxes.)"
+              </div>
+              <div class="example">
+                "Why do you continue to support policies that harm the environment?" (This presupposes that you support such policies.)"
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Begging the Question -->
+        <div class="fallacy-card fallacy-presumption" data-category="presumption" data-code="P3">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-circle-notch"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Begging the Question</h3>
+              <div class="fallacy-code">Petitio Principii (P3)</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When one assumes in the premises of an argument the truth of what one seeks to establish in the conclusion of that same argument.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "This book is true because it says so in the book itself."
+              </div>
+              <div class="example">
+                "God exists because the Bible says so, and the Bible is the word of God."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fallacies of Ambiguity -->
+    <section id="ambiguity" class="fallacy-section">
+      <div class="category-header category-ambiguity">
+        <h2><i class="fas fa-language"></i> Fallacies of Ambiguity</h2>
+        <p>In these fallacies, the mistakes in argument arise as a result of the shift in the meaning of words or phrases, from the meanings that they have in the premises to different meanings that they have in the conclusion.</p>
+      </div>
+
+      <div class="fallacies-grid">
+        <!-- Equivocation -->
+        <div class="fallacy-card fallacy-ambiguity" data-category="ambiguity" data-code="A1">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Equivocation</h3>
+              <div class="fallacy-code">A1</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When the same word or phrase is used with two or more meanings, deliberately or accidentally, in formulating an argument.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "A bird in the hand is worth two in the bush. A bird is an animal. Therefore, any animal in the hand is worth two in the bush."
+              </div>
+              <div class="example">
+                "Stars are just huge balls of gas. Famous actors are stars. Therefore, famous actors are just huge balls of gas."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amphiboly -->
+        <div class="fallacy-card fallacy-ambiguity" data-category="ambiguity" data-code="A2">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-glasses"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Amphiboly</h3>
+              <div class="fallacy-code">A2</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When one of the statements in an argument has more than one plausible meaning, because of the loose or awkward way in which the words in that statement have been combined.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "The professor said on Monday we would have an exam. Therefore, the exam will be held on Monday."
+              </div>
+              <div class="example">
+                "Wanted: Car for sale by owner with good tires." (Ambiguous whether the owner or the car has good tires.)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accent -->
+        <div class="fallacy-card fallacy-ambiguity" data-category="ambiguity" data-code="A3">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-volume-up"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Accent</h3>
+              <div class="fallacy-code">A3</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              When a shift of meaning arises within an argument as a consequence of changes in the emphasis given to its words or parts.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "I never said he stole the money." (Depending on which word is emphasized, this can have several different meanings.)
+              </div>
+              <div class="example">
+                "We should not speak ill of our friends." (If emphasis is on "friends," it could imply that we can speak ill of others.)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Composition -->
+        <div class="fallacy-card fallacy-ambiguity" data-category="ambiguity" data-code="A4">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-object-group"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Composition</h3>
+              <div class="fallacy-code">A4</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              This fallacy is committed (a) when one reasons mistakenly from the attributes of a part to the attributes of the whole, or (b) when one reasons mistakenly from the attributes of an individual member of some collection to the attributes of the totality of that collection.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "Each player on the team is an excellent athlete. Therefore, this must be an excellent team."
+              </div>
+              <div class="example">
+                "Every component of this machine is lightweight. Therefore, the entire machine must be lightweight."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Division -->
+        <div class="fallacy-card fallacy-ambiguity" data-category="ambiguity" data-code="A5">
+          <div class="card-header">
+            <div class="fallacy-icon">
+              <i class="fas fa-cut"></i>
+            </div>
+            <div class="fallacy-title">
+              <h3>Division</h3>
+              <div class="fallacy-code">A5</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="fallacy-definition">
+              This fallacy is committed (a) when one reasons mistakenly from the attributes of a whole to the attributes of one of its parts, or (b) when one reasons mistakenly from the attributes of a totality of some collection of entities to the attributes of the individual entities within that collection.
+            </div>
+            <div class="examples-header">
+              <i class="fas fa-lightbulb"></i> Examples
+            </div>
+            <div class="examples-container">
+              <div class="example">
+                "The United States is the richest country in the world. Therefore, every American must be rich."
+              </div>
+              <div class="example">
+                "This restaurant is excellent. Therefore, every dish they serve must be excellent."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+  // Get references to DOM elements
+  const searchInput = document.getElementById('search-input');
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const fallacyCards = document.querySelectorAll('.fallacy-card');
+  
+  // Search functionality
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase().trim();
+    
+    fallacyCards.forEach(card => {
+      const cardTitle = card.querySelector('h3').textContent.toLowerCase();
+      const cardCode = card.querySelector('.fallacy-code').textContent.toLowerCase();
+      const cardDefinition = card.querySelector('.fallacy-definition').textContent.toLowerCase();
+      const cardExamples = Array.from(card.querySelectorAll('.example'))
+        .map(example => example.textContent.toLowerCase())
+        .join(' ');
+      
+      const cardContent = `${cardTitle} ${cardCode} ${cardDefinition} ${cardExamples}`;
+      
+      // Show/hide based on search term
+      if (searchTerm === '' || cardContent.includes(searchTerm)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    
+    // Check if any cards are visible for each section
+    checkEmptySections();
+  });
+  
+  // Filter button functionality
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove active class from all buttons
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      const filterCategory = this.getAttribute('data-filter');
+      
+      // Show/hide cards based on category
+      fallacyCards.forEach(card => {
+        if (filterCategory === 'all' || card.getAttribute('data-category') === filterCategory) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Check if any cards are visible for each section
+      checkEmptySections();
+    });
+  });
+  
+  // Function to check if sections are empty and hide/show them
+  function checkEmptySections() {
+    const sections = document.querySelectorAll('.fallacy-section');
+    
+    sections.forEach(section => {
+      const sectionId = section.getAttribute('id');
+      const visibleCards = section.querySelectorAll('.fallacy-card[style="display: block;"]');
+      
+      if (visibleCards.length === 0) {
+        section.style.display = 'none';
+      } else {
+        section.style.display = 'block';
+      }
+    });
+  }
+});
+    </script>
+    </body>
+</html>
