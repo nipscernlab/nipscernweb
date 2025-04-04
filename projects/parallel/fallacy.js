@@ -11,21 +11,21 @@ document.addEventListener('DOMContentLoaded', function() {
     {
       id: 'R2',
       name: 'The appeal to emotion',
-      latin: '',
+      latin: 'None',
       definition: 'When correct reasoning is replaced by appeals to specific emotions, such as pity, pride, or envy.',
       examples: 'Example: "If you truly cared about children, you would support this policy."'
     },
     {
       id: 'R3',
       name: 'The red herring',
-      latin: '',
+      latin: 'None',
       definition: 'When correct reasoning is manipulated by the introduction of some event or character that deliberately misleads the audience and thus hinders rational inference.',
       examples: 'Example: "Why focus on my client\'s tax fraud when there are much bigger tax evaders out there?"'
     },
     {
       id: 'R4',
       name: 'The straw man',
-      latin: '',
+      latin: 'None',
       definition: 'When correct reasoning is undermined by the deliberate misrepresentation of the opponent\'s position.',
       examples: 'Example: "She wants environmental regulations, which means she wants to destroy all businesses."'
     },
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     {
       id: 'P1',
       name: 'Accident',
-      latin: '',
+      latin: 'None',
       definition: 'When one mistakenly applies a generalization to an individual case that it does not properly govern.',
       examples: 'Example: "Cutting people with knives is wrong. Surgeons cut people with knives. Therefore, surgeons are doing something wrong."'
     },
@@ -102,35 +102,35 @@ document.addEventListener('DOMContentLoaded', function() {
     {
       id: 'A1',
       name: 'Equivocation',
-      latin: '',
+      latin: 'None',
       definition: 'When the same word or phrase is used with two or more meanings, deliberately or accidentally, in formulating an argument.',
       examples: 'Example: "A feather is light. What is light cannot be dark. Therefore, a feather cannot be dark."'
     },
     {
       id: 'A2',
       name: 'Amphiboly',
-      latin: '',
+      latin: 'None',
       definition: 'When one of the statements in an argument has more than one plausible meaning, because of the loose or awkward way in which the words in that statement have been combined.',
       examples: 'Example: "I shot an elephant in my pajamas. How the elephant got into my pajamas, I will never know."'
     },
     {
       id: 'A3',
       name: 'Accent',
-      latin: '',
+      latin: 'None',
       definition: 'When a shift of meaning arises within an argument as a consequence of changes in the emphasis given to its words or parts.',
       examples: 'Example: "We should not speak ill of our friends" (emphasizing "friends" suggests it\'s okay to speak ill of others)'
     },
     {
       id: 'A4',
       name: 'Composition',
-      latin: '',
+      latin: 'None',
       definition: 'This fallacy is committed (a) when one reasons mistakenly from the attributes of a part to the attributes of the whole, or (b) when one reasons mistakenly from the attributes of an individual member of some collection to the attributes of the totality of that collection.',
       examples: 'Example: "Each part of this machine is lightweight, so the whole machine must be lightweight."'
     },
     {
       id: 'A5',
       name: 'Division',
-      latin: '',
+      latin: 'None',
       definition: 'This fallacy is committed (a) when one reasons mistakenly from the attributes of a whole to the attributes of one of its parts, or (b) when one reasons mistakenly from the attributes of a totality of some collection of entities to the attributes of the individual entities within that collection.',
       examples: 'Example: "This university is over 100 years old, so every building on campus must be over 100 years old."'
     }
