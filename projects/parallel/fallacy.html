@@ -134,6 +134,25 @@
     .filter-btn.active {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
+    
+    .btn-game {
+        background: linear-gradient(90deg,  
+            #ff00ff, /* Magenta */
+            #00ffff, /* Ciano */
+            #0066ff, /* Azul elétrico */
+            #00ff66, /* Verde neon */
+            #ff00ff /* Magenta novamente para loop */
+        );
+        background-size: 300% 100%; /* Aumentamos o tamanho para criar a ilusão de continuidade */
+        animation: auroraMove 12s linear infinite;
+        color: white;
+        border: none;
+    }
+
+    @keyframes auroraMove {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 300% 50%; }
+    }
 
     .btn-all {
       background-color: #2c3e50;
@@ -539,7 +558,7 @@
         <input type="text" id="search-input" placeholder="Search fallacies...">
       </div>
       <div class="filter-buttons">
-        <button id="openFallacyGame" class="filter-btn btn-all active" data-filter="all">
+        <button id="openFallacyGame" class="filter-btn btn-game active" data-filter="all">
           <i class="fa-solid fa-gamepad"></i> Play Fallacy Game
         </button>
         <button class="filter-btn btn-all active" data-filter="all">
