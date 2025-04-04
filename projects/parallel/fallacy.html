@@ -6,6 +6,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' height='48px' viewBox='0 -960 960 960' width='48px' fill='%23634FA2'><path d='M230-160q-45 0-77.5-32.5T120-270q0-45 32.5-77.5T230-380q45 0 77.5 32.5T340-270q0 45-32.5 77.5T230-160Zm500 0q-45 0-77.5-32.5T620-270q0-45 32.5-77.5T730-380q46 0 78 32.5t32 77.5q0 45-32 77.5T730-160ZM480-580q-45 0-77.5-32.5T370-690q0-45 32.5-77.5T480-800q45 0 77.5 32.5T590-690q0 45-32.5 77.5T480-580Z'/></svg>">
   <title>Logical Fallacies Guide</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/projects/parallel/fallacy.css">
   <style>
     :root {
       /* Color Schemes for Fallacy Categories */
@@ -516,6 +517,11 @@
     html {
       scroll-behavior: smooth;
     }
+    
+    .image {
+      height: 30px;
+    filter: brightness(0) invert(1);
+    }
   </style>
 </head>
 <body>
@@ -533,6 +539,9 @@
         <input type="text" id="search-input" placeholder="Search fallacies...">
       </div>
       <div class="filter-buttons">
+        <button id="openFallacyGame" class="filter-btn btn-all active" data-filter="all">
+          <i class="fa-solid fa-gamepad"></i> Play Fallacy Game
+        </button>
         <button class="filter-btn btn-all active" data-filter="all">
           <i class="fas fa-layer-group"></i> All
         </button>
@@ -648,9 +657,9 @@
 
         <!-- Straw Man -->
         <div class="fallacy-card fallacy-relevance" data-category="relevance" data-code="R4">
-          <div class="card-header">
+           <div class="card-header">
             <div class="fallacy-icon">
-              <i class="fa-solid fa-wheat-awn"></i>   
+              <img src="/projects/parallel/icon_logic_Farming-Scarecrow--Streamline-Ultimate.png" class="image">
             </div>
             <div class="fallacy-title">
               <h3>Straw Man</h3>
@@ -1143,7 +1152,39 @@
       </div>
     </section>
   </div>
-    
+   <!-- Modal structure -->
+  <div id="fallacyModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Logical Fallacies Game</h2>
+      <p class="progress-indicator">Select a fallacy card to begin</p>
+      
+      <div class="card-container" id="cardContainer"></div>
+      
+      <div class="selected-card-container" id="selectedCardContainer">
+        <div class="selected-card-content" id="selectedCardContent">
+          <div class="card-title" id="cardTitle"></div>
+          <div class="card-latin" id="cardLatin"></div>
+          <div class="card-definition" id="cardDefinition"></div>
+          <div class="card-examples" id="cardExamples"></div>
+        </div>
+        <button class="btn" id="nextBtn">Next</button>
+        <div class="rating-container" id="ratingContainer">
+          <p>How well did you know this fallacy?</p>
+          <div>
+            <span class="star" data-rating="1"><i class="fas fa-star"></i></span>
+            <span class="star" data-rating="2"><i class="fas fa-star"></i></span>
+            <span class="star" data-rating="3"><i class="fas fa-star"></i></span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="result-container" id="resultContainer">
+        <div class="result-text" id="resultText"></div>
+        <button class="btn" id="playAgainBtn">Play Again</button>
+      </div>
+    </div>
+  </div> 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
   // Get references to DOM elements
@@ -1219,5 +1260,7 @@
   }
 });
     </script>
+          <script src="/projects/parallel/fallacy.js" ></script>
+
     </body>
 </html>
