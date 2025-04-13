@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="icon" href="./icon_building_columns_solid.svg" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@500&display=swap" rel="stylesheet">
+    <title>Logic Fields Reference</title>
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #9c5fff;
+            --accent-hover: #b17fff;
+            --accent-light: rgba(156, 95, 255, 0.1);
+        }
+        
+        :root.light {
+          --bg-primary: #ffffff;
+          --bg-secondary: #f5f5f5;
+          --text-primary: #1a1a1a;
+          --text-secondary: #444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 4rem;
+        }
+        
+        h1, h2 {
+          font-family: 'Space Grotesk', sans-serif;
+          letter-spacing: -0.5px;
+        }
+
+        header {
+            background-color: var(--bg-secondary);
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #9c5fff, #d787ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin: 2.5rem 0 1.5rem;
+            color: var(--accent);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            height: 3px;
+            width: 60%;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .intro {
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .category {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .category:hover {
+            transform: translateY(-5px);
+        }
+
+        .logic-entry {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logic-entry:last-child {
+            border-bottom: none;
+        }
+
+        .book {
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .book strong {
+            color: var(--text-primary);
+            font-style: normal;
+        }
+
+        .author {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-view {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .view-btn {
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .view-btn:hover:not(.active) {
+            background-color: rgba(156, 95, 255, 0.2);
+        }
+
+        .view-content {
+             display: none !important;
+            visibility: hidden;
+            position: absolute;
+            left: -9999px;
+
+        }
+
+        .view-content.active {
+            display: block !important;
+            visibility: visible;
+            position: static;
+        }
+
+        .search-container {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 0.75rem 1.25rem;
+            border: 2px solid var(--bg-secondary);
+            border-radius: 50px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(156, 95, 255, 0.2);
+        }
+
+        .card-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-left: 3px solid var(--accent);
+        }
+        
+        .card {
+          backdrop-filter: blur(6px);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+        }
+        .card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+          border-left: 3px solid var(--accent);
+        }
+
+
+        .card h3 {
+            color: var(--accent);
+            margin-top: 0;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            margin-top: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .highlight {
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0 3px;
+            border-radius: 3px;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--accent);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-3px);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .category {
+                padding: 1.5rem;
+            }
+            
+            .card-view {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fields of Logic Reference</h1>
+        <p>A comprehensive collection of logic fields and their foundational texts</p>
+    </header>
+
+    <div class="container">
+        <div class="intro">
+            <p>This reference provides a comprehensive overview of logic fields throughout history, from Aristotle to present day, along with their foundational texts or articles for further reading.</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchBox" class="search-box" placeholder="Search for logic fields or books...">
+        </div>
+
+        <div class="toggle-view">
+            <button class="view-btn active" data-view="list">List View</button>
+            <button class="view-btn" data-view="card">Card View</button>
+            <button class="view-btn" id="themeToggle">Toggle Theme</button>
+        </div>
+
+        <div id="listView" class="view-content active">
+            <div class="category" id="classical-logic">
+                <h2>Classical Logic</h2>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Aristotelian Logic (Syllogistic Logic)</h3>
+                    <div class="book"><strong>Book:</strong> "Prior Analytics" by Aristotle (4th century BCE)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Stoic Logic (Propositional Logic)</h3>
+                    <div class="book"><strong>Book:</strong> "The Logical Part of Chrysippus' Teaching" (fragments collected in "Stoicorum Veterum Fragmenta" by Hans von Arnim)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Megarian Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Studies in Logic and Probability" by George Boole discusses Megarian contributions</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Buddhist Logic (Hetuvidya)</h3>
+                    <div class="book"><strong>Book:</strong> "Pramāṇavārttika" by Dharmakīrti (7th century)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Traditional Chinese Logic (School of Names, Mohist Logic)</h3>
+                    <div class="book"><strong>Book:</strong> "The Mohist Canon" (Mozi)</div>
+                </div>
+            </div>
+
+            <div class="category" id="medieval-logic">
+                <h2>Medieval Developments</h2>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Scholastic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Summulae Logicales" by Peter of Spain (13th century)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Medieval Modal Logic</h3>
+                    <div class="book"><strong>Book:</strong> "De Modalibus" by William of Ockham</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Supposition Theory</h3>
+                    <div class="book"><strong>Book:</strong> "Tractatus de Suppositionibus" by William of Ockham</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Consequences Theory</h3>
+                    <div class="book"><strong>Book:</strong> "De Consequentiis" by John Buridan (14th century)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Obligationes (Disputational Logic)</h3>
+                    <div class="book"><strong>Book:</strong> "Tractatus de Obligationibus" by Walter Burley (early 14th century)</div>
+                </div>
+            </div>
+
+            <div class="category" id="modern-classical-logic">
+                <h2>Modern Classical Logic</h2>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Propositional Logic (Truth-Functional Logic)</h3>
+                    <div class="book"><strong>Book:</strong> "Begriffsschrift" by Gottlob Frege (1879)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>First-Order Logic (Predicate Logic)</h3>
+                    <div class="book"><strong>Book:</strong> "Principia Mathematica" by Whitehead & Russell (1910-1913)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Second-Order Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Second-order Logic and Foundations of Mathematics" by Väänänen (2001)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Higher-Order Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Simple Type Theory" by Alonzo Church (1940)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Set Theory</h3>
+                    <div class="book"><strong>Book:</strong> "Grundlagen der Mengenlehre" by Ernst Zermelo (1908)</div>
+                </div>
+            </div>
+
+            <div class="category" id="non-classical-logics">
+                <h2>Non-Classical Logics</h2>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Modal Logic (Alethic, Deontic, Epistemic, Temporal)</h3>
+                    <div class="book"><strong>Book:</strong> "Symbolic Logic" by C.I. Lewis & C.H. Langford (1932)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Many-Valued Logic</h3>
+                    <div class="book"><strong>Book:</strong> "On three-valued logic" by Jan Łukasiewicz (1920)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Fuzzy Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Fuzzy Sets" by Lotfi Zadeh (1965)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Intuitionistic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Zur Intuitionistischen Arithmetik und Zahlentheorie" by Arend Heyting (1930)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Relevance Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Entailment: The Logic of Relevance and Necessity" by Anderson & Belnap (1975)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Paraconsistent Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Paraconsistent Logic: Essays on the Inconsistent" by Priest, Routley & Norman (1989)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Quantum Logic</h3>
+                    <div class="book"><strong>Book:</strong> "The Logic of Quantum Mechanics" by Birkhoff & von Neumann (1936)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Free Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Free Logic: Selected Essays" by Karel Lambert (2002)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Non-Monotonic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Non-monotonic Reasoning" by McDermott & Doyle (1980)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Default Logic</h3>
+                    <div class="book"><strong>Book:</strong> "A Logic for Default Reasoning" by Raymond Reiter (1980)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Linear Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Linear Logic" by Jean-Yves Girard (1987)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Substructural Logics</h3>
+                    <div class="book"><strong>Book:</strong> "Substructural Logics" by Došen & Schroeder-Heister (1993)</div>
+                </div>
+            </div>
+
+            <div class="category" id="mathematical-logic">
+                <h2>Mathematical Logic</h2>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Model Theory</h3>
+                    <div class="book"><strong>Book:</strong> "Model Theory" by Chen Chung Chang & Jerome Keisler (1973)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Proof Theory</h3>
+                    <div class="book"><strong>Book:</strong> "Beweistheorie" by Gerhard Gentzen (1934-1935)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Recursion Theory (Computability Theory)</h3>
+                    <div class="book"><strong>Book:</strong> "Theory of Recursive Functions and Effective Computability" by Hartley Rogers (1967)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Set Theory</h3>
+                    <div class="book"><strong>Book:</strong> "Set Theory: An Introduction to Independence Proofs" by Kenneth Kunen (1980)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Category Theory</h3>
+                    <div class="book"><strong>Book:</strong> "Categories for the Working Mathematician" by Saunders Mac Lane (1971)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Type Theory</h3>
+                    <div class="book"><strong>Book:</strong> "Introduction to Type Theory" by Herman Geuvers (2011)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Constructive Mathematics</h3>
+                    <div class="book"><strong>Book:</strong> "Constructive Analysis" by Errett Bishop & Douglas Bridges (1985)</div>
+                </div>
+            </div>
+
+            <div class="category" id="philosophical-logic">
+                <h2>Philosophical Logic</h2>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Philosophical Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Introduction to Philosophical Logic" by Anthony Grayling (1982)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Informal Logic</h3>
+                    <div class="book"><strong>Book:</strong> "A Practical Study of Argument" by Trudy Govier (1985)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Dialectical Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Science of Logic" by G.W.F. Hegel (1812-1816)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Transcendental Logic (Kantian)</h3>
+                    <div class="book"><strong>Book:</strong> "Critique of Pure Reason" by Immanuel Kant (1781)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Phenomenological Logic (Husserlian)</h3>
+                    <div class="book"><strong>Book:</strong> "Formal and Transcendental Logic" by Edmund Husserl (1929)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Hermeneutic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Truth and Method" by Hans-Georg Gadamer (1960)</div>
+                </div>
+            </div>
+
+            <div class="category" id="applied-logic">
+                <h2>Applied Logic</h2>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Computational Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Handbook of Practical Logic and Automated Reasoning" by John Harrison (2009)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Programming Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Logic in Computer Science" by Huth & Ryan (2004)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Database Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Foundation for Object/Relational Databases: The Third Manifesto" by Date & Darwen (1998)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Logic Programming</h3>
+                    <div class="book"><strong>Book:</strong> "Foundations of Logic Programming" by John Lloyd (1984)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Description Logic</h3>
+                    <div class="book"><strong>Book:</strong> "The Description Logic Handbook" by Baader, Calvanese, McGuinness, Nardi & Patel-Schneider (2003)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Dynamic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Dynamic Logic" by Harel, Kozen & Tiuryn (2000)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Epistemic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Knowledge and Belief" by Jaakko Hintikka (1962)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Doxastic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Reasoning about Knowledge" by Fagin, Halpern, Moses & Vardi (1995)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Temporal Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Temporal Logic of Programs" by Amir Pnueli (1977)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Deontic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Deontic Logic in Computer Science" by Meyer & Wieringa (1993)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Game Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Game Logic" by Rohit Parikh (1985)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Belief Revision Theory</h3>
+                    <div class="book"><strong>Book:</strong> "On the Logic of Theory Change" by Alchourrón, Gärdenfors & Makinson (1985)</div>
+                </div>
+            </div>
+
+            <div class="category" id="contemporary-developments">
+                <h2>Contemporary Developments</h2>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Independence-Friendly Logic</h3>
+                    <div class="book"><strong>Book:</strong> "The Principles of Mathematics Revisited" by Jaakko Hintikka (1996)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Dialogical Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Dialogische Logik" by Lorenzen & Lorenz (1978)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Resource-Conscious Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Semantical Considerations on Nonmonotonic Logic" by Robert Moore (1985)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Abstract Algebraic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Abstract Algebraic Logic" by Font, Jansana & Pigozzi (2003)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Logical Pluralism</h3>
+                    <div class="book"><strong>Book:</strong> "Logical Pluralism" by Beall & Restall (2006)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Coalgebraic Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Coalgebraic Logic" by Moss & Viglizzo (2004)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Dependence Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Dependence Logic" by Jouko Väänänen (2007)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Team Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Modal and First-order Dependence Logic" by Kontinen & Väänänen (2013)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Inquisitive Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Inquisitive Semantics" by Ciardelli, Groenendijk & Roelofsen (2018)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Categorical Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Lectures on the Curry-Howard Isomorphism" by Sørensen & Urzyczyn (2006)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Combinatory Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Combinatory Logic" by Curry & Feys (1958)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Provability Logic</h3>
+                    <div class="book"><strong>Book:</strong> "The Logic of Provability" by George Boolos (1993)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Tense Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Tense Logic and the Theory of Linear Order" by Burgess (1984)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Situation Theory</h3>
+                    <div class="book"><strong>Book:</strong> "Situations and Attitudes" by Barwise & Perry (1983)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Hybrid Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Hybrid Logics: Characterization, Interpolation and Complexity" by Areces & ten Cate (2007)</div>
+                </div>
+                <div class="logic-entry" data-aos="fade-up">
+                    <h3>Adaptive Logic</h3>
+                    <div class="book"><strong>Book:</strong> "Adaptive Logics and Dynamic Proofs" by Batens (2007)</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cardView" class="view-content card-view">
+            <!-- Cards will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <a href="#" class="back-to-top" id="backToTop">↑</a>
+
+    <script>
+// View Toggle
+const viewBtns = document.querySelectorAll('.view-btn');
+const viewContents = document.querySelectorAll('.view-content');
+
+viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-view');
+        
+        // Toggle active class on buttons
+        viewBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Toggle active class on content
+        viewContents.forEach(content => {
+            content.classList.remove('active');
+            if (content.id === view + 'View') {
+                content.classList.add('active');
+            }
+        });
+        
+        // If card view is selected and it's empty, populate it
+        if (view === 'card' && document.querySelector('#cardView').children.length === 0) {
+            populateCardView();
+        }
+    });
+});
+
+// Populate Card View
+function populateCardView() {
+    const cardView = document.getElementById('cardView');
+    cardView.innerHTML = ''; // limpa o conteúdo anterior para evitar duplicação
+
+    const logicEntries = document.querySelectorAll('.logic-entry');
+
+    logicEntries.forEach(entry => {
+        const title = entry.querySelector('h3')?.textContent;
+        const book = entry.querySelector('.book')?.textContent;
+
+        if (title && book) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <h3>${title}</h3>
+                <p>${book}</p>
+            `;
+            cardView.appendChild(card);
+        }
+    });
+}
+
+// Search Functionality
+const searchBox = document.getElementById('searchBox');
+
+searchBox.addEventListener('input', () => {
+    const searchTerm = searchBox.value.toLowerCase();
+    const listEntries = document.querySelectorAll('.logic-entry');
+    const cardEntries = document.querySelectorAll('.card');
+    
+    // Highlight and filter list view
+    listEntries.forEach(entry => {
+        const title = entry.querySelector('h3').textContent.toLowerCase();
+        const book = entry.querySelector('.book').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || book.includes(searchTerm)) {
+            entry.style.display = 'block';
+            
+            // Highlight matches
+            highlightText(entry, searchTerm);
+        } else {
+            entry.style.display = 'none';
+        }
+    });
+    
+    // Filter card view
+    if (cardEntries.length > 0) {
+        cardEntries.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const text = card.querySelector('p').textContent.toLowerCase();
+
+            if (title.includes(searchTerm) || text.includes(searchTerm)) {
+                card.style.display = 'block';
+                highlightText(card, searchTerm); // Highlight matches
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // If no entries are found, show empty message
+    const activeView = document.querySelector('.view-content.active');
+    const visibleEntries = activeView.querySelectorAll('.logic-entry:not([style*="display: none"]), .card:not([style*="display: none"])');
+
+    if (visibleEntries.length === 0 && searchTerm !== '') {
+        if (!document.getElementById('no-results')) {
+            const noResults = document.createElement('div');
+            noResults.id = 'no-results';
+            noResults.style.textAlign = 'center';
+            noResults.style.padding = '2rem';
+            noResults.style.color = 'var(--text-secondary)';
+            noResults.innerHTML = `No results found for "<span style="color: var(--accent)">${searchTerm}</span>"`;
+            activeView.appendChild(noResults);
+        } else {
+            document.getElementById('no-results').innerHTML = `No results found for "<span style="color: var(--accent)">${searchTerm}</span>"`;
+            document.getElementById('no-results').style.display = 'block';
+        }
+    } else if (document.getElementById('no-results')) {
+        document.getElementById('no-results').style.display = 'none';
+    }
+});
+
+// Function to highlight search terms
+function highlightText(element, searchTerm) {
+    if (searchTerm === '') {
+        // Reset highlighting
+        element.innerHTML = element.innerHTML.replace(/<span class="highlight">([^<]+)<\/span>/g, '$1');
+        return;
+    }
+    
+    const h3 = element.querySelector('h3');
+    const bookOrP = element.querySelector('.book') || element.querySelector('p');
+    
+    if (h3 && !h3.dataset.original) {
+        h3.dataset.original = h3.textContent;
+    }
+    
+    if (bookOrP && !bookOrP.dataset.original) {
+        bookOrP.dataset.original = bookOrP.innerHTML;
+    }
+    
+    // Reset to original text before highlighting again
+    if (h3 && h3.dataset.original) {
+        h3.textContent = h3.dataset.original;
+    }
+    
+    if (bookOrP && bookOrP.dataset.original) {
+        bookOrP.innerHTML = bookOrP.dataset.original;
+    }
+    
+    // Apply highlighting if search term exists
+    if (searchTerm !== '') {
+        if (h3) {
+            h3.innerHTML = highlightOccurrences(h3.textContent, searchTerm);
+        }
+        
+        if (bookOrP) {
+            bookOrP.innerHTML = highlightOccurrences(bookOrP.innerHTML, searchTerm);
+        }
+    }
+}
+
+// Function to highlight occurrences of search term
+function highlightOccurrences(text, searchTerm) {
+    if (!searchTerm) return text;
+    
+    const regex = new RegExp(searchTerm, 'gi');
+    return text.replace(regex, match => `<span class="highlight">${match}</span>`);
+}
+
+// Back to top button functionality
+const backToTopBtn = document.getElementById('backToTop');
+
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        backToTopBtn.classList.add('visible');
+    } else {
+        backToTopBtn.classList.remove('visible');
+    }
+});
+
+backToTopBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', () => {
+    // Show categories expanded initially
+    document.querySelectorAll('.category').forEach(category => {
+        category.classList.add('expanded');
+    });
+    
+    // Make sure card view is populated if active initially
+    const activeView = document.querySelector('.view-content.active');
+    if (activeView && activeView.id === 'cardView' && activeView.children.length === 0) {
+        populateCardView();
+    }
+});
+
+// Corrected theme toggle function to preserve content
+document.getElementById('themeToggle').addEventListener('click', () => {
+    document.documentElement.classList.toggle('light');
+    
+    // Make sure card view is populated after theme change if it's active
+    const activeView = document.querySelector('.view-content.active');
+    if (activeView && activeView.id === 'cardView' && activeView.children.length === 0) {
+        populateCardView();
+    }
+});
+        
+    </script>
+    
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init({ duration: 800, once: true });
+    </script>
+    </body>
+</html>
