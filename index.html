@@ -48,7 +48,8 @@
         <link rel="stylesheet" href="/css/cards.css">
         <link rel="stylesheet" href="/css/footer-old.css">
         <link rel="stylesheet" href="/css/search.css">
-        
+        <link rel="stylesheet" href="/css/iframe.css">
+
     </head>
     <body class="bg-white text-gray-800">
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WV6QJWVX" height="0" width="0" style="display: none; visibility: hidden;"></iframe></noscript>
@@ -104,7 +105,19 @@
                     <span class="vertical-bar"></span>
                 </h1>
                 <p data-i18n="home_subtitle_text" class="text-xl mb-8">Collaborating globally to push the boundaries of physics, technology, and innovation.</p>
-                <div class="flex justify-center space-x-4">
+                
+                <!-- Vídeo do YouTube -->
+                <div class="video-wrapper" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="video-container" onclick="window.open('https://www.youtube.com/watch?v=gYWpNuHMmJA', '_blank')">
+                        <img src="https://img.youtube.com/vi/gYWpNuHMmJA/maxresdefault.jpg" alt="NIPSCERN Lab Video" class="video-thumbnail">
+                        <div class="play-button-overlay">
+                            <div class="play-button"></div>
+                        </div>
+                    </div>
+                    <p class="video-caption">Assista, no YouTube, ao nosso vídeo sobre Fractais &amp; FPGAs</p>
+                </div>
+                
+                <div class="flex justify-center space-x-4 mt-8">
                     <a data-i18n="home_btn_learn_more" href="#current-research" class="btn-primary px-6 py-3 rounded-full">Learn More</a>
                     <a data-i18n="home_btn_explore_projects" href="#current-research" class="btn-primary px-6 py-3 rounded-full">Explore Projects</a>
                 </div>
