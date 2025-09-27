@@ -1,0 +1,163 @@
+/* CSS para o vídeo do YouTube */
+.video-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    position: relative;
+    border-radius: 20px;
+    padding: 8px;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* Aurora Borealis Border Animation */
+.video-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    padding: 8px;
+    background: linear-gradient(45deg, 
+        #ff006e, #fb5607, #ffbe0b, #8338ec, #3a86ff, 
+        #06ffa5, #ff006e, #fb5607, #ffbe0b, #8338ec, #3a86ff);
+    background-size: 400% 400%;
+    animation: aurora 12s ease-in-out infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+}
+
+@keyframes aurora {
+    0%, 100% {
+        background-position: 0% 50%;
+        filter: hue-rotate(0deg) brightness(1.2);
+    }
+    25% {
+        background-position: 100% 0%;
+        filter: hue-rotate(90deg) brightness(1.4);
+    }
+    50% {
+        background-position: 100% 100%;
+        filter: hue-rotate(180deg) brightness(1.1);
+    }
+    75% {
+        background-position: 0% 100%;
+        filter: hue-rotate(270deg) brightness(1.3);
+    }
+}
+
+.video-container:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+.video-container:hover::before {
+    animation-duration: 6s;
+    filter: brightness(1.5) saturate(1.3);
+}
+
+.video-thumbnail {
+    width: 100%;
+    height: 450px;
+    border-radius: 15px;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+    transition: filter 0.4s ease;
+}
+
+.video-container:hover .video-thumbnail {
+    filter: brightness(0.85) contrast(1.1);
+}
+
+.play-button-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(15px);
+    z-index: 2;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.video-container:hover .play-button-overlay {
+    background: rgba(255, 255, 255, 1);
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.play-button {
+    width: 0;
+    height: 0;
+    border-left: 25px solid #667eea;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    margin-left: 5px;
+    transition: all 0.3s ease;
+}
+
+.video-container:hover .play-button {
+    border-left-color: #5a67d8;
+    filter: drop-shadow(0 2px 4px rgba(90, 103, 216, 0.3));
+}
+
+.video-caption {
+    text-align: center;
+    margin-top: 1rem;
+    color: #003366;
+    font-size: 1.1rem;
+    font-weight: 300;
+    opacity: 0.9;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.video-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .video-container {
+        max-width: 95%;
+        margin: 1.5rem auto;
+    }
+    
+    .video-container::before {
+        padding: 6px;
+    }
+    
+    .video-thumbnail {
+        height: 250px;
+    }
+    
+    .play-button-overlay {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .video-container:hover .play-button-overlay {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    
+    .play-button {
+        border-left: 20px solid #667eea;
+        border-top: 12px solid transparent;
+        border-bottom: 12px solid transparent;
+    }
+    
+    .video-caption {
+        font-size: 1rem;
+    }
+}
