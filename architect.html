@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Architect of the Mind: A Six-Year Construction Project</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #151515;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --accent: #c9a961;
+            --accent-dim: #8a7441;
+            --border: #2a2a2a;
+            --completed: #4a7c59;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            font-weight: 300;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 5rem;
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+        
+        .philosophy {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-left: 2px solid var(--accent);
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+        
+        .progress-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .progress-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            transition: border-color 0.3s;
+        }
+        
+        .progress-card:hover {
+            border-color: var(--accent-dim);
+        }
+        
+        .progress-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+        
+        nav button:hover, nav button.active {
+            color: var(--accent);
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .year {
+            margin-bottom: 4rem;
+        }
+        
+        .year-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .year-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--accent);
+        }
+        
+        .quarter {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-left: 2px solid var(--border);
+        }
+        
+        .quarter h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+        
+        .resource {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .resource:hover {
+            border-color: var(--accent-dim);
+        }
+        
+        .resource.completed {
+            border-left: 3px solid var(--completed);
+        }
+        
+        .checkbox {
+            min-width: 20px;
+            min-height: 20px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .checkbox:hover {
+            border-color: var(--accent);
+        }
+        
+        .checkbox.checked {
+            background: var(--completed);
+            border-color: var(--completed);
+        }
+        
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .resource-content {
+            flex: 1;
+        }
+        
+        .resource-title {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+        }
+        
+        .resource-meta {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+        
+        .resource-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .category {
+            margin-bottom: 2rem;
+        }
+        
+        .category-header {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        footer {
+            margin-top: 5rem;
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .export-button {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .export-button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .integration-year {
+            background: var(--bg-secondary);
+            padding: 3rem;
+            border: 2px solid var(--accent-dim);
+            margin-top: 3rem;
+        }
+        
+        .integration-year h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 2rem 1rem;
+            }
+            
+            nav {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>The Architect of the Mind</h1>
+            <p class="subtitle">A Six-Year Construction Project in Logic & Global Culture</p>
+            <div class="philosophy">
+                "The goal is not to have an answer for everything, but to build a mind that can rigorously approach anything. This plan integrates two journeys: a deep, vertical mastery of Logic—the grammar of reality—and a broad, horizontal exploration of Culture—the story of humanity. They are not separate, but two lenses focused on the same point: a well-lived, well-understood life."
+            </div>
+        </header>
+
+        <div class="progress-overview">
+            <div class="progress-card">
+                <h3>Logic Journey</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="logic-progress" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="logic-completed">0</span>
+                    <span id="logic-total">0 resources</span>
+                </div>
+            </div>
+            
+            <div class="progress-card">
+                <h3>Culture Journey</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="culture-progress" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="culture-completed">0</span>
+                    <span id="culture-total">0 resources</span>
+                </div>
+            </div>
+            
+            <div class="progress-card">
+                <h3>Total Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="total-progress" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="total-completed">0</span>
+                    <span id="total-resources">0 resources</span>
+                </div>
+            </div>
+        </div>
+
+        <nav>
+            <button class="active" onclick="showSection('logic')">LOGIC</button>
+            <button onclick="showSection('culture')">CULTURE</button>
+            <button onclick="showSection('integration')">SYNTHESIS & FRONTIER</button>
+        </nav>
+
+        <div id="logic-section" class="content-section active">
+            <!-- YEAR 1: THE TOOLKIT - PROPOSITIONAL & FIRST-ORDER LOGIC -->
+            <div class="year">
+                <div class="year-header"><h2>Year 1: The Toolkit - Propositional & First-Order Logic</h2></div>
+                <div class="quarter">
+                    <h3>Q1: The Foundations of Reasoning</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Smith, Peter - An Introduction to Formal Logic</div><div class="resource-meta">334 pages | 2020</div><div class="resource-description">The best modern starting point. Work through Chapters 1-15, doing the exercises. This is your foundation.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Plato - Euthyphro & Meno</div><div class="resource-meta">~60 pages | c. 399-380 BCE</div><div class="resource-description">Witness the Socratic method in action. The search for definitions is the beginning of logic.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: Classical Logic & Natural Deduction</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Smith, Peter - An Introduction to Formal Logic</div><div class="resource-meta">Complete the book | Chapters 16-34</div><div class="resource-description">Master predicate logic. The exercises are not optional; they are the work.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Aristotle - Prior Analytics (Book I)</div><div class="resource-meta">~80 pages | c. 350 BCE</div><div class="resource-description">Read the original. See the invention of the first formal system: syllogistic logic. Compare its structure to modern logic.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Modern Revolution</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Enderton, Herbert - A Mathematical Introduction to Logic</div><div class="resource-meta">Chapters 1-2, ~190 pages | 2001</div><div class="resource-description">The next level of rigor. Re-learn everything from a purely mathematical perspective. Focus on soundness and completeness.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Frege, Gottlob - Begriffsschrift (selections)</div><div class="resource-meta">~50 pages | 1879</div><div class="resource-description">Study this with a guide (e.g., online lectures). Don't just read it, understand the conceptual leap of quantification that began modern logic.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: Consolidation & History</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Kneale & Kneale - The Development of Logic</div><div class="resource-meta">Read Parts I & II, ~200 pages | 1962</div><div class="resource-description">Contextualize your knowledge. Understand the full arc from the Greeks to Frege.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Review and Practice</div><div class="resource-meta">Self-directed</div><div class="resource-description">Go back through Smith and Enderton. Solve problems you skipped. Explain concepts to an imaginary student. Solidify your core.</div></div></div>
+                </div>
+            </div>
+
+            <!-- YEAR 2: THE LIMITS - INCOMPLETENESS & COMPUTABILITY -->
+            <div class="year">
+                <div class="year-header"><h2>Year 2: The Limits - Incompleteness & Computability</h2></div>
+                <div class="quarter">
+                    <h3>Q1: The Hilbert Program & Gödel's First Theorem</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Smith, Peter - An Introduction to Gödel's Theorems</div><div class="resource-meta">Part I & II, ~150 pages | 2013</div><div class="resource-description">The best guide available. Understand the historical context and the mechanics of Gödel numbering.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Hofstadter, Douglas - Gödel, Escher, Bach</div><div class="resource-meta">Read Parts I & II | 1979</div><div class="resource-description">Read this in parallel. It builds the intuition and wonder that fuels the technical work.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: Gödel's Second Theorem & Its Aftermath</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Smith, Peter - An Introduction to Gödel's Theorems</div><div class="resource-meta">Complete the book | Part III & IV, ~220 pages</div><div class="resource-description">Work through the proofs of the incompleteness theorems. This is one of the most profound intellectual achievements of humanity.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Gödel, Kurt - On Formally Undecidable Propositions...</div><div class="resource-meta">38 pages | 1931</div><div class="resource-description">Now, read the original paper. You won't be reading it for the first time; you'll be reading it with understanding.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Birth of the Computer - Turing</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Boolos, Burgess, Jeffrey - Computability and Logic</div><div class="resource-meta">Chapters 1-7, ~100 pages | 2007</div><div class="resource-description">A formal introduction to Turing Machines and recursive functions.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Turing, Alan - On Computable Numbers...</div><div class="resource-meta">36 pages | 1936</div><div class="resource-description">Read the paper that defined what a computer is, before any computer existed. Identify the Halting Problem.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: Church's Thesis & Unsolvability</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Boolos, Burgess, Jeffrey - Computability and Logic</div><div class="resource-meta">Chapters 8-15, ~150 pages</div><div class="resource-description">Understand the equivalence of different models of computation (Church-Turing Thesis) and explore the landscape of undecidable problems.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Church, Alonzo - An Unsolvable Problem of Elementary Number Theory</div><div class="resource-meta">18 pages | 1936</div><div class="resource-description">Understand the lambda calculus approach to the same fundamental limit.</div></div></div>
+                </div>
+            </div>
+
+            <!-- YEAR 3: THE UNIVERSES - SET THEORY & MODEL THEORY -->
+            <div class="year">
+                <div class="year-header"><h2>Year 3: The Universes - Set Theory & Model Theory</h2></div>
+                <div class="quarter">
+                    <h3>Q1: Cantor's Paradise - Naive & Axiomatic Set Theory</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Halmos, Paul - Naive Set Theory</div><div class="resource-meta">104 pages | 1960</div><div class="resource-description">A beautiful and intuitive introduction to the fundamental concepts: ordinals, cardinals, and the paradoxes.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Enderton, Herbert - The Elements of Set Theory</div><div class="resource-meta">Chapters 1-6, ~150 pages | 1977</div><div class="resource-description">A formal development of ZFC. Rebuild mathematics from the axioms of Zermelo-Fraenkel.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: The Continuum & Independence</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Kunen, Kenneth - Set Theory: An Introduction to Independence Proofs</div><div class="resource-meta">Read Part I, ~100 pages | 1980</div><div class="resource-description">This is a serious graduate text. Your goal is to understand combinatorial set theory and the philosophical motivation for forcing.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Cohen, Paul - Set Theory and the Continuum Hypothesis</div><div class="resource-meta">Read Chapters I & II | 1966</div><div class="resource-description">Understand the story and the impact of the independence of the Continuum Hypothesis, even if you don't follow every technical detail of forcing yet.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: Structures & Satisfaction - Model Theory</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Hodges, Wilfrid - A Shorter Model Theory</div><div class="resource-meta">Chapters 1-4, ~150 pages | 1997</div><div class="resource-description">The study of the relationship between language and structure. Master the Compactness Theorem and Löwenheim-Skolem theorems.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Marker, David - Model Theory: An Introduction</div><div class="resource-meta">Read Chapter 1 | 2002</div><div class="resource-description">Use this as a second voice to solidify the foundational concepts from a different, more algebraic perspective.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: Quantifier Elimination & Stability</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Hodges, Wilfrid - A Shorter Model Theory</div><div class="resource-meta">Chapters 5-8, ~160 pages</div><div class="resource-description">Delve into the core techniques of modern model theory. Understand what makes a theory 'tame' and well-behaved.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Morley, Michael - Categoricity in Power</div><div class="resource-meta">8 pages | 1965</div><div class="resource-description">Read one of the landmark papers of 20th-century model theory.</div></div></div>
+                </div>
+            </div>
+
+            <!-- YEAR 4: THE ALTERNATIVES - NON-CLASSICAL LOGICS -->
+            <div class="year">
+                <div class="year-header"><h2>Year 4: The Alternatives - Non-Classical Logics</h2></div>
+                <div class="quarter">
+                    <h3>Q1: Possible Worlds - Modal Logic</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Blackburn, de Rijke, Venema - Modal Logic</div><div class="resource-meta">Chapters 1-4, ~250 pages | 2001</div><div class="resource-description">The definitive modern guide. Master Kripke semantics and understand the zoo of modal systems.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Kripke, Saul - Semantical Considerations on Modal Logic</div><div class="resource-meta">18 pages | 1963</div><div class="resource-description">The paper that revolutionized the field with possible worlds semantics.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: Applications of Modality - Epistemic & Temporal</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Blackburn, de Rijke, Venema - Modal Logic</div><div class="resource-meta">Chapters 6-7, ~100 pages</div><div class="resource-description">Explore advanced topics and see how modal logic is applied to knowledge, time, and computation.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Fagin, Halpern, Moses, Vardi - Reasoning About Knowledge</div><div class="resource-meta">Read Chapters 1-3, ~100 pages | 1995</div><div class="resource-description">See how modal logic becomes a powerful tool for computer science and AI.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Constructive Path - Intuitionistic Logic</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Priest, Graham - An Introduction to Non-Classical Logic</div><div class="resource-meta">Chapters 1-3 & 6-7, ~150 pages | 2008</div><div class="resource-description">A clear introduction to the semantics and proof systems of intuitionistic logic.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Brouwer, L.E.J. - Intuitionism and Formalism</div><div class="resource-meta">20 pages | 1913</div><div class="resource-description">Read the philosophical manifesto. What does it mean for truth to be 'constructed'?</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: Logic of Resources & Contradiction</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Restall, Greg - An Introduction to Substructural Logics</div><div class="resource-meta">Read Parts I & II, ~150 pages | 2000</div><div class="resource-description">Explore logics that question basic structural rules, leading to Relevance and Linear logic.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Girard, Jean-Yves - Linear Logic</div><div class="resource-meta">71 pages | 1987</div><div class="resource-description">A revolutionary paper that treats propositions as resources that can be consumed.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Priest, Graham - In Contradiction</div><div class="resource-meta">Read Chapters 1-5, ~80 pages | 2006</div><div class="resource-description">Engage with paraconsistent logic and the challenging idea that some contradictions might be true (dialetheism).</div></div></div>
+                </div>
+            </div>
+
+            <!-- YEAR 5: THE STRUCTURE - PROOF THEORY & CATEGORICAL LOGIC -->
+            <div class="year">
+                <div class="year-header"><h2>Year 5: The Structure - Proof Theory, Type Theory & Categories</h2></div>
+                <div class="quarter">
+                    <h3>Q1: The Syntax of Proof - Proof Theory</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Troelstra & Schwichtenberg - Basic Proof Theory</div><div class="resource-meta">Chapters 1-4, ~150 pages | 2000</div><div class="resource-description">Shift focus from 'truth' (models) to 'proof' (syntax). Master natural deduction and sequent calculus.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Gentzen, Gerhard - Investigations into Logical Deduction</div><div class="resource-meta">68 pages | 1935</div><div class="resource-description">Read the original paper on the Hauptsatz (cut-elimination theorem), a cornerstone of proof theory.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: Proofs as Programs - The Curry-Howard Correspondence</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Girard, Jean-Yves - Proofs and Types</div><div class="resource-meta">176 pages | 1989</div><div class="resource-description">A beautiful and deep exploration of the idea that a proof of a proposition is a program of that proposition's type.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Martin-Löf, Per - Intuitionistic Type Theory</div><div class="resource-meta">91 pages | 1984</div><div class="resource-description">The foundation for modern constructive mathematics and proof assistants like Coq and Agda.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Logic of Structure - Category Theory</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Awodey, Steve - Category Theory</div><div class="resource-meta">Chapters 1-5, ~150 pages | 2010</div><div class="resource-description">Learn the language of modern mathematics: categories, functors, natural transformations, and adjoints.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Lawvere, F.W. - Adjointness in Foundations</div><div class="resource-meta">16 pages | 1969</div><div class="resource-description">The paper that argued that the adjoint functor relationship is more fundamental than set membership.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: Logic as a Category</h3>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Awodey, Steve - Category Theory</div><div class="resource-meta">Chapters 6-10, ~150 pages</div><div class="resource-description">See how proof systems can be seen as categories, and how logic finds its most abstract and powerful expression in Topos Theory.</div></div></div>
+                    <div class="resource" data-section="logic"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Goldblatt, Robert - Topoi: The Categorial Analysis of Logic</div><div class="resource-meta">Read Chapters 1-4 | 1984</div><div class="resource-description">Begin to explore the idea of a topos as a universe for mathematics, a generalization of set theory.</div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="culture-section" class="content-section">
+            <!-- YEAR 1: THE AXIAL AGE & THE NATURE OF MAN -->
+            <div class="year">
+                <div class="year-header"><h2>Year 1: The Axial Age & The Nature of Man</h2></div>
+                <div class="quarter">
+                    <h3>Q1: The Greek Miracle</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Homer - The Iliad & The Odyssey</div><div class="resource-meta">Lattimore translations</div><div class="resource-description">The foundational myths of the West. Focus on the concepts of honor (timē), excellence (aretē), and fate.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Plato - The Republic</div><div class="resource-meta">Grube/Reeve translation</div><div class="resource-description">The cornerstone of Western philosophy. Justice in the state and the soul. The allegory of the cave.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: The Indian Foundation</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">The Upanishads</div><div class="resource-meta">Easwaran translation</div><div class="resource-description">The philosophical heart of Hinduism. Explore the concepts of Brahman, Atman, and non-duality.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">The Bhagavad Gita</div><div class="resource-meta">Easwaran translation</div><div class="resource-description">A dialogue on duty (dharma), action (karma), and the nature of God. A masterpiece of spiritual literature.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Chinese Order</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Confucius - The Analects</div><div class="resource-meta">Slingerland translation</div><div class="resource-description">The foundation of East Asian social and ethical thought. Ren (humaneness), Li (ritual), and the well-ordered society.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Lao Tzu - Tao Te Ching</div><div class="resource-meta">Mitchell translation</div><div class="resource-description">The foundational text of Taoism. The Way (Tao), non-action (Wu Wei), and the power of the natural.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: The Human Animal</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Sapolsky, Robert - Behave: The Biology of Humans at Our Best and Worst</div><div class="resource-meta">790 pages | Biology</div><div class="resource-description">Your foundational book on human nature, from the level of neurons to culture. A modern masterpiece.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Darwin, Charles - On the Origin of Species</div><div class="resource-meta">1st Edition | Evolution</div><div class="resource-description">Read the argument that changed our understanding of life itself.</div></div></div>
+                </div>
+            </div>
+
+            <!-- YEAR 2: EMPIRES, EPICS & THE MIND -->
+            <div class="year">
+                <div class="year-header"><h2>Year 2: Empires, Epics & The Mind</h2></div>
+                <div class="quarter">
+                    <h3>Q1: Rome, Christianity & The Birth of the Self</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Virgil - The Aeneid</div><div class="resource-meta">Fagles translation</div><div class="resource-description">The founding epic of Rome. Contrast its sense of duty and destiny with the Greek epics.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Augustine - Confessions</div><div class="resource-meta">Chadwick translation</div><div class="resource-description">Arguably the first autobiography. The invention of the modern inner life, grappling with memory, time, and faith.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: The Islamic Golden Age & The Medieval World</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Ibn Khaldun - The Muqaddimah: An Introduction to History</div><div class="resource-meta">Abridged version</div><div class="resource-description">The foundational work of sociology, economics, and historiography, written in the 14th century.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Dante Alighieri - The Divine Comedy</div><div class="resource-meta">Mandelbaum translation</div><div class="resource-description">A journey through the medieval cosmos and a synthesis of theology, philosophy, and poetry.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The World from a Different Shore</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Murasaki Shikibu - The Tale of Genji</div><div class="resource-meta">Seidensticker or Tyler translation</div><div class="resource-description">The world's first novel, from 11th-century Japan. A profound exploration of aesthetics, love, and impermanence.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Popol Vuh: The Mayan Book of the Dawn of Life</div><div class="resource-meta">Tedlock translation</div><div class="resource-description">A foundational creation narrative of the Americas, offering a completely different cosmology.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: The Thinking Mind</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Kahneman, Daniel - Thinking, Fast and Slow</div><div class="resource-meta">499 pages | Psychology</div><div class="resource-description">A foundational book on cognitive biases and the two systems that rule our minds. Critical for any logician.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Atkins, Peter - The Periodic Kingdom</div><div class="resource-meta">161 pages | Chemistry</div><div class="resource-description">A journey through the periodic table as a landscape, explaining the fundamental logic of chemistry.</div></div></div>
+                </div>
+            </div>
+
+            <!-- YEAR 3: RENAISSANCE, REVOLUTION & THE NOVEL -->
+            <div class="year">
+                <div class="year-header"><h2>Year 3: Renaissance, Revolution & The Novel</h2></div>
+                <div class="quarter">
+                    <h3>Q1: The Rebirth of Man</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Shakespeare, William - Hamlet, King Lear, The Tempest</div><div class="resource-meta">~300 pages</div><div class="resource-description">The height of the English language. An unparalleled exploration of human consciousness, morality, and power.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Montaigne, Michel de - Essays</div><div class="resource-meta">Frame translation (selected)</div><div class="resource-description">The invention of the essay form. A profound and humble exploration of the self.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: The Age of Reason and Revolution</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Locke, John - Second Treatise of Government</div><div class="resource-meta">180 pages</div><div class="resource-description">The philosophical bedrock of modern liberal democracy.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Kant, Immanuel - Groundwork for the Metaphysics of Morals</div><div class="resource-meta">130 pages</div><div class="resource-description">The categorical imperative. A revolution in ethics that parallels his revolution in epistemology.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Great Novels</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Dostoyevsky, Fyodor - The Brothers Karamazov</div><div class="resource-meta">Pevear/Volokhonsky translation</div><div class="resource-description">A philosophical novel of unmatched depth, wrestling with faith, doubt, and morality in 19th-century Russia.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Tolstoy, Leo - War and Peace</div><div class="resource-meta">1225 pages</div><div class="resource-description">This will take the whole quarter. An epic of life itself, exploring history, free will, and the search for meaning.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: The Fabric of Society</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Smith, Adam - The Wealth of Nations</div><div class="resource-meta">Books I-II | Economics</div><div class="resource-description">Understand the foundational arguments for capitalism from the original source.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Marx, Karl & Engels, Friedrich - The Communist Manifesto & Capital (Vol 1, Part 1)</div><div class="resource-meta">~150 pages | Politics/Economics</div><div class="resource-description">Understand the most influential critique of capitalism.</div></div></div>
+                </div>
+            </div>
+
+            <!-- YEAR 4: MODERNITY, MEANING & THE COSMOS -->
+            <div class="year">
+                <div class="year-header"><h2>Year 4: Modernity, Meaning & The Cosmos</h2></div>
+                <div class="quarter">
+                    <h3>Q1: The Break with Tradition</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Nietzsche, Friedrich - Beyond Good and Evil & On the Genealogy of Morals</div><div class="resource-meta">Kaufmann translations</div><div class="resource-description">A devastating critique of morality and the philosophical announcement of the modern condition.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Joyce, James - Ulysses</div><div class="resource-meta">732 pages</div><div class="resource-description">The landmark of literary modernism. A deep dive into consciousness, language, and the epic nature of an ordinary day.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: The Post-Colonial Voice</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Achebe, Chinua - Things Fall Apart</div><div class="resource-meta">209 pages | 1958</div><div class="resource-description">A powerful depiction of the clash between Nigerian indigenous culture and European colonialism, told from the inside.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">García Márquez, Gabriel - One Hundred Years of Solitude</div><div class="resource-meta">417 pages</div><div class="resource-description">The masterpiece of magical realism and a sprawling epic of Latin American history and myth.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Laws of the Universe</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Feynman, Richard - The Character of Physical Law</div><div class="resource-meta">208 pages | Physics</div><div class="resource-description">Your foundational book on physics. A conceptually deep and intuitive guide to the fundamental laws of nature.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Sagan, Carl - Cosmos</div><div class="resource-meta">365 pages | Cosmology</div><div class="resource-description">An awe-inspiring journey through the universe that connects science with a sense of wonder.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: Art and Music</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Berger, John - Ways of Seeing</div><div class="resource-meta">176 pages | Art History</div><div class="resource-description">A classic that will change how you look at art, connecting it to ideology, power, and society.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Copland, Aaron - What to Listen for in Music</div><div class="resource-meta">288 pages | Music Theory</div><div class="resource-description">A clear and accessible guide to understanding the structure and language of music.</div></div></div>
+                </div>
+            </div>
+
+            <!-- YEAR 5: THE CONTEMPORARY WORLD & ITS SYSTEMS -->
+            <div class="year">
+                <div class="year-header"><h2>Year 5: The Contemporary World & Its Systems</h2></div>
+                <div class="quarter">
+                    <h3>Q1: The Code of Life</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Mukherjee, Siddhartha - The Gene: An Intimate History</div><div class="resource-meta">592 pages | Genetics</div><div class="resource-description">The story of the quest to understand heredity, from Aristotle to CRISPR.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Gleick, James - The Information: A History, a Theory, a Flood</div><div class="resource-meta">544 pages | Information Theory</div><div class="resource-description">The history of the idea of information, connecting drums in Africa to the bit and the quantum.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: Systems and Power</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Foucault, Michel - Discipline and Punish</div><div class="resource-meta">333 pages</div><div class="resource-description">A challenging but essential analysis of modern power, surveillance, and control.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Rawls, John - A Theory of Justice</div><div class="resource-meta">Read Part I | Political Philosophy</div><div class="resource-description">Understand the most important argument for liberalism and social justice of the 20th century: the Veil of Ignorance.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Human Place</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Diamond, Jared - Guns, Germs, and Steel</div><div class="resource-meta">528 pages | Anthropology/History</div><div class="resource-description">A grand narrative of environmental determinism that seeks to explain the broad patterns of human history.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Kolbert, Elizabeth - The Sixth Extinction: An Unnatural History</div><div class="resource-meta">319 pages | Environmental Science</div><div class="resource-description">A clear-eyed look at the current mass extinction event and humanity's role in it.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: The Future</h3>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Bostrom, Nick - Superintelligence: Paths, Dangers, Strategies</div><div class="resource-meta">352 pages | AI/Futurology</div><div class="resource-description">A rigorous philosophical and technical argument about the potential risks of advanced AI.</div></div></div>
+                    <div class="resource" data-section="culture"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Frankl, Viktor - Man's Search for Meaning</div><div class="resource-meta">184 pages</div><div class="resource-description">End the content phase not with a system, but with a testament to the indestructible human search for meaning, even in the face of absolute suffering.</div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="integration-section" class="content-section">
+            <div class="integration-year">
+                <h2>Year 6: Synthesis & Frontier</h2>
+                <div class="philosophy">
+                    "This final year is about weaving the threads. Logic provides the structure, Culture provides the substance. Now you must build the fabric of your own thought. The goal is to move from student to architect, to ask your own questions and begin the lifelong project of answering them."
+                </div>
+                <div class="quarter">
+                    <h3>Q1: The Philosophy of...</h3>
+                    <div class="resource" data-section="integration"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Shapiro, Stewart - Thinking about Mathematics: The Philosophy of Mathematics</div><div class="resource-meta">308 pages</div><div class="resource-description">Now that you know the tools, what is the nature of the thing being built? Explore Platonism, formalism, and structuralism.</div></div></div>
+                    <div class="resource" data-section="integration"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Haack, Susan - Philosophy of Logics</div><div class="resource-meta">276 pages</div><div class="resource-description">With your deep knowledge of non-classical logics, you can now engage with the profound question: is there one true logic, or many?</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q2: Pushing the Frontier</h3>
+                    <div class="resource" data-section="integration"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Homotopy Type Theory: Univalent Foundations of Mathematics</div><div class="resource-meta">Read Preface & Introduction</div><div class="resource-description">Engage with the current frontier. Understand the revolutionary idea of treating proofs as spaces.</div></div></div>
+                    <div class="resource" data-section="integration"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Choose Your Frontier</div><div class="resource-meta">Self-directed research</div><div class="resource-description">Pick one area from Year 5 (e.g., Categorical Logic, HoTT, Advanced Model Theory) and dive deeper. Read current survey papers on arXiv.org.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q3: The Synthesis Project - Teaching</h3>
+                    <div class="resource" data-section="integration"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">The Feynman Technique Project</div><div class="resource-meta">Self-directed project</div><div class="resource-description">Choose three profoundly difficult topics from your journey (e.g., Forcing, Gödel's Second Theorem, Linear Logic) and write or record a clear, simple explanation for an intelligent undergraduate. This is the true test of understanding.</div></div></div>
+                </div>
+                <div class="quarter">
+                    <h3>Q4: The Architect's Blueprint</h3>
+                    <div class="resource" data-section="integration"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Write Your Synthesis Essay</div><div class="resource-meta">~50 pages</div><div class="resource-description">Connect the logical and cultural threads. How does an understanding of computability change one's reading of existentialism? How does category theory relate to structuralism in anthropology? This is your first original contribution.</div></div></div>
+                    <div class="resource" data-section="integration"><div class="checkbox" onclick="toggleResource(this)"></div><div class="resource-content"><div class="resource-title">Design Your Next Decade</div><div class="resource-meta">Living document</div><div class="resource-description">You have built the architect. What will you build now? Formulate the questions that will guide your next phase of life and work.</div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>This journey transforms you from a student of knowledge to an architect of understanding.</p>
+            <p>The complete human is not one who knows everything, but one who has the tools to build anything in the world of thought.</p>
+            <button class="export-button" onclick="exportProgress()">Export Your Progress</button>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize
+        let completedResources = new Set();
+        
+        // Load saved progress
+        function loadProgress() {
+            const saved = localStorage.getItem('completedResources');
+            if (saved) {
+                completedResources = new Set(JSON.parse(saved));
+                const allResources = document.querySelectorAll('.resource');
+                completedResources.forEach(index => {
+                    if (allResources[index]) {
+                        const checkbox = allResources[index].querySelector('.checkbox');
+                        checkbox.classList.add('checked');
+                        allResources[index].classList.add('completed');
+                    }
+                });
+            }
+            updateAllProgress();
+        }
+        
+        // Toggle resource completion
+        function toggleResource(checkbox) {
+            const resource = checkbox.parentElement;
+            const allResources = Array.from(document.querySelectorAll('.resource'));
+            const index = allResources.indexOf(resource);
+            
+            checkbox.classList.toggle('checked');
+            resource.classList.toggle('completed');
+            
+            if (checkbox.classList.contains('checked')) {
+                completedResources.add(index);
+            } else {
+                completedResources.delete(index);
+            }
+            
+            saveProgress();
+            updateAllProgress();
+        }
+        
+        // Save progress
+        function saveProgress() {
+            localStorage.setItem('completedResources', JSON.stringify([...completedResources]));
+        }
+        
+        // Update all progress indicators
+        function updateAllProgress() {
+            updateSectionProgress('logic');
+            updateSectionProgress('culture');
+            updateSectionProgress('integration');
+            updateTotalProgress();
+            updateYearProgress();
+        }
+        
+        // Update section progress
+        function updateSectionProgress(section) {
+            const resources = document.querySelectorAll(`.resource[data-section="${section}"]`);
+            const completed = Array.from(resources).filter(r => 
+                r.classList.contains('completed')
+            ).length;
+            const total = resources.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            const progressBar = document.getElementById(`${section}-progress`);
+            const completedSpan = document.getElementById(`${section}-completed`);
+            const totalSpan = document.getElementById(`${section}-total`);
+            
+            if (progressBar) progressBar.style.width = percentage + '%';
+            if (completedSpan) completedSpan.textContent = `${completed} / ${total}`;
+            if (totalSpan) totalSpan.textContent = `${total} resources`;
+        }
+        
+        // Update total progress
+        function updateTotalProgress() {
+            const allResources = document.querySelectorAll('.resource');
+            const completed = document.querySelectorAll('.resource.completed').length;
+            const total = allResources.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            const progressBar = document.getElementById('total-progress');
+            const completedSpan = document.getElementById('total-completed');
+            const totalSpan = document.getElementById('total-resources');
+            
+            if (progressBar) progressBar.style.width = percentage + '%';
+            if (completedSpan) completedSpan.textContent = `${completed} / ${total}`;
+            if (totalSpan) totalSpan.textContent = `${total} resources`;
+        }
+        
+        // Update year progress
+        function updateYearProgress() {
+             document.querySelectorAll('.year').forEach((yearElement, index) => {
+                const resources = yearElement.querySelectorAll('.resource');
+                if (resources.length === 0) return;
+
+                const completed = Array.from(resources).filter(r => r.classList.contains('completed')).length;
+                const total = resources.length;
+                const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                const progressSpan = yearElement.querySelector('.year-header .progress-stats');
+                if (progressSpan) {
+                    progressSpan.textContent = `${percentage}% (${completed}/${total})`;
+                }
+            });
+        }
+        
+        
+        // Show section
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`${section}-section`).classList.add('active');
+            
+            // Activate button
+            event.target.classList.add('active');
+        }
+        
+        // Export progress
+        function exportProgress() {
+            const logicResources = document.querySelectorAll('.resource[data-section="logic"]');
+            const cultureResources = document.querySelectorAll('.resource[data-section="culture"]');
+            const integrationResources = document.querySelectorAll('.resource[data-section="integration"]');
+            
+            const logicCompleted = Array.from(logicResources).filter(r => r.classList.contains('completed'));
+            const cultureCompleted = Array.from(cultureResources).filter(r => r.classList.contains('completed'));
+            const integrationCompleted = Array.from(integrationResources).filter(r => r.classList.contains('completed'));
+            
+            let report = 'THE ARCHITECT OF THE MIND - PROGRESS REPORT\n';
+            report += '=' .repeat(50) + '\n\n';
+            
+            report += 'LOGIC JOURNEY\n';
+            report += '-'.repeat(50) + '\n';
+            report += `Progress: ${logicCompleted.length}/${logicResources.length} (${logicResources.length > 0 ? Math.round((logicCompleted.length/logicResources.length)*100) : 0}%)\n\n`;
+            report += 'Completed Resources:\n';
+            logicCompleted.forEach(r => {
+                const title = r.querySelector('.resource-title').textContent;
+                report += `✓ ${title}\n`;
+            });
+            report += '\n\n';
+            
+            report += 'CULTURE JOURNEY\n';
+            report += '-'.repeat(50) + '\n';
+            report += `Progress: ${cultureCompleted.length}/${cultureResources.length} (${cultureResources.length > 0 ? Math.round((cultureCompleted.length/cultureResources.length)*100) : 0}%)\n\n`;
+            report += 'Completed Resources:\n';
+            cultureCompleted.forEach(r => {
+                const title = r.querySelector('.resource-title').textContent;
+                report += `✓ ${title}\n`;
+            });
+            report += '\n\n';
+            
+            report += 'SYNTHESIS & FRONTIER\n';
+            report += '-'.repeat(50) + '\n';
+            report += `Progress: ${integrationCompleted.length}/${integrationResources.length} (${integrationResources.length > 0 ? Math.round((integrationCompleted.length/integrationResources.length)*100) : 0}%)\n\n`;
+            report += 'Completed Resources:\n';
+            integrationCompleted.forEach(r => {
+                const title = r.querySelector('.resource-title').textContent;
+                report += `✓ ${title}\n`;
+            });
+            report += '\n\n';
+            
+            const totalCompleted = logicCompleted.length + cultureCompleted.length + integrationCompleted.length;
+            const totalResources = logicResources.length + cultureResources.length + integrationResources.length;
+            
+            report += 'OVERALL PROGRESS\n';
+            report += '-'.repeat(50) + '\n';
+            report += `Total: ${totalCompleted}/${totalResources} (${totalResources > 0 ? Math.round((totalCompleted/totalResources)*100) : 0}%)\n`;
+            report += '\n';
+            report += 'Generated: ' + new Date().toLocaleDateString() + '\n';
+            
+            // Download as text file
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'architect-of-the-mind-progress.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+        });
+    </script>
+</body>
+</html>
