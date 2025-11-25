@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CNN — Guia mínimo e passo a passo</title>
+  <!-- Fontes elegantes e ícones -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --bg: #f2f6fb;     /* very light */
+      --card: #ffffff;
+      --text: #0b2540;   /* deep navy */
+      --accent: #b8841a; /* warm gold */
+      --muted: #5f6b78;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+    .wrap{max-width:980px;margin:36px auto;padding:28px;background:var(--card);border-radius:12px;box-shadow:0 8px 30px rgba(11,37,64,0.06)}
+    header{display:flex;align-items:flex-start;gap:18px}
+    h1{font-family:Merriweather, serif;margin:0;font-size:28px;color:var(--text)}
+    p.lead{margin:6px 0 18px;color:var(--muted);max-width:78%}
+    h2{font-family:Merriweather, serif;margin-top:22px;margin-bottom:10px;color:var(--text);font-size:18px}
+    .section{margin-bottom:16px}
+    .term{font-weight:600;color:var(--text)}
+    .muted{color:var(--muted)}
+    ul{margin:8px 0 14px 20px}
+    ol{margin:8px 0 14px 20px}
+    code{background:#f3f6fa;padding:3px 6px;border-radius:6px;font-family:monospace;color:var(--text)}
+    .matrix-table{border-collapse:collapse;margin:8px 0 12px}
+    .matrix-table td{border:1px solid #e6eef6;padding:6px 10px;font-family:monospace;background:#fff}
+    .box{border-left:4px solid var(--accent);background:#fff9ee;padding:12px 14px;border-radius:8px;margin:12px 0}
+    .row{display:flex;gap:18px}
+    .col{flex:1}
+    footer{margin-top:20px;color:var(--muted);font-size:0.95em}
+    .icon{color:var(--accent);margin-right:8px}
+    .pseudo{background:#f7fbff;border:1px solid #e6f0fb;padding:12px;border-radius:8px;font-family:monospace}
+    .kbd{background:#eef6ff;padding:4px 8px;border-radius:6px;border:1px solid #d8ecff;font-family:monospace}
+    @media (max-width:720px){.row{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1><i class="fa-solid fa-brain icon" aria-hidden></i>CNN — Guia mínimo e passo a passo</h1>
+        <p class="lead">Documento objetivo. Primeiro: teoria completa e clara. Depois: como a imagem é processada passo a passo. Ao final: pseudocódigo para implementar a CNN com sua pasta <code>images/num0...</code>.</p>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-eye icon"></i>Visão geral</h2>
+      <p>Você tem 50 imagens por classe (0–9) organizadas assim:</p>
+      <p class="muted"><code>images/num0/num0_1.png ... num0_50.png</code><br><code>images/num1/num1_1.png ... num1_50.png</code> ... <code>images/num9/num9_50.png</code></p>
+      <p>Objetivo: treinar uma <span class="term">CNN (Convolutional Neural Network — rede neural convolucional)</span> simples que, após o treino, para cada nova imagem retorne um vetor de 10 probabilidades, por exemplo:</p>
+      <p class="box"><code>[0.02, 0.05, 0.87, 0.01, 0.01, 0.01, 0.01, 0.01, 0.00, 0.01]</code> → predição: <strong>2</strong> (87% de confiança)</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-layer-group icon"></i>1) Imagem = matriz</h2>
+      <p>Uma imagem em preto e branco (grayscale) é uma matriz 2D: cada célula contém a intensidade do pixel. Exemplo (5×5):</p>
+      <table class="matrix-table" aria-label="matriz exemplo">
+        <tr><td>0.0</td><td>0.1</td><td>0.2</td><td>0.1</td><td>0.0</td></tr>
+        <tr><td>0.0</td><td>0.9</td><td>1.0</td><td>0.8</td><td>0.1</td></tr>
+        <tr><td>0.0</td><td>0.7</td><td>0.9</td><td>0.6</td><td>0.0</td></tr>
+        <tr><td>0.0</td><td>0.2</td><td>0.3</td><td>0.1</td><td>0.0</td></tr>
+        <tr><td>0.0</td><td>0.0</td><td>0.1</td><td>0.0</td><td>0.0</td></tr>
+      </table>
+      <p class="muted">Em código isso vira um array 2D. Se fosse colorida, teríamos 3 matrizes (R,G,B).</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-filter icon"></i>2) Filtro (kernel) e convolução — teoria exata</h2>
+      <p><span class="term">Filtro (kernel)</span>: pequena matriz de pesos (ex.: 3×3). Cada peso é um número que será ajustado no treino.</p>
+      <p>Exemplo de filtro 3×3 (detector de borda vertical):</p>
+      <table class="matrix-table" aria-label="filtro exemplo">
+        <tr><td>1</td><td>0</td><td>-1</td></tr>
+        <tr><td>1</td><td>0</td><td>-1</td></tr>
+        <tr><td>1</td><td>0</td><td>-1</td></tr>
+      </table>
+
+      <p>Operação <strong>convolução</strong> (deslizar o filtro sobre a imagem): para cada posição:</p>
+      <ol>
+        <li>multiplica-se elemento-a-elemento o bloco 3×3 da imagem pelos 9 pesos do filtro;</li>
+        <li>somam-se os 9 produtos → obtém-se um único número;</li>
+        <li>esse número é colocado na mesma posição do novo mapa (feature map).</li>
+      </ol>
+      <p class="muted">Resultado: um novo mapa (matriz) onde valores altos indicam que o padrão do filtro aparece naquela região.</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-bolt icon"></i>3) ReLU — por que e o que faz</h2>
+      <p><span class="term">ReLU (Rectified Linear Unit — Unidade Linear Retificada)</span> aplica <code>ReLU(x) = max(0, x)</code> a cada elemento do feature map.</p>
+      <p>Motivos práticos:</p>
+      <ul>
+        <li>elimina valores negativos (ruído / anti-correspondência);</li>
+        <li>introduz não-linearidade — essencial para representar funções complexas;</li>
+        <li>simplicidade computacional e eficiência no treino.</li>
+      </ul>
+      <p class="muted">Resultado prático: apenas sinais "positivos" (fortes) seguem adiante, o que facilita a detecção de padrões.</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-layer-group icon"></i>4) Max Pool (agregação por máximo)</h2>
+      <p><span class="term">Max Pool</span> divide o mapa em blocos (ex.: 2×2) e mantém apenas o maior valor de cada bloco. Exemplos de efeito:</p>
+      <ul>
+        <li>reduz a dimensão espacial (economia de processamento);</li>
+        <li>confere tolerância a pequenos deslocamentos da escrita manual;</li>
+        <li>destaca o sinal mais forte em cada região.</li>
+      </ul>
+      <p class="muted">Perda de detalhes finos é deliberada: objetivo é generalizar, não reter cada pixel.</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-sitemap icon"></i>5) Flatten e Fully Connected (saída)</h2>
+      <p>Depois de repetir conv→ReLU→pool algumas vezes, teremos vários mapas (por exemplo 4 mapas 13×13). Unimos todos em um único vetor contínuo (flatten):</p>
+      <p class="muted">Ex.: 4 × 13 × 13 = 676 valores → vetor <code>[v0, v1, ..., v675]</code></p>
+      <p>Uma camada <span class="term">Fully Connected (FC)</span> tem uma matriz de pesos de shape <code>(num_classes, vetor_length)</code>. Multiplicando essa matriz pelo vetor geramos <strong>logits</strong> (valores brutos, um por classe).</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-chart-simple icon"></i>6) Softmax → probabilidades</h2>
+      <p><span class="term">Softmax</span> transforma logits <code>[z0...z9]</code> em probabilidades <code>[p0...p9]</code>:</p>
+      <p class="pseudo">p_i = exp(z_i) / sum_j exp(z_j)</p>
+      <p class="muted">Cada <code>p_i</code> é a confiança do modelo para a classe i. O valor mais alto indica a predição.</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-play icon"></i>7) Treino — passo a passo operacional</h2>
+      <ol>
+        <li><strong>Preparar dados:</strong> garanta que as imagens estão em <code>images/num0 ... num9</code> e nomeadas <code>numX_1.png ... numX_50.png</code>. Todas em preto e branco e mesmas dimensões (ex.: 28×28) — ou serão redimensionadas no carregamento.</li>
+        <li><strong>Mini-batches:</strong> o algoritmo pega K imagens (ex.: 16) de uma vez — mistura classes no lote.</li>
+        <li><strong>Forward pass:</strong> cada imagem passa por conv→ReLU→pool (pode repetir)→flatten→FC → logits.</li>
+        <li><strong>Loss (perda):</strong> compara logits com o rótulo verdadeiro (por exemplo Cross-Entropy Loss) e produz um número que mede o erro do lote.</li>
+        <li><strong>Backward pass (retropropagação):</strong> calcula o gradiente da perda em relação a todos os pesos (filtros, FC). Gradiente = direção que reduz a perda.</li>
+        <li><strong>Atualizar pesos:</strong> o otimizador (por exemplo Adam ou SGD — Stochastic Gradient Descent) aplica alterações aos pesos usando uma taxa (learning rate).</li>
+        <li><strong>Repetir:</strong> prossiga para o próximo lote até cobrir todas as imagens (= 1 época). Repita por várias épocas.</li>
+      </ol>
+      <p class="muted">Ao fim do treino, filtros e pesos estarão afinados: filtros responderão forte a padrões úteis; a FC combinará essas respostas para formar logits corretos.</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-file-export icon"></i>8) Arquivo de saída (o que é salvo)</h2>
+      <p>Salva-se um arquivo (ex.: <code>simple_cnn.pth</code>) contendo:</p>
+      <ul>
+        <li>matrizes de pesos dos filtros (cada filtro: 3×3 ou 5×5 números);</li>
+        <li>vetores bias dos filtros;</li>
+        <li>matriz de pesos e bias da camada Fully Connected;</li>
+        <li>mapeamento de classes (opcional).</li>
+      </ul>
+      <p class="muted">É apenas um arquivo de números. Para usar, um segundo programa carrega esse arquivo e aplica exatamente as mesmas operações (convolução, ReLU, pool, FC) a uma nova imagem.</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-image icon"></i>9) Como a nova imagem é classificada (fluxo final)</h2>
+      <ol>
+        <li>Carregar arquivo de pesos salvo.</li>
+        <li>Carregar imagem nova (<code>numTest.png</code>), transformar para grayscale e redimensionar exatamente como no treino.</li>
+        <li>Executar forward pass usando os pesos carregados.</li>
+        <li>Obter logits → aplicar softmax → vetor de probabilidades.</li>
+        <li>Interpretar: ex.: <code>[0.02,0.05,0.87,...]</code> → dizer "87% de probabilidade de ser 2".</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-code icon"></i>10) Pseudocódigo (casca) — o que você implementa e em que ordem</h2>
+      <p>Este pseudocódigo orienta a sequência lógica. Não é implementação exata: é a "casca" para você preencher em Python / PyTorch.</p>
+
+      <div class="pseudo">
+<pre>
+# 1) CONFIG
+ - definir caminhos: DATA_DIR = 'images'
+ - definir hiperparâmetros: BATCH_SIZE, LR (learning rate), EPOCHS
+
+# 2) DADOS
+ - ler pastas images/num0 ... images/num9
+ - para cada imagem: abrir, converter para grayscale, redimensionar (28x28), normalizar
+ - criar DataLoader que devolve lotes (batch) embaralhados
+
+# 3) MODELO (estrutura mínima)
+ - camada conv1: in_channels=1, out_channels=4, kernel_size=3
+ - ReLU
+ - MaxPool 2x2
+ - (opcional) repetir bloco conv+ReLU+pool
+ - flatten
+ - fully connected (linear) com saída = 10
+
+# 4) FUNÇÃO DE PERDA E OTIMIZADOR
+ - loss = CrossEntropyLoss()
+ - optimizer = Adam(model.parameters(), lr=LR)
+
+# 5) LOOP DE TREINO
+ for epoch in range(EPOCHS):
+   for batch_imgs, batch_labels in DataLoader:
+     model.train()
+     optimizer.zero_grad()
+     logits = model(batch_imgs)
+     loss = loss_fn(logits, batch_labels)
+     loss.backward()
+     optimizer.step()
+   salvar/checkpoint opcional
+
+# 6) SALVAR MODELO
+ - salvar pesos (state_dict) + classes em arquivo (ex.: simple_cnn.pth)
+
+# 7) INFERÊNCIA (script separado)
+ - carregar modelo e pesos
+ - carregar imagem nova (numTest.png), aplicar mesmo preprocess
+ - forward pass → logits
+ - probs = softmax(logits)
+ - print probs e classe com maior prob
+</pre>
+      </div>
+
+      <p class="muted">Observações: mantenha os mesmos preprocessamentos (resize, normalize) no treino e na inferência. O arquivo salvo é apenas números — o script de inferência precisa saber a arquitetura para reconstruir o modelo e carregar esses números.</p>
+    </section>
+
+    <section class="section">
+      <h2><i class="fa-solid fa-lightbulb icon"></i>Dicas práticas e recomendações</h2>
+      <ul>
+        <li>Comece com imagens 28×28; é suficiente para dígitos desenhados à mão.</li>
+        <li>Se notar overfitting (treino ótimo, teste ruim), aumente variação: desenhe mais exemplos, aplique rotações leves ou shift.</li>
+        <li>Teste a inferência com várias imagens novas e compare a confiança (softmax).</li>
+        <li>Se quiser, poso gerar um notebook Colab com a casca em PyTorch para você completar e rodar.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <div class="muted">Documento formatado para leitura clara. Se desejar alterações (cores, incluir blocos de código reais, ou Notebook Colab pronto), eu atualizo.</div>
+    </footer>
+  </div>
+</body>
+</html>
