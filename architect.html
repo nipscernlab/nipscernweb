@@ -3,1329 +3,897 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/assets/icons/architecture_128.svg" type="image/svg+xml" sizes="128x128" />
-    <title>The Architect of the Mind: A Six-Year Construction Project</title>
+    <title>The Architect: Curator's Edition</title>
+    
+    <link rel="icon" href="/assets/icons/architecture_128.svg" type="image/svg+xml" sizes="128x128">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #151515;
-            --text-primary: #e8e8e8;
-            --text-secondary: #a0a0a0;
-            --accent: #c9a961;
-            --accent-dim: #8a7441;
+            --bg-body: #050505;
+            --bg-card: #0f0f0f;
+            --bg-card-hover: #141414;
             --border: #2a2a2a;
-            --completed: #4a7c59;
+            --gold: #c5a059;
+            --gold-dim: #7a6335;
+            --gold-glow: rgba(197, 160, 89, 0.15);
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --logic-accent: #4a6fa5;
+            --culture-accent: #a54a4a;
+            --success: #2e7d32;
+
+            /* Tag Colors */
+            --tag-book: #3d4c53;
+            --tag-paper: #533d3d;
+            --tag-art: #534b3d;
+            --tag-music: #4a3d53;
+            --tag-film: #3d534f;
+            --tag-place: #2e2e2e;
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
         body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background-color: var(--bg-body);
+            color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            font-weight: 300;
             overflow-x: hidden;
+            background-image: radial-gradient(circle at top center, #1a1a1a 0%, #050505 60%);
+            min-height: 100vh;
         }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3 { font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
+        .serif { font-family: 'Cormorant Garamond', serif; }
         
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
-        }
-        
+        /* --- HERO SECTION --- */
         header {
+            height: 80vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
             text-align: center;
-            margin-bottom: 5rem;
-            padding: 3rem 0;
+            padding: 2rem;
             border-bottom: 1px solid var(--border);
-        }
-        
-        h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 3.5rem;
-            font-weight: 300;
-            letter-spacing: 0.02em;
-            margin-bottom: 1rem;
-            color: var(--accent);
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            font-weight: 300;
-            letter-spacing: 0.05em;
-        }
-        
-        .philosophy {
-            max-width: 800px;
-            margin: 3rem auto;
-            padding: 2rem;
-            background: var(--bg-secondary);
-            border-left: 2px solid var(--accent);
-            font-style: italic;
-            color: var(--text-secondary);
-        }
-        
-        .progress-overview {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-        }
-        
-        .progress-card {
-            background: var(--bg-secondary);
-            padding: 2rem;
-            border: 1px solid var(--border);
-            transition: border-color 0.3s;
-        }
-        
-        .progress-card:hover {
-            border-color: var(--accent-dim);
-        }
-        
-        .progress-card h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.5rem;
-            font-weight: 400;
-            margin-bottom: 1rem;
-            color: var(--accent);
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: var(--border);
-            margin: 1rem 0;
             position: relative;
         }
-        
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            transition: width 0.3s ease;
+
+        .hero-title {
+            font-size: clamp(3rem, 6vw, 6rem);
+            background: linear-gradient(to bottom, #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px var(--gold-glow);
+            margin-bottom: 1rem;
         }
-        
-        .progress-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 3rem 0;
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-        
-        nav button {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1rem;
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            transition: color 0.3s;
-            font-family: 'Inter', sans-serif;
-            font-weight: 300;
-            letter-spacing: 0.05em;
-        }
-        
-        nav button:hover, nav button.active {
-            color: var(--accent);
-        }
-        
-        .content-section {
-            display: none;
-        }
-        
-        .content-section.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .year {
-            margin-bottom: 4rem;
-        }
-        
-        .year-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .year-header h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2rem;
-            font-weight: 400;
-            color: var(--accent);
-        }
-        
-        .year-progress {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
-        .quarter {
-            margin-bottom: 3rem;
-            padding: 2rem;
-            background: var(--bg-secondary);
-            border-left: 2px solid var(--border);
-        }
-        
-        .quarter h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.5rem;
-            font-weight: 400;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-        }
-        
-        .resource {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            transition: border-color 0.3s;
-        }
-        
-        .resource:hover {
-            border-color: var(--accent-dim);
-        }
-        
-        .resource.completed {
-            border-left: 3px solid var(--completed);
-        }
-        
-        .checkbox {
-            min-width: 20px;
-            min-height: 20px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s;
-        }
-        
-        .checkbox:hover {
-            border-color: var(--accent);
-        }
-        
-        .checkbox.checked {
-            background: var(--completed);
-            border-color: var(--completed);
-        }
-        
-        .checkbox.checked::after {
-            content: '✓';
-            color: white;
-            font-size: 0.8rem;
-        }
-        
-        .resource-content {
-            flex: 1;
-        }
-        
-        .resource-title {
-            font-weight: 500;
-            margin-bottom: 0.3rem;
-            color: var(--text-primary);
-        }
-        
-        .resource-meta {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.3rem;
-        }
-        
-        .resource-description {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+
+        .hero-subtitle {
+            font-size: 1.4rem; color: var(--text-muted);
+            max-width: 700px; margin-bottom: 3rem;
             font-style: italic;
         }
 
-        .keystone {
-            font-family: 'Cormorant Garamond', serif;
-            color: var(--accent);
-            font-weight: 600;
-        }
-        
-        footer {
-            margin-top: 5rem;
-            padding: 3rem 0;
-            text-align: center;
-            border-top: 1px solid var(--border);
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        
-        .export-button {
-            background: var(--bg-secondary);
+        /* --- PROGRESS HUD --- */
+        .hud {
+            display: flex; gap: 2rem;
+            padding: 1rem 3rem;
+            background: rgba(20,20,20,0.8);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hud-item { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
+        .hud-num { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold); }
+        .hud-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: #666; margin-top: 5px; }
+
+        /* --- MAIN TIMELINE --- */
+        .container { max-width: 1600px; margin: 0 auto; padding: 4rem 2rem; }
+
+        .year-block {
+            margin-bottom: 8rem;
+            position: relative;
+        }
+
+        .year-header {
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 3rem; gap: 1.5rem;
+        }
+        
+        .year-num {
+            font-family: 'Cinzel', serif; font-size: 4rem;
+            color: var(--bg-body); -webkit-text-stroke: 1px var(--gold-dim);
+            opacity: 0.5;
+        }
+        
+        .year-title { font-size: 2rem; color: var(--text-main); }
+
+        /* --- SPLIT GRID (PARALLEL STUDY) --- */
+        .parallel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            position: relative;
+        }
+
+        .parallel-grid::after {
+            content: ''; position: absolute;
+            top: 0; bottom: 0; left: 50%; width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--border), transparent);
+        }
+
+        .col-header {
+            display: flex; align-items: center; gap: 1rem;
+            margin-bottom: 2rem; padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .col-header i { font-size: 1.2rem; }
+        .col-logic { color: var(--logic-accent); }
+        .col-culture { color: var(--culture-accent); }
+        .col-title { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 0.1em; }
+
+        /* --- CARD ITEM --- */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 1.2rem; margin-bottom: 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-weight: 300;
-            letter-spacing: 0.05em;
-            transition: all 0.3s;
-            margin-top: 1rem;
+            position: relative; overflow: hidden;
+            display: flex; gap: 1.2rem; align-items: flex-start;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold-dim);
+            background: var(--bg-card-hover);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Checkbox Styling */
+        .check-circle {
+            min-width: 20px; height: 20px;
+            border: 2px solid #444; border-radius: 50%;
+            margin-top: 5px;
+            display: grid; place-items: center;
+            transition: 0.3s;
+        }
+
+        .card.completed { border-color: var(--success); opacity: 0.6; }
+        .card.completed .check-circle { background: var(--success); border-color: var(--success); }
+        .check-circle::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: #fff; font-size: 10px; opacity: 0; transform: scale(0); transition: 0.2s; }
+        .card.completed .check-circle::after { opacity: 1; transform: scale(1); }
+
+        /* Content Styling */
+        .card-content { flex: 1; }
+        
+        .tag-row { display: flex; gap: 8px; margin-bottom: 6px; }
+        .tag {
+            font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; 
+            font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
         }
         
-        .export-button:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+        .tag-book { background: var(--tag-book); color: #b0c4de; }
+        .tag-paper { background: var(--tag-paper); color: #deb0b0; }
+        .tag-art { background: var(--tag-art); color: #ded6b0; }
+        .tag-music { background: var(--tag-music); color: #cbb0de; }
+        .tag-film { background: var(--tag-film); color: #b0dec6; }
+        .tag-place { background: var(--tag-place); color: #aaa; border: 1px solid #444; }
+        .tag-arch { background: #53453d; color: #decab0; }
+
+        .card-title { font-size: 1rem; color: #fff; margin-bottom: 2px; line-height: 1.3; font-weight: 600; }
+        .card-author { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
+        .card-desc { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: #888; line-height: 1.4; }
+
+        /* --- TOAST & MODAL --- */
+        #toast {
+            visibility: hidden; min-width: 250px;
+            background-color: #1a1a1a; color: var(--gold); border: 1px solid var(--gold);
+            text-align: center; border-radius: 4px; padding: 16px;
+            position: fixed; z-index: 1000; left: 50%; bottom: 30px;
+            transform: translateX(-50%);
+            font-family: 'Cinzel', serif; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            opacity: 0; transition: opacity 0.5s, bottom 0.5s;
         }
-        
-        .integration-year {
-            background: var(--bg-secondary);
-            padding: 3rem;
-            border: 2px solid var(--accent-dim);
-            margin-top: 3rem;
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.8s;
         }
-        
-        .integration-year h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 2rem;
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            text-align: center; max-width: 600px; padding: 2rem;
+            transform: translateY(20px); transition: 0.8s;
         }
-        
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .modal-year { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold); margin-bottom: 1rem; letter-spacing: 0.2em; }
+        .modal-quote { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; color: #fff; margin-bottom: 2rem; line-height: 1.4; }
+        .modal-btn {
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            padding: 10px 30px; font-family: 'Inter', sans-serif; cursor: pointer;
+            transition: 0.3s; text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .modal-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold-glow); }
+
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .container {
-                padding: 2rem 1rem;
-            }
-            
-            nav {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+            .hero-title { font-size: 3rem; }
+            .parallel-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .parallel-grid::after { display: none; }
         }
     </style>
 </head>
 <body>
+
+    <header>
+        <h1 class="hero-title">THE ARCHITECT</h1>
+        <p class="hero-subtitle serif">"A synthesis of rigorous logic and boundless culture. A six-year construction of the soul."</p>
+        
+        <div class="hud">
+            <div class="hud-item">
+                <span class="hud-num" id="stat-logic">0/0</span>
+                <span class="hud-label">Logic</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-num" id="stat-culture">0/0</span>
+                <span class="hud-label">Culture</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-num" id="stat-percent">0%</span>
+                <span class="hud-label">Total</span>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
-        <header>
-            <h1>The Architect of the Mind</h1>
-            <p class="subtitle">A Six-Year Construction Project: Logic & Universal Knowledge</p>
-            <div class="philosophy">
-                "The goal is not to know everything, but to build a mind capable of rigorous thought across all domains. This plan integrates vertical mastery of Logic—the grammar of reality—with horizontal breadth across Universal Knowledge—encompassing the sciences, arts, and humanities. The result: a life examined, principled, and free from unnecessary suffering."
-            </div>
-        </header>
 
-        <div class="progress-overview">
-            <div class="progress-card">
-                <h3>Logic Mastery</h3>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="logic-progress" style="width: 0%"></div>
-                </div>
-                <div class="progress-stats">
-                    <span id="logic-completed">0 / 0</span>
-                    <span id="logic-total">0 resources</span>
-                </div>
+        <div class="year-block" id="year-1">
+            <div class="year-header">
+                <span class="year-num">I</span>
+                <h2 class="year-title">Foundation: Roots & The Classics</h2>
             </div>
-            
-            <div class="progress-card">
-                <h3>Universal Knowledge</h3>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="knowledge-progress" style="width: 0%"></div>
+            <div class="parallel-grid">
+                <div class="col">
+                    <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Trivium</span></div>
+                    
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">An Introduction to Formal Logic</div>
+                            <span class="card-author">Peter Smith</span>
+                            <div class="card-desc">Mastering Propositional & Predicate logic syntax.</div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Organon (Categories)</div>
+                            <span class="card-author">Aristotle</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                            <div class="card-title">Stoic Logic Fragments</div>
+                            <span class="card-author">Chrysippus</span>
+                            <div class="card-desc">The birth of propositional logic.</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="progress-stats">
-                    <span id="knowledge-completed">0 / 0</span>
-                    <span id="knowledge-total">0 resources</span>
-                </div>
-            </div>
-            
-            <div class="progress-card">
-                <h3>Total Progress</h3>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="total-progress" style="width: 0%"></div>
-                </div>
-                <div class="progress-stats">
-                    <span id="total-completed">0 / 0</span>
-                    <span id="total-resources">0 resources</span>
-                </div>
-            </div>
-        </div>
 
-        <nav>
-            <button class="active" onclick="showSection('logic')">LOGIC (THE FORM)</button>
-            <button onclick="showSection('knowledge')">UNIVERSAL KNOWLEDGE (THE CONTENT)</button>
-            <button onclick="showSection('integration')">SYNTHESIS (THE ARCHITECTURE)</button>
-        </nav>
+                <div class="col">
+                    <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Quadrivium</span></div>
+                    
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">The Story of Art</div>
+                            <span class="card-author">E.H. Gombrich</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">The Iliad & The Odyssey</div>
+                            <span class="card-author">Homer</span>
+                        </div>
+                    </div>
 
-        <!-- =================================================================================== -->
-        <!-- SECTION 1: LOGIC (THE FORM) -->
-        <!-- =================================================================================== -->
-        <div id="logic-section" class="content-section active">
-            
-            <!-- YEAR 1: FOUNDATIONS -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 1: The Toolkit - Propositional & First-Order Logic</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                <div class="quarter">
-                    <h3>Q1: The Foundations of Reasoning</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Smith, Peter - An Introduction to Formal Logic</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">The best modern starting point. Work through all exercises systematically. This is your foundation.</div>
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">The Parthenon Marbles</div>
+                            <span class="card-author">Phidias</span>
+                            <div class="card-desc">Study the Elgin Marbles (British Museum).</div>
                         </div>
                     </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q2: Classical Logic & First Principles</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Plato - Euthyphro, Meno, & Theaetetus</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">Witness the Socratic method. The search for definitions and the problem of knowledge are the beginnings of logic.</div>
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">Primavera & Birth of Venus</div>
+                            <span class="card-author">Botticelli</span>
                         </div>
                     </div>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Aristotle - Organon (Selections: Categories, On Interpretation, Prior Analytics I)</div>
-                            <div class="resource-meta">Full Read of Selections</div>
-                            <div class="resource-description">The original formal system: categories, propositions, and syllogistic logic. Understand its structure and genius.</div>
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                            <div class="card-title">Cello Suites</div>
+                            <span class="card-author">J.S. Bach</span>
+                            <div class="card-desc">Pure mathematical structure in sound.</div>
                         </div>
                     </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: The Modern Revolution</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Frege, Gottlob - Begriffsschrift (with commentary)</div>
-                            <div class="resource-meta">1879 | Original Paper</div>
-                            <div class="resource-description">The conceptual leap of quantification that began modern logic. Read a guide alongside it.</div>
-                        </div>
-                    </div>
-                     <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Russell, Bertrand - On Denoting & Mathematical Logic as Based on the Theory of Types</div>
-                            <div class="resource-meta">1905 & 1908 | Original Papers</div>
-                            <div class="resource-description">Understand Russell's solution to paradoxes and the motivation for type theory, which led to Principia Mathematica.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: Consolidation & History</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Kneale & Kneale - The Development of Logic</div>
-                            <div class="resource-meta">Reference Text</div>
-                            <div class="resource-description">This is your historical reference for the entire 6-year journey. As you learn a new topic (e.g., modal logic), read the corresponding chapter here to understand its history.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Review and Practice</div>
-                            <div class="resource-meta">Self-directed</div>
-                            <div class="resource-description">Revisit Smith's exercises. Solve skipped problems. Teach concepts aloud to solidify them.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- YEAR 2: LIMITS -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 2: The Limits - Incompleteness & Computability</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                 <div class="quarter">
-                    <h3>Q1-Q2: Gödel's Incompleteness Theorems</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Smith, Peter - An Introduction to Gödel's Theorems</div>
-                            <div class="resource-meta">Full Read (Dedicated Half-Year)</div>
-                            <div class="resource-description">The best guide available. Give this text the time it deserves. Master Gödel numbering, the diagonal lemma, and the proofs of both theorems.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Hofstadter, Douglas - Gödel, Escher, Bach</div>
-                            <div class="resource-meta">1979 | Parallel Read</div>
-                            <div class="resource-description">Builds intuition and wonder about strange loops and self-reference. Not a formal text, but essential for context.</div>
-                        </div>
-                    </div>
-                     <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Gödel, Kurt - On Formally Undecidable Propositions...</div>
-                            <div class="resource-meta">1931 | Original Paper</div>
-                            <div class="resource-description">After finishing Smith's book, read the original paper with the help of a guide (like van Heijenoort's).</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: Turing and the Halting Problem</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Petzold, Charles - The Annotated Turing</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A guided, line-by-line reading of Turing's seminal paper. More accessible than diving straight into the original. Master Turing Machines.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: The Church-Turing Thesis</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Sipser, Michael - Introduction to the Theory of Computation</div>
-                            <div class="resource-meta">Full Read of Part One: Automata and Computability</div>
-                            <div class="resource-description">A modern, clear text that formalizes the Church-Turing thesis and explores other undecidable problems.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- YEAR 3: UNIVERSES -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 3: The Universes - Set Theory & Model Theory</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                <div class="quarter">
-                    <h3>Q1: Axiomatic Set Theory</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Halmos, Paul - Naive Set Theory</div>
-                            <div class="resource-meta">1960 | Full Read</div>
-                            <div class="resource-description">An intuitive but rigorous introduction to the language of modern mathematics: ordinals, cardinals, and paradoxes.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Enderton, Herbert - Elements of Set Theory</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">The formal development of Zermelo-Fraenkel with Choice (ZFC). Do the exercises.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q2: Independence & Forcing</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Smullyan & Fitting - Set Theory and the Continuum Problem</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">An accessible introduction to the ideas of forcing and the independence of the Continuum Hypothesis.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: Foundations of Model Theory</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Marker, David - Model Theory: An Introduction</div>
-                            <div class="resource-meta">Full Read of Chapters 1-4</div>
-                            <div class="resource-description">The study of mathematical structures using logic. Marker is the modern gold standard. Master Compactness, Löwenheim-Skolem, and Quantifier Elimination.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: Advanced Model Theory</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Marker, David - Model Theory: An Introduction</div>
-                            <div class="resource-meta">Full Read of Chapters 5-8</div>
-                            <div class="resource-description">Continue with Marker to be introduced to types, stability, and other core concepts of 20th-century model theory.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- YEAR 4: ALTERNATIVES -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 4: Alternatives - Non-Classical & Philosophical Logics</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                <div class="quarter">
-                    <h3>Q1: Modal Logic</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Priest, Graham - An Introduction to Non-Classical Logic</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A brilliant survey of the non-classical landscape. Start with his chapters on modal logics to master Kripke semantics.</div>
-                        </div>
-                    </div>
-                     <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Kripke, Saul - Naming and Necessity</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A foundational text in the philosophy of language that shows the philosophical power of modal thinking.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q2: Applications of Modal Logic</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Fagin, Halpern, et al. - Reasoning About Knowledge</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">The application of modal logic to knowledge (Epistemic Logic) and belief. Crucial for computer science and AI.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Stanford Encyclopedia of Philosophy: "Deontic Logic" & "Temporal Logic"</div>
-                            <div class="resource-meta">Article Study</div>
-                            <div class="resource-description">Use these high-quality articles to get a rigorous introduction to the logic of obligation/permission and the logic of time.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: Intuitionistic & Substructural Logics</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Return to Priest's "An Introduction to Non-Classical Logic"</div>
-                            <div class="resource-meta">Focused Reading</div>
-                            <div class="resource-description">Now, work through the chapters on Intuitionistic Logic (the logic of constructive proof).</div>
-                        </div>
-                    </div>
-                     <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Restall, Greg - An Introduction to Substructural Logics</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">Logics that question basic structural rules, like weakening or contraction. Includes relevance and linear logic.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: Paraconsistent & Quantum Logics</h3>
-                     <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Priest, Graham - In Contradiction</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">An introduction to Paraconsistent Logic and Dialetheism: the idea that some contradictions can be true.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">SEP: "Quantum Logic and Probability Theory" & "Inductive Logic"</div>
-                            <div class="resource-meta">Article Study</div>
-                            <div class="resource-description">Use the SEP to get a rigorous introduction to Quantum Logic (which denies distributivity) and the vast field of Inductive Logic (reasoning under uncertainty).</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- YEAR 5: STRUCTURE -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 5: The Structure - Proof Theory & Categorical Logic</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                 <div class="quarter">
-                    <h3>Q1: Structural Proof Theory</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Troelstra & Schwichtenberg - Basic Proof Theory</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">From truth (model theory) to proof (proof theory). Master natural deduction and sequent calculus.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Gentzen, Gerhard - Investigations into Logical Deduction</div>
-                            <div class="resource-meta">1935 | Original Paper</div>
-                            <div class="resource-description">Understand the significance of the cut-elimination theorem (Hauptsatz).</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q2: The Curry-Howard Correspondence</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Sørensen & Urzyczyn - Lectures on the Curry-Howard Isomorphism</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A detailed text on the profound discovery that proofs are programs, and propositions are types. Unifies logic and computation.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: Category Theory</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Awodey, Steve - Category Theory</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">The language of modern mathematics: categories, functors, natural transformations, limits, and adjunctions.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: Categorical Logic & Topoi</h3>
-                    <div class="resource" data-section="logic">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Goldblatt, Robert - Topoi: The Categorial Analysis of Logic</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A topos as a generalized universe of sets, where intuitionistic logic is the internal language. A challenging but rewarding read.</div>
+                    <div class="card" onclick="toggleItem(this, 1)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-arch">ARCH</span><span class="tag tag-place">PLACE</span></div>
+                            <div class="card-title">The Pantheon</div>
+                            <span class="card-author">Rome</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- =================================================================================== -->
-        <!-- SECTION 2: UNIVERSAL KNOWLEDGE (THE CONTENT) -->
-        <!-- =================================================================================== -->
-        <div id="knowledge-section" class="content-section">
-            
-            <!-- YEAR 1: THE HUMAN ANIMAL -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 1: The Human Animal - Body & Mind</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                <div class="quarter">
-                    <h3>Q1: The Biological Foundation</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Sapolsky, Robert - Behave: The Biology of Humans at Our Best and Worst</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A masterpiece that integrates neuroscience, endocrinology, and sociology to explain why we do what we do. The best single book on human biology.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q2: The Malleable Brain & Basic Health</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Doidge, Norman - The Brain That Changes Itself</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">Stories of personal transformation that reveal the science of neuroplasticity.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">First Aid/CPR/AED Certification</div>
-                            <div class="resource-meta">Practical Skill</div>
-                            <div class="resource-description">Acquire the knowledge to save a life. Get certified by a recognized organization.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: The Psychological Animal</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Kahneman, Daniel - Thinking, Fast and Slow</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A critical text for any logician. Understand the systematic biases and errors in human reasoning.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: The Search for Meaning</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Frankl, Viktor - Man's Search for Meaning</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A profound meditation on the indestructible human drive to find meaning, even in the most horrific circumstances. A testament to the power of logotherapy.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title"><span class="keystone">Cultural Keystone</span></div>
-                            <div class="resource-description">Read: The Epic of Gilgamesh & The Book of Job. Watch: The film "Ikiru" (To Live) by Akira Kurosawa.</div>
-                        </div>
-                    </div>
-                </div>
+        <div class="year-block" id="year-2">
+            <div class="year-header">
+                <span class="year-num">II</span>
+                <h2 class="year-title">Structure & The East</h2>
             </div>
-
-            <!-- YEAR 2: THE SOCIAL FABRIC -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 2: The Social Fabric - Culture, Society & Language</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                <div class="quarter">
-                    <h3>Q1: How We Connect</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Christakis, Nicholas A. - Blueprint: The Evolutionary Origins of a Good Society</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">Argues that our genes encode a suite of traits for love, friendship, cooperation, and learning that form a "social suite" for making good societies.</div>
+            <div class="parallel-grid">
+                <div class="col">
+                    <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                    <div class="card" onclick="toggleItem(this, 2)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Naive Set Theory</div>
+                            <span class="card-author">Paul Halmos</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 2)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">A Book of Abstract Algebra</div>
+                            <span class="card-author">Charles Pinter</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 2)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">The Laws of Thought</div>
+                            <span class="card-author">George Boole</span>
                         </div>
                     </div>
                 </div>
-                <div class="quarter">
-                    <h3>Q2: Interpreting Cultures</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Geertz, Clifford - The Interpretation of Cultures</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A foundational text of modern anthropology. Understand the method of "thick description" and see cultures as systems of symbols and meaning.</div>
+                <div class="col">
+                    <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture</span></div>
+                    <div class="card" onclick="toggleItem(this, 2)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Tao Te Ching</div>
+                            <span class="card-author">Lao Tzu</span>
                         </div>
                     </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: Language & Thought</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Pinker, Steven - The Language Instinct</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">An accessible and powerful introduction to the science of language, from universal grammar to how children learn to speak.</div>
+                    
+                    <div class="card" onclick="toggleItem(this, 2)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">Thirty-six Views of Mount Fuji</div>
+                            <span class="card-author">Hokusai</span>
+                            <div class="card-desc">The Great Wave. Precision and nature.</div>
                         </div>
                     </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: Power & Ritual</h3>
-                     <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Confucius - The Analects</div>
-                            <div class="resource-meta">Full Read (Slingerland translation)</div>
-                            <div class="resource-description">The foundation of much of East Asian thought on social order, ritual (Li), humaneness (Ren), and the cultivation of character.</div>
+                     <div class="card" onclick="toggleItem(this, 2)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">Travelers among Mountains and Streams</div>
+                            <span class="card-author">Fan Kuan</span>
                         </div>
                     </div>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title"><span class="keystone">Cultural Keystone</span></div>
-                            <div class="resource-description">Read: The Code of Hammurabi. Watch: The documentary "The Century of the Self". Listen: The album "Graceland" by Paul Simon (a cross-cultural collaboration).</div>
+                    <div class="card" onclick="toggleItem(this, 2)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-place">PLACE</span><span class="tag tag-arch">ARCH</span></div>
+                            <div class="card-title">The Alhambra</div>
+                            <span class="card-author">Granada, Spain</span>
+                            <div class="card-desc">Islamic geometric perfection.</div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- YEAR 3: THE ARC OF HISTORY-->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 3: The Arc of History - A Global Perspective</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                 <div class="quarter">
-                    <h3>Q1: A New History of the World</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Frankopan, Peter - The Silk Roads: A New History of the World</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A necessary corrective to Eurocentric histories, arguing for the centrality of Persia and Central Asia in shaping the world.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q2: Encounters & Exchanges</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">McNeill, William H. - Plagues and Peoples</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A sweeping history of the profound impact of infectious diseases on the rise and fall of civilizations.</div>
-                        </div>
-                    </div>
-                </div>
-                <div classs="quarter">
-                    <h3>Q3: The Perspective of the Governed</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Scott, James C. - Against the Grain: A Deep History of the Earliest States</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A fascinating and subversive look at how early states formed, arguing that life outside the state was often preferable.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: History in the Making</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Thucydides - History of the Peloponnesian War</div>
-                            <div class="resource-meta">Full Read (Landmark edition)</div>
-                            <div class="resource-description">The first great work of history and international relations, analyzing power, fear, and human nature in a way that remains eternally relevant.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title"><span class="keystone">Cultural Keystone</span></div>
-                            <div class="resource-description">Read: "The Muqaddimah" by Ibn Khaldun (abridged). Watch: The film "Seven Samurai" by Akira Kurosawa. Study: The Bayeux Tapestry.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- YEAR 4: SYSTEMS OF POWER & WEALTH -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 4: Systems of Power & Wealth</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                <div class="quarter">
-                    <h3>Q1: The Origins of Inequality</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Acemoglu & Robinson - Why Nations Fail: The Origins of Power, Prosperity, and Poverty</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A grand theory of global economic history, arguing that inclusive political and economic institutions are the key to long-term prosperity.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q2: The Logic of Capitalism</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Heilbroner, Robert L. - The Worldly Philosophers</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">The lives, times, and ideas of the great economic thinkers, from Adam Smith and Karl Marx to John Maynard Keynes. The best narrative introduction.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: Global Order & Disorder</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Kissinger, Henry - World Order</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">An analysis of different historical concepts of international order—from the Westphalian to the Chinese—and the challenges of building a shared order today.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: Justice & Governance</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Sandel, Michael J. - Justice: What's the Right Thing to Do?</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">An incredibly accessible introduction to political philosophy, exploring utilitarianism, libertarianism, and the moral theories of Kant, Aristotle, and Rawls.</div>
-                        </div>
-                    </div>
-                     <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title"><span class="keystone">Cultural Keystone</span></div>
-                            <div class="resource-description">Read: "The Prince" by Machiavelli. Watch: The film "The Battle of Algiers". Listen: To the symphonies of Shostakovich (art under political pressure).</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- YEAR 5: THE REALM OF MEANING & BEAUTY -->
-            <div class="year">
-                <div class="year-header">
-                    <h2>Year 5: The Realm of Meaning & Beauty</h2>
-                    <span class="year-progress">0%</span>
-                </div>
-                <div class="quarter">
-                    <h3>Q1: The Epic Tradition</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Homer - The Iliad & The Odyssey</div>
-                            <div class="resource-meta">Full Read (Lattimore or Fagles translations)</div>
-                            <div class="resource-description">The foundational epics of Western literature. Themes of glory (kleos), honor (timē), and fate.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title"><span class="keystone">Cultural Keystone</span></div>
-                            <div class="resource-description">Art: Study Greek pottery (black-figure and red-figure styles). Music: Listen to Monteverdi's opera "L'Orfeo".</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q2: The Birth of the Novel</h3>
-                     <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Murasaki Shikibu - The Tale of Genji</div>
-                            <div class="resource-meta">Full Read (Seidensticker or Tyler translation)</div>
-                            <div class="resource-description">The world's first novel, from 11th-century Japan. A profound exploration of aesthetics, love, and the Buddhist concept of impermanence (mono no aware).</div>
-                        </div>
-                    </div>
-                     <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title"><span class="keystone">Cultural Keystone</span></div>
-                            <div class="resource-description">Art: Study Japanese ukiyo-e woodblock prints (Hokusai, Hiroshige). Music: Listen to traditional Gagaku court music.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: The Human Condition in Drama & Poetry</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Shakespeare, William - Hamlet, King Lear, The Tempest, Sonnets</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">The pinnacle of the English language. Unparalleled explorations of consciousness, morality, power, and what it means to be human.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Rumi - The Essential Rumi</div>
-                            <div class="resource-meta">Full Read (Coleman Barks translation)</div>
-                            <div class="resource-description">The ecstatic, mystical poetry of the great 13th-century Persian Sufi master.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: The Modern Masterpiece</h3>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">García Márquez, Gabriel - One Hundred Years of Solitude</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">A landmark of magical realism and a masterpiece of 20th-century literature, weaving the history of Latin America into a mythical family saga.</div>
-                        </div>
-                    </div>
-                    <div class="resource" data-section="knowledge">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title"><span class="keystone">Cultural Keystone</span></div>
-                            <div class="resource-description">Art: Study the murals of Diego Rivera and the paintings of Frida Kahlo. Music: Listen to the "Buena Vista Social Club" album and the Bossa Nova of Antônio Carlos Jobim. Watch: The film "Citizen Kane".</div>
+                    <div class="card" onclick="toggleItem(this, 2)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                            <div class="card-title">Ragas (Sitar)</div>
+                            <span class="card-author">Ravi Shankar</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- =================================================================================== -->
-        <!-- SECTION 3: SYNTHESIS (THE ARCHITECTURE) -->
-        <!-- =================================================================================== -->
-        <div id="integration-section" class="content-section">
-            <div class="integration-year">
-                <h2>Year 6: Synthesis, Philosophy & Original Work</h2>
-                <div class="philosophy">
-                    "This final year is not about acquiring new knowledge, but about weaving the threads of logic and universal understanding into a coherent worldview. You move from student to architect. You will ask your own questions and begin the lifelong project of answering them, building a mind that is not merely full, but functional, integrated, and wise."
-                </div>
-                <div class="quarter">
-                    <h3>Q1: Philosophy of Logic, Science, and Mathematics</h3>
-                    <div class="resource" data-section="integration">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Haack, Susan - Philosophy of Logics</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">Now that you know many logics, you can ask: Is there one true logic, or many? What is the relationship between logic and reality?</div>
+        <div class="year-block" id="year-3">
+            <div class="year-header">
+                <span class="year-num">III</span>
+                <h2 class="year-title">Limits, Passion & Society</h2>
+            </div>
+            <div class="parallel-grid">
+                <div class="col">
+                    <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                    <div class="card" onclick="toggleItem(this, 3)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Intro to Gödel's Theorems</div>
+                            <span class="card-author">Peter Smith</span>
                         </div>
                     </div>
-                    <div class="resource" data-section="integration">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Kuhn, Thomas - The Structure of Scientific Revolutions</div>
-                            <div class="resource-meta">Full Read</div>
-                            <div class="resource-description">Integrate your knowledge of history and science. How does scientific knowledge actually progress? Understand paradigm shifts and normal science.</div>
+                    <div class="card" onclick="toggleItem(this, 3)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Tractatus Logico-Philosophicus</div>
+                            <span class="card-author">Wittgenstein</span>
                         </div>
                     </div>
                 </div>
-                <div class="quarter">
-                    <h3>Q2: The Frontiers and Deep Dives</h3>
-                    <div class="resource" data-section="integration">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Homotopy Type Theory: Univalent Foundations</div>
-                            <div class="resource-meta">The Frontier of Logic</div>
-                            <div class="resource-description">Read the preface and introduction to grasp the current frontier: treating proofs as spaces, unifying logic, topology, and computer science.</div>
+                <div class="col">
+                    <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture</span></div>
+                    <div class="card" onclick="toggleItem(this, 3)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Hamlet & King Lear</div>
+                            <span class="card-author">Shakespeare</span>
                         </div>
                     </div>
-                     <div class="resource" data-section="integration">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Choose Your Frontier</div>
-                            <div class="resource-meta">Self-directed Research</div>
-                            <div class="resource-description">Deep dive into one advanced area that fascinates you. Read recent survey papers on arXiv or the Stanford Encyclopedia of Philosophy.</div>
+                     <div class="card" onclick="toggleItem(this, 3)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">The Wealth of Nations</div>
+                            <span class="card-author">Adam Smith</span>
                         </div>
                     </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q3: Teaching & Integration</h3>
-                    <div class="resource" data-section="integration">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">The Feynman Technique Project</div>
-                            <div class="resource-meta">Test of Understanding</div>
-                            <div class="resource-description">Choose three difficult topics (e.g., Forcing, Gödel's Second Theorem, Categorical Logic) and write a clear, simple explanation for an intelligent undergraduate. This is the ultimate test of your own understanding.</div>
+
+                    <div class="card" onclick="toggleItem(this, 3)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">Wanderer above the Sea of Fog</div>
+                            <span class="card-author">Caspar David Friedrich</span>
                         </div>
                     </div>
-                    <div class="resource" data-section="integration">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Cross-Disciplinary Essays</div>
-                            <div class="resource-meta">Synthesis Essays</div>
-                            <div class="resource-description">Write three short essays connecting different domains. How does Gödel's incompleteness relate to themes in existential literature? How can model theory be applied to linguistics? What is the relationship between thermodynamics and economic theory?</div>
+                    <div class="card" onclick="toggleItem(this, 3)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">The Black Paintings</div>
+                            <span class="card-author">Goya</span>
+                            <div class="card-desc">Saturn Devouring His Son.</div>
                         </div>
                     </div>
-                </div>
-                <div class="quarter">
-                    <h3>Q4: Original Contribution</h3>
-                    <div class="resource" data-section="integration">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Write Your Synthesis</div>
-                            <div class="resource-meta">Personal Magnum Opus</div>
-                            <div class="resource-description">Produce a 50-100 page work that articulates your integrated worldview. It could be a philosophical treatise, a logical analysis of a cultural phenomenon, or a framework for a principled life. This is your first original contribution.</div>
+                    <div class="card" onclick="toggleItem(this, 3)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                            <div class="card-title">Symphony No. 9</div>
+                            <span class="card-author">Beethoven</span>
                         </div>
                     </div>
-                    <div class="resource" data-section="integration">
-                        <div class="checkbox" onclick="toggleResource(this)"></div>
-                        <div class="resource-content">
-                            <div class="resource-title">Design Your Next Decade</div>
-                            <div class="resource-meta">A Living Document</div>
-                            <div class="resource-description">You are now an architect. What will you build? Formulate the guiding questions and projects for the next phase of your life, based on the solid foundation you have constructed.</div>
+                     <div class="card" onclick="toggleItem(this, 3)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                            <div class="card-title">Requiem in D minor</div>
+                            <span class="card-author">Mozart</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <footer>
-            <p>This journey transforms you from student to architect of understanding.</p>
-            <p>The complete human has the tools to rigorously approach any domain of thought.</p>
-            <button class="export-button" onclick="exportProgress()">Export Progress</button>
-        </footer>
+        <div class="year-block" id="year-4">
+            <div class="year-header">
+                <span class="year-num">IV</span>
+                <h2 class="year-title">Meaning & Modernity</h2>
+            </div>
+            <div class="parallel-grid">
+                <div class="col">
+                    <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                    <div class="card" onclick="toggleItem(this, 4)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">A Shorter Model Theory</div>
+                            <span class="card-author">Wilfrid Hodges</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 4)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Naming and Necessity</div>
+                            <span class="card-author">Saul Kripke</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture</span></div>
+                    <div class="card" onclick="toggleItem(this, 4)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Thus Spoke Zarathustra</div>
+                            <span class="card-author">Nietzsche</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card" onclick="toggleItem(this, 4)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">Water Lilies & Impression Sunrise</div>
+                            <span class="card-author">Claude Monet</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 4)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">Les Demoiselles d'Avignon</div>
+                            <span class="card-author">Picasso</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 4)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                            <div class="card-title">The Rite of Spring</div>
+                            <span class="card-author">Stravinsky</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 4)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                            <div class="card-title">Kind of Blue</div>
+                            <span class="card-author">Miles Davis</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 4)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                            <div class="card-title">Metropolis (1927)</div>
+                            <span class="card-author">Fritz Lang</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="year-block" id="year-5">
+            <div class="year-header">
+                <span class="year-num">V</span>
+                <h2 class="year-title">Alternative Worlds</h2>
+            </div>
+            <div class="parallel-grid">
+                <div class="col">
+                    <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                    <div class="card" onclick="toggleItem(this, 5)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">On the Plurality of Worlds</div>
+                            <span class="card-author">David Lewis</span>
+                        </div>
+                    </div>
+                     <div class="card" onclick="toggleItem(this, 5)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Intro to Non-Classical Logic</div>
+                            <span class="card-author">Graham Priest</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture</span></div>
+                    <div class="card" onclick="toggleItem(this, 5)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Ficciones</div>
+                            <span class="card-author">Jorge Luis Borges</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card" onclick="toggleItem(this, 5)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">The Persistence of Memory</div>
+                            <span class="card-author">Salvador Dalí</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 5)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                            <div class="card-title">No. 5, 1948</div>
+                            <span class="card-author">Jackson Pollock</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 5)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                            <div class="card-title">2001: A Space Odyssey</div>
+                            <span class="card-author">Kubrick</span>
+                        </div>
+                    </div>
+                     <div class="card" onclick="toggleItem(this, 5)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                            <div class="card-title">Persona</div>
+                            <span class="card-author">Ingmar Bergman</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 5)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                            <div class="card-title">The Dark Side of the Moon</div>
+                            <span class="card-author">Pink Floyd</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="year-block" id="year-6">
+            <div class="year-header">
+                <span class="year-num">VI</span>
+                <h2 class="year-title">Synthesis & The Contemporary</h2>
+            </div>
+            <div class="parallel-grid">
+                <div class="col">
+                    <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                    <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Conceptual Mathematics</div>
+                            <span class="card-author">Lawvere & Schanuel</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Philosophical Investigations</div>
+                            <span class="card-author">Wittgenstein</span>
+                        </div>
+                    </div>
+                     <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Homotopy Type Theory</div>
+                            <span class="card-author">Univalent Foundations</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture</span></div>
+                    <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">Structure of Scientific Revolutions</div>
+                            <span class="card-author">Thomas Kuhn</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                            <div class="card-title">One Hundred Years of Solitude</div>
+                            <span class="card-author">García Márquez</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                            <div class="card-title">Spirited Away</div>
+                            <span class="card-author">Miyazaki</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                            <div class="card-title">The Tree of Life</div>
+                            <span class="card-author">Terrence Malick</span>
+                        </div>
+                    </div>
+                     <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                            <div class="card-title">In the Mood for Love</div>
+                            <span class="card-author">Wong Kar-wai</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="toggleItem(this, 6)">
+                        <div class="check-circle"></div>
+                        <div class="card-content">
+                            <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                            <div class="card-title">Guggenheim Bilbao</div>
+                            <span class="card-author">Frank Gehry</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    
+
+    <div id="toast">Marked as Complete</div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <div class="modal-year" id="modal-year-title">YEAR I COMPLETE</div>
+            <div class="modal-quote" id="modal-quote">"The mind is not a vessel to be filled, but a fire to be kindled."</div>
+            <button class="modal-btn" onclick="closeModal()">Proceed</button>
+        </div>
+    </div>
+
     <script>
-        let completedResources = new Set();
-        
-        function showSection(section) {
-            document.querySelectorAll('.content-section').forEach(s => {
-                s.classList.remove('active');
-            });
-            document.querySelectorAll('nav button').forEach(b => {
-                b.classList.remove('active');
-            });
-            document.getElementById(`${section}-section`).classList.add('active');
-            const button = document.querySelector(`nav button[onclick="showSection('${section}')"]`);
-            if (button) {
-                button.classList.add('active');
-            }
-        }
-        
-        function toggleResource(checkbox) {
-            const resource = checkbox.parentElement;
-            const allResources = Array.from(document.querySelectorAll('.resource'));
-            const index = allResources.indexOf(resource);
+        // --- DATA ---
+        const quotes = {
+            1: "Foundation laid. You have learned to see and to speak.",
+            2: "The world is larger than you thought. Structure is everywhere.",
+            3: "The limits of logic meet the boundlessness of human passion.",
+            4: "Modernity fractured the world; you are picking up the pieces.",
+            5: "Reality is plural. You now walk among many worlds.",
+            6: "THE ARCHITECT IS AWAKE. Go forth and build."
+        };
+
+        const yearStatus = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false };
+
+        document.addEventListener('DOMContentLoaded', loadProgress);
+
+        function toggleItem(el, year) {
+            el.classList.toggle('completed');
             
-            checkbox.classList.toggle('checked');
-            resource.classList.toggle('completed');
-            
-            if (checkbox.classList.contains('checked')) {
-                completedResources.add(index);
-            } else {
-                completedResources.delete(index);
+            if(el.classList.contains('completed')) {
+                showToast("Wisdom Acquired");
+                triggerMiniConfetti(el);
             }
             
             saveProgress();
-            updateAllProgress();
+            updateHUD();
+            checkYearCompletion(year);
         }
 
-        function updateAllProgress() {
-            updateSectionProgress('logic');
-            updateSectionProgress('knowledge');
-            updateSectionProgress('integration');
-            updateTotalProgress();
-            updateYearProgress();
-        }
-        
-        function updateSectionProgress(section) {
-            const resources = document.querySelectorAll(`.resource[data-section="${section}"]`);
-            const completedCount = Array.from(resources).filter(r => r.classList.contains('completed')).length;
-            const totalCount = resources.length;
-            const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+        function updateHUD() {
+            const logicTotal = document.querySelectorAll('.col-logic ~ .card').length;
+            const logicDone = document.querySelectorAll('.col-logic ~ .card.completed').length;
+            const cultureTotal = document.querySelectorAll('.col-culture ~ .card').length;
+            const cultureDone = document.querySelectorAll('.col-culture ~ .card.completed').length;
             
-            const progressBar = document.getElementById(`${section}-progress`);
-            const completedSpan = document.getElementById(`${section}-completed`);
-            const totalSpan = document.getElementById(`${section}-total`);
+            document.getElementById('stat-logic').innerText = `${logicDone}/${logicTotal}`;
+            document.getElementById('stat-culture').innerText = `${cultureDone}/${cultureTotal}`;
             
-            if (progressBar) progressBar.style.width = percentage + '%';
-            if (completedSpan) completedSpan.textContent = `${completedCount} / ${totalCount}`;
-            if (totalSpan) totalSpan.textContent = `${totalCount} resources`;
-        }
-        
-        function updateTotalProgress() {
-            const allResources = document.querySelectorAll('.resource');
-            const completedCount = document.querySelectorAll('.resource.completed').length;
-            const totalCount = allResources.length;
-            const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+            const total = logicTotal + cultureTotal;
+            const done = logicDone + cultureDone;
+            const percent = total === 0 ? 0 : Math.round((done/total)*100);
             
-            const progressBar = document.getElementById('total-progress');
-            const completedSpan = document.getElementById('total-completed');
-            const totalSpan = document.getElementById('total-resources');
-            
-            if (progressBar) progressBar.style.width = percentage + '%';
-            if (completedSpan) completedSpan.textContent = `${completedCount} / ${totalCount}`;
-            if (totalSpan) totalSpan.textContent = `${totalCount} resources`;
-        }
-        
-        function updateYearProgress() {
-            document.querySelectorAll('.year').forEach(yearElement => {
-                const resources = yearElement.querySelectorAll('.resource');
-                if (resources.length === 0) return;
+            document.getElementById('stat-percent').innerText = `${percent}%`;
 
-                const completedCount = Array.from(resources).filter(r => r.classList.contains('completed')).length;
-                const totalCount = resources.length;
-                const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
-                const progressSpan = yearElement.querySelector('.year-progress');
-                if (progressSpan) {
-                    progressSpan.textContent = `${percentage}% (${completedCount}/${totalCount})`;
-                }
-            });
+            if(percent === 100) setTimeout(() => openModal(6), 1000);
         }
-        
-        function saveProgress() {
-            try {
-                localStorage.setItem('architectProgress', JSON.stringify([...completedResources]));
-            } catch (e) {
-                console.error('Error saving progress:', e);
+
+        function checkYearCompletion(year) {
+            if(yearStatus[year]) return;
+            const yearBlock = document.getElementById(`year-${year}`);
+            const total = yearBlock.querySelectorAll('.card').length;
+            const done = yearBlock.querySelectorAll('.card.completed').length;
+
+            if(total === done && total > 0) {
+                yearStatus[year] = true;
+                setTimeout(() => openModal(year), 800);
+                triggerBigConfetti();
             }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function openModal(year) {
+            document.getElementById('modal-year-title').innerText = year === 6 ? "MAGNUM OPUS COMPLETE" : `YEAR ${toRoman(year)} COMPLETED`;
+            document.getElementById('modal-quote').innerText = quotes[year];
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function toRoman(num) {
+            return ["", "I", "II", "III", "IV", "V", "VI"][num] || num;
+        }
+
+        function triggerMiniConfetti(element) {
+            const rect = element.getBoundingClientRect();
+            const x = (rect.left + rect.width / 2) / window.innerWidth;
+            const y = (rect.top + rect.height / 2) / window.innerHeight;
+            confetti({ particleCount: 30, spread: 60, origin: { x, y }, colors: ['#c5a059', '#ffffff'], disableForReducedMotion: true });
+        }
+
+        function triggerBigConfetti() {
+            const end = Date.now() + 3000;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#c5a059', '#a54a4a'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#c5a059', '#4a6fa5'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        function saveProgress() {
+            const indices = [];
+            document.querySelectorAll('.card').forEach((el, index) => {
+                if(el.classList.contains('completed')) indices.push(index);
+            });
+            localStorage.setItem('architect_v7_indices', JSON.stringify(indices));
+            localStorage.setItem('architect_v7_years', JSON.stringify(yearStatus));
         }
 
         function loadProgress() {
-            const saved = localStorage.getItem('architectProgress');
-            if (saved) {
-                try {
-                    const savedSet = new Set(JSON.parse(saved));
-                    const allResources = document.querySelectorAll('.resource');
-                    allResources.forEach((resource, index) => {
-                         if (savedSet.has(index)) {
-                            const checkbox = resource.querySelector('.checkbox');
-                            checkbox.classList.add('checked');
-                            resource.classList.add('completed');
-                            completedResources.add(index);
-                         }
-                    });
-                } catch (e) {
-                    console.error('Error loading progress:', e);
-                    completedResources = new Set();
-                }
+            const indices = JSON.parse(localStorage.getItem('architect_v7_indices'));
+            const years = JSON.parse(localStorage.getItem('architect_v7_years'));
+            if(indices) {
+                const cards = document.querySelectorAll('.card');
+                indices.forEach(i => { if(cards[i]) cards[i].classList.add('completed'); });
             }
-            updateAllProgress();
+            if(years) Object.assign(yearStatus, years);
+            updateHUD();
         }
-        
-        function exportProgress() {
-            const sections = [
-                { id: 'logic', title: 'LOGIC MASTERY' },
-                { id: 'knowledge', title: 'UNIVERSAL KNOWLEDGE' },
-                { id: 'integration', title: 'SYNTHESIS & ORIGINAL WORK' }
-            ];
-
-            let report = 'THE ARCHITECT OF THE MIND - PROGRESS REPORT\n';
-            report += '='.repeat(60) + '\n\n';
-            report += `Generated: ${new Date().toLocaleString()}\n\n`;
-
-            let totalCompleted = 0;
-            let totalResources = 0;
-
-            sections.forEach(sec => {
-                const resources = document.querySelectorAll(`.resource[data-section="${sec.id}"]`);
-                const completed = Array.from(resources).filter(r => r.classList.contains('completed'));
-                totalCompleted += completed.length;
-                totalResources += resources.length;
-
-                report += `${sec.title}\n`;
-                report += '-'.repeat(60) + '\n';
-                report += `Progress: ${completed.length}/${resources.length} `;
-                report += `(${resources.length > 0 ? Math.round((completed.length/resources.length)*100) : 0}%)\n\n`;
-                
-                if(completed.length > 0){
-                    report += 'Completed Resources:\n';
-                    completed.forEach(r => {
-                        const title = r.querySelector('.resource-title').textContent;
-                        report += `  ✓ ${title}\n`;
-                    });
-                }
-                report += '\n\n';
-            });
-            
-            report += 'OVERALL PROGRESS\n';
-            report += '-'.repeat(60) + '\n';
-            report += `Total: ${totalCompleted}/${totalResources} `;
-            report += `(${totalResources > 0 ? Math.round((totalCompleted/totalResources)*100) : 0}%)\n`;
-            
-            const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `architect-progress-${new Date().toISOString().split('T')[0]}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-            document.querySelector('nav button[onclick="showSection(\'logic\')"]').classList.add('active');
-            loadProgress();
-        });
-    </script></body>
+    </script>
+</body>
 </html>
