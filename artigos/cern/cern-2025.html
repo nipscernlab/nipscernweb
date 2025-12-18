@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-section="cern">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NIPSCERN — PUBLICAÇÕES (CERN 2025)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="../../csss/style3.css" />
+
+  <style>
+    .year-page {
+      max-width: 1040px;
+      margin: 0 auto 120px;
+      padding: 160px 20px 0;
+      text-align: center;
+    }
+    .year-hero { margin-bottom: 20px; }
+    .year-hero h1 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+    }
+    .year-hero p {
+      max-width: 780px;
+      margin: 0 auto;
+      color: #d5dafe;
+      line-height: 1.6;
+    }
+    .year-search {
+      margin: 24px auto 32px;
+      max-width: 780px;
+      text-align: left;
+    }
+    .search-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .back-arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(120, 200, 255, 0.7);
+      background: rgba(5, 10, 25, 0.9);
+      color: #e9ecff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      box-shadow: 0 0 12px rgba(120, 200, 255, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+    .back-arrow:hover {
+      transform: translateX(-1px);
+      background: rgba(10, 30, 60, 0.95);
+      box-shadow: 0 0 18px rgba(120, 200, 255, 0.6);
+    }
+    .year-articles {
+      display: flex;
+      justify-content: center;
+    }
+    .articles-grid {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .article-card {
+      background: rgba(5, 10, 25, 0.92);
+      border-radius: 18px;
+      padding: 18px 22px;
+      border: 1px solid rgba(120, 200, 255, 0.25);
+      box-shadow: 0 0 28px rgba(0, 0, 0, 0.6);
+      text-align: left;
+    }
+    .article-card-title {
+      font-family: "Playfair Display", serif;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+    .article-card-meta {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      margin-bottom: 6px;
+    }
+    .article-card-authors {
+      font-size: 0.85rem;
+      color: #d5dafe;
+      margin-bottom: 10px;
+    }
+    .article-card-link {
+      font-size: 0.9rem;
+      color: #5fc7ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .article-card-link:hover {
+      text-decoration: underline;
+    }
+    .results-badge {
+      margin-left: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: rgba(10, 25, 60, 0.9);
+      border: 1px solid rgba(120, 200, 255, 0.6);
+      color: #e9ecff;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .results-badge strong { font-weight: 600; }
+  </style>
+</head>
+
+<body>
+  <canvas id="stars"></canvas>
+
+  <header class="header">
+    <div class="logo-container">
+      <img src="../../img/logo.png" alt="Logo NIPSCERN" class="logo-img" />
+      <p class="site-subtitle">NIPSCERN — PUBLICAÇÕES (CERN 2025)</p>
+    </div>
+    <a href="https://www.nipscern.com/#current-research"
+       class="home-icon"
+       title="Página inicial"
+       target="_blank"
+       rel="noopener">
+      <img src="../../img/home-cosmic.png" alt="Home" class="home-img" />
+    </a>
+  </header>
+
+  <main class="year-page" id="congresso">
+    <section class="year-hero">
+      <h1>CERN — Publicações de 2025</h1>
+      <p>
+        Página reservada para as <strong>publicações de 2025</strong> do eixo CERN.
+        Aqui estarão os trabalhos apresentados em <strong>congressos</strong>,
+        revistas científicas e demais produções técnicas deste ano.
+      </p>
+    </section>
+
+    <section class="year-search">
+      <div class="articles-filters">
+        <div class="filter-group search-group">
+          <div class="search-header">
+            <a href="cern.html" class="back-arrow"
+               title="Voltar para a página com todos os anos do CERN"
+               aria-label="Voltar para a página com todos os anos do CERN">←</a>
+            <span class="filter-label">Buscar publicação</span>
+          </div>
+
+          <div class="search-wrapper">
+            <input id="article-search" type="text"
+                   placeholder="Digite título, autor ou palavra-chave" />
+            <button type="button" class="search-icon">🔍</button>
+            <span class="results-badge">
+              <strong id="articles-count-visible">1</strong>
+              <span>de</span>
+              <span id="articles-count-total">1</span>
+              <span>publicações</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="year-articles">
+      <div class="articles-grid">
+
+        <article class="article-card">
+          <h2 class="article-card-title">
+            Título de Publicação CERN 2025 — Congresso
+          </h2>
+          <p class="article-card-meta">
+            Tipo: Congresso · Nome do Evento (2025)
+          </p>
+          <p class="article-card-authors">
+            <strong>Autores:</strong>
+            Nome do Autor 1; Nome do Autor 2; Nome do Autor 3
+          </p>
+          <a class="article-card-link"
+             href="../../artigos/pdfs/cern/2025/exemplo_cern_2025.pdf"
+             target="_blank" rel="noopener">
+            Ler PDF
+          </a>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <script defer src="../../js/script3.js"></script>
+</body>
+</html>

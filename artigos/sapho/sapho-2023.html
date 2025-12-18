@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-section="sapho" data-year="2023">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NIPSCERN — Artigos (SAPHO 2023)</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <!-- CSS oficial -->
+  <link rel="stylesheet" href="../../csss/style3.css" />
+
+  <!-- Ajustes específicos desta página -->
+  <style>
+    .header {
+      width: 100%;
+      padding: 14px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(6px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-img {
+      width: 94px;
+      height: auto;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .logo-title {
+      font-size: 1.28rem;
+      opacity: 0.85;
+    }
+
+    .logo-subtitle {
+      font-size: 1rem;
+      opacity: 0.75;
+    }
+
+    .home-icon {
+      width: 96px;
+      height: auto;
+      filter: drop-shadow(0 0 6px #5fc7ff90);
+      transition: 0.25s ease;
+    }
+
+    .home-icon:hover {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 10px #5fc7ff);
+    }
+
+    .year-page {
+      position: relative;
+      padding-bottom: 80px;
+    }
+
+    .year-hero {
+      text-align: center;
+      margin: 180px auto 32px;
+      max-width: 900px;
+    }
+
+    .year-articles {
+      display: flex;
+      justify-content: center;
+    }
+
+    .articles-grid {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .article-card {
+      background: rgba(5, 10, 25, 0.92);
+      border-radius: 18px;
+      padding: 22px 30px;
+      border: 1px solid rgba(120, 200, 255, 0.25);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .article-card-title {
+      font-family: "Playfair Display", serif;
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+    }
+
+    .article-card-excerpt {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .article-card-link {
+      font-size: 0.9rem;
+      color: #5fc7ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .article-card-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="stars"></canvas>
+
+  <!-- AQUI o cabeçalho global será injetado via JS -->
+  <div data-header-artigos></div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="year-page">
+
+    <section class="year-hero">
+      <h1 class="section-title">SAPHO — Artigos de 2023</h1>
+      <p class="section-subtitle">
+        Página reservada para os artigos de <strong>2023</strong> do eixo SAPHO.
+        Você pode ir preenchendo conforme forem sendo organizados.
+      </p>
+    </section>
+
+    <section class="year-articles">
+      <div class="articles-grid">
+
+        <article class="article-card">
+          <h2 class="article-card-title">Título de Artigo SAPHO 2023 — 01</h2>
+          <p class="article-card-excerpt">
+            Resumo curto do primeiro artigo de 2023. Troque pelos dados reais depois.
+          </p>
+          <a href="#" class="article-card-link" target="_blank" rel="noopener">Ler PDF</a>
+        </article>
+
+        <article class="article-card">
+          <h2 class="article-card-title">Título de Artigo SAPHO 2023 — 02</h2>
+          <p class="article-card-excerpt">
+            Pequena descrição do segundo artigo de 2023. Use este texto como prévia.
+          </p>
+          <a href="#" class="article-card-link" target="_blank" rel="noopener">Ler PDF</a>
+        </article>
+
+        <article class="article-card">
+          <h2 class="article-card-title">Título de Artigo SAPHO 2023 — 03</h2>
+          <p class="article-card-excerpt">
+            Outro resumo breve para o terceiro artigo. Depois é só substituir.
+          </p>
+          <a href="#" class="article-card-link" target="_blank" rel="noopener">Ler PDF</a>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <script defer src="../../js/script3.js"></script>
+</body>
+</html>

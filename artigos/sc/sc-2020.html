@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-section="sc">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NIPSCERN — PUBLICAÇÕES (SC 2020)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="../../csss/style3.css" />
+
+  <!-- ===== ESTILO ESPECÍFICO — PÁGINA SC 2020 (ROXO) ===== -->
+  <style>
+    .sc-year-page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 140px 20px 96px;
+    }
+
+    .sc-year-title {
+      font-family: "Playfair Display", serif;
+      font-weight: 700;
+      font-size: clamp(2.4rem, 3vw, 2.8rem);
+      text-align: center;
+      margin-bottom: 10px;
+      color: #f5f1ff;
+    }
+
+    .sc-year-subtitle {
+      text-align: center;
+      font-size: 0.98rem;
+      max-width: 720px;
+      margin: 0 auto 40px;
+      color: #d6c8ff;
+    }
+
+    .sc-year-subtitle strong {
+      color: #e0c2ff;
+    }
+
+    /* Linha: seta de voltar + busca + contador */
+    .pub-search-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    /* Botão redondo de voltar (seta) */
+    .pub-back-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      color: #fdfbff;
+      text-decoration: none;
+      border: 1px solid rgba(181, 123, 255, 0.7);
+      background: rgba(30, 15, 60, 0.8);
+      box-shadow: 0 0 12px rgba(154, 75, 255, 0.5);
+      transition: 0.2s ease;
+    }
+
+    .pub-back-pill:hover {
+      background: rgba(80, 40, 150, 0.85);
+      border-color: rgba(211, 163, 255, 1);
+      box-shadow: 0 0 18px rgba(211, 163, 255, 1);
+      transform: translateY(-2px);
+    }
+
+    /* Cápsula de busca */
+    .pub-search-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(181, 123, 255, 0.6);
+      background: rgba(10, 6, 30, 0.85);
+      box-shadow: 0 0 14px rgba(154, 75, 255, 0.45);
+    }
+
+    .pub-search-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(181, 123, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: #e0c2ff;
+      background: radial-gradient(circle at 30% 0, rgba(181, 123, 255, 0.5), transparent 60%);
+    }
+
+    .pub-search-pill input {
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #f5f1ff;
+      font-size: 0.9rem;
+      min-width: 240px;
+    }
+
+    .pub-search-pill input::placeholder {
+      color: #9f93c7;
+    }
+
+    .pub-count-pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(181, 123, 255, 0.4);
+      font-size: 0.78rem;
+      color: #e8ddff;
+      background: rgba(37, 20, 73, 0.85);
+    }
+
+    /* Lista de publicações */
+    .pub-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .pub-card {
+      border-radius: 18px;
+      border: 1px solid rgba(181, 123, 255, 0.55);
+      background:
+        radial-gradient(circle at 0 0, rgba(181, 123, 255, 0.18), transparent 60%),
+        rgba(5, 5, 20, 0.96);
+      padding: 22px 24px 20px;
+      box-shadow: 0 0 18px rgba(50, 30, 100, 0.6);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    .pub-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(211, 163, 255, 0.95);
+      box-shadow: 0 0 26px rgba(154, 75, 255, 0.9);
+    }
+
+    .pub-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #f5f1ff;
+    }
+
+    .pub-meta {
+      font-size: 0.78rem;
+      color: #c7b7ff;
+      margin-bottom: 2px;
+    }
+
+    .pub-meta strong {
+      color: #e0c2ff;
+    }
+
+    .pub-actions {
+      margin-top: 10px;
+    }
+
+    .pub-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(181, 123, 255, 0.9);
+      color: #fdfbff;
+      text-decoration: none;
+      background: linear-gradient(90deg, rgba(154, 75, 255, 0.85), rgba(211, 163, 255, 0.85));
+      box-shadow: 0 0 12px rgba(154, 75, 255, 0.9);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .pub-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 18px rgba(211, 163, 255, 1);
+    }
+
+    .pub-link::before {
+      content: "↗";
+      font-size: 0.82rem;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="stars"></canvas>
+
+  <!-- CABEÇALHO -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="../../img/logo.png" alt="Logo NIPSCERN" class="logo-img" />
+      <p class="site-subtitle">NIPSCERN — PUBLICAÇÕES (SC)</p>
+    </div>
+
+    <a href="https://www.nipscern.com/#current-research"
+       class="home-icon"
+       title="Página inicial"
+       target="_blank"
+       rel="noopener">
+      <img src="../../img/home-cosmic.png" alt="Home" class="home-img" />
+    </a>
+  </header>
+
+  <!-- CONTEÚDO SC 2020 -->
+  <main class="sc-year-page">
+    <h1 class="sc-year-title">SC — Publicações de 2020</h1>
+    <p class="sc-year-subtitle">
+      Página reservada para as publicações de <strong>2020</strong> da zona de convergência
+      <strong>SC</strong>, com estudos em coautoria entre os eixos SAPHO e CERN
+      e resultados de pesquisa em áreas afins.
+    </p>
+
+    <!-- Seta de voltar + busca + contador -->
+    <div class="pub-search-row">
+      <!-- seta para voltar para a página dos anos -->
+      <a href="sc.html" class="pub-back-pill" title="Voltar para a linha do tempo SC">←</a>
+
+      <!-- barra de busca -->
+      <div class="pub-search-pill">
+        <div class="pub-search-icon">🔍</div>
+        <input
+          id="pub-search-input"
+          type="search"
+          placeholder="Digite título, autor ou palavra-chave..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- contador de publicações -->
+      <div id="pub-count" class="pub-count-pill">
+        2 de 2 publicações
+      </div>
+    </div>
+
+    <!-- Lista de publicações -->
+    <section id="pub-list" class="pub-list">
+      <!-- PUBLICAÇÃO 1 -->
+      <article class="pub-card"
+               data-title="Arquitetura Multi-Core de Processadores Reconfiguráveis para Reconstrução Online de Energia no Calorímetro Hadrônico do ATLAS"
+               data-authors="Melissa Santos Aguiar; Mariana de Oliveira Resende; Lucca Oliveira Facio Viccini; Kinn Dias; Tiago Teixeira; Luciano Manhães de Andrade Filho; José Manoel de Seixas"
+               data-keywords="sc congresso 2020 multi-core processadores reconfiguráveis reconstrução online energia calorímetro hadrônico atlas">
+        <h2 class="pub-title">
+          Arquitetura Multi-Core de Processadores Reconfiguráveis para Reconstrução Online de Energia
+          no Calorímetro Hadrônico do ATLAS
+        </h2>
+        <p class="pub-meta">
+          <strong>Tipo:</strong> Congresso (2020)
+        </p>
+        <p class="pub-meta">
+          <strong>Autores:</strong>
+          Melissa Santos Aguiar; Mariana de Oliveira Resende; Lucca Oliveira Facio Viccini;
+          Kinn Dias; Tiago Teixeira; Luciano Manhães de Andrade Filho; José Manoel de Seixas.
+        </p>
+
+        <div class="pub-actions">
+          <a
+            href="../pdfs/cs/2020/sc-congresso-2020-01.pdf"
+            class="pub-link"
+            target="_blank"
+            rel="noopener"
+          >
+            Ler PDF
+          </a>
+        </div>
+      </article>
+
+      <!-- PUBLICAÇÃO 2 -->
+      <article class="pub-card"
+               data-title="Processamento Multicore para Reconstrução Online de Energia por Meio de Redes Neurais"
+               data-authors="Melissa Aguiar; Lucca Viccini; Dabson Ferreira; Mariana Resende; Mateus Faria; Luciano Filho; José de Seixas"
+               data-keywords="sc congresso 2020 processamento multicore reconstrução online energia redes neurais">
+        <h2 class="pub-title">
+          Processamento Multicore para Reconstrução Online de Energia por Meio de Redes Neurais
+        </h2>
+        <p class="pub-meta">
+          <strong>Tipo:</strong> Congresso (2020)
+        </p>
+        <p class="pub-meta">
+          <strong>Autores:</strong>
+          Melissa Aguiar; Lucca Viccini; Dabson Ferreira; Mariana Resende;
+          Mateus Faria; Luciano Filho; José de Seixas.
+        </p>
+
+        <div class="pub-actions">
+          <a
+            href="../pdfs/cs/2020/sc-congresso-2020-02.pdf"
+            class="pub-link"
+            target="_blank"
+            rel="noopener"
+          >
+            Ler PDF
+          </a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script defer src="../../js/script3.js"></script>
+
+  <!-- Script da busca rápida -->
+  <script>
+    (function () {
+      const input = document.getElementById("pub-search-input");
+      const cards = Array.from(document.querySelectorAll(".pub-card"));
+      const count = document.getElementById("pub-count");
+      const total = cards.length;
+
+      function updateCount(visible) {
+        count.textContent = visible + " de " + total + " publicações";
+      }
+
+      function applyFilter() {
+        const q = (input.value || "").toLowerCase().trim();
+        let visible = 0;
+
+        cards.forEach(card => {
+          const text =
+            (card.dataset.title + " " +
+             card.dataset.authors + " " +
+             card.dataset.keywords + " " +
+             card.textContent).toLowerCase();
+
+          const show = !q || text.includes(q);
+          card.style.display = show ? "" : "none";
+          if (show) visible++;
+        });
+
+        updateCount(visible);
+      }
+
+      if (input) {
+        input.addEventListener("input", applyFilter);
+      }
+      applyFilter();
+    })();
+  </script>
+</body>
+</html>

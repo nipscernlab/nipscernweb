@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-section="cern">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NIPSCERN — Publicações (CERN 2012)</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <!-- CSS oficial -->
+  <link rel="stylesheet" href="../../csss/style3.css" />
+
+  <style>
+    .year-page {
+      max-width: 1040px;
+      margin: 0 auto 120px;
+      padding: 160px 20px 0;
+      text-align: center;
+    }
+
+    .year-hero {
+      margin-bottom: 20px;
+    }
+
+    .year-hero h1 {
+      font-family: "Playfair Display", serif;
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+    }
+
+    .year-hero p {
+      max-width: 780px;
+      margin: 0 auto;
+      color: #d5dafe;
+      line-height: 1.6;
+    }
+
+    .year-search {
+      margin: 24px auto 32px;
+      max-width: 880px;
+      text-align: left;
+    }
+
+    .year-search .articles-filters {
+      display: flex;
+      justify-content: center;
+    }
+
+    .year-search .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .year-search .filter-label {
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      opacity: 0.75;
+    }
+
+    .back-to-years {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid rgba(140, 210, 255, 0.55);
+      background: radial-gradient(circle at 30% 0%, rgba(120, 200, 255, 0.25), transparent);
+      color: #e9ecff;
+      font-size: 1.2rem;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .back-to-years:hover {
+      border-color: rgba(160, 230, 255, 0.9);
+      box-shadow: 0 0 18px rgba(80, 180, 255, 0.5);
+    }
+
+    .search-wrapper {
+      position: relative;
+      min-width: 260px;
+      max-width: 420px;
+      flex: 1 1 auto;
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      padding: 10px 38px 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(140, 210, 255, 0.55);
+      background: rgba(3, 8, 20, 0.9);
+      color: #e9ecff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .search-wrapper input::placeholder {
+      color: rgba(213, 218, 254, 0.6);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: none;
+      background: radial-gradient(circle at 30% 0%, #5fc7ff, #385bff);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #050814;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .articles-count-badge {
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(120, 200, 255, 0.5);
+      background: rgba(6, 12, 30, 0.9);
+      color: #d5dafe;
+      white-space: nowrap;
+    }
+
+    .year-articles {
+      display: flex;
+      justify-content: center;
+    }
+
+    .articles-grid {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .article-card {
+      background: rgba(5, 10, 25, 0.92);
+      border-radius: 18px;
+      padding: 18px 22px;
+      border: 1px solid rgba(120, 200, 255, 0.25);
+      box-shadow: 0 0 28px rgba(0, 0, 0, 0.6);
+      text-align: left;
+    }
+
+    .article-card-title {
+      font-family: "Playfair Display", serif;
+      font-size: 1.08rem;
+      margin-bottom: 8px;
+    }
+
+    .article-card-meta {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .article-card-authors {
+      font-size: 0.82rem;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .article-card-link {
+      font-size: 0.9rem;
+      color: #5fc7ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .article-card-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="stars"></canvas>
+
+  <!-- CABEÇALHO -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="../../img/logo.png" alt="Logo NIPSCERN" class="logo-img" />
+      <p class="site-subtitle">NIPSCERN — PUBLICAÇÕES (CERN 2012)</p>
+    </div>
+
+    <a href="https://www.nipscern.com/#current-research"
+       class="home-icon"
+       title="Página inicial"
+       target="_blank"
+       rel="noopener">
+      <img src="../../img/home-cosmic.png" alt="Home" class="home-img" />
+    </a>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="year-page" id="congresso">
+
+    <!-- TÍTULO + INTRO -->
+    <section class="year-hero">
+      <h1>CERN — Publicações de 2012</h1>
+      <p>
+        Página reservada para as publicações de <strong>2012</strong> do eixo CERN.
+        Aqui estarão os trabalhos apresentados em <strong>congressos</strong>.
+      </p>
+    </section>
+
+    <!-- BUSCA + VOLTAR + CONTADOR -->
+    <section class="year-search">
+      <div class="articles-filters">
+        <div class="filter-group search-group">
+          <a
+            href="cern.html#congresso"
+            class="back-to-years"
+            aria-label="Voltar para a linha do tempo do CERN"
+          >
+            ←
+          </a>
+
+          <span class="filter-label">Buscar artigo</span>
+
+          <div class="search-wrapper">
+            <input
+              id="article-search"
+              type="text"
+              placeholder="Digite título, autor ou palavra-chave"
+            />
+            <button type="button" class="search-icon">🔍</button>
+          </div>
+
+          <span class="articles-count-badge">
+            <span id="articles-count-visible">2</span>
+            de
+            <span id="articles-count-total">2</span>
+            publicações
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTA DE ARTIGOS 2012 -->
+    <section class="year-articles">
+      <div class="articles-grid">
+
+        <!-- Artigo 1 – FPGA + Filtro Casado + Redes Neurais -->
+        <article class="article-card">
+          <h2 class="article-card-title">
+            FPGA Implementation of Matched Filter and Neural Networks for Calorimeter Signal Processing
+          </h2>
+          <p class="article-card-meta">
+            Tipo: Congresso (2012)
+          </p>
+          <p class="article-card-authors">
+            <strong>Autores:</strong>
+            Marcos Vinícius Silva Oliveira;
+            Bernardo Sotto-Maior Peralva;
+            Luciano Manhães de Andrade Filho;
+            Augusto Santiago Cerqueira.
+          </p>
+          <a
+            class="article-card-link"
+            href="../../artigos/pdfs/cern/2012/cern-congresso-2012-fpga-filtro-casado-redes-neurais.pdf"
+            target="_blank"
+            rel="noopener"
+          >
+            Ler PDF
+          </a>
+        </article>
+
+        <!-- Artigo 2 – TileCal + detecção com filtro casado + RN -->
+        <article class="article-card">
+          <h2 class="article-card-title">
+            Signal Detection in TileCal Using Matched Filter and Neural Networks
+          </h2>
+          <p class="article-card-meta">
+            Tipo: Congresso (2012)
+          </p>
+          <p class="article-card-authors">
+            <strong>Autores:</strong>
+            Marcos Vinícius Silva Oliveira;
+            Bernardo Sotto-Maior Peralva;
+            Luciano Manhães de Andrade Filho;
+            Augusto Santiago Cerqueira.
+          </p>
+          <a
+            class="article-card-link"
+            href="../../artigos/pdfs/cern/2012/cern-congresso-2012-tilecal-deteccao-filtro-casado-redes-neurais.pdf"
+            target="_blank"
+            rel="noopener"
+          >
+            Ler PDF
+          </a>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <script defer src="../../js/script3.js"></script>
+</body>
+</html>

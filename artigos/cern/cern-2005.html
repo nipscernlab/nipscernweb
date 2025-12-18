@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-section="cern">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>NIPSCERN — Publicações (CERN 2005)</title>
+  <meta name="description" content="Publicações do eixo CERN no ano de 2005 — NIPSCERN" />
+
+  <!-- CSS principal -->
+  <link rel="stylesheet" href="../../csss/style3.css" />
+
+  <!-- Font Awesome FREE -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+</head>
+
+<body>
+  <!-- Fundo estrelado -->
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <!-- ===== CABEÇALHO NIPSCERN ===== -->
+  <header class="header">
+    
+<div class="logo-container">
+  <a href="../../index3.html" class="logo-link">
+    <img src="../../img/logo.png" alt="Logo NIPSCERN" class="logo-img" />
+    <p class="site-subtitle">NIPSCERN — PUBLICAÇÕES</p>
+  </a>
+</div>
+
+
+
+    <!-- ===== MENU COM ÍCONES ===== -->
+    <nav class="header-nav top-nav" aria-label="Seções principais do NIPSCERN">
+      <a href="../sapho/sapho.html" class="top-nav__link is-sapho" title="Ir para SAPHO">
+        <i class="fa-solid fa-microchip" aria-hidden="true"></i>
+        <span>SAPHO</span>
+      </a>
+
+      <span class="top-nav__sep" aria-hidden="true">|</span>
+
+      <a href="../cern/cern.html" class="top-nav__link is-cern is-active" title="Ir para CERN">
+        <i class="fa-solid fa-atom" aria-hidden="true"></i>
+        <span>CERN</span>
+      </a>
+
+      <span class="top-nav__sep" aria-hidden="true">|</span>
+
+      <a href="../sc/sc.html" class="top-nav__link is-sc" title="Ir para SC">
+        <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+        <span>SC</span>
+      </a>
+
+      <span class="top-nav__sep" aria-hidden="true">|</span>
+
+      <a
+        href="https://www.nipscern.com/#current-research"
+        class="top-nav__link is-home"
+        aria-label="Ir para a página principal do NIPSCERN"
+        title="Site oficial"
+      >
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+      </a>
+    </nav>
+  </header>
+
+  <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+  <main id="conteudo-principal" class="publications-page">
+
+    <!-- Título -->
+    <section class="publications-hero">
+      <h1 class="page-title">
+        PUBLICAÇÕES — CERN <span class="highlight-year">2005</span>
+      </h1>
+    </section>
+
+    <!-- FILTROS -->
+    <section class="publications-filters" aria-label="Filtros de tipo de publicação">
+      <div class="filters-row">
+        <button type="button" class="filter-btn is-active" data-filter-tipo="todos">
+          Todos
+        </button>
+<button type="button" class="filter-btn" data-filter-tipo="favoritos" aria-label="Mostrar apenas favoritos">
+  ⭐ Favoritos
+</button>
+
+
+        <button type="button" class="filter-btn" data-filter-tipo="congresso">
+          Congresso
+        </button>
+        <button type="button" class="filter-btn" data-filter-tipo="revista">
+          Revista
+        </button>
+        <button type="button" class="filter-btn" data-filter-tipo="tese">
+          Tese
+        </button>
+      </div>
+
+      <div class="filters-row subfilters-row" aria-label="Subtipos de tese">
+        <button type="button" class="filter-btn" data-filter-nivel="tcc">TCC</button>
+        <button type="button" class="filter-btn" data-filter-nivel="mestrado">Mestrado</button>
+        <button type="button" class="filter-btn" data-filter-nivel="doutorado">Doutorado</button>
+      </div>
+    </section>
+
+    <!-- BUSCA -->
+    <section class="publications-search" aria-label="Busca nas publicações">
+
+
+
+<div class="pub-tools">
+  <a class="back-arrow-btn js-back-years" href="#" aria-label="Voltar para a página dos anos" title="Voltar">
+    ←
+  </a>
+
+      <div class="publications-search-row">
+        <div class="publications-search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+            type="search"
+            id="busca-publicacoes"
+            class="publications-search-input"
+            placeholder="Digite parte do título, autor ou palavra-chave..."
+            aria-label="Buscar publicações por título, autor ou palavra-chave"
+          />
+
+
+
+
+        </div>
+
+        <div
+          class="publications-count"
+          id="publications-count"
+          aria-live="polite"
+        >
+          0 publicações
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTA DE PUBLICAÇÕES -->
+    <section
+      class="publications-list-wrapper"
+      aria-label="Lista de publicações"
+      aria-live="polite"
+    >
+      <div
+        id="lista-publicacoes"
+        class="publications-list"
+        data-eixo="cern"
+        data-ano="2005"
+        data-json-path="/data/cern/2005.json"
+      ></div>
+
+      <p
+        id="status-publicacoes"
+        class="publications-status"
+        role="status"
+        aria-live="polite"
+      >
+        Carregando publicações...
+      </p>
+    </section>
+  </main>
+
+  <!-- JS principal -->
+  <script src="../../js/script3.js" defer></script>
+</body>
+</html>
