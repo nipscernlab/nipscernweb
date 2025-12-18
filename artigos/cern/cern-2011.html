@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-section="cern">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NIPSCERN — Artigos (CERN 2011)</title>
+
+  <link rel="stylesheet" href="../../csss/style3.css" />
+  <script defer src="../../js/script3.js"></script>
+
+  <!-- (opcional) estilos locais de year-page / pub-card
+       se ainda não estiverem no style3.css -->
+  <style>
+    .year-page {
+      max-width: 1040px;
+      margin: 0 auto 120px;
+      padding: 140px 20px 60px;
+      color: #e9ecff;
+    }
+
+    .year-title {
+      font-size: 1.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .filters { /* mesmo estilo da página de anos */
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(120, 200, 255, 0.25);
+      padding-bottom: 8px;
+    }
+
+    .filter-btn,
+    .subfilter-btn {
+      background: transparent;
+      border: 1px solid rgba(120, 200, 255, 0.4);
+      color: #e9ecff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .filter-btn:hover,
+    .subfilter-btn:hover {
+      background: rgba(120, 200, 255, 0.12);
+      border-color: rgba(120, 200, 255, 0.9);
+    }
+
+    .filter-btn.active {
+      background: rgba(120, 200, 255, 0.2);
+      border-color: rgba(120, 200, 255, 1);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 110%;
+      left: 0;
+      background: rgba(4, 12, 32, 0.98);
+      border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      z-index: 10;
+      min-width: 140px;
+    }
+
+    .dropdown-content .subfilter-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 4px;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .publications-grid {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .pub-card {
+      background: radial-gradient(circle at top left, rgba(80, 180, 255, 0.14), rgba(4, 10, 26, 0.95));
+      border-radius: 18px;
+      border: 1px solid rgba(140, 210, 255, 0.26);
+      padding: 14px 22px 18px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65);
+      color: #e9ecff;
+    }
+
+    .pub-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    .pub-type-badge {
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: rgba(123, 203, 255, 0.23);
+      border: 1px solid rgba(160, 220, 255, 0.8);
+      font-weight: 600;
+    }
+
+    .pub-year { opacity: 0.85; }
+
+    .pub-title {
+      font-size: 1.02rem;
+      margin: 4px 0 6px;
+      line-height: 1.5;
+    }
+
+    .pub-title a {
+      color: #8fd1ff;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .pub-title a:hover {
+      color: #ffffff;
+      border-color: rgba(143, 209, 255, 0.9);
+    }
+
+    .pub-authors,
+    .pub-orient {
+      font-size: 0.9rem;
+      color: #c7d5ff;
+      margin: 0;
+    }
+
+    .pub-orient {
+      margin-top: 2px;
+      opacity: 0.92;
+    }
+
+    .back-button-container {
+      max-width: 1040px;
+      margin: 120px auto 0;
+      padding: 0 20px;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #a4cfff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: transparent;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .back-button:hover {
+      background: rgba(120, 200, 255, 0.12);
+      border-color: rgba(120, 200, 255, 0.7);
+      color: #ffffff;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="stars"></canvas>
+
+  <!-- Cabeçalho -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="../../img/logo.png" alt="Logo NIPSCERN" class="logo-img" />
+      <p class="site-subtitle">NIPSCERN — ARTIGOS (CERN)</p>
+    </div>
+
+    <a href="https://www.nipscern.com/#current-research" class="home-button">
+      <img src="../../img/home.png" alt="Home" />
+    </a>
+  </header>
+
+  <!-- Voltar para a página de anos -->
+  <div class="back-button-container">
+    <a href="./cern.html" class="back-button">← Voltar para os Anos</a>
+  </div>
+
+  <section class="year-page">
+    <h1 class="year-title">Publicações — 2011</h1>
+
+    <!-- FILTROS (publicações) -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="todos">Todos</button>
+      <button class="filter-btn" data-filter="congresso">Congresso</button>
+      <button class="filter-btn" data-filter="revista">Revista</button>
+
+      <div class="dropdown">
+        <button class="filter-btn" data-filter="tese">Tese ▼</button>
+        <div class="dropdown-content">
+          <button class="subfilter-btn" data-subfilter="tcc">TCC</button>
+          <button class="subfilter-btn" data-subfilter="mestrado">Mestrado</button>
+          <button class="subfilter-btn" data-subfilter="doutorado">Doutorado</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDS DE PUBLICAÇÃO -->
+    <div class="publications-grid" id="publications-grid">
+
+      <!-- CARD DO TCC 2011 -->
+      <article class="pub-card"
+               data-tipo="tese"
+               data-nivel="tcc">
+        <div class="pub-meta">
+          <span class="pub-type-badge">TCC — CERN</span>
+          <span class="pub-year">2011</span>
+        </div>
+
+        <h3 class="pub-title">
+          <a href="../pdfs/cern/2011/rodrigo-araujo-tcc.pdf"
+             target="_blank"
+             rel="noopener noreferrer">
+            Detecção de Raios Cósmicos em Calorímetros Altamente Segmentados Usando Transformada de Hough Aleatória
+          </a>
+        </h3>
+
+        <p class="pub-authors">
+          Autor: Rodrigo Araujo Pereira
+        </p>
+
+        <p class="pub-orient">
+          Orientadores: Prof. José Manoel de Seixas, Prof. Luciano M. de Andrade Filho
+        </p>
+      </article>
+
+      <!-- outros artigos de 2011 entram aqui, sempre como .pub-card -->
+
+    </div>
+  </section>
+</body>
+</html>
