@@ -1,0 +1,2100 @@
+:root {
+  --bg: #060612;
+  --ink: #e9ecff;
+  --muted: #b8c0ff;
+  --cern: #00e5ff;
+  --sapho: #ff8a00;
+  --sc: #b388ff; /* roxo suave para SC */
+  --diagram-shift: -120px;
+  --title-shift: 80px;
+}
+
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+/* ===== FUNDO ESTRELADO ===== */
+#stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* Link que envolve o logo no cabeçalho global de artigos */
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+
+
+/* ===== CABEÇALHO (VERSÃO CORRETA) ===== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* esta linha é a mágica */
+
+  padding: 25px 40px;
+  height: 110px;
+  background: rgba(6, 6, 18, 0.65);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.25);
+  z-index: 10;
+}
+
+
+
+
+/* logo e título clicáveis (voltam para a página principal de publicações) */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logo-img {
+  height: 80px;
+  width: auto;
+  transition: transform 0.4s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
+
+.site-subtitle {
+  font-size: 1.6rem;
+  color: #ffffff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.header-nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ===== LINKS DO CABEÇALHO POR EIXO — versao suave ===== */
+
+.header-nav a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+/* SAPHO – hover laranja suave */
+.header-nav a[href*="sapho"]:hover {
+  color: #ffb86b;
+  text-shadow: 0 0 6px rgba(255, 184, 107, 0.45);
+}
+
+/* CERN – hover azul suave */
+.header-nav a[href*="cern"]:hover {
+  color: #8de8ff;
+  text-shadow: 0 0 6px rgba(141, 232, 255, 0.45);
+}
+
+/* SC – hover roxo suave */
+.header-nav a[href*="sc"]:hover {
+  color: #d2b3ff;
+  text-shadow: 0 0 6px rgba(210, 179, 255, 0.45);
+}
+
+/* HOME – hover suave neutro */
+.header-nav a[href*="nipscern"]:hover,
+.header-nav a.home-link:hover {
+  color: #e5e9ff;
+  text-shadow: 0 0 6px rgba(180, 190, 255, 0.35);
+}
+
+
+
+
+.home-link {
+  text-decoration: none;
+}
+
+.home-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 95px;
+  height: 88px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  margin-left: auto;
+}
+
+.home-img {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.6));
+  transition: filter 0.4s ease, transform 0.3s ease;
+}
+
+.home-icon:hover .home-img {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.9));
+}
+
+/* ===== CONTEÚDO GERAL ===== */
+main {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 220px);
+  padding-top: 90px;
+  padding-bottom: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* =========================================================
+   PÁGINA PRINCIPAL — DIAGRAMA NIPSCERN
+   ========================================================= */
+
+.titulo-diagrama {
+  position: relative;
+  top: 87px;
+  text-align: left;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 30px;
+  color: var(--ink);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  z-index: 3;
+}
+
+.titulo-diagrama .cern-text {
+  color: var(--cern);
+  text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+}
+
+.titulo-diagrama .sapho-text {
+  color: var(--sapho);
+  text-shadow: 0 0 12px rgba(255, 138, 0, 0.6);
+}
+
+/* DIAGRAMA */
+.diagram {
+  position: relative;
+  width: 700px;
+  height: 650px;
+  z-index: 2;
+  transform: translateX(var(--diagram-shift));
+  top: 90px;
+}
+
+.circle {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  opacity: 0.9;
+  border: 3px solid transparent;
+  transition: transform 0.4s ease, box-shadow 0.6s ease;
+  text-decoration: none;
+}
+
+.sapho {
+  border-color: var(--sapho);
+  box-shadow: 0 0 60px var(--sapho);
+  left: 150px;
+  top: 160px;
+}
+
+.cern {
+  border-color: var(--cern);
+  box-shadow: 0 0 60px var(--cern);
+  left: 420px;
+  top: 160px;
+}
+
+.circle:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 40px currentColor;
+}
+
+/* INTERSEÇÃO SC */
+.intersection {
+  position: absolute;
+  z-index: 6;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.link-intersection {
+  text-decoration: none;
+  font-size: 1.3rem;
+}
+
+.sc {
+  left: 455px;
+  top: 330px;
+  transform: translate(-50%, -50%);
+}
+
+.s,
+.c {
+  color: #ffffff;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+}
+
+/* NÚCLEOS */
+.nucleos {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 80px;
+  display: flex;
+  gap: 25px;
+  z-index: 9;
+}
+
+.nucleo {
+  background: rgba(10, 10, 25, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  width: 280px;
+  padding: 25px 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.4s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--ink);
+  display: block;
+}
+
+.nucleo:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.1);
+}
+
+.nucleo h3 {
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.nucleo p {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.sapho-box h3 {
+  color: var(--sapho);
+  text-shadow: 0 0 12px rgba(255, 138, 0, 0.6);
+}
+
+.sc-box h3 {
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.cern-box h3 {
+  color: var(--cern);
+  text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+}
+
+/* ===== RODAPÉ ===== */
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 15px 0;
+  background: rgba(6, 6, 18, 0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -2px 12px rgba(255, 138, 0, 0.2);
+  color: var(--muted);
+  font-size: 0.8rem;
+  z-index: 10;
+}
+
+.footer-line {
+  height: 2px;
+  width: 60%;
+  margin: 0 auto 8px;
+  background: linear-gradient(90deg, var(--sapho), var(--cern));
+  border-radius: 4px;
+  animation: glowFooter 6s ease-in-out infinite;
+}
+
+/* =========================================================
+   PÁGINAS DE ANOS (LAYOUT ANTIGO / ANIMAÇÕES)
+   (mantidas por compatibilidade, mas você está usando o grid novo)
+   ========================================================= */
+
+.years-wrap {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 220px);
+  padding-top: 150px;
+  padding-bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Nebulosa atrás do título */
+.years-wrap::before {
+  content: "";
+  position: absolute;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.05) 40%,
+    transparent 72%
+  );
+  filter: blur(40px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.years-title {
+  font-size: 2.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  color: var(--ink);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  animation: titleTwinkle 6s ease-in-out infinite;
+}
+
+.years-title::after {
+  content: "";
+  display: block;
+  width: 160px;
+  height: 3px;
+  margin: 14px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.7),
+    rgba(255, 255, 255, 0)
+  );
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.4);
+  opacity: 0.6;
+}
+
+.years-sub {
+  font-size: 0.95rem;
+  max-width: 520px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 28px auto 90px;
+}
+
+/* ACENTOS POR EIXO NAS PÁGINAS DE ANOS (years-wrap) */
+
+/* CERN */
+html[data-section="cern"] .years-wrap::before {
+  background: radial-gradient(
+    circle,
+    rgba(0, 229, 255, 0.2) 0%,
+    rgba(0, 229, 255, 0.06) 40%,
+    transparent 72%
+  );
+}
+html[data-section="cern"] .years-title {
+  text-shadow: 0 0 14px rgba(0, 229, 255, 0.6);
+}
+html[data-section="cern"] .years-sub strong {
+  color: var(--cern);
+}
+
+/* SAPHO */
+html[data-section="sapho"] .years-wrap::before {
+  background: radial-gradient(
+    circle,
+    rgba(255, 138, 0, 0.2) 0%,
+    rgba(255, 138, 0, 0.06) 40%,
+    transparent 72%
+  );
+}
+html[data-section="sapho"] .years-title {
+  text-shadow: 0 0 14px rgba(255, 138, 0, 0.6);
+}
+html[data-section="sapho"] .years-sub strong {
+  color: var(--sapho);
+}
+
+/* SC */
+html[data-section="sc"] .years-wrap::before {
+  background: radial-gradient(
+    circle,
+    rgba(179, 136, 255, 0.22) 0%,
+    rgba(179, 136, 255, 0.07) 40%,
+    transparent 72%
+  );
+}
+html[data-section="sc"] .years-title {
+  text-shadow: 0 0 14px rgba(179, 136, 255, 0.65);
+}
+html[data-section="sc"] .years-sub strong {
+  color: var(--sc);
+}
+
+/* ===== ANIMAÇÕES GERAIS ===== */
+
+@keyframes yearFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes titleTwinkle {
+  0%,
+  100% {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.25),
+      0 0 16px rgba(255, 255, 255, 0.12);
+    opacity: 0.98;
+  }
+  40% {
+    text-shadow: 0 0 14px rgba(255, 255, 255, 0.5),
+      0 0 28px rgba(255, 255, 255, 0.28);
+    opacity: 1;
+  }
+  70% {
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.18),
+      0 0 12px rgba(255, 255, 255, 0.08);
+    opacity: 0.94;
+  }
+}
+
+/* =========================================================
+   ARTIGOS / PUBLICAÇÕES POR ANO (FILTROS, BUSCA, LISTA)
+   ========================================================= */
+
+.articles-page {
+  max-width: 1040px;
+  margin: 0 auto 120px;
+  padding: 140px 20px 0;
+}
+
+.articles-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+  margin-right: 8px;
+}
+
+.filter-chip {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(233, 236, 255, 0.35);
+  background: rgba(6, 6, 18, 0.8);
+  color: #e9ecff;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease,
+    border-color 0.2s ease, transform 0.1s ease;
+}
+
+.filter-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(132, 214, 255, 0.3);
+}
+
+.filter-chip.is-active {
+  border-color: rgba(132, 214, 255, 0.9);
+  box-shadow: 0 0 14px rgba(132, 214, 255, 0.6);
+  background: radial-gradient(
+    circle at top,
+    rgba(132, 214, 255, 0.25),
+    transparent
+  );
+}
+
+/* VARIAÇÃO SAPHO — chips laranja */
+html[data-section="sapho"] .filter-chip:hover {
+  box-shadow: 0 0 12px rgba(255, 138, 0, 0.5);
+}
+
+html[data-section="sapho"] .filter-chip.is-active {
+  border-color: rgba(255, 138, 0, 0.95);
+  box-shadow: 0 0 16px rgba(255, 138, 0, 0.8);
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 138, 0, 0.35),
+    transparent
+  );
+}
+
+.thesis-subfilter[data-visible="false"] {
+  opacity: 0;
+  max-height: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.thesis-subfilter[data-visible="true"] {
+  opacity: 1;
+  max-height: 200px;
+  pointer-events: auto;
+  transition: opacity 0.2s ease, max-height 0.2s ease;
+}
+
+/* Lista de artigos */
+
+.articles-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.article-card {
+  border-radius: 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(233, 236, 255, 0.18);
+  background: radial-gradient(
+      circle at top left,
+      rgba(132, 214, 255, 0.05),
+      transparent
+    )
+    border-box,
+    rgba(6, 6, 18, 0.92);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.article-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.article-meta {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+.article-meta span {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+}
+
+.article-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: #e9ecff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(233, 236, 255, 0.38);
+}
+
+.article-link:hover {
+  box-shadow: 0 0 14px rgba(233, 236, 255, 0.4);
+}
+
+.articles-empty {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Busca de artigos (lupinha) */
+
+.articles-filters .search-group {
+  margin-top: 18px;
+}
+
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 360px;
+}
+
+#article-search {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(233, 236, 255, 0.18);
+  background: rgba(6, 8, 24, 0.9);
+  color: #e9ecff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+#article-search::placeholder {
+  color: rgba(233, 236, 255, 0.45);
+}
+
+#article-search:focus {
+  border-color: rgba(142, 197, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(142, 197, 255, 0.35);
+}
+
+.search-icon {
+  border: 1px solid rgba(233, 236, 255, 0.25);
+  background: radial-gradient(circle at 0% 0%, #253bff, #111426);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.search-icon:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* ============================================================
+   PÁGINAS DE LINHA DO TEMPO (CERN / SAPHO / SC)
+   ============================================================ */
+
+.years-page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 160px 20px 120px;
+  text-align: center;
+}
+
+.years-page .section-title {
+  font-family: "Playfair Display", serif;
+  font-size: 2.6rem;
+  color: #ffffff;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+
+.years-page .section-intro {
+  color: #d5dafe;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============================================================
+   TIPOS DE PUBLICAÇÃO (CONGRESSO / REVISTA / TESE)
+   ============================================================ */
+
+.pub-types {
+  margin-top: 24px;
+  text-align: left;
+}
+
+.pub-types-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.pub-types-intro {
+  color: #d5dafe;
+  font-size: 0.98rem;
+  max-width: 820px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.pub-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* cartão base */
+.pub-card {
+  background: rgba(9, 12, 28, 0.8);
+  border-radius: 18px;
+  padding: 20px 18px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition: 0.25s ease;
+}
+
+/* cartão clicável (tem data-pub-type) */
+.pub-card[data-pub-type] {
+  cursor: pointer;
+}
+
+/* borda levemente azul para CERN (padrão) */
+.pub-card-cern {
+  border-color: rgba(70, 150, 255, 0.45);
+}
+
+.pub-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 18px rgba(70, 150, 255, 0.45);
+}
+
+.pub-card-title {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.pub-card-text {
+  font-size: 0.95rem;
+  color: #d6ddff;
+  line-height: 1.5;
+}
+
+/* estado ativo (quando o usuário escolhe Congresso/Revista/Tese) */
+.pub-card.is-active {
+  border-color: rgba(0, 229, 255, 0.95);
+  box-shadow: 0 0 24px rgba(0, 229, 255, 0.7);
+  background: radial-gradient(
+    circle at top,
+    rgba(0, 229, 255, 0.18),
+    rgba(6, 6, 18, 0.98)
+  );
+}
+
+/* subtipos da Tese: TCC / Mestrado / Doutorado */
+/* por padrão, ficam escondidos */
+.pub-subtypes {
+  margin-top: 12px;
+  display: none;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* quando o card de Tese estiver "aberto", mostramos os subtipos */
+.pub-card.show-subtypes .pub-subtypes {
+  display: flex;
+}
+
+.pub-sub-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #f5f7ff;
+  background: rgba(15, 18, 40, 0.95);
+}
+
+/* ============================================================
+   FILTROS DA LINHA DO TEMPO (CERN / SAPHO / SC)
+   ============================================================ */
+
+.timeline-filters {
+  margin: 20px auto 32px;
+  max-width: 900px;
+  text-align: center;          /* CENTRALIZA TEXTO */
+}
+
+.timeline-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;         /* CENTRALIZA O LABEL */
+}
+
+.timeline-filter-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: rgba(233, 236, 255, 0.7);
+}
+
+.timeline-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;     /* CENTRALIZA OS BOTÕES */
+}
+
+/* chips menores para TCC / Mestrado / Doutorado */
+.filter-chip.is-small {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+/* grupo de nível de tese: aparece só quando tese é selecionado */
+.thesis-level-group[data-visible="false"] {
+  display: none;
+}
+
+.thesis-level-group[data-visible="true"] {
+  display: flex;
+}
+
+
+
+
+/* ============================================================
+   GRID HORIZONTAL DE ANOS — LAYOUT PRINCIPAL
+   ============================================================ */
+
+.years-strip-wrapper {
+  margin: 40px auto 120px;
+  max-width: 1100px;
+  padding: 0 20px;
+}
+
+.years-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  justify-content: center;
+}
+
+/* Botão de ano – apenas o número, centralizado */
+.year-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 170px;
+  height: 72px;
+  border-radius: 18px;
+
+  background: rgba(10, 10, 20, 0.75);
+  border: 1px solid rgba(120, 180, 255, 0.25);
+  backdrop-filter: blur(6px);
+
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  transition: 0.22s ease-in-out;
+  outline: none;
+
+  opacity: 0; /* para a animação de entrada */
+}
+
+/* subtítulo (não usamos mais, mas escondemos por segurança) */
+.year-tagline {
+  display: none !important;
+}
+
+/* hover geral (azul padrão, usado em CERN) */
+.year-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 18px rgba(70, 150, 255, 0.55);
+  border-color: rgba(70, 150, 255, 0.6);
+}
+
+/* acentos por eixo (cores de borda e hover) */
+.year-card-cern {
+  border-color: rgba(70, 150, 255, 0.35);
+}
+.year-card-cern:hover {
+  box-shadow: 0 0 22px rgba(70, 150, 255, 0.7);
+}
+
+/* SAPHO – laranja */
+.year-card-sapho {
+  border-color: rgba(255, 140, 60, 0.35);
+}
+.year-card-sapho:hover {
+  box-shadow: 0 0 22px rgba(255, 140, 60, 0.7);
+  border-color: rgba(255, 140, 60, 0.9);
+}
+
+/* SC – roxo */
+.year-card-sc {
+  border-color: rgba(180, 90, 255, 0.35);
+}
+.year-card-sc:hover {
+  box-shadow: 0 0 22px rgba(180, 90, 255, 0.7);
+  border-color: rgba(180, 90, 255, 0.9);
+}
+
+/* ============================================================
+   ANIMAÇÃO DE ENTRADA DOS ANOS
+   ============================================================ */
+
+@keyframes yearCardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.years-grid .year-card {
+  animation: yearCardFadeUp 0.8s ease-out forwards;
+}
+
+/* atrasos em cascata (até 12 anos) */
+.years-grid .year-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.years-grid .year-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.years-grid .year-card:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.years-grid .year-card:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.years-grid .year-card:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.years-grid .year-card:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.years-grid .year-card:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.years-grid .year-card:nth-child(8) {
+  animation-delay: 0.4s;
+}
+.years-grid .year-card:nth-child(9) {
+  animation-delay: 0.45s;
+}
+.years-grid .year-card:nth-child(10) {
+  animation-delay: 0.5s;
+}
+.years-grid .year-card:nth-child(11) {
+  animation-delay: 0.55s;
+}
+.years-grid .year-card:nth-child(12) {
+  animation-delay: 0.6s;
+}
+
+
+
+/* ============================================================
+   NIPSCERN — Estilo das páginas de publicações (CERN 2005)
+   ============================================================ */
+
+/* Container principal */
+.publications-page {
+  max-width: 1080px;
+  margin: 150px auto 120px; /* espaço extra depois do cabeçalho fixo */
+  padding: 0 24px 80px;
+}
+
+/* ------------------------------
+   Título da página
+------------------------------ */
+.publications-hero {
+  margin-top: 40px;  /* empurra um pouco abaixo do header */
+  margin-bottom: 42px;
+  text-align: center;
+}
+
+.page-title {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e5e9ff;
+  margin-bottom: 14px;
+}
+
+.page-title .highlight-year {
+  color: #a5b4ff;
+  text-shadow: 0 0 6px rgba(129, 140, 248, 0.4);
+}
+
+/* se ainda existir um subtítulo, deixa centralizado e discreto */
+.page-subtitle {
+  font-size: 0.95rem;
+  color: #c7d2ff;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* ------------------------------
+   FILTROS (Todos / Congresso / Revista / Tese)
+------------------------------ */
+
+.publications-filters {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Linha principal: TODOS / CONGRESSO / REVISTA / TESE */
+.filters-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;  /* espaço maior até os subfiltros */
+}
+
+/* Subfiltros: TCC / MESTRADO / DOUTORADO (começam escondidos) */
+.subfilters-row {
+  display: none;         /* o JS mostra quando TESE está ativo */
+  opacity: 0.9;
+  margin-top: 10px;      /* respiro entre os grupos */
+}
+
+/* Botões de filtro */
+.filter-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 255, 0.3);
+  padding: 7px 18px;
+  background: rgba(15, 23, 42, 0.45);
+  color: #e5e9ff;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+}
+
+.filter-btn:hover {
+  border-color: rgba(196, 181, 253, 0.7);
+  background: rgba(25, 35, 78, 0.65);
+  transform: translateY(-1px);
+}
+
+.filter-btn.is-active {
+  background: rgba(108, 99, 255, 0.35);
+  border-color: rgba(158, 148, 255, 0.8);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(129, 140, 248, 0.4);
+}
+
+/* ------------------------------
+   BUSCA + LUPA + CONTADOR
+------------------------------ */
+
+/* escondemos o texto acima da caixinha */
+.publications-search-label {
+  display: none;
+}
+
+.publications-search {
+  margin-top: 30px;
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+/* linha com input + contador */
+.publications-search-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;   /* espaço entre a caixa e o contador */
+  flex-wrap: wrap;
+}
+
+/* wrapper do campo com a lupa */
+.publications-search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 550px;   /* caixa mais larga */
+}
+
+/* Ícone da lupa (apenas o ícone, sem botão) */
+.publications-search .search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  opacity: 0.75;
+  pointer-events: none;
+
+  /* garante que qualquer estilo antigo de botão não apareça */
+  border: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* Campo de busca */
+.publications-search-input {
+  width: 100%;
+  padding: 12px 18px 12px 48px; /* espaço extra pro texto não encostar na lupa */
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 255, 0.35);
+  background: rgba(6, 8, 30, 0.85);
+  color: #e5e9ff;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+}
+
+.publications-search-input::placeholder {
+  color: rgba(156, 163, 255, 0.6);
+}
+
+.publications-search-input:focus {
+  border-color: rgba(180, 170, 255, 0.9);
+  background: rgba(10, 14, 52, 0.92);
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.3);
+}
+
+/* Contador "3 publicações" ao lado da caixa */
+.publications-count {
+  font-size: 1rem;
+  color: #cbd5ff;
+  background: rgba(20, 22, 54, 0.55);
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 255, 0.25);
+  backdrop-filter: blur(4px);
+  white-space: nowrap; /* não quebra "3 publicações" em duas linhas */
+}
+
+/* ------------------------------
+   LISTA DE PUBLICAÇÕES
+------------------------------ */
+
+.publications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 26px; /* espaço entre um card e outro */
+}
+
+/* Card de cada publicação */
+.publication-card {
+  position: relative;
+  border-radius: 16px;
+  padding: 24px;
+  background: rgba(6, 8, 30, 0.75);
+  border: 1px solid rgba(148, 163, 255, 0.25);
+  box-shadow: 0 0 14px rgba(15, 23, 42, 0.7); /* glow discreto */
+  backdrop-filter: blur(6px);
+}
+
+/* Título */
+.publication-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.35rem;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+/* Autores + tipo + veículo + ano + eixo */
+.publication-meta {
+  font-size: 0.95rem;
+  color: #c9d2ff;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+.pub-authors {
+  font-weight: 500;
+}
+
+/* Resumo */
+.publication-summary {
+  font-size: 0.95rem;
+  color: #e5e7ff;
+  margin-bottom: 14px;
+}
+
+/* Link "Abrir PDF" */
+.publication-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  border-radius: 999px;
+  padding: 8px 18px;
+  border: 1px solid rgba(148, 163, 255, 0.4);
+  background: rgba(15, 23, 42, 0.65);
+  color: #e5e9ff;
+  text-decoration: none;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+
+.publication-link:hover {
+  background: rgba(30, 40, 85, 0.85);
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.3);
+}
+
+/* Mensagem de status (erro, carregando, nenhum resultado) */
+.publications-status {
+  margin-top: 20px;
+  font-size: 1rem;
+  color: #aab4ff;
+  text-align: center;
+}
+
+/* ------------------------------
+   RESPONSIVO
+------------------------------ */
+
+@media (max-width: 768px) {
+  .publications-page {
+    margin: 130px auto 80px;
+    padding: 0 16px 60px;
+  }
+
+  .page-title {
+    font-size: 1.6rem;
+  }
+
+  .publications-search-row {
+    gap: 12px;
+  }
+
+  .publications-search-wrapper {
+    max-width: 100%;
+  }
+
+  .publication-card {
+    padding: 18px;
+  }
+}
+
+
+
+
+/* === Ajustes finos CERN 2005 — busca + contador === */
+
+/* Mais espaço entre o título e a área de filtros/busca */
+.publications-hero {
+  margin-bottom: 60px;
+}
+
+/* Linha da busca: input + contador lado a lado */
+.publications-search-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: nowrap; /* não quebra linha em desktop */
+}
+
+/* Em telas pequenas, aí sim pode quebrar em duas linhas */
+@media (max-width: 900px) {
+  .publications-search-row {
+    flex-wrap: wrap;
+  }
+}
+
+/* Caixa de busca mais larga, mas sem ocupar 100% pra sobrar espaço pro contador */
+.publications-search-wrapper {
+  max-width: 560px;
+}
+
+/* Título da busca um pouco maior */
+.publications-search-label {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+/* Lupa realmente separada do texto "Digite..." */
+.publications-search .search-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  opacity: 0.8;
+
+  /* sobrescreve o estilo antigo de .search-icon (aquele botãozinho) */
+  border: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* Texto da caixa mais afastado da lupa */
+.publications-search-input {
+  padding: 10px 16px 10px 56px; /* antes 42px */
+  font-size: 1rem;
+}
+
+/* Contador ao lado da caixa, sem quebrar no meio */
+.publications-count {
+  font-size: 0.95rem;
+  white-space: nowrap; /* mantém "3 publicações" em uma linha só */
+}
+
+
+/* === CERN 2005 — remover texto acima da caixinha de busca === */
+
+.publications-search-label {
+  display: none;
+}
+
+/* Ajustar o espaçamento já que tiramos o texto */
+.publications-search {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+
+/* ===== LINKS DO CABEÇALHO ===== */
+
+.header-links {
+  margin-left: auto;   /* ADICIONAR ESTA LINHA */
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+
+.header-links a {
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.25s ease;
+}
+
+/* SAPHO — laranja suave */
+.link-sapho {
+  color: #ffb56b;
+}
+.link-sapho:hover {
+  color: #ffd8ac;
+  text-shadow: 0 0 6px rgba(255,181,107,0.55);
+}
+
+/* CERN — azul suave */
+.link-cern {
+  color: #8ab4ff;
+}
+.link-cern:hover {
+  color: #c5d8ff;
+  text-shadow: 0 0 6px rgba(138,180,255,0.55);
+}
+
+/* SC — roxo suave */
+.link-sc {
+  color: #c9a6ff;
+}
+.link-sc:hover {
+  color: #e5d4ff;
+  text-shadow: 0 0 6px rgba(201,166,255,0.55);
+}
+
+/* Ícone Home */
+.home-icon {
+  font-size: 18px;
+  color: #ffffffcc;
+  margin-left: 10px;
+}
+.home-icon:hover {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255,255,255,0.6);
+}
+
+.home-icon-svg {
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.3s ease;
+  display: inline-block;
+}
+
+.home-icon-svg:hover {
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 6px #9FDFFF);
+}
+
+/* ===== ÍCONE HOME (SVG AZUL NEON SUAVE) ===== */
+
+.home-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.home-svg {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 0 6px rgba(147, 197, 253, 0.6));
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.home-icon:hover .home-svg {
+  transform: translateY(-1px) scale(1.05);
+  filter: drop-shadow(0 0 12px rgba(147, 197, 253, 0.85));
+}
+
+
+/* ===== OVERRIDE (seguro) — menu com ícones um pouco maior ===== */
+.header-nav.top-nav .top-nav__link{
+  font-size: 1.24rem;      /* texto um tiquinho maior */
+  letter-spacing: 0.07em;
+}
+
+.header-nav.top-nav .top-nav__link i{
+  font-size: 1.28rem;      /* ícone um tiquinho maior */
+}
+
+.header-nav.top-nav{
+  gap: 18px;               /* mais respiro */
+}
+
+.header-nav.top-nav .top-nav__sep{
+  font-size: 1.10rem;      /* barra levemente maior */
+  opacity: 0.32;           /* continua discreta */
+}
+
+
+
+/* ===== Favoritos (estrelinha) — cards de publicação ===== */
+.publication-card{
+  position: relative;
+}
+
+.fav-btn{
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(148,163,255,.28);
+  background: rgba(6,8,30,.55);
+  color: rgba(233,236,255,.85);
+
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.fav-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(129,140,248,.22);
+}
+
+.fav-btn.is-fav{
+  color: #ffd48a;
+  border-color: rgba(255, 212, 138, .55);
+  box-shadow: 0 0 14px rgba(255, 212, 138, .22);
+}
+
+.fav-btn i{
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+
+
+/* ===== Voltar (seta) ao lado da busca — seguro/isolado ===== */
+.pub-tools{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* botão seta */
+.back-arrow-btn{
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(10,12,25,0.35);
+
+  color: rgba(233,236,255,0.85);
+  text-decoration: none;
+  user-select: none;
+
+  transition: transform .15s ease, box-shadow .20s ease, border-color .20s ease, color .20s ease, text-shadow .20s ease;
+}
+
+/* cor por eixo (fallbacks seguros) */
+html[data-section="cern"]  .back-arrow-btn{ --accent: #4da3ff; }
+html[data-section="sapho"] .back-arrow-btn{ --accent: #ff8a00; }
+html[data-section="sc"]    .back-arrow-btn{ --accent: #b388ff; }
+
+.back-arrow-btn:hover{
+  color: var(--accent, #b388ff);
+  border-color: rgba(255,255,255,0.22);
+  text-shadow: 0 0 10px var(--accent, #b388ff);
+  box-shadow: 0 0 18px rgba(179,136,255,0.25);
+  transform: translateX(-2px);
+}
+
+.back-arrow-btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.16), 0 0 18px rgba(179,136,255,0.25);
+}
+
+
+/* ===============================
+   BOTÃO VOLTAR — CERN (DESTAQUE)
+   =============================== */
+
+.back-arrow-btn{
+  --cern-blue: #4da3ff;
+
+  width: 44px;
+  height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: 600;
+
+  color: #e9ecff;
+  text-decoration: none;
+  user-select: none;
+
+  background:
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(77,163,255,0.35),
+      rgba(10,14,30,0.85) 65%
+    );
+
+  border: 1px solid rgba(77,163,255,0.55);
+
+  box-shadow:
+    0 0 10px rgba(77,163,255,0.35),
+    inset 0 0 8px rgba(77,163,255,0.25);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease,
+    color 0.22s ease;
+}
+
+/* Hover — chama atenção, mas elegante */
+.back-arrow-btn:hover{
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(77,163,255,0.55),
+      rgba(10,14,30,0.9) 65%
+    );
+
+  box-shadow:
+    0 0 18px rgba(77,163,255,0.65),
+    0 0 32px rgba(77,163,255,0.35),
+    inset 0 0 10px rgba(77,163,255,0.35);
+
+  transform: translateX(-3px) scale(1.05);
+}
+
+/* Acessibilidade */
+.back-arrow-btn:focus-visible{
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(233,236,255,0.25),
+    0 0 20px rgba(77,163,255,0.6);
+}
+
+
+/* =====================================================
+   CERN — Paleta azul (override visual por eixo)
+   ===================================================== */
+
+html[data-section="cern"]{
+  --axis-main: #4da3ff;
+  --axis-glow: rgba(77,163,255,0.55);
+  --axis-border: rgba(77,163,255,0.45);
+}
+
+/* Ano destacado no título */
+html[data-section="cern"] .highlight-year{
+  color: var(--axis-main);
+  text-shadow: 0 0 10px var(--axis-glow);
+}
+
+/* Botões de filtro (Todos, Favoritos, etc.) */
+html[data-section="cern"] .filter-btn{
+  border-color: var(--axis-border);
+  color: #e9ecff;
+}
+
+html[data-section="cern"] .filter-btn:hover{
+  box-shadow: 0 0 14px var(--axis-glow);
+}
+
+/* Botão ativo */
+html[data-section="cern"] .filter-btn.is-active{
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(77,163,255,0.45),
+    rgba(10,14,30,0.9) 65%
+  );
+  border-color: var(--axis-main);
+  box-shadow:
+    0 0 18px var(--axis-glow),
+    inset 0 0 8px rgba(77,163,255,0.35);
+}
+
+/* Subfiltros (TCC, Mestrado, Doutorado) */
+html[data-section="cern"] .subfilters-row .filter-btn{
+  border-color: rgba(77,163,255,0.35);
+}
+
+html[data-section="cern"] .subfilters-row .filter-btn.is-active{
+  background: rgba(77,163,255,0.25);
+  box-shadow: 0 0 14px var(--axis-glow);
+}
+
+
+
+/* =========================================================
+   NIPSCERN — Responsividade (SAFE OVERRIDE)
+   Cole no FINAL do style3.css
+   ========================================================= */
+
+/* 1) Regras base para não estourar tela */
+* { box-sizing: border-box; }
+img, svg, video, canvas { max-width: 100%; height: auto; }
+body { overflow-x: hidden; }
+
+/* 2) Container central “fluido” */
+:root{
+  --page-max: 1040px;
+  --pad-x: clamp(14px, 3vw, 22px);
+  --gap: clamp(12px, 2.2vw, 18px);
+}
+
+.years-page,
+.articles-page,
+.cern-years-page,
+.sapho-years-page,
+.sc-years-page{
+  width: 100%;
+  max-width: var(--page-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+}
+
+/* 3) Títulos e textos “escala” com a tela */
+.page-title,
+.articles-title,
+.years-title{
+  font-size: clamp(22px, 3.2vw, 34px);
+  line-height: 1.2;
+}
+
+.publication-title,
+.article-title{
+  font-size: clamp(16px, 2.2vw, 22px);
+}
+
+/* 4) Cards: largura total no mobile, central no desktop */
+.publication-card,
+.article-card{
+  width: 100%;
+}
+
+/* 5) Barra de filtros e busca: quebra bem no celular */
+.filters-row,
+.articles-filters,
+.timeline-filters{
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  justify-content: center;
+}
+
+/* 6) Linha da lupa / busca / contador: empilha no mobile */
+.search-row,
+.search-wrap,
+.publications-search{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* campo busca não ficar gigante nem minúsculo */
+#busca-publicacoes,
+#article-search{
+  width: min(520px, 86vw);
+}
+
+/* contador */
+#publications-count{
+  white-space: nowrap;
+}
+
+/* 7) Header: garante que não “quebre” em telas pequenas */
+.header{
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+}
+
+.logo-container{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.site-subtitle,
+.logo-subtitle{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 65vw;
+}
+
+/* =========================================================
+   BREAKPOINTS
+   ========================================================= */
+
+/* Celular */
+@media (max-width: 480px){
+  .header-nav.top-nav{ gap: 10px; }
+  .top-nav__link{ padding: 8px 10px; }
+
+  /* Título do topo não ficar enorme */
+  .site-subtitle, .logo-subtitle{ max-width: 58vw; }
+
+  /* Botões de filtro menores */
+  .filter-btn, .filter-chip{
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  /* Cards com mais respiro vertical */
+  .publication-card, .article-card{
+    padding: 16px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px){
+  :root{ --page-max: 980px; }
+  .publication-card, .article-card{ padding: 18px; }
+}
+
+/* Notebook/desktop grande */
+@media (min-width: 1440px){
+  :root{ --page-max: 1180px; }
+}
+
+.fav-btn i{
+  font-size: 1.45rem; /* aumenta a estrela */
+ 
+}
+
+/* =========================================
+   CERN (e anos) — Entrada + Glow consistente
+   (aplica em TODOS os botões de ano)
+========================================= */
+
+/* Troque .year-btn pelo seletor real dos seus botões de ano */
+.year-btn {
+  opacity: 0;
+  transform: translateY(16px) scale(0.985);
+  filter: blur(1.5px);
+  transition: box-shadow .35s ease, border-color .35s ease, transform .35s ease;
+  will-change: transform, opacity, filter;
+}
+
+/* Estado "entrou" */
+.year-btn.is-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+  animation: nip-year-in 700ms cubic-bezier(.2, .9, .2, 1) both;
+}
+
+/* Glow padrão (fica bonito e uniforme) */
+.year-btn.is-in {
+  box-shadow:
+    0 0 0 1px rgba(120, 180, 255, 0.22),
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    0 0 22px rgba(0, 229, 255, 0.12);
+}
+
+/* Hover reforça glow */
+.year-btn:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow:
+    0 0 0 1px rgba(120, 180, 255, 0.35),
+    0 14px 40px rgba(0, 0, 0, 0.55),
+    0 0 30px rgba(0, 229, 255, 0.20);
+}
+
+/* Keyframes da entrada */
+@keyframes nip-year-in {
+  0% { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(2px); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* Respeita reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .year-btn, .year-btn.is-in {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ================================
+   ANOS — entrada + glow (universal)
+   Funciona em qualquer botão/link marcado com data-year
+================================ */
+
+[data-year]{
+  opacity: 0;
+  transform: translateY(16px) scale(0.985);
+  filter: blur(1.5px);
+  will-change: transform, opacity, filter;
+}
+
+/* estado entrou */
+[data-year].is-in{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+  animation: nip-year-in 700ms cubic-bezier(.2,.9,.2,1) both;
+  animation-delay: var(--in-delay, 0ms);
+
+  /* glow consistente */
+  box-shadow:
+    0 0 0 1px rgba(120, 180, 255, 0.22),
+    0 10px 30px rgba(0, 0, 0, 0.45),
+    0 0 22px rgba(0, 229, 255, 0.12);
+}
+
+[data-year]:hover{
+  transform: translateY(-2px) scale(1.01);
+  box-shadow:
+    0 0 0 1px rgba(120, 180, 255, 0.35),
+    0 14px 40px rgba(0, 0, 0, 0.55),
+    0 0 30px rgba(0, 229, 255, 0.20);
+}
+
+@keyframes nip-year-in{
+  0%{opacity:0; transform:translateY(18px) scale(0.985); filter:blur(2px)}
+  60%{opacity:1}
+  100%{opacity:1; transform:translateY(0) scale(1); filter:blur(0)}
+}
+
+@media (prefers-reduced-motion: reduce){
+  [data-year], [data-year].is-in{
+    animation:none !important;
+    transition:none !important;
+    opacity:1 !important;
+    transform:none !important;
+    filter:none !important;
+  }
+}
+
+
+/* ==============================
+   CERN — filtros em coluna
+   (Nível da tese abaixo de Tese)
+============================== */
+
+/* força empilhar os grupos (Tipo de publicação em cima, Nível da tese embaixo) */
+.timeline-filters {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center;
+  gap: 16px;
+}
+
+/* garante que cada grupo ocupe a largura e fique bonitinho */
+.timeline-filter-group {
+  width: min(920px, 100%);
+  text-align: center;
+}
+
+/* chips sempre centralizados */
+.timeline-filter-chips {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+/* quando aparecer, o grupo do nível da tese fica naturalmente abaixo */
+.thesis-level-group {
+  width: min(920px, 100%);
+}
+
+
+
+/* ===============================
+   HOME — Font Awesome (padrão 2005)
+=============================== */
+
+.home-fa {
+  font-size: 20px;
+  color: #cfe9ff;
+  opacity: 0.85;
+  transition: transform 0.25s ease, opacity 0.25s ease, text-shadow 0.25s ease;
+}
+
+.home-link:hover .home-fa {
+  opacity: 1;
+  transform: scale(1.12);
+  text-shadow:
+    0 0 6px rgba(120, 200, 255, 0.6),
+    0 0 14px rgba(120, 200, 255, 0.35);
+}
+
+
+/* =========================================
+   HOME (Font Awesome) — override final seguro
+   ========================================= */
+.header .home-link{
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.header .home-fa{
+  font-size: 20px;
+  line-height: 1;
+  color: #cfe9ff;
+  opacity: .9;
+  transition: transform .2s ease, opacity .2s ease, text-shadow .2s ease;
+}
+
+.header .home-link:hover .home-fa{
+  opacity: 1;
+  transform: scale(1.12);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.55);
+}
+
+/* === AUMENTAR APENAS A CASINHA (Font Awesome) === */
+.header-nav .home-link i {
+  font-size: 1.5rem;
+}
+
+
+/* =======================================================
+   PATCH — Cards maiores nas páginas de ano (2004/2005/2008…)
+   Cole no FINAL do style3.css
+======================================================= */
+
+.publications-list-wrapper {
+  width: 100%;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.publications-list {
+  width: 100%;
+  max-width: 980px;   /* <<< aumenta a “caixa” geral */
+  margin: 0 auto;
+}
+
+.publication-card {
+  width: 100%;
+  max-width: 980px;   /* <<< garante que o card acompanhe */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.publication-card__content {
+  padding: 22px 26px; /* <<< mais respiro dentro */
+}
+
+@media (max-width: 640px) {
+  .publications-list {
+    max-width: 100%;
+  }
+  .publication-card {
+    max-width: 100%;
+  }
+  .publication-card__content {
+    padding: 18px 18px;
+  }
+}
+
+
