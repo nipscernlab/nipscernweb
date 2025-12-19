@@ -16,6 +16,26 @@
   box-sizing: border-box;
 }
 
+
+/* =========================================================
+   PATCH GLOBAL — ESCALA CONSISTENTE DO SITE
+   (impede "zoom" causado por fonte do navegador)
+   ========================================================= */
+
+html {
+  font-size: 16px;                 /* base universal */
+  -webkit-text-size-adjust: 100%;  /* Safari / iOS */
+  text-size-adjust: 100%;          /* padrão */
+}
+
+body {
+  zoom: 1;                         /* neutraliza zoom implícito */
+}
+
+
+
+
+
 html,
 body {
   height: 100%;
@@ -2095,6 +2115,49 @@ body { overflow-x: hidden; }
   .publication-card__content {
     padding: 18px 18px;
   }
+}
+
+
+
+/* =========================================================
+   OVERRIDE FINAL — TIPOGRAFIA E ESCALA (SAFE)
+   Garante que títulos e textos não "estourem"
+   ========================================================= */
+
+/* títulos principais */
+.page-title,
+.years-title,
+.section-title {
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.2;
+}
+
+/* títulos de cards */
+.publication-title,
+.article-title {
+  font-size: clamp(16px, 2.1vw, 22px);
+}
+
+/* textos normais */
+.publication-meta,
+.publication-summary,
+.article-meta,
+.article-summary,
+p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* filtros e botões */
+.filter-btn,
+.filter-chip,
+.pub-sub-pill {
+  font-size: 0.85rem;
+}
+
+/* evita estouro horizontal */
+body {
+  overflow-x: hidden;
 }
 
 
