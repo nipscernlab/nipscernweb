@@ -2160,4 +2160,987 @@ body {
   overflow-x: hidden;
 }
 
+/* =========================================================
+   NIPSCERN — MOBILE FIX (até 768px)
+   Corrige diagrama, núcleos e header no celular
+   ========================================================= */
 
+@media (max-width: 768px) {
+
+  /* ===== HEADER ===== */
+  .header {
+    height: 80px;
+    padding: 16px 18px;
+  }
+
+  .logo-img {
+    height: 52px;
+  }
+
+  .site-subtitle {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+  }
+
+  /* espaço correto pro conteúdo */
+  main {
+    padding-top: 90px;
+  }
+
+  /* ===== DIAGRAMA ===== */
+  .diagram {
+    width: 100%;
+    height: auto;
+    transform: none;
+    top: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .circle {
+    width: 240px;
+    height: 240px;
+    font-size: 1.4rem;
+  }
+
+  .sapho {
+    left: 0;
+    top: 0;
+    position: relative;
+    margin-right: -60px;
+  }
+
+  .cern {
+    left: 0;
+    top: 0;
+    position: relative;
+  }
+
+  /* interseção SC */
+  .intersection.sc {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .link-intersection {
+    font-size: 1rem;
+  }
+
+  /* ===== NÚCLEOS ===== */
+  .nucleos {
+    position: static;
+    transform: none;
+    margin-top: 40px;
+    margin-bottom: 80px;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+  .nucleo {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    font-size: 0.75rem;
+  }
+}
+
+/* =========================================================
+   NIPSCERN — MOBILE FIX (até 768px)
+   Corrige diagrama, núcleos e header no celular
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* ===== HEADER ===== */
+  .header {
+    height: 80px;
+    padding: 16px 18px;
+  }
+
+  .logo-img {
+    height: 52px;
+  }
+
+  .site-subtitle {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+  }
+
+  /* espaço correto pro conteúdo */
+  main {
+    padding-top: 90px;
+  }
+
+  /* ===== DIAGRAMA ===== */
+  .diagram {
+    width: 100%;
+    height: auto;
+    transform: none;
+    top: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .circle {
+    width: 240px;
+    height: 240px;
+    font-size: 1.4rem;
+  }
+
+  .sapho {
+    left: 0;
+    top: 0;
+    position: relative;
+    margin-right: -60px;
+  }
+
+  .cern {
+    left: 0;
+    top: 0;
+    position: relative;
+  }
+
+  /* interseção SC */
+  .intersection.sc {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .link-intersection {
+    font-size: 1rem;
+  }
+
+  /* ===== NÚCLEOS ===== */
+  .nucleos {
+    position: static;
+    transform: none;
+    margin-top: 40px;
+    margin-bottom: 80px;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+  .nucleo {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    font-size: 0.75rem;
+  }
+}
+
+
+/* =========================================================
+   MOBILE FIX — HOME (index3)
+   Não mexe no desktop. Só melhora celular/tablet.
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* Header menor no celular */
+  .header{
+    height: 82px;
+    padding: 14px 16px;
+  }
+  .logo-img{ height: 52px; }
+  .site-subtitle{
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60vw;
+  }
+  .home-icon{ width: 44px; height: 44px; }
+
+  /* Conteúdo não “come” atrás do header */
+  main{
+    padding-top: 96px;
+    padding-bottom: 90px;
+  }
+
+  /* Título “Sinergia…” central e com tamanho responsivo */
+  .titulo-diagrama{
+    top: 0;
+    margin: 8px 0 14px;
+    text-align: center;
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  }
+
+  /* ===== DIAGRAMA: vira um bloco central responsivo ===== */
+  .diagram{
+    width: min(92vw, 420px);
+    height: min(92vw, 420px);
+    transform: none;     /* remove translateX do desktop */
+    top: 0;              /* remove empurrão vertical */
+    margin: 18px auto 18px;
+  }
+
+  /* Círculos diminuem e reposicionam proporcionalmente */
+  .circle{
+    width: min(56vw, 240px);
+    height: min(56vw, 240px);
+    font-size: clamp(1.05rem, 4.6vw, 1.35rem);
+    letter-spacing: 1px;
+  }
+
+  .sapho{
+    left: 6%;
+    top: 18%;
+  }
+  .cern{
+    left: 44%;
+    top: 18%;
+  }
+
+  /* Interseção SC volta pro centro real do overlap */
+  .intersection.sc{
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .link-intersection{ font-size: 1rem; }
+
+  /* ===== Núcleos: sai do fixed e vira coluna ===== */
+  .nucleos{
+    position: relative;     /* antes era fixed */
+    left: auto;
+    bottom: auto;
+    transform: none;
+
+    width: 100%;
+    padding: 0 16px;
+    margin: 22px auto 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 2;
+  }
+
+  .nucleo{
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* Footer: em mobile, fixed costuma atrapalhar */
+  .footer{
+    position: relative;   /* antes era fixed */
+    margin-top: 22px;
+  }
+}
+
+
+
+/* =========================================================
+   MOBILE FIX — HOME (index3)
+   Não mexe no desktop. Só melhora celular/tablet.
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* Header menor no celular */
+  .header{
+    height: 82px;
+    padding: 14px 16px;
+  }
+  .logo-img{ height: 52px; }
+  .site-subtitle{
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60vw;
+  }
+  .home-icon{ width: 44px; height: 44px; }
+
+  /* Conteúdo não “come” atrás do header */
+  main{
+    padding-top: 96px;
+    padding-bottom: 90px;
+  }
+
+  /* Título “Sinergia…” central e com tamanho responsivo */
+  .titulo-diagrama{
+    top: 0;
+    margin: 8px 0 14px;
+    text-align: center;
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  }
+
+  /* ===== DIAGRAMA: vira um bloco central responsivo ===== */
+  .diagram{
+    width: min(92vw, 420px);
+    height: min(92vw, 420px);
+    transform: none;     /* remove translateX do desktop */
+    top: 0;              /* remove empurrão vertical */
+    margin: 18px auto 18px;
+  }
+
+  /* Círculos diminuem e reposicionam proporcionalmente */
+  .circle{
+    width: min(56vw, 240px);
+    height: min(56vw, 240px);
+    font-size: clamp(1.05rem, 4.6vw, 1.35rem);
+    letter-spacing: 1px;
+  }
+
+  .sapho{
+    left: 6%;
+    top: 18%;
+  }
+  .cern{
+    left: 44%;
+    top: 18%;
+  }
+
+  /* Interseção SC volta pro centro real do overlap */
+  .intersection.sc{
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .link-intersection{ font-size: 1rem; }
+
+  /* ===== Núcleos: sai do fixed e vira coluna ===== */
+  .nucleos{
+    position: relative;     /* antes era fixed */
+    left: auto;
+    bottom: auto;
+    transform: none;
+
+    width: 100%;
+    padding: 0 16px;
+    margin: 22px auto 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 2;
+  }
+
+  .nucleo{
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* Footer: em mobile, fixed costuma atrapalhar */
+  .footer{
+    position: relative;   /* antes era fixed */
+    margin-top: 22px;
+  }
+}
+/* =========================================================
+   MOBILE FIX V2 — HOME (index3)
+   Ajusta: título, diagrama (mais alto), e cards sem sobrepor
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* ---------- HEADER ---------- */
+  .header{
+    height: 78px;
+    padding: 12px 14px;
+  }
+  .logo-img{ height: 50px; }
+  .site-subtitle{
+    font-size: 1.02rem;
+    letter-spacing: 1px;
+    max-width: 58vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ---------- MAIN / ESPAÇOS ---------- */
+  main{
+    padding-top: 86px !important;   /* menos “buraco” */
+    padding-bottom: 40px !important;
+  }
+
+  /* ---------- TÍTULO “Sinergia…” ---------- */
+  .titulo-diagrama{
+    top: 0 !important;
+    margin: 0 auto 10px !important;
+    text-align: center !important;
+    font-size: clamp(1.0rem, 4.6vw, 1.25rem) !important;
+    line-height: 1.15 !important;
+    max-width: 92vw;
+  }
+
+  /* força “SAPHO e CERN” ficarem juntos e centralizados */
+  .titulo-diagrama .sapho-text,
+  .titulo-diagrama .cern-text{
+    display: inline !important;
+    white-space: nowrap;
+  }
+
+  /* ---------- DIAGRAMA ---------- */
+  .diagram{
+    width: min(92vw, 390px) !important;
+    height: min(92vw, 390px) !important;
+    transform: none !important;
+    top: 0 !important;
+    margin: 8px auto 14px !important;  /* sobe o diagrama */
+  }
+
+  .circle{
+    width: min(54vw, 225px) !important;
+    height: min(54vw, 225px) !important;
+    font-size: clamp(1.0rem, 4.8vw, 1.25rem) !important;
+    letter-spacing: 1px !important;
+  }
+
+  .sapho{ left: 4% !important; top: 18% !important; }
+  .cern { left: 46% !important; top: 18% !important; }
+
+  /* SC bem no miolo */
+  .intersection.sc{
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  .link-intersection{ font-size: 0.95rem !important; }
+
+  /* ---------- NÚCLEOS/CARDS (sem fixed) ---------- */
+  .nucleos{
+    position: relative !important; /* mata o fixed */
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+
+    width: 100% !important;
+    padding: 0 14px !important;
+    margin: 8px auto 0 !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    z-index: 2 !important;
+  }
+
+  .nucleo{
+    width: 100% !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
+    padding: 18px 16px !important;
+  }
+
+  /* ---------- FOOTER: no mobile, sem fixed ---------- */
+  .footer{
+    position: relative !important;
+    margin-top: 16px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE FIX V2 — HOME (index3)
+   Ajusta: título, diagrama (mais alto), e cards sem sobrepor
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* ---------- HEADER ---------- */
+  .header{
+    height: 78px;
+    padding: 12px 14px;
+  }
+  .logo-img{ height: 50px; }
+  .site-subtitle{
+    font-size: 1.02rem;
+    letter-spacing: 1px;
+    max-width: 58vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ---------- MAIN / ESPAÇOS ---------- */
+  main{
+    padding-top: 86px !important;   /* menos “buraco” */
+    padding-bottom: 40px !important;
+  }
+
+  /* ---------- TÍTULO “Sinergia…” ---------- */
+  .titulo-diagrama{
+    top: 0 !important;
+    margin: 0 auto 10px !important;
+    text-align: center !important;
+    font-size: clamp(1.0rem, 4.6vw, 1.25rem) !important;
+    line-height: 1.15 !important;
+    max-width: 92vw;
+  }
+
+  /* força “SAPHO e CERN” ficarem juntos e centralizados */
+  .titulo-diagrama .sapho-text,
+  .titulo-diagrama .cern-text{
+    display: inline !important;
+    white-space: nowrap;
+  }
+
+  /* ---------- DIAGRAMA ---------- */
+  .diagram{
+    width: min(92vw, 390px) !important;
+    height: min(92vw, 390px) !important;
+    transform: none !important;
+    top: 0 !important;
+    margin: 8px auto 14px !important;  /* sobe o diagrama */
+  }
+
+  .circle{
+    width: min(54vw, 225px) !important;
+    height: min(54vw, 225px) !important;
+    font-size: clamp(1.0rem, 4.8vw, 1.25rem) !important;
+    letter-spacing: 1px !important;
+  }
+
+  .sapho{ left: 4% !important; top: 18% !important; }
+  .cern { left: 46% !important; top: 18% !important; }
+
+  /* SC bem no miolo */
+  .intersection.sc{
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  .link-intersection{ font-size: 0.95rem !important; }
+
+  /* ---------- NÚCLEOS/CARDS (sem fixed) ---------- */
+  .nucleos{
+    position: relative !important; /* mata o fixed */
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+
+    width: 100% !important;
+    padding: 0 14px !important;
+    margin: 8px auto 0 !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    z-index: 2 !important;
+  }
+
+  .nucleo{
+    width: 100% !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
+    padding: 18px 16px !important;
+  }
+
+  /* ---------- FOOTER: no mobile, sem fixed ---------- */
+  .footer{
+    position: relative !important;
+    margin-top: 16px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE FINAL — HOME (index3)
+   Diagrama simplificado e UX correta
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* ---------- DIAGRAMA ---------- */
+  .diagram{
+    width: 100%;
+    height: auto;
+    position: relative;
+    margin: 16px auto 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* esconde o círculo CERN no mobile */
+  .circle.cern{
+    display: none;
+  }
+
+  /* SAPHO vira o foco principal */
+  .circle.sapho{
+    position: relative;
+    left: auto;
+    top: auto;
+    width: min(68vw, 260px);
+    height: min(68vw, 260px);
+    font-size: clamp(1.1rem, 5vw, 1.35rem);
+  }
+
+  /* SC vira um “badge” abaixo */
+  .intersection.sc{
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  .link-intersection{
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+}
+
+
+/* =========================================================
+   MOBILE — POLIMENTO FINAL HOME
+   Compacta o diagrama e melhora leitura
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* Diagrama mais compacto */
+  .circle.sapho{
+    width: min(60vw, 220px);
+    height: min(60vw, 220px);
+    margin-top: 6px;
+  }
+
+  /* Espaço geral mais enxuto */
+  .diagram{
+    margin: 10px auto 12px;
+  }
+
+  /* Badge SC com identidade visual */
+  .intersection.sc{
+    margin-top: 10px;
+  }
+
+  .link-intersection{
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.18);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Cards um pouco mais próximos */
+  .nucleos{
+    margin-top: 12px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE — Venn completo (SAPHO + CERN + SC)
+   ========================================================= */
+@media (max-width: 768px){
+
+  /* área do diagrama */
+  .diagram{
+    width: min(92vw, 360px) !important;
+    height: min(92vw, 360px) !important;
+    margin: 14px auto 18px !important;
+    position: relative !important;
+    transform: none !important;
+    top: 0 !important;
+  }
+
+  /* círculos responsivos */
+  .circle{
+    width: 62% !important;   /* proporcional ao container */
+    height: 62% !important;
+    font-size: clamp(1.0rem, 4.4vw, 1.25rem) !important;
+    letter-spacing: 1px !important;
+    position: absolute !important;
+    top: 18% !important;
+  }
+
+  /* SAPHO à esquerda */
+  .circle.sapho{
+    left: 6% !important;
+    display: flex !important;
+  }
+
+  /* CERN à direita */
+  .circle.cern{
+    left: 32% !important;
+    display: flex !important;
+  }
+
+  /* interseção SC bem no meio */
+  .intersection.sc{
+    position: absolute !important;
+    left: 50% !important;
+    top: 49% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    z-index: 7 !important;
+    text-align: center !important;
+  }
+
+  .link-intersection{
+    font-size: 0.95rem !important;
+    padding: 6px 12px !important;
+    border-radius: 999px !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    display: inline-block !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE — ajuste fino do texto dentro do Venn
+   (evita SAPHO/CERN colarem no SC)
+   ========================================================= */
+@media (max-width: 768px){
+
+  /* deixa as palavras menores no diagrama */
+  .circle{
+    font-size: clamp(0.85rem, 3.6vw, 1.05rem) !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  /* SAPHO "puxa" o texto para o lado de fora (esquerda) */
+  .circle.sapho{
+    justify-content: flex-start !important;
+    padding-left: 14px !important;
+  }
+
+  /* CERN "puxa" o texto para o lado de fora (direita) */
+  .circle.cern{
+    justify-content: flex-end !important;
+    padding-right: 14px !important;
+  }
+
+  /* SC fica bem legível no meio */
+  .intersection.sc{
+    z-index: 9 !important;
+  }
+
+  .link-intersection{
+    font-size: 0.9rem !important;
+    padding: 6px 10px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE (Venn) — versão definitiva igual ao desktop
+   Cole no FINAL do style3.css
+   ========================================================= */
+@media (max-width: 768px){
+
+  /* Título acima do diagrama (opcional: mantém central e com respiro) */
+  .titulo-diagrama{
+    top: 0 !important;
+    margin: 18px auto 18px !important;
+    text-align: center !important;
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem) !important;
+  }
+
+  /* Container do diagrama: grande e centralizado */
+  .diagram{
+    width: min(92vw, 520px) !important;
+    height: min(62vw, 360px) !important; /* proporção “wide” igual ao desktop */
+    margin: 8px auto 28px !important;
+    position: relative !important;
+    transform: none !important;
+    top: 0 !important;
+    left: auto !important;
+    right: auto !important;
+  }
+
+  /* Círculos grandes e proporcionais */
+  .circle{
+    position: absolute !important;
+    width: 66% !important;     /* grande */
+    height: 92% !important;    /* círculo “alto” dentro do container wide */
+    top: 4% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: clamp(1.1rem, 4.8vw, 1.55rem) !important;
+    letter-spacing: 0.14em !important;
+    font-weight: 700 !important;
+  }
+
+  /* SAPHO à esquerda */
+  .circle.sapho{
+    left: 0% !important;
+  }
+
+  /* CERN à direita (com overlap bonito no centro) */
+  .circle.cern{
+    left: 34% !important; /* <<< controla o overlap; 34% deixa igual ao desktop */
+  }
+
+  /* SC exatamente no meio da interseção */
+  .intersection.sc{
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 9 !important;
+  }
+
+  /* SC como “pill” discreta (fica igual ao estilo da 2ª imagem) */
+  .link-intersection{
+    font-size: clamp(0.85rem, 3.6vw, 1.05rem) !important;
+    letter-spacing: 0.12em !important;
+    padding: 6px 12px !important;
+    border-radius: 999px !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE HOME — Venn grande + cards naturais (FIX)
+   Cole no FINAL do style3.css
+   ========================================================= */
+@media (max-width: 768px){
+
+  /* dá respiro real abaixo do header fixo */
+  main{
+    padding-top: 120px !important;
+    padding-bottom: 40px !important;
+  }
+
+  /* título central e bem posicionado */
+  .titulo-diagrama{
+    top: 0 !important;
+    margin: 6px auto 18px !important;
+    text-align: center !important;
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem) !important;
+  }
+
+  /* DIAGRAMA: agora ele ocupa a largura (igual desktop) */
+  .diagram{
+    width: min(96vw, 560px) !important;
+    height: min(78vw, 460px) !important;  /* <<< bem maior */
+    margin: 0 auto 22px !important;
+    transform: none !important;
+    top: 0 !important;
+  }
+
+  /* CÍRCULOS: grandes de verdade */
+  .circle{
+    width: 70% !important;
+    height: 100% !important;
+    top: 0% !important;
+
+    font-size: clamp(1.15rem, 5vw, 1.6rem) !important;
+    letter-spacing: 0.14em !important;
+  }
+
+  /* POSIÇÃO: overlap parecido com o desktop */
+  .circle.sapho{
+justify-content: flex-start !important;
+  padding-left: 70px !important;
+ left: 0% !important; }
+  
+.circle.cern{  
+  justify-content: flex-start !important;
+  padding-left: 130px !important;
+left: 45% !important; } /* <<< mais overlap (fica mais bonito) */
+
+  /* SC exatamente no meio */
+  .intersection.sc{
+    left: 58% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 10 !important;
+  }
+
+  .link-intersection{
+    font-size: clamp(0.9rem, 3.8vw, 1.05rem) !important;
+    padding: 6px 12px !important;
+    border-radius: 999px !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+  }
+
+  /* CARDS (núcleos): no mobile NÃO podem ser fixed */
+  .nucleos{
+    position: relative !important;   /* <<< era fixed (isso criava “vazio”) */
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+
+    width: min(92vw, 520px) !important;
+    margin: 10px auto 0 !important;
+
+    flex-direction: column !important;
+    gap: 14px !important;
+  }
+
+  .nucleo{
+    width: 100% !important;
+  }
+}
+
+
+/* =========================================================
+   PATCH MOBILE — Venn (SAPHO/CERN/SC) sem cortar bordas
+   Cole no FINAL do style3.css
+========================================================= */
+@media (max-width: 768px){
+
+  /* 1) diagrama vira responsivo e centralizado */
+  .diagram{
+    width: min(92vw, 520px);
+    height: min(86vw, 520px);
+    top: 70px;                      /* ajuste fino se precisar */
+    transform: none !important;     /* mata translateX do desktop */
+    margin: 0 auto;
+  }
+
+  /* garante que nada seja “cortado” pelo container */
+  .diagram{ overflow: visible; }
+
+  /* 2) círculos em tamanho responsivo */
+  .circle{
+    width: min(44vw, 260px);
+    height: min(44vw, 260px);
+    font-size: clamp(1.05rem, 3.2vw, 1.55rem);
+  }
+
+  /* 3) posições em % (isso impede o CERN de cortar à direita) */
+  .sapho{
+    left: 6%;
+    top: 18%;
+  }
+
+  .cern{
+    left: 46%;      /* << puxa o CERN mais pra dentro */
+    top: 18%;
+  }
+
+  /* 4) SC no centro da interseção */
+  .intersection.sc{
+    left: 58% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}
