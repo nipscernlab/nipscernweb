@@ -1,371 +1,671 @@
-YEAR I: Origins, Myth & The Foundations of Reason
+# THE ARCHITECT: A Six-Year Construction of the Complete Mind
 
-Logic (Trivium)
+## Philosophy & Objectives
 
-    [BOOK] An Introduction to Formal Logic - Peter Smith: Propositional & predicate logic syntax. Foundation of all formal reasoning.
+**Primary Goals:**
+1. **Formal Logic:** Comprehensive formation in philosophical logic (deontic, modal, paraconsistent, non-classical, paradoxes) with applications to CERN experimental physics
+2. **Informal Logic:** Decision-making framework, bias recognition, argumentation, ethical reasoning for daily life
+3. **Cultural Formation:** Non-Eurocentric survey of human cultural production across all domains and epochs
+4. **Contribution:** Original work in logic (pure or applied) by year 6
 
-    [BOOK] Organon (Categories, Prior Analytics) - Aristotle: Classification and syllogistic reasoning. Western logic begins here.
+**Constraints:** 4 hours/day × 6 years = ~8,760 hours total  
+**Note:** Cultural content (films, music, poetry) consumed passively, reducing mental load
 
-    [PAPER] Stoic Logic Fragments - Chrysippus: Early propositional logic. Conditional reasoning before Boole.
+---
 
-    [BOOK] The Art of Rhetoric - Aristotle: Persuasion, argumentation, practical reasoning.
+## YEAR I: Origins, Myth & The Foundations of Reason
 
-    [BOOK] Nyaya Sutras - Akshapada Gautama: Indian logic basics. Inference, comparison, and testimony.
+### Logic (Trivium)
 
-Culture & Nature
+**[BOOK] An Introduction to Formal Logic - Peter Smith**  
+Propositional & predicate logic syntax. Foundation of all formal reasoning.
 
-    [BOOK] Sapiens: A Brief History of Humankind - Yuval Noah Harari: 70,000 years of human history. Sets context for all cultural study.
+**[BOOK] Organon (Categories, Prior Analytics) - Aristotle**  
+Classification and syllogistic reasoning. Western logic begins here.
 
-    [BOOK] The Story of Art - E.H. Gombrich: Visual culture from caves to modernity. Definitive art history.
+**[PAPER] Stoic Logic Fragments - Chrysippus**  
+Early propositional logic. Conditional reasoning before Boole.
 
-    [BOOK] Cosmos - Carl Sagan: Astronomy and the history of science. Our place in the universe.
+**[BOOK] The Art of Rhetoric - Aristotle**  
+Persuasion, argumentation, practical reasoning.
 
-    [BOOK] A Short History of Nearly Everything - Bill Bryson: Geology, paleontology, archaeology. Earth's 4.5 billion years.
+**[BOOK] Nyaya Sutras - Akshapada Gautama**  
+Indian logic basics. Inference, comparison, and testimony.
 
-    [BOOK] Five Kingdoms: An Illustrated Guide to the Phyla of Life on Earth - Lynn Margulis & Karlene V. Schwartz: Taxonomy of life. Bacteria to humans.
+**[BOOK] A Rulebook for Arguments - Anthony Weston**  
+Critical thinking handbook. Essential for detecting fallacies and constructing solid arguments.
 
-    [BOOK] Popol Vuh - K'iche' Maya: Mayan creation myth and cosmology. Non-Western worldview.
+**[BOOK] An Introduction to Non-Classical Logic - Graham Priest**  
+Paraconsistent, relevant, fuzzy, intuitionistic logic. Prepares for diverse logical systems.
 
-    [BOOK] The Epic of Gilgamesh - Anonymous: Oldest written story. Friendship, mortality, meaning.
+### Culture & Nature
 
-    [BOOK] Bhagavad Gita - Vyasa: Hindu philosophy. Duty, action, spirituality.
+**[BOOK] Sapiens: A Brief History of Humankind - Yuval Noah Harari**  
+70,000 years of human history. Sets context for all cultural study.
 
-    [BOOK] The Iliad - Homer: Foundational Western epic. War, heroism, rage.
+**[BOOK] The Story of Art - E.H. Gombrich**  
+Visual culture from caves to modernity. Definitive art history.
 
-    [BOOK] Tao Te Ching - Lao Tzu: Eastern dialectics. Flow, paradox, natural order.
+**[BOOK] Cosmos - Carl Sagan**  
+Astronomy and the history of science. Our place in the universe.
 
-    [BOOK] The Analects - Confucius: Social order, duty, ritual, righteous life.
+**[BOOK] A Short History of Nearly Everything - Bill Bryson**  
+Geology, paleontology, archaeology. Earth's 4.5 billion years.
 
-    [BOOK] The Essential Rumi - Rumi: Persian Sufi poetry. Ecstasy and divine love.
+**[BOOK] Five Kingdoms: An Illustrated Guide to the Phyla of Life on Earth - Lynn Margulis & Karlene V. Schwartz**  
+Taxonomy of life. Bacteria to humans.
 
-    [BOOK] Shi Jing (Book of Songs) - Various (China): Ancient Chinese poetry. Daily life, court, nature.
+**[BOOK] Popol Vuh - K'iche' Maya**  
+Mayan creation myth and cosmology. Non-Western worldview.
 
-    [BOOK] Indigenous Poetry: Dreamtime Songs - Aboriginal Australia: Oral tradition. Land as living narrative.
+**[BOOK] The Epic of Gilgamesh - Anonymous**  
+Oldest written story. Friendship, mortality, meaning.
 
-    [ART] Lascaux & Altamira Caves - Prehistoric (~17,000 BCE): Birth of symbolic representation. Earliest human art.
+**[BOOK] Bhagavad Gita - Vyasa**  
+Hindu philosophy. Duty, action, spirituality.
 
-    [ART] Terracotta Army - Qin Dynasty: 8,000 life-sized warriors. Individuality within mass.
+**[BOOK] The Iliad - Homer**  
+Foundational Western epic. War, heroism, rage.
 
-    [ART] The Parthenon Marbles - Phidias: Classical Greek sculpture. Idealized human form.
+**[BOOK] Tao Te Ching - Lao Tzu**  
+Eastern dialectics. Flow, paradox, natural order.
 
-    [ART] Aboriginal Rock Art (Kakadu) - Aboriginal Australia: 20,000+ years of continuous artistic tradition.
+**[BOOK] The Analects - Confucius**  
+Social order, duty, ritual, righteous life.
 
-    [PLACE] Moai Statues (Rapa Nui) - Easter Island: Ancestral veneration and Polynesian cosmology.
+**[BOOK] The Essential Rumi - Rumi**  
+Persian Sufi poetry. Ecstasy and divine love.
 
-    [ARCH] Stonehenge - Neolithic Britain: Astronomical alignment and communal ritual.
+**[BOOK] Shi Jing (Book of Songs) - Various (China)**  
+Ancient Chinese poetry. Daily life, court, nature.
 
-    [ARCH] Machu Picchu - Inca Empire: Sacred geography and engineering marvel.
+**[BOOK] Indigenous Poetry: Dreamtime Songs - Aboriginal Australia**  
+Oral tradition. Land as living narrative.
 
-    [MUSIC] Gregorian Chant - Medieval: Monophonic sacred contemplation. Foundation of Western notation.
+**[BOOK] The Poetic Edda - Anonymous (Iceland)**  
+Norse mythology and cosmology. Gods, giants, fate.
 
-    [MUSIC] Cello Suites - Johann Sebastian Bach: Baroque perfection. Mathematical beauty in sound.
+**[ART] Lascaux & Altamira Caves - Prehistoric (~17,000 BCE)**  
+Birth of symbolic representation. Earliest human art.
 
-    [MUSIC] Traditional Gamelan - Java/Bali: Non-linear, cyclical musical structures.
+**[ART] Terracotta Army - Qin Dynasty**  
+8,000 life-sized warriors. Individuality within mass.
 
-    [MUSIC] Didgeridoo & Songlines - Aboriginal Australia: Sonic mapping of ancestral journeys.
+**[ART] The Parthenon Marbles - Phidias**  
+Classical Greek sculpture. Idealized human form.
 
-    [MUSIC] Throat Singing - Tuva/Mongolia: Harmonic overtones and nature mimicry.
+**[ART] Aboriginal Rock Art (Kakadu) - Aboriginal Australia**  
+20,000+ years of continuous artistic tradition.
 
-    [ART] Noh Theater - Zeami Motokiyo: Japanese ritualized drama. Masks and minimal movement.
+**[PLACE] Moai Statues (Rapa Nui) - Easter Island**  
+Ancestral veneration and Polynesian cosmology.
 
-YEAR II: Structure, Faith & The Living World
+**[ARCH] Stonehenge - Neolithic Britain**  
+Astronomical alignment and communal ritual.
 
-Logic
+**[ARCH] Machu Picchu - Inca Empire**  
+Sacred geography and engineering marvel.
 
-    [BOOK] Naive Set Theory - Paul Halmos: Foundation of mathematical objects. Sets, relations, functions.
+**[MUSIC] Gregorian Chant - Medieval**  
+Monophonic sacred contemplation. Foundation of Western notation.
 
-    [BOOK] How to Prove It: A Structured Approach - Daniel J. Velleman: The missing link. Bridges calculation to rigorous mathematical proof. (Adicionado)
+**[MUSIC] Cello Suites - Johann Sebastian Bach**  
+Baroque perfection. Mathematical beauty in sound.
 
-    [BOOK] A Book of Abstract Algebra - Charles C. Pinter: Groups, rings, fields. Algebraic structure of mathematics.
+**[MUSIC] Traditional Gamelan - Java/Bali**  
+Non-linear, cyclical musical structures.
 
-    [BOOK] The Laws of Thought - George Boole: Boolean algebra. Logic becomes mathematics.
+**[MUSIC] Didgeridoo & Songlines - Aboriginal Australia**  
+Sonic mapping of ancestral journeys.
 
-Culture & Life
+**[MUSIC] Throat Singing - Tuva/Mongolia**  
+Harmonic overtones and nature mimicry.
 
-    [NATURE] The Diversity of Life - Edward O. Wilson: Biodiversity, ecosystems, species. Earth's living systems.
+**[ART] Noh Theater - Zeami Motokiyo**  
+Japanese ritualized drama. Masks and minimal movement.
 
-    [BOOK] On the Origin of Species - Charles Darwin: Natural selection. Revolution in biology and thought.
+**[FILM] The Seventh Seal - Ingmar Bergman**  
+Death, meaning, faith. Nordic existential cinema.
 
-    [BOOK] The Selfish Gene - Richard Dawkins: Gene-centered evolution. Replicators and survival machines.
+---
 
-    [BOOK] The Body: A Guide for Occupants - Bill Bryson: Accessible human body overview. Systems and functions.
+## YEAR II: Structure, Faith & The Living World
 
-    [BOOK] The Story of the Human Body - Daniel E. Lieberman: Evolution and anatomy together. How our bodies became what they are.
+### Logic
 
-    [BOOK] The Song of the Cell - Siddhartha Mukherjee: The unit of life. Pathologies explained through cellular failure.
+**[BOOK] Naive Set Theory - Paul Halmos**  
+Foundation of mathematical objects. Sets, relations, functions.
 
-    [BOOK] The Developing Human: Clinically Oriented Embryology - Keith L. Moore & T.V.N. Persaud: Human life from conception to birth. Embryological development.
+**[BOOK] How to Prove It: A Structured Approach - Daniel J. Velleman**  
+The missing link. Bridges calculation to rigorous mathematical proof.
 
-    [BOOK] Being Mortal: Medicine and What Matters in the End - Atul Gawande: Aging, death, end-of-life. Medicine and mortality.
+**[BOOK] A Book of Abstract Algebra - Charles C. Pinter**  
+Groups, rings, fields. Algebraic structure of mathematics.
 
-    [BOOK] Behave: The Biology of Humans at Our Best and Worst - Robert M. Sapolsky: Neurobiology meets behavior. Hormones, brain, evolution.
+**[BOOK] The Laws of Thought - George Boole**  
+Boolean algebra. Logic becomes mathematics.
 
-    [BOOK] The Tale of Genji - Murasaki Shikibu: World's first novel. Japanese court life and aesthetics.
+### Culture & Life
 
-    [BOOK] One Thousand and One Nights - Various (Arab/Persian): Framed narratives and the power of storytelling.
+**[NATURE] The Diversity of Life - Edward O. Wilson**  
+Biodiversity, ecosystems, species. Earth's living systems.
 
-    [BOOK] Meditations - Marcus Aurelius: Stoic philosophy in practice. Resilience and duty.
+**[BOOK] On the Origin of Species - Charles Darwin**  
+Natural selection. Revolution in biology and thought.
 
-    [BOOK] The Rubaiyat - Omar Khayyam: Carpe diem, skepticism, mathematics, and wine.
+**[BOOK] The Selfish Gene - Richard Dawkins**  
+Gene-centered evolution. Replicators and survival machines.
 
-    [BOOK] Complete Poems - Sappho: Fragmented beauty. Lyricism and desire.
+**[BOOK] The Story of the Human Body - Daniel E. Lieberman**  
+Evolution and anatomy together. How our bodies became what they are.
 
-    [BOOK] Cantar de Mio Cid - Anonymous (Spain): Spanish epic poetry. Honor and exile.
+**[BOOK] The Song of the Cell - Siddhartha Mukherjee**  
+The unit of life. Pathologies explained through cellular failure.
 
-    [BOOK] The Conference of the Birds - Farid ud-Din Attar: Persian Sufi allegory. Spiritual quest and transformation.
+**[BOOK] The Developing Human: Clinically Oriented Embryology - Keith L. Moore & T.V.N. Persaud**  
+Human life from conception to birth. Embryological development.
 
-    [PLACE] The Alhambra - Nasrid Dynasty: Islamic geometric perfection and tessellation.
+**[BOOK] Being Mortal: Medicine and What Matters in the End - Atul Gawande**  
+Aging, death, end-of-life. Medicine and mortality.
 
-    [PLACE] Angkor Wat - Khmer Empire: Hindu-Buddhist cosmology carved in stone.
+**[BOOK] Behave: The Biology of Humans at Our Best and Worst - Robert M. Sapolsky**  
+Neurobiology meets behavior. Hormones, brain, evolution.
 
-    [ART] Ukiyo-e Prints (The Great Wave) - Hokusai: The "Floating World". Nature and impermanence.
+**[BOOK] The Tale of Genji - Murasaki Shikibu**  
+World's first novel. Japanese court life and aesthetics.
 
-    [ARCH] Great Zimbabwe - Shona People: African medieval stone architecture.
+**[BOOK] One Thousand and One Nights - Various (Arab/Persian)**  
+Framed narratives and the power of storytelling.
 
-    [ART] Benin Bronzes - Edo People: Mastery of metal casting and court history.
+**[BOOK] Meditations - Marcus Aurelius**  
+Stoic philosophy in practice. Resilience and duty.
 
-    [MUSIC] Brandenburg Concertos - Johann Sebastian Bach: Baroque orchestral mastery. Counterpoint and form.
+**[BOOK] Enchiridion - Epictetus**  
+The technical manual of resilience. Logic applied to emotion and the dichotomy of control.
 
-    [MUSIC] Ragas (Sitar) - Ravi Shankar: Indian classical improvisation and mood.
+**[BOOK] The Rubaiyat - Omar Khayyam**  
+Carpe diem, skepticism, mathematics, and wine.
 
-    [MUSIC] Qawwali - Nusrat Fateh Ali Khan: Sufi devotional ecstatic music.
+**[BOOK] Complete Poems - Sappho**  
+Fragmented beauty. Lyricism and desire.
 
-    [MUSIC] Mbira Music - Zimbabwe: Shona ancestral communication through thumb piano.
+**[BOOK] Cantar de Mio Cid - Anonymous (Spain)**  
+Spanish epic poetry. Honor and exile.
 
-    [ARCH] Gothic Cathedrals (Chartres/Notre Dame) - Medieval France: Light, height, and divine geometry.
+**[BOOK] The Conference of the Birds - Farid ud-Din Attar**  
+Persian Sufi allegory. Spiritual quest and transformation.
 
-    [ARCH] Petra - Nabataeans: Rock-cut architecture in the desert.
+**[BOOK] Njal's Saga - Anonymous (Iceland)**  
+Icelandic saga. Honor, law, fate, and bloodfeud.
 
-    [ART] Las Meninas - Diego Velázquez: Baroque painting. Perspective, representation, reality.
+**[PLACE] The Alhambra - Nasrid Dynasty**  
+Islamic geometric perfection and tessellation.
 
-YEAR III: Analysis, Topology & The Humanist Spark
+**[PLACE] Angkor Wat - Khmer Empire**  
+Hindu-Buddhist cosmology carved in stone.
 
-Logic
+**[ART] Ukiyo-e Prints (The Great Wave) - Hokusai**  
+The "Floating World". Nature and impermanence.
 
-    [BOOK] Principles of Mathematical Analysis - Walter Rudin: Real analysis foundations. Rigorous limits, continuity, convergence.
+**[ARCH] Great Zimbabwe - Shona People**  
+African medieval stone architecture.
 
-    [BOOK] Introduction to Topology - Bert Mendelson: Spaces, continuity, homeomorphism. Prep for HoTT.
+**[ART] Benin Bronzes - Edo People**  
+Mastery of metal casting and court history.
 
-    [BOOK] The Foundations of Arithmetic - Gottlob Frege: Logicism. Numbers defined as logical objects.
+**[MUSIC] Brandenburg Concertos - Johann Sebastian Bach**  
+Baroque orchestral mastery. Counterpoint and form.
 
-    [BOOK] An Introduction to Gödel's Theorems - Peter Smith: Incompleteness. The limits of formal systems.
+**[MUSIC] Ragas (Sitar) - Ravi Shankar**  
+Indian classical improvisation and mood.
 
-Culture & Society
+**[MUSIC] Qawwali - Nusrat Fateh Ali Khan**  
+Sufi devotional ecstatic music.
 
-    [BOOK] The Silk Roads - Peter Frankopan: A non-Eurocentric history of the world.
+**[MUSIC] Mbira Music - Zimbabwe**  
+Shona ancestral communication through thumb piano.
 
-    [BOOK] The Worldly Philosophers - Robert Heilbroner: The economic thinkers who shaped history. Value, labor, and capital. (Adicionado)
+**[MUSIC] Norwegian Folk Music - Hardanger Fiddle Tradition**  
+Traditional Nordic string music and folk dances.
 
-    [BOOK] Groundwork of the Metaphysics of Morals - Immanuel Kant: Categorical imperative. Deontological ethics foundation.
+**[ARCH] Gothic Cathedrals (Chartres/Notre Dame) - Medieval France**  
+Light, height, and divine geometry.
 
-    [BOOK] Don Quixote - Miguel de Cervantes: Meta-fiction, idealism vs. reality.
+**[ARCH] Petra - Nabataeans**  
+Rock-cut architecture in the desert.
 
-    [BOOK] Hamlet / King Lear - William Shakespeare: The invention of the modern human psyche.
+**[ART] Las Meninas - Diego Velázquez**  
+Baroque painting. Perspective, representation, reality.
 
-    [BOOK] Dream of the Red Chamber - Cao Xueqin: The pinnacle of Chinese classical fiction.
+---
 
-    [BOOK] The Prince - Niccolò Machiavelli: Realpolitik and power dynamics.
+## YEAR III: Analysis, Topology & The Humanist Spark
 
-    [BOOK] Leaves of Grass - Walt Whitman: American transcendentalism and democracy of the soul.
+### Logic
 
-    [BOOK] Haiku (Selected) - Basho / Issa / Buson: Zen observation. Capturing the moment.
+**[BOOK] Understanding Analysis - Stephen Abbott**   
+Real analysis with pedagogical clarity. Rigorous limits, continuity, convergence. *(~150-200 hours)*
 
-    [BOOK] Sonnets from the Portuguese - Elizabeth Barrett Browning: Victorian love poetry and female voice.
+**[BOOK] Introduction to Topology - Bert Mendelson**  
+Spaces, continuity, homeomorphism. Prep for advanced work.
 
-    [ART] David / Sistine Chapel - Michelangelo: Renaissance Humanism. The glorified body.
+**[BOOK] The Fundamental Wisdom of the Middle Way - Nagarjuna**  
+Buddhist logic (Tetralemma). Logical deconstruction of reality to break binary bias.
 
-    [PLACE] Taj Mahal - Shah Jahan: Mughal symmetry and grief.
+**[BOOK] The Foundations of Arithmetic - Gottlob Frege**  
+Logicism. Numbers defined as logical objects.
 
-    [ART] Dogon Masks - Dogon People (Mali): Cosmological symbolism and ritual.
+**[BOOK] An Introduction to Gödel's Theorems - Peter Smith**  
+Incompleteness. The limits of formal systems.
 
-    [MUSIC] Symphony No. 9 - Beethoven: The transition to Romanticism. Radical joy.
+### Culture & Society
 
-    [MUSIC] The Four Seasons - Vivaldi: Narrative programmatic music.
+**[BOOK] The Silk Roads - Peter Frankopan**  
+A non-Eurocentric history of the world.
 
-    [MUSIC] Bachianas Brasileiras - Heitor Villa-Lobos: Brazilian fusion of Bach and folk.
+**[BOOK] The Worldly Philosophers - Robert Heilbroner**  
+The economic thinkers who shaped history. Value, labor, and capital.
 
-    [ART] Tartuffe / The Misanthrope - Molière: French comedy of manners and hypocrisy.
+**[BOOK] Groundwork of the Metaphysics of Morals - Immanuel Kant**  
+Categorical imperative. Deontological ethics foundation.
 
-    [ART] Phaedra - Jean Racine: Neoclassical tragedy and psychological torment.
+**[BOOK] Don Quixote - Miguel de Cervantes**  
+Meta-fiction, idealism vs. reality.
 
-    [FILM] The Passion of Joan of Arc - Carl Theodor Dreyer: Silent cinema as spiritual cinema.
+**[BOOK] Hamlet / King Lear - William Shakespeare**  
+The invention of the modern human psyche.
 
-YEAR IV: Computation, Modernity & The Broken Mirror
+**[BOOK] Dream of the Red Chamber - Cao Xueqin**  
+The pinnacle of Chinese classical fiction.
 
-Logic
+**[BOOK] The Prince - Niccolò Machiavelli**  
+Realpolitik and power dynamics.
 
-    [BOOK] The Annotated Turing - Charles Petzold: The Turing Machine. What is computable?
+**[BOOK] Leaves of Grass - Walt Whitman**  
+American transcendentalism and democracy of the soul.
 
-    [PAPER] The Mathematical Theory of Communication - Claude Shannon: Information as entropy. The physics of logic. (Adicionado)
+**[BOOK] Haiku (Selected) - Basho / Issa / Buson**  
+Zen observation. Capturing the moment.
 
-    [BOOK] Cybernetics - Norbert Wiener: Control and communication in the animal and the machine. (Adicionado)
+**[BOOK] Sonnets from the Portuguese - Elizabeth Barrett Browning**  
+Victorian love poetry and female voice.
 
-    [BOOK] Introduction to the Theory of Computation - Michael Sipser: Recursion, decidability, complexity theory.
+**[BOOK] Peer Gynt - Henrik Ibsen**  
+Norwegian poetic drama. Identity, fantasy, and self-deception.
 
-    [BOOK] Algebraic Topology - Allen Hatcher: Fundamental groups, homotopy, homology. Foundation for HoTT.
+**[ART] David / Sistine Chapel - Michelangelo**  
+Renaissance Humanism. The glorified body.
 
-    [BOOK] Tractatus Logico-Philosophicus - Ludwig Wittgenstein: "Whereof one cannot speak, thereof one must be silent."
+**[PLACE] Taj Mahal - Shah Jahan**  
+Mughal symmetry and grief.
 
-Culture & Science
+**[ART] Dogon Masks - Dogon People (Mali)**  
+Cosmological symbolism and ritual.
 
-    [BOOK] The Interpretation of Dreams - Sigmund Freud: The subconscious and symbolic logic of the mind.
+**[MUSIC] Symphony No. 9 - Beethoven**  
+The transition to Romanticism. Radical joy.
 
-    [BOOK] Mind: A Brief Introduction - John R. Searle: Consciousness, intentionality, philosophy of mind.
+**[MUSIC] The Four Seasons - Vivaldi**  
+Narrative programmatic music.
 
-    [BOOK] The Embodied Mind - Francisco Varela, Evan Thompson, Eleanor Rosch: Cognition as embodied action. Buddhist-cognitive synthesis.
+**[MUSIC] Bachianas Brasileiras - Heitor Villa-Lobos**  
+Brazilian fusion of Bach and folk.
 
-    [BOOK] Six Easy Pieces - Richard Feynman: Physics, Relativity, and Quantum basics.
+**[ART] Tartuffe / The Misanthrope - Molière**  
+French comedy of manners and hypocrisy.
 
-    [BOOK] The Information - James Gleick: A history, a theory, a flood. The DNA of the digital age. (Adicionado)
+**[ART] Phaedra - Jean Racine**  
+Neoclassical tragedy and psychological torment.
 
-    [BOOK] Crime and Punishment - Fyodor Dostoevsky: Psychological realism and moral dilemmas.
+**[FILM] The Passion of Joan of Arc - Carl Theodor Dreyer**  
+Silent cinema as spiritual cinema.
 
-    [BOOK] In Search of Lost Time (Swann's Way) - Marcel Proust: Memory, time, and subjective experience.
+**[FILM] Wild Strawberries - Ingmar Bergman**  
+Memory, regret, mortality. Bergman's humanist masterpiece.
 
-    [BOOK] Things Fall Apart - Chinua Achebe: The collision of African tradition and colonialism.
+---
 
-    [BOOK] Wide Sargasso Sea - Jean Rhys: Postcolonial rewriting. Caribbean voice.
+## YEAR IV: Computation, Modernity & The Broken Mirror
 
-    [BOOK] The Waste Land - T.S. Eliot: Modernist fragmentation and cultural collage.
+### Logic
 
-    [BOOK] Les Fleurs du mal - Charles Baudelaire: Beauty in decay. The urban modern experience.
+**[BOOK] The Annotated Turing - Charles Petzold**  
+The Turing Machine. What is computable?
 
-    [BOOK] Canto General - Pablo Neruda: Epic of Latin American history and landscape.
+**[PAPER] The Mathematical Theory of Communication - Claude Shannon**  
+Information as entropy. The physics of logic.
 
-    [ART] Impression: Sunrise - Claude Monet: Capturing light and perception, not just objects.
+**[BOOK] Cybernetics - Norbert Wiener**  
+Control and communication in the animal and the machine.
 
-    [ART] Les Demoiselles d'Avignon - Pablo Picasso: Cubism. Shattering perspective. African mask influence.
+**[BOOK] Introduction to the Theory of Computation - Michael Sipser**  
+Recursion, decidability, complexity theory.
 
-    [ART] The Scream - Edvard Munch: Existential anxiety visualized.
+**[BOOK] The Uses of Argument - Stephen Toulmin**  
+The Toulmin model. How argumentation functions in the real world beyond mathematical form.
 
-    [MUSIC] The Rite of Spring - Igor Stravinsky: Rhythm over harmony. Modernism begins.
+**[BOOK] Algebraic Topology - James Munkres**   
+Fundamental groups, homotopy, homology. More accessible than Hatcher. *(~200-300 hours)*
 
-    [MUSIC] Pierrot Lunaire - Arnold Schoenberg: Atonality and Sprechstimme.
+**[BOOK] Tractatus Logico-Philosophicus - Ludwig Wittgenstein**  
+"Whereof one cannot speak, thereof one must be silent."
 
-    [MUSIC] Blue Train - John Coltrane: Hard bop and modal exploration.
+### Culture & Science
 
-    [ART] The Decisive Moment - Henri Cartier-Bresson: Street photography as geometry and time.
+**[BOOK] Being and Time (Part I: Dasein) - Martin Heidegger**   
+Phenomenology and ontology. Being-in-the-world and temporality.
 
-    [FILM] Metropolis - Fritz Lang: Industrial dystopia and class struggle.
+**[BOOK] The Myth of Sisyphus - Albert Camus** 
+Absurdism. The only serious philosophical question is suicide.
 
-    [FILM] Battleship Potemkin - Sergei Eisenstein: Montage theory and revolutionary cinema.
+**[BOOK] The Interpretation of Dreams - Sigmund Freud**  
+The subconscious and symbolic logic of the mind.
 
-    [FILM] M - Fritz Lang: Expressionist crime and moral ambiguity.
+**[BOOK] Mind: A Brief Introduction - John R. Searle**  
+Consciousness, intentionality, philosophy of mind.
 
-YEAR V: Categories, Plurality & The Global Chorus
+**[BOOK] The Embodied Mind - Francisco Varela, Evan Thompson, Eleanor Rosch**  
+Cognition as embodied action. Buddhist-cognitive synthesis.
 
-Logic
+**[BOOK] Six Easy Pieces - Richard Feynman**  
+Physics, Relativity, and Quantum basics.
 
-    [BOOK] Category Theory - Steve Awodey: Objects, Morphisms, Functors. Thinking in arrows.
+**[BOOK] The Information - James Gleick**  
+A history, a theory, a flood. The DNA of the digital age.
 
-    [BOOK] Modal Logic - Patrick Blackburn: Necessity and possibility. The logic of alternate realities. (Adicionado)
+**[BOOK] Crime and Punishment - Fyodor Dostoevsky**  
+Psychological realism and moral dilemmas.
 
-    [BOOK] Naming and Necessity - Saul Kripke: Possible worlds, rigid designators, and truth.
+**[BOOK] In Search of Lost Time (Swann's Way) - Marcel Proust**  
+Memory, time, and subjective experience.
 
-    [BOOK] Lectures on the Curry-Howard Isomorphism - Morten Heine Sørensen: Proofs as programs. Essential for HoTT.
+**[BOOK] Things Fall Apart - Chinua Achebe**  
+The collision of African tradition and colonialism.
 
-    [BOOK] Game Theory: A Nontechnical Introduction - Morton D. Davis: Strategic logic. Nash equilibrium.
+**[BOOK] Wide Sargasso Sea - Jean Rhys**  
+Postcolonial rewriting. Caribbean voice.
 
-    [BOOK] The Book of Why - Judea Pearl: The logic of science. Causal diagrams, counterfactuals, causation vs. correlation.
+**[BOOK] The Waste Land - T.S. Eliot**  
+Modernist fragmentation and cultural collage.
 
-Culture & Ethics
+**[BOOK] Les Fleurs du mal - Charles Baudelaire**  
+Beauty in decay. The urban modern experience.
 
-    [BOOK] Women, Fire, and Dangerous Things - George Lakoff: Cognitive linguistics. Categorization and metaphor.
+**[BOOK] Canto General - Pablo Neruda**  
+Epic of Latin American history and landscape.
 
-    [BOOK] Thinking, Fast and Slow - Daniel Kahneman: System 1 vs System 2. The cognitive biases that break logic. (Adicionado)
+**[ART] Impression: Sunrise - Claude Monet**  
+Capturing light and perception, not just objects.
 
-    [BOOK] Practical Ethics - Peter Singer: Applied utilitarian ethics across domains.
+**[ART] Les Demoiselles d'Avignon - Pablo Picasso**  
+Cubism. Shattering perspective. African mask influence.
 
-    [BOOK] The Imperative of Responsibility - Hans Jonas: Technology ethics and future generations.
+**[ART] The Scream - Edvard Munch**  
+Existential anxiety visualized.
 
-    [BOOK] One Hundred Years of Solitude - Gabriel García Márquez: Magical Realism. Time as a cycle.
+**[MUSIC] The Rite of Spring - Igor Stravinsky**  
+Rhythm over harmony. Modernism begins.
 
-    [BOOK] The Master and Margarita - Mikhail Bulgakov: Satire, theology, and the surreal.
+**[MUSIC] Pierrot Lunaire - Arnold Schoenberg**  
+Atonality and Sprechstimme.
 
-    [BOOK] Ficciones - Jorge Luis Borges: Literature as logic puzzles. Labyrinths and infinity.
+**[MUSIC] Blue Train - John Coltrane**  
+Hard bop and modal exploration.
 
-    [BOOK] The God of Small Things - Arundhati Roy: Caste, trauma, and non-linear narrative in India.
+**[ART] The Decisive Moment - Henri Cartier-Bresson**  
+Street photography as geometry and time.
 
-    [BOOK] Season of Migration to the North - Tayeb Salih: Sudanese postcolonial identity and cultural collision.
+**[FILM] Metropolis - Fritz Lang**  
+Industrial dystopia and class struggle.
 
-    [BOOK] Twenty Love Poems and a Song of Despair - Pablo Neruda: Passion, nature, and elemental imagery.
+**[FILM] Battleship Potemkin - Sergei Eisenstein**  
+Montage theory and revolutionary cinema.
 
-    [BOOK] Selected Poems - Fernando Pessoa: Heteronyms. The fragmented self.
+**[FILM] M - Fritz Lang**  
+Expressionist crime and moral ambiguity.
 
-    [BOOK] Ariel - Sylvia Plath: Confessional poetry and psychological intensity.
+**[FILM] Persona - Ingmar Bergman**  
+Identity, silence, the dissolution of self.
 
-    [ART] Guernica - Pablo Picasso: War, suffering, and political protest.
+**[FILM] Let the Right One In - Tomas Alfredson**  
+Swedish vampire cinema. Loneliness and ethical monstrosity.
 
-    [ART] Muralism - Diego Rivera: Art for the people. Social history.
+**[FILM] Citizen Kane - Orson Welles**  
+Narrative innovation and American ambition. The greatest film ever made (allegedly).
 
-    [ART] The Persistence of Memory - Salvador Dalí: Surrealist time and psychological landscape.
+**[FILM] 8½ - Federico Fellini**  
+Italian meta-cinema. Director's creative crisis as art.
 
-    [ART] Ndebele House Painting - Ndebele Women (South Africa): Geometric communal art and identity.
+**[FILM] Breathless (À bout de souffle) - Jean-Luc Godard** 
+French New Wave. Jump cuts and existential cool.
 
-    [MUSIC] Kind of Blue - Miles Davis: Modal Jazz. Improvisation as composition.
+---
 
-    [MUSIC] Afrobeat Collection - Fela Kuti: Political resistance through polyrhythm.
+## YEAR V: Categories, Plurality & The Global Chorus
 
-    [MUSIC] Bossa Nova - João Gilberto / Tom Jobim: Brazilian rhythmic sophistication and harmony.
+### Logic
 
-    [MUSIC] Te Vaka - Pacific Island fusion: Polynesian contemporary music and navigation songs.
+**[BOOK] Category Theory - Steve Awodey**  
+Objects, Morphisms, Functors. Thinking in arrows.
 
-    [ART] Butoh - Tatsumi Hijikata: Japanese post-war dance. Body as trauma and transformation.
+**[BOOK] Modal Logic - Patrick Blackburn, Maarten de Rijke, Yde Venema**  
+Necessity and possibility. The logic of alternate realities.
 
-    [FILM] Rashomon - Akira Kurosawa: Subjective truth. The unreliability of memory.
+**[BOOK] Naming and Necessity - Saul Kripke**  
+Possible worlds, rigid designators, and truth.
 
-    [FILM] Pather Panchali - Satyajit Ray: Lyrical realism in Indian cinema.
+**[BOOK] Lectures on the Curry-Howard Isomorphism - Morten Heine Sørensen**  
+Proofs as programs. Essential for type theory.
 
-    [FILM] Black Orpheus - Marcel Camus: Brazilian favela reimagining of Greek myth.
+**[BOOK] Game Theory: A Nontechnical Introduction - Morton D. Davis**  
+Strategic logic. Nash equilibrium.
 
-    [FILM] Touki Bouki - Djibril Diop Mambéty: Senegalese New Wave and African modernity.
+**[BOOK] The Book of Why - Judea Pearl**  
+The logic of science. Causal diagrams, counterfactuals, causation vs. correlation.
 
-YEAR VI: Synthesis, The Frontier & The Homotopy
+**[BOOK] Informal Logic - Douglas Walton**  
+Systematic treatment of informal argumentation and dialogue schemes. The definitive text.
 
-Logic (Frontier)
+### Culture & Ethics
 
-    [BOOK] Basic Proof Theory - A.S. Troelstra & H. Schwichtenberg: Proofs as objects. Natural deduction, sequent calculus.
+**[BOOK] Women, Fire, and Dangerous Things - George Lakoff**  
+Cognitive linguistics. Categorization and metaphor.
 
-    [BOOK] Types and Programming Languages - Benjamin C. Pierce: Type theory, lambda calculus, Curry-Howard correspondence.
+**[BOOK] Thinking, Fast and Slow - Daniel Kahneman**  
+System 1 vs System 2. The cognitive biases that break logic.
 
-    [BOOK] Philosophical Logic - John P. Burgess: Systematic overview: free logic, identity, vagueness, conditionals.
+**[BOOK] The Scout Mindset - Julia Galef**  
+Epistemic rationality. Truth-seeking vs. soldier mindset.
 
-    [BOOK] Quantum Logic and Probability Theory - Itamar Pitowsky: Conceptual quantum logic: non-Boolean structures.
+**[BOOK] Thinking in Bets - Annie Duke**  
+Decision making under uncertainty. Bayesian probability applied to daily life.
 
-    [BOOK] Homotopy Type Theory - Univalent Foundations Program: THE GOAL. Types as spaces, proofs as paths. The new foundation of math.
+**[BOOK] Algorithms to Live By - Brian Christian & Tom Griffiths**  
+Computer science applied to human decisions. Optimization for daily life.
 
-    [BOOK] Seven Sketches in Compositionality - Brendan Fong & David I. Spivak: Applied Category Theory. The logic of systems.
+**[BOOK] Antifragile - Nassim Nicholas Taleb**  
+How systems gain from disorder. The logic of risk and survival.
 
-    [BOOK] Philosophical Investigations - Ludwig Wittgenstein: Meaning is use. Language games. The cure for dogmatic logic.
+**[BOOK] The Righteous Mind - Jonathan Haidt**  
+Moral psychology. Why logic fails in politics and religion.
 
-Synthesis & Contemporary
+**[BOOK] Practical Ethics - Peter Singer**  
+Applied utilitarian ethics across domains.
 
-    [BOOK] Gödel, Escher, Bach - Douglas Hofstadter: The ultimate synthesis of logic, art, and music.
+**[BOOK] The Imperative of Responsibility - Hans Jonas**  
+Technology ethics and future generations.
 
-    [BOOK] Orientalism - Edward Said: Deconstructing how the West views the "Other".
+**[BOOK] One Hundred Years of Solitude - Gabriel García Márquez**  
+Magical Realism. Time as a cycle.
 
-    [BOOK] The Structure of Scientific Revolutions - Thomas S. Kuhn: Paradigm shifts and the sociology of science.
+**[BOOK] The Master and Margarita - Mikhail Bulgakov**  
+Satire, theology, and the surreal.
 
-    [BOOK] Invisible Cities - Italo Calvino: Combinatorial literature. Urbanism and imagination.
+**[BOOK] Ficciones - Jorge Luis Borges**  
+Literature as logic puzzles. Labyrinths and infinity.
 
-    [BOOK] If on a winter's night a traveler - Italo Calvino: Meta-fiction and the reader's role.
+**[BOOK] The God of Small Things - Arundhati Roy**  
+Caste, trauma, and non-linear narrative in India.
 
-    [BOOK] Midnight's Children - Salman Rushdie: Indian independence through magical realism.
+**[BOOK] Season of Migration to the North - Tayeb Salih**  
+Sudanese postcolonial identity and cultural collision.
 
-    [BOOK] View with a Grain of Sand - Wisława Szymborska: Irony, biology, and philosophical wit.
+**[BOOK] Twenty Love Poems and a Song of Despair - Pablo Neruda**  
+Passion, nature, and elemental imagery.
 
-    [BOOK] The Collected Poems - Octavio Paz: Mexican surrealism and temporal meditation.
+**[BOOK] Selected Poems - Fernando Pessoa**  
+Heteronyms. The fragmented self.
 
-    [ART] Contemporary Installation - Ai Weiwei: Art as activism and social commentary.
+**[BOOK] Ariel - Sylvia Plath**  
+Confessional poetry and psychological intensity.
 
-    [ART] Spiral Jetty - Robert Smithson: Land Art. Entropy and nature.
+**[BOOK] Independent People - Halldór Laxness**  
+Icelandic epic. Stubbornness, poverty, and dignity. Nobel Prize 1955.
 
-    [ART] The Gates - Christo and Jeanne-Claude: Environmental intervention and ephemeral art.
+**[ART] Guernica - Pablo Picasso**  
+War, suffering, and political protest.
 
-    [ART] El Anatsui (Metal Tapestries) - El Anatsui: African recycled metal. Transformation and history woven in bottle caps.
+**[ART] Muralism - Diego Rivera**  
+Art for the people. Social history.
 
-    [MUSIC] 4'33" - John Cage: Silence and ambient sound. The philosophy of listening.
+**[ART] The Persistence of Memory - Salvador Dalí**  
+Surrealist time and psychological landscape.
 
-    [MUSIC] Music for 18 Musicians - Steve Reich: Minimalism. Phase shifting and pattern.
+**[ART] Ndebele House Painting - Ndebele Women (South Africa)**  
+Geometric communal art and identity.
 
-    [MUSIC] In C - Terry Riley: Modular minimalism and collective improvisation.
+**[MUSIC] Kind of Blue - Miles Davis**  
+Modal Jazz. Improvisation as composition.
+
+**[MUSIC] Afrobeat Collection - Fela Kuti**  
+Political resistance through polyrhythm.
+
+**[MUSIC] Bossa Nova - João Gilberto / Tom Jobim**  
+Brazilian rhythmic sophistication and harmony.
+
+**[MUSIC] Te Vaka - Pacific Island fusion**  
+Polynesian contemporary music and navigation songs.
+
+**[MUSIC] Sigur Rós - Ágætis byrjun**  
+Icelandic post-rock. Ethereal soundscapes and invented language.
+
+**[ART] Butoh - Tatsumi Hijikata**  
+Japanese post-war dance. Body as trauma and transformation.
+
+**[FILM] Rashomon - Akira Kurosawa**  
+Subjective truth. The unreliability of memory.
+
+**[FILM] Pather Panchali - Satyajit Ray**  
+Lyrical realism in Indian cinema.
+
+**[FILM] Black Orpheus - Marcel Camus**  
+Brazilian favela reimagining of Greek myth.
+
+**[FILM] Touki Bouki - Djibril Diop Mambéty**  
+Senegalese New Wave and African modernity.
+
+---
+
+## YEAR VI: Synthesis, The Frontier & Philosophical Application
+
+### Logic (Frontier & Application)
+
+**[BOOK] Basic Proof Theory - A.S. Troelstra & H. Schwichtenberg**  
+Proofs as objects. Natural deduction, sequent calculus.
+
+**[BOOK] Types and Programming Languages - Benjamin C. Pierce**  
+Type theory, lambda calculus, Curry-Howard correspondence.
+
+**[BOOK] Philosophical Logic - John P. Burgess**  
+Systematic overview: free logic, identity, vagueness, conditionals, deontic logic.
+
+**[BOOK] In Contradiction - Graham Priest**  
+Paraconsistent logic deep dive. TRUE contradictions and dialethism.
+
+**[BOOK] Deontic Logic and Legal Systems - Carlos E. Alchourrón & Eugenio Bulygin**  
+Logic of obligations, permissions, prohibitions. Normative reasoning.
+
+**[PAPER] On the Acceptability of Arguments and Its Fundamental Role in Nonmonotonic Reasoning - Phan Minh Dung**  
+Argumentation Frameworks. Abstracting arguments as nodes in a graph. Logic meets AI.
+
+**[PAPER] Paradoxes and Contemporary Logic - Andrea Cantini (Stanford Encyclopedia)**  
+Survey of major paradoxes: Liar, Sorites, Russell, Curry. Resolution strategies.
+
+**[BOOK] Quantum Logic and Probability Theory - Itamar Pitowsky**  
+Conceptual quantum logic: non-Boolean structures.
+
+**[BOOK] Homotopy Type Theory - Univalent Foundations Program**  
+Survey of foundations. Types as spaces, proofs as paths. Introduction to cutting-edge, not specialization. *(~100-150 hours)*
+
+**[BOOK] Seven Sketches in Compositionality - Brendan Fong & David I. Spivak**  
+Applied Category Theory. The logic of systems.
+
+**[BOOK] Philosophical Investigations - Ludwig Wittgenstein**  
+Meaning is use. Language games. The cure for dogmatic logic.
+
+### Synthesis & Contemporary
+
+**[BOOK] Gödel, Escher, Bach - Douglas Hofstadter**  
+The ultimate synthesis of logic, art, and music.
+
+**[BOOK] Orientalism - Edward Said**  
+Deconstructing how the West views the "Other".
+
+**[BOOK] The Structure of Scientific Revolutions - Thomas S. Kuhn**  
+Paradigm shifts and the sociology of science.
+
+**[BOOK] Invisible Cities - Italo Calvino**  
+Combinatorial literature. Urbanism and imagination.
+
+**[BOOK] If on a winter's night a traveler - Italo Calvino**  
+Meta-fiction and the reader's role.
+
+**[BOOK] Midnight's Children - Salman Rushdie**  
+Indian independence through magical realism.
+
+**[BOOK] View with a Grain of Sand - Wisława Szymborska**  
+Irony, biology, and philosophical wit.
+
+**[BOOK] The Collected Poems - Octavio Paz**  
+Mexican surrealism and temporal meditation.
+
+**[BOOK] The Nordic Theory of Everything - Anu Partanen**  
+Nordic social model. Equality, trust, and collective well-being.
+
+**[ART] Contemporary Installation - Ai Weiwei**  
+Art as activism and social commentary.
+
+**[ART] Spiral Jetty - Robert Smithson**  
+Land Art. Entropy and nature.
+
+**[ART] The Gates - Christo and Jeanne-Claude**  
+Environmental intervention and ephemeral art.
+
+**[ART] El Anatsui (Metal Tapestries) - El Anatsui**  
+African recycled metal. Transformation and history woven in bottle caps.
+
+**[ARCH] Brasília - Oscar Niemeyer** 
+Modernist utopia. Curved concrete and urban planning as ideology.
+
+**[ARCH] Barcelona Pavilion - Ludwig Mies van der Rohe** 
+Minimalist perfection. "Less is more" in built form.
+
+**[MUSIC] 4'33" - John Cage**  
+Silence and ambient sound. The philosophy of listening.
+
+**[MUSIC] Music for 18 Musicians - Steve Reich**  
+Minimalism. Phase shifting and pattern.
+
+**[MUSIC] In C - Terry Riley**  
+Modular minimalism and collective improvisation.
+
+**[MUSIC] In Rainbows - Radiohead** 
+Contemporary rock as art. Digital anxiety and human connection.
+
+**[MUSIC] Loveless - My Bloody Valentine** 
+Shoegaze maximalism. Texture as melody.
+
+**[FILM] Melancholia - Lars von Trier**  
+Danish cinema. Depression, beauty, and planetary apocalypse.
+
+---
