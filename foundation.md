@@ -80,7 +80,7 @@ Persian Sufi poetry. Ecstasy and divine love.
 Ancient Chinese poetry. Daily life, court, nature.
 
 **[BOOK] Indigenous Poetry: Dreamtime Songs - Aboriginal Australia**  
-Oral tradition. Land as living narrative.
+Oral tradition. Land as a living narrative.
 
 **[BOOK] The Poetic Edda - Anonymous (Iceland)**  
 Norse mythology and cosmology. Gods, giants, fate.
