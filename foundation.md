@@ -38,6 +38,9 @@ Critical thinking handbook. Essential for detecting fallacies and constructing s
 **[BOOK] An Introduction to Non-Classical Logic - Graham Priest**  
 Paraconsistent, relevant, fuzzy, intuitionistic logic. Prepares for diverse logical systems.
 
+**[BOOK] Materials For the Study of Navya-Nyaya Logic - Daniel H. H. Ingalls**  
+Technical exposition of Navya-Nyaya. Expands the scope of general logic.
+
 ### Culture & Nature
 
 **[BOOK] Sapiens: A Brief History of Humankind - Yuval Noah Harari**  
