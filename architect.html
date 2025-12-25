@@ -15,230 +15,261 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
 
-    <style>
-        :root {
-            --bg-body: #050505;
-            --bg-card: #0f0f0f;
-            --bg-card-hover: #141414;
-            --border: #2a2a2a;
-            --gold: #c5a059;
-            --gold-dim: #7a6335;
-            --gold-glow: rgba(197, 160, 89, 0.15);
-            --text-main: #e0e0e0;
-            --text-muted: #888;
-            --logic-accent: #4a6fa5;
-            --culture-accent: #a54a4a;
-            --success: #2e7d32;
+<style>
+    :root {
+        --bg-body: #050505;
+        --bg-card: #0f0f0f;
+        --bg-card-hover: #141414;
+        --border: #2a2a2a;
+        --gold: #c5a059;
+        --gold-dim: #7a6335;
+        --gold-glow: rgba(197, 160, 89, 0.15);
+        --text-main: #e0e0e0;
+        --text-muted: #888;
+        --logic-accent: #4a6fa5;
+        --culture-accent: #a54a4a;
+        --success: #2e7d32;
 
-            --tag-book: #3d4c53;
-            --tag-paper: #533d3d;
-            --tag-art: #534b3d;
-            --tag-music: #4a3d53;
-            --tag-film: #3d534f;
-            --tag-place: #2e2e2e;
-            --tag-arch: #53453d;
-            --tag-nature: #2e5e38;
-        }
+        /* Tag Colors - Root Variables */
+        --tag-book: #3d4c53;
+        --tag-paper: #533d3d;
+        --tag-art: #534b3d;
+        --tag-music: #4a3d53;
+        --tag-film: #3d534f;
+        --tag-place: #2e2e2e;
+        --tag-arch: #53453d;
+        --tag-nature: #2e5e38;
+        --tag-poetry: #5b3d53; /* Nova */
+        --tag-doc: #3d5351;    /* Nova */
+    }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at top center, #1a1a1a 0%, #050505 60%);
-        }
+    body {
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+        overflow-x: hidden;
+        background-image: radial-gradient(circle at top center, #1a1a1a 0%, #050505 60%);
+    }
 
-        #viewport {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden;
-        }
-        #content {
-            padding-bottom: 150px;
-            will-change: transform;
-        }
+    #viewport {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        overflow-y: auto; /* Permitir scroll */
+        overflow-x: hidden;
+    }
 
-        h1, h2, h3 { font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
-        .serif { font-family: 'Cormorant Garamond', serif; }
-        
-        header {
-            height: 90vh;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            text-align: center;
-            padding: 2rem;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-        }
+    #content {
+        padding-bottom: 150px;
+        will-change: transform;
+    }
 
-        .hero-title {
-            font-size: clamp(3rem, 6vw, 6rem);
-            background: linear-gradient(to bottom, #fff, var(--gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px var(--gold-glow);
-            margin-bottom: 1rem;
-        }
+    h1, h2, h3 { font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
+    .serif { font-family: 'Cormorant Garamond', serif; }
+    
+    header {
+        height: 90vh;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        text-align: center;
+        padding: 2rem;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+    }
 
-        .hero-subtitle {
-            font-size: 1.4rem; color: var(--text-muted);
-            max-width: 700px; margin-bottom: 3rem;
-            font-style: italic;
-        }
+    .hero-title {
+        font-size: clamp(3rem, 6vw, 6rem);
+        background: linear-gradient(to bottom, #fff, var(--gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 40px var(--gold-glow);
+        margin-bottom: 1rem;
+    }
 
-        .hud {
-            display: flex; gap: 2rem;
-            padding: 1rem 3rem;
-            background: rgba(20,20,20,0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-top: 2rem;
-        }
+    .hero-subtitle {
+        font-size: 1.4rem; color: var(--text-muted);
+        max-width: 700px; margin-bottom: 3rem;
+        font-style: italic;
+    }
 
-        .hud-item { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
-        .hud-num { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold); }
-        .hud-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: #666; margin-top: 5px; }
+    /* HUD Stats */
+    .hud {
+        display: flex; gap: 2rem;
+        padding: 1rem 3rem;
+        background: rgba(20,20,20,0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        margin-top: 2rem;
+    }
 
-        .container { max-width: 1600px; margin: 0 auto; padding: 4rem 2rem; }
+    .hud-item { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
+    .hud-num { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold); }
+    .hud-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: #666; margin-top: 5px; }
 
-        .year-block {
-            margin-bottom: 8rem;
-            position: relative;
-        }
+    .container { max-width: 1600px; margin: 0 auto; padding: 4rem 2rem; }
 
-        .year-header {
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 3rem; gap: 1.5rem;
-        }
-        
-        .year-num {
-            font-family: 'Cinzel', serif; font-size: 4rem;
-            color: var(--bg-body); -webkit-text-stroke: 1px var(--gold-dim);
-            opacity: 0.5;
-        }
-        
-        .year-title { font-size: 2rem; color: var(--text-main); }
+    /* Year Blocks */
+    .year-block {
+        margin-bottom: 8rem;
+        position: relative;
+    }
 
-        .parallel-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            position: relative;
-        }
+    .year-header {
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 4rem; gap: 1.5rem;
+    }
+    
+    .year-num {
+        font-family: 'Cinzel', serif; font-size: 4.5rem;
+        color: transparent; -webkit-text-stroke: 1px var(--gold-dim);
+        opacity: 0.4;
+    }
+    
+    .year-title { font-size: 2.2rem; color: var(--text-main); text-align: center; }
 
-        .parallel-grid::after {
-            content: ''; position: absolute;
-            top: 0; bottom: 0; left: 50%; width: 1px;
-            background: linear-gradient(to bottom, transparent, var(--border), transparent);
-        }
+    /* Grid Layout */
+    .parallel-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        position: relative;
+    }
 
-        .col-header {
-            display: flex; align-items: center; gap: 1rem;
-            margin-bottom: 2rem; padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .col-header i { font-size: 1.2rem; }
-        .col-logic { color: var(--logic-accent); }
-        .col-culture { color: var(--culture-accent); }
-        .col-title { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 0.1em; }
+    .parallel-grid::after {
+        content: ''; position: absolute;
+        top: 0; bottom: 0; left: 50%; width: 1px;
+        background: linear-gradient(to bottom, transparent, var(--border), transparent);
+    }
 
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 1.2rem; margin-bottom: 1rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative; overflow: hidden;
-            display: flex; gap: 1.2rem; align-items: flex-start;
-        }
+    .col-header {
+        display: flex; align-items: center; gap: 1rem;
+        margin-bottom: 2rem; padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .col-header i { font-size: 1.2rem; }
+    .col-logic { color: var(--logic-accent); border-color: rgba(74, 111, 165, 0.3); }
+    .col-culture { color: var(--culture-accent); border-color: rgba(165, 74, 74, 0.3); }
+    .col-title { font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 0.1em; }
 
-        .card:hover {
-            transform: translateY(-3px);
-            border-color: var(--gold-dim);
-            background: var(--bg-card-hover);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
+    /* Cards */
+    .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 1.2rem; margin-bottom: 1.2rem;
+        border-radius: 4px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative; overflow: hidden;
+        display: flex; gap: 1.2rem; align-items: flex-start;
+    }
 
-        .check-circle {
-            min-width: 20px; height: 20px;
-            border: 2px solid #444; border-radius: 50%;
-            margin-top: 5px;
-            display: grid; place-items: center;
-            transition: 0.3s;
-        }
+    .card:hover {
+        transform: translateY(-4px);
+        border-color: var(--gold-dim);
+        background: var(--bg-card-hover);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
 
-        .card.completed { border-color: var(--success); opacity: 0.6; }
-        .card.completed .check-circle { background: var(--success); border-color: var(--success); }
-        .check-circle::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: #fff; font-size: 10px; opacity: 0; transform: scale(0); transition: 0.2s; }
-        .card.completed .check-circle::after { opacity: 1; transform: scale(1); }
+    /* Checkbox System */
+    .check-circle {
+        min-width: 22px; height: 22px;
+        border: 2px solid #333; border-radius: 50%;
+        margin-top: 4px;
+        display: grid; place-items: center;
+        transition: 0.3s;
+        background: transparent;
+    }
 
-        .card-content { flex: 1; }
-        
-        .tag-row { display: flex; gap: 8px; margin-bottom: 6px; }
-        .tag {
-            font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; 
-            font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-        }
-        
-        .tag-book { background: var(--tag-book); color: #b0c4de; }
-        .tag-paper { background: var(--tag-paper); color: #deb0b0; }
-        .tag-art { background: var(--tag-art); color: #ded6b0; }
-        .tag-music { background: var(--tag-music); color: #cbb0de; }
-        .tag-film { background: var(--tag-film); color: #b0dec6; }
-        .tag-place { background: var(--tag-place); color: #aaa; border: 1px solid #444; }
-        .tag-arch { background: #53453d; color: #decab0; }
-        .tag-nature { background: var(--tag-nature); color: #b0deb6; }
+    .card.completed { border-color: var(--success); opacity: 0.7; }
+    .card.completed .check-circle { background: var(--success); border-color: var(--success); }
+    
+    .check-circle::after { 
+        content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; 
+        color: #fff; font-size: 10px; opacity: 0; transform: scale(0); transition: 0.2s; 
+    }
+    .card.completed .check-circle::after { opacity: 1; transform: scale(1); }
 
-        .card-title { font-size: 1rem; color: #fff; margin-bottom: 2px; line-height: 1.3; font-weight: 600; }
-        .card-author { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
-        .card-desc { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: #888; line-height: 1.4; }
+    .card-content { flex: 1; }
+    
+    /* Tags Styling */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .tag {
+        font-size: 0.65rem; padding: 2px 8px; border-radius: 3px; 
+        font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    
+    .tag-book { background: var(--tag-book); color: #b0c4de; }
+    .tag-paper { background: var(--tag-paper); color: #deb0b0; }
+    .tag-art { background: var(--tag-art); color: #ded6b0; }
+    .tag-music { background: var(--tag-music); color: #cbb0de; }
+    .tag-film { background: var(--tag-film); color: #b0dec6; }
+    .tag-place { background: var(--tag-place); color: #aaa; border: 1px solid #444; }
+    .tag-arch { background: var(--tag-arch); color: #decab0; }
+    .tag-nature { background: var(--tag-nature); color: #b0deb6; }
+    .tag-poetry { background: var(--tag-poetry); color: #e1b0de; }
+    .tag-doc { background: var(--tag-doc); color: #b0decc; }
 
-        #toast {
-            visibility: hidden; min-width: 250px;
-            background-color: #1a1a1a; color: var(--gold); border: 1px solid var(--gold);
-            text-align: center; border-radius: 4px; padding: 16px;
-            position: fixed; z-index: 1000; left: 50%; bottom: 30px;
-            transform: translateX(-50%);
-            font-family: 'Cinzel', serif; box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            opacity: 0; transition: opacity 0.5s, bottom 0.5s;
-        }
-        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+    /* Card Typography */
+    .card-title { font-size: 1.05rem; color: #fff; margin-bottom: 2px; line-height: 1.3; font-weight: 600; }
+    .card-author { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px; }
+    .card-desc { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: #999; line-height: 1.4; }
 
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 2000;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: 0.8s;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    /* Toast Notification */
+    #toast {
+        visibility: hidden; min-width: 280px;
+        background-color: #121212; color: var(--gold); border: 1px solid var(--gold);
+        text-align: center; border-radius: 4px; padding: 18px;
+        position: fixed; z-index: 1000; left: 50%; bottom: 30px;
+        transform: translateX(-50%);
+        font-family: 'Cinzel', serif; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        opacity: 0; transition: all 0.5s ease;
+    }
+    #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
 
-        .modal-content {
-            text-align: center; max-width: 600px; padding: 2rem;
-            transform: translateY(20px); transition: 0.8s;
-        }
-        .modal-overlay.active .modal-content { transform: translateY(0); }
+    /* Modal / Progression Screen */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.97); z-index: 2000;
+        display: flex; justify-content: center; align-items: center;
+        opacity: 0; pointer-events: none; transition: 0.8s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
-        .modal-year { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold); margin-bottom: 1rem; letter-spacing: 0.2em; }
-        .modal-quote { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; color: #fff; margin-bottom: 2rem; line-height: 1.4; }
-        .modal-btn {
-            background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            padding: 10px 30px; font-family: 'Inter', sans-serif; cursor: pointer;
-            transition: 0.3s; text-transform: uppercase; letter-spacing: 0.1em;
-        }
-        .modal-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold-glow); }
+    .modal-content {
+        text-align: center; max-width: 650px; padding: 3rem;
+        transform: translateY(30px); transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        @media (max-width: 768px) {
-            .hero-title { font-size: 3rem; }
-            .parallel-grid { grid-template-columns: 1fr; gap: 2rem; }
-            .parallel-grid::after { display: none; }
-        }
-    </style>
+    .modal-year { font-family: 'Cinzel', serif; font-size: 1.6rem; color: var(--gold); margin-bottom: 1rem; letter-spacing: 0.3em; }
+    .modal-quote { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-style: italic; color: #fff; margin-bottom: 2.5rem; line-height: 1.4; }
+    .modal-btn {
+        background: transparent; border: 1px solid var(--gold); color: var(--gold);
+        padding: 12px 40px; font-family: 'Inter', sans-serif; cursor: pointer;
+        transition: 0.3s; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem;
+    }
+    .modal-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 25px var(--gold-glow); }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .container { padding: 2rem 1rem; }
+        .parallel-grid { gap: 2rem; }
+    }
+
+    @media (max-width: 768px) {
+        header { height: auto; padding: 6rem 1rem; }
+        .hero-title { font-size: 3.2rem; }
+        .parallel-grid { grid-template-columns: 1fr; gap: 3rem; }
+        .parallel-grid::after { display: none; }
+        .hud { flex-direction: column; gap: 1rem; border-radius: 20px; padding: 1.5rem; }
+        .year-header { flex-direction: column; text-align: center; }
+        .year-num { font-size: 3.5rem; margin-bottom: -10px; }
+    }
+</style>
 </head>
 <body>
 
@@ -268,401 +299,996 @@
         <div class="container">
 
             <!-- YEAR I -->
-            <div class="year-block" id="year-1">
-                <div class="year-header">
-                    <span class="year-num">I</span>
-                    <h2 class="year-title">Origins, Myth & The Foundations of Reason</h2>
-                </div>
-                <div class="parallel-grid">
-                    <div class="col">
-                        <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic (Trivium)</span></div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">An Introduction to Formal Logic</div>
-                                <span class="card-author">Peter Smith</span>
-                                <div class="card-desc">Propositional & predicate logic syntax. Foundation of all formal reasoning.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Organon (Categories, Prior Analytics)</div>
-                                <span class="card-author">Aristotle</span>
-                                <div class="card-desc">Classification and syllogistic reasoning. Western logic begins here.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
-                                <div class="card-title">Stoic Logic Fragments</div>
-                                <span class="card-author">Chrysippus</span>
-                                <div class="card-desc">Early propositional logic. Conditional reasoning before Boole.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">The Art of Rhetoric</div>
-                                <span class="card-author">Aristotle</span>
-                                <div class="card-desc">Persuasion, argumentation, practical reasoning.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Nyaya Sutras</div>
-                                <span class="card-author">Akshapada Gautama</span>
-                                <div class="card-desc">Indian logic basics. Inference, comparison, and testimony.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Materials For the Study of Navya-Nyaya Logic</div> 
-                                <span class="card-author">Daniel H. H. Ingalls</span>
-                                <div class="card-desc">Technical exposition of Navya-Nyaya. Expands the scope of general logic.</div>
-                            </div>
-                        </div>
-
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">A Rulebook for Arguments</div>
-                                <span class="card-author">Anthony Weston</span>
-                                <div class="card-desc">Critical thinking handbook. Essential for detecting fallacies and constructing solid arguments.</div>
-                            </div>
-                        </div>
-
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">An Introduction to Non-Classical Logic</div>
-                                <span class="card-author">Graham Priest</span>
-                                <div class="card-desc">Paraconsistent, relevant, fuzzy, intuitionistic logic. Prepares for diverse logical systems.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Escher on Escher: Exploring the Infinite</div>
-                                <span class="card-author">M.C. Escher</span>
-                                <div class="card-desc">Paradox, tessellation, and the visualization of infinity. First-person insights into mathematical art.</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col">
-                        <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture & Nature</span></div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Sapiens: A Brief History of Humankind</div>
-                                <span class="card-author">Yuval Noah Harari</span>
-                                <div class="card-desc">70,000 years of human history. Sets context for all cultural study.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">The Story of Art</div>
-                                <span class="card-author">E.H. Gombrich</span>
-                                <div class="card-desc">Visual culture from caves to modernity. Definitive art history.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Cosmos</div>
-                                <span class="card-author">Carl Sagan</span>
-                                <div class="card-desc">Astronomy and the history of science. Our place in the universe.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">A Short History of Nearly Everything</div>
-                                <span class="card-author">Bill Bryson</span>
-                                <div class="card-desc">Geology, paleontology, archaeology. Earth's 4.5 billion years.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Five Kingdoms: An Illustrated Guide to the Phyla of Life on Earth</div>
-                                <span class="card-author">Lynn Margulis & Karlene V. Schwartz</span>
-                                <div class="card-desc">Taxonomy of life. Bacteria to humans.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Popol Vuh</div>
-                                <span class="card-author">K'iche' Maya</span>
-                                <div class="card-desc">Mayan creation myth and cosmology. Non-Western worldview.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">The Epic of Gilgamesh</div>
-                                <span class="card-author">Anonymous</span>
-                                <div class="card-desc">Oldest written story. Friendship, mortality, meaning.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Bhagavad Gita</div>
-                                <span class="card-author">Vyasa</span>
-                                <div class="card-desc">Hindu philosophy. Duty, action, spirituality.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">The Iliad</div>
-                                <span class="card-author">Homer</span>
-                                <div class="card-desc">Foundational Western epic. War, heroism, rage.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Tao Te Ching</div>
-                                <span class="card-author">Lao Tzu</span>
-                                <div class="card-desc">Eastern dialectics. Flow, paradox, natural order.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">The Analects</div>
-                                <span class="card-author">Confucius</span>
-                                <div class="card-desc">Social order, duty, ritual, righteous life.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">The Essential Rumi</div>
-                                <span class="card-author">Rumi</span>
-                                <div class="card-desc">Persian Sufi poetry. Ecstasy and divine love.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Shi Jing (Book of Songs)</div>
-                                <span class="card-author">Various (China)</span>
-                                <div class="card-desc">Ancient Chinese poetry. Daily life, court, nature.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Indigenous Poetry: Dreamtime Songs</div>
-                                <span class="card-author">Aboriginal Australia</span>
-                                <div class="card-desc">Oral tradition. Land as living narrative.</div>
-                            </div>
-                        </div>
-
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">The Poetic Edda</div>
-                                <span class="card-author">Anonymous (Iceland)</span>
-                                <div class="card-desc">Norse mythology and cosmology. Gods, giants, fate.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
-                                <div class="card-title">Lascaux & Altamira Caves</div>
-                                <span class="card-author">Prehistoric (~17,000 BCE)</span>
-                                <div class="card-desc">Birth of symbolic representation. Earliest human art.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
-                                <div class="card-title">Terracotta Army</div>
-                                <span class="card-author">Qin Dynasty</span>
-                                <div class="card-desc">8,000 life-sized warriors. Individuality within mass.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
-                                <div class="card-title">The Parthenon Marbles</div>
-                                <span class="card-author">Phidias</span>
-                                <div class="card-desc">Classical Greek sculpture. Idealized human form.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
-                                <div class="card-title">Aboriginal Rock Art (Kakadu)</div>
-                                <span class="card-author">Aboriginal Australia</span>
-                                <div class="card-desc">20,000+ years of continuous artistic tradition.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-place">PLACE</span></div>
-                                <div class="card-title">Moai Statues (Rapa Nui)</div>
-                                <span class="card-author">Easter Island</span>
-                                <div class="card-desc">Ancestral veneration and Polynesian cosmology.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
-                                <div class="card-title">Stonehenge</div>
-                                <span class="card-author">Neolithic Britain</span>
-                                <div class="card-desc">Astronomical alignment and communal ritual.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
-                                <div class="card-title">Machu Picchu</div>
-                                <span class="card-author">Inca Empire</span>
-                                <div class="card-desc">Sacred geography and engineering marvel.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
-                                <div class="card-title">Gregorian Chant</div>
-                                <span class="card-author">Medieval</span>
-                                <div class="card-desc">Monophonic sacred contemplation. Foundation of Western notation.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
-                                <div class="card-title">Cello Suites</div>
-                                <span class="card-author">Johann Sebastian Bach</span>
-                                <div class="card-desc">Baroque perfection. Mathematical beauty in sound.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
-                                <div class="card-title">Traditional Gamelan</div>
-                                <span class="card-author">Java/Bali</span>
-                                <div class="card-desc">Non-linear, cyclical musical structures.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
-                                <div class="card-title">Didgeridoo & Songlines</div>
-                                <span class="card-author">Aboriginal Australia</span>
-                                <div class="card-desc">Sonic mapping of ancestral journeys.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
-                                <div class="card-title">Throat Singing</div>
-                                <span class="card-author">Tuva/Mongolia</span>
-                                <div class="card-desc">Harmonic overtones and nature mimicry.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
-                                <div class="card-title">Noh Theater</div>
-                                <span class="card-author">Zeami Motokiyo</span>
-                                <div class="card-desc">Japanese ritualized drama. Masks and minimal movement.</div>
-                            </div>
-                        </div>
-
-                        <div class="card" onclick="toggleItem(this, 1)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
-                                <div class="card-title">The Seventh Seal</div>
-                                <span class="card-author">Ingmar Bergman</span>
-                                <div class="card-desc">Death, meaning, faith. Nordic existential cinema.</div>
-                            </div>
-                        </div>
-                    </div>
+<div class="year-block" id="year-1">
+    <div class="year-header">
+        <span class="year-num">I</span>
+        <h2 class="year-title">Origins, Myth & The Foundations of Reason</h2>
+    </div>
+    <div class="parallel-grid">
+        
+        <!-- COLUMN: LOGIC -->
+        <div class="col">
+            <div class="col-header col-logic">
+                <i class="fa-solid fa-brain"></i>
+                <span class="col-title">Logic (Trivium)</span>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">An Introduction to Formal Logic</div>
+                    <span class="card-author">Peter Smith</span>
+                    <div class="card-desc">Propositional & predicate logic syntax. Foundation of all formal reasoning.</div>
                 </div>
             </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Organon (Categories, Prior Analytics)</div>
+                    <span class="card-author">Aristotle</span>
+                    <div class="card-desc">Classification and syllogistic reasoning. Western logic begins here.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                    <div class="card-title">Stoic Logic Fragments</div>
+                    <span class="card-author">Chrysippus</span>
+                    <div class="card-desc">Early propositional logic. Conditional reasoning before Boole.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Art of Rhetoric</div>
+                    <span class="card-author">Aristotle</span>
+                    <div class="card-desc">Persuasion, argumentation, practical reasoning.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Nyaya Sutras</div>
+                    <span class="card-author">Akshapada Gautama</span>
+                    <div class="card-desc">Indian logic basics. Inference, comparison, and testimony.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Materials For the Study of Navya-Nyaya Logic</div>
+                    <span class="card-author">Daniel H. H. Ingalls</span>
+                    <div class="card-desc">Technical exposition of Navya-Nyaya. Expands the scope of general logic.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">A Rulebook for Arguments</div>
+                    <span class="card-author">Anthony Weston</span>
+                    <div class="card-desc">Critical thinking handbook. Essential for detecting fallacies and constructing solid arguments.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">An Introduction to Non-Classical Logic</div>
+                    <span class="card-author">Graham Priest</span>
+                    <div class="card-desc">Paraconsistent, relevant, fuzzy, intuitionistic logic. Prepares for diverse logical systems.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Escher on Escher: Exploring the Infinite</div>
+                    <span class="card-author">M.C. Escher</span>
+                    <div class="card-desc">Paradox, tessellation, and the visualization of infinity. First-person insights into mathematical art.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- COLUMN: CULTURE & NATURE -->
+        <div class="col">
+            <div class="col-header col-culture">
+                <i class="fa-solid fa-eye"></i>
+                <span class="col-title">Culture & Nature</span>
+            </div>
+            
+            <!-- BOOKS -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Sapiens: A Brief History of Humankind</div>
+                    <span class="card-author">Yuval Noah Harari</span>
+                    <div class="card-desc">70,000 years of human history. Sets context for all cultural study.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Story of Art</div>
+                    <span class="card-author">E.H. Gombrich</span>
+                    <div class="card-desc">Visual culture from caves to modernity. Definitive art history.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Cosmos</div>
+                    <span class="card-author">Carl Sagan</span>
+                    <div class="card-desc">Astronomy and the history of science. Our place in the universe.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">A Short History of Nearly Everything</div>
+                    <span class="card-author">Bill Bryson</span>
+                    <div class="card-desc">Geology, paleontology, archaeology. Earth's 4.5 billion years.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Five Kingdoms: An Illustrated Guide to the Phyla of Life on Earth</div>
+                    <span class="card-author">Lynn Margulis & Karlene V. Schwartz</span>
+                    <div class="card-desc">Taxonomy of life. Bacteria to humans.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Popol Vuh</div>
+                    <span class="card-author">K'iche' Maya</span>
+                    <div class="card-desc">Mayan creation myth and cosmology. Non-Western worldview.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Epic of Gilgamesh</div>
+                    <span class="card-author">Anonymous</span>
+                    <div class="card-desc">Oldest written story. Friendship, mortality, meaning.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Bhagavad Gita</div>
+                    <span class="card-author">Vyasa</span>
+                    <div class="card-desc">Hindu philosophy. Duty, action, spirituality.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Iliad</div>
+                    <span class="card-author">Homer</span>
+                    <div class="card-desc">Foundational Western epic. War, heroism, rage.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Odyssey</div>
+                    <span class="card-author">Homer</span>
+                    <div class="card-desc">Journey, cunning, homecoming. The archetypal hero's journey.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Tao Te Ching</div>
+                    <span class="card-author">Lao Tzu</span>
+                    <div class="card-desc">Eastern dialectics. Flow, paradox, natural order.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Analects</div>
+                    <span class="card-author">Confucius</span>
+                    <div class="card-desc">Social order, duty, ritual, righteous life.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Essential Rumi</div>
+                    <span class="card-author">Rumi</span>
+                    <div class="card-desc">Persian Sufi poetry. Ecstasy and divine love.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Shi Jing (Book of Songs)</div>
+                    <span class="card-author">Various (China)</span>
+                    <div class="card-desc">Ancient Chinese poetry. Daily life, court, nature.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Indigenous Poetry: Dreamtime Songs</div>
+                    <span class="card-author">Aboriginal Australia</span>
+                    <div class="card-desc">Oral tradition. Land as a living narrative.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Poetic Edda</div>
+                    <span class="card-author">Anonymous (Iceland)</span>
+                    <div class="card-desc">Norse mythology and cosmology. Gods, giants, fate.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Beowulf</div>
+                    <span class="card-author">Anonymous (Anglo-Saxon)</span>
+                    <div class="card-desc">Old English epic. Monsters, honor, mortality.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Kalevala</div>
+                    <span class="card-author">Elias Lönnrot (Finland)</span>
+                    <div class="card-desc">Finnish national epic. Shamanic magic and creation myths.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Prose Edda</div>
+                    <span class="card-author">Snorri Sturluson (Iceland)</span>
+                    <div class="card-desc">Norse mythological handbook. Cosmology and poetic tradition.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Völuspá</div>
+                    <span class="card-author">Anonymous (Norse)</span>
+                    <div class="card-desc">The prophecy of the seeress. Creation to Ragnarök.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Hávamál</div>
+                    <span class="card-author">Anonymous (Norse)</span>
+                    <div class="card-desc">Odin's wisdom poetry. Ethical and practical advice.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Enuma Elish</div>
+                    <span class="card-author">Babylonian</span>
+                    <div class="card-desc">Mesopotamian creation myth. Cosmic order from chaos.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Book of the Dead</div>
+                    <span class="card-author">Ancient Egypt</span>
+                    <div class="card-desc">Egyptian funerary texts. Journey through the afterlife.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Kojiki</div>
+                    <span class="card-author">O no Yasumaro (Japan)</span>
+                    <div class="card-desc">Japanese creation myths and Shinto cosmology.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Ramayana</div>
+                    <span class="card-author">Valmiki</span>
+                    <div class="card-desc">Hindu epic. Dharma, devotion, and righteous kingship.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Mahabharata (selections)</div>
+                    <span class="card-author">Vyasa</span>
+                    <div class="card-desc">World's longest epic. War, duty, complexity of dharma.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Sundiata: An Epic of Old Mali</div>
+                    <span class="card-author">Djeli Mamoudou Kouyaté</span>
+                    <div class="card-desc">West African oral epic. The Lion King of Mali.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Mwindo Epic</div>
+                    <span class="card-author">Nyanga people (Congo)</span>
+                    <div class="card-desc">Central African hero epic. Magic and transformation.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Inuit Traditional Songs</div>
+                    <span class="card-author">Various</span>
+                    <div class="card-desc">Arctic oral poetry. Nature, spirits, survival.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Navajo Creation Story</div>
+                    <span class="card-author">Diné tradition</span>
+                    <div class="card-desc">Emergence narrative. Sacred geography of the Southwest.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Aztec Poetry: Nezahualcoyotl</div>
+                    <span class="card-author">Nahuatl poetry</span>
+                    <div class="card-desc">Impermanence and beauty.</div>
+                </div>
+            </div>
+
+            <!-- DOCUMENTARIES -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">Cave of Forgotten Dreams (2010)</div>
+                    <span class="card-author">Werner Herzog</span>
+                    <div class="card-desc">Chauvet Cave paintings. 32,000-year-old art and human consciousness.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">The Story of India (2007)</div>
+                    <span class="card-author">Michael Wood (BBC)</span>
+                    <div class="card-desc">10,000 years of Indian civilization. Comprehensive cultural survey.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">Africa (2013)</div>
+                    <span class="card-author">David Attenborough (BBC)</span>
+                    <div class="card-desc">Natural history as cultural context. Biodiversity and human origins.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">First Peoples (2015)</div>
+                    <span class="card-author">PBS</span>
+                    <div class="card-desc">Human migration out of Africa. Archaeological and genetic evidence.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">The Ascent of Man (1973)</div>
+                    <span class="card-author">Jacob Bronowski (BBC)</span>
+                    <div class="card-desc">Science and human cultural evolution. Classic series.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">Civilisations (2018)</div>
+                    <span class="card-author">BBC</span>
+                    <div class="card-desc">Global art history. Non-Eurocentric perspective.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">The Power of Myth (1988)</div>
+                    <span class="card-author">Joseph Campbell & Bill Moyers</span>
+                    <div class="card-desc">Comparative mythology. Universal patterns in human stories.</div>
+                </div>
+            </div>
+
+            <!-- ART -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Lascaux & Altamira Caves</div>
+                    <span class="card-author">Prehistoric (~17,000 BCE)</span>
+                    <div class="card-desc">Birth of symbolic representation. Earliest human art.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Chauvet Cave</div>
+                    <span class="card-author">Prehistoric (~30,000 BCE)</span>
+                    <div class="card-desc">Oldest known cave paintings. Sophisticated artistic technique.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Terracotta Army</div>
+                    <span class="card-author">Qin Dynasty</span>
+                    <div class="card-desc">8,000 life-sized warriors. Individuality within mass.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">The Parthenon Marbles</div>
+                    <span class="card-author">Phidias</span>
+                    <div class="card-desc">Classical Greek sculpture. Idealized human form.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Olmec Colossal Heads</div>
+                    <span class="card-author">Mesoamerica</span>
+                    <div class="card-desc">Massive stone sculptures. First major Mesoamerican civilization.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Moai Statues</div>
+                    <span class="card-author">Rapa Nui (Easter Island)</span>
+                    <div class="card-desc">Monolithic human figures. Polynesian ancestor worship.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Aboriginal Rock Art (Kakadu)</div>
+                    <span class="card-author">Aboriginal Australia</span>
+                    <div class="card-desc">20,000+ years of continuous artistic tradition.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Bradshaw Paintings (Gwion Gwion)</div>
+                    <span class="card-author">Aboriginal Australia</span>
+                    <div class="card-desc">Ancient rock art. Mysterious figures in elaborate dress.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Nazca Lines</div>
+                    <span class="card-author">Peru</span>
+                    <div class="card-desc">Giant geoglyphs. Astronomical and ceremonial purposes.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Venus of Willendorf</div>
+                    <span class="card-author">Paleolithic</span>
+                    <div class="card-desc">Fertility figurine. Universal symbol of the feminine.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Lion Man of Hohlenstein-Stadel</div>
+                    <span class="card-author">Paleolithic Germany</span>
+                    <div class="card-desc">Oldest known zoomorphic sculpture. 40,000 years old.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Rock Art of Alta</div>
+                    <span class="card-author">Norway</span>
+                    <div class="card-desc">6,000 petroglyphs. Stone Age Nordic life and spirituality.</div>
+                </div>
+            </div>
+
+            <!-- PLACES & ARCHITECTURE -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-place">PLACE</span></div>
+                    <div class="card-title">Göbekli Tepe</div>
+                    <span class="card-author">Turkey</span>
+                    <div class="card-desc">World's oldest temple complex. Pre-agricultural religious site.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Stonehenge</div>
+                    <span class="card-author">Neolithic Britain</span>
+                    <div class="card-desc">Astronomical alignment and communal ritual.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Machu Picchu</div>
+                    <span class="card-author">Inca Empire</span>
+                    <div class="card-desc">Sacred geography and engineering marvel.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Newgrange</div>
+                    <span class="card-author">Neolithic Ireland</span>
+                    <div class="card-desc">Passage tomb. Winter solstice illumination chamber.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Great Pyramid of Giza</div>
+                    <span class="card-author">Ancient Egypt</span>
+                    <div class="card-desc">Mathematical precision and monumental ambition.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Ziggurat of Ur</div>
+                    <span class="card-author">Mesopotamia</span>
+                    <div class="card-desc">Temple tower. Connection between earth and heaven.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Borobudur</div>
+                    <span class="card-author">Java, Indonesia</span>
+                    <div class="card-desc">Largest Buddhist temple. Mandala in stone.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Chichen Itza</div>
+                    <span class="card-author">Maya civilization</span>
+                    <div class="card-desc">Astronomical observatory and ceremonial center.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Great Wall of China</div>
+                    <span class="card-author">Various dynasties</span>
+                    <div class="card-desc">Defensive fortification. Symbol of Chinese civilization.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Cliff Palace</div>
+                    <span class="card-author">Ancestral Puebloans (Mesa Verde)</span>
+                    <div class="card-desc">Indigenous North American cliff dwellings.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Urnes Stave Church</div>
+                    <span class="card-author">Norway (12th century)</span>
+                    <div class="card-desc">Wooden medieval church. Viking-Christian synthesis.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Borgund Stave Church</div>
+                    <span class="card-author">Norway</span>
+                    <div class="card-desc">Best preserved stave church. Dragon-head ornaments.</div>
+                </div>
+            </div>
+
+            <!-- MUSIC -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Gregorian Chant</div>
+                    <span class="card-author">Medieval</span>
+                    <div class="card-desc">Monophonic sacred contemplation. Foundation of Western notation.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Cello Suites</div>
+                    <span class="card-author">Johann Sebastian Bach</span>
+                    <div class="card-desc">Baroque perfection. Mathematical beauty in sound.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Traditional Gamelan</div>
+                    <span class="card-author">Java/Bali</span>
+                    <div class="card-desc">Non-linear, cyclical musical structures.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Didgeridoo & Songlines</div>
+                    <span class="card-author">Aboriginal Australia</span>
+                    <div class="card-desc">Sonic mapping of ancestral journeys.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Throat Singing</div>
+                    <span class="card-author">Tuva/Mongolia</span>
+                    <div class="card-desc">Harmonic overtones and nature mimicry.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Gregorian Chant: Missa de Angelis</div>
+                    <span class="card-author">Medieval liturgy</span>
+                    <div class="card-desc">Sacred polyphony and modal harmony.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Kulning</div>
+                    <span class="card-author">Swedish herding calls</span>
+                    <div class="card-desc">Female vocal tradition. Calling cattle in mountains.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Hardanger Fiddle</div>
+                    <span class="card-author">Norwegian folk</span>
+                    <div class="card-desc">Sympathetic strings. Dance music of rural Norway.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Lur</div>
+                    <span class="card-author">Nordic Bronze Age</span>
+                    <div class="card-desc">Ancient bronze horns. Ritual and ceremonial music.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Sami Joik</div>
+                    <span class="card-author">Indigenous Sami people</span>
+                    <div class="card-desc">Spiritual singing tradition. Person, place, or animal as melody.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Kora Music</div>
+                    <span class="card-author">West Africa</span>
+                    <div class="card-desc">21-string harp-lute. Griot storytelling tradition.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Shakuhachi</div>
+                    <span class="card-author">Japanese bamboo flute</span>
+                    <div class="card-desc">Zen Buddhist meditation music.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Oud</div>
+                    <span class="card-author">Middle Eastern lute</span>
+                    <div class="card-desc">Foundation of many string instruments.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Carnatic Classical</div>
+                    <span class="card-author">South India</span>
+                    <div class="card-desc">Complex rhythmic cycles and improvisation.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Peking Opera</div>
+                    <span class="card-author">Chinese traditional</span>
+                    <div class="card-desc">Stylized vocal performance and percussion.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Native American Flute</div>
+                    <span class="card-author">Various tribes</span>
+                    <div class="card-desc">Courtship and spiritual music.</div>
+                </div>
+            </div>
+
+            <!-- PERFORMANCE & FILM -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Noh Theater</div>
+                    <span class="card-author">Zeami Motokiyo</span>
+                    <div class="card-desc">Japanese ritualized drama. Masks and minimal movement.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Kathakali</div>
+                    <span class="card-author">Kerala, India</span>
+                    <div class="card-desc">Dance-drama. Elaborate costumes and mudras.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Wayang Kulit</div>
+                    <span class="card-author">Indonesian shadow puppets</span>
+                    <div class="card-desc">Hindu epic storytelling. Light and shadow narrative.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Bunraku</div>
+                    <span class="card-author">Japanese puppet theater</span>
+                    <div class="card-desc">Three-person puppet operation. Emotional subtlety.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">The Seventh Seal</div>
+                    <span class="card-author">Ingmar Bergman (1957)</span>
+                    <div class="card-desc">Death, meaning, faith. Nordic existential cinema.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">Nanook of the North (1922)</div>
+                    <span class="card-author">Robert Flaherty</span>
+                    <div class="card-desc">First feature-length documentary. Inuit life in Arctic.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">Baraka (1992)</div>
+                    <span class="card-author">Ron Fricke</span>
+                    <div class="card-desc">Non-narrative visual meditation on humanity and nature.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">Samsara (2011)</div>
+                    <span class="card-author">Ron Fricke</span>
+                    <div class="card-desc">Global visual poem. Sacred, profane, and cyclical.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">Koyaanisqatsi (1982)</div>
+                    <span class="card-author">Godfrey Reggio</span>
+                    <div class="card-desc">Life out of balance. Hopi prophecy and modernity.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- YEAR II -->
             <div class="year-block" id="year-2">
