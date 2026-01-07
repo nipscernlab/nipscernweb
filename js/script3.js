@@ -171,6 +171,7 @@
 
 // -----------------------------------------------------
 // 2) PUBLICAÇÕES POR ANO (JSON + filtros + busca + fav)
+// (mantido do seu projeto antigo)
 // -----------------------------------------------------
 (function () {
   document.addEventListener("DOMContentLoaded", () => {
@@ -254,7 +255,6 @@
       card.innerHTML = `
         <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button" aria-label="Favoritar">
           <i class="${isFav ? "fa-solid fa-star" : "fa-regular fa-star"}"></i>
-
         </button>
 
         <h2 class="publication-title">${titulo}</h2>
@@ -354,7 +354,6 @@
     }
 
     function initUI() {
-      // ✅ ESTADO INICIAL (o que estava faltando):
       // Subfiltros começam SEMPRE escondidos
       mostrarSubfiltros(false);
 
@@ -430,7 +429,7 @@
 
         setStatus("");
 
-        // ✅ garante que, ao carregar, continua escondido até clicar em TESE
+        // garante que, ao carregar, continua escondido até clicar em TESE
         mostrarSubfiltros(tipoAtual === "tese");
 
         aplicarFiltros();
@@ -453,14 +452,11 @@
   const reduceMotion =
     window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
-  // Troque o seletor se necessário
   const yearButtons = Array.from(document.querySelectorAll(".year-btn"));
   if (!yearButtons.length) return;
 
-  // garante que todos comecem "fora"
   yearButtons.forEach((btn) => btn.classList.remove("is-in"));
 
-  // entrada com stagger (efeito cascata)
   yearButtons.forEach((btn, i) => {
     if (reduceMotion) {
       btn.classList.add("is-in");
@@ -470,7 +466,6 @@
   });
 })();
 
-
 // =========================================
 // ANOS — aplica animação/ glow em TODOS (sem depender de classe)
 // Marca automaticamente itens com texto "####" (ex: 2001, 2025)
@@ -479,15 +474,12 @@
   const reduceMotion =
     window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
-  // pega links/botoes/divs clicáveis comuns
   const candidates = Array.from(
     document.querySelectorAll("a, button, .year, .card, .chip, .pill, div, li")
   );
 
-  // filtra quem parece "um ano"
   const years = candidates.filter((el) => {
     const t = (el.textContent || "").trim();
-    // exatamente 4 dígitos e dentro de um range plausível
     if (!/^\d{4}$/.test(t)) return false;
     const y = Number(t);
     return y >= 1900 && y <= 2100;
@@ -498,7 +490,6 @@
     return;
   }
 
-  // marca e anima em cascata
   years.forEach((el, i) => {
     const y = (el.textContent || "").trim();
     el.setAttribute("data-year", y);
@@ -509,7 +500,6 @@
       el.classList.add("is-in");
     } else {
       el.style.setProperty("--in-delay", `${60 + i * 55}ms`);
-      // requestAnimationFrame garante que o browser aplique o estado inicial antes do "is-in"
       requestAnimationFrame(() => el.classList.add("is-in"));
     }
   });
@@ -517,4 +507,331 @@
   console.log("[NIPSCERN] Animação aplicada em", years.length, "anos.");
 })();
 
+// =====================================================
+// 3) NIPSCERN • HUB de Publicações (filtros + cards)
+//   - Multi-eixo (SAPHO/CERN/SC)
+//   - Tipo, Ano, Busca, Favoritos
+//   - Inicial: mais recentes + "Carregar mais"
+//   - ✅ Puxa JSON legado em /data/*/*.json
+// =====================================================
+(function () {
+  const grid = document.getElementById("pubsGrid");
+  if (!grid) return; // só roda na página que tiver o hub
 
+  // ---------- CONFIG ----------
+  const PAGE_SIZE = 24;
+  const LS_KEY = "nipscern_favs_v1";
+
+  // ---------- DADOS (carregados via JSON) ----------
+  let DATA = [];
+
+  // ✅ IMPORTANTE: como seu preview está em /publications/,
+  // usamos caminhos relativos "../data/...".
+  // No site publicado (nipscern.com/publications/), também funciona.
+  const SOURCES = [
+    "../data/cern/2001.json",
+    "../data/cern/2004.json",
+    "../data/cern/2005.json",
+    "../data/cern/2008.json",
+  ];
+
+  function resolveHref(path, baseJsonUrl) {
+    try {
+      return new URL(path, baseJsonUrl).pathname; // vira "/artigos/pdfs/..."
+    } catch {
+      return path;
+    }
+  }
+
+  async function loadPublicacoes() {
+    try {
+      const responses = await Promise.all(
+        SOURCES.map(async (url) => {
+          const res = await fetch(url, { cache: "no-store" });
+          if (!res.ok) throw new Error(`Falha ao carregar ${url} (${res.status})`);
+          const json = await res.json();
+          const baseJsonUrl = new URL(url, window.location.href);
+          return { json, baseJsonUrl };
+        })
+      );
+
+      DATA = responses.flatMap(({ json, baseJsonUrl }) => {
+        const eixo = (json.eixo || "").toLowerCase();
+        const anoBase = Number(json.ano || 0);
+        const pubs = Array.isArray(json.publicacoes) ? json.publicacoes : [];
+
+        return pubs.map((p) => ({
+          id: p.id,
+          eixo,
+          tipo: (p.tipo || "").toLowerCase(),
+          ano: Number(p.ano || anoBase),
+          titulo: p.titulo || "Sem título",
+          autores: p.autores || "—",
+          resumo: p.resumo || "",
+          palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
+          veiculo: p.veiculo || "",
+          nivel: p.nivel || null,
+          arquivo: resolveHref(p.arquivo, baseJsonUrl),
+        }));
+      });
+
+    } catch (err) {
+      console.error("Erro ao carregar JSONs do hub:", err);
+      DATA = [];
+    }
+  }
+
+  // ---------- ELEMENTOS ----------
+  const eixoWrap = document.getElementById("filterEixo");
+  const tipoWrap = document.getElementById("filterTipo");
+  const yearSelect = document.getElementById("yearSelect");
+  const searchEl = document.getElementById("pubSearch");
+  const favOnlyBtn = document.getElementById("favOnlyBtn");
+  const resultsMeta = document.getElementById("resultsMeta");
+  const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+  // ---------- FAVORITOS ----------
+  const loadFavs = () => {
+    try { return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]")); }
+    catch { return new Set(); }
+  };
+  const saveFavs = (set) => localStorage.setItem(LS_KEY, JSON.stringify([...set]));
+  let favs = loadFavs();
+
+  // ---------- ESTADO ----------
+  let state = {
+    eixos: new Set(["all"]),  // multi seleção
+    tipo: "all",
+    ano: "all",
+    q: "",
+    favOnly: false,
+    limit: PAGE_SIZE,
+  };
+
+  // ---------- HELPERS ----------
+  const norm = (s) =>
+    (s || "")
+      .toString()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+  function getEixosActive() {
+    if (state.eixos.has("all")) return null;
+    return state.eixos;
+  }
+
+  function matches(item) {
+    const active = getEixosActive();
+    if (active && !active.has(item.eixo)) return false;
+
+    if (state.tipo !== "all" && item.tipo !== state.tipo) return false;
+
+    if (state.ano !== "all" && String(item.ano) !== String(state.ano)) return false;
+
+    if (state.favOnly && !favs.has(item.id)) return false;
+
+    const q = norm(state.q).trim();
+    if (q) {
+      const hay = norm(
+        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(" ")} ${item.eixo} ${item.tipo} ${item.ano}`
+      );
+      if (!hay.includes(q)) return false;
+    }
+
+    return true;
+  }
+
+  function badge(item) {
+    return `${item.eixo.toUpperCase()} • ${item.tipo.toUpperCase()} • ${item.ano}`;
+  }
+
+  function cardHTML(item) {
+    const isFav = favs.has(item.id);
+
+    const resumoHTML = item.resumo
+      ? `<p class="pub-resumo">${item.resumo}</p>`
+      : "";
+
+    const veicHTML = item.veiculo
+      ? `<p class="pub-veic">${item.veiculo}</p>`
+      : "";
+
+    const kw = (item.palavrasChave || []).slice(0, 4);
+    const kwHTML = kw.length
+      ? `<div class="pub-kw">${kw.map(k => `<span class="kw">${k}</span>`).join("")}</div>`
+      : "";
+
+    return `
+      <article class="pub-card" data-id="${item.id}">
+        <div class="pub-top">
+          <span class="pub-badge">${badge(item)}</span>
+          <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button" aria-label="Favoritar" title="Favoritar">
+            <i class="fa-solid fa-star"></i>
+          </button>
+        </div>
+
+        <h3 class="pub-title">${item.titulo}</h3>
+        <p class="pub-meta">${item.autores}</p>
+        ${veicHTML}
+        ${resumoHTML}
+        ${kwHTML}
+
+        <div class="pub-actions">
+          <a class="pub-open" href="${item.arquivo}" target="_blank" rel="noopener">Abrir PDF</a>
+        </div>
+      </article>
+    `;
+  }
+
+  function setActiveChips(container, attr, activeValue) {
+    container.querySelectorAll(`[${attr}]`).forEach(btn => {
+      const v = btn.getAttribute(attr);
+      btn.classList.toggle("is-active", v === activeValue);
+    });
+  }
+
+  function syncEixoChipsUI() {
+    const btns = eixoWrap.querySelectorAll("[data-eixo]");
+    btns.forEach(btn => {
+      const v = btn.getAttribute("data-eixo");
+      btn.classList.toggle("is-active", state.eixos.has(v));
+    });
+  }
+
+  function populateYears() {
+    const years = Array.from(new Set(DATA.map(d => d.ano))).sort((a,b) => b-a);
+    yearSelect.innerHTML = `<option value="all">Todos</option>` +
+      years.map(y => `<option value="${y}">${y}</option>`).join("");
+  }
+
+  function render() {
+    const filtered = DATA
+      .filter(matches)
+      .sort((a,b) => (b.ano - a.ano) || (norm(a.titulo).localeCompare(norm(b.titulo))));
+
+    const visible = filtered.slice(0, state.limit);
+
+    resultsMeta.textContent = `Mostrando ${visible.length} de ${filtered.length} resultado(s)`;
+
+    grid.innerHTML = visible.map(cardHTML).join("") || `
+      <div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>
+    `;
+
+    loadMoreBtn.style.display = filtered.length > visible.length ? "inline-flex" : "none";
+
+    grid.querySelectorAll(".fav-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const card = btn.closest(".pub-card");
+        const id = card.getAttribute("data-id");
+        if (favs.has(id)) favs.delete(id);
+        else favs.add(id);
+        saveFavs(favs);
+        render();
+      });
+    });
+  }
+
+  // ---------- EVENTOS ----------
+  eixoWrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-eixo]");
+    if (!btn) return;
+    const v = btn.getAttribute("data-eixo");
+
+    if (v === "all") {
+      state.eixos = new Set(["all"]);
+    } else {
+      if (state.eixos.has("all")) state.eixos.delete("all");
+
+      if (state.eixos.has(v)) state.eixos.delete(v);
+      else state.eixos.add(v);
+
+      if (state.eixos.size === 0) state.eixos.add("all");
+    }
+
+    state.limit = PAGE_SIZE;
+    syncEixoChipsUI();
+    render();
+  });
+
+  tipoWrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-tipo]");
+    if (!btn) return;
+    state.tipo = btn.getAttribute("data-tipo");
+    state.limit = PAGE_SIZE;
+    setActiveChips(tipoWrap, "data-tipo", state.tipo);
+    render();
+  });
+
+  yearSelect.addEventListener("change", () => {
+    state.ano = yearSelect.value;
+    state.limit = PAGE_SIZE;
+    render();
+  });
+
+  searchEl.addEventListener("input", () => {
+    state.q = searchEl.value;
+    state.limit = PAGE_SIZE;
+    render();
+  });
+
+  favOnlyBtn.addEventListener("click", () => {
+    state.favOnly = !state.favOnly;
+    favOnlyBtn.setAttribute("aria-pressed", state.favOnly ? "true" : "false");
+    favOnlyBtn.classList.toggle("is-active", state.favOnly);
+    state.limit = PAGE_SIZE;
+    render();
+  });
+
+  loadMoreBtn.addEventListener("click", () => {
+    state.limit += PAGE_SIZE;
+    render();
+  });
+
+  // Clique no Venn para filtrar e rolar
+  document.querySelectorAll(".diagram.venn [data-id]").forEach(el => {
+    el.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      const eixo = el.getAttribute("data-id");
+      if (!eixo) return;
+
+      if (state.eixos.has("all")) state.eixos.delete("all");
+      if (state.eixos.has(eixo)) state.eixos.delete(eixo);
+      else state.eixos.add(eixo);
+      if (state.eixos.size === 0) state.eixos.add("all");
+
+      state.limit = PAGE_SIZE;
+      syncEixoChipsUI();
+      render();
+
+      document.getElementById("pubs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  document.querySelectorAll(".intersection.sc a").forEach(el => {
+    el.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      const eixo = "sc";
+
+      if (state.eixos.has("all")) state.eixos.delete("all");
+      if (state.eixos.has(eixo)) state.eixos.delete(eixo);
+      else state.eixos.add(eixo);
+      if (state.eixos.size === 0) state.eixos.add("all");
+
+      state.limit = PAGE_SIZE;
+      syncEixoChipsUI();
+      render();
+
+      document.getElementById("pubs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  // ---------- INICIALIZA ----------
+  (async function initHub() {
+    await loadPublicacoes();
+    populateYears();
+    syncEixoChipsUI();
+    setActiveChips(tipoWrap, "data-tipo", state.tipo);
+    render();
+  })();
+
+})();
