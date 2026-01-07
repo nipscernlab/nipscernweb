@@ -835,3 +835,29 @@
   })();
 
 })();
+
+
+
+function cardHTML(item) {
+  const isFav = favs.has(item.id);
+
+  return `
+    <article class="pub-card" data-id="${item.id}">
+      <div class="pub-top">
+        <span class="pub-badge">${badge(item)}</span>
+
+        <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button" aria-label="Favoritar" title="Favoritar">
+          <i class="${isFav ? "fa-solid fa-star" : "fa-regular fa-star"}"></i>
+        </button>
+      </div>
+
+      <h3 class="pub-title">${item.titulo}</h3>
+      <p class="pub-meta">${item.autores}</p>
+
+      <div class="pub-actions">
+        <a class="pub-open" href="${item.arquivo}" target="_blank" rel="noopener">Abrir PDF</a>
+      </div>
+    </article>
+  `;
+}
+
