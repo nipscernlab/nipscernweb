@@ -63,23 +63,67 @@
     </div>
   </main>
 
-  <!-- ===== SEÇÃO DOS NÚCLEOS ===== -->
-  <section class="nucleos">
-    <a class="nucleo sapho-box" href="/artigos/sapho/sapho.html" target="_blank" rel="noopener">
-      <h3>SAPHO</h3>
-      <p>Núcleo SAPHO: arquitetura de sistemas e camadas humanas-operacionais.</p>
-    </a>
+ 
+<!-- ===== HUB DE PUBLICAÇÕES (Filtros + Cards) ===== -->
+<section id="pubs" class="pubs-hub" aria-label="Hub de publicações">
+  <h2 class="pubs-title">Publicações</h2>
 
-    <a class="nucleo sc-box" href="/artigos/sc/sc.html" target="_blank" rel="noopener">
-      <h3>SC</h3>
-      <p>Zona de convergência CERN × SAPHO com coautoria e resultados comuns.</p>
-    </a>
+  <!-- FILTROS -->
+  <div class="pubs-filters">
 
-    <a class="nucleo cern-box" href="/artigos/cern/cern.html" target="_blank" rel="noopener">
-      <h3>CERN</h3>
-      <p>Núcleo CERN: engenharia, redes, automação e experimentação técnica.</p>
-    </a>
-  </section>
+    <div class="filter-block">
+      <p class="filters-label">EIXO</p>
+      <div class="filter-row" id="filterEixo" role="group" aria-label="Filtro de eixo">
+        <button class="chip is-active" data-eixo="all">Todos</button>
+        <button class="chip" data-eixo="sapho">SAPHO</button>
+        <button class="chip" data-eixo="cern">CERN</button>
+        <button class="chip" data-eixo="sc">SC</button>
+
+        <button class="chip chip-star" id="favOnlyBtn" aria-pressed="false" title="Somente favoritos">
+          <i class="fa-solid fa-star"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-block">
+      <p class="filters-label">TIPO</p>
+      <div class="filter-row" id="filterTipo" role="group" aria-label="Filtro de tipo">
+        <button class="chip is-active" data-tipo="all">Todos</button>
+        <button class="chip" data-tipo="congresso">Congresso</button>
+        <button class="chip" data-tipo="revista">Revista</button>
+        <button class="chip" data-tipo="tese">Tese</button>
+      </div>
+    </div>
+
+    <div class="filter-block">
+      <p class="filters-label">ANO</p>
+      <div class="filter-row">
+        <select id="yearSelect" class="year-select" aria-label="Filtro de ano">
+          <option value="all">Todos</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-block">
+      <p class="filters-label">BUSCA</p>
+      <div class="search-row">
+        <input id="pubSearch" type="search" placeholder="Buscar por título, autor, ano..." autocomplete="off" />
+      </div>
+    </div>
+
+  </div>
+
+  <!-- META + AÇÕES -->
+  <div class="results-bar">
+    <span id="resultsMeta">Mostrando 0</span>
+    <button id="loadMoreBtn" class="load-more" type="button">Carregar mais</button>
+  </div>
+
+  <!-- CARDS -->
+  <div class="pubs-grid" id="pubsGrid"></div>
+</section>
+
+
 
   <!-- ===== RODAPÉ ===== -->
   <footer class="footer">
