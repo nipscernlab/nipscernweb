@@ -3144,3 +3144,137 @@ left: 45% !important; } /* <<< mais overlap (fica mais bonito) */
     transform: translate(-50%, -50%) !important;
   }
 }
+
+/* ===== HUB de Publicações (Filtros + Cards) ===== */
+.pubs-hub { max-width: 1040px; margin: 40px auto 120px; padding: 0 20px; }
+.pubs-title { text-align: center; margin: 0 0 14px; }
+
+.pubs-filters { text-align: center; margin: 14px auto 18px; }
+.filter-block { margin: 14px 0; }
+.filters-label { letter-spacing: .16em; opacity: .75; font-size: 12px; margin: 0 0 10px; }
+
+.filter-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.chip { border: 1px solid rgba(120,200,255,.35); background: rgba(6,6,18,.35); color: #e9ecff; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+.chip.is-active { box-shadow: 0 0 0 2px rgba(120,200,255,.25); }
+.chip-star { width: 44px; justify-content: center; align-items: center; display: inline-flex; }
+
+.search-row { display: flex; justify-content: center; }
+#pubSearch { width: min(560px, 92vw); padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(120,200,255,.25); background: rgba(6,6,18,.35); color: #e9ecff; outline: none; }
+
+.year-select { padding: 10px 12px; border-radius: 14px; border: 1px solid rgba(120,200,255,.25); background: rgba(6,6,18,.35); color: #e9ecff; }
+
+.results-bar { display: flex; justify-content: center; align-items: center; gap: 14px; margin: 8px 0 18px; opacity: .9; flex-wrap: wrap; }
+.load-more { border: 1px solid rgba(120,200,255,.25); background: rgba(6,6,18,.35); color: #e9ecff; border-radius: 14px; padding: 10px 14px; cursor: pointer; display: inline-flex; }
+
+.pubs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.pub-card { border: 1px solid rgba(120,200,255,.25); background: rgba(6,6,18,.35); border-radius: 18px; padding: 16px; }
+.pub-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.pub-badge { font-size: 12px; letter-spacing: .12em; opacity: .85; }
+.fav-btn { border: none; background: transparent; cursor: pointer; opacity: .7; color: inherit; }
+.fav-btn.is-fav { opacity: 1; }
+.pub-title { margin: 6px 0 8px; }
+.pub-meta { margin: 0 0 6px; opacity: .85; }
+.pub-actions { margin-top: 12px; }
+.pub-open { display: inline-block; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(120,200,255,.25); text-decoration: none; color: #e9ecff; }
+
+.no-results { text-align: center; opacity: .75; padding: 24px; }
+
+
+
+
+
+/* ================================
+   HUB • Cards em 1 coluna (sempre)
+   ================================ */
+
+#pubsGrid {
+  display: grid;
+  grid-template-columns: 1fr !important; /* 1 coluna */
+  gap: 18px; /* espaçamento entre cards */
+  max-width: 920px; /* opcional: deixa os cards mais elegantes no centro */
+  margin: 0 auto;   /* centraliza o bloco */
+}
+
+/* garante que o card ocupe a largura toda da coluna */
+#pubsGrid .pub-card {
+  width: 100%;
+}
+
+
+/* ================================
+   HUB • Favorito sempre visível
+   ================================ */
+
+/* Se o seu CSS escondia no normal e mostrava no hover,
+   isso força a ficar sempre visível */
+#pubsGrid .fav-btn {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+/* Se existir regra tipo ".pub-card:hover .fav-btn { ... }"
+   isso não atrapalha mais, porque acima tem !important */
+
+#pubsGrid .fav-btn { display: inline-flex !important; }
+
+
+/* =========================================
+   FIX DEFINITIVO — Estrela sempre visível
+   ========================================= */
+
+/* garante que o card permita elementos posicionados */
+#pubsGrid .pub-card {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* botão de favorito SEMPRE visível */
+#pubsGrid .pub-card .fav-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+
+  transform: none !important;
+  pointer-events: auto !important;
+  z-index: 10;
+
+  background: rgba(6, 10, 30, 0.75);
+  border: 1px solid rgba(120, 180, 255, 0.35);
+  border-radius: 999px;
+  padding: 6px;
+
+  box-shadow: 0 0 10px rgba(120, 180, 255, 0.25);
+}
+
+/* remove QUALQUER lógica de hover que esconda */
+#pubsGrid .pub-card:hover .fav-btn {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+/* ícone da estrela */
+#pubsGrid .fav-btn i {
+  color: #ffd36a;
+  font-size: 14px;
+}
+
+/* =========================================
+   Estrela neutra (padrão) e amarela só ao favoritar
+   ========================================= */
+
+#pubsGrid .fav-btn i {
+  color: rgba(255, 255, 255, 0.75) !important; /* neutra */
+}
+
+#pubsGrid .fav-btn.is-fav i {
+  color: #ffd36a !important; /* amarela quando favoritada */
+}
+
+
