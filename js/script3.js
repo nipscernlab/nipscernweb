@@ -27,7 +27,6 @@
     moveAmp: reduceMotion ? 2 : 5,
     moveFreq: 0.00005,
 
-    // meteoro esquerda -> direita
     shootingProb: reduceMotion ? 0.0005 : 0.0012,
     shootingBaseSpeed: 12,
     shootingExtraSpeed: 6,
@@ -171,7 +170,7 @@
 
 // -----------------------------------------------------
 // 2) PUBLICAÇÕES POR ANO (JSON + filtros + busca + fav)
-// (mantido do seu projeto antigo)
+// (mantido para páginas antigas que usam #lista-publicacoes)
 // -----------------------------------------------------
 (function () {
   document.addEventListener("DOMContentLoaded", () => {
@@ -192,7 +191,6 @@
 
     const backBtn = document.querySelector(".back-arrow-btn");
 
-    // Favoritos (persistência)
     const LS_KEY = "nipscern:favorites:v1";
     const readFavs = () => {
       try {
@@ -204,10 +202,9 @@
     const writeFavs = (set) =>
       localStorage.setItem(LS_KEY, JSON.stringify([...set]));
 
-    // Estado
     let lista = [];
-    let tipoAtual = "todos"; // todos | favoritos | congresso | revista | tese
-    let nivelAtual = ""; // tcc | mestrado | doutorado | ""
+    let tipoAtual = "todos";
+    let nivelAtual = "";
     let termoBusca = "";
 
     function setStatus(msg) {
@@ -330,19 +327,16 @@
         const nivel = pub.nivel || "";
         const isFav = pub.id && favs.has(pub.id);
 
-        // filtro tipo
         if (tipoAtual === "favoritos" && !isFav) return false;
         if (tipoAtual !== "todos" && tipoAtual !== "favoritos") {
           if (tipo !== tipoAtual) return false;
         }
 
-        // filtro nível (só em tese)
         if (nivelAtual) {
           if (tipo !== "tese") return false;
           if (nivel !== nivelAtual) return false;
         }
 
-        // busca
         if (!matchesBusca(pub, termoBusca)) return false;
 
         return true;
@@ -354,18 +348,13 @@
     }
 
     function initUI() {
-      // Subfiltros começam SEMPRE escondidos
       mostrarSubfiltros(false);
 
-      // Tipo (Todos / Favoritos / Congresso / Revista / Tese)
       btnTipo.forEach((btn) => {
         btn.addEventListener("click", () => {
           tipoAtual = btn.getAttribute("data-filter-tipo") || "todos";
 
-          // subfiltros só em tese
           mostrarSubfiltros(tipoAtual === "tese");
-
-          // se saiu de tese, zera nível
           if (tipoAtual !== "tese") nivelAtual = "";
 
           marcarAtivoTipo(btn);
@@ -373,13 +362,11 @@
         });
       });
 
-      // Nível (TCC / Mestrado / Doutorado)
       btnNivel.forEach((btn) => {
         btn.addEventListener("click", (ev) => {
           ev.stopPropagation();
           nivelAtual = btn.getAttribute("data-filter-nivel") || "";
 
-          // força tese ativa
           tipoAtual = "tese";
           mostrarSubfiltros(true);
 
@@ -391,7 +378,6 @@
         });
       });
 
-      // Busca
       if (searchEl) {
         searchEl.addEventListener("input", () => {
           termoBusca = (searchEl.value || "").trim();
@@ -399,7 +385,6 @@
         });
       }
 
-      // Voltar
       if (backBtn) {
         backBtn.addEventListener("click", () => window.history.back());
       }
@@ -428,10 +413,7 @@
         }
 
         setStatus("");
-
-        // garante que, ao carregar, continua escondido até clicar em TESE
         mostrarSubfiltros(tipoAtual === "tese");
-
         aplicarFiltros();
       } catch (err) {
         console.error(err);
@@ -445,143 +427,86 @@
   });
 })();
 
-// =========================================
-// Anos — animação de entrada em TODOS os botões
-// =========================================
-(function () {
-  const reduceMotion =
-    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-
-  const yearButtons = Array.from(document.querySelectorAll(".year-btn"));
-  if (!yearButtons.length) return;
-
-  yearButtons.forEach((btn) => btn.classList.remove("is-in"));
-
-  yearButtons.forEach((btn, i) => {
-    if (reduceMotion) {
-      btn.classList.add("is-in");
-      return;
-    }
-    setTimeout(() => btn.classList.add("is-in"), 60 + i * 55);
-  });
-})();
-
-// =========================================
-// ANOS — aplica animação/ glow em TODOS (sem depender de classe)
-// Marca automaticamente itens com texto "####" (ex: 2001, 2025)
-// =========================================
-(function () {
-  const reduceMotion =
-    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-
-  const candidates = Array.from(
-    document.querySelectorAll("a, button, .year, .card, .chip, .pill, div, li")
-  );
-
-  const years = candidates.filter((el) => {
-    const t = (el.textContent || "").trim();
-    if (!/^\d{4}$/.test(t)) return false;
-    const y = Number(t);
-    return y >= 1900 && y <= 2100;
-  });
-
-  if (!years.length) {
-    console.warn("[NIPSCERN] Não encontrei itens de ano (####) para animar.");
-    return;
-  }
-
-  years.forEach((el, i) => {
-    const y = (el.textContent || "").trim();
-    el.setAttribute("data-year", y);
-
-    el.classList.remove("is-in");
-
-    if (reduceMotion) {
-      el.classList.add("is-in");
-    } else {
-      el.style.setProperty("--in-delay", `${60 + i * 55}ms`);
-      requestAnimationFrame(() => el.classList.add("is-in"));
-    }
-  });
-
-  console.log("[NIPSCERN] Animação aplicada em", years.length, "anos.");
-})();
-
 // =====================================================
 // 3) NIPSCERN • HUB de Publicações (filtros + cards)
 //   - Multi-eixo (SAPHO/CERN/SC)
 //   - Tipo, Ano, Busca, Favoritos
 //   - Inicial: mais recentes + "Carregar mais"
-//   - ✅ Puxa JSON legado em /data/*/*.json
+//   - ✅ Puxa JSONs em /data/*/*.json
+//   - ✅ NÃO derruba tudo se 1 JSON falhar
 // =====================================================
 (function () {
   const grid = document.getElementById("pubsGrid");
-  if (!grid) return; // só roda na página que tiver o hub
+  if (!grid) return;
 
-  // ---------- CONFIG ----------
   const PAGE_SIZE = 24;
   const LS_KEY = "nipscern_favs_v1";
 
-  // ---------- DADOS (carregados via JSON) ----------
   let DATA = [];
 
-  // ✅ IMPORTANTE: como seu preview está em /publications/,
-  // usamos caminhos relativos "../data/...".
-  // No site publicado (nipscern.com/publications/), também funciona.
+  // ✅ use caminhos ABSOLUTOS: funcionam no local e no site
   const SOURCES = [
-    "../data/cern/2001.json",
-    "../data/cern/2004.json",
-    "../data/cern/2005.json",
-    "../data/cern/2008.json",
+    "/data/cern/2001.json",
+    "/data/cern/2004.json",
+    "/data/cern/2005.json",
+    "/data/cern/2008.json",
   ];
 
   function resolveHref(path, baseJsonUrl) {
     try {
-      return new URL(path, baseJsonUrl).pathname; // vira "/artigos/pdfs/..."
+      return new URL(path, baseJsonUrl).pathname; // "/artigos/pdfs/..."
     } catch {
       return path;
     }
   }
 
   async function loadPublicacoes() {
-    try {
-      const responses = await Promise.all(
-        SOURCES.map(async (url) => {
-          const res = await fetch(url, { cache: "no-store" });
-          if (!res.ok) throw new Error(`Falha ao carregar ${url} (${res.status})`);
-          const json = await res.json();
-          const baseJsonUrl = new URL(url, window.location.href);
-          return { json, baseJsonUrl };
-        })
-      );
+    // ✅ não usa Promise.all (que derruba tudo)
+    const settled = await Promise.allSettled(
+      SOURCES.map(async (url) => {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`${url} (${res.status})`);
+        const json = await res.json();
+        const baseJsonUrl = new URL(url, window.location.href);
+        return { json, baseJsonUrl, url };
+      })
+    );
 
-      DATA = responses.flatMap(({ json, baseJsonUrl }) => {
-        const eixo = (json.eixo || "").toLowerCase();
-        const anoBase = Number(json.ano || 0);
-        const pubs = Array.isArray(json.publicacoes) ? json.publicacoes : [];
+    const ok = [];
+    const fail = [];
 
-        return pubs.map((p) => ({
-          id: p.id,
-          eixo,
-          tipo: (p.tipo || "").toLowerCase(),
-          ano: Number(p.ano || anoBase),
-          titulo: p.titulo || "Sem título",
-          autores: p.autores || "—",
-          resumo: p.resumo || "",
-          palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
-          veiculo: p.veiculo || "",
-          nivel: p.nivel || null,
-          arquivo: resolveHref(p.arquivo, baseJsonUrl),
-        }));
-      });
+    settled.forEach((r) => {
+      if (r.status === "fulfilled") ok.push(r.value);
+      else fail.push(r.reason);
+    });
 
-    } catch (err) {
-      console.error("Erro ao carregar JSONs do hub:", err);
-      DATA = [];
+    if (fail.length) {
+      console.warn("[HUB] Alguns JSONs falharam (vou ignorar e seguir):", fail);
     }
+
+    DATA = ok.flatMap(({ json, baseJsonUrl }) => {
+      const eixo = (json.eixo || "").toLowerCase();
+      const anoBase = Number(json.ano || 0);
+      const pubs = Array.isArray(json.publicacoes) ? json.publicacoes : [];
+
+      return pubs.map((p) => ({
+        id: p.id,
+        eixo,
+        tipo: (p.tipo || "").toLowerCase(),
+        ano: Number(p.ano || anoBase),
+        titulo: p.titulo || "Sem título",
+        autores: p.autores || "—",
+        resumo: p.resumo || "",
+        palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
+        veiculo: p.veiculo || "",
+        nivel: p.nivel || null,
+        arquivo: resolveHref(p.arquivo, baseJsonUrl),
+      }));
+    });
+
+    console.log("[HUB] Total de publicações carregadas:", DATA.length);
   }
 
-  // ---------- ELEMENTOS ----------
   const eixoWrap = document.getElementById("filterEixo");
   const tipoWrap = document.getElementById("filterTipo");
   const yearSelect = document.getElementById("yearSelect");
@@ -590,17 +515,20 @@
   const resultsMeta = document.getElementById("resultsMeta");
   const loadMoreBtn = document.getElementById("loadMoreBtn");
 
-  // ---------- FAVORITOS ----------
   const loadFavs = () => {
-    try { return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]")); }
-    catch { return new Set(); }
+    try {
+      return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]"));
+    } catch {
+      return new Set();
+    }
   };
-  const saveFavs = (set) => localStorage.setItem(LS_KEY, JSON.stringify([...set]));
+  const saveFavs = (set) =>
+    localStorage.setItem(LS_KEY, JSON.stringify([...set]));
+
   let favs = loadFavs();
 
-  // ---------- ESTADO ----------
   let state = {
-    eixos: new Set(["all"]),  // multi seleção
+    eixos: new Set(["all"]),
     tipo: "all",
     ano: "all",
     q: "",
@@ -608,11 +536,11 @@
     limit: PAGE_SIZE,
   };
 
-  // ---------- HELPERS ----------
   const norm = (s) =>
     (s || "")
       .toString()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
 
   function getEixosActive() {
@@ -625,8 +553,8 @@
     if (active && !active.has(item.eixo)) return false;
 
     if (state.tipo !== "all" && item.tipo !== state.tipo) return false;
-
-    if (state.ano !== "all" && String(item.ano) !== String(state.ano)) return false;
+    if (state.ano !== "all" && String(item.ano) !== String(state.ano))
+      return false;
 
     if (state.favOnly && !favs.has(item.id)) return false;
 
@@ -637,7 +565,6 @@
       );
       if (!hay.includes(q)) return false;
     }
-
     return true;
   }
 
@@ -648,25 +575,19 @@
   function cardHTML(item) {
     const isFav = favs.has(item.id);
 
-    const resumoHTML = item.resumo
-      ? `<p class="pub-resumo">${item.resumo}</p>`
-      : "";
-
-    const veicHTML = item.veiculo
-      ? `<p class="pub-veic">${item.veiculo}</p>`
-      : "";
-
-    const kw = (item.palavrasChave || []).slice(0, 4);
-    const kwHTML = kw.length
-      ? `<div class="pub-kw">${kw.map(k => `<span class="kw">${k}</span>`).join("")}</div>`
-      : "";
+    const resumoHTML = item.resumo ? `<p class="pub-resumo">${item.resumo}</p>` : "";
+    const veicHTML = item.veiculo ? `<p class="pub-veic">${item.veiculo}</p>` : "";
 
     return `
       <article class="pub-card" data-id="${item.id}">
         <div class="pub-top">
           <span class="pub-badge">${badge(item)}</span>
-          <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button" aria-label="Favoritar" title="Favoritar">
-            <i class="fa-solid fa-star"></i>
+
+          <!-- ⭐ sempre visível; só fica amarela quando is-fav -->
+          <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button"
+            aria-label="Favoritar" aria-pressed="${isFav ? "true" : "false"}"
+            title="Favoritar">
+            <i class="${isFav ? "fa-solid fa-star" : "fa-regular fa-star"}"></i>
           </button>
         </div>
 
@@ -674,7 +595,6 @@
         <p class="pub-meta">${item.autores}</p>
         ${veicHTML}
         ${resumoHTML}
-        ${kwHTML}
 
         <div class="pub-actions">
           <a class="pub-open" href="${item.arquivo}" target="_blank" rel="noopener">Abrir PDF</a>
@@ -684,7 +604,7 @@
   }
 
   function setActiveChips(container, attr, activeValue) {
-    container.querySelectorAll(`[${attr}]`).forEach(btn => {
+    container.querySelectorAll(`[${attr}]`).forEach((btn) => {
       const v = btn.getAttribute(attr);
       btn.classList.toggle("is-active", v === activeValue);
     });
@@ -692,49 +612,69 @@
 
   function syncEixoChipsUI() {
     const btns = eixoWrap.querySelectorAll("[data-eixo]");
-    btns.forEach(btn => {
+    btns.forEach((btn) => {
       const v = btn.getAttribute("data-eixo");
       btn.classList.toggle("is-active", state.eixos.has(v));
     });
   }
 
   function populateYears() {
-    const years = Array.from(new Set(DATA.map(d => d.ano))).sort((a,b) => b-a);
-    yearSelect.innerHTML = `<option value="all">Todos</option>` +
-      years.map(y => `<option value="${y}">${y}</option>`).join("");
+    const years = Array.from(new Set(DATA.map((d) => d.ano))).sort((a, b) => b - a);
+    yearSelect.innerHTML =
+      `<option value="all">Todos</option>` +
+      years.map((y) => `<option value="${y}">${y}</option>`).join("");
   }
 
   function render() {
+    if (!DATA.length) {
+      resultsMeta.textContent = "Mostrando 0 de 0 resultado(s)";
+      grid.innerHTML = `
+        <div class="no-results">
+          Nenhuma publicação foi carregada. <br/>
+          Verifique se os arquivos existem em <code>/data/...</code>.
+        </div>
+      `;
+      loadMoreBtn.style.display = "none";
+      return;
+    }
+
     const filtered = DATA
       .filter(matches)
-      .sort((a,b) => (b.ano - a.ano) || (norm(a.titulo).localeCompare(norm(b.titulo))));
+      .sort(
+        (a, b) => (b.ano - a.ano) || norm(a.titulo).localeCompare(norm(b.titulo))
+      );
 
     const visible = filtered.slice(0, state.limit);
 
     resultsMeta.textContent = `Mostrando ${visible.length} de ${filtered.length} resultado(s)`;
 
-    grid.innerHTML = visible.map(cardHTML).join("") || `
-      <div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>
-    `;
+    grid.innerHTML =
+      visible.map(cardHTML).join("") ||
+      `<div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>`;
 
-    loadMoreBtn.style.display = filtered.length > visible.length ? "inline-flex" : "none";
+    loadMoreBtn.style.display =
+      filtered.length > visible.length ? "inline-flex" : "none";
 
-    grid.querySelectorAll(".fav-btn").forEach(btn => {
+    grid.querySelectorAll(".fav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const card = btn.closest(".pub-card");
         const id = card.getAttribute("data-id");
+        if (!id) return;
+
         if (favs.has(id)) favs.delete(id);
         else favs.add(id);
+
         saveFavs(favs);
+        state.limit = Math.max(state.limit, PAGE_SIZE);
         render();
       });
     });
   }
 
-  // ---------- EVENTOS ----------
   eixoWrap.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-eixo]");
     if (!btn) return;
+
     const v = btn.getAttribute("data-eixo");
 
     if (v === "all") {
@@ -787,8 +727,7 @@
     render();
   });
 
-  // Clique no Venn para filtrar e rolar
-  document.querySelectorAll(".diagram.venn [data-id]").forEach(el => {
+  document.querySelectorAll(".diagram.venn [data-id]").forEach((el) => {
     el.addEventListener("click", (ev) => {
       ev.preventDefault();
       const eixo = el.getAttribute("data-id");
@@ -807,7 +746,7 @@
     });
   });
 
-  document.querySelectorAll(".intersection.sc a").forEach(el => {
+  document.querySelectorAll(".intersection.sc a").forEach((el) => {
     el.addEventListener("click", (ev) => {
       ev.preventDefault();
       const eixo = "sc";
@@ -825,7 +764,6 @@
     });
   });
 
-  // ---------- INICIALIZA ----------
   (async function initHub() {
     await loadPublicacoes();
     populateYears();
@@ -833,31 +771,4 @@
     setActiveChips(tipoWrap, "data-tipo", state.tipo);
     render();
   })();
-
 })();
-
-
-
-function cardHTML(item) {
-  const isFav = favs.has(item.id);
-
-  return `
-    <article class="pub-card" data-id="${item.id}">
-      <div class="pub-top">
-        <span class="pub-badge">${badge(item)}</span>
-
-        <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button" aria-label="Favoritar" title="Favoritar">
-          <i class="${isFav ? "fa-solid fa-star" : "fa-regular fa-star"}"></i>
-        </button>
-      </div>
-
-      <h3 class="pub-title">${item.titulo}</h3>
-      <p class="pub-meta">${item.autores}</p>
-
-      <div class="pub-actions">
-        <a class="pub-open" href="${item.arquivo}" target="_blank" rel="noopener">Abrir PDF</a>
-      </div>
-    </article>
-  `;
-}
-
