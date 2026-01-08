@@ -3277,4 +3277,256 @@ left: 45% !important; } /* <<< mais overlap (fica mais bonito) */
   color: #ffd36a !important; /* amarela quando favoritada */
 }
 
+/* ===========================
+   FIX HUB / CARDS (publications)
+   =========================== */
 
+/* 1) Não travar o scroll da página */
+html, body {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* 2) Canvas de estrelas sempre no fundo e não "clica" */
+#stars {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 3) Conteúdo acima do canvas */
+.header,
+main,
+#pubs,
+.footer {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* 4) HUB e grid visíveis */
+#pubs {
+  display: block !important;
+}
+
+.pubs-grid {
+  position: relative !important;
+  z-index: 6 !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important; /* 1 card por linha (como você queria) */
+  gap: 18px !important;
+  margin-top: 18px !important;
+}
+
+/* 5) Card ocupando a largura certinha */
+.pub-card {
+  width: 100% !important;
+  max-width: 1040px;
+  margin: 0 auto !important;
+}
+
+/* 6) Estrelinha sempre visível, mas só fica amarela quando favoritado */
+.pub-card .fav-btn {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.pub-card .fav-btn i {
+  color: rgba(233,236,255,.75) !important; /* “apagada” padrão */
+}
+
+.pub-card .fav-btn.is-fav i {
+  color: #ffcc33 !important; /* amarela ao clicar (favorito) */
+}
+
+/* ===========================
+   FIX HUB / CARDS (publications)
+   =========================== */
+
+/* 1) Não travar o scroll da página */
+html, body {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* 2) Canvas de estrelas sempre no fundo e não "clica" */
+#stars {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 3) Conteúdo acima do canvas */
+.header,
+main,
+#pubs,
+.footer {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* 4) HUB e grid visíveis */
+#pubs {
+  display: block !important;
+}
+
+.pubs-grid {
+  position: relative !important;
+  z-index: 6 !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important; /* 1 card por linha (como você queria) */
+  gap: 18px !important;
+  margin-top: 18px !important;
+}
+
+/* 5) Card ocupando a largura certinha */
+.pub-card {
+  width: 100% !important;
+  max-width: 1040px;
+  margin: 0 auto !important;
+}
+
+/* 6) Estrelinha sempre visível, mas só fica amarela quando favoritado */
+.pub-card .fav-btn {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.pub-card .fav-btn i {
+  color: rgba(233,236,255,.75) !important; /* “apagada” padrão */
+}
+
+.pub-card .fav-btn.is-fav i {
+  color: #ffcc33 !important; /* amarela ao clicar (favorito) */
+}
+
+
+/* ===== FIX DEFINITIVO: CARDS VISÍVEIS ===== */
+
+.pubs-hub {
+  overflow: visible !important;
+}
+
+.pubs-grid {
+  min-height: 1px !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.pub-card {
+  position: relative !important;
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+
+/* ===== FIX DEFINITIVO: CARDS VISÍVEIS ===== */
+
+.pubs-hub {
+  overflow: visible !important;
+}
+
+.pubs-grid {
+  min-height: 1px !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.pub-card {
+  position: relative !important;
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+
+/* ================================
+   HUB — 1 CARD POR LINHA
+================================ */
+.pubs-grid{
+  display: grid !important;
+  grid-template-columns: 1fr !important; /* 1 coluna */
+  gap: 16px !important;
+  width: min(920px, 100%) !important;    /* largura boa no desktop */
+  margin: 0 auto !important;            /* centraliza */
+}
+
+/* garante que o card ocupa a linha toda */
+.pub-card{
+  width: 100% !important;
+}
+
+
+/* ================================
+   HUB — 1 CARD POR LINHA
+================================ */
+.pubs-grid{
+  display: grid !important;
+  grid-template-columns: 1fr !important; /* 1 coluna */
+  gap: 16px !important;
+  width: min(920px, 100%) !important;    /* largura boa no desktop */
+  margin: 0 auto !important;            /* centraliza */
+}
+
+/* garante que o card ocupa a linha toda */
+.pub-card{
+  width: 100% !important;
+}
+
+/* ================================
+   HUB — FAVORITO (estrela)
+   - sempre aparece
+   - só fica amarela quando "is-fav"
+================================ */
+.pub-card .fav-btn{
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+/* cor padrão (não favoritado) */
+.pub-card .fav-btn i{
+  color: rgba(233, 236, 255, 0.75) !important; /* “branquinho” */
+}
+
+/* quando favoritado */
+.pub-card .fav-btn.is-fav i{
+  color: #f5c542 !important; /* amarelo */
+}
+
+/* se existir CSS antigo que só mostrava no hover, mata ele */
+.pub-card:hover .fav-btn{
+  opacity: 1 !important;
+}
+
+/* ================================
+   HUB — FAVORITO (estrela)
+   - sempre aparece
+   - só fica amarela quando "is-fav"
+================================ */
+.pub-card .fav-btn{
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+/* cor padrão (não favoritado) */
+.pub-card .fav-btn i{
+  color: rgba(233, 236, 255, 0.75) !important; /* “branquinho” */
+}
+
+/* quando favoritado */
+.pub-card .fav-btn.is-fav i{
+  color: #f5c542 !important; /* amarelo */
+}
+
+/* se existir CSS antigo que só mostrava no hover, mata ele */
+.pub-card:hover .fav-btn{
+  opacity: 1 !important;
+}
