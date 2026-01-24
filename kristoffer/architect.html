@@ -1,0 +1,3234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Architect: Omniscient Edition</title>
+    
+    <link rel="icon" href="/assets/icons/architecture_128.svg" type="image/svg+xml" sizes="128x128">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
+
+<style>
+    :root {
+        --bg-body: #050505;
+        --bg-card: #0f0f0f;
+        --bg-card-hover: #141414;
+        --border: #2a2a2a;
+        --gold: #c5a059;
+        --gold-dim: #7a6335;
+        --gold-glow: rgba(197, 160, 89, 0.15);
+        --text-main: #e0e0e0;
+        --text-muted: #888;
+        --logic-accent: #4a6fa5;
+        --culture-accent: #a54a4a;
+        --success: #2e7d32;
+
+        /* Tag Colors - Root Variables */
+        --tag-book: #3d4c53;
+        --tag-paper: #533d3d;
+        --tag-art: #534b3d;
+        --tag-music: #4a3d53;
+        --tag-film: #3d534f;
+        --tag-place: #2e2e2e;
+        --tag-arch: #53453d;
+        --tag-nature: #2e5e38;
+        --tag-poetry: #5b3d53; /* Nova */
+        --tag-doc: #3d5351;    /* Nova */
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+        overflow-x: hidden;
+        background-image: radial-gradient(circle at top center, #1a1a1a 0%, #050505 60%);
+    }
+
+    #viewport {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        overflow-y: auto; /* Permitir scroll */
+        overflow-x: hidden;
+    }
+
+    #content {
+        padding-bottom: 150px;
+        will-change: transform;
+    }
+
+    h1, h2, h3 { font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
+    .serif { font-family: 'Cormorant Garamond', serif; }
+    
+    header {
+        height: 90vh;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        text-align: center;
+        padding: 2rem;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+    }
+
+    .hero-title {
+        font-size: clamp(3rem, 6vw, 6rem);
+        background: linear-gradient(to bottom, #fff, var(--gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 40px var(--gold-glow);
+        margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.4rem; color: var(--text-muted);
+        max-width: 700px; margin-bottom: 3rem;
+        font-style: italic;
+    }
+
+    /* HUD Stats */
+    .hud {
+        display: flex; gap: 2rem;
+        padding: 1rem 3rem;
+        background: rgba(20,20,20,0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        margin-top: 2rem;
+    }
+
+    .hud-item { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
+    .hud-num { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold); }
+    .hud-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: #666; margin-top: 5px; }
+
+    .container { max-width: 1600px; margin: 0 auto; padding: 4rem 2rem; }
+
+    /* Year Blocks */
+    .year-block {
+        margin-bottom: 8rem;
+        position: relative;
+    }
+
+    .year-header {
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 4rem; gap: 1.5rem;
+    }
+    
+    .year-num {
+        font-family: 'Cinzel', serif; font-size: 4.5rem;
+        color: transparent; -webkit-text-stroke: 1px var(--gold-dim);
+        opacity: 0.4;
+    }
+    
+    .year-title { font-size: 2.2rem; color: var(--text-main); text-align: center; }
+
+    /* Grid Layout */
+    .parallel-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        position: relative;
+    }
+
+    .parallel-grid::after {
+        content: ''; position: absolute;
+        top: 0; bottom: 0; left: 50%; width: 1px;
+        background: linear-gradient(to bottom, transparent, var(--border), transparent);
+    }
+
+    .col-header {
+        display: flex; align-items: center; gap: 1rem;
+        margin-bottom: 2rem; padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .col-header i { font-size: 1.2rem; }
+    .col-logic { color: var(--logic-accent); border-color: rgba(74, 111, 165, 0.3); }
+    .col-culture { color: var(--culture-accent); border-color: rgba(165, 74, 74, 0.3); }
+    .col-title { font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 0.1em; }
+
+    /* Cards */
+    .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 1.2rem; margin-bottom: 1.2rem;
+        border-radius: 4px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative; overflow: hidden;
+        display: flex; gap: 1.2rem; align-items: flex-start;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        border-color: var(--gold-dim);
+        background: var(--bg-card-hover);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    /* Checkbox System */
+    .check-circle {
+        min-width: 22px; height: 22px;
+        border: 2px solid #333; border-radius: 50%;
+        margin-top: 4px;
+        display: grid; place-items: center;
+        transition: 0.3s;
+        background: transparent;
+    }
+
+    .card.completed { border-color: var(--success); opacity: 0.7; }
+    .card.completed .check-circle { background: var(--success); border-color: var(--success); }
+    
+    .check-circle::after { 
+        content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; 
+        color: #fff; font-size: 10px; opacity: 0; transform: scale(0); transition: 0.2s; 
+    }
+    .card.completed .check-circle::after { opacity: 1; transform: scale(1); }
+
+    .card-content { flex: 1; }
+    
+    /* Tags Styling */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .tag {
+        font-size: 0.65rem; padding: 2px 8px; border-radius: 3px; 
+        font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    
+    .tag-book { background: var(--tag-book); color: #b0c4de; }
+    .tag-paper { background: var(--tag-paper); color: #deb0b0; }
+    .tag-art { background: var(--tag-art); color: #ded6b0; }
+    .tag-music { background: var(--tag-music); color: #cbb0de; }
+    .tag-film { background: var(--tag-film); color: #b0dec6; }
+    .tag-place { background: var(--tag-place); color: #aaa; border: 1px solid #444; }
+    .tag-arch { background: var(--tag-arch); color: #decab0; }
+    .tag-nature { background: var(--tag-nature); color: #b0deb6; }
+    .tag-poetry { background: var(--tag-poetry); color: #e1b0de; }
+    .tag-doc { background: var(--tag-doc); color: #b0decc; }
+
+    /* Card Typography */
+    .card-title { font-size: 1.05rem; color: #fff; margin-bottom: 2px; line-height: 1.3; font-weight: 600; }
+    .card-author { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px; }
+    .card-desc { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: #999; line-height: 1.4; }
+
+    /* Toast Notification */
+    #toast {
+        visibility: hidden; min-width: 280px;
+        background-color: #121212; color: var(--gold); border: 1px solid var(--gold);
+        text-align: center; border-radius: 4px; padding: 18px;
+        position: fixed; z-index: 1000; left: 50%; bottom: 30px;
+        transform: translateX(-50%);
+        font-family: 'Cinzel', serif; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        opacity: 0; transition: all 0.5s ease;
+    }
+    #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+    /* Modal / Progression Screen */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.97); z-index: 2000;
+        display: flex; justify-content: center; align-items: center;
+        opacity: 0; pointer-events: none; transition: 0.8s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .modal-content {
+        text-align: center; max-width: 650px; padding: 3rem;
+        transform: translateY(30px); transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+
+    .modal-year { font-family: 'Cinzel', serif; font-size: 1.6rem; color: var(--gold); margin-bottom: 1rem; letter-spacing: 0.3em; }
+    .modal-quote { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-style: italic; color: #fff; margin-bottom: 2.5rem; line-height: 1.4; }
+    .modal-btn {
+        background: transparent; border: 1px solid var(--gold); color: var(--gold);
+        padding: 12px 40px; font-family: 'Inter', sans-serif; cursor: pointer;
+        transition: 0.3s; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem;
+    }
+    .modal-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 25px var(--gold-glow); }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .container { padding: 2rem 1rem; }
+        .parallel-grid { gap: 2rem; }
+    }
+
+    @media (max-width: 768px) {
+        header { height: auto; padding: 6rem 1rem; }
+        .hero-title { font-size: 3.2rem; }
+        .parallel-grid { grid-template-columns: 1fr; gap: 3rem; }
+        .parallel-grid::after { display: none; }
+        .hud { flex-direction: column; gap: 1rem; border-radius: 20px; padding: 1.5rem; }
+        .year-header { flex-direction: column; text-align: center; }
+        .year-num { font-size: 3.5rem; margin-bottom: -10px; }
+    }
+</style>
+</head>
+<body>
+
+<div id="viewport">
+    <div id="content">
+
+        <header>
+            <h1 class="hero-title">THE ARCHITECT</h1>
+            <p class="hero-subtitle serif">"A synthesis of Logic, Nature, and Culture. A six-year construction of the complete mind."</p>
+            
+            <div class="hud">
+                <div class="hud-item">
+                    <span class="hud-num" id="stat-logic">0/0</span>
+                    <span class="hud-label">Logic</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-num" id="stat-culture">0/0</span>
+                    <span class="hud-label">Culture</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-num" id="stat-percent">0%</span>
+                    <span class="hud-label">Total</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+
+            <!-- YEAR I -->
+<div class="year-block" id="year-1">
+    <div class="year-header">
+        <span class="year-num">I</span>
+        <h2 class="year-title">Origins, Myth & The Foundations of Reason</h2>
+    </div>
+    <div class="parallel-grid">
+        
+        <!-- COLUMN: LOGIC -->
+        <div class="col">
+            <div class="col-header col-logic">
+                <i class="fa-solid fa-brain"></i>
+                <span class="col-title">Logic (Trivium)</span>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">An Introduction to Formal Logic</div>
+                    <span class="card-author">Peter Smith</span>
+                    <div class="card-desc">Propositional & predicate logic syntax. Foundation of all formal reasoning.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Organon (Categories, Prior Analytics)</div>
+                    <span class="card-author">Aristotle</span>
+                    <div class="card-desc">Classification and syllogistic reasoning. Western logic begins here.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                    <div class="card-title">Stoic Logic Fragments</div>
+                    <span class="card-author">Chrysippus</span>
+                    <div class="card-desc">Early propositional logic. Conditional reasoning before Boole.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Art of Rhetoric</div>
+                    <span class="card-author">Aristotle</span>
+                    <div class="card-desc">Persuasion, argumentation, practical reasoning.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Nyaya Sutras</div>
+                    <span class="card-author">Akshapada Gautama</span>
+                    <div class="card-desc">Indian logic basics. Inference, comparison, and testimony.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Materials For the Study of Navya-Nyaya Logic</div>
+                    <span class="card-author">Daniel H. H. Ingalls</span>
+                    <div class="card-desc">Technical exposition of Navya-Nyaya. Expands the scope of general logic.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">A Rulebook for Arguments</div>
+                    <span class="card-author">Anthony Weston</span>
+                    <div class="card-desc">Critical thinking handbook. Essential for detecting fallacies and constructing solid arguments.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">An Introduction to Non-Classical Logic</div>
+                    <span class="card-author">Graham Priest</span>
+                    <div class="card-desc">Paraconsistent, relevant, fuzzy, intuitionistic logic. Prepares for diverse logical systems.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Escher on Escher: Exploring the Infinite</div>
+                    <span class="card-author">M.C. Escher</span>
+                    <div class="card-desc">Paradox, tessellation, and the visualization of infinity. First-person insights into mathematical art.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- COLUMN: CULTURE & NATURE -->
+        <div class="col">
+            <div class="col-header col-culture">
+                <i class="fa-solid fa-eye"></i>
+                <span class="col-title">Culture & Nature</span>
+            </div>
+            
+            <!-- BOOKS -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Sapiens: A Brief History of Humankind</div>
+                    <span class="card-author">Yuval Noah Harari</span>
+                    <div class="card-desc">70,000 years of human history. Sets context for all cultural study.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Story of Art</div>
+                    <span class="card-author">E.H. Gombrich</span>
+                    <div class="card-desc">Visual culture from caves to modernity. Definitive art history.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Cosmos</div>
+                    <span class="card-author">Carl Sagan</span>
+                    <div class="card-desc">Astronomy and the history of science. Our place in the universe.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">A Short History of Nearly Everything</div>
+                    <span class="card-author">Bill Bryson</span>
+                    <div class="card-desc">Geology, paleontology, archaeology. Earth's 4.5 billion years.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Five Kingdoms: An Illustrated Guide to the Phyla of Life on Earth</div>
+                    <span class="card-author">Lynn Margulis & Karlene V. Schwartz</span>
+                    <div class="card-desc">Taxonomy of life. Bacteria to humans.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Popol Vuh</div>
+                    <span class="card-author">K'iche' Maya</span>
+                    <div class="card-desc">Mayan creation myth and cosmology. Non-Western worldview.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Epic of Gilgamesh</div>
+                    <span class="card-author">Anonymous</span>
+                    <div class="card-desc">Oldest written story. Friendship, mortality, meaning.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Bhagavad Gita</div>
+                    <span class="card-author">Vyasa</span>
+                    <div class="card-desc">Hindu philosophy. Duty, action, spirituality.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Iliad</div>
+                    <span class="card-author">Homer</span>
+                    <div class="card-desc">Foundational Western epic. War, heroism, rage.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Odyssey</div>
+                    <span class="card-author">Homer</span>
+                    <div class="card-desc">Journey, cunning, homecoming. The archetypal hero's journey.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Tao Te Ching</div>
+                    <span class="card-author">Lao Tzu</span>
+                    <div class="card-desc">Eastern dialectics. Flow, paradox, natural order.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Analects</div>
+                    <span class="card-author">Confucius</span>
+                    <div class="card-desc">Social order, duty, ritual, righteous life.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Essential Rumi</div>
+                    <span class="card-author">Rumi</span>
+                    <div class="card-desc">Persian Sufi poetry. Ecstasy and divine love.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Shi Jing (Book of Songs)</div>
+                    <span class="card-author">Various (China)</span>
+                    <div class="card-desc">Ancient Chinese poetry. Daily life, court, nature.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Indigenous Poetry: Dreamtime Songs</div>
+                    <span class="card-author">Aboriginal Australia</span>
+                    <div class="card-desc">Oral tradition. Land as a living narrative.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Poetic Edda</div>
+                    <span class="card-author">Anonymous (Iceland)</span>
+                    <div class="card-desc">Norse mythology and cosmology. Gods, giants, fate.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Beowulf</div>
+                    <span class="card-author">Anonymous (Anglo-Saxon)</span>
+                    <div class="card-desc">Old English epic. Monsters, honor, mortality.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Kalevala</div>
+                    <span class="card-author">Elias Lönnrot (Finland)</span>
+                    <div class="card-desc">Finnish national epic. Shamanic magic and creation myths.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Prose Edda</div>
+                    <span class="card-author">Snorri Sturluson (Iceland)</span>
+                    <div class="card-desc">Norse mythological handbook. Cosmology and poetic tradition.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Völuspá</div>
+                    <span class="card-author">Anonymous (Norse)</span>
+                    <div class="card-desc">The prophecy of the seeress. Creation to Ragnarök.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Hávamál</div>
+                    <span class="card-author">Anonymous (Norse)</span>
+                    <div class="card-desc">Odin's wisdom poetry. Ethical and practical advice.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Enuma Elish</div>
+                    <span class="card-author">Babylonian</span>
+                    <div class="card-desc">Mesopotamian creation myth. Cosmic order from chaos.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">The Book of the Dead</div>
+                    <span class="card-author">Ancient Egypt</span>
+                    <div class="card-desc">Egyptian funerary texts. Journey through the afterlife.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Kojiki</div>
+                    <span class="card-author">O no Yasumaro (Japan)</span>
+                    <div class="card-desc">Japanese creation myths and Shinto cosmology.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Ramayana</div>
+                    <span class="card-author">Valmiki</span>
+                    <div class="card-desc">Hindu epic. Dharma, devotion, and righteous kingship.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Mahabharata (selections)</div>
+                    <span class="card-author">Vyasa</span>
+                    <div class="card-desc">World's longest epic. War, duty, complexity of dharma.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Sundiata: An Epic of Old Mali</div>
+                    <span class="card-author">Djeli Mamoudou Kouyaté</span>
+                    <div class="card-desc">West African oral epic. The Lion King of Mali.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="card-title">Mwindo Epic</div>
+                    <span class="card-author">Nyanga people (Congo)</span>
+                    <div class="card-desc">Central African hero epic. Magic and transformation.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Inuit Traditional Songs</div>
+                    <span class="card-author">Various</span>
+                    <div class="card-desc">Arctic oral poetry. Nature, spirits, survival.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Navajo Creation Story</div>
+                    <span class="card-author">Diné tradition</span>
+                    <div class="card-desc">Emergence narrative. Sacred geography of the Southwest.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-poetry">POETRY</span></div>
+                    <div class="card-title">Aztec Poetry: Nezahualcoyotl</div>
+                    <span class="card-author">Nahuatl poetry</span>
+                    <div class="card-desc">Impermanence and beauty.</div>
+                </div>
+            </div>
+
+            <!-- DOCUMENTARIES -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">Cave of Forgotten Dreams (2010)</div>
+                    <span class="card-author">Werner Herzog</span>
+                    <div class="card-desc">Chauvet Cave paintings. 32,000-year-old art and human consciousness.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">The Story of India (2007)</div>
+                    <span class="card-author">Michael Wood (BBC)</span>
+                    <div class="card-desc">10,000 years of Indian civilization. Comprehensive cultural survey.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">Africa (2013)</div>
+                    <span class="card-author">David Attenborough (BBC)</span>
+                    <div class="card-desc">Natural history as cultural context. Biodiversity and human origins.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">First Peoples (2015)</div>
+                    <span class="card-author">PBS</span>
+                    <div class="card-desc">Human migration out of Africa. Archaeological and genetic evidence.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">The Ascent of Man (1973)</div>
+                    <span class="card-author">Jacob Bronowski (BBC)</span>
+                    <div class="card-desc">Science and human cultural evolution. Classic series.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">Civilisations (2018)</div>
+                    <span class="card-author">BBC</span>
+                    <div class="card-desc">Global art history. Non-Eurocentric perspective.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-doc">DOCUMENTARY</span></div>
+                    <div class="card-title">The Power of Myth (1988)</div>
+                    <span class="card-author">Joseph Campbell & Bill Moyers</span>
+                    <div class="card-desc">Comparative mythology. Universal patterns in human stories.</div>
+                </div>
+            </div>
+
+            <!-- ART -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Lascaux & Altamira Caves</div>
+                    <span class="card-author">Prehistoric (~17,000 BCE)</span>
+                    <div class="card-desc">Birth of symbolic representation. Earliest human art.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Chauvet Cave</div>
+                    <span class="card-author">Prehistoric (~30,000 BCE)</span>
+                    <div class="card-desc">Oldest known cave paintings. Sophisticated artistic technique.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Terracotta Army</div>
+                    <span class="card-author">Qin Dynasty</span>
+                    <div class="card-desc">8,000 life-sized warriors. Individuality within mass.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">The Parthenon Marbles</div>
+                    <span class="card-author">Phidias</span>
+                    <div class="card-desc">Classical Greek sculpture. Idealized human form.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Olmec Colossal Heads</div>
+                    <span class="card-author">Mesoamerica</span>
+                    <div class="card-desc">Massive stone sculptures. First major Mesoamerican civilization.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Moai Statues</div>
+                    <span class="card-author">Rapa Nui (Easter Island)</span>
+                    <div class="card-desc">Monolithic human figures. Polynesian ancestor worship.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Aboriginal Rock Art (Kakadu)</div>
+                    <span class="card-author">Aboriginal Australia</span>
+                    <div class="card-desc">20,000+ years of continuous artistic tradition.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Bradshaw Paintings (Gwion Gwion)</div>
+                    <span class="card-author">Aboriginal Australia</span>
+                    <div class="card-desc">Ancient rock art. Mysterious figures in elaborate dress.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Nazca Lines</div>
+                    <span class="card-author">Peru</span>
+                    <div class="card-desc">Giant geoglyphs. Astronomical and ceremonial purposes.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Venus of Willendorf</div>
+                    <span class="card-author">Paleolithic</span>
+                    <div class="card-desc">Fertility figurine. Universal symbol of the feminine.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Lion Man of Hohlenstein-Stadel</div>
+                    <span class="card-author">Paleolithic Germany</span>
+                    <div class="card-desc">Oldest known zoomorphic sculpture. 40,000 years old.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Rock Art of Alta</div>
+                    <span class="card-author">Norway</span>
+                    <div class="card-desc">6,000 petroglyphs. Stone Age Nordic life and spirituality.</div>
+                </div>
+            </div>
+
+            <!-- PLACES & ARCHITECTURE -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-place">PLACE</span></div>
+                    <div class="card-title">Göbekli Tepe</div>
+                    <span class="card-author">Turkey</span>
+                    <div class="card-desc">World's oldest temple complex. Pre-agricultural religious site.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Stonehenge</div>
+                    <span class="card-author">Neolithic Britain</span>
+                    <div class="card-desc">Astronomical alignment and communal ritual.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Machu Picchu</div>
+                    <span class="card-author">Inca Empire</span>
+                    <div class="card-desc">Sacred geography and engineering marvel.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Newgrange</div>
+                    <span class="card-author">Neolithic Ireland</span>
+                    <div class="card-desc">Passage tomb. Winter solstice illumination chamber.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Great Pyramid of Giza</div>
+                    <span class="card-author">Ancient Egypt</span>
+                    <div class="card-desc">Mathematical precision and monumental ambition.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Ziggurat of Ur</div>
+                    <span class="card-author">Mesopotamia</span>
+                    <div class="card-desc">Temple tower. Connection between earth and heaven.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Borobudur</div>
+                    <span class="card-author">Java, Indonesia</span>
+                    <div class="card-desc">Largest Buddhist temple. Mandala in stone.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Chichen Itza</div>
+                    <span class="card-author">Maya civilization</span>
+                    <div class="card-desc">Astronomical observatory and ceremonial center.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Great Wall of China</div>
+                    <span class="card-author">Various dynasties</span>
+                    <div class="card-desc">Defensive fortification. Symbol of Chinese civilization.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Cliff Palace</div>
+                    <span class="card-author">Ancestral Puebloans (Mesa Verde)</span>
+                    <div class="card-desc">Indigenous North American cliff dwellings.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Urnes Stave Church</div>
+                    <span class="card-author">Norway (12th century)</span>
+                    <div class="card-desc">Wooden medieval church. Viking-Christian synthesis.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                    <div class="card-title">Borgund Stave Church</div>
+                    <span class="card-author">Norway</span>
+                    <div class="card-desc">Best preserved stave church. Dragon-head ornaments.</div>
+                </div>
+            </div>
+
+            <!-- MUSIC -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Gregorian Chant</div>
+                    <span class="card-author">Medieval</span>
+                    <div class="card-desc">Monophonic sacred contemplation. Foundation of Western notation.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Cello Suites</div>
+                    <span class="card-author">Johann Sebastian Bach</span>
+                    <div class="card-desc">Baroque perfection. Mathematical beauty in sound.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Traditional Gamelan</div>
+                    <span class="card-author">Java/Bali</span>
+                    <div class="card-desc">Non-linear, cyclical musical structures.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Didgeridoo & Songlines</div>
+                    <span class="card-author">Aboriginal Australia</span>
+                    <div class="card-desc">Sonic mapping of ancestral journeys.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Throat Singing</div>
+                    <span class="card-author">Tuva/Mongolia</span>
+                    <div class="card-desc">Harmonic overtones and nature mimicry.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Gregorian Chant: Missa de Angelis</div>
+                    <span class="card-author">Medieval liturgy</span>
+                    <div class="card-desc">Sacred polyphony and modal harmony.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Kulning</div>
+                    <span class="card-author">Swedish herding calls</span>
+                    <div class="card-desc">Female vocal tradition. Calling cattle in mountains.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Hardanger Fiddle</div>
+                    <span class="card-author">Norwegian folk</span>
+                    <div class="card-desc">Sympathetic strings. Dance music of rural Norway.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Lur</div>
+                    <span class="card-author">Nordic Bronze Age</span>
+                    <div class="card-desc">Ancient bronze horns. Ritual and ceremonial music.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Sami Joik</div>
+                    <span class="card-author">Indigenous Sami people</span>
+                    <div class="card-desc">Spiritual singing tradition. Person, place, or animal as melody.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Kora Music</div>
+                    <span class="card-author">West Africa</span>
+                    <div class="card-desc">21-string harp-lute. Griot storytelling tradition.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Shakuhachi</div>
+                    <span class="card-author">Japanese bamboo flute</span>
+                    <div class="card-desc">Zen Buddhist meditation music.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Oud</div>
+                    <span class="card-author">Middle Eastern lute</span>
+                    <div class="card-desc">Foundation of many string instruments.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Carnatic Classical</div>
+                    <span class="card-author">South India</span>
+                    <div class="card-desc">Complex rhythmic cycles and improvisation.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Peking Opera</div>
+                    <span class="card-author">Chinese traditional</span>
+                    <div class="card-desc">Stylized vocal performance and percussion.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                    <div class="card-title">Native American Flute</div>
+                    <span class="card-author">Various tribes</span>
+                    <div class="card-desc">Courtship and spiritual music.</div>
+                </div>
+            </div>
+
+            <!-- PERFORMANCE & FILM -->
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Noh Theater</div>
+                    <span class="card-author">Zeami Motokiyo</span>
+                    <div class="card-desc">Japanese ritualized drama. Masks and minimal movement.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Kathakali</div>
+                    <span class="card-author">Kerala, India</span>
+                    <div class="card-desc">Dance-drama. Elaborate costumes and mudras.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Wayang Kulit</div>
+                    <span class="card-author">Indonesian shadow puppets</span>
+                    <div class="card-desc">Hindu epic storytelling. Light and shadow narrative.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                    <div class="card-title">Bunraku</div>
+                    <span class="card-author">Japanese puppet theater</span>
+                    <div class="card-desc">Three-person puppet operation. Emotional subtlety.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">The Seventh Seal</div>
+                    <span class="card-author">Ingmar Bergman (1957)</span>
+                    <div class="card-desc">Death, meaning, faith. Nordic existential cinema.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">Nanook of the North (1922)</div>
+                    <span class="card-author">Robert Flaherty</span>
+                    <div class="card-desc">First feature-length documentary. Inuit life in Arctic.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">Baraka (1992)</div>
+                    <span class="card-author">Ron Fricke</span>
+                    <div class="card-desc">Non-narrative visual meditation on humanity and nature.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">Samsara (2011)</div>
+                    <span class="card-author">Ron Fricke</span>
+                    <div class="card-desc">Global visual poem. Sacred, profane, and cyclical.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                    <div class="card-title">Koyaanisqatsi (1982)</div>
+                    <span class="card-author">Godfrey Reggio</span>
+                    <div class="card-desc">Life out of balance. Hopi prophecy and modernity.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- YEAR II -->
+            <div class="year-block" id="year-2">
+                <div class="year-header">
+                    <span class="year-num">II</span>
+                    <h2 class="year-title">Structure, Faith & The Living World</h2>
+                </div>
+                <div class="parallel-grid">
+                    <div class="col">
+                        <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Naive Set Theory</div>
+                                <span class="card-author">Paul Halmos</span>
+                                <div class="card-desc">Foundation of mathematical objects. Sets, relations, functions.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">How to Prove It: A Structured Approach</div>
+                                <span class="card-author">Daniel J. Velleman</span>
+                                <div class="card-desc">The missing link. Bridges calculation to rigorous mathematical proof.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">A Book of Abstract Algebra</div>
+                                <span class="card-author">Charles C. Pinter</span>
+                                <div class="card-desc">Groups, rings, fields. Algebraic structure of mathematics.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Laws of Thought</div>
+                                <span class="card-author">George Boole</span>
+                                <div class="card-desc">Boolean algebra. Logic becomes mathematics.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture & Life</span></div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-nature">NATURE</span></div>
+                                <div class="card-title">The Diversity of Life</div>
+                                <span class="card-author">Edward O. Wilson</span>
+                                <div class="card-desc">Biodiversity, ecosystems, species. Earth's living systems.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">On the Origin of Species</div>
+                                <span class="card-author">Charles Darwin</span>
+                                <div class="card-desc">Natural selection. Revolution in biology and thought.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Selfish Gene</div>
+                                <span class="card-author">Richard Dawkins</span>
+                                <div class="card-desc">Gene-centered evolution. Replicators and survival machines.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Story of the Human Body</div>
+                                <span class="card-author">Daniel E. Lieberman</span>
+                                <div class="card-desc">Evolution and anatomy together. How our bodies became what they are.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Song of the Cell</div>
+                                <span class="card-author">Siddhartha Mukherjee</span>
+                                <div class="card-desc">The unit of life. Pathologies explained through cellular failure.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Developing Human: Clinically Oriented Embryology</div>
+                                <span class="card-author">Keith L. Moore & T.V.N. Persaud</span>
+                                <div class="card-desc">Human life from conception to birth. Embryological development.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Being Mortal: Medicine and What Matters in the End</div>
+                                <span class="card-author">Atul Gawande</span>
+                                <div class="card-desc">Aging, death, end-of-life. Medicine and mortality.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Behave: The Biology of Humans at Our Best and Worst</div>
+                                <span class="card-author">Robert M. Sapolsky</span>
+                                <div class="card-desc">Neurobiology meets behavior. Hormones, brain, evolution.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Tale of Genji</div>
+                                <span class="card-author">Murasaki Shikibu</span>
+                                <div class="card-desc">World's first novel. Japanese court life and aesthetics.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">One Thousand and One Nights</div>
+                                <span class="card-author">Various (Arab/Persian)</span>
+                                <div class="card-desc">Framed narratives and the power of storytelling.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Meditations</div>
+                                <span class="card-author">Marcus Aurelius</span>
+                                <div class="card-desc">Stoic philosophy in practice. Resilience and duty.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Enchiridion</div>
+                                <span class="card-author">Epictetus</span>
+                                <div class="card-desc">The technical manual of resilience. Logic applied to emotion and the dichotomy of control.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Rubaiyat</div>
+                                <span class="card-author">Omar Khayyam</span>
+                                <div class="card-desc">Carpe diem, skepticism, mathematics, and wine.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Complete Poems</div>
+                                <span class="card-author">Sappho</span>
+                                <div class="card-desc">Fragmented beauty. Lyricism and desire.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Cantar de Mio Cid</div>
+                                <span class="card-author">Anonymous (Spain)</span>
+                                <div class="card-desc">Spanish epic poetry. Honor and exile.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Conference of the Birds</div>
+                                <span class="card-author">Farid ud-Din Attar</span>
+                                <div class="card-desc">Persian Sufi allegory. Spiritual quest and transformation.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Njal's Saga</div>
+                                <span class="card-author">Anonymous (Iceland)</span>
+                                <div class="card-desc">Icelandic saga. Honor, law, fate, and bloodfeud.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-place">PLACE</span></div>
+                                <div class="card-title">The Alhambra</div>
+                                <span class="card-author">Nasrid Dynasty</span>
+                                <div class="card-desc">Islamic geometric perfection and tessellation.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-place">PLACE</span></div>
+                                <div class="card-title">Angkor Wat</div>
+                                <span class="card-author">Khmer Empire</span>
+                                <div class="card-desc">Hindu-Buddhist cosmology carved in stone.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Ukiyo-e Prints (The Great Wave)</div>
+                                <span class="card-author">Hokusai</span>
+                                <div class="card-desc">The "Floating World". Nature and impermanence.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                                <div class="card-title">Great Zimbabwe</div>
+                                <span class="card-author">Shona People</span>
+                                <div class="card-desc">African medieval stone architecture.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Benin Bronzes</div>
+                                <span class="card-author">Edo People</span>
+                                <div class="card-desc">Mastery of metal casting and court history.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Brandenburg Concertos</div>
+                                <span class="card-author">Johann Sebastian Bach</span>
+                                <div class="card-desc">Baroque orchestral mastery. Counterpoint and form.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Ragas (Sitar)</div>
+                                <span class="card-author">Ravi Shankar</span>
+                                <div class="card-desc">Indian classical improvisation and mood.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Qawwali</div>
+                                <span class="card-author">Nusrat Fateh Ali Khan</span>
+                                <div class="card-desc">Sufi devotional ecstatic music.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Mbira Music</div>
+                                <span class="card-author">Zimbabwe</span>
+                                <div class="card-desc">Shona ancestral communication through thumb piano.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Norwegian Folk Music</div>
+                                <span class="card-author">Hardanger Fiddle Tradition</span>
+                                <div class="card-desc">Traditional Nordic string music and folk dances.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                                <div class="card-title">Gothic Cathedrals (Chartres/Notre Dame)</div>
+                                <span class="card-author">Medieval France</span>
+                                <div class="card-desc">Light, height, and divine geometry.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                                <div class="card-title">Petra</div>
+                                <span class="card-author">Nabataeans</span>
+                                <div class="card-desc">Rock-cut architecture in the desert.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Las Meninas</div>
+                                <span class="card-author">Diego Velázquez</span>
+                                <div class="card-desc">Baroque painting. Perspective, representation, reality.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YEAR III -->
+            <div class="year-block" id="year-3">
+                <div class="year-header">
+                    <span class="year-num">III</span>
+                    <h2 class="year-title">Analysis, Topology & The Humanist Spark</h2>
+                </div>
+                <div class="parallel-grid">
+                    <div class="col">
+                        <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Understanding Analysis</div>
+                                <span class="card-author">Stephen Abbott</span>
+                                <div class="card-desc">Real analysis with pedagogical clarity. Rigorous limits, continuity, convergence.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Introduction to Topology</div>
+                                <span class="card-author">Bert Mendelson</span>
+                                <div class="card-desc">Spaces, continuity, homeomorphism. Prep for advanced work.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Fundamental Wisdom of the Middle Way</div>
+                                <span class="card-author">Nagarjuna</span>
+                                <div class="card-desc">Buddhist logic (Tetralemma). Logical deconstruction of reality to break binary bias.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Foundations of Arithmetic</div>
+                                <span class="card-author">Gottlob Frege</span>
+                                <div class="card-desc">Logicism. Numbers defined as logical objects.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">An Introduction to Gödel's Theorems</div>
+                                <span class="card-author">Peter Smith</span>
+                                <div class="card-desc">Incompleteness. The limits of formal systems.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture & Society</span></div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Silk Roads</div>
+                                <span class="card-author">Peter Frankopan</span>
+                                <div class="card-desc">A non-Eurocentric history of the world.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Worldly Philosophers</div>
+                                <span class="card-author">Robert Heilbroner</span>
+                                <div class="card-desc">The economic thinkers who shaped history. Value, labor, and capital.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Groundwork of the Metaphysics of Morals</div>
+                                <span class="card-author">Immanuel Kant</span>
+                                <div class="card-desc">Categorical imperative. Deontological ethics foundation.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Don Quixote</div>
+                                <span class="card-author">Miguel de Cervantes</span>
+                                <div class="card-desc">Meta-fiction, idealism vs. reality.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Hamlet / King Lear</div>
+                                <span class="card-author">William Shakespeare</span>
+                                <div class="card-desc">The invention of the modern human psyche.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Dream of the Red Chamber</div>
+                                <span class="card-author">Cao Xueqin</span>
+                                <div class="card-desc">The pinnacle of Chinese classical fiction.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Prince</div>
+                                <span class="card-author">Niccolò Machiavelli</span>
+                                <div class="card-desc">Realpolitik and power dynamics.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Leaves of Grass</div>
+                                <span class="card-author">Walt Whitman</span>
+                                <div class="card-desc">American transcendentalism and democracy of the soul.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Haiku (Selected)</div>
+                                <span class="card-author">Basho / Issa / Buson</span>
+                                <div class="card-desc">Zen observation. Capturing the moment.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Sonnets from the Portuguese</div>
+                                <span class="card-author">Elizabeth Barrett Browning</span>
+                                <div class="card-desc">Victorian love poetry and female voice.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Peer Gynt</div>
+                                <span class="card-author">Henrik Ibsen</span>
+                                <div class="card-desc">Norwegian poetic drama. Identity, fantasy, and self-deception.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">David / Sistine Chapel</div>
+                                <span class="card-author">Michelangelo</span>
+                                <div class="card-desc">Renaissance Humanism. The glorified body.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-place">PLACE</span></div>
+                                <div class="card-title">Taj Mahal</div>
+                                <span class="card-author">Shah Jahan</span>
+                                <div class="card-desc">Mughal symmetry and grief.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Dogon Masks</div>
+                                <span class="card-author">Dogon People (Mali)</span>
+                                <div class="card-desc">Cosmological symbolism and ritual.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Symphony No. 9</div>
+                                <span class="card-author">Beethoven</span>
+                                <div class="card-desc">The transition to Romanticism. Radical joy.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">The Four Seasons</div>
+                                <span class="card-author">Vivaldi</span>
+                                <div class="card-desc">Narrative programmatic music.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Bachianas Brasileiras</div>
+                                <span class="card-author">Heitor Villa-Lobos</span>
+                                <div class="card-desc">Brazilian fusion of Bach and folk.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Tartuffe / The Misanthrope</div>
+                                <span class="card-author">Molière</span>
+                                <div class="card-desc">French comedy of manners and hypocrisy.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Phaedra</div>
+                                <span class="card-author">Jean Racine</span>
+                                <div class="card-desc">Neoclassical tragedy and psychological torment.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">The Passion of Joan of Arc</div>
+                                <span class="card-author">Carl Theodor Dreyer</span>
+                                <div class="card-desc">Silent cinema as spiritual cinema.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Wild Strawberries</div>
+                                <span class="card-author">Ingmar Bergman</span>
+                                <div class="card-desc">Memory, regret, mortality. Bergman's humanist masterpiece.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YEAR IV -->
+            <div class="year-block" id="year-4">
+                <div class="year-header">
+                    <span class="year-num">IV</span>
+                    <h2 class="year-title">Computation, Modernity & The Broken Mirror</h2>
+                </div>
+                <div class="parallel-grid">
+                    <div class="col">
+                        <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Annotated Turing</div>
+                                <span class="card-author">Charles Petzold</span>
+                                <div class="card-desc">The Turing Machine. What is computable?</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="card-title">The Mathematical Theory of Communication</div>
+                                <span class="card-author">Claude Shannon</span>
+                                <div class="card-desc">Information as entropy. The physics of logic.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Cybernetics</div>
+                                <span class="card-author">Norbert Wiener</span>
+                                <div class="card-desc">Control and communication in the animal and the machine.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Introduction to the Theory of Computation</div>
+                                <span class="card-author">Michael Sipser</span>
+                                <div class="card-desc">Recursion, decidability, complexity theory.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Uses of Argument</div>
+                                <span class="card-author">Stephen Toulmin</span>
+                                <div class="card-desc">The Toulmin model. How argumentation functions in the real world beyond mathematical form.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Algebraic Topology</div>
+                                <span class="card-author">James Munkres</span>
+                                <div class="card-desc">Fundamental groups, homotopy, homology. Foundation for HoTT.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Tractatus Logico-Philosophicus</div>
+                                <span class="card-author">Ludwig Wittgenstein</span>
+                                <div class="card-desc">"Whereof one cannot speak, thereof one must be silent."</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture & Science</span></div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Being and Time (Part I)</div>
+                                <span class="card-author">Martin Heidegger</span>
+                                <div class="card-desc">Phenomenology and ontology. Being-in-the-world and temporality.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Myth of Sisyphus</div>
+                                <span class="card-author">Albert Camus</span>
+                                <div class="card-desc">Absurdism. The only serious philosophical question is suicide.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Interpretation of Dreams</div>
+                                <span class="card-author">Sigmund Freud</span>
+                                <div class="card-desc">The subconscious and symbolic logic of the mind.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Mind: A Brief Introduction</div>
+                                <span class="card-author">John R. Searle</span>
+                                <div class="card-desc">Consciousness, intentionality, philosophy of mind.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Embodied Mind</div>
+                                <span class="card-author">Francisco Varela, Evan Thompson, Eleanor Rosch</span>
+                                <div class="card-desc">Cognition as embodied action. Buddhist-cognitive synthesis.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Six Easy Pieces</div>
+                                <span class="card-author">Richard Feynman</span>
+                                <div class="card-desc">Physics, Relativity, and Quantum basics.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Information</div>
+                                <span class="card-author">James Gleick</span>
+                                <div class="card-desc">A history, a theory, a flood. The DNA of the digital age.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Crime and Punishment</div>
+                                <span class="card-author">Fyodor Dostoevsky</span>
+                                <div class="card-desc">Psychological realism and moral dilemmas.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">In Search of Lost Time (Swann's Way)</div>
+                                <span class="card-author">Marcel Proust</span>
+                                <div class="card-desc">Memory, time, and subjective experience.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Things Fall Apart</div>
+                                <span class="card-author">Chinua Achebe</span>
+                                <div class="card-desc">The collision of African tradition and colonialism.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Wide Sargasso Sea</div>
+                                <span class="card-author">Jean Rhys</span>
+                                <div class="card-desc">Postcolonial rewriting. Caribbean voice.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Waste Land</div>
+                                <span class="card-author">T.S. Eliot</span>
+                                <div class="card-desc">Modernist fragmentation and cultural collage.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Les Fleurs du mal</div>
+                                <span class="card-author">Charles Baudelaire</span>
+                                <div class="card-desc">Beauty in decay. The urban modern experience.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Canto General</div>
+                                <span class="card-author">Pablo Neruda</span>
+                                <div class="card-desc">Epic of Latin American history and landscape.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Impression: Sunrise</div>
+                                <span class="card-author">Claude Monet</span>
+                                <div class="card-desc">Capturing light and perception, not just objects.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Les Demoiselles d'Avignon</div>
+                                <span class="card-author">Pablo Picasso</span>
+                                <div class="card-desc">Cubism. Shattering perspective. African mask influence.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">The Scream</div>
+                                <span class="card-author">Edvard Munch</span>
+                                <div class="card-desc">Existential anxiety visualized.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">The Rite of Spring</div>
+                                <span class="card-author">Igor Stravinsky</span>
+                                <div class="card-desc">Rhythm over harmony. Modernism begins.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Pierrot Lunaire</div>
+                                <span class="card-author">Arnold Schoenberg</span>
+                                <div class="card-desc">Atonality and Sprechstimme.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Blue Train</div>
+                                <span class="card-author">John Coltrane</span>
+                                <div class="card-desc">Hard bop and modal exploration.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">The Decisive Moment</div>
+                                <span class="card-author">Henri Cartier-Bresson</span>
+                                <div class="card-desc">Street photography as geometry and time.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Metropolis</div>
+                                <span class="card-author">Fritz Lang</span>
+                                <div class="card-desc">Industrial dystopia and class struggle.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Battleship Potemkin</div>
+                                <span class="card-author">Sergei Eisenstein</span>
+                                <div class="card-desc">Montage theory and revolutionary cinema.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">M</div>
+                                <span class="card-author">Fritz Lang</span>
+                                <div class="card-desc">Expressionist crime and moral ambiguity.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Persona</div>
+                                <span class="card-author">Ingmar Bergman</span>
+                                <div class="card-desc">Identity, silence, the dissolution of self.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Let the Right One In</div>
+                                <span class="card-author">Tomas Alfredson</span>
+                                <div class="card-desc">Swedish vampire cinema. Loneliness and ethical monstrosity.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Citizen Kane</div>
+                                <span class="card-author">Orson Welles</span>
+                                <div class="card-desc">Narrative innovation and American ambition.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">8½</div>
+                                <span class="card-author">Federico Fellini</span>
+                                <div class="card-desc">Italian meta-cinema. Director's creative crisis as art.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Breathless</div>
+                                <span class="card-author">Jean-Luc Godard</span>
+                                <div class="card-desc">French New Wave. Jump cuts and existential cool.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YEAR V -->
+            <div class="year-block" id="year-5">
+                <div class="year-header">
+                    <span class="year-num">V</span>
+                    <h2 class="year-title">Categories, Plurality & The Global Chorus</h2>
+                </div>
+                <div class="parallel-grid">
+                    <div class="col">
+                        <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic</span></div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Category Theory</div>
+                                <span class="card-author">Steve Awodey</span>
+                                <div class="card-desc">Objects, Morphisms, Functors. Thinking in arrows.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Modal Logic</div>
+                                <span class="card-author">Blackburn, de Rijke, Venema</span>
+                                <div class="card-desc">Necessity and possibility. The logic of alternate realities.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Naming and Necessity</div>
+                                <span class="card-author">Saul Kripke</span>
+                                <div class="card-desc">Possible worlds, rigid designators, and truth.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Lectures on the Curry-Howard Isomorphism</div>
+                                <span class="card-author">Morten Heine Sørensen</span>
+                                <div class="card-desc">Proofs as programs. Essential for type theory.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Game Theory: A Nontechnical Introduction</div>
+                                <span class="card-author">Morton D. Davis</span>
+                                <div class="card-desc">Strategic logic. Nash equilibrium.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Book of Why</div>
+                                <span class="card-author">Judea Pearl</span>
+                                <div class="card-desc">The logic of science. Causal diagrams, counterfactuals, causation vs. correlation.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Informal Logic</div>
+                                <span class="card-author">Douglas Walton</span>
+                                <div class="card-desc">Systematic treatment of informal argumentation and dialogue schemes. The definitive text.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col">
+                        <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Culture & Ethics</span></div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Women, Fire, and Dangerous Things</div>
+                                <span class="card-author">George Lakoff</span>
+                                <div class="card-desc">Cognitive linguistics. Categorization and metaphor.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Thinking, Fast and Slow</div>
+                                <span class="card-author">Daniel Kahneman</span>
+                                <div class="card-desc">System 1 vs System 2. The cognitive biases that break logic.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Scout Mindset</div>
+                                <span class="card-author">Julia Galef</span>
+                                <div class="card-desc">Epistemic rationality. Truth-seeking vs. soldier mindset.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Thinking in Bets</div>
+                                <span class="card-author">Annie Duke</span>
+                                <div class="card-desc">Decision making under uncertainty. Bayesian probability applied to daily life.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Algorithms to Live By</div>
+                                <span class="card-author">Brian Christian & Tom Griffiths</span>
+                                <div class="card-desc">Computer science applied to human decisions. Optimization for daily life.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Antifragile</div>
+                                <span class="card-author">Nassim Nicholas Taleb</span>
+                                <div class="card-desc">How systems gain from disorder. The logic of risk and survival.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Righteous Mind</div>
+                                <span class="card-author">Jonathan Haidt</span>
+                                <div class="card-desc">Moral psychology. Why logic fails in politics and religion.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Practical Ethics</div>
+                                <span class="card-author">Peter Singer</span>
+                                <div class="card-desc">Applied utilitarian ethics across domains.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Imperative of Responsibility</div>
+                                <span class="card-author">Hans Jonas</span>
+                                <div class="card-desc">Technology ethics and future generations.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">One Hundred Years of Solitude</div>
+                                <span class="card-author">Gabriel García Márquez</span>
+                                <div class="card-desc">Magical Realism. Time as a cycle.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Master and Margarita</div>
+                                <span class="card-author">Mikhail Bulgakov</span>
+                                <div class="card-desc">Satire, theology, and the surreal.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Ficciones</div>
+                                <span class="card-author">Jorge Luis Borges</span>
+                                <div class="card-desc">Literature as logic puzzles. Labyrinths and infinity.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The God of Small Things</div>
+                                <span class="card-author">Arundhati Roy</span>
+                                <div class="card-desc">Caste, trauma, and non-linear narrative in India.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Season of Migration to the North</div>
+                                <span class="card-author">Tayeb Salih</span>
+                                <div class="card-desc">Sudanese postcolonial identity and cultural collision.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Twenty Love Poems and a Song of Despair</div>
+                                <span class="card-author">Pablo Neruda</span>
+                                <div class="card-desc">Passion, nature, and elemental imagery.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Selected Poems</div>
+                                <span class="card-author">Fernando Pessoa</span>
+                                <div class="card-desc">Heteronyms. The fragmented self.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Ariel</div>
+                                <span class="card-author">Sylvia Plath</span>
+                                <div class="card-desc">Confessional poetry and psychological intensity.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Independent People</div>
+                                <span class="card-author">Halldór Laxness</span>
+                                <div class="card-desc">Icelandic epic. Stubbornness, poverty, and dignity.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Guernica</div>
+                                <span class="card-author">Pablo Picasso</span>
+                                <div class="card-desc">War, suffering, and political protest.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Muralism</div>
+                                <span class="card-author">Diego Rivera</span>
+                                <div class="card-desc">Art for the people. Social history.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">The Persistence of Memory</div>
+                                <span class="card-author">Salvador Dalí</span>
+                                <div class="card-desc">Surrealist time and psychological landscape.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Ndebele House Painting</div>
+                                <span class="card-author">Ndebele Women (South Africa)</span>
+                                <div class="card-desc">Geometric communal art and identity.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Kind of Blue</div>
+                                <span class="card-author">Miles Davis</span>
+                                <div class="card-desc">Modal Jazz. Improvisation as composition.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Afrobeat Collection</div>
+                                <span class="card-author">Fela Kuti</span>
+                                <div class="card-desc">Political resistance through polyrhythm.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Bossa Nova</div>
+                                <span class="card-author">João Gilberto / Tom Jobim</span>
+                                <div class="card-desc">Brazilian rhythmic sophistication and harmony.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Te Vaka</div>
+                                <span class="card-author">Pacific Island fusion</span>
+                                <div class="card-desc">Polynesian contemporary music and navigation songs.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Ágætis byrjun</div>
+                                <span class="card-author">Sigur Rós</span>
+                                <div class="card-desc">Icelandic post-rock. Ethereal soundscapes and invented language.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Butoh</div>
+                                <span class="card-author">Tatsumi Hijikata</span>
+                                <div class="card-desc">Japanese post-war dance. Body as trauma and transformation.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Rashomon</div>
+                                <span class="card-author">Akira Kurosawa</span>
+                                <div class="card-desc">Subjective truth. The unreliability of memory.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Pather Panchali</div>
+                                <span class="card-author">Satyajit Ray</span>
+                                <div class="card-desc">Lyrical realism in Indian cinema.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Black Orpheus</div>
+                                <span class="card-author">Marcel Camus</span>
+                                <div class="card-desc">Brazilian favela reimagining of Greek myth.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 5)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Touki Bouki</div>
+                                <span class="card-author">Djibril Diop Mambéty</span>
+                                <div class="card-desc">Senegalese New Wave and African modernity.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YEAR VI -->
+            <div class="year-block" id="year-6">
+                <div class="year-header">
+                    <span class="year-num">VI</span>
+                    <h2 class="year-title">Synthesis, The Frontier & The Homotopy</h2>
+                </div>
+                <div class="parallel-grid">
+                    <div class="col">
+                        <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic (Frontier)</span></div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Basic Proof Theory</div>
+                                <span class="card-author">A.S. Troelstra & H. Schwichtenberg</span>
+                                <div class="card-desc">Proofs as objects. Natural deduction, sequent calculus.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Types and Programming Languages</div>
+                                <span class="card-author">Benjamin C. Pierce</span>
+                                <div class="card-desc">Type theory, lambda calculus, Curry-Howard correspondence.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Philosophical Logic</div>
+                                <span class="card-author">John P. Burgess</span>
+                                <div class="card-desc">Systematic overview: free logic, identity, vagueness, conditionals, deontic logic.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">In Contradiction</div>
+                                <span class="card-author">Graham Priest</span>
+                                <div class="card-desc">Paraconsistent logic deep dive. TRUE contradictions and dialethism.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Deontic Logic and Legal Systems</div>
+                                <span class="card-author">Carlos E. Alchourrón & Eugenio Bulygin</span>
+                                <div class="card-desc">Logic of obligations, permissions, prohibitions. Normative reasoning.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="card-title">On the Acceptability of Arguments</div>
+                                <span class="card-author">Phan Minh Dung</span>
+                                <div class="card-desc">Argumentation Frameworks. Abstracting arguments as nodes in a graph. Logic meets AI.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="card-title">Paradoxes and Contemporary Logic</div>
+                                <span class="card-author">Andrea Cantini</span>
+                                <div class="card-desc">Survey of major paradoxes: Liar, Sorites, Russell, Curry. Resolution strategies.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Quantum Logic and Probability Theory</div>
+                                <span class="card-author">Itamar Pitowsky</span>
+                                <div class="card-desc">Conceptual quantum logic: non-Boolean structures.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Homotopy Type Theory</div>
+                                <span class="card-author">Univalent Foundations Program</span>
+                                <div class="card-desc">THE GOAL. Types as spaces, proofs as paths. The new foundation of math.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Seven Sketches in Compositionality</div>
+                                <span class="card-author">Brendan Fong & David I. Spivak</span>
+                                <div class="card-desc">Applied Category Theory. The logic of systems.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Philosophical Investigations</div>
+                                <span class="card-author">Ludwig Wittgenstein</span>
+                                <div class="card-desc">Meaning is use. Language games. The cure for dogmatic logic.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="col-header col-culture"><i class="fa-solid fa-eye"></i><span class="col-title">Synthesis & Contemporary</span></div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Gödel, Escher, Bach</div>
+                                <span class="card-author">Douglas Hofstadter</span>
+                                <div class="card-desc">The ultimate synthesis of logic, art, and music.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Orientalism</div>
+                                <span class="card-author">Edward Said</span>
+                                <div class="card-desc">Deconstructing how the West views the "Other".</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Structure of Scientific Revolutions</div>
+                                <span class="card-author">Thomas S. Kuhn</span>
+                                <div class="card-desc">Paradigm shifts and the sociology of science.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Invisible Cities</div>
+                                <span class="card-author">Italo Calvino</span>
+                                <div class="card-desc">Combinatorial literature. Urbanism and imagination.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">If on a winter's night a traveler</div>
+                                <span class="card-author">Italo Calvino</span>
+                                <div class="card-desc">Meta-fiction and the reader's role.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Midnight's Children</div>
+                                <span class="card-author">Salman Rushdie</span>
+                                <div class="card-desc">Indian independence through magical realism.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">View with a Grain of Sand</div>
+                                <span class="card-author">Wisława Szymborska</span>
+                                <div class="card-desc">Irony, biology, and philosophical wit.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Collected Poems</div>
+                                <span class="card-author">Octavio Paz</span>
+                                <div class="card-desc">Mexican surrealism and temporal meditation.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">The Nordic Theory of Everything</div>
+                                <span class="card-author">Anu Partanen</span>
+                                <div class="card-desc">Nordic social model. Equality, trust, and collective well-being.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Contemporary Installation</div>
+                                <span class="card-author">Ai Weiwei</span>
+                                <div class="card-desc">Art as activism and social commentary.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">Spiral Jetty</div>
+                                <span class="card-author">Robert Smithson</span>
+                                <div class="card-desc">Land Art. Entropy and nature.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">The Gates</div>
+                                <span class="card-author">Christo and Jeanne-Claude</span>
+                                <div class="card-desc">Environmental intervention and ephemeral art.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-art">ART</span></div>
+                                <div class="card-title">El Anatsui (Metal Tapestries)</div>
+                                <span class="card-author">El Anatsui</span>
+                                <div class="card-desc">African recycled metal. Transformation and history woven in bottle caps.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                                <div class="card-title">Brasília</div>
+                                <span class="card-author">Oscar Niemeyer</span>
+                                <div class="card-desc">Modernist utopia. Curved concrete and urban planning as ideology.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-arch">ARCH</span></div>
+                                <div class="card-title">Barcelona Pavilion</div>
+                                <span class="card-author">Mies van der Rohe</span>
+                                <div class="card-desc">Minimalist perfection. "Less is more" in built form.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">4'33"</div>
+                                <span class="card-author">John Cage</span>
+                                <div class="card-desc">Silence and ambient sound. The philosophy of listening.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Music for 18 Musicians</div>
+                                <span class="card-author">Steve Reich</span>
+                                <div class="card-desc">Minimalism. Phase shifting and pattern.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">In C</div>
+                                <span class="card-author">Terry Riley</span>
+                                <div class="card-desc">Modular minimalism and collective improvisation.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">In Rainbows</div>
+                                <span class="card-author">Radiohead</span>
+                                <div class="card-desc">Contemporary rock as art. Digital anxiety and human connection.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-music">MUSIC</span></div>
+                                <div class="card-title">Loveless</div>
+                                <span class="card-author">My Bloody Valentine</span>
+                                <div class="card-desc">Shoegaze maximalism. Texture as melody.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-film">FILM</span></div>
+                                <div class="card-title">Melancholia</div>
+                                <span class="card-author">Lars von Trier</span>
+                                <div class="card-desc">Danish cinema. Depression, beauty, and planetary apocalypse.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> 
+    </div> 
+</div> 
+
+<div id="toast">Wisdom Acquired</div>
+
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <div class="modal-year" id="modal-year-title">YEAR I COMPLETE</div>
+        <div class="modal-quote" id="modal-quote">"The mind is not a vessel to be filled, but a fire to be kindled."</div>
+        <button class="modal-btn" onclick="closeModal()">Proceed</button>
+    </div>
+</div>
+
+<script>
+    // --- MOMENTUM SCROLL ENGINE ---
+    const body = document.body;
+    const content = document.getElementById('content');
+    let sy = 0;
+    let dy = 0;
+
+    function renderScroll() {
+        dy = dy + (sy - dy) * 0.1;
+        dy = Math.floor(dy * 100) / 100;
+        content.style.transform = `translate3d(0, -${dy}px, 0)`;
+        requestAnimationFrame(renderScroll);
+    }
+
+    window.addEventListener('scroll', () => {
+        sy = window.scrollY;
+    });
+
+    new ResizeObserver(entries => {
+        for (let entry of entries) {
+            body.style.height = entry.contentRect.height + 'px';
+        }
+    }).observe(content);
+
+    requestAnimationFrame(renderScroll);
+
+    // --- APP DATA & LOGIC ---
+    const quotes = {
+        1: "Foundation laid. You have learned to see nature and syntax.",
+        2: "The world is larger than you thought. Structure is everywhere.",
+        3: "The limits of logic meet the complexity of nations and passion.",
+        4: "Modernity fractured the world; you are picking up the pieces.",
+        5: "Reality is plural. You now walk among many worlds.",
+        6: "THE ARCHITECT IS AWAKE. Go forth and build."
+    };
+
+    const yearStatus = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false };
+
+    document.addEventListener('DOMContentLoaded', loadProgress);
+
+    function toggleItem(el, year) {
+        el.classList.toggle('completed');
+        
+        if(el.classList.contains('completed')) {
+            showToast("Wisdom Acquired");
+            triggerMiniConfetti(el);
+        }
+        
+        saveProgress();
+        updateHUD();
+        checkYearCompletion(year);
+    }
+
+    function updateHUD() {
+        const logicCards = document.querySelectorAll('.col-logic').length > 0 
+            ? Array.from(document.querySelectorAll('.col')).filter(col => 
+                col.querySelector('.col-logic')).flatMap(col => 
+                Array.from(col.querySelectorAll('.card')))
+            : [];
+        
+        const cultureCards = document.querySelectorAll('.col-culture').length > 0
+            ? Array.from(document.querySelectorAll('.col')).filter(col => 
+                col.querySelector('.col-culture')).flatMap(col => 
+                Array.from(col.querySelectorAll('.card')))
+            : [];
+        
+        const logicTotal = logicCards.length;
+        const logicDone = logicCards.filter(c => c.classList.contains('completed')).length;
+        const cultureTotal = cultureCards.length;
+        const cultureDone = cultureCards.filter(c => c.classList.contains('completed')).length;
+        
+        document.getElementById('stat-logic').innerText = `${logicDone}/${logicTotal}`;
+        document.getElementById('stat-culture').innerText = `${cultureDone}/${cultureTotal}`;
+        
+        const total = logicTotal + cultureTotal;
+        const done = logicDone + cultureDone;
+        const percent = total === 0 ? 0 : Math.round((done/total)*100);
+        
+        document.getElementById('stat-percent').innerText = `${percent}%`;
+
+        if(percent === 100) setTimeout(() => openModal(6), 1000);
+    }
+
+    function checkYearCompletion(year) {
+        if(yearStatus[year]) return;
+        const yearBlock = document.getElementById(`year-${year}`);
+        const total = yearBlock.querySelectorAll('.card').length;
+        const done = yearBlock.querySelectorAll('.card.completed').length;
+
+        if(total === done && total > 0) {
+            yearStatus[year] = true;
+            setTimeout(() => openModal(year), 800);
+            triggerBigConfetti();
+        }
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById("toast");
+        toast.innerText = msg;
+        toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    function openModal(year) {
+        document.getElementById('modal-year-title').innerText = year === 6 ? "MAGNUM OPUS COMPLETE" : `YEAR ${toRoman(year)} COMPLETED`;
+        document.getElementById('modal-quote').innerText = quotes[year];
+        document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('active');
+    }
+
+    function toRoman(num) {
+        return ["", "I", "II", "III", "IV", "V", "VI"][num] || num;
+    }
+
+    function triggerMiniConfetti(element) {
+        const rect = element.getBoundingClientRect();
+        const x = (rect.left + rect.width / 2) / window.innerWidth;
+        const y = (rect.top + rect.height / 2) / window.innerHeight;
+        confetti({ 
+            particleCount: 30, 
+            spread: 60, 
+            origin: { x, y }, 
+            colors: ['#c5a059', '#ffffff'], 
+            disableForReducedMotion: true 
+        });
+    }
+
+    function triggerBigConfetti() {
+        const end = Date.now() + 3000;
+        (function frame() {
+            confetti({ 
+                particleCount: 5, 
+                angle: 60, 
+                spread: 55, 
+                origin: { x: 0 }, 
+                colors: ['#c5a059', '#a54a4a'] 
+            });
+            confetti({ 
+                particleCount: 5, 
+                angle: 120, 
+                spread: 55, 
+                origin: { x: 1 }, 
+                colors: ['#c5a059', '#4a6fa5'] 
+            });
+            if (Date.now() < end) requestAnimationFrame(frame);
+        }());
+    }
+
+    function saveProgress() {
+        const indices = [];
+        document.querySelectorAll('.card').forEach((el, index) => {
+            if(el.classList.contains('completed')) indices.push(index);
+        });
+        localStorage.setItem('architect_v10_indices', JSON.stringify(indices));
+        localStorage.setItem('architect_v10_years', JSON.stringify(yearStatus));
+    }
+
+    function loadProgress() {
+        const indices = JSON.parse(localStorage.getItem('architect_v10_indices'));
+        const years = JSON.parse(localStorage.getItem('architect_v10_years'));
+        if(indices) {
+            const cards = document.querySelectorAll('.card');
+            indices.forEach(i => { if(cards[i]) cards[i].classList.add('completed'); });
+        }
+        if(years) Object.assign(yearStatus, years);
+        updateHUD();
+    }
+</script>
+</body>
+</html>
