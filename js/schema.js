@@ -14,7 +14,7 @@ const jsonLdData = {
         "@type": "Organization",
         "name": "NIPSCERN Lab",
         "url": "https://nipscern.com",
-        "logo": "https://nipscern.com/assets/icons/icon_home_psychology.svg",
+        "logo": "https://nipscern.com/assets/icons/icon_home_nipscern.svg",
         "sameAs": [
             // Add social links if needed, e.g., "https://twitter.com/nipscern"
         ]

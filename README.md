@@ -1,7 +1,7 @@
 # NIPSCERN Lab Website (NIPSCERNWEB)
 
 <div align="center">
-  <img src="https://github.com/nipscernlab/nipscernweb/blob/main/assets/icons/icon_home_psychology.svg" alt="NIPSCERN Logo" width="200"/>
+  <img src="https://github.com/nipscernlab/nipscernweb/blob/main/assets/icons/icon_home_nipscern.svg" alt="NIPSCERN Logo" width="200"/>
 </div>
 
 ## About
