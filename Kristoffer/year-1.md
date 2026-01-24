@@ -1,6 +1,6 @@
 # THE ARCHITECT: Year I (2026) - Monthly Schedule
 
-**Study Parameters:** 4 hours/day | 120 hours/month | Logic texts sequential only | Culture texts parallel | Passive content integrated weekly
+**Study Parameters:** 4 hours/day | 120 hours/month
 
 ---
 
