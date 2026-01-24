@@ -1,113 +1,28 @@
-# NIPSCERN Lab Website (NIPSCERNWEB)
+<p align="center">
+  <img src="https://github.com/nipscernlab/nipscernweb/blob/main/assets/icons/nipscernv2.svg"
+       alt="NIPSCERN Icon"
+       width="160">
+</p>
 
-<div align="center">
-  <img src="https://github.com/nipscernlab/nipscernweb/blob/main/assets/icons/nipscernv2.svg" alt="NIPSCERN Logo" width="200"/>
-</div>
+# NIPSCERNWEB
 
-## About
+**NIPSCERNWEB** is the official web repository of the **NIPSCERN Laboratory**, containing all assets and source files used to build and deliver **nipscern.com**.
 
-Welcome to the NIPSCERN Lab website repository. Our laboratory, based at the Federal University of Juiz de Fora (UFJF), Brazil, focuses on signal processing, instrumentation, and processor architecture research. This website showcases our various projects and research initiatives.
+This repository hosts the complete website stack, including:
 
-Website: [nipscern.com](https://nipscern.com)
+- HTML, CSS, and JavaScript sources  
+- Visual assets, icons, and branding materials  
+- Documentation and tutorial content  
+- Project pages, publications, and technical references  
 
-## Projects
+The website is globally delivered via **Cloudflare’s distributed infrastructure**, ensuring high availability and low-latency access worldwide.  
+Domain management and content delivery are fully handled through Cloudflare services.
 
-### SAPHO (Scalable Architecture Processor for Hardware Optimization)
-Our flagship project revolutionizes Processor Soft Cores (PSCs) by introducing dynamic resource allocation. Key features:
-- Scalable architecture that adapts to program requirements
-- Variable word size optimization
-- Dual compiler system:
-  - C+− compiler: Converts C subset to Assembly
-  - Assembly-to-Verilog compiler: Generates optimized hardware configurations
-- Integrated with Aurora IDE for streamlined development
+NIPSCERNWEB serves as the primary platform for:
 
-### Aurora IDE
-Modern integrated development environment for SAPHO:
-- Electron-based interface
-- Multiple specialized terminals
-- GitHub integration
-- AI assistance (ChatGPT and Claude)
-- Real-time debugging
-- Automated backup system
-- Monaco editor integration
+- Presenting laboratory projects and software ecosystems  
+- Publishing technical documentation and tutorials  
+- Disseminating scientific papers and research outcomes  
+- Communicating advances and discoveries in **particle physics**, particularly those related to **CERN**
 
-### ALICE
-New compiler project featuring:
-- Abstract Syntax Tree implementation
-- Advanced code optimization
-- Modern compiler architecture
-- [Project under development]
-
-### Helvetia
-Documentation hub containing:
-- Research papers
-- Technical documentation
-- Journal publications
-- Project documentation
-- Academic resources
-
-### Infinity Manager
-Windows post-format utility:
-- Automated tool installation
-- Laboratory software suite setup
-- Configuration management
-- Time-saving automation features
-
-### CERN
-Educational section dedicated to:
-- CERN history and achievements
-- ATLAS experiment details
-- Particle physics research
-- Scientific collaboration insights
-
-## Technical Details
-
-### Deployment
-- Hosted on Cloudflare
-- Domain: nipscern.com
-- Open-source codebase
-
-### Repository Structure
-```
-A lot of files!
-
-```
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/nipscernlab/nipscernweb.git
-cd nipscernweb
-```
-
-## Contributing
-
-We welcome contributions! To contribute:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Contact
-
-- Website: [nipscern.com](https://nipscern.com)
-- GitHub: [github.com/nipscernlab](https://github.com/nipscernlab)
-- Email: contact@nipscern.com
-
-## License
-
-Working on it!
-
-## Acknowledgments
-
-- Federal University of Juiz de Fora (UFJF)
-- Engineering Faculty
-- Signal Processing and Instrumentation Core
-- All contributors and researchers
-
----
-
-Made with ❤️ by NIPSCERN Lab
+Our mission is **high-level scientific outreach**, providing accurate, accessible, and technically rigorous content on **particle physics**, experimental research, and new discoveries at CERN.
