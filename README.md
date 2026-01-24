@@ -1,10 +1,7 @@
-<p align="left">
+<p align="center">
   <img src="https://github.com/nipscernlab/nipscernweb/blob/main/assets/icon-projects/nipscernweb.svg"
        alt="NIPSCERN Icon"
        width="160">
-</p>
-
-<p align="right">
   <img src="https://github.com/nipscernlab/nipscernweb/blob/main/assets/icons/nipscernv2.svg"
        alt="NIPSCERN Icon"
        width="160">
