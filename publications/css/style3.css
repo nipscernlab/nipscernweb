@@ -4,40 +4,26 @@
   --muted: #b8c0ff;
   --cern: #00e5ff;
   --sapho: #ff8a00;
-  --sc: #b388ff; /* roxo suave para SC */
+  --sc: #b388ff;
+
   --diagram-shift: -120px;
   --title-shift: 80px;
+
+  --page-max: 1040px;
+  --pad-x: clamp(14px, 3vw, 22px);
+  --gap: clamp(12px, 2.2vw, 18px);
 }
 
 /* ===== RESET ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-
-/* =========================================================
-   PATCH GLOBAL — ESCALA CONSISTENTE DO SITE
-   (impede "zoom" causado por fonte do navegador)
-   ========================================================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
-  font-size: 16px;                 /* base universal */
-  -webkit-text-size-adjust: 100%;  /* Safari / iOS */
-  text-size-adjust: 100%;          /* padrão */
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-body {
-  zoom: 1;                         /* neutraliza zoom implícito */
-}
-
-
-
-
-
-html,
-body {
+html, body {
   height: 100%;
   font-family: "Space Grotesk", system-ui, sans-serif;
   color: var(--ink);
@@ -48,8 +34,7 @@ body {
 /* ===== FUNDO ESTRELADO ===== */
 #stars {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
@@ -57,7 +42,7 @@ body {
   pointer-events: none;
 }
 
-/* Link que envolve o logo no cabeçalho global de artigos */
+/* Link que envolve o logo */
 .logo-link {
   display: flex;
   align-items: center;
@@ -65,19 +50,13 @@ body {
   color: inherit;
 }
 
-
-
-/* ===== CABEÇALHO (VERSÃO CORRETA) ===== */
+/* ===== CABEÇALHO ===== */
 .header {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-
+  top: 0; left: 0; right: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* esta linha é a mágica */
-
+  justify-content: space-between;
   padding: 25px 40px;
   height: 110px;
   background: rgba(6, 6, 18, 0.65);
@@ -87,16 +66,13 @@ body {
   z-index: 10;
 }
 
-
-
-
-/* logo e título clicáveis (voltam para a página principal de publicações) */
 .logo-container {
   display: flex;
   align-items: center;
   gap: 18px;
   text-decoration: none;
   cursor: pointer;
+  min-width: 0;
 }
 
 .logo-img {
@@ -104,16 +80,16 @@ body {
   width: auto;
   transition: transform 0.4s ease;
 }
-
-.logo-img:hover {
-  transform: scale(1.05);
-}
+.logo-img:hover { transform: scale(1.05); }
 
 .site-subtitle {
   font-size: 1.6rem;
   color: #ffffff;
   letter-spacing: 2px;
   text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-nav {
@@ -122,8 +98,6 @@ body {
   align-items: center;
   gap: 16px;
 }
-
-/* ===== LINKS DO CABEÇALHO POR EIXO — versao suave ===== */
 
 .header-nav a {
   text-decoration: none;
@@ -134,58 +108,45 @@ body {
   transition: color 0.25s ease, text-shadow 0.25s ease;
 }
 
-/* SAPHO – hover laranja suave */
 .header-nav a[href*="sapho"]:hover {
   color: #ffb86b;
   text-shadow: 0 0 6px rgba(255, 184, 107, 0.45);
 }
-
-/* CERN – hover azul suave */
 .header-nav a[href*="cern"]:hover {
   color: #8de8ff;
   text-shadow: 0 0 6px rgba(141, 232, 255, 0.45);
 }
-
-/* SC – hover roxo suave */
 .header-nav a[href*="sc"]:hover {
   color: #d2b3ff;
   text-shadow: 0 0 6px rgba(210, 179, 255, 0.45);
 }
-
-/* HOME – hover suave neutro */
 .header-nav a[href*="nipscern"]:hover,
 .header-nav a.home-link:hover {
   color: #e5e9ff;
   text-shadow: 0 0 6px rgba(180, 190, 255, 0.35);
 }
 
-
-
-
-.home-link {
-  text-decoration: none;
-}
-
-.home-icon {
-  display: flex;
+/* HOME */
+.header .home-link{
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 95px;
-  height: 88px;
-  transition: transform 0.3s ease, filter 0.3s ease;
-  margin-left: auto;
+  border-radius: 999px;
+  text-decoration: none;
 }
-
-.home-img {
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.6));
-  transition: filter 0.4s ease, transform 0.3s ease;
+.header .home-fa{
+  font-size: 20px;
+  line-height: 1;
+  color: #cfe9ff;
+  opacity: .9;
+  transition: transform .2s ease, opacity .2s ease, text-shadow .2s ease;
 }
-
-.home-icon:hover .home-img {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.9));
+.header .home-link:hover .home-fa{
+  opacity: 1;
+  transform: scale(1.12);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.55);
 }
 
 /* ===== CONTEÚDO GERAL ===== */
@@ -201,9 +162,8 @@ main {
 }
 
 /* =========================================================
-   PÁGINA PRINCIPAL — DIAGRAMA NIPSCERN
+   HOME — DIAGRAMA NIPSCERN
    ========================================================= */
-
 .titulo-diagrama {
   position: relative;
   top: 87px;
@@ -221,7 +181,6 @@ main {
   color: var(--cern);
   text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
 }
-
 .titulo-diagrama .sapho-text {
   color: var(--sapho);
   text-shadow: 0 0 12px rgba(255, 138, 0, 0.6);
@@ -294,8 +253,7 @@ main {
   transform: translate(-50%, -50%);
 }
 
-.s,
-.c {
+.s, .c {
   color: #ffffff;
   text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
 }
@@ -337,26 +295,13 @@ main {
   margin-bottom: 8px;
   text-transform: uppercase;
 }
-
 .nucleo p {
   font-size: 0.9rem;
   color: var(--muted);
 }
-
-.sapho-box h3 {
-  color: var(--sapho);
-  text-shadow: 0 0 12px rgba(255, 138, 0, 0.6);
-}
-
-.sc-box h3 {
-  color: #fff;
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
-}
-
-.cern-box h3 {
-  color: var(--cern);
-  text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
-}
+.sapho-box h3 { color: var(--sapho); text-shadow: 0 0 12px rgba(255, 138, 0, 0.6); }
+.sc-box h3 { color: #fff; text-shadow: 0 0 12px rgba(255, 255, 255, 0.6); }
+.cern-box h3 { color: var(--cern); text-shadow: 0 0 12px rgba(0, 229, 255, 0.6); }
 
 /* ===== RODAPÉ ===== */
 .footer {
@@ -383,169 +328,12 @@ main {
 }
 
 /* =========================================================
-   PÁGINAS DE ANOS (LAYOUT ANTIGO / ANIMAÇÕES)
-   (mantidas por compatibilidade, mas você está usando o grid novo)
+   ARTIGOS / PUBLICAÇÕES POR ANO (cards de ano antigos)
    ========================================================= */
-
-.years-wrap {
-  position: relative;
-  z-index: 1;
-  min-height: calc(100vh - 220px);
-  padding-top: 150px;
-  padding-bottom: 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-/* Nebulosa atrás do título */
-.years-wrap::before {
-  content: "";
-  position: absolute;
-  top: 110px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.05) 40%,
-    transparent 72%
-  );
-  filter: blur(40px);
-  opacity: 0.55;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.years-title {
-  font-size: 2.4rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 18px;
-  color: var(--ink);
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-  animation: titleTwinkle 6s ease-in-out infinite;
-}
-
-.years-title::after {
-  content: "";
-  display: block;
-  width: 160px;
-  height: 3px;
-  margin: 14px auto 0;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0.7),
-    rgba(255, 255, 255, 0)
-  );
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.4);
-  opacity: 0.6;
-}
-
-.years-sub {
-  font-size: 0.95rem;
-  max-width: 520px;
-  line-height: 1.6;
-  color: var(--muted);
-  margin: 28px auto 90px;
-}
-
-/* ACENTOS POR EIXO NAS PÁGINAS DE ANOS (years-wrap) */
-
-/* CERN */
-html[data-section="cern"] .years-wrap::before {
-  background: radial-gradient(
-    circle,
-    rgba(0, 229, 255, 0.2) 0%,
-    rgba(0, 229, 255, 0.06) 40%,
-    transparent 72%
-  );
-}
-html[data-section="cern"] .years-title {
-  text-shadow: 0 0 14px rgba(0, 229, 255, 0.6);
-}
-html[data-section="cern"] .years-sub strong {
-  color: var(--cern);
-}
-
-/* SAPHO */
-html[data-section="sapho"] .years-wrap::before {
-  background: radial-gradient(
-    circle,
-    rgba(255, 138, 0, 0.2) 0%,
-    rgba(255, 138, 0, 0.06) 40%,
-    transparent 72%
-  );
-}
-html[data-section="sapho"] .years-title {
-  text-shadow: 0 0 14px rgba(255, 138, 0, 0.6);
-}
-html[data-section="sapho"] .years-sub strong {
-  color: var(--sapho);
-}
-
-/* SC */
-html[data-section="sc"] .years-wrap::before {
-  background: radial-gradient(
-    circle,
-    rgba(179, 136, 255, 0.22) 0%,
-    rgba(179, 136, 255, 0.07) 40%,
-    transparent 72%
-  );
-}
-html[data-section="sc"] .years-title {
-  text-shadow: 0 0 14px rgba(179, 136, 255, 0.65);
-}
-html[data-section="sc"] .years-sub strong {
-  color: var(--sc);
-}
-
-/* ===== ANIMAÇÕES GERAIS ===== */
-
-@keyframes yearFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes titleTwinkle {
-  0%,
-  100% {
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.25),
-      0 0 16px rgba(255, 255, 255, 0.12);
-    opacity: 0.98;
-  }
-  40% {
-    text-shadow: 0 0 14px rgba(255, 255, 255, 0.5),
-      0 0 28px rgba(255, 255, 255, 0.28);
-    opacity: 1;
-  }
-  70% {
-    text-shadow: 0 0 6px rgba(255, 255, 255, 0.18),
-      0 0 12px rgba(255, 255, 255, 0.08);
-    opacity: 0.94;
-  }
-}
-
-/* =========================================================
-   ARTIGOS / PUBLICAÇÕES POR ANO (FILTROS, BUSCA, LISTA)
-   ========================================================= */
-
 .articles-page {
-  max-width: 1040px;
+  max-width: var(--page-max);
   margin: 0 auto 120px;
-  padding: 140px 20px 0;
+  padding: 140px var(--pad-x) 0;
 }
 
 .articles-filters {
@@ -578,55 +366,37 @@ html[data-section="sc"] .years-sub strong {
   background: rgba(6, 6, 18, 0.8);
   color: #e9ecff;
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease,
-    border-color 0.2s ease, transform 0.1s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
 }
-
 .filter-chip:hover {
   transform: translateY(-1px);
   box-shadow: 0 0 12px rgba(132, 214, 255, 0.3);
 }
-
 .filter-chip.is-active {
   border-color: rgba(132, 214, 255, 0.9);
   box-shadow: 0 0 14px rgba(132, 214, 255, 0.6);
-  background: radial-gradient(
-    circle at top,
-    rgba(132, 214, 255, 0.25),
-    transparent
-  );
+  background: radial-gradient(circle at top, rgba(132, 214, 255, 0.25), transparent);
 }
 
-/* VARIAÇÃO SAPHO — chips laranja */
-html[data-section="sapho"] .filter-chip:hover {
-  box-shadow: 0 0 12px rgba(255, 138, 0, 0.5);
-}
-
+html[data-section="sapho"] .filter-chip:hover { box-shadow: 0 0 12px rgba(255, 138, 0, 0.5); }
 html[data-section="sapho"] .filter-chip.is-active {
   border-color: rgba(255, 138, 0, 0.95);
   box-shadow: 0 0 16px rgba(255, 138, 0, 0.8);
-  background: radial-gradient(
-    circle at top,
-    rgba(255, 138, 0, 0.35),
-    transparent
-  );
+  background: radial-gradient(circle at top, rgba(255, 138, 0, 0.35), transparent);
 }
 
-.thesis-subfilter[data-visible="false"] {
+.thesis-subfilter[data-visible="false"]{
   opacity: 0;
   max-height: 0;
   pointer-events: none;
   overflow: hidden;
 }
-
-.thesis-subfilter[data-visible="true"] {
+.thesis-subfilter[data-visible="true"]{
   opacity: 1;
   max-height: 200px;
   pointer-events: auto;
   transition: opacity 0.2s ease, max-height 0.2s ease;
 }
-
-/* Lista de artigos */
 
 .articles-list {
   display: grid;
@@ -638,33 +408,13 @@ html[data-section="sapho"] .filter-chip.is-active {
   border-radius: 18px;
   padding: 16px 18px;
   border: 1px solid rgba(233, 236, 255, 0.18);
-  background: radial-gradient(
-      circle at top left,
-      rgba(132, 214, 255, 0.05),
-      transparent
-    )
-    border-box,
-    rgba(6, 6, 18, 0.92);
+  background: radial-gradient(circle at top left, rgba(132, 214, 255, 0.05), transparent) border-box, rgba(6, 6, 18, 0.92);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
 }
 
-.article-title {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 6px;
-}
-
-.article-meta {
-  font-size: 0.8rem;
-  opacity: 0.8;
-  margin-bottom: 10px;
-}
-
-.article-meta span {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.75rem;
-}
+.article-title { font-size: 1rem; font-weight: 500; margin-bottom: 6px; }
+.article-meta { font-size: 0.8rem; opacity: 0.8; margin-bottom: 10px; }
+.article-meta span { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; }
 
 .article-link {
   display: inline-flex;
@@ -677,402 +427,22 @@ html[data-section="sapho"] .filter-chip.is-active {
   border-radius: 999px;
   border: 1px solid rgba(233, 236, 255, 0.38);
 }
+.article-link:hover { box-shadow: 0 0 14px rgba(233, 236, 255, 0.4); }
 
-.article-link:hover {
-  box-shadow: 0 0 14px rgba(233, 236, 255, 0.4);
-}
+.articles-empty { font-size: 0.9rem; opacity: 0.8; }
 
-.articles-empty {
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
-
-/* Busca de artigos (lupinha) */
-
-.articles-filters .search-group {
-  margin-top: 18px;
-}
-
-.search-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 360px;
-}
-
-#article-search {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(233, 236, 255, 0.18);
-  background: rgba(6, 8, 24, 0.9);
-  color: #e9ecff;
-  font-family: inherit;
-  font-size: 0.9rem;
-  outline: none;
-}
-
-#article-search::placeholder {
-  color: rgba(233, 236, 255, 0.45);
-}
-
-#article-search:focus {
-  border-color: rgba(142, 197, 255, 0.9);
-  box-shadow: 0 0 0 1px rgba(142, 197, 255, 0.35);
-}
-
-.search-icon {
-  border: 1px solid rgba(233, 236, 255, 0.25);
-  background: radial-gradient(circle at 0% 0%, #253bff, #111426);
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.search-icon:hover {
-  border-color: rgba(255, 255, 255, 0.8);
-}
-
-/* ============================================================
-   PÁGINAS DE LINHA DO TEMPO (CERN / SAPHO / SC)
-   ============================================================ */
-
-.years-page {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 160px 20px 120px;
-  text-align: center;
-}
-
-.years-page .section-title {
-  font-family: "Playfair Display", serif;
-  font-size: 2.6rem;
-  color: #ffffff;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-}
-
-.years-page .section-intro {
-  color: #d5dafe;
-  font-size: 1.1rem;
-  margin-bottom: 40px;
-  line-height: 1.6;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* ============================================================
-   TIPOS DE PUBLICAÇÃO (CONGRESSO / REVISTA / TESE)
-   ============================================================ */
-
-.pub-types {
-  margin-top: 24px;
-  text-align: left;
-}
-
-.pub-types-title {
-  font-family: "Playfair Display", serif;
-  font-size: 1.8rem;
-  color: #ffffff;
-  margin-bottom: 10px;
-}
-
-.pub-types-intro {
-  color: #d5dafe;
-  font-size: 0.98rem;
-  max-width: 820px;
-  line-height: 1.5;
-  margin-bottom: 24px;
-}
-
-.pub-types-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-
-/* cartão base */
-.pub-card {
-  background: rgba(9, 12, 28, 0.8);
-  border-radius: 18px;
-  padding: 20px 18px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  transition: 0.25s ease;
-}
-
-/* cartão clicável (tem data-pub-type) */
-.pub-card[data-pub-type] {
-  cursor: pointer;
-}
-
-/* borda levemente azul para CERN (padrão) */
-.pub-card-cern {
-  border-color: rgba(70, 150, 255, 0.45);
-}
-
-.pub-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 18px rgba(70, 150, 255, 0.45);
-}
-
-.pub-card-title {
-  font-size: 1.2rem;
-  margin-bottom: 8px;
-  color: #ffffff;
-}
-
-.pub-card-text {
-  font-size: 0.95rem;
-  color: #d6ddff;
-  line-height: 1.5;
-}
-
-/* estado ativo (quando o usuário escolhe Congresso/Revista/Tese) */
-.pub-card.is-active {
-  border-color: rgba(0, 229, 255, 0.95);
-  box-shadow: 0 0 24px rgba(0, 229, 255, 0.7);
-  background: radial-gradient(
-    circle at top,
-    rgba(0, 229, 255, 0.18),
-    rgba(6, 6, 18, 0.98)
-  );
-}
-
-/* subtipos da Tese: TCC / Mestrado / Doutorado */
-/* por padrão, ficam escondidos */
-.pub-subtypes {
-  margin-top: 12px;
-  display: none;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* quando o card de Tese estiver "aberto", mostramos os subtipos */
-.pub-card.show-subtypes .pub-subtypes {
-  display: flex;
-}
-
-.pub-sub-pill {
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #f5f7ff;
-  background: rgba(15, 18, 40, 0.95);
-}
-
-/* ============================================================
-   FILTROS DA LINHA DO TEMPO (CERN / SAPHO / SC)
-   ============================================================ */
-
-.timeline-filters {
-  margin: 20px auto 32px;
-  max-width: 900px;
-  text-align: center;          /* CENTRALIZA TEXTO */
-}
-
-.timeline-filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-  align-items: center;         /* CENTRALIZA O LABEL */
-}
-
-.timeline-filter-label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: rgba(233, 236, 255, 0.7);
-}
-
-.timeline-filter-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;     /* CENTRALIZA OS BOTÕES */
-}
-
-/* chips menores para TCC / Mestrado / Doutorado */
-.filter-chip.is-small {
-  padding: 4px 10px;
-  font-size: 0.8rem;
-}
-
-/* grupo de nível de tese: aparece só quando tese é selecionado */
-.thesis-level-group[data-visible="false"] {
-  display: none;
-}
-
-.thesis-level-group[data-visible="true"] {
-  display: flex;
-}
-
-
-
-
-/* ============================================================
-   GRID HORIZONTAL DE ANOS — LAYOUT PRINCIPAL
-   ============================================================ */
-
-.years-strip-wrapper {
-  margin: 40px auto 120px;
-  max-width: 1100px;
-  padding: 0 20px;
-}
-
-.years-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 22px;
-  justify-content: center;
-}
-
-/* Botão de ano – apenas o número, centralizado */
-.year-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 170px;
-  height: 72px;
-  border-radius: 18px;
-
-  background: rgba(10, 10, 20, 0.75);
-  border: 1px solid rgba(120, 180, 255, 0.25);
-  backdrop-filter: blur(6px);
-
-  text-decoration: none;
-  color: #ffffff;
-  font-size: 1.25rem;
-  font-weight: 700;
-
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-  transition: 0.22s ease-in-out;
-  outline: none;
-
-  opacity: 0; /* para a animação de entrada */
-}
-
-/* subtítulo (não usamos mais, mas escondemos por segurança) */
-.year-tagline {
-  display: none !important;
-}
-
-/* hover geral (azul padrão, usado em CERN) */
-.year-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 18px rgba(70, 150, 255, 0.55);
-  border-color: rgba(70, 150, 255, 0.6);
-}
-
-/* acentos por eixo (cores de borda e hover) */
-.year-card-cern {
-  border-color: rgba(70, 150, 255, 0.35);
-}
-.year-card-cern:hover {
-  box-shadow: 0 0 22px rgba(70, 150, 255, 0.7);
-}
-
-/* SAPHO – laranja */
-.year-card-sapho {
-  border-color: rgba(255, 140, 60, 0.35);
-}
-.year-card-sapho:hover {
-  box-shadow: 0 0 22px rgba(255, 140, 60, 0.7);
-  border-color: rgba(255, 140, 60, 0.9);
-}
-
-/* SC – roxo */
-.year-card-sc {
-  border-color: rgba(180, 90, 255, 0.35);
-}
-.year-card-sc:hover {
-  box-shadow: 0 0 22px rgba(180, 90, 255, 0.7);
-  border-color: rgba(180, 90, 255, 0.9);
-}
-
-/* ============================================================
-   ANIMAÇÃO DE ENTRADA DOS ANOS
-   ============================================================ */
-
-@keyframes yearCardFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.years-grid .year-card {
-  animation: yearCardFadeUp 0.8s ease-out forwards;
-}
-
-/* atrasos em cascata (até 12 anos) */
-.years-grid .year-card:nth-child(1) {
-  animation-delay: 0.05s;
-}
-.years-grid .year-card:nth-child(2) {
-  animation-delay: 0.1s;
-}
-.years-grid .year-card:nth-child(3) {
-  animation-delay: 0.15s;
-}
-.years-grid .year-card:nth-child(4) {
-  animation-delay: 0.2s;
-}
-.years-grid .year-card:nth-child(5) {
-  animation-delay: 0.25s;
-}
-.years-grid .year-card:nth-child(6) {
-  animation-delay: 0.3s;
-}
-.years-grid .year-card:nth-child(7) {
-  animation-delay: 0.35s;
-}
-.years-grid .year-card:nth-child(8) {
-  animation-delay: 0.4s;
-}
-.years-grid .year-card:nth-child(9) {
-  animation-delay: 0.45s;
-}
-.years-grid .year-card:nth-child(10) {
-  animation-delay: 0.5s;
-}
-.years-grid .year-card:nth-child(11) {
-  animation-delay: 0.55s;
-}
-.years-grid .year-card:nth-child(12) {
-  animation-delay: 0.6s;
-}
-
-
-
-/* ============================================================
-   NIPSCERN — Estilo das páginas de publicações (CERN 2005)
-   ============================================================ */
-
-/* Container principal */
+/* =========================================================
+   PÁGINAS DE PUBLICAÇÕES (2004/2005/2008...) — LISTA
+   ========================================================= */
 .publications-page {
   max-width: 1080px;
-  margin: 150px auto 120px; /* espaço extra depois do cabeçalho fixo */
+  margin: 150px auto 120px;
   padding: 0 24px 80px;
 }
 
-/* ------------------------------
-   Título da página
------------------------------- */
 .publications-hero {
-  margin-top: 40px;  /* empurra um pouco abaixo do header */
-  margin-bottom: 42px;
+  margin-top: 40px;
+  margin-bottom: 60px;
   text-align: center;
 }
 
@@ -1085,12 +455,6 @@ html[data-section="sapho"] .filter-chip.is-active {
   margin-bottom: 14px;
 }
 
-.page-title .highlight-year {
-  color: #a5b4ff;
-  text-shadow: 0 0 6px rgba(129, 140, 248, 0.4);
-}
-
-/* se ainda existir um subtítulo, deixa centralizado e discreto */
 .page-subtitle {
   font-size: 0.95rem;
   color: #c7d2ff;
@@ -1098,32 +462,17 @@ html[data-section="sapho"] .filter-chip.is-active {
   margin: 0 auto;
 }
 
-/* ------------------------------
-   FILTROS (Todos / Congresso / Revista / Tese)
------------------------------- */
-
-.publications-filters {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-/* Linha principal: TODOS / CONGRESSO / REVISTA / TESE */
+/* filtros */
+.publications-filters { margin-bottom: 20px; text-align: center; }
 .filters-row {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 18px;  /* espaço maior até os subfiltros */
+  margin-bottom: 18px;
 }
+.subfilters-row { display: none; opacity: 0.9; margin-top: 10px; }
 
-/* Subfiltros: TCC / MESTRADO / DOUTORADO (começam escondidos) */
-.subfilters-row {
-  display: none;         /* o JS mostra quando TESE está ativo */
-  opacity: 0.9;
-  margin-top: 10px;      /* respiro entre os grupos */
-}
-
-/* Botões de filtro */
 .filter-btn {
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 255, 0.3);
@@ -1136,13 +485,11 @@ html[data-section="sapho"] .filter-chip.is-active {
   cursor: pointer;
   transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
 }
-
 .filter-btn:hover {
   border-color: rgba(196, 181, 253, 0.7);
   background: rgba(25, 35, 78, 0.65);
   transform: translateY(-1px);
 }
-
 .filter-btn.is-active {
   background: rgba(108, 99, 255, 0.35);
   border-color: rgba(158, 148, 255, 0.8);
@@ -1150,58 +497,44 @@ html[data-section="sapho"] .filter-chip.is-active {
   box-shadow: 0 0 10px rgba(129, 140, 248, 0.4);
 }
 
-/* ------------------------------
-   BUSCA + LUPA + CONTADOR
------------------------------- */
+/* busca */
+.publications-search-label { display: none; }
+.publications-search { margin-top: 10px; margin-bottom: 20px; text-align: center; }
 
-/* escondemos o texto acima da caixinha */
-.publications-search-label {
-  display: none;
-}
-
-.publications-search {
-  margin-top: 30px;
-  margin-bottom: 22px;
-  text-align: center;
-}
-
-/* linha com input + contador */
 .publications-search-row {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;   /* espaço entre a caixa e o contador */
-  flex-wrap: wrap;
+  gap: 16px;
+  flex-wrap: nowrap;
+}
+@media (max-width: 900px) {
+  .publications-search-row { flex-wrap: wrap; }
 }
 
-/* wrapper do campo com a lupa */
 .publications-search-wrapper {
   position: relative;
   width: 100%;
-  max-width: 550px;   /* caixa mais larga */
+  max-width: 560px;
 }
 
-/* Ícone da lupa (apenas o ícone, sem botão) */
 .publications-search .search-icon {
   position: absolute;
-  left: 16px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.2rem;
-  opacity: 0.75;
+  font-size: 1.1rem;
+  opacity: 0.8;
   pointer-events: none;
-
-  /* garante que qualquer estilo antigo de botão não apareça */
   border: none;
   background: transparent;
   padding: 0;
   box-shadow: none;
 }
 
-/* Campo de busca */
 .publications-search-input {
   width: 100%;
-  padding: 12px 18px 12px 48px; /* espaço extra pro texto não encostar na lupa */
+  padding: 10px 16px 10px 56px;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 255, 0.35);
   background: rgba(6, 8, 30, 0.85);
@@ -1210,51 +543,45 @@ html[data-section="sapho"] .filter-chip.is-active {
   outline: none;
   transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
 }
-
-.publications-search-input::placeholder {
-  color: rgba(156, 163, 255, 0.6);
-}
-
+.publications-search-input::placeholder { color: rgba(156, 163, 255, 0.6); }
 .publications-search-input:focus {
   border-color: rgba(180, 170, 255, 0.9);
   background: rgba(10, 14, 52, 0.92);
   box-shadow: 0 0 12px rgba(129, 140, 248, 0.3);
 }
 
-/* Contador "3 publicações" ao lado da caixa */
 .publications-count {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #cbd5ff;
   background: rgba(20, 22, 54, 0.55);
   padding: 10px 20px;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 255, 0.25);
   backdrop-filter: blur(4px);
-  white-space: nowrap; /* não quebra "3 publicações" em duas linhas */
+  white-space: nowrap;
 }
 
-/* ------------------------------
-   LISTA DE PUBLICAÇÕES
------------------------------- */
-
+/* LISTA */
+.publications-list-wrapper { width: 100%; padding-left: 18px; padding-right: 18px; }
 .publications-list {
   display: flex;
   flex-direction: column;
-  gap: 26px; /* espaço entre um card e outro */
+  gap: 26px;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
 }
 
-/* Card de cada publicação */
 .publication-card {
   position: relative;
   border-radius: 16px;
   padding: 24px;
   background: rgba(6, 8, 30, 0.75);
   border: 1px solid rgba(148, 163, 255, 0.25);
-  box-shadow: 0 0 14px rgba(15, 23, 42, 0.7); /* glow discreto */
+  box-shadow: 0 0 14px rgba(15, 23, 42, 0.7);
   backdrop-filter: blur(6px);
 }
 
-/* Título */
 .publication-title {
   font-family: "Playfair Display", serif;
   font-size: 1.35rem;
@@ -1262,7 +589,6 @@ html[data-section="sapho"] .filter-chip.is-active {
   margin-bottom: 8px;
 }
 
-/* Autores + tipo + veículo + ano + eixo */
 .publication-meta {
   font-size: 0.95rem;
   color: #c9d2ff;
@@ -1270,18 +596,14 @@ html[data-section="sapho"] .filter-chip.is-active {
   margin-bottom: 12px;
 }
 
-.pub-authors {
-  font-weight: 500;
-}
+.pub-authors { font-weight: 500; }
 
-/* Resumo */
 .publication-summary {
   font-size: 0.95rem;
   color: #e5e7ff;
   margin-bottom: 14px;
 }
 
-/* Link "Abrir PDF" */
 .publication-link {
   display: inline-flex;
   align-items: center;
@@ -1295,13 +617,11 @@ html[data-section="sapho"] .filter-chip.is-active {
   text-decoration: none;
   transition: background 0.18s, box-shadow 0.18s;
 }
-
 .publication-link:hover {
   background: rgba(30, 40, 85, 0.85);
   box-shadow: 0 0 12px rgba(129, 140, 248, 0.3);
 }
 
-/* Mensagem de status (erro, carregando, nenhum resultado) */
 .publications-status {
   margin-top: 20px;
   font-size: 1rem;
@@ -1309,1843 +629,35 @@ html[data-section="sapho"] .filter-chip.is-active {
   text-align: center;
 }
 
-/* ------------------------------
-   RESPONSIVO
------------------------------- */
-
-@media (max-width: 768px) {
-  .publications-page {
-    margin: 130px auto 80px;
-    padding: 0 16px 60px;
-  }
-
-  .page-title {
-    font-size: 1.6rem;
-  }
-
-  .publications-search-row {
-    gap: 12px;
-  }
-
-  .publications-search-wrapper {
-    max-width: 100%;
-  }
-
-  .publication-card {
-    padding: 18px;
-  }
-}
-
-
-
-
-/* === Ajustes finos CERN 2005 — busca + contador === */
-
-/* Mais espaço entre o título e a área de filtros/busca */
-.publications-hero {
-  margin-bottom: 60px;
-}
-
-/* Linha da busca: input + contador lado a lado */
-.publications-search-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: nowrap; /* não quebra linha em desktop */
-}
-
-/* Em telas pequenas, aí sim pode quebrar em duas linhas */
-@media (max-width: 900px) {
-  .publications-search-row {
-    flex-wrap: wrap;
-  }
-}
-
-/* Caixa de busca mais larga, mas sem ocupar 100% pra sobrar espaço pro contador */
-.publications-search-wrapper {
-  max-width: 560px;
-}
-
-/* Título da busca um pouco maior */
-.publications-search-label {
-  font-size: 1.05rem;
-  margin-bottom: 10px;
-}
-
-/* Lupa realmente separada do texto "Digite..." */
-.publications-search .search-icon {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.1rem;
-  opacity: 0.8;
-
-  /* sobrescreve o estilo antigo de .search-icon (aquele botãozinho) */
-  border: none;
-  background: transparent;
-  padding: 0;
-  box-shadow: none;
-}
-
-/* Texto da caixa mais afastado da lupa */
-.publications-search-input {
-  padding: 10px 16px 10px 56px; /* antes 42px */
-  font-size: 1rem;
-}
-
-/* Contador ao lado da caixa, sem quebrar no meio */
-.publications-count {
-  font-size: 0.95rem;
-  white-space: nowrap; /* mantém "3 publicações" em uma linha só */
-}
-
-
-/* === CERN 2005 — remover texto acima da caixinha de busca === */
-
-.publications-search-label {
-  display: none;
-}
-
-/* Ajustar o espaçamento já que tiramos o texto */
-.publications-search {
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
-
-/* ===== LINKS DO CABEÇALHO ===== */
-
-.header-links {
-  margin-left: auto;   /* ADICIONAR ESTA LINHA */
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-
-.header-links a {
-  font-size: 15px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: 0.25s ease;
-}
-
-/* SAPHO — laranja suave */
-.link-sapho {
-  color: #ffb56b;
-}
-.link-sapho:hover {
-  color: #ffd8ac;
-  text-shadow: 0 0 6px rgba(255,181,107,0.55);
-}
-
-/* CERN — azul suave */
-.link-cern {
-  color: #8ab4ff;
-}
-.link-cern:hover {
-  color: #c5d8ff;
-  text-shadow: 0 0 6px rgba(138,180,255,0.55);
-}
-
-/* SC — roxo suave */
-.link-sc {
-  color: #c9a6ff;
-}
-.link-sc:hover {
-  color: #e5d4ff;
-  text-shadow: 0 0 6px rgba(201,166,255,0.55);
-}
-
-/* Ícone Home */
-.home-icon {
-  font-size: 18px;
-  color: #ffffffcc;
-  margin-left: 10px;
-}
-.home-icon:hover {
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(255,255,255,0.6);
-}
-
-.home-icon-svg {
-  cursor: pointer;
-  transition: transform 0.2s ease, filter 0.3s ease;
-  display: inline-block;
-}
-
-.home-icon-svg:hover {
-  transform: scale(1.12);
-  filter: drop-shadow(0 0 6px #9FDFFF);
-}
-
-/* ===== ÍCONE HOME (SVG AZUL NEON SUAVE) ===== */
-
-.home-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  text-decoration: none;
-}
-
-.home-svg {
-  width: 26px;
-  height: 26px;
-  filter: drop-shadow(0 0 6px rgba(147, 197, 253, 0.6));
-  transition: transform 0.25s ease, filter 0.25s ease;
-}
-
-.home-icon:hover .home-svg {
-  transform: translateY(-1px) scale(1.05);
-  filter: drop-shadow(0 0 12px rgba(147, 197, 253, 0.85));
-}
-
-
-/* ===== OVERRIDE (seguro) — menu com ícones um pouco maior ===== */
-.header-nav.top-nav .top-nav__link{
-  font-size: 1.24rem;      /* texto um tiquinho maior */
-  letter-spacing: 0.07em;
-}
-
-.header-nav.top-nav .top-nav__link i{
-  font-size: 1.28rem;      /* ícone um tiquinho maior */
-}
-
-.header-nav.top-nav{
-  gap: 18px;               /* mais respiro */
-}
-
-.header-nav.top-nav .top-nav__sep{
-  font-size: 1.10rem;      /* barra levemente maior */
-  opacity: 0.32;           /* continua discreta */
-}
-
-
-
-/* ===== Favoritos (estrelinha) — cards de publicação ===== */
-.publication-card{
-  position: relative;
-}
-
+/* Favoritos */
 .fav-btn{
   position: absolute;
   top: 14px;
   right: 14px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   width: 38px;
   height: 38px;
   border-radius: 999px;
-
   border: 1px solid rgba(148,163,255,.28);
   background: rgba(6,8,30,.55);
-  color: rgba(233,236,255,.85);
-
   cursor: pointer;
-  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
 }
-
 .fav-btn:hover{
   transform: translateY(-1px);
   box-shadow: 0 0 14px rgba(129,140,248,.22);
 }
-
-.fav-btn.is-fav{
-  color: #ffd48a;
-  border-color: rgba(255, 212, 138, .55);
-  box-shadow: 0 0 14px rgba(255, 212, 138, .22);
-}
-
 .fav-btn i{
   font-size: 1.05rem;
-  line-height: 1;
+  color: rgba(233,236,255,.75);
 }
-
-
-
-/* ===== Voltar (seta) ao lado da busca — seguro/isolado ===== */
-.pub-tools{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-/* botão seta */
-.back-arrow-btn{
-  width: 38px;
-  height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(10,12,25,0.35);
-
-  color: rgba(233,236,255,0.85);
-  text-decoration: none;
-  user-select: none;
-
-  transition: transform .15s ease, box-shadow .20s ease, border-color .20s ease, color .20s ease, text-shadow .20s ease;
-}
-
-/* cor por eixo (fallbacks seguros) */
-html[data-section="cern"]  .back-arrow-btn{ --accent: #4da3ff; }
-html[data-section="sapho"] .back-arrow-btn{ --accent: #ff8a00; }
-html[data-section="sc"]    .back-arrow-btn{ --accent: #b388ff; }
-
-.back-arrow-btn:hover{
-  color: var(--accent, #b388ff);
-  border-color: rgba(255,255,255,0.22);
-  text-shadow: 0 0 10px var(--accent, #b388ff);
-  box-shadow: 0 0 18px rgba(179,136,255,0.25);
-  transform: translateX(-2px);
-}
-
-.back-arrow-btn:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.16), 0 0 18px rgba(179,136,255,0.25);
-}
-
-
-/* ===============================
-   BOTÃO VOLTAR — CERN (DESTAQUE)
-   =============================== */
-
-.back-arrow-btn{
-  --cern-blue: #4da3ff;
-
-  width: 44px;
-  height: 44px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-  font-size: 1.25rem;
-  font-weight: 600;
-
-  color: #e9ecff;
-  text-decoration: none;
-  user-select: none;
-
-  background:
-    radial-gradient(
-      circle at 30% 30%,
-      rgba(77,163,255,0.35),
-      rgba(10,14,30,0.85) 65%
-    );
-
-  border: 1px solid rgba(77,163,255,0.55);
-
-  box-shadow:
-    0 0 10px rgba(77,163,255,0.35),
-    inset 0 0 8px rgba(77,163,255,0.25);
-
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.22s ease,
-    background 0.22s ease,
-    color 0.22s ease;
-}
-
-/* Hover — chama atenção, mas elegante */
-.back-arrow-btn:hover{
-  color: #ffffff;
-
-  background:
-    radial-gradient(
-      circle at 30% 30%,
-      rgba(77,163,255,0.55),
-      rgba(10,14,30,0.9) 65%
-    );
-
-  box-shadow:
-    0 0 18px rgba(77,163,255,0.65),
-    0 0 32px rgba(77,163,255,0.35),
-    inset 0 0 10px rgba(77,163,255,0.35);
-
-  transform: translateX(-3px) scale(1.05);
-}
-
-/* Acessibilidade */
-.back-arrow-btn:focus-visible{
-  outline: none;
-  box-shadow:
-    0 0 0 3px rgba(233,236,255,0.25),
-    0 0 20px rgba(77,163,255,0.6);
-}
-
-
-/* =====================================================
-   CERN — Paleta azul (override visual por eixo)
-   ===================================================== */
-
-html[data-section="cern"]{
-  --axis-main: #4da3ff;
-  --axis-glow: rgba(77,163,255,0.55);
-  --axis-border: rgba(77,163,255,0.45);
-}
-
-/* Ano destacado no título */
-html[data-section="cern"] .highlight-year{
-  color: var(--axis-main);
-  text-shadow: 0 0 10px var(--axis-glow);
-}
-
-/* Botões de filtro (Todos, Favoritos, etc.) */
-html[data-section="cern"] .filter-btn{
-  border-color: var(--axis-border);
-  color: #e9ecff;
-}
-
-html[data-section="cern"] .filter-btn:hover{
-  box-shadow: 0 0 14px var(--axis-glow);
-}
-
-/* Botão ativo */
-html[data-section="cern"] .filter-btn.is-active{
-  background: radial-gradient(
-    circle at 30% 30%,
-    rgba(77,163,255,0.45),
-    rgba(10,14,30,0.9) 65%
-  );
-  border-color: var(--axis-main);
-  box-shadow:
-    0 0 18px var(--axis-glow),
-    inset 0 0 8px rgba(77,163,255,0.35);
-}
-
-/* Subfiltros (TCC, Mestrado, Doutorado) */
-html[data-section="cern"] .subfilters-row .filter-btn{
-  border-color: rgba(77,163,255,0.35);
-}
-
-html[data-section="cern"] .subfilters-row .filter-btn.is-active{
-  background: rgba(77,163,255,0.25);
-  box-shadow: 0 0 14px var(--axis-glow);
-}
-
-
+.fav-btn.is-fav i{ color: #ffd36a; }
 
 /* =========================================================
-   NIPSCERN — Responsividade (SAFE OVERRIDE)
-   Cole no FINAL do style3.css
+   HUB (Página principal de publications) — LISTA (igual 1ª imagem)
    ========================================================= */
-
-/* 1) Regras base para não estourar tela */
-* { box-sizing: border-box; }
-img, svg, video, canvas { max-width: 100%; height: auto; }
-body { overflow-x: hidden; }
-
-/* 2) Container central “fluido” */
-:root{
-  --page-max: 1040px;
-  --pad-x: clamp(14px, 3vw, 22px);
-  --gap: clamp(12px, 2.2vw, 18px);
-}
-
-.years-page,
-.articles-page,
-.cern-years-page,
-.sapho-years-page,
-.sc-years-page{
-  width: 100%;
-  max-width: var(--page-max);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--pad-x);
-  padding-right: var(--pad-x);
-}
-
-/* 3) Títulos e textos “escala” com a tela */
-.page-title,
-.articles-title,
-.years-title{
-  font-size: clamp(22px, 3.2vw, 34px);
-  line-height: 1.2;
-}
-
-.publication-title,
-.article-title{
-  font-size: clamp(16px, 2.2vw, 22px);
-}
-
-/* 4) Cards: largura total no mobile, central no desktop */
-.publication-card,
-.article-card{
-  width: 100%;
-}
-
-/* 5) Barra de filtros e busca: quebra bem no celular */
-.filters-row,
-.articles-filters,
-.timeline-filters{
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap);
-  justify-content: center;
-}
-
-/* 6) Linha da lupa / busca / contador: empilha no mobile */
-.search-row,
-.search-wrap,
-.publications-search{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-}
-
-/* campo busca não ficar gigante nem minúsculo */
-#busca-publicacoes,
-#article-search{
-  width: min(520px, 86vw);
-}
-
-/* contador */
-#publications-count{
-  white-space: nowrap;
-}
-
-/* 7) Header: garante que não “quebre” em telas pequenas */
-.header{
-  padding-left: var(--pad-x);
-  padding-right: var(--pad-x);
-}
-
-.logo-container{
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.site-subtitle,
-.logo-subtitle{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 65vw;
-}
-
-/* =========================================================
-   BREAKPOINTS
-   ========================================================= */
-
-/* Celular */
-@media (max-width: 480px){
-  .header-nav.top-nav{ gap: 10px; }
-  .top-nav__link{ padding: 8px 10px; }
-
-  /* Título do topo não ficar enorme */
-  .site-subtitle, .logo-subtitle{ max-width: 58vw; }
-
-  /* Botões de filtro menores */
-  .filter-btn, .filter-chip{
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-
-  /* Cards com mais respiro vertical */
-  .publication-card, .article-card{
-    padding: 16px;
-  }
-}
-
-/* Tablet */
-@media (max-width: 768px){
-  :root{ --page-max: 980px; }
-  .publication-card, .article-card{ padding: 18px; }
-}
-
-/* Notebook/desktop grande */
-@media (min-width: 1440px){
-  :root{ --page-max: 1180px; }
-}
-
-.fav-btn i{
-  font-size: 1.45rem; /* aumenta a estrela */
- 
-}
-
-/* =========================================
-   CERN (e anos) — Entrada + Glow consistente
-   (aplica em TODOS os botões de ano)
-========================================= */
-
-/* Troque .year-btn pelo seletor real dos seus botões de ano */
-.year-btn {
-  opacity: 0;
-  transform: translateY(16px) scale(0.985);
-  filter: blur(1.5px);
-  transition: box-shadow .35s ease, border-color .35s ease, transform .35s ease;
-  will-change: transform, opacity, filter;
-}
-
-/* Estado "entrou" */
-.year-btn.is-in {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-  animation: nip-year-in 700ms cubic-bezier(.2, .9, .2, 1) both;
-}
-
-/* Glow padrão (fica bonito e uniforme) */
-.year-btn.is-in {
-  box-shadow:
-    0 0 0 1px rgba(120, 180, 255, 0.22),
-    0 10px 30px rgba(0, 0, 0, 0.45),
-    0 0 22px rgba(0, 229, 255, 0.12);
-}
-
-/* Hover reforça glow */
-.year-btn:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow:
-    0 0 0 1px rgba(120, 180, 255, 0.35),
-    0 14px 40px rgba(0, 0, 0, 0.55),
-    0 0 30px rgba(0, 229, 255, 0.20);
-}
-
-/* Keyframes da entrada */
-@keyframes nip-year-in {
-  0% { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(2px); }
-  60% { opacity: 1; }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
-
-/* Respeita reduce motion */
-@media (prefers-reduced-motion: reduce) {
-  .year-btn, .year-btn.is-in {
-    animation: none !important;
-    transition: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-    filter: none !important;
-  }
-}
-
-/* ================================
-   ANOS — entrada + glow (universal)
-   Funciona em qualquer botão/link marcado com data-year
-================================ */
-
-[data-year]{
-  opacity: 0;
-  transform: translateY(16px) scale(0.985);
-  filter: blur(1.5px);
-  will-change: transform, opacity, filter;
-}
-
-/* estado entrou */
-[data-year].is-in{
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-  animation: nip-year-in 700ms cubic-bezier(.2,.9,.2,1) both;
-  animation-delay: var(--in-delay, 0ms);
-
-  /* glow consistente */
-  box-shadow:
-    0 0 0 1px rgba(120, 180, 255, 0.22),
-    0 10px 30px rgba(0, 0, 0, 0.45),
-    0 0 22px rgba(0, 229, 255, 0.12);
-}
-
-[data-year]:hover{
-  transform: translateY(-2px) scale(1.01);
-  box-shadow:
-    0 0 0 1px rgba(120, 180, 255, 0.35),
-    0 14px 40px rgba(0, 0, 0, 0.55),
-    0 0 30px rgba(0, 229, 255, 0.20);
-}
-
-@keyframes nip-year-in{
-  0%{opacity:0; transform:translateY(18px) scale(0.985); filter:blur(2px)}
-  60%{opacity:1}
-  100%{opacity:1; transform:translateY(0) scale(1); filter:blur(0)}
-}
-
-@media (prefers-reduced-motion: reduce){
-  [data-year], [data-year].is-in{
-    animation:none !important;
-    transition:none !important;
-    opacity:1 !important;
-    transform:none !important;
-    filter:none !important;
-  }
-}
-
-
-/* ==============================
-   CERN — filtros em coluna
-   (Nível da tese abaixo de Tese)
-============================== */
-
-/* força empilhar os grupos (Tipo de publicação em cima, Nível da tese embaixo) */
-.timeline-filters {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center;
-  gap: 16px;
-}
-
-/* garante que cada grupo ocupe a largura e fique bonitinho */
-.timeline-filter-group {
-  width: min(920px, 100%);
-  text-align: center;
-}
-
-/* chips sempre centralizados */
-.timeline-filter-chips {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px 12px;
-}
-
-/* quando aparecer, o grupo do nível da tese fica naturalmente abaixo */
-.thesis-level-group {
-  width: min(920px, 100%);
-}
-
-
-
-/* ===============================
-   HOME — Font Awesome (padrão 2005)
-=============================== */
-
-.home-fa {
-  font-size: 20px;
-  color: #cfe9ff;
-  opacity: 0.85;
-  transition: transform 0.25s ease, opacity 0.25s ease, text-shadow 0.25s ease;
-}
-
-.home-link:hover .home-fa {
-  opacity: 1;
-  transform: scale(1.12);
-  text-shadow:
-    0 0 6px rgba(120, 200, 255, 0.6),
-    0 0 14px rgba(120, 200, 255, 0.35);
-}
-
-
-/* =========================================
-   HOME (Font Awesome) — override final seguro
-   ========================================= */
-.header .home-link{
-  width: 44px;
-  height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  text-decoration: none;
-}
-
-.header .home-fa{
-  font-size: 20px;
-  line-height: 1;
-  color: #cfe9ff;
-  opacity: .9;
-  transition: transform .2s ease, opacity .2s ease, text-shadow .2s ease;
-}
-
-.header .home-link:hover .home-fa{
-  opacity: 1;
-  transform: scale(1.12);
-  text-shadow: 0 0 10px rgba(0, 229, 255, 0.55);
-}
-
-/* === AUMENTAR APENAS A CASINHA (Font Awesome) === */
-.header-nav .home-link i {
-  font-size: 1.5rem;
-}
-
-
-/* =======================================================
-   PATCH — Cards maiores nas páginas de ano (2004/2005/2008…)
-   Cole no FINAL do style3.css
-======================================================= */
-
-.publications-list-wrapper {
-  width: 100%;
-  padding-left: 18px;
-  padding-right: 18px;
-}
-
-.publications-list {
-  width: 100%;
-  max-width: 980px;   /* <<< aumenta a “caixa” geral */
-  margin: 0 auto;
-}
-
-.publication-card {
-  width: 100%;
-  max-width: 980px;   /* <<< garante que o card acompanhe */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.publication-card__content {
-  padding: 22px 26px; /* <<< mais respiro dentro */
-}
-
-@media (max-width: 640px) {
-  .publications-list {
-    max-width: 100%;
-  }
-  .publication-card {
-    max-width: 100%;
-  }
-  .publication-card__content {
-    padding: 18px 18px;
-  }
-}
-
-
-
-/* =========================================================
-   OVERRIDE FINAL — TIPOGRAFIA E ESCALA (SAFE)
-   Garante que títulos e textos não "estourem"
-   ========================================================= */
-
-/* títulos principais */
-.page-title,
-.years-title,
-.section-title {
-  font-size: clamp(22px, 3vw, 34px);
-  line-height: 1.2;
-}
-
-/* títulos de cards */
-.publication-title,
-.article-title {
-  font-size: clamp(16px, 2.1vw, 22px);
-}
-
-/* textos normais */
-.publication-meta,
-.publication-summary,
-.article-meta,
-.article-summary,
-p {
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-/* filtros e botões */
-.filter-btn,
-.filter-chip,
-.pub-sub-pill {
-  font-size: 0.85rem;
-}
-
-/* evita estouro horizontal */
-body {
-  overflow-x: hidden;
-}
-
-/* =========================================================
-   NIPSCERN — MOBILE FIX (até 768px)
-   Corrige diagrama, núcleos e header no celular
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  /* ===== HEADER ===== */
-  .header {
-    height: 80px;
-    padding: 16px 18px;
-  }
-
-  .logo-img {
-    height: 52px;
-  }
-
-  .site-subtitle {
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-  }
-
-  /* espaço correto pro conteúdo */
-  main {
-    padding-top: 90px;
-  }
-
-  /* ===== DIAGRAMA ===== */
-  .diagram {
-    width: 100%;
-    height: auto;
-    transform: none;
-    top: 0;
-    display: flex;
-    justify-content: center;
-  }
-
-  .circle {
-    width: 240px;
-    height: 240px;
-    font-size: 1.4rem;
-  }
-
-  .sapho {
-    left: 0;
-    top: 0;
-    position: relative;
-    margin-right: -60px;
-  }
-
-  .cern {
-    left: 0;
-    top: 0;
-    position: relative;
-  }
-
-  /* interseção SC */
-  .intersection.sc {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .link-intersection {
-    font-size: 1rem;
-  }
-
-  /* ===== NÚCLEOS ===== */
-  .nucleos {
-    position: static;
-    transform: none;
-    margin-top: 40px;
-    margin-bottom: 80px;
-    flex-direction: column;
-    gap: 16px;
-    padding: 0 16px;
-  }
-
-  .nucleo {
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  /* ===== FOOTER ===== */
-  .footer {
-    font-size: 0.75rem;
-  }
-}
-
-/* =========================================================
-   NIPSCERN — MOBILE FIX (até 768px)
-   Corrige diagrama, núcleos e header no celular
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  /* ===== HEADER ===== */
-  .header {
-    height: 80px;
-    padding: 16px 18px;
-  }
-
-  .logo-img {
-    height: 52px;
-  }
-
-  .site-subtitle {
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-  }
-
-  /* espaço correto pro conteúdo */
-  main {
-    padding-top: 90px;
-  }
-
-  /* ===== DIAGRAMA ===== */
-  .diagram {
-    width: 100%;
-    height: auto;
-    transform: none;
-    top: 0;
-    display: flex;
-    justify-content: center;
-  }
-
-  .circle {
-    width: 240px;
-    height: 240px;
-    font-size: 1.4rem;
-  }
-
-  .sapho {
-    left: 0;
-    top: 0;
-    position: relative;
-    margin-right: -60px;
-  }
-
-  .cern {
-    left: 0;
-    top: 0;
-    position: relative;
-  }
-
-  /* interseção SC */
-  .intersection.sc {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .link-intersection {
-    font-size: 1rem;
-  }
-
-  /* ===== NÚCLEOS ===== */
-  .nucleos {
-    position: static;
-    transform: none;
-    margin-top: 40px;
-    margin-bottom: 80px;
-    flex-direction: column;
-    gap: 16px;
-    padding: 0 16px;
-  }
-
-  .nucleo {
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  /* ===== FOOTER ===== */
-  .footer {
-    font-size: 0.75rem;
-  }
-}
-
-
-/* =========================================================
-   MOBILE FIX — HOME (index3)
-   Não mexe no desktop. Só melhora celular/tablet.
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  /* Header menor no celular */
-  .header{
-    height: 82px;
-    padding: 14px 16px;
-  }
-  .logo-img{ height: 52px; }
-  .site-subtitle{
-    font-size: 1.05rem;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 60vw;
-  }
-  .home-icon{ width: 44px; height: 44px; }
-
-  /* Conteúdo não “come” atrás do header */
-  main{
-    padding-top: 96px;
-    padding-bottom: 90px;
-  }
-
-  /* Título “Sinergia…” central e com tamanho responsivo */
-  .titulo-diagrama{
-    top: 0;
-    margin: 8px 0 14px;
-    text-align: center;
-    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
-  }
-
-  /* ===== DIAGRAMA: vira um bloco central responsivo ===== */
-  .diagram{
-    width: min(92vw, 420px);
-    height: min(92vw, 420px);
-    transform: none;     /* remove translateX do desktop */
-    top: 0;              /* remove empurrão vertical */
-    margin: 18px auto 18px;
-  }
-
-  /* Círculos diminuem e reposicionam proporcionalmente */
-  .circle{
-    width: min(56vw, 240px);
-    height: min(56vw, 240px);
-    font-size: clamp(1.05rem, 4.6vw, 1.35rem);
-    letter-spacing: 1px;
-  }
-
-  .sapho{
-    left: 6%;
-    top: 18%;
-  }
-  .cern{
-    left: 44%;
-    top: 18%;
-  }
-
-  /* Interseção SC volta pro centro real do overlap */
-  .intersection.sc{
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-  .link-intersection{ font-size: 1rem; }
-
-  /* ===== Núcleos: sai do fixed e vira coluna ===== */
-  .nucleos{
-    position: relative;     /* antes era fixed */
-    left: auto;
-    bottom: auto;
-    transform: none;
-
-    width: 100%;
-    padding: 0 16px;
-    margin: 22px auto 0;
-
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    z-index: 2;
-  }
-
-  .nucleo{
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  /* Footer: em mobile, fixed costuma atrapalhar */
-  .footer{
-    position: relative;   /* antes era fixed */
-    margin-top: 22px;
-  }
-}
-
-
-
-/* =========================================================
-   MOBILE FIX — HOME (index3)
-   Não mexe no desktop. Só melhora celular/tablet.
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  /* Header menor no celular */
-  .header{
-    height: 82px;
-    padding: 14px 16px;
-  }
-  .logo-img{ height: 52px; }
-  .site-subtitle{
-    font-size: 1.05rem;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 60vw;
-  }
-  .home-icon{ width: 44px; height: 44px; }
-
-  /* Conteúdo não “come” atrás do header */
-  main{
-    padding-top: 96px;
-    padding-bottom: 90px;
-  }
-
-  /* Título “Sinergia…” central e com tamanho responsivo */
-  .titulo-diagrama{
-    top: 0;
-    margin: 8px 0 14px;
-    text-align: center;
-    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
-  }
-
-  /* ===== DIAGRAMA: vira um bloco central responsivo ===== */
-  .diagram{
-    width: min(92vw, 420px);
-    height: min(92vw, 420px);
-    transform: none;     /* remove translateX do desktop */
-    top: 0;              /* remove empurrão vertical */
-    margin: 18px auto 18px;
-  }
-
-  /* Círculos diminuem e reposicionam proporcionalmente */
-  .circle{
-    width: min(56vw, 240px);
-    height: min(56vw, 240px);
-    font-size: clamp(1.05rem, 4.6vw, 1.35rem);
-    letter-spacing: 1px;
-  }
-
-  .sapho{
-    left: 6%;
-    top: 18%;
-  }
-  .cern{
-    left: 44%;
-    top: 18%;
-  }
-
-  /* Interseção SC volta pro centro real do overlap */
-  .intersection.sc{
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-  .link-intersection{ font-size: 1rem; }
-
-  /* ===== Núcleos: sai do fixed e vira coluna ===== */
-  .nucleos{
-    position: relative;     /* antes era fixed */
-    left: auto;
-    bottom: auto;
-    transform: none;
-
-    width: 100%;
-    padding: 0 16px;
-    margin: 22px auto 0;
-
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    z-index: 2;
-  }
-
-  .nucleo{
-    width: 100%;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  /* Footer: em mobile, fixed costuma atrapalhar */
-  .footer{
-    position: relative;   /* antes era fixed */
-    margin-top: 22px;
-  }
-}
-/* =========================================================
-   MOBILE FIX V2 — HOME (index3)
-   Ajusta: título, diagrama (mais alto), e cards sem sobrepor
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  /* ---------- HEADER ---------- */
-  .header{
-    height: 78px;
-    padding: 12px 14px;
-  }
-  .logo-img{ height: 50px; }
-  .site-subtitle{
-    font-size: 1.02rem;
-    letter-spacing: 1px;
-    max-width: 58vw;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* ---------- MAIN / ESPAÇOS ---------- */
-  main{
-    padding-top: 86px !important;   /* menos “buraco” */
-    padding-bottom: 40px !important;
-  }
-
-  /* ---------- TÍTULO “Sinergia…” ---------- */
-  .titulo-diagrama{
-    top: 0 !important;
-    margin: 0 auto 10px !important;
-    text-align: center !important;
-    font-size: clamp(1.0rem, 4.6vw, 1.25rem) !important;
-    line-height: 1.15 !important;
-    max-width: 92vw;
-  }
-
-  /* força “SAPHO e CERN” ficarem juntos e centralizados */
-  .titulo-diagrama .sapho-text,
-  .titulo-diagrama .cern-text{
-    display: inline !important;
-    white-space: nowrap;
-  }
-
-  /* ---------- DIAGRAMA ---------- */
-  .diagram{
-    width: min(92vw, 390px) !important;
-    height: min(92vw, 390px) !important;
-    transform: none !important;
-    top: 0 !important;
-    margin: 8px auto 14px !important;  /* sobe o diagrama */
-  }
-
-  .circle{
-    width: min(54vw, 225px) !important;
-    height: min(54vw, 225px) !important;
-    font-size: clamp(1.0rem, 4.8vw, 1.25rem) !important;
-    letter-spacing: 1px !important;
-  }
-
-  .sapho{ left: 4% !important; top: 18% !important; }
-  .cern { left: 46% !important; top: 18% !important; }
-
-  /* SC bem no miolo */
-  .intersection.sc{
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-  .link-intersection{ font-size: 0.95rem !important; }
-
-  /* ---------- NÚCLEOS/CARDS (sem fixed) ---------- */
-  .nucleos{
-    position: relative !important; /* mata o fixed */
-    left: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-
-    width: 100% !important;
-    padding: 0 14px !important;
-    margin: 8px auto 0 !important;
-
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    z-index: 2 !important;
-  }
-
-  .nucleo{
-    width: 100% !important;
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    padding: 18px 16px !important;
-  }
-
-  /* ---------- FOOTER: no mobile, sem fixed ---------- */
-  .footer{
-    position: relative !important;
-    margin-top: 16px !important;
-  }
-}
-
-
-/* =========================================================
-   MOBILE FIX V2 — HOME (index3)
-   Ajusta: título, diagrama (mais alto), e cards sem sobrepor
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  /* ---------- HEADER ---------- */
-  .header{
-    height: 78px;
-    padding: 12px 14px;
-  }
-  .logo-img{ height: 50px; }
-  .site-subtitle{
-    font-size: 1.02rem;
-    letter-spacing: 1px;
-    max-width: 58vw;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* ---------- MAIN / ESPAÇOS ---------- */
-  main{
-    padding-top: 86px !important;   /* menos “buraco” */
-    padding-bottom: 40px !important;
-  }
-
-  /* ---------- TÍTULO “Sinergia…” ---------- */
-  .titulo-diagrama{
-    top: 0 !important;
-    margin: 0 auto 10px !important;
-    text-align: center !important;
-    font-size: clamp(1.0rem, 4.6vw, 1.25rem) !important;
-    line-height: 1.15 !important;
-    max-width: 92vw;
-  }
-
-  /* força “SAPHO e CERN” ficarem juntos e centralizados */
-  .titulo-diagrama .sapho-text,
-  .titulo-diagrama .cern-text{
-    display: inline !important;
-    white-space: nowrap;
-  }
-
-  /* ---------- DIAGRAMA ---------- */
-  .diagram{
-    width: min(92vw, 390px) !important;
-    height: min(92vw, 390px) !important;
-    transform: none !important;
-    top: 0 !important;
-    margin: 8px auto 14px !important;  /* sobe o diagrama */
-  }
-
-  .circle{
-    width: min(54vw, 225px) !important;
-    height: min(54vw, 225px) !important;
-    font-size: clamp(1.0rem, 4.8vw, 1.25rem) !important;
-    letter-spacing: 1px !important;
-  }
-
-  .sapho{ left: 4% !important; top: 18% !important; }
-  .cern { left: 46% !important; top: 18% !important; }
-
-  /* SC bem no miolo */
-  .intersection.sc{
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-  .link-intersection{ font-size: 0.95rem !important; }
-
-  /* ---------- NÚCLEOS/CARDS (sem fixed) ---------- */
-  .nucleos{
-    position: relative !important; /* mata o fixed */
-    left: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-
-    width: 100% !important;
-    padding: 0 14px !important;
-    margin: 8px auto 0 !important;
-
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    z-index: 2 !important;
-  }
-
-  .nucleo{
-    width: 100% !important;
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    padding: 18px 16px !important;
-  }
-
-  /* ---------- FOOTER: no mobile, sem fixed ---------- */
-  .footer{
-    position: relative !important;
-    margin-top: 16px !important;
-  }
-}
-
-
-/* =========================================================
-   MOBILE FINAL — HOME (index3)
-   Diagrama simplificado e UX correta
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  /* ---------- DIAGRAMA ---------- */
-  .diagram{
-    width: 100%;
-    height: auto;
-    position: relative;
-    margin: 16px auto 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  /* esconde o círculo CERN no mobile */
-  .circle.cern{
-    display: none;
-  }
-
-  /* SAPHO vira o foco principal */
-  .circle.sapho{
-    position: relative;
-    left: auto;
-    top: auto;
-    width: min(68vw, 260px);
-    height: min(68vw, 260px);
-    font-size: clamp(1.1rem, 5vw, 1.35rem);
-  }
-
-  /* SC vira um “badge” abaixo */
-  .intersection.sc{
-    position: relative;
-    left: auto;
-    top: auto;
-    transform: none;
-    margin-top: 12px;
-    text-align: center;
-  }
-
-  .link-intersection{
-    font-size: 0.95rem;
-    opacity: 0.9;
-  }
-}
-
-
-/* =========================================================
-   MOBILE — POLIMENTO FINAL HOME
-   Compacta o diagrama e melhora leitura
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  /* Diagrama mais compacto */
-  .circle.sapho{
-    width: min(60vw, 220px);
-    height: min(60vw, 220px);
-    margin-top: 6px;
-  }
-
-  /* Espaço geral mais enxuto */
-  .diagram{
-    margin: 10px auto 12px;
-  }
-
-  /* Badge SC com identidade visual */
-  .intersection.sc{
-    margin-top: 10px;
-  }
-
-  .link-intersection{
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.18);
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-  }
-
-  /* Cards um pouco mais próximos */
-  .nucleos{
-    margin-top: 12px;
-  }
-}
-
-
-/* =========================================================
-   MOBILE — Venn completo (SAPHO + CERN + SC)
-   ========================================================= */
-@media (max-width: 768px){
-
-  /* área do diagrama */
-  .diagram{
-    width: min(92vw, 360px) !important;
-    height: min(92vw, 360px) !important;
-    margin: 14px auto 18px !important;
-    position: relative !important;
-    transform: none !important;
-    top: 0 !important;
-  }
-
-  /* círculos responsivos */
-  .circle{
-    width: 62% !important;   /* proporcional ao container */
-    height: 62% !important;
-    font-size: clamp(1.0rem, 4.4vw, 1.25rem) !important;
-    letter-spacing: 1px !important;
-    position: absolute !important;
-    top: 18% !important;
-  }
-
-  /* SAPHO à esquerda */
-  .circle.sapho{
-    left: 6% !important;
-    display: flex !important;
-  }
-
-  /* CERN à direita */
-  .circle.cern{
-    left: 32% !important;
-    display: flex !important;
-  }
-
-  /* interseção SC bem no meio */
-  .intersection.sc{
-    position: absolute !important;
-    left: 50% !important;
-    top: 49% !important;
-    transform: translate(-50%, -50%) !important;
-    margin: 0 !important;
-    z-index: 7 !important;
-    text-align: center !important;
-  }
-
-  .link-intersection{
-    font-size: 0.95rem !important;
-    padding: 6px 12px !important;
-    border-radius: 999px !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.18) !important;
-    display: inline-block !important;
-  }
-}
-
-
-/* =========================================================
-   MOBILE — ajuste fino do texto dentro do Venn
-   (evita SAPHO/CERN colarem no SC)
-   ========================================================= */
-@media (max-width: 768px){
-
-  /* deixa as palavras menores no diagrama */
-  .circle{
-    font-size: clamp(0.85rem, 3.6vw, 1.05rem) !important;
-    letter-spacing: 0.08em !important;
-  }
-
-  /* SAPHO "puxa" o texto para o lado de fora (esquerda) */
-  .circle.sapho{
-    justify-content: flex-start !important;
-    padding-left: 14px !important;
-  }
-
-  /* CERN "puxa" o texto para o lado de fora (direita) */
-  .circle.cern{
-    justify-content: flex-end !important;
-    padding-right: 14px !important;
-  }
-
-  /* SC fica bem legível no meio */
-  .intersection.sc{
-    z-index: 9 !important;
-  }
-
-  .link-intersection{
-    font-size: 0.9rem !important;
-    padding: 6px 10px !important;
-  }
-}
-
-
-/* =========================================================
-   MOBILE (Venn) — versão definitiva igual ao desktop
-   Cole no FINAL do style3.css
-   ========================================================= */
-@media (max-width: 768px){
-
-  /* Título acima do diagrama (opcional: mantém central e com respiro) */
-  .titulo-diagrama{
-    top: 0 !important;
-    margin: 18px auto 18px !important;
-    text-align: center !important;
-    font-size: clamp(1.05rem, 4.2vw, 1.35rem) !important;
-  }
-
-  /* Container do diagrama: grande e centralizado */
-  .diagram{
-    width: min(92vw, 520px) !important;
-    height: min(62vw, 360px) !important; /* proporção “wide” igual ao desktop */
-    margin: 8px auto 28px !important;
-    position: relative !important;
-    transform: none !important;
-    top: 0 !important;
-    left: auto !important;
-    right: auto !important;
-  }
-
-  /* Círculos grandes e proporcionais */
-  .circle{
-    position: absolute !important;
-    width: 66% !important;     /* grande */
-    height: 92% !important;    /* círculo “alto” dentro do container wide */
-    top: 4% !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    font-size: clamp(1.1rem, 4.8vw, 1.55rem) !important;
-    letter-spacing: 0.14em !important;
-    font-weight: 700 !important;
-  }
-
-  /* SAPHO à esquerda */
-  .circle.sapho{
-    left: 0% !important;
-  }
-
-  /* CERN à direita (com overlap bonito no centro) */
-  .circle.cern{
-    left: 34% !important; /* <<< controla o overlap; 34% deixa igual ao desktop */
-  }
-
-  /* SC exatamente no meio da interseção */
-  .intersection.sc{
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 9 !important;
-  }
-
-  /* SC como “pill” discreta (fica igual ao estilo da 2ª imagem) */
-  .link-intersection{
-    font-size: clamp(0.85rem, 3.6vw, 1.05rem) !important;
-    letter-spacing: 0.12em !important;
-    padding: 6px 12px !important;
-    border-radius: 999px !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.18) !important;
-    color: #ffffff !important;
-    text-decoration: none !important;
-  }
-}
-
-
-/* =========================================================
-   MOBILE HOME — Venn grande + cards naturais (FIX)
-   Cole no FINAL do style3.css
-   ========================================================= */
-@media (max-width: 768px){
-
-  /* dá respiro real abaixo do header fixo */
-  main{
-    padding-top: 120px !important;
-    padding-bottom: 40px !important;
-  }
-
-  /* título central e bem posicionado */
-  .titulo-diagrama{
-    top: 0 !important;
-    margin: 6px auto 18px !important;
-    text-align: center !important;
-    font-size: clamp(1.05rem, 4.2vw, 1.35rem) !important;
-  }
-
-  /* DIAGRAMA: agora ele ocupa a largura (igual desktop) */
-  .diagram{
-    width: min(96vw, 560px) !important;
-    height: min(78vw, 460px) !important;  /* <<< bem maior */
-    margin: 0 auto 22px !important;
-    transform: none !important;
-    top: 0 !important;
-  }
-
-  /* CÍRCULOS: grandes de verdade */
-  .circle{
-    width: 70% !important;
-    height: 100% !important;
-    top: 0% !important;
-
-    font-size: clamp(1.15rem, 5vw, 1.6rem) !important;
-    letter-spacing: 0.14em !important;
-  }
-
-  /* POSIÇÃO: overlap parecido com o desktop */
-  .circle.sapho{
-justify-content: flex-start !important;
-  padding-left: 70px !important;
- left: 0% !important; }
-  
-.circle.cern{  
-  justify-content: flex-start !important;
-  padding-left: 130px !important;
-left: 45% !important; } /* <<< mais overlap (fica mais bonito) */
-
-  /* SC exatamente no meio */
-  .intersection.sc{
-    left: 58% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 10 !important;
-  }
-
-  .link-intersection{
-    font-size: clamp(0.9rem, 3.8vw, 1.05rem) !important;
-    padding: 6px 12px !important;
-    border-radius: 999px !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.18) !important;
-  }
-
-  /* CARDS (núcleos): no mobile NÃO podem ser fixed */
-  .nucleos{
-    position: relative !important;   /* <<< era fixed (isso criava “vazio”) */
-    left: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-
-    width: min(92vw, 520px) !important;
-    margin: 10px auto 0 !important;
-
-    flex-direction: column !important;
-    gap: 14px !important;
-  }
-
-  .nucleo{
-    width: 100% !important;
-  }
-}
-
-
-/* =========================================================
-   PATCH MOBILE — Venn (SAPHO/CERN/SC) sem cortar bordas
-   Cole no FINAL do style3.css
-========================================================= */
-@media (max-width: 768px){
-
-  /* 1) diagrama vira responsivo e centralizado */
-  .diagram{
-    width: min(92vw, 520px);
-    height: min(86vw, 520px);
-    top: 70px;                      /* ajuste fino se precisar */
-    transform: none !important;     /* mata translateX do desktop */
-    margin: 0 auto;
-  }
-
-  /* garante que nada seja “cortado” pelo container */
-  .diagram{ overflow: visible; }
-
-  /* 2) círculos em tamanho responsivo */
-  .circle{
-    width: min(44vw, 260px);
-    height: min(44vw, 260px);
-    font-size: clamp(1.05rem, 3.2vw, 1.55rem);
-  }
-
-  /* 3) posições em % (isso impede o CERN de cortar à direita) */
-  .sapho{
-    left: 6%;
-    top: 18%;
-  }
-
-  .cern{
-    left: 46%;      /* << puxa o CERN mais pra dentro */
-    top: 18%;
-  }
-
-  /* 4) SC no centro da interseção */
-  .intersection.sc{
-    left: 58% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-}
-
-/* ===== HUB de Publicações (Filtros + Cards) ===== */
 .pubs-hub { max-width: 1040px; margin: 40px auto 120px; padding: 0 20px; }
 .pubs-title { text-align: center; margin: 0 0 14px; }
 
@@ -3166,367 +678,125 @@ left: 45% !important; } /* <<< mais overlap (fica mais bonito) */
 .results-bar { display: flex; justify-content: center; align-items: center; gap: 14px; margin: 8px 0 18px; opacity: .9; flex-wrap: wrap; }
 .load-more { border: 1px solid rgba(120,200,255,.25); background: rgba(6,6,18,.35); color: #e9ecff; border-radius: 14px; padding: 10px 14px; cursor: pointer; display: inline-flex; }
 
-.pubs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-.pub-card { border: 1px solid rgba(120,200,255,.25); background: rgba(6,6,18,.35); border-radius: 18px; padding: 16px; }
+/* >>> AQUI está a diferença: LISTA (flex column), nunca grid */
+.pubs-grid{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  width: min(920px, 100%) !important;
+  margin: 0 auto !important;
+}
+
+.pub-card{
+  position: relative;
+  width: 100% !important;
+  border: 1px solid rgba(120,200,255,.25);
+  background: rgba(6,6,18,.35);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+}
+
 .pub-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .pub-badge { font-size: 12px; letter-spacing: .12em; opacity: .85; }
-.fav-btn { border: none; background: transparent; cursor: pointer; opacity: .7; color: inherit; }
-.fav-btn.is-fav { opacity: 1; }
-.pub-title { margin: 6px 0 8px; }
+
+.pub-card .fav-btn{
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  display: inline-flex !important;
+}
+.pub-card .fav-btn i{ color: rgba(233,236,255,.75); }
+.pub-card .fav-btn.is-fav i{ color: #ffcc33; }
+
+.pub-title { margin: 6px 0 8px; font-size: 16px; line-height: 1.25; }
 .pub-meta { margin: 0 0 6px; opacity: .85; }
-.pub-actions { margin-top: 12px; }
+.pub-actions { margin-top: 12px; display: flex; gap: 10px; }
 .pub-open { display: inline-block; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(120,200,255,.25); text-decoration: none; color: #e9ecff; }
 
 .no-results { text-align: center; opacity: .75; padding: 24px; }
 
+/* =========================================================
+   RESPONSIVO — PONTOS ESSENCIAIS
+   ========================================================= */
+@media (max-width: 768px) {
+  .publications-page { margin: 130px auto 80px; padding: 0 16px 60px; }
+  .page-title { font-size: 1.6rem; }
+  .publication-card { padding: 18px; }
 
+  /* HOME mobile básico (sem repetir 10 versões) */
+  .header { height: 82px; padding: 14px 16px; }
+  .logo-img { height: 52px; }
+  .site-subtitle { font-size: 1.05rem; letter-spacing: 1px; max-width: 60vw; }
 
+  main { padding-top: 120px; padding-bottom: 40px; }
 
+  .titulo-diagrama{
+    top: 0;
+    margin: 6px auto 18px;
+    text-align: center;
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  }
 
-/* ================================
-   HUB • Cards em 1 coluna (sempre)
-   ================================ */
+  .diagram{
+    width: min(96vw, 560px);
+    height: min(78vw, 460px);
+    margin: 0 auto 22px;
+    transform: none;
+    top: 0;
+  }
 
-#pubsGrid {
-  display: grid;
-  grid-template-columns: 1fr !important; /* 1 coluna */
-  gap: 18px; /* espaçamento entre cards */
-  max-width: 920px; /* opcional: deixa os cards mais elegantes no centro */
-  margin: 0 auto;   /* centraliza o bloco */
+  .circle{
+    width: 70%;
+    height: 100%;
+    top: 0%;
+    font-size: clamp(1.15rem, 5vw, 1.6rem);
+    letter-spacing: 0.14em;
+  }
+
+  .circle.sapho{
+    left: 0%;
+    justify-content: flex-start;
+    padding-left: 70px;
+  }
+
+  .circle.cern{
+    left: 45%;
+    justify-content: flex-start;
+    padding-left: 130px;
+  }
+
+  .intersection.sc{
+    left: 58%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+
+  .link-intersection{
+    font-size: clamp(0.9rem, 3.8vw, 1.05rem);
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+
+  .nucleos{
+    position: relative;
+    left: auto; bottom: auto;
+    transform: none;
+    width: min(92vw, 520px);
+    margin: 10px auto 0;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .nucleo{ width: 100%; }
+
+  .footer{ position: relative; margin-top: 16px; }
 }
 
-/* garante que o card ocupe a largura toda da coluna */
-#pubsGrid .pub-card {
-  width: 100%;
-}
-
-
-/* ================================
-   HUB • Favorito sempre visível
-   ================================ */
-
-/* Se o seu CSS escondia no normal e mostrava no hover,
-   isso força a ficar sempre visível */
-#pubsGrid .fav-btn {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: none !important;
-  pointer-events: auto !important;
-}
-
-/* Se existir regra tipo ".pub-card:hover .fav-btn { ... }"
-   isso não atrapalha mais, porque acima tem !important */
-
-#pubsGrid .fav-btn { display: inline-flex !important; }
-
-
-/* =========================================
-   FIX DEFINITIVO — Estrela sempre visível
-   ========================================= */
-
-/* garante que o card permita elementos posicionados */
-#pubsGrid .pub-card {
-  position: relative;
-  overflow: visible !important;
-}
-
-/* botão de favorito SEMPRE visível */
-#pubsGrid .pub-card .fav-btn {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: inline-flex !important;
-
-  transform: none !important;
-  pointer-events: auto !important;
-  z-index: 10;
-
-  background: rgba(6, 10, 30, 0.75);
-  border: 1px solid rgba(120, 180, 255, 0.35);
-  border-radius: 999px;
-  padding: 6px;
-
-  box-shadow: 0 0 10px rgba(120, 180, 255, 0.25);
-}
-
-/* remove QUALQUER lógica de hover que esconda */
-#pubsGrid .pub-card:hover .fav-btn {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: none !important;
-}
-
-/* ícone da estrela */
-#pubsGrid .fav-btn i {
-  color: #ffd36a;
-  font-size: 14px;
-}
-
-/* =========================================
-   Estrela neutra (padrão) e amarela só ao favoritar
-   ========================================= */
-
-#pubsGrid .fav-btn i {
-  color: rgba(255, 255, 255, 0.75) !important; /* neutra */
-}
-
-#pubsGrid .fav-btn.is-fav i {
-  color: #ffd36a !important; /* amarela quando favoritada */
-}
-
-/* ===========================
-   FIX HUB / CARDS (publications)
-   =========================== */
-
-/* 1) Não travar o scroll da página */
-html, body {
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
-
-/* 2) Canvas de estrelas sempre no fundo e não "clica" */
-#stars {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
-/* 3) Conteúdo acima do canvas */
-.header,
-main,
-#pubs,
-.footer {
-  position: relative !important;
-  z-index: 5 !important;
-}
-
-/* 4) HUB e grid visíveis */
-#pubs {
-  display: block !important;
-}
-
-.pubs-grid {
-  position: relative !important;
-  z-index: 6 !important;
-  display: grid !important;
-  grid-template-columns: 1fr !important; /* 1 card por linha (como você queria) */
-  gap: 18px !important;
-  margin-top: 18px !important;
-}
-
-/* 5) Card ocupando a largura certinha */
-.pub-card {
-  width: 100% !important;
-  max-width: 1040px;
-  margin: 0 auto !important;
-}
-
-/* 6) Estrelinha sempre visível, mas só fica amarela quando favoritado */
-.pub-card .fav-btn {
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-.pub-card .fav-btn i {
-  color: rgba(233,236,255,.75) !important; /* “apagada” padrão */
-}
-
-.pub-card .fav-btn.is-fav i {
-  color: #ffcc33 !important; /* amarela ao clicar (favorito) */
-}
-
-/* ===========================
-   FIX HUB / CARDS (publications)
-   =========================== */
-
-/* 1) Não travar o scroll da página */
-html, body {
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
-
-/* 2) Canvas de estrelas sempre no fundo e não "clica" */
-#stars {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
-/* 3) Conteúdo acima do canvas */
-.header,
-main,
-#pubs,
-.footer {
-  position: relative !important;
-  z-index: 5 !important;
-}
-
-/* 4) HUB e grid visíveis */
-#pubs {
-  display: block !important;
-}
-
-.pubs-grid {
-  position: relative !important;
-  z-index: 6 !important;
-  display: grid !important;
-  grid-template-columns: 1fr !important; /* 1 card por linha (como você queria) */
-  gap: 18px !important;
-  margin-top: 18px !important;
-}
-
-/* 5) Card ocupando a largura certinha */
-.pub-card {
-  width: 100% !important;
-  max-width: 1040px;
-  margin: 0 auto !important;
-}
-
-/* 6) Estrelinha sempre visível, mas só fica amarela quando favoritado */
-.pub-card .fav-btn {
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-.pub-card .fav-btn i {
-  color: rgba(233,236,255,.75) !important; /* “apagada” padrão */
-}
-
-.pub-card .fav-btn.is-fav i {
-  color: #ffcc33 !important; /* amarela ao clicar (favorito) */
-}
-
-
-/* ===== FIX DEFINITIVO: CARDS VISÍVEIS ===== */
-
-.pubs-hub {
-  overflow: visible !important;
-}
-
-.pubs-grid {
-  min-height: 1px !important;
-  height: auto !important;
-  overflow: visible !important;
-}
-
-.pub-card {
-  position: relative !important;
-  opacity: 1 !important;
-  transform: none !important;
-  visibility: visible !important;
-}
-
-
-/* ===== FIX DEFINITIVO: CARDS VISÍVEIS ===== */
-
-.pubs-hub {
-  overflow: visible !important;
-}
-
-.pubs-grid {
-  min-height: 1px !important;
-  height: auto !important;
-  overflow: visible !important;
-}
-
-.pub-card {
-  position: relative !important;
-  opacity: 1 !important;
-  transform: none !important;
-  visibility: visible !important;
-}
-
-
-/* ================================
-   HUB — 1 CARD POR LINHA
-================================ */
-.pubs-grid{
-  display: grid !important;
-  grid-template-columns: 1fr !important; /* 1 coluna */
-  gap: 16px !important;
-  width: min(920px, 100%) !important;    /* largura boa no desktop */
-  margin: 0 auto !important;            /* centraliza */
-}
-
-/* garante que o card ocupa a linha toda */
-.pub-card{
-  width: 100% !important;
-}
-
-
-/* ================================
-   HUB — 1 CARD POR LINHA
-================================ */
-.pubs-grid{
-  display: grid !important;
-  grid-template-columns: 1fr !important; /* 1 coluna */
-  gap: 16px !important;
-  width: min(920px, 100%) !important;    /* largura boa no desktop */
-  margin: 0 auto !important;            /* centraliza */
-}
-
-/* garante que o card ocupa a linha toda */
-.pub-card{
-  width: 100% !important;
-}
-
-/* ================================
-   HUB — FAVORITO (estrela)
-   - sempre aparece
-   - só fica amarela quando "is-fav"
-================================ */
-.pub-card .fav-btn{
-  opacity: 1 !important;
-  transform: none !important;
-  visibility: visible !important;
-}
-
-/* cor padrão (não favoritado) */
-.pub-card .fav-btn i{
-  color: rgba(233, 236, 255, 0.75) !important; /* “branquinho” */
-}
-
-/* quando favoritado */
-.pub-card .fav-btn.is-fav i{
-  color: #f5c542 !important; /* amarelo */
-}
-
-/* se existir CSS antigo que só mostrava no hover, mata ele */
-.pub-card:hover .fav-btn{
-  opacity: 1 !important;
-}
-
-/* ================================
-   HUB — FAVORITO (estrela)
-   - sempre aparece
-   - só fica amarela quando "is-fav"
-================================ */
-.pub-card .fav-btn{
-  opacity: 1 !important;
-  transform: none !important;
-  visibility: visible !important;
-}
-
-/* cor padrão (não favoritado) */
-.pub-card .fav-btn i{
-  color: rgba(233, 236, 255, 0.75) !important; /* “branquinho” */
-}
-
-/* quando favoritado */
-.pub-card .fav-btn.is-fav i{
-  color: #f5c542 !important; /* amarelo */
-}
-
-/* se existir CSS antigo que só mostrava no hover, mata ele */
-.pub-card:hover .fav-btn{
-  opacity: 1 !important;
+@keyframes glowFooter {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
