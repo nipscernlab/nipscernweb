@@ -444,17 +444,14 @@
 
   let DATA = [];
 
-  // ✅ use caminhos ABSOLUTOS: funcionam no local e no site
+  // ✅ fontes do HUB
   const SOURCES = [
-    "/data/cern/2001.json",
-    "/data/cern/2004.json",
-    "/data/cern/2005.json",
-    "/data/cern/2008.json",
+    "/publications/data/publicacoes.json"
   ];
 
   function resolveHref(path, baseJsonUrl) {
     try {
-      return new URL(path, baseJsonUrl).pathname; // "/artigos/pdfs/..."
+      return new URL(path, baseJsonUrl).pathname; // "/publications/..." ou "/artigos/..."
     } catch {
       return path;
     }
@@ -484,24 +481,29 @@
       console.warn("[HUB] Alguns JSONs falharam (vou ignorar e seguir):", fail);
     }
 
+    // ✅✅✅ CORREÇÃO AQUI: eixo do ITEM (p.eixo) tem prioridade
     DATA = ok.flatMap(({ json, baseJsonUrl }) => {
-      const eixo = (json.eixo || "").toLowerCase();
+      const eixoRoot = (json.eixo || "").toLowerCase();
       const anoBase = Number(json.ano || 0);
       const pubs = Array.isArray(json.publicacoes) ? json.publicacoes : [];
 
-      return pubs.map((p) => ({
-        id: p.id,
-        eixo,
-        tipo: (p.tipo || "").toLowerCase(),
-        ano: Number(p.ano || anoBase),
-        titulo: p.titulo || "Sem título",
-        autores: p.autores || "—",
-        resumo: p.resumo || "",
-        palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
-        veiculo: p.veiculo || "",
-        nivel: p.nivel || null,
-        arquivo: resolveHref(p.arquivo, baseJsonUrl),
-      }));
+      return pubs.map((p) => {
+        const eixoItem = (p.eixo || eixoRoot || "").toLowerCase();
+
+        return {
+          id: p.id,
+          eixo: eixoItem, // ✅ agora fica "cern", "sapho", "sc"
+          tipo: (p.tipo || "").toLowerCase(),
+          ano: Number(p.ano || anoBase),
+          titulo: p.titulo || "Sem título",
+          autores: p.autores || "—",
+          resumo: p.resumo || "",
+          palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
+          veiculo: p.veiculo || "",
+          nivel: p.nivel || null,
+          arquivo: resolveHref(p.arquivo, baseJsonUrl),
+        };
+      });
     });
 
     console.log("[HUB] Total de publicações carregadas:", DATA.length);
@@ -631,7 +633,7 @@
       grid.innerHTML = `
         <div class="no-results">
           Nenhuma publicação foi carregada. <br/>
-          Verifique se os arquivos existem em <code>/data/...</code>.
+          Verifique se os arquivos existem em <code>/publications/data/...</code>.
         </div>
       `;
       loadMoreBtn.style.display = "none";
@@ -772,3 +774,152 @@
     render();
   })();
 })();
+
+// =====================================================
+// 3) PUBLICAÇÕES • Cards a partir do JSON master
+// =====================================================
+(function () {
+  const grid = document.getElementById("pubGrid");
+  const statusEl = document.getElementById("pubsStatus");
+  if (!grid) return;
+
+  // Ajuste fino para sites em subpasta (GitHub Pages etc.)
+  const ROOT =
+    document.querySelector('meta[name="nipscern-root"]')?.content?.trim() || "";
+
+  // Caminho do JSON master (recomendado você salvar aqui no projeto)
+ const JSON_URL = "./json/publicacoes-nipscern.json";
+
+
+  // Converte caminhos absolutos "/publications/..." para funcionar em subpastas
+  function resolvePath(p) {
+    if (!p || typeof p !== "string") return "#";
+    if (p.startsWith("http://") || p.startsWith("https://")) return p;
+    if (p.startsWith("/")) return `${ROOT}${p}`;
+    return `${ROOT}/${p}`;
+  }
+
+  function escapeHTML(s) {
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function prettyTipo(tipo, nivel) {
+    const t = (tipo || "").toLowerCase();
+    const n = (nivel || "").toLowerCase();
+
+    if (t === "tese") {
+      if (n === "tcc") return "Tese • TCC";
+      if (n === "mestrado") return "Tese • Mestrado";
+      if (n === "doutorado") return "Tese • Doutorado";
+      return "Tese";
+    }
+    if (t === "revista") return "Revista";
+    if (t === "congresso") return "Congresso";
+    return tipo || "Publicação";
+  }
+
+  function eixoLabel(eixo) {
+    const e = (eixo || "").toLowerCase();
+    if (e === "cern") return "CERN";
+    if (e === "sapho") return "SAPHO";
+    if (e === "cs") return "CS";
+    return (eixo || "MULTI").toUpperCase();
+  }
+
+  function buildCard(p) {
+    const eixo = (p.eixo || "").toLowerCase();
+    const ano = p.ano ?? "";
+    const titulo = escapeHTML(p.titulo || "Sem título");
+    const autores = escapeHTML(p.autores || "Autor não informado");
+    const veiculo = escapeHTML(p.veiculo || "");
+    const resumo = (p.resumo || "").trim();
+    const resumoHtml = resumo
+      ? `<p class="pub-resumo">${escapeHTML(resumo)}</p>`
+      : "";
+
+    const tipoTxt = escapeHTML(prettyTipo(p.tipo, p.nivel));
+    const arquivoHref = resolvePath(p.arquivo);
+
+    // tags (chips)
+    const chipEixo = `<span class="chip chip--${escapeHTML(eixo)}">${escapeHTML(
+      eixoLabel(p.eixo)
+    )}</span>`;
+    const chipAno = ano !== "" ? `<span class="chip chip--soft">${escapeHTML(ano)}</span>` : "";
+    const chipTipo = `<span class="chip chip--soft">${tipoTxt}</span>`;
+
+    return `
+      <article class="pub-card" data-eixo="${escapeHTML(eixo)}" data-ano="${escapeHTML(
+      ano
+    )}" data-tipo="${escapeHTML(p.tipo || "")}" data-nivel="${escapeHTML(
+      p.nivel || ""
+    )}">
+        <header class="pub-top">
+          <div class="pub-chips">
+            ${chipEixo}
+            ${chipAno}
+            ${chipTipo}
+          </div>
+          <h3 class="pub-title">${titulo}</h3>
+          <p class="pub-autores">${autores}</p>
+          ${veiculo ? `<p class="pub-veiculo">${veiculo}</p>` : ""}
+        </header>
+
+        <div class="pub-body">
+          ${resumoHtml}
+        </div>
+
+        <footer class="pub-actions">
+          <a class="pub-btn" href="${escapeHTML(
+            arquivoHref
+          )}" target="_blank" rel="noopener">
+            Abrir PDF
+          </a>
+        </footer>
+      </article>
+    `;
+  }
+
+  async function loadAndRender() {
+    try {
+      statusEl && (statusEl.textContent = "Carregando publicações…");
+
+      const res = await fetch(JSON_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Falha ao carregar JSON (${res.status})`);
+
+      const data = await res.json();
+      const pubs = Array.isArray(data?.publicacoes) ? data.publicacoes : [];
+
+      // Ordenação: mais recente primeiro
+      pubs.sort((a, b) => (b.ano || 0) - (a.ano || 0));
+
+      // Render
+      grid.innerHTML = pubs.map(buildCard).join("");
+
+      // Status
+      statusEl &&
+        (statusEl.textContent = `${pubs.length} publicações carregadas.`);
+      console.log(`[NIPSCERN] Publicações carregadas: ${pubs.length}`);
+    } catch (err) {
+      console.error("[NIPSCERN] Erro ao carregar publicações:", err);
+      statusEl &&
+        (statusEl.textContent =
+          "Erro ao carregar publicações. Verifique o caminho do JSON.");
+      grid.innerHTML = `
+        <div class="pub-error">
+          Não foi possível carregar as publicações.<br/>
+          <small>Verifique se o arquivo existe em: <code>${escapeHTML(
+            JSON_URL
+          )}</code></small>
+        </div>
+      `;
+    }
+  }
+
+  loadAndRender();
+})();
+
