@@ -229,7 +229,59 @@
         opacity: 0; transition: all 0.5s ease;
     }
     #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+    
+    /* Estilo para o Menu de Anos */
+.year-dropdown {
+    position: relative;
+    cursor: pointer;
+}
 
+.year-menu {
+    position: absolute;
+    bottom: 120%; /* Aparece acima do HUD */
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--gold-dim);
+    backdrop-filter: blur(15px);
+    border-radius: 8px;
+    padding: 10px;
+    display: none; /* Escondido por padrão */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 300px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    opacity: 0;
+    transition: all 0.4s ease;
+    z-index: 1000;
+}
+
+.year-menu.active {
+    display: grid;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.year-opt {
+    padding: 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.year-opt:hover {
+    color: var(--gold);
+    border-color: var(--gold-glow);
+    background: rgba(197, 160, 89, 0.05);
+}
+
+/* Animação de transição de conteúdo */
+.fade-out { opacity: 0; transform: translateY(20px); transition: 0.5s; }
+.fade-in { opacity: 1; transform: translateY(0); transition: 0.5s; }
+    
     /* Modal / Progression Screen */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -292,6 +344,18 @@
                 <div class="hud-item">
                     <span class="hud-num" id="stat-percent">0%</span>
                     <span class="hud-label">Total</span>
+                </div>
+                <div class="hud-item year-dropdown" id="year-selector">
+                    <div class="year-menu" id="year-menu">
+                        <div class="year-opt" onclick="loadYear(1)">YEAR I</div>
+                        <div class="year-opt" onclick="loadYear(2)">YEAR II</div>
+                        <div class="year-opt" onclick="loadYear(3)">YEAR III</div>
+                        <div class="year-opt" onclick="loadYear(4)">YEAR IV</div>
+                        <div class="year-opt" onclick="loadYear(5)">YEAR V</div>
+                        <div class="year-opt" onclick="loadYear(6)">YEAR VI</div>
+                    </div>
+                    <span class="hud-num" id="year-study">SELECT</span>
+                    <span class="hud-label">ERA</span>
                 </div>
             </div>
         </header>
@@ -3065,6 +3129,71 @@
     const content = document.getElementById('content');
     let sy = 0;
     let dy = 0;
+    
+    const yearSelector = document.getElementById('year-selector');
+    const yearMenu = document.getElementById('year-menu');
+    const contentArea = document.getElementById('content'); // Onde o conteúdo será injetado
+
+    // Toggle do Menu
+    yearSelector.addEventListener('click', (e) => {
+        e.stopPropagation();
+        yearMenu.classList.toggle('active');
+    });
+
+    // Fechar menu ao clicar fora
+    document.addEventListener('click', () => {
+        yearMenu.classList.remove('active');
+    });
+
+    async function loadYear(yearNumber) {
+        const url = `https://nipscern.com/kristoffer/year-${yearNumber}.md`;
+        const yearDisplay = document.getElementById('year-study');
+        
+        // Feedback visual imediato
+        yearDisplay.innerText = `YR ${yearNumber}`;
+        
+        try {
+            // Efeito de saída suave
+            contentArea.style.opacity = '0';
+            contentArea.style.transform = 'translateY(10px)';
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Falha ao carregar arquivo');
+            
+            const markdownText = await response.text();
+            
+            setTimeout(() => {
+                // Aqui você pode usar uma biblioteca como 'marked.js' para converter MD em HTML
+                // Por enquanto, injetamos como texto formatado para manter a estrutura
+                contentArea.innerHTML = `<div class="container serif" style="white-space: pre-wrap;">${markdownText}</div>`;
+                
+                // Efeito de entrada suave
+                contentArea.style.opacity = '1';
+                contentArea.style.transform = 'translateY(0)';
+                
+                // Confetes para celebrar a nova era (usando sua lib carregada)
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#c5a059', '#ffffff']
+                });
+            }, 500);
+
+        } catch (error) {
+            console.error(error);
+            showToast("Error summoning the archives.");
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast') || alert(msg);
+        if(t.classList) {
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    }
 
     function renderScroll() {
         dy = dy + (sy - dy) * 0.1;
