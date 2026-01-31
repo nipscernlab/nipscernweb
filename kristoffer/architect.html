@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
     :root {
         --bg-body: #050505;
@@ -230,57 +230,62 @@
     }
     #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
     
+    #content, #md-render-area {
+        transition: opacity 0.4s ease;
+    }
+    
     /* Estilo para o Menu de Anos */
-.year-dropdown {
-    position: relative;
-    cursor: pointer;
-}
+    .year-dropdown {
+        position: relative;
+        cursor: pointer;
+    }
 
-.year-menu {
-    position: absolute;
-    bottom: 120%; /* Aparece acima do HUD */
-    left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    background: rgba(15, 15, 15, 0.95);
-    border: 1px solid var(--gold-dim);
-    backdrop-filter: blur(15px);
-    border-radius: 8px;
-    padding: 10px;
-    display: none; /* Escondido por padrão */
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    width: 300px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-    opacity: 0;
-    transition: all 0.4s ease;
-    z-index: 1000;
-}
+    .year-menu {
+        position: absolute;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: rgba(15, 15, 15, 0.98);
+        border: 1px solid var(--gold-dim);
+        backdrop-filter: blur(15px);
+        border-radius: 8px;
+        padding: 15px;
+        display: none; 
+        grid-template-columns: repeat(2, 1fr); /* 2 columns for better mobile clicking */
+        gap: 10px;
+        width: 250px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 9999; /* Ensure it's on top */
+        pointer-events: auto; /* Vital for clicking */
+    }
 
-.year-menu.active {
-    display: grid;
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
+    .year-menu.active {
+        display: grid;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
 
-.year-opt {
-    padding: 8px;
-    font-family: 'Cinzel', serif;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    border: 1px solid transparent;
-    transition: 0.3s;
-    text-align: center;
-}
+    .year-opt {
+        padding: 12px; /* Bigger tap target */
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        color: var(--gold);
+        border: 1px solid rgba(197, 160, 89, 0.2);
+        cursor: pointer;
+        text-align: center;
+        transition: 0.3s;
+    }
 
-.year-opt:hover {
-    color: var(--gold);
-    border-color: var(--gold-glow);
-    background: rgba(197, 160, 89, 0.05);
-}
+    .year-opt:hover {
+        background: var(--gold);
+        color: #000;
+    }
 
-/* Animação de transição de conteúdo */
-.fade-out { opacity: 0; transform: translateY(20px); transition: 0.5s; }
-.fade-in { opacity: 1; transform: translateY(0); transition: 0.5s; }
+    /* Animação de transição de conteúdo */
+    .fade-out { opacity: 0; transform: translateY(20px); transition: 0.5s; }
+    .fade-in { opacity: 1; transform: translateY(0); transition: 0.5s; }
     
     /* Modal / Progression Screen */
     .modal-overlay {
@@ -3130,60 +3135,113 @@
     let sy = 0;
     let dy = 0;
     
+    const mainContent = document.getElementById('content');
     const yearSelector = document.getElementById('year-selector');
     const yearMenu = document.getElementById('year-menu');
-    const contentArea = document.getElementById('content'); // Onde o conteúdo será injetado
+    let mdContainer = null;
 
-    // Toggle do Menu
+    // 1. CLICK LOGIC
+    // Use a single listener for the selector
     yearSelector.addEventListener('click', (e) => {
-        e.stopPropagation();
+        e.stopPropagation(); // Prevents immediate closing
         yearMenu.classList.toggle('active');
     });
 
-    // Fechar menu ao clicar fora
-    document.addEventListener('click', () => {
-        yearMenu.classList.remove('active');
+    // Close menu when clicking anywhere else
+    document.addEventListener('click', (e) => {
+        if (!yearMenu.contains(e.target)) {
+            yearMenu.classList.remove('active');
+        }
     });
 
+    // 2. NAVIGATION LOGIC
     async function loadYear(yearNumber) {
-        const url = `https://nipscern.com/kristoffer/year-${yearNumber}.md`;
-        const yearDisplay = document.getElementById('year-study');
+        // Close menu immediately
+        yearMenu.classList.remove('active');
         
-        // Feedback visual imediato
+        const url = `https://www.nipscern.com/kristoffer/year-${yearNumber}.md`;
+        const yearDisplay = document.getElementById('year-study');
         yearDisplay.innerText = `YR ${yearNumber}`;
         
         try {
-            // Efeito de saída suave
-            contentArea.style.opacity = '0';
-            contentArea.style.transform = 'translateY(10px)';
+            // Hide main content (Preserves your checkboxes/scroll)
+            mainContent.style.display = 'none';
             
+            if (mdContainer) mdContainer.remove();
+            
+            // Create MD container
+            mdContainer = document.createElement('div');
+            mdContainer.id = 'md-render-area';
+            mdContainer.style.backgroundImage = 'radial-gradient(circle at top center, #1a1a1a 0%, #050505 60%)';
+            mdContainer.style.minHeight = '100vh';
+            mdContainer.style.width = '100%';
+            mainContent.parentNode.insertBefore(mdContainer, mainContent.nextSibling);
+
             const response = await fetch(url);
-            if (!response.ok) throw new Error('Falha ao carregar arquivo');
-            
+            if (!response.ok) throw new Error('Network response was not ok');
             const markdownText = await response.text();
             
+            // Render MD
+            const htmlContent = marked.parse(markdownText);
+            
+            mdContainer.innerHTML = `
+                <div class="container" style="opacity: 0; transform: translateY(20px); transition: 0.5s all; padding-top: 50px;">
+                    <button onclick="loadHome()" style="background:transparent; border:1px solid var(--gold-dim); color:var(--gold); padding:10px 20px; cursor:pointer; font-family:'Cinzel'; margin-bottom:40px; display: flex; align-items: center; gap: 10px; text-transform: uppercase;">
+                        <i class="fas fa-chevron-left"></i> Return to Architect
+                    </button>
+                    <div class="serif" style="color: var(--text-main); line-height: 1.8; font-size: 1.2rem;">
+                        ${htmlContent}
+                    </div>
+                </div>
+            `;
+
+            // Fade in effect
             setTimeout(() => {
-                // Aqui você pode usar uma biblioteca como 'marked.js' para converter MD em HTML
-                // Por enquanto, injetamos como texto formatado para manter a estrutura
-                contentArea.innerHTML = `<div class="container serif" style="white-space: pre-wrap;">${markdownText}</div>`;
-                
-                // Efeito de entrada suave
-                contentArea.style.opacity = '1';
-                contentArea.style.transform = 'translateY(0)';
-                
-                // Confetes para celebrar a nova era (usando sua lib carregada)
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#c5a059', '#ffffff']
-                });
-            }, 500);
+                const inner = mdContainer.querySelector('.container');
+                if(inner) {
+                    inner.style.opacity = '1';
+                    inner.style.transform = 'translateY(0)';
+                }
+            }, 50);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Success effect
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#c5a059', '#ffffff']
+            });
 
         } catch (error) {
             console.error(error);
-            showToast("Error summoning the archives.");
+            // Error handling with a return button
+            if (mdContainer) {
+                mdContainer.innerHTML = `
+                    <div class="container" style="text-align: center; padding-top: 100px;">
+                        <h2 class="serif" style="color: var(--gold); margin-bottom: 20px;">ARCHIVES UNAVAILABLE</h2>
+                        <button onclick="loadHome()" style="background:var(--gold); border:none; color:#000; padding:12px 30px; cursor:pointer; font-family:'Cinzel';">
+                            RETURN TO ARCHITECT
+                        </button>
+                    </div>
+                `;
+            }
         }
+    }
+
+    function loadHome() {
+        if (mdContainer) {
+            mdContainer.remove();
+            mdContainer = null;
+        }
+        mainContent.style.display = 'block';
+        document.getElementById('year-study').innerText = 'SELECT';
+        
+        // This ensures your Logic/Culture stats are still accurate
+        if (typeof updateStats === "function") updateStats();
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function showToast(msg) {
