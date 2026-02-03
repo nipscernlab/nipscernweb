@@ -1,6 +1,10 @@
 // =====================================================
-// NIPSCERN • Starfield (meteoro) + Publicações (JSON)
-// Arquivo único, limpo e sem duplicações
+// NIPSCERN • Starfield + HUB de Publicações (OFICIAL)
+// - Multi-eixo (SAPHO/CERN/SC)
+// - Tipo, Ano, Busca, Favoritos
+// - TESE com submenu (TCC/Mestrado/Doutorado)
+// - "Carregar mais"
+// - ✅ Não duplica grids / não pisa no DOM
 // =====================================================
 
 // -----------------------------------------------------
@@ -169,272 +173,8 @@
 })();
 
 // -----------------------------------------------------
-// 2) PUBLICAÇÕES POR ANO (JSON + filtros + busca + fav)
-// (mantido para páginas antigas que usam #lista-publicacoes)
+// 2) HUB de Publicações (OFICIAL)
 // -----------------------------------------------------
-(function () {
-  document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("lista-publicacoes");
-    if (!container) return;
-
-    const statusEl = document.getElementById("status-publicacoes");
-    const countEl = document.getElementById("publications-count");
-    const searchEl = document.getElementById("busca-publicacoes");
-
-    const jsonPath = container.dataset.jsonPath;
-    const eixo = (container.dataset.eixo || "").toUpperCase();
-    const ano = container.dataset.ano || "";
-
-    const btnTipo = Array.from(document.querySelectorAll("[data-filter-tipo]"));
-    const btnNivel = Array.from(document.querySelectorAll("[data-filter-nivel]"));
-    const subRow = document.querySelector(".subfilters-row");
-
-    const backBtn = document.querySelector(".back-arrow-btn");
-
-    const LS_KEY = "nipscern:favorites:v1";
-    const readFavs = () => {
-      try {
-        return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]"));
-      } catch {
-        return new Set();
-      }
-    };
-    const writeFavs = (set) =>
-      localStorage.setItem(LS_KEY, JSON.stringify([...set]));
-
-    let lista = [];
-    let tipoAtual = "todos";
-    let nivelAtual = "";
-    let termoBusca = "";
-
-    function setStatus(msg) {
-      if (statusEl) statusEl.textContent = msg || "";
-    }
-
-    function pluralPublicacao(n) {
-      if (n === 1) return "1 publicação";
-      return `${n} publicações`;
-    }
-
-    function setCount(n) {
-      if (countEl) countEl.textContent = pluralPublicacao(n);
-    }
-
-    function labelTipo(tipo, nivel) {
-      if (tipo === "congresso") return "Artigo de congresso";
-      if (tipo === "revista") return "Artigo de revista";
-      if (tipo === "tese") {
-        if (nivel === "tcc") return "Trabalho de conclusão de curso";
-        if (nivel === "mestrado") return "Dissertação de mestrado";
-        if (nivel === "doutorado") return "Tese de doutorado";
-        return "Tese";
-      }
-      return "Publicação";
-    }
-
-    function criarCard(pub) {
-      const card = document.createElement("article");
-      card.className = "publication-card";
-      card.dataset.tipo = pub.tipo || "outro";
-      card.dataset.nivel = pub.nivel || "";
-      card.dataset.id = pub.id || "";
-
-      const titulo = pub.titulo || "Publicação sem título";
-      const autores = pub.autores || "";
-      const tipoLbl = labelTipo(pub.tipo, pub.nivel);
-      const veiculo = pub.veiculo || "";
-      const resumo = pub.resumo || "";
-      const arquivo = pub.arquivo || "#";
-
-      const favs = readFavs();
-      const isFav = pub.id && favs.has(pub.id);
-
-      card.innerHTML = `
-        <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button" aria-label="Favoritar">
-          <i class="${isFav ? "fa-solid fa-star" : "fa-regular fa-star"}"></i>
-        </button>
-
-        <h2 class="publication-title">${titulo}</h2>
-
-        <p class="publication-meta">
-          ${autores ? `<span class="pub-authors">${autores}</span>` : ""}
-          ${tipoLbl ? ` • <span class="pub-type">${tipoLbl}</span>` : ""}
-          ${veiculo ? ` • <span class="pub-venue">${veiculo}</span>` : ""}
-          ${ano ? ` • <span class="pub-year">${ano}</span>` : ""}
-          ${eixo ? ` • <span class="pub-axis">${eixo}</span>` : ""}
-        </p>
-
-        ${resumo ? `<p class="publication-summary">${resumo}</p>` : ""}
-
-        <a href="${arquivo}" class="publication-link" target="_blank" rel="noopener noreferrer">
-          📄 Abrir PDF
-        </a>
-      `;
-
-      const favBtn = card.querySelector(".fav-btn");
-      favBtn.addEventListener("click", () => {
-        if (!pub.id) return;
-        const favs2 = readFavs();
-        if (favs2.has(pub.id)) favs2.delete(pub.id);
-        else favs2.add(pub.id);
-        writeFavs(favs2);
-        aplicarFiltros();
-      });
-
-      return card;
-    }
-
-    function matchesBusca(pub, term) {
-      if (!term) return true;
-      const t = term.toLowerCase();
-      const hay = [
-        pub.titulo || "",
-        pub.autores || "",
-        pub.resumo || "",
-        pub.veiculo || "",
-        pub.tipo || "",
-        pub.nivel || "",
-      ]
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(t);
-    }
-
-    function marcarAtivoTipo(btnAtivo) {
-      btnTipo.forEach((b) => b.classList.remove("is-active"));
-      if (btnAtivo) btnAtivo.classList.add("is-active");
-    }
-
-    function marcarAtivoNivel(btnAtivo) {
-      btnNivel.forEach((b) => b.classList.remove("is-active"));
-      if (btnAtivo) btnAtivo.classList.add("is-active");
-    }
-
-    function mostrarSubfiltros(show) {
-      if (!subRow) return;
-      subRow.style.display = show ? "flex" : "none";
-      if (!show) {
-        nivelAtual = "";
-        marcarAtivoNivel(null);
-      }
-    }
-
-    function aplicarFiltros() {
-      const favs = readFavs();
-
-      const filtradas = lista.filter((pub) => {
-        const tipo = pub.tipo || "outro";
-        const nivel = pub.nivel || "";
-        const isFav = pub.id && favs.has(pub.id);
-
-        if (tipoAtual === "favoritos" && !isFav) return false;
-        if (tipoAtual !== "todos" && tipoAtual !== "favoritos") {
-          if (tipo !== tipoAtual) return false;
-        }
-
-        if (nivelAtual) {
-          if (tipo !== "tese") return false;
-          if (nivel !== nivelAtual) return false;
-        }
-
-        if (!matchesBusca(pub, termoBusca)) return false;
-
-        return true;
-      });
-
-      container.innerHTML = "";
-      filtradas.forEach((pub) => container.appendChild(criarCard(pub)));
-      setCount(filtradas.length);
-    }
-
-    function initUI() {
-      mostrarSubfiltros(false);
-
-      btnTipo.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          tipoAtual = btn.getAttribute("data-filter-tipo") || "todos";
-
-          mostrarSubfiltros(tipoAtual === "tese");
-          if (tipoAtual !== "tese") nivelAtual = "";
-
-          marcarAtivoTipo(btn);
-          aplicarFiltros();
-        });
-      });
-
-      btnNivel.forEach((btn) => {
-        btn.addEventListener("click", (ev) => {
-          ev.stopPropagation();
-          nivelAtual = btn.getAttribute("data-filter-nivel") || "";
-
-          tipoAtual = "tese";
-          mostrarSubfiltros(true);
-
-          const btnTese = document.querySelector('[data-filter-tipo="tese"]');
-          marcarAtivoTipo(btnTese);
-          marcarAtivoNivel(btn);
-
-          aplicarFiltros();
-        });
-      });
-
-      if (searchEl) {
-        searchEl.addEventListener("input", () => {
-          termoBusca = (searchEl.value || "").trim();
-          aplicarFiltros();
-        });
-      }
-
-      if (backBtn) {
-        backBtn.addEventListener("click", () => window.history.back());
-      }
-    }
-
-    async function carregarJSON() {
-      if (!jsonPath) {
-        setStatus("Configuração ausente (data-json-path não informado).");
-        setCount(0);
-        return;
-      }
-
-      try {
-        setStatus("Carregando publicações...");
-        const resp = await fetch(jsonPath);
-        if (!resp.ok) throw new Error("Falha ao carregar JSON: " + resp.status);
-
-        const data = await resp.json();
-        lista = Array.isArray(data.publicacoes) ? data.publicacoes : [];
-
-        if (!lista.length) {
-          setStatus("Nenhuma publicação cadastrada para este ano.");
-          setCount(0);
-          container.innerHTML = "";
-          return;
-        }
-
-        setStatus("");
-        mostrarSubfiltros(tipoAtual === "tese");
-        aplicarFiltros();
-      } catch (err) {
-        console.error(err);
-        setStatus("Ocorreu um erro ao carregar as publicações.");
-        setCount(0);
-      }
-    }
-
-    initUI();
-    carregarJSON();
-  });
-})();
-
-// =====================================================
-// 3) NIPSCERN • HUB de Publicações (filtros + cards)
-//   - Multi-eixo (SAPHO/CERN/SC)
-//   - Tipo, Ano, Busca, Favoritos
-//   - Inicial: mais recentes + "Carregar mais"
-//   - ✅ Puxa JSONs em /data/*/*.json
-//   - ✅ NÃO derruba tudo se 1 JSON falhar
-// =====================================================
 (function () {
   const grid = document.getElementById("pubsGrid");
   if (!grid) return;
@@ -444,21 +184,98 @@
 
   let DATA = [];
 
-  // ✅ fontes do HUB
+  // Fonte do HUB
   const SOURCES = [
     "/publications/data/publicacoes.json"
   ];
 
+  const eixoWrap = document.getElementById("filterEixo");
+  const tipoWrap = document.getElementById("filterTipo");
+  const yearSelect = document.getElementById("yearSelect");
+  const searchEl = document.getElementById("pubSearch");
+  const favOnlyBtn = document.getElementById("favOnlyBtn");
+  const resultsMeta = document.getElementById("resultsMeta");
+  const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+  // Submenu TESE
+  const chipTeseBtn = document.getElementById("chipTeseBtn");
+  const submenuTese = document.getElementById("submenuTese");
+  const btnApplyTese = document.getElementById("btnApplyTese");
+
   function resolveHref(path, baseJsonUrl) {
     try {
-      return new URL(path, baseJsonUrl).pathname; // "/publications/..." ou "/artigos/..."
+      return new URL(path, baseJsonUrl).pathname;
     } catch {
       return path;
     }
   }
 
+  const loadFavs = () => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]"));
+    } catch {
+      return new Set();
+    }
+  };
+  const saveFavs = (set) =>
+    localStorage.setItem(LS_KEY, JSON.stringify([...set]));
+
+  let favs = loadFavs();
+
+  let state = {
+    eixos: new Set(["all"]),     // multi-seleção
+    tipo: "all",                 // all | congresso | revista | tese
+    niveis: new Set(),           // tcc | mestrado | doutorado
+    ano: "all",
+    q: "",
+    favOnly: false,
+    limit: PAGE_SIZE,
+  };
+
+  const norm = (s) =>
+    (s || "")
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+
+  function eixoLabel(eixo) {
+    const e = (eixo || "").toLowerCase();
+    if (e === "sapho") return "SAPHO";
+    if (e === "cern") return "CERN";
+    if (e === "sc") return "SC (SAPHO × CERN)";
+    return (eixo || "").toUpperCase();
+  }
+
+  function tipoLabel(tipo) {
+    const t = (tipo || "").toLowerCase();
+    if (t === "congresso") return "CONGRESSO";
+    if (t === "revista") return "REVISTA";
+    if (t === "tese") return "TESE";
+    return (tipo || "").toUpperCase();
+  }
+
+  function nivelLabel(nivel) {
+    const n = (nivel || "").toLowerCase();
+    if (n === "tcc") return "TCC";
+    if (n === "mestrado") return "MESTRADO";
+    if (n === "doutorado") return "DOUTORADO";
+    return (nivel || "").toUpperCase();
+  }
+
+  function badge(item) {
+    const eixo = eixoLabel(item.eixo);
+    const tipo = tipoLabel(item.tipo);
+    const ano = item.ano ?? "—";
+
+    if ((item.tipo || "").toLowerCase() === "tese" && item.nivel) {
+      return `${eixo} • ${tipo} (${nivelLabel(item.nivel)}) • ${ano}`;
+    }
+    return `${eixo} • ${tipo} • ${ano}`;
+  }
+
   async function loadPublicacoes() {
-    // ✅ não usa Promise.all (que derruba tudo)
     const settled = await Promise.allSettled(
       SOURCES.map(async (url) => {
         const res = await fetch(url, { cache: "no-store" });
@@ -481,7 +298,6 @@
       console.warn("[HUB] Alguns JSONs falharam (vou ignorar e seguir):", fail);
     }
 
-    // ✅✅✅ CORREÇÃO AQUI: eixo do ITEM (p.eixo) tem prioridade
     DATA = ok.flatMap(({ json, baseJsonUrl }) => {
       const eixoRoot = (json.eixo || "").toLowerCase();
       const anoBase = Number(json.ano || 0);
@@ -492,7 +308,7 @@
 
         return {
           id: p.id,
-          eixo: eixoItem, // ✅ agora fica "cern", "sapho", "sc"
+          eixo: eixoItem, // sapho | cern | sc
           tipo: (p.tipo || "").toLowerCase(),
           ano: Number(p.ano || anoBase),
           titulo: p.titulo || "Sem título",
@@ -500,7 +316,7 @@
           resumo: p.resumo || "",
           palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
           veiculo: p.veiculo || "",
-          nivel: p.nivel || null,
+          nivel: p.nivel ? String(p.nivel).toLowerCase() : null,
           arquivo: resolveHref(p.arquivo, baseJsonUrl),
         };
       });
@@ -508,42 +324,6 @@
 
     console.log("[HUB] Total de publicações carregadas:", DATA.length);
   }
-
-  const eixoWrap = document.getElementById("filterEixo");
-  const tipoWrap = document.getElementById("filterTipo");
-  const yearSelect = document.getElementById("yearSelect");
-  const searchEl = document.getElementById("pubSearch");
-  const favOnlyBtn = document.getElementById("favOnlyBtn");
-  const resultsMeta = document.getElementById("resultsMeta");
-  const loadMoreBtn = document.getElementById("loadMoreBtn");
-
-  const loadFavs = () => {
-    try {
-      return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]"));
-    } catch {
-      return new Set();
-    }
-  };
-  const saveFavs = (set) =>
-    localStorage.setItem(LS_KEY, JSON.stringify([...set]));
-
-  let favs = loadFavs();
-
-  let state = {
-    eixos: new Set(["all"]),
-    tipo: "all",
-    ano: "all",
-    q: "",
-    favOnly: false,
-    limit: PAGE_SIZE,
-  };
-
-  const norm = (s) =>
-    (s || "")
-      .toString()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
 
   function getEixosActive() {
     if (state.eixos.has("all")) return null;
@@ -555,37 +335,38 @@
     if (active && !active.has(item.eixo)) return false;
 
     if (state.tipo !== "all" && item.tipo !== state.tipo) return false;
-    if (state.ano !== "all" && String(item.ano) !== String(state.ano))
-      return false;
+
+    // níveis (só aplica se tiver marcado algum)
+    if (state.niveis.size > 0) {
+      if (item.tipo !== "tese") return false;
+      if (!item.nivel || !state.niveis.has(item.nivel)) return false;
+    }
+
+    if (state.ano !== "all" && String(item.ano) !== String(state.ano)) return false;
 
     if (state.favOnly && !favs.has(item.id)) return false;
 
-    const q = norm(state.q).trim();
+    const q = norm(state.q);
     if (q) {
       const hay = norm(
-        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(" ")} ${item.eixo} ${item.tipo} ${item.ano}`
+        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(" ")} ${item.eixo} ${item.tipo} ${item.ano} ${item.nivel || ""}`
       );
       if (!hay.includes(q)) return false;
     }
-    return true;
-  }
 
-  function badge(item) {
-    return `${item.eixo.toUpperCase()} • ${item.tipo.toUpperCase()} • ${item.ano}`;
+    return true;
   }
 
   function cardHTML(item) {
     const isFav = favs.has(item.id);
-
     const resumoHTML = item.resumo ? `<p class="pub-resumo">${item.resumo}</p>` : "";
     const veicHTML = item.veiculo ? `<p class="pub-veic">${item.veiculo}</p>` : "";
 
     return `
-      <article class="pub-card" data-id="${item.id}">
+      <article class="pub-card" data-id="${item.id}" data-eixo="${item.eixo}">
         <div class="pub-top">
           <span class="pub-badge">${badge(item)}</span>
 
-          <!-- ⭐ sempre visível; só fica amarela quando is-fav -->
           <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button"
             aria-label="Favoritar" aria-pressed="${isFav ? "true" : "false"}"
             title="Favoritar">
@@ -599,7 +380,10 @@
         ${resumoHTML}
 
         <div class="pub-actions">
-          <a class="pub-open" href="${item.arquivo}" target="_blank" rel="noopener">Abrir PDF</a>
+          <a class="pub-open" href="${item.arquivo}" target="_blank" rel="noopener">
+            Abrir PDF
+            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+          </a>
         </div>
       </article>
     `;
@@ -633,7 +417,7 @@
       grid.innerHTML = `
         <div class="no-results">
           Nenhuma publicação foi carregada. <br/>
-          Verifique se os arquivos existem em <code>/publications/data/...</code>.
+          Verifique se o arquivo existe em <code>/publications/data/publicacoes.json</code>.
         </div>
       `;
       loadMoreBtn.style.display = "none";
@@ -642,9 +426,7 @@
 
     const filtered = DATA
       .filter(matches)
-      .sort(
-        (a, b) => (b.ano - a.ano) || norm(a.titulo).localeCompare(norm(b.titulo))
-      );
+      .sort((a, b) => (b.ano - a.ano) || norm(a.titulo).localeCompare(norm(b.titulo)));
 
     const visible = filtered.slice(0, state.limit);
 
@@ -660,7 +442,7 @@
     grid.querySelectorAll(".fav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const card = btn.closest(".pub-card");
-        const id = card.getAttribute("data-id");
+        const id = card?.getAttribute("data-id");
         if (!id) return;
 
         if (favs.has(id)) favs.delete(id);
@@ -673,6 +455,40 @@
     });
   }
 
+  // -----------------------
+  // Submenu TESE (UI)
+  // -----------------------
+  function closeTeseMenu() {
+    if (!submenuTese || !chipTeseBtn) return;
+    submenuTese.classList.remove("is-open");
+    chipTeseBtn.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleTeseMenu() {
+    if (!submenuTese || !chipTeseBtn) return;
+    const open = !submenuTese.classList.contains("is-open");
+    submenuTese.classList.toggle("is-open", open);
+    chipTeseBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function readSelectedNiveis() {
+    if (!submenuTese) return new Set();
+    const checks = submenuTese.querySelectorAll('input[type="checkbox"]');
+    const set = new Set();
+    checks.forEach((cb) => {
+      if (cb.checked) set.add(String(cb.value).toLowerCase());
+    });
+    return set;
+  }
+
+  function clearSelectedNiveisUI() {
+    if (!submenuTese) return;
+    submenuTese.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
+  }
+
+  // -----------------------
+  // Eventos dos filtros
+  // -----------------------
   eixoWrap.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-eixo]");
     if (!btn) return;
@@ -683,10 +499,8 @@
       state.eixos = new Set(["all"]);
     } else {
       if (state.eixos.has("all")) state.eixos.delete("all");
-
       if (state.eixos.has(v)) state.eixos.delete(v);
       else state.eixos.add(v);
-
       if (state.eixos.size === 0) state.eixos.add("all");
     }
 
@@ -696,9 +510,20 @@
   });
 
   tipoWrap.addEventListener("click", (e) => {
+    // Cuidado: clique dentro do submenu não deve cair aqui
     const btn = e.target.closest("[data-tipo]");
     if (!btn) return;
-    state.tipo = btn.getAttribute("data-tipo");
+
+    const tipo = btn.getAttribute("data-tipo") || "all";
+    state.tipo = tipo;
+
+    // se mudou para NÃO tese, limpamos niveis
+    if (tipo !== "tese") {
+      state.niveis.clear();
+      clearSelectedNiveisUI();
+      closeTeseMenu();
+    }
+
     state.limit = PAGE_SIZE;
     setActiveChips(tipoWrap, "data-tipo", state.tipo);
     render();
@@ -729,6 +554,7 @@
     render();
   });
 
+  // Clique no diagrama filtra o HUB e rola até ele
   document.querySelectorAll(".diagram.venn [data-id]").forEach((el) => {
     el.addEventListener("click", (ev) => {
       ev.preventDefault();
@@ -766,6 +592,34 @@
     });
   });
 
+  // Submenu TESE: hover desktop já é CSS; clique é para mobile
+  if (chipTeseBtn && submenuTese) {
+    chipTeseBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      toggleTeseMenu();
+    });
+
+    submenuTese.addEventListener("click", (ev) => ev.stopPropagation());
+
+    document.addEventListener("click", () => closeTeseMenu());
+
+    btnApplyTese?.addEventListener("click", () => {
+      const set = readSelectedNiveis();
+
+      state.niveis = set;
+
+      // se marcou níveis, faz sentido “tipo = tese”
+      if (state.niveis.size > 0) {
+        state.tipo = "tese";
+        setActiveChips(tipoWrap, "data-tipo", "tese");
+      }
+      state.limit = PAGE_SIZE;
+      closeTeseMenu();
+      render();
+    });
+  }
+
+  // Boot
   (async function initHub() {
     await loadPublicacoes();
     populateYears();
@@ -774,152 +628,3 @@
     render();
   })();
 })();
-
-// =====================================================
-// 3) PUBLICAÇÕES • Cards a partir do JSON master
-// =====================================================
-(function () {
-  const grid = document.getElementById("pubGrid");
-  const statusEl = document.getElementById("pubsStatus");
-  if (!grid) return;
-
-  // Ajuste fino para sites em subpasta (GitHub Pages etc.)
-  const ROOT =
-    document.querySelector('meta[name="nipscern-root"]')?.content?.trim() || "";
-
-  // Caminho do JSON master (recomendado você salvar aqui no projeto)
- const JSON_URL = "./json/publicacoes-nipscern.json";
-
-
-  // Converte caminhos absolutos "/publications/..." para funcionar em subpastas
-  function resolvePath(p) {
-    if (!p || typeof p !== "string") return "#";
-    if (p.startsWith("http://") || p.startsWith("https://")) return p;
-    if (p.startsWith("/")) return `${ROOT}${p}`;
-    return `${ROOT}/${p}`;
-  }
-
-  function escapeHTML(s) {
-    return String(s ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function prettyTipo(tipo, nivel) {
-    const t = (tipo || "").toLowerCase();
-    const n = (nivel || "").toLowerCase();
-
-    if (t === "tese") {
-      if (n === "tcc") return "Tese • TCC";
-      if (n === "mestrado") return "Tese • Mestrado";
-      if (n === "doutorado") return "Tese • Doutorado";
-      return "Tese";
-    }
-    if (t === "revista") return "Revista";
-    if (t === "congresso") return "Congresso";
-    return tipo || "Publicação";
-  }
-
-  function eixoLabel(eixo) {
-    const e = (eixo || "").toLowerCase();
-    if (e === "cern") return "CERN";
-    if (e === "sapho") return "SAPHO";
-    if (e === "cs") return "CS";
-    return (eixo || "MULTI").toUpperCase();
-  }
-
-  function buildCard(p) {
-    const eixo = (p.eixo || "").toLowerCase();
-    const ano = p.ano ?? "";
-    const titulo = escapeHTML(p.titulo || "Sem título");
-    const autores = escapeHTML(p.autores || "Autor não informado");
-    const veiculo = escapeHTML(p.veiculo || "");
-    const resumo = (p.resumo || "").trim();
-    const resumoHtml = resumo
-      ? `<p class="pub-resumo">${escapeHTML(resumo)}</p>`
-      : "";
-
-    const tipoTxt = escapeHTML(prettyTipo(p.tipo, p.nivel));
-    const arquivoHref = resolvePath(p.arquivo);
-
-    // tags (chips)
-    const chipEixo = `<span class="chip chip--${escapeHTML(eixo)}">${escapeHTML(
-      eixoLabel(p.eixo)
-    )}</span>`;
-    const chipAno = ano !== "" ? `<span class="chip chip--soft">${escapeHTML(ano)}</span>` : "";
-    const chipTipo = `<span class="chip chip--soft">${tipoTxt}</span>`;
-
-    return `
-      <article class="pub-card" data-eixo="${escapeHTML(eixo)}" data-ano="${escapeHTML(
-      ano
-    )}" data-tipo="${escapeHTML(p.tipo || "")}" data-nivel="${escapeHTML(
-      p.nivel || ""
-    )}">
-        <header class="pub-top">
-          <div class="pub-chips">
-            ${chipEixo}
-            ${chipAno}
-            ${chipTipo}
-          </div>
-          <h3 class="pub-title">${titulo}</h3>
-          <p class="pub-autores">${autores}</p>
-          ${veiculo ? `<p class="pub-veiculo">${veiculo}</p>` : ""}
-        </header>
-
-        <div class="pub-body">
-          ${resumoHtml}
-        </div>
-
-        <footer class="pub-actions">
-          <a class="pub-btn" href="${escapeHTML(
-            arquivoHref
-          )}" target="_blank" rel="noopener">
-            Abrir PDF
-          </a>
-        </footer>
-      </article>
-    `;
-  }
-
-  async function loadAndRender() {
-    try {
-      statusEl && (statusEl.textContent = "Carregando publicações…");
-
-      const res = await fetch(JSON_URL, { cache: "no-store" });
-      if (!res.ok) throw new Error(`Falha ao carregar JSON (${res.status})`);
-
-      const data = await res.json();
-      const pubs = Array.isArray(data?.publicacoes) ? data.publicacoes : [];
-
-      // Ordenação: mais recente primeiro
-      pubs.sort((a, b) => (b.ano || 0) - (a.ano || 0));
-
-      // Render
-      grid.innerHTML = pubs.map(buildCard).join("");
-
-      // Status
-      statusEl &&
-        (statusEl.textContent = `${pubs.length} publicações carregadas.`);
-      console.log(`[NIPSCERN] Publicações carregadas: ${pubs.length}`);
-    } catch (err) {
-      console.error("[NIPSCERN] Erro ao carregar publicações:", err);
-      statusEl &&
-        (statusEl.textContent =
-          "Erro ao carregar publicações. Verifique o caminho do JSON.");
-      grid.innerHTML = `
-        <div class="pub-error">
-          Não foi possível carregar as publicações.<br/>
-          <small>Verifique se o arquivo existe em: <code>${escapeHTML(
-            JSON_URL
-          )}</code></small>
-        </div>
-      `;
-    }
-  }
-
-  loadAndRender();
-})();
-
