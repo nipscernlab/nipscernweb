@@ -1,10 +1,10 @@
+// /publications/js/script3.js
 // =====================================================
 // NIPSCERN • Starfield + HUB de Publicações (OFICIAL)
-// - Multi-eixo (SAPHO/CERN/SC)
+// - Multi-eixo (SAPHO/CERN/SC/CS)
 // - Tipo, Ano, Busca, Favoritos
-// - TESE com submenu (TCC/Mestrado/Doutorado)
-// - "Carregar mais"
-// - ✅ Não duplica grids / não pisa no DOM
+// - TESE com submenu (TCC/Mestrado/Doutorado) ✅ fix definitivo
+// - Infinite scroll (carrega automaticamente ao chegar no fim) ✅
 // =====================================================
 
 // -----------------------------------------------------
@@ -181,26 +181,30 @@
 
   const PAGE_SIZE = 24;
   const LS_KEY = "nipscern_favs_v1";
-
   let DATA = [];
 
-  // Fonte do HUB
-  const SOURCES = [
-    "/publications/data/publicacoes.json"
-  ];
+  const SOURCES = ["/publications/data/publicacoes.json"];
 
   const eixoWrap = document.getElementById("filterEixo");
   const tipoWrap = document.getElementById("filterTipo");
+
   const yearSelect = document.getElementById("yearSelect");
+  const yearDD = document.getElementById("yearDD");
+  const yearBtn = document.getElementById("yearBtn");
+  const yearBtnLabel = document.getElementById("yearBtnLabel");
+  const yearMenu = document.getElementById("yearMenu");
+
   const searchEl = document.getElementById("pubSearch");
   const favOnlyBtn = document.getElementById("favOnlyBtn");
   const resultsMeta = document.getElementById("resultsMeta");
-  const loadMoreBtn = document.getElementById("loadMoreBtn");
 
-  // Submenu TESE
+  // Infinite scroll UI (precisa existir no HTML)
+  const sentinelEl = document.getElementById("infiniteSentinel");
+  const loaderEl = document.getElementById("pubLoader");
+
+  // TESE submenu
   const chipTeseBtn = document.getElementById("chipTeseBtn");
   const submenuTese = document.getElementById("submenuTese");
-  const btnApplyTese = document.getElementById("btnApplyTese");
 
   function resolveHref(path, baseJsonUrl) {
     try {
@@ -219,18 +223,21 @@
   };
   const saveFavs = (set) =>
     localStorage.setItem(LS_KEY, JSON.stringify([...set]));
-
   let favs = loadFavs();
 
   let state = {
-    eixos: new Set(["all"]),     // multi-seleção
-    tipo: "all",                 // all | congresso | revista | tese
-    niveis: new Set(),           // tcc | mestrado | doutorado
+    eixos: new Set(["all"]),
+    tipo: "all",
+    niveis: new Set(), // tcc | mestrado | doutorado
     ano: "all",
     q: "",
     favOnly: false,
     limit: PAGE_SIZE,
   };
+
+  let _io = null;
+  let _isLoadingMore = false;
+  let _lastFilteredTotal = 0;
 
   const norm = (s) =>
     (s || "")
@@ -240,13 +247,16 @@
       .toLowerCase()
       .trim();
 
-  function eixoLabel(eixo) {
-    const e = (eixo || "").toLowerCase();
-    if (e === "sapho") return "SAPHO";
-    if (e === "cern") return "CERN";
-    if (e === "sc") return "SC (SAPHO × CERN)";
-    return (eixo || "").toUpperCase();
-  }
+ 
+function eixoLabel(eixo) {
+  const e = (eixo || "").toLowerCase();
+  if (e === "sapho") return "SAPHO";
+  if (e === "cern") return "CERN";
+  if (e === "sc") return "SC (SAPHO × CERN)";
+  return (eixo || "").toUpperCase();
+}
+
+
 
   function tipoLabel(tipo) {
     const t = (tipo || "").toLowerCase();
@@ -282,44 +292,46 @@
         if (!res.ok) throw new Error(`${url} (${res.status})`);
         const json = await res.json();
         const baseJsonUrl = new URL(url, window.location.href);
-        return { json, baseJsonUrl, url };
+        return { json, baseJsonUrl };
       })
     );
 
     const ok = [];
     const fail = [];
 
-    settled.forEach((r) => {
-      if (r.status === "fulfilled") ok.push(r.value);
-      else fail.push(r.reason);
-    });
-
-    if (fail.length) {
-      console.warn("[HUB] Alguns JSONs falharam (vou ignorar e seguir):", fail);
-    }
+    settled.forEach((r) =>
+      r.status === "fulfilled" ? ok.push(r.value) : fail.push(r.reason)
+    );
+    if (fail.length) console.warn("[HUB] Alguns JSONs falharam:", fail);
 
     DATA = ok.flatMap(({ json, baseJsonUrl }) => {
       const eixoRoot = (json.eixo || "").toLowerCase();
       const anoBase = Number(json.ano || 0);
       const pubs = Array.isArray(json.publicacoes) ? json.publicacoes : [];
 
-      return pubs.map((p) => {
-        const eixoItem = (p.eixo || eixoRoot || "").toLowerCase();
+return pubs.map((p) => {
+  let eixoItem = (p.eixo || eixoRoot || "").toLowerCase();
 
-        return {
-          id: p.id,
-          eixo: eixoItem, // sapho | cern | sc
-          tipo: (p.tipo || "").toLowerCase(),
-          ano: Number(p.ano || anoBase),
-          titulo: p.titulo || "Sem título",
-          autores: p.autores || "—",
-          resumo: p.resumo || "",
-          palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
-          veiculo: p.veiculo || "",
-          nivel: p.nivel ? String(p.nivel).toLowerCase() : null,
-          arquivo: resolveHref(p.arquivo, baseJsonUrl),
-        };
-      });
+  // 🔁 normalização definitiva CS → SC
+  if (eixoItem === "cs") eixoItem = "sc";
+
+  return {
+    id: p.id,
+    eixo: eixoItem,
+    tipo: (p.tipo || "").toLowerCase(),
+    ano: Number(p.ano || anoBase),
+    titulo: p.titulo || "Sem título",
+    autores: p.autores || "—",
+    resumo: p.resumo || "",
+    palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
+    veiculo: p.veiculo || "",
+    nivel: p.nivel ? String(p.nivel).toLowerCase() : null,
+    arquivo: resolveHref(p.arquivo, baseJsonUrl),
+  };
+});
+
+
+
     });
 
     console.log("[HUB] Total de publicações carregadas:", DATA.length);
@@ -336,20 +348,21 @@
 
     if (state.tipo !== "all" && item.tipo !== state.tipo) return false;
 
-    // níveis (só aplica se tiver marcado algum)
     if (state.niveis.size > 0) {
       if (item.tipo !== "tese") return false;
       if (!item.nivel || !state.niveis.has(item.nivel)) return false;
     }
 
-    if (state.ano !== "all" && String(item.ano) !== String(state.ano)) return false;
-
+    if (state.ano !== "all" && String(item.ano) !== String(state.ano))
+      return false;
     if (state.favOnly && !favs.has(item.id)) return false;
 
     const q = norm(state.q);
     if (q) {
       const hay = norm(
-        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(" ")} ${item.eixo} ${item.tipo} ${item.ano} ${item.nivel || ""}`
+        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(
+          " "
+        )} ${item.eixo} ${item.tipo} ${item.ano} ${item.nivel || ""}`
       );
       if (!hay.includes(q)) return false;
     }
@@ -404,13 +417,235 @@
     });
   }
 
+  // -----------------------
+  // ANO dropdown (2 colunas)
+  // -----------------------
   function populateYears() {
-    const years = Array.from(new Set(DATA.map((d) => d.ano))).sort((a, b) => b - a);
+    const years = Array.from(new Set(DATA.map((d) => d.ano)))
+      .filter((y) => Number.isFinite(y))
+      .sort((a, b) => b - a);
+
     yearSelect.innerHTML =
       `<option value="all">Todos</option>` +
       years.map((y) => `<option value="${y}">${y}</option>`).join("");
+
+    const items = [`all`, ...years.map(String)];
+    yearMenu.innerHTML = `
+      <div class="year-grid">
+        ${items
+          .map((v) => {
+            const label = v === "all" ? "Todos" : v;
+            const active = String(state.ano) === String(v) ? "is-active" : "";
+            return `<button type="button" class="year-item ${active}" data-year="${v}">${label}</button>`;
+          })
+          .join("")}
+      </div>
+    `;
+
+    yearBtnLabel.textContent = state.ano === "all" ? "Todos" : String(state.ano);
   }
 
+  function reserveYearSpace(open) {
+    const block = yearDD?.closest(".filter-block");
+    if (!block) return;
+
+    if (!open) {
+      block.style.marginBottom = "";
+      return;
+    }
+
+    const menu = yearMenu;
+    if (!menu) return;
+
+    const h = menu.getBoundingClientRect().height;
+    block.style.marginBottom = `${Math.ceil(h + 14)}px`;
+  }
+
+  function closeYearMenu() {
+    if (!yearDD) return;
+    yearDD.classList.remove("is-open");
+    yearBtn?.setAttribute("aria-expanded", "false");
+    reserveYearSpace(false);
+  }
+
+  function openYearMenu() {
+    if (!yearDD) return;
+    yearDD.classList.add("is-open");
+    yearBtn?.setAttribute("aria-expanded", "true");
+    requestAnimationFrame(() => reserveYearSpace(true));
+  }
+
+  yearBtn.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    const open = yearDD.classList.contains("is-open");
+    if (open) closeYearMenu();
+    else openYearMenu();
+  });
+
+  yearMenu.addEventListener("click", (ev) => {
+    const btn = ev.target.closest(".year-item");
+    if (!btn) return;
+
+    const v = btn.getAttribute("data-year") || "all";
+    state.ano = v;
+    yearSelect.value = v;
+
+    yearBtnLabel.textContent = v === "all" ? "Todos" : v;
+
+    yearMenu.querySelectorAll(".year-item").forEach((b) => {
+      b.classList.toggle("is-active", b.getAttribute("data-year") === v);
+    });
+
+    state.limit = PAGE_SIZE;
+    closeYearMenu();
+    render();
+  });
+
+  // -----------------------
+  // TESE submenu (FIX DEFINITIVO)
+  // -----------------------
+  function markActiveNivelUI() {
+    submenuTese.querySelectorAll(".submenu-item[data-nivel]").forEach((b) => {
+      const n = String(b.getAttribute("data-nivel") || "").toLowerCase();
+      b.classList.toggle("is-active", state.niveis.has(n));
+    });
+  }
+
+  function closeTeseMenu() {
+    submenuTese.classList.remove("is-open");
+    chipTeseBtn.setAttribute("aria-expanded", "false");
+  }
+
+  function openTeseMenu() {
+    submenuTese.classList.add("is-open");
+    chipTeseBtn.setAttribute("aria-expanded", "true");
+
+    if (submenuTese.parentElement !== document.body) {
+      document.body.appendChild(submenuTese);
+    }
+
+    const r = chipTeseBtn.getBoundingClientRect();
+    const gap = 10;
+
+    const top = Math.round(r.bottom + gap);
+    let left = Math.round(r.left);
+
+    submenuTese.style.top = `${top}px`;
+    submenuTese.style.left = `${left}px`;
+
+    const menuW = submenuTese.offsetWidth || 280;
+    const maxLeft = window.innerWidth - menuW - 12;
+    if (left > maxLeft) {
+      left = Math.max(12, maxLeft);
+      submenuTese.style.left = `${left}px`;
+    }
+  }
+
+  function toggleTeseMenu() {
+    const isOpen = submenuTese.classList.contains("is-open");
+    if (isOpen) closeTeseMenu();
+    else openTeseMenu();
+  }
+
+  chipTeseBtn.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    state.tipo = "tese";
+    setActiveChips(tipoWrap, "data-tipo", "tese");
+
+    toggleTeseMenu();
+    markActiveNivelUI();
+    state.limit = PAGE_SIZE;
+    render();
+  });
+
+  submenuTese.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+
+    const btn = ev.target.closest(".submenu-item[data-nivel]");
+    if (!btn) return;
+
+    const nivel = String(btn.getAttribute("data-nivel") || "").toLowerCase();
+    if (state.niveis.has(nivel)) state.niveis.delete(nivel);
+    else state.niveis.add(nivel);
+
+    state.tipo = "tese";
+    setActiveChips(tipoWrap, "data-tipo", "tese");
+
+    markActiveNivelUI();
+    state.limit = PAGE_SIZE;
+    render();
+  });
+
+  document.addEventListener("click", () => {
+    closeYearMenu();
+    closeTeseMenu();
+  });
+
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") {
+      closeYearMenu();
+      closeTeseMenu();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (submenuTese.classList.contains("is-open")) openTeseMenu();
+  });
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (submenuTese.classList.contains("is-open")) openTeseMenu();
+    },
+    true
+  );
+
+  // -----------------------
+  // Infinite scroll (liga/desliga conforme os filtros)
+  // -----------------------
+  function ensureInfiniteScroll() {
+    if (!sentinelEl) return;
+
+    const canLoad = state.limit < _lastFilteredTotal;
+
+    // se não tem mais para carregar, desconecta e esconde loader
+    if (!canLoad) {
+      if (_io) _io.disconnect();
+      if (loaderEl) loaderEl.hidden = true;
+      return;
+    }
+
+    // garante que existe um observer ativo
+    if (_io) _io.disconnect();
+
+    _io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.some((e) => e.isIntersecting);
+        if (!hit) return;
+        if (_isLoadingMore) return;
+
+        if (state.limit >= _lastFilteredTotal) return;
+
+        _isLoadingMore = true;
+        if (loaderEl) loaderEl.hidden = false;
+
+        // carrega mais + re-render
+        state.limit += PAGE_SIZE;
+        render();
+
+        if (loaderEl) loaderEl.hidden = true;
+        _isLoadingMore = false;
+      },
+      { root: null, rootMargin: "1200px 0px 1200px 0px", threshold: 0 }
+    );
+
+    _io.observe(sentinelEl);
+  }
+
+  // -----------------------
+  // Render
+  // -----------------------
   function render() {
     if (!DATA.length) {
       resultsMeta.textContent = "Mostrando 0 de 0 resultado(s)";
@@ -420,13 +655,18 @@
           Verifique se o arquivo existe em <code>/publications/data/publicacoes.json</code>.
         </div>
       `;
-      loadMoreBtn.style.display = "none";
+      _lastFilteredTotal = 0;
+      ensureInfiniteScroll();
       return;
     }
 
     const filtered = DATA
       .filter(matches)
-      .sort((a, b) => (b.ano - a.ano) || norm(a.titulo).localeCompare(norm(b.titulo)));
+      .sort(
+        (a, b) => b.ano - a.ano || norm(a.titulo).localeCompare(norm(b.titulo))
+      );
+
+    _lastFilteredTotal = filtered.length;
 
     const visible = filtered.slice(0, state.limit);
 
@@ -435,9 +675,6 @@
     grid.innerHTML =
       visible.map(cardHTML).join("") ||
       `<div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>`;
-
-    loadMoreBtn.style.display =
-      filtered.length > visible.length ? "inline-flex" : "none";
 
     grid.querySelectorAll(".fav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -453,41 +690,13 @@
         render();
       });
     });
+
+    // (re)liga infinite scroll sempre que renderiza (filtros mudam, total muda, etc.)
+    ensureInfiniteScroll();
   }
 
   // -----------------------
-  // Submenu TESE (UI)
-  // -----------------------
-  function closeTeseMenu() {
-    if (!submenuTese || !chipTeseBtn) return;
-    submenuTese.classList.remove("is-open");
-    chipTeseBtn.setAttribute("aria-expanded", "false");
-  }
-
-  function toggleTeseMenu() {
-    if (!submenuTese || !chipTeseBtn) return;
-    const open = !submenuTese.classList.contains("is-open");
-    submenuTese.classList.toggle("is-open", open);
-    chipTeseBtn.setAttribute("aria-expanded", open ? "true" : "false");
-  }
-
-  function readSelectedNiveis() {
-    if (!submenuTese) return new Set();
-    const checks = submenuTese.querySelectorAll('input[type="checkbox"]');
-    const set = new Set();
-    checks.forEach((cb) => {
-      if (cb.checked) set.add(String(cb.value).toLowerCase());
-    });
-    return set;
-  }
-
-  function clearSelectedNiveisUI() {
-    if (!submenuTese) return;
-    submenuTese.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
-  }
-
-  // -----------------------
-  // Eventos dos filtros
+  // Eventos: EIXO / TIPO / BUSCA / FAV
   // -----------------------
   eixoWrap.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-eixo]");
@@ -510,28 +719,23 @@
   });
 
   tipoWrap.addEventListener("click", (e) => {
-    // Cuidado: clique dentro do submenu não deve cair aqui
     const btn = e.target.closest("[data-tipo]");
     if (!btn) return;
+
+    // TESE é tratado no listener do chipTeseBtn
+    if (btn.id === "chipTeseBtn") return;
 
     const tipo = btn.getAttribute("data-tipo") || "all";
     state.tipo = tipo;
 
-    // se mudou para NÃO tese, limpamos niveis
     if (tipo !== "tese") {
       state.niveis.clear();
-      clearSelectedNiveisUI();
       closeTeseMenu();
+      markActiveNivelUI();
     }
 
     state.limit = PAGE_SIZE;
     setActiveChips(tipoWrap, "data-tipo", state.tipo);
-    render();
-  });
-
-  yearSelect.addEventListener("change", () => {
-    state.ano = yearSelect.value;
-    state.limit = PAGE_SIZE;
     render();
   });
 
@@ -549,77 +753,9 @@
     render();
   });
 
-  loadMoreBtn.addEventListener("click", () => {
-    state.limit += PAGE_SIZE;
-    render();
-  });
-
-  // Clique no diagrama filtra o HUB e rola até ele
-  document.querySelectorAll(".diagram.venn [data-id]").forEach((el) => {
-    el.addEventListener("click", (ev) => {
-      ev.preventDefault();
-      const eixo = el.getAttribute("data-id");
-      if (!eixo) return;
-
-      if (state.eixos.has("all")) state.eixos.delete("all");
-      if (state.eixos.has(eixo)) state.eixos.delete(eixo);
-      else state.eixos.add(eixo);
-      if (state.eixos.size === 0) state.eixos.add("all");
-
-      state.limit = PAGE_SIZE;
-      syncEixoChipsUI();
-      render();
-
-      document.getElementById("pubs")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  });
-
-  document.querySelectorAll(".intersection.sc a").forEach((el) => {
-    el.addEventListener("click", (ev) => {
-      ev.preventDefault();
-      const eixo = "sc";
-
-      if (state.eixos.has("all")) state.eixos.delete("all");
-      if (state.eixos.has(eixo)) state.eixos.delete(eixo);
-      else state.eixos.add(eixo);
-      if (state.eixos.size === 0) state.eixos.add("all");
-
-      state.limit = PAGE_SIZE;
-      syncEixoChipsUI();
-      render();
-
-      document.getElementById("pubs")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  });
-
-  // Submenu TESE: hover desktop já é CSS; clique é para mobile
-  if (chipTeseBtn && submenuTese) {
-    chipTeseBtn.addEventListener("click", (ev) => {
-      ev.stopPropagation();
-      toggleTeseMenu();
-    });
-
-    submenuTese.addEventListener("click", (ev) => ev.stopPropagation());
-
-    document.addEventListener("click", () => closeTeseMenu());
-
-    btnApplyTese?.addEventListener("click", () => {
-      const set = readSelectedNiveis();
-
-      state.niveis = set;
-
-      // se marcou níveis, faz sentido “tipo = tese”
-      if (state.niveis.size > 0) {
-        state.tipo = "tese";
-        setActiveChips(tipoWrap, "data-tipo", "tese");
-      }
-      state.limit = PAGE_SIZE;
-      closeTeseMenu();
-      render();
-    });
-  }
-
+  // -----------------------
   // Boot
+  // -----------------------
   (async function initHub() {
     await loadPublicacoes();
     populateYears();
