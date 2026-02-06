@@ -1,7 +1,9 @@
+/* /publications/css/style3.css */
 :root{
   --bg: #060612;
   --ink: #e9ecff;
   --muted: #b8c0ff;
+
   --cern: #00e5ff;
   --sapho: #ff8a00;
   --sc: #b388ff;
@@ -63,8 +65,6 @@ html, body{
 
 .logo-fa{
   display: inline-flex;
-  visibility: visible;
-  opacity: 1;
   font-size: 2.2rem;
   line-height: 1;
   color: #e9ecff;
@@ -184,7 +184,6 @@ main{
   box-shadow: 0 0 40px currentColor;
 }
 
-/* Interseção SC */
 .intersection{
   position: absolute;
   z-index: 6;
@@ -206,44 +205,62 @@ main{
   text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
 }
 
-/* ===== RODAPÉ ===== */
-.footer{
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  padding: 15px 0;
-  background: rgba(6, 6, 18, 0.7);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 -2px 12px rgba(255, 138, 0, 0.2);
-  color: var(--muted);
-  font-size: 0.8rem;
-  z-index: 10;
-}
-.footer-line{
-  height: 2px;
-  width: 60%;
-  margin: 0 auto 8px;
-  background: linear-gradient(90deg, var(--sapho), var(--cern));
-  border-radius: 4px;
-  animation: glowFooter 6s ease-in-out infinite;
-}
-@keyframes glowFooter{
-  0%,100%{ opacity: 0.6; }
-  50%{ opacity: 1; }
-}
-
 /* =========================================================
-   HUB — FILTROS + LISTA (OFICIAL)
+   HUB — FILTROS + LISTA
    ========================================================= */
-.pubs-hub{ max-width: 1040px; margin: 40px auto 120px; padding: 0 20px; position: relative; z-index: 1; }
+.pubs-hub{
+  max-width: 1040px;
+  margin: 40px auto 120px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
 .pubs-title{ text-align: center; margin: 0 0 14px; }
 
-.pubs-filters{ text-align: center; margin: 14px auto 18px; }
-.filter-block{ margin: 14px 0; }
-.filters-label{ letter-spacing: .16em; opacity: .75; font-size: 12px; margin: 0 0 10px; }
+.pubs-filters{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 14px auto 18px;
+}
 
-.filter-row{ display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center; }
+.filter-block{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.filter-line{
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.filters-label{
+  width: 70px;
+  flex: 0 0 70px;
+  text-align: right;
+  letter-spacing: .16em;
+  opacity: .75;
+  font-size: 12px;
+}
+
+.filter-row,
+.search-row{
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-row{ width: 100%; }
 
 .chip{
   border: 1px solid rgba(120,200,255,.35);
@@ -254,25 +271,32 @@ main{
   cursor: pointer;
   user-select: none;
 }
-.chip.is-active{ box-shadow: 0 0 0 2px rgba(120,200,255,.25); }
-.chip-star{ width: 44px; justify-content: center; align-items: center; display: inline-flex; }
 
-.search-row{ display: flex; justify-content: center; }
+.chip.is-active{
+  box-shadow: 0 0 0 2px rgba(120,200,255,.25);
+}
+
+.chip-star{
+  width: 44px;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+
+.chip-tese{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 #pubSearch{
-  width: min(560px, 92vw);
+  width: min(560px, 100%);
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(120,200,255,.25);
   background: rgba(6,6,18,.35);
   color: #e9ecff;
   outline: none;
-}
-.year-select{
-  padding: 10px 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(120,200,255,.25);
-  background: rgba(6,6,18,.35);
-  color: #e9ecff;
 }
 
 .results-bar{
@@ -284,6 +308,7 @@ main{
   opacity: .9;
   flex-wrap: wrap;
 }
+
 .load-more{
   border: 1px solid rgba(120,200,255,.25);
   background: rgba(6,6,18,.35);
@@ -314,15 +339,21 @@ main{
 }
 .pub-card:hover{ transform: translateY(-2px); }
 
-.pub-top{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
+.pub-top{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
 .pub-badge{ font-size: 12px; letter-spacing: .12em; opacity: .85; }
-
 .pub-title{ margin: 6px 0 8px; font-size: 16px; line-height: 1.25; }
 .pub-meta{ margin: 0 0 6px; opacity: .85; }
 .pub-veic{ margin: 0 0 6px; opacity: .85; }
 .pub-resumo{ margin: 8px 0 0; opacity: .9; line-height: 1.45; }
 
 .pub-actions{ margin-top: 12px; display: flex; gap: 10px; }
+
 .pub-open{
   display: inline-flex;
   align-items: center;
@@ -334,19 +365,13 @@ main{
   text-decoration: none;
   color: #e9ecff;
 }
+
 .pub-open i{ color: #ffffff; font-size: .95em; opacity: .9; }
 .pub-open:hover i{ opacity: 1; }
 
 .no-results{ text-align: center; opacity: .75; padding: 24px; }
 
-/* Favoritos (sempre visível) */
-.pub-card .fav-btn{
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  pointer-events: auto;
-  display: inline-flex;
-}
+/* Favoritos */
 .fav-btn{
   display: inline-flex;
   align-items: center;
@@ -390,63 +415,168 @@ main{
     0 18px 48px rgba(0,0,0,0.55);
 }
 
+/* ===============================
+   Tooltip — SC (SAPHO × CERN)
+   =============================== */
+.has-tooltip{ position: relative; }
+
+.has-tooltip::after{
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  padding: 6px 10px;
+  border-radius: 10px;
+
+  background: rgba(10, 12, 28, 0.95);
+  border: 1px solid rgba(179,136,255,0.45);
+  color: #e9ecff;
+
+  font-size: 11px;
+  letter-spacing: .12em;
+  white-space: nowrap;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+  box-shadow: 0 0 18px rgba(179,136,255,0.35);
+}
+.has-tooltip:hover::after{
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
 
 /* ===============================
-   SUBMENU TESE (HUB)
+   Dropdown de ANO (2 colunas)
    =============================== */
-.chip-parent{ position: relative; display: inline-flex; align-items: center; }
-.chip-tese{ display: inline-flex; align-items: center; gap: 10px; }
-.chevron{ font-size: 12px; opacity: 0.85; }
+.year-dd{ position: relative; width: 220px; }
 
-.submenu{
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  min-width: 220px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(10, 12, 20, 0.92);
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-  backdrop-filter: blur(10px);
-  display: none;
-  z-index: 30;
-}
-
-@media (hover: hover) and (pointer: fine){
-  .chip-parent:hover .submenu{ display: block; }
-}
-
-.submenu.is-open{ display: block; }
-
-.submenu-item{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 6px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 13px;
-}
-.submenu-item:hover{ background: rgba(255,255,255,0.06); }
-
-.submenu-actions{
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-end;
-}
-.btn-mini{
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,.92);
-  border-radius: 12px;
-  padding: 8px 10px;
-  cursor: pointer;
+.year-dd-btn{
+  width: 100%;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(120,200,255,.30);
+  background: rgba(6,6,18,.55);
+  color: #e9ecff;
+
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .04em;
+
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
 }
-.btn-mini:hover{ border-color: rgba(255,255,255,0.22); }
+.year-dd-btn:hover{ border-color: rgba(0,229,255,.45); }
+
+.year-dd-menu{
+  display: none;
+  margin-top: 10px;
+
+  background: rgba(15, 20, 45, 0.98);
+  border: 1px solid rgba(0,229,255,0.25);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.75);
+  backdrop-filter: blur(12px);
+
+  border-radius: 16px;
+  padding: 12px;
+
+  position: absolute;
+  left: 0;
+  z-index: 999;
+}
+.year-dd.is-open .year-dd-menu{ display: block; }
+
+.year-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  max-height: 260px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.year-item{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #eef2ff;
+  padding: 10px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.year-item:hover{
+  background: rgba(0,229,255,0.10);
+  border-color: rgba(0,229,255,0.45);
+  box-shadow: 0 0 18px rgba(0,229,255,0.18);
+}
+.year-item.is-active{
+  background: rgba(0,229,255,0.16);
+  border-color: rgba(0,229,255,0.70);
+  box-shadow: 0 0 0 2px rgba(0,229,255,0.18);
+}
+
+/* ===============================
+   SUBMENU TESE — SÓLIDO e 1 por linha
+   (JS move pro BODY e posiciona FIXED)
+   =============================== */
+#submenuTese{
+  display: none;
+  min-width: 280px;
+  padding: 14px;
+  border-radius: 18px;
+
+  background: rgba(10, 12, 28, 0.96);
+  border: 1px solid rgba(0,229,255,0.22);
+  box-shadow: 0 26px 80px rgba(0,0,0,0.70);
+  backdrop-filter: blur(12px);
+
+  position: fixed; /* ✅ menu flutua acima de tudo */
+  z-index: 2147483647;
+}
+#submenuTese.is-open{ display: block; }
+
+.submenu-grid{
+  display: grid;
+  grid-template-columns: 1fr; /* ✅ 1 por linha */
+  gap: 10px;
+}
+
+.submenu-item{
+  width: 100%;
+  text-align: left;
+
+  background: rgba(40, 45, 75, 0.95);       /* ✅ mais sólido */
+  border: 1px solid rgba(140, 160, 255, 0.35);
+  color: #f3f6ff;
+
+  border-radius: 16px;
+  padding: 12px 14px;
+
+  font-weight: 800;
+  letter-spacing: 0.05em;
+
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.submenu-item:hover{
+  background: rgba(70, 90, 160, 0.95);
+  border-color: rgba(0, 229, 255, 0.65);
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.22);
+}
+.submenu-item.is-active{
+  background: rgba(0, 229, 255, 0.22);
+  border-color: rgba(0, 229, 255, 0.95);
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.22);
+}
 
 /* =========================================================
    RESPONSIVO ESSENCIAL
@@ -508,258 +638,54 @@ main{
     border: 1px solid rgba(255,255,255,0.18);
   }
 
-  .footer{ position: relative; margin-top: 16px; }
-}
-/* ===============================
-   HUB — Labels à esquerda
-   =============================== */
-
-.pubs-filters{
-  text-align: left; /* não precisa centralizar mais */
-}
-
-.filter-block{
-  margin: 14px 0;
-}
-
-/* linha: label esquerda + opções direita */
-.filter-line{
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* label vira “coluna” fixa */
-.filter-line .filters-label{
-  margin: 0;                 /* mata o margin antigo */
-  width: 70px;               /* ajuste fino: 60~90px */
-  flex: 0 0 70px;
-  text-align: right;         /* fica alinhadinho */
-  letter-spacing: .16em;
-  opacity: .75;
-  font-size: 12px;
-}
-
-/* opções ocupam o resto */
-.filter-line .filter-row,
-.filter-line .search-row{
-  flex: 1 1 auto;
-  justify-content: flex-start; /* fica mais “organizado” */
-}
-
-/* BUSCA ocupa mais bonito */
-.filter-line #pubSearch{
-  width: min(560px, 100%);
-}
-
-/* Mobile: volta a ficar label em cima (mais confortável) */
-@media (max-width: 768px){
-  .filter-line{
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-  .filter-line .filters-label{
-    width: auto;
-    flex: 0 0 auto;
-    text-align: center;
-  }
-  .filter-line .filter-row,
-.filter-line .search-row{
-  justify-content: flex-start;
-}
-
-.filter-line #pubSearch{
-  margin-left: 90px;
-}
-
-
-}
-
-
-/* ===============================
-   HUB — filtros centralizados
-   =============================== */
-
-/* centraliza o bloco inteiro de filtros */
-.pubs-filters{
-  display: flex;
-  flex-direction: column;
-  align-items: center;   /* 🔑 centralização horizontal */
-}
-
-/* cada linha (EIXO / TIPO / ANO / BUSCA) */
-.filter-block{
-  width: 100%;
-  display: flex;
-  justify-content: center; /* 🔑 centraliza a linha */
-}
-
-/* grid da linha: label + controles */
-.filter-line{
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  max-width: 920px;      /* 🔑 largura visual do painel */
-  margin-left: 200px;
-}
-
-/* coluna das labels */
-.filter-line .filters-label{
-  width: 70px;
-  flex: 0 0 70px;
-  text-align: right;
-  margin: 0;
-  letter-spacing: .16em;
-  opacity: .75;
-  font-size: 12px;
-}
-
-/* área dos controles */
-.filter-line .filter-row,
-.filter-line .search-row{
-  flex: 1;
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-/* BUSCA mais elegante e central */
-.filter-line .search-row{
-  justify-content: center;
-}
-.filter-line #pubSearch{
-  width: min(560px, 100%);
-}
-
-/* mobile: empilha e mantém central */
-@media (max-width: 768px){
-  .filter-line{
-    flex-direction: column;
-    align-items: center;
-  }
-  .filter-line .filters-label{
-    width: auto;
-    flex: none;
-    text-align: center;
-  }
-  .filter-line .filter-row,
-  .filter-line .search-row{
-  justify-content: flex-start;
-}
-
-.filter-line #pubSearch{
-  margin-left: 84px;
-}
-
-
-
-}
-/* ===============================
-   AJUSTE FINAL — BUSCA ALINHADA À ESQUERDA
-   =============================== */
-
-/* garante largura comum para todas as linhas */
-.filter-line{
-  width: 100%;
-  max-width: 920px;     /* mesma largura visual do painel */
-  margin: 0 auto;
-}
-
-/* label fixa (EIXO / TIPO / ANO / BUSCA) */
-.filter-line .filters-label{
-  width: 70px;
-  flex: 0 0 70px;
-  text-align: right;
-}
-
-/* linha da BUSCA NÃO centraliza */
-.filter-line .search-row{
-  justify-content: flex-start !important;
-}
-
-/* input da busca começa alinhado aos chips */
-.filter-line #pubSearch{
-  margin-left: 0;                 /* remove qualquer empurrão */
-  width: min(560px, 100%);        /* elegante e controlado */
-}
-
-
-/* =========================================================
-   HUB — FILTROS (OFICIAL • SEM DUPLICAÇÃO)
-   ========================================================= */
-
-.pubs-filters{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-
-.filter-block{
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-/* linha = label (esq) + controles (dir) */
-.filter-line{
-  width: 100%;
-  max-width: 920px;
-  margin: 0 auto;
-
-  display: flex;
-  align-items: center;
-  gap: 16px;
-transform: translateX(155px);
-}
-
-.filter-line .filters-label{
-  width: 70px;
-  flex: 0 0 70px;
-  margin: 0;
-
-  text-align: right;
-  letter-spacing: .16em;
-  opacity: .75;
-  font-size: 12px;
-}
-
-.filter-line .filter-row,
-.filter-line .search-row{
-  flex: 1;
-  display: flex;
-  justify-content: flex-start;  /* ✅ tudo começa alinhado à esquerda */
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.filter-line #pubSearch{
-  width: min(560px, 100%);
-}
-
-/* Mobile: empilha (mais confortável) */
-@media (max-width: 768px){
+  /* filtros empilhados */
   .filter-line{
     flex-direction: column;
     align-items: center;
     gap: 8px;
   }
 
-  .filter-line .filters-label{
+  .filters-label{
     width: auto;
     flex: none;
     text-align: center;
   }
 
-  .filter-line .filter-row,
-  .filter-line .search-row{
+  .filter-row,
+  .search-row{
     justify-content: center;
   }
 
-  .filter-line #pubSearch{
+  #pubSearch{
     width: min(560px, 92vw);
   }
+
+  .year-dd{ width: min(260px, 92vw); }
 }
+.year-dd{ position: relative; width: 220px; }
+
+.year-dd-menu{
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  border-radius: 16px;
+  padding: 12px;
+  z-index: 999; /* ok */
+}
+
+#infiniteSentinel{ height: 48px; width: 100%; }
+
+
+.pub-loader{
+  margin: 14px auto 0;
+  width: fit-content;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(10,10,30,.55);
+  color: var(--muted);
+  font-size: 0.95rem;
+  backdrop-filter: blur(10px);
+}
+
+

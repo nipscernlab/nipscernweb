@@ -1,9 +1,9 @@
+<!-- index3.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>NIPSCERN — PUBLICAÇÕES</title>
 
   <!-- CSS principal -->
@@ -46,7 +46,6 @@
     </h2>
 
     <div class="diagram venn">
-      <!-- CÍRCULOS -->
       <a href="/publications/artigos/sapho/sapho.html" target="_blank" class="circle sapho" data-id="sapho">SAPHO</a>
       <a href="/publications/artigos/cern/cern.html" target="_blank" class="circle cern" data-id="cern">CERN</a>
 
@@ -58,26 +57,22 @@
     </div>
   </main>
 
-  <!-- ===== HUB DE PUBLICAÇÕES (Filtros + Cards) ===== -->
+  <!-- ===== HUB DE PUBLICAÇÕES ===== -->
   <section id="pubs" class="pubs-hub" aria-label="Hub de publicações">
     <h2 class="pubs-title">Publicações</h2>
 
-    <!-- FILTROS -->
     <div class="pubs-filters">
 
-      
+      <!-- EIXO -->
       <div class="filter-block">
         <div class="filter-line">
           <p class="filters-label">EIXO</p>
 
-          <button class="chip is-active" data-eixo="all">Todos</button>
           <div class="filter-row" id="filterEixo" role="group" aria-label="Filtro de eixo">
+            <button class="chip is-active" data-eixo="all">Todos</button>
             <button class="chip" data-eixo="sapho">SAPHO</button>
             <button class="chip" data-eixo="cern">CERN</button>
-            <button class="chip" data-eixo="sc">SC</button>
-
-            
-
+            <button class="chip has-tooltip" data-eixo="sc" data-tooltip="SAPHO × CERN">SC</button>
           </div>
         </div>
       </div>
@@ -91,587 +86,86 @@
             <button class="chip is-active" data-tipo="all">Todos</button>
             <button class="chip" data-tipo="congresso">Congresso</button>
             <button class="chip" data-tipo="revista">Revista</button>
-            <button class="chip" data-tipo="tese">
-              Tese <i class="fa-solid fa-angle-down" aria-hidden="true" style="margin-left:8px;"></i>
+
+            <!-- TESE -->
+            <button class="chip chip-tese" id="chipTeseBtn" data-tipo="tese" type="button" aria-expanded="false">
+              Tese <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
             </button>
+
             <button class="chip chip-star" id="favOnlyBtn" aria-pressed="false" title="Somente favoritos">
               <i class="fa-solid fa-star"></i>
             </button>
-
-            
           </div>
         </div>
       </div>
 
       <!-- ANO -->
       <div class="filter-block">
-        <div class="filter-line" style="opacity: 1;">
+        <div class="filter-line">
+          <p class="filters-label">ANO</p>
 
+          <div class="filter-row">
+            <!-- select escondido (compatível) -->
+            <select id="yearSelect" class="year-select" aria-label="Filtro de ano" hidden>
+              <option value="all">Todos</option>
+            </select>
+
+            <!-- dropdown custom -->
+            <div class="year-dd" id="yearDD">
+              <button type="button" class="year-dd-btn" id="yearBtn" aria-haspopup="listbox" aria-expanded="false">
+                <span id="yearBtnLabel">Todos</span>
+                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+              </button>
+
+              <div class="year-dd-menu" id="yearMenu" role="listbox" aria-label="Lista de anos">
+                <!-- JS preenche -->
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- BUSCA -->
       <div class="filter-block">
         <div class="filter-line">
+          <p class="filters-label">BUSCA</p>
 
           <div class="search-row">
+            <input id="pubSearch" type="search" placeholder="Buscar por título, autor, ano..." autocomplete="off">
           </div>
         </div>
       </div>
 
     </div>
-    <p class="filters-label">ANO</p>
-    <div class="filter-row">
-      <select id="yearSelect" class="year-select" aria-label="Filtro de ano">
-        <option value="all">Todos</option>
-      </select>
-    </div>
-    <input id="pubSearch" type="search" placeholder="Buscar por título, autor, ano..." autocomplete="off">
-    <p class="filters-label">BUSCA</p>
 
-    
-    <div class="results-bar">
-      <span id="resultsMeta">Mostrando 24 de 70 resultado(s)</span>
-      <button id="loadMoreBtn" class="load-more" type="button" style="display: inline-flex;">Carregar mais</button>
-    </div>
+   <div class="results-bar">
+  <span id="resultsMeta">Mostrando 0 de 0 resultado(s)</span>
+</div>
 
-    <!-- CARDS (gerados pelo HUB: #pubsGrid) -->
-    <div class="pubs-grid" id="pubsGrid">
-      <article class="pub-card" data-id="cern-2025-revista-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2025</span>
+<div class="pubs-grid" id="pubsGrid"></div>
 
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
+<!-- sentinela do infinite scroll -->
+<div id="infiniteSentinel" aria-hidden="true"></div>
+<div class="pub-loader" id="pubLoader" hidden>Carregando mais resultados…</div>
 
-        <h3 class="pub-title">Maximum Likelihood Signal Estimation and Data Quality Monitoring for Hadronic Calorimetry in High Luminosity Conditions</h3>
-        <p class="pub-meta">Sarita de Miranda Rimes; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">IEEE Transactions on Nuclear Science (2025)</p>
-        
+<!-- loader opcional -->
+<div class="pub-loader" id="pubLoader" hidden>
+  Carregando mais resultados…
+</div>
 
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2025/cern-revista-2025-sarita-rimes-maximum-likelihood-signal-estimation-data-quality.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="sapho-2025-tcc-01" data-eixo="sapho">
-        <div class="pub-top">
-          <span class="pub-badge">SAPHO • TESE (TCC) • 2025</span>
 
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Métodos de Implementação de Funções Não Lineares em FPGA</h3>
-        <p class="pub-meta">Tiago de Castro Falcão Guimarães</p>
-        <p class="pub-veic">TCC — Engenharia Elétrica (UFJF, 2025)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/sapho/2025/tiago-falcao-tcc.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2025-revista-02" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2025</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Online Pulse Compensation for High-Rate Calorimetry: Improving Energy Spectrum Estimation</h3>
-        <p class="pub-meta">Tiago Motta Quirino; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">Electronics (2025)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2025/cern-revista-2025-tiago-quirino-online-pulse-compensation-energy-spectrum.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2025-mestrado-lucca-oliveira-facio-viccini-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • TESE (MESTRADO) • 2025</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Reconstrução de Energia no Calorímetro Hadrônico do ATLAS para Sistemas de Trigger em Ambientes de Alta Luminosidade</h3>
-        <p class="pub-meta">Lucca Oliveira Facio Viccini</p>
-        <p class="pub-veic">Dissertação de Mestrado — Engenharia Elétrica (UFJF, 2025)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2025/cern-mestrado-2025-lucca-oliveira-facio-viccini-reconstrucao-energia-tilecal-trigger.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cs-2025-mestrado-leandro-da-graca-ribeiro-01" data-eixo="cs">
-        <div class="pub-top">
-          <span class="pub-badge">CS • TESE (MESTRADO) • 2025</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Simulador de pulsos do TileCal em tempo real utilizando o processador SAPHO e FPGA</h3>
-        <p class="pub-meta">Leandro da Graça Ribeiro</p>
-        <p class="pub-veic">Dissertação de Mestrado — Engenharia Elétrica (UFJF, 2025)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cs/2025/cs-mestrado-2025-leandro-da-graca-ribeiro-simulador-pulsos-tilecal-sapho-fpga.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2024-revista-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2024</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">FPGA Parallel Deconvolution for Online Energy Estimation in High-Rate Calorimeters</h3>
-        <p class="pub-meta">Igo A. S. Luz; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">Journal of Instrumentation (JINST) (2024)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2024/cern-revista-2024-igo-luz-fpga-parallel-deconvolution-calorimeters.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2024-revista-02" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2024</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Non-negative Sparse Deconvolution for PMT Signal Reconstruction in Hadronic Calorimetry</h3>
-        <p class="pub-meta">Tiago M. Quirino; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">Nuclear Instruments and Methods in Physics Research A (2024)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2024/cern-revista-2024-tiago-quirino-non-negative-sparse-deconvolution-pmt.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cs-2023-mestrado-melissa-santos-aguiar-01" data-eixo="cs">
-        <div class="pub-top">
-          <span class="pub-badge">CS • TESE (MESTRADO) • 2023</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Implementação Embarcada em FPGA de Métodos Visando a Reconstrução Online de Energia no Calorímetro Hadrônico do Experimento ATLAS</h3>
-        <p class="pub-meta">Melissa Santos Aguiar</p>
-        <p class="pub-veic">Dissertação de Mestrado — Engenharia Elétrica (UFJF, 2023)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cs/2023/cs-mestrado-2023-melissa-santos-aguiar-implementacao-embarcada-fpga-reconstrucao-energia-atlas.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cs-2023-tcc-lucca-viccini-01" data-eixo="cs">
-        <div class="pub-top">
-          <span class="pub-badge">CS • TESE (TCC) • 2023</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Otimizações Para Processador Soft-Core Embarcado em FPGA Visando Implementação de Métodos de Reconstrução Online de Energia em Aceleradores de Partículas</h3>
-        <p class="pub-meta">Lucca Oliveira Facio Viccini</p>
-        <p class="pub-veic">TCC — Engenharia Elétrica (UFJF, 2023)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cs/2023/lucca-viccini-tcc.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2023-revista-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2023</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Probability-Based Data Quality Monitoring for Energy Reconstruction in Hadronic Calorimetry</h3>
-        <p class="pub-meta">Sarita de Miranda Rimes; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">Journal of Computational Electronics (2023)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2023/cern-revista-2023-sarita-rimes-probability-based-data-quality-energy-calorimetry.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2022-doutorado-tiago-motta-quirino-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • TESE (DOUTORADO) • 2022</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Aprendizado Online de Redes Neurais Artificiais Aplicadas à Reconstrução de Energia no Calorímetro Hadrônico do ATLAS</h3>
-        <p class="pub-meta">Tiago Motta Quirino</p>
-        <p class="pub-veic">Tese de Doutorado — Engenharia Elétrica (UFJF, 2022)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2022/cern-doutorado-2022-tiago-motta-quirino-aprendizado-online-redes-neurais-reconstrucao-energia-atlas.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2022-revista-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2022</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Optimal Linear Filtering for Energy Estimation in High Pile-Up Calorimeters</h3>
-        <p class="pub-meta">Guilherme Inácio Gonçalves; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">Journal of Control, Automation and Electrical Systems (2022)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2022/cern-revista-2022-guilherme-goncalves-optimal-linear-filtering-calorimetry.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2021-revista-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2021</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">A matched filter based approach for high-energy estimation in calorimetry under high pile-up</h3>
-        <p class="pub-meta">Bernardo S. Peralva; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">IEEE Transactions on Nuclear Science (2021)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2021/cern-revista-2021-bernardo-peralva-matched-filter-energy-estimation-calorimetry.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2021-doutorado-dayane-oliveira-goncalves-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • TESE (DOUTORADO) • 2021</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Detecção Online Embarcada de Sinais Raros com Baixa Relação Sinal-Ruído em Ambientes com Alta Taxa de Eventos</h3>
-        <p class="pub-meta">Dayane Oliveira Gonçalves</p>
-        <p class="pub-veic">Tese de Doutorado — Engenharia Elétrica (UFJF, 2021)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2021/cern-doutorado-2021-dayane-oliveira-goncalves-deteccao-online-embarcarda-sinais-raros-tilemuon.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2021-doutorado-tiago-aparecido-teixeira-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • TESE (DOUTORADO) • 2021</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Implementação de Métodos Esparsos para Deconvolução On-line de Sinais no Calorímetro Hadrônico do ATLAS</h3>
-        <p class="pub-meta">Tiago Aparecido Teixeira</p>
-        <p class="pub-veic">Tese de Doutorado — Engenharia Elétrica (UFJF, 2021)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2021/cern-doutorado-2021-tiago-aparecido-teixeira-deconvolucao-online-representacao-esparsa-atlas.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2021-tcc-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • TESE (TCC) • 2021</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Implementação em FPGA de Filtro FIR Utilizando Máquina de Estados Para Estimação Online de Energia no Calorímetro de Telhas</h3>
-        <p class="pub-meta">Kinn Belarmino Batista Dias</p>
-        <p class="pub-veic">TCC — Engenharia Elétrica (UFJF, 2021)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2021/kinn-dias-tcc.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2021-revista-02" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2021</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Linear Equation System Solver Circuit for Streaming Processing in FPGA</h3>
-        <p class="pub-meta">Tiago A. Teixeira; Luciano M. de Andrade Filho</p>
-        <p class="pub-veic">Journal of Control, Automation and Electrical Systems, v. 33, p. 677–687 (2022)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2021/cern-revista-2021-tiago-teixeira-linear-equation-system-fpga.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2021-revista-03" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2021</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Sparse deconvolution methods for online energy estimation in high pile-up calorimeters</h3>
-        <p class="pub-meta">Tiago Teixeira; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">IEEE Transactions on Nuclear Science (2021/2022)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2021/cern-revista-2021-tiago-teixeira-sparse-deconvolution-energy-calorimeters.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2020-mestrado-guilherme-inacio-goncalves-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • TESE (MESTRADO) • 2020</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Estimação de Energia para Calorímetros Finamente Segmentados Operando em Condições Severas de Empilhamento de Sinais</h3>
-        <p class="pub-meta">Guilherme Inácio Gonçalves</p>
-        <p class="pub-veic">Dissertação de Mestrado — Modelagem Computacional (UERJ, 2020)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2020/cern-mestrado-2020-guilherme-inacio-goncalves-estimacao-energia-calorimetros-pileup.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2020-revista-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • REVISTA • 2020</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Performance Evaluation of Energy Reconstruction Methods for High Luminosity Experiments on a Many-Core Platform</h3>
-        <p class="pub-meta">Juan Lieber Marin; Luciano M. de Andrade Filho; José Manoel de Seixas</p>
-        <p class="pub-veic">Journal of Control, Automation and Electrical Systems (2020)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2020/cern-revista-2020-juan-lieber-performance-energy-reconstruction.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cs-2020-congresso-02" data-eixo="cs">
-        <div class="pub-top">
-          <span class="pub-badge">CS • CONGRESSO • 2020</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Processamento Multicore Embarcado em FPGA Aplicado à Reconstrução Online de Energia</h3>
-        <p class="pub-meta">Melissa Santos Aguiar</p>
-        <p class="pub-veic">Congresso (2020)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cs/2020/sc-congresso-2020-02.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cs-2020-tcc-melissa-aguiar-01" data-eixo="cs">
-        <div class="pub-top">
-          <span class="pub-badge">CS • TESE (TCC) • 2020</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Processamento Multicore Embarcado em FPGA de um Método Iterativo de Deconvolução Baseado em Representação Esparsa de Dados</h3>
-        <p class="pub-meta">Melissa Santos Aguiar</p>
-        <p class="pub-veic">TCC — Engenharia Elétrica (UFJF, 2020)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cs/2020/melissa-aguiar-tcc.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cs-2020-congresso-01" data-eixo="cs">
-        <div class="pub-top">
-          <span class="pub-badge">CS • CONGRESSO • 2020</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Processamento Multicore Embarcado em FPGA de um Método Iterativo de Deconvolução Baseado em Representação Esparsa de Dados Visando a Reconstrução Online de Energia em Aceleradores de Partículas</h3>
-        <p class="pub-meta">Melissa Santos Aguiar</p>
-        <p class="pub-veic">Congresso (2020)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cs/2020/sc-congresso-2020-01.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    
-      <article class="pub-card" data-id="cern-2020-tcc-01" data-eixo="cern">
-        <div class="pub-top">
-          <span class="pub-badge">CERN • TESE (TCC) • 2020</span>
-
-          <button class="fav-btn " type="button" aria-label="Favoritar" aria-pressed="false" title="Favoritar">
-            <i class="fa-regular fa-star"></i>
-          </button>
-        </div>
-
-        <h3 class="pub-title">Reconstrução de Energia no Calorímetro Hadrônico do ATLAS para Fase de Alta Luminosidade do LHC</h3>
-        <p class="pub-meta">Alessa Monay e Silva</p>
-        <p class="pub-veic">TCC — Engenharia Elétrica (UFJF, 2020)</p>
-        
-
-        <div class="pub-actions">
-          <a class="pub-open" href="/publications/artigos/pdfs/cern/2020/alessa-monay-tcc.pdf" target="_blank" rel="noopener">
-            Abrir PDF
-            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-          </a>
-        </div>
-      </article>
-    </div>
   </section>
 
-  <!-- ===== RODAPÉ ===== -->
-  <footer class="footer">
-    <div class="footer-line"></div>
-    <p>© 2026 NIPSCERN</p>
-  </footer>
+  <!-- SUBMENU TESE (fica fora do fluxo; JS move pro BODY e posiciona FIXED) -->
+  <div class="submenu" id="submenuTese" role="menu" aria-label="Filtro de nível de tese">
+    <div class="submenu-grid">
+      <button class="submenu-item" type="button" data-nivel="tcc">TCC</button>
+      <button class="submenu-item" type="button" data-nivel="mestrado">Mestrado</button>
+      <button class="submenu-item" type="button" data-nivel="doutorado">Doutorado</button>
+    </div>
+
+    <!-- (Sem “Limpar”, como você pediu) -->
+  </div>
 
   <script src="/publications/js/script3.js" defer></script>
 </body>
