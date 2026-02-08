@@ -197,6 +197,7 @@
   const searchEl = document.getElementById("pubSearch");
   const favOnlyBtn = document.getElementById("favOnlyBtn");
   const resultsMeta = document.getElementById("resultsMeta");
+
 const backTopBtn = document.getElementById("backToTop");
 
 
@@ -238,6 +239,8 @@ const backTopBtn = document.getElementById("backToTop");
   let _io = null;
   let _isLoadingMore = false;
   let _lastFilteredTotal = 0;
+
+
 
   const norm = (s) =>
     (s || "")
@@ -688,9 +691,39 @@ const backTopBtn = document.getElementById("backToTop");
 
     resultsMeta.textContent = `Mostrando ${visible.length} de ${filtered.length} resultado(s)`;
 
-    grid.innerHTML =
-      visible.map(cardHTML).join("") ||
-      `<div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>`;
+
+    const STEP = 15; // ✅ de 15 em 15
+
+if (!visible.length) {
+  grid.innerHTML = `<div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>`;
+} else {
+  const parts = [];
+
+  for (let i = 0; i < visible.length; i++) {
+    parts.push(cardHTML(visible[i]));
+
+    const loadedSoFar = i + 1;
+
+    // ✅ coloca marcador quando fecha 15, 30, 45... ou no último carregado
+    const isMilestone = (loadedSoFar % STEP === 0) || (loadedSoFar === visible.length);
+
+    if (isMilestone) {
+      const from = Math.max(1, loadedSoFar - (loadedSoFar % STEP || STEP) + 1);
+      const to = loadedSoFar;
+
+      parts.push(`
+        <div class="progress-row">
+          <span class="progress-pill">
+            Vistos: ${to} / ${filtered.length} <span style="opacity:.7">(${from}–${to})</span>
+          </span>
+        </div>
+      `);
+    }
+  }
+
+  grid.innerHTML = parts.join("");
+}
+
 
     grid.querySelectorAll(".fav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
