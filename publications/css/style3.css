@@ -38,7 +38,6 @@ html, body{
   z-index: 0;
   background: transparent;
   pointer-events: none;
-
 }
 
 /* ===== CABEÇALHO ===== */
@@ -123,7 +122,7 @@ main{
   align-items: center;
 }
 
-/* ===== HOME — DIAGRAMA ===== */
+/* ===== HOME — TÍTULO + EFEITO (FINAL) ===== */
 .titulo-diagrama{
   position: relative;
   top: 87px;
@@ -133,18 +132,44 @@ main{
   letter-spacing: 1px;
   margin-bottom: 30px;
   color: var(--ink);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
   z-index: 3;
+
+  display: inline-block;
+  will-change: text-shadow;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
+
 .titulo-diagrama .cern-text{
   color: var(--cern);
-  text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+  text-shadow: 0 0 14px rgba(0, 229, 255, 0.55);
 }
 .titulo-diagrama .sapho-text{
   color: var(--sapho);
-  text-shadow: 0 0 12px rgba(255, 138, 0, 0.6);
+  text-shadow: 0 0 14px rgba(255, 138, 0, 0.55);
 }
 
+@keyframes nip-title-pulse{
+  0%,100%{
+    text-shadow:
+      0 0 10px rgba(233,236,255,.22),
+      0 0 26px rgba(0,229,255,.14);
+  }
+  50%{
+    text-shadow:
+      0 0 18px rgba(233,236,255,.38),
+      0 0 52px rgba(0,229,255,.28);
+  }
+}
+
+.titulo-diagrama.fx-pulse{
+  animation: nip-title-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .titulo-diagrama.fx-pulse{ animation: none; }
+}
+
+/* ===== HOME — DIAGRAMA ===== */
 .diagram{
   position: relative;
   width: 700px;
@@ -171,6 +196,7 @@ main{
   transition: transform 0.4s ease, box-shadow 0.6s ease;
   text-decoration: none;
 }
+
 .sapho{
   border-color: var(--sapho);
   box-shadow: 0 0 60px var(--sapho);
@@ -266,21 +292,9 @@ main{
 
 .search-row{ width: 100%; }
 
-.chip{
-  border: 1px solid rgba(120,200,255,.35);
-  background: rgba(6,6,18,.35);
-  color: #e9ecff;
-  padding: 8px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  user-select: none;
-}
-
 /* =========================================================
-   CHIPS — ATIVO mais visível + cores por EIXO + fav "maré"
-   Cole após .chip (substitui o .chip.is-active antigo)
+   CHIPS — ATIVO + cores por EIXO + fav "maré"
    ========================================================= */
-
 .chip{
   border: 1px solid rgba(120,200,255,.35);
   background: rgba(6,6,18,.35);
@@ -309,7 +323,7 @@ main{
     0 0 0 6px rgba(0,229,255,.12);
 }
 
-/* ✅ padrão para filtros que NÃO são eixo (TIPO / etc): glow branco frio */
+/* padrão para filtros que NÃO são eixo */
 .chip.is-active{
   color: #ffffff;
   border-color: rgba(255,255,255,.42);
@@ -320,11 +334,7 @@ main{
     0 0 34px rgba(255,255,255,.08);
 }
 
-/* =========================================================
-   EIXO — cores fortes e inequívocas
-   ========================================================= */
-
-/* TODOS (branco) */
+/* EIXO — cores fortes */
 #filterEixo .chip.is-active[data-eixo="all"]{
   border-color: rgba(255,255,255,.45);
   background: rgba(255,255,255,.06);
@@ -333,8 +343,6 @@ main{
     0 0 12px rgba(255,255,255,.12);
 }
 
-
-/* SAPHO (laranja de verdade) */
 #filterEixo .chip.is-active[data-eixo="sapho"]{
   border-color: rgba(255,138,0,.80);
   background: rgba(255,138,0,.14);
@@ -344,7 +352,6 @@ main{
     0 0 46px rgba(255,138,0,.14);
 }
 
-/* CERN (ciano/azul tech) */
 #filterEixo .chip.is-active[data-eixo="cern"]{
   border-color: rgba(0,229,255,.80);
   background: rgba(0,229,255,.14);
@@ -354,7 +361,6 @@ main{
     0 0 46px rgba(0,229,255,.14);
 }
 
-/* SC (lilás/roxo) */
 #filterEixo .chip.is-active[data-eixo="sc"]{
   border-color: rgba(179,136,255,.82);
   background: rgba(179,136,255,.14);
@@ -364,7 +370,7 @@ main{
     0 0 46px rgba(179,136,255,.14);
 }
 
-/* (opcional, mas ajuda UX) Hover do eixo já “dá pista” da cor */
+/* hover “dá pista” da cor */
 #filterEixo .chip:not(.is-active)[data-eixo="sapho"]:hover{
   border-color: rgba(255,138,0,.55);
   box-shadow: 0 0 18px rgba(255,138,0,.14);
@@ -378,15 +384,10 @@ main{
   box-shadow: 0 0 18px rgba(179,136,255,.14);
 }
 
-/* =========================================================
-   FAVORITOS (chip do filtro) — "maré azulada" + estrela amarelo
-   ========================================================= */
+/* FAVORITOS chip */
 #favOnlyBtn.chip-star.is-active{
-  /* BORDA AMARELA */
   border-color: #ffd24a;
   background: rgba(255, 210, 74, 0.14);
-
-  /* GLOW MARÉ (aura) */
   box-shadow:
     0 0 0 2px rgba(255, 210, 74, 0.35),
     0 0 22px rgba(45, 226, 196, 0.22),
@@ -394,16 +395,9 @@ main{
 }
 
 #favOnlyBtn.chip-star.is-active i{
-  color: #ffd24a; /* estrela amarelo puro */
+  color: #ffd24a;
   text-shadow: 0 0 10px rgba(255, 210, 74, .35);
 }
-
-
-#favOnlyBtn.chip-star.is-active i{
-  color: #ffd24a; /* amarelo bem amarelo (não confunde com SAPHO) */
-  text-shadow: 0 0 10px rgba(255, 210, 74, .25);
-}
-
 
 .chip-star{
   width: 44px;
@@ -418,13 +412,13 @@ main{
   gap: 10px;
 }
 
-/* BUSCA — borda branco gelo */
+/* BUSCA */
 #pubSearch{
   width: min(560px, 100%);
   padding: 12px 14px;
   border-radius: 14px;
 
-  border: 1px solid rgba(255,255,255,.38); /* branco gelo */
+  border: 1px solid rgba(255,255,255,.38);
   background: rgba(6,6,18,.35);
   color: #e9ecff;
 
@@ -436,7 +430,6 @@ main{
   border-color: rgba(255,255,255,.65);
   box-shadow: 0 0 18px rgba(255,255,255,.18);
 }
-
 
 .results-bar{
   display: flex;
@@ -466,6 +459,7 @@ main{
   margin: 0 auto;
 }
 
+/* CARDS */
 .pub-card{
   position: relative;
   width: 100%;
@@ -554,9 +548,7 @@ main{
     0 18px 48px rgba(0,0,0,0.55);
 }
 
-/* ===============================
-   Tooltip — SC (SAPHO × CERN)
-   =============================== */
+/* Tooltip — SC */
 .has-tooltip{ position: relative; }
 
 .has-tooltip::after{
@@ -598,10 +590,6 @@ select[hidden]{
   display: none !important;
 }
 
-.year-dd{ position: relative; width: 220px; }
-.year-dd-btn{ display: inline-flex; }  /* botão do dropdown */
-
-
 .year-dd-btn{
   width: 100%;
   display: inline-flex;
@@ -612,7 +600,7 @@ select[hidden]{
   padding: 12px 14px;
   border-radius: 14px;
 
-  border: 1px solid rgba(255,255,255,.38); /* branco gelo */
+  border: 1px solid rgba(255,255,255,.38);
   background: rgba(6,6,18,.55);
   color: #e9ecff;
 
@@ -629,7 +617,6 @@ select[hidden]{
   border-color: rgba(255,255,255,.65);
   box-shadow: 0 0 18px rgba(255,255,255,.18);
 }
-
 
 .year-dd-menu{
   display: none;
@@ -670,7 +657,6 @@ select[hidden]{
   letter-spacing: .06em;
 }
 
-/* ANO — hover e ativo em branco gelo (neutro) */
 .year-item:hover{
   background: rgba(255,255,255,0.08);
   border-color: rgba(255,255,255,0.45);
@@ -686,11 +672,8 @@ select[hidden]{
     0 0 12px rgba(255,255,255,0.16);
 }
 
-
-
 /* ===============================
-   SUBMENU TESE — SÓLIDO e 1 por linha
-   (JS move pro BODY e posiciona FIXED)
+   SUBMENU TESE — FIXED
    =============================== */
 #submenuTese{
   display: none;
@@ -703,14 +686,14 @@ select[hidden]{
   box-shadow: 0 26px 80px rgba(0,0,0,0.70);
   backdrop-filter: blur(12px);
 
-  position: fixed; /* ✅ menu flutua acima de tudo */
+  position: fixed;
   z-index: 2147483647;
 }
 #submenuTese.is-open{ display: block; }
 
 .submenu-grid{
   display: grid;
-  grid-template-columns: 1fr; /* ✅ 1 por linha */
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
@@ -718,7 +701,7 @@ select[hidden]{
   width: 100%;
   text-align: left;
 
-  background: rgba(40, 45, 75, 0.95);       /* ✅ mais sólido */
+  background: rgba(40, 45, 75, 0.95);
   border: 1px solid rgba(140, 160, 255, 0.35);
   color: #f3f6ff;
 
@@ -731,10 +714,6 @@ select[hidden]{
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
-/* =========================================================
-   SUBMENU TESE — branco gelo (neutro)
-   ========================================================= */
 
 .submenu-item:hover{
   background: rgba(255,255,255,0.08);
@@ -751,6 +730,78 @@ select[hidden]{
     0 0 12px rgba(255,255,255,0.18);
 }
 
+/* Sentinel + loader */
+#infiniteSentinel{ height: 48px; width: 100%; }
+
+.pub-loader{
+  margin: 14px auto 0;
+  width: fit-content;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(10,10,30,.55);
+  color: var(--muted);
+  font-size: 0.95rem;
+  backdrop-filter: blur(10px);
+}
+
+/* ===============================
+   Botão flutuante: Voltar ao topo
+   (APENAS UMA VERSÃO)
+   =============================== */
+.back-top{
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 99999;
+
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(10, 10, 30, .75);
+  backdrop-filter: blur(10px);
+
+  color: #e9ecff;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+
+  transition:
+    opacity .25s ease,
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.back-top i{
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(233,236,255,.35));
+  transition: transform .2s ease, filter .2s ease;
+}
+
+.back-top.is-show{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-top:hover{
+  border-color: rgba(255,255,255,.65);
+  box-shadow: 0 0 18px rgba(255,255,255,.16);
+}
+.back-top:hover i{
+  transform: translateY(-2px) scale(1.05);
+  filter: drop-shadow(0 0 14px rgba(233,236,255,.6));
+}
 
 /* =========================================================
    RESPONSIVO ESSENCIAL
@@ -812,7 +863,6 @@ select[hidden]{
     border: 1px solid rgba(255,255,255,0.18);
   }
 
-  /* filtros empilhados */
   .filter-line{
     flex-direction: column;
     align-items: center;
@@ -835,251 +885,242 @@ select[hidden]{
   }
 
   .year-dd{ width: min(260px, 92vw); }
-}
-.year-dd{ position: relative; width: 220px; }
 
-.year-dd-menu{
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  border-radius: 16px;
-  padding: 12px;
-  z-index: 999; /* ok */
-}
-
-#infiniteSentinel{ height: 48px; width: 100%; }
-
-
-.pub-loader{
-  margin: 14px auto 0;
-  width: fit-content;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(10,10,30,.55);
-  color: var(--muted);
-  font-size: 0.95rem;
-  backdrop-filter: blur(10px);
-}
-
-/* ===============================
-   Botão flutuante: Voltar ao topo
-   =============================== */
-.back-top{
-  position: fixed;
-  right: 22px;
-  bottom: 22px;
-
-  width: 46px;
-  height: 46px;
-  border-radius: 999px;
-
-  border: 1px solid rgba(255,255,255,.35);
-  background: rgba(10, 10, 30, .75);
-  backdrop-filter: blur(10px);
-
-  color: #e9ecff;
-  cursor: pointer;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-
-  z-index: 99999; /* 🔥 MAIS ALTO QUE HEADER E CANVAS */
-
-  transition:
-    opacity .25s ease,
-    transform .25s ease,
-    box-shadow .25s ease,
-    border-color .25s ease;
-}
-
-
-.back-top i{
-  font-size: 18px;
-  line-height: 1;
-}
-
-.back-top.is-show{
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.back-top:hover{
-  border-color: rgba(255,255,255,.65);
-  box-shadow: 0 0 18px rgba(255,255,255,.16);
-}
-
-/* não atrapalha no mobile */
-@media (max-width: 768px){
   .back-top{ right: 14px; bottom: 14px; }
 }
 
-.back-top{ opacity: 1 !important; pointer-events: auto !important; }
-.back-top {
-  position: fixed;
-  right: 22px;
-  bottom: 22px;
-  z-index: 1000;
+/* ==========================================
+   EFEITO DE ENTRADA (toca 1 vez e para)
+   Use: class="titulo-diagrama fx-intro"
+   ========================================== */
 
-  background: transparent;
-  border: none;
-  cursor: pointer;
-
+.titulo-diagrama.fx-intro{
   opacity: 0;
-  pointer-events: none;
   transform: translateY(10px);
-  transition: opacity .25s ease, transform .25s ease;
+  animation: title-intro 900ms ease-out 120ms forwards;
+  will-change: transform, opacity, text-shadow, filter;
 }
 
-.back-top.is-show {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.back-top i {
-  font-size: 36px;
-  color: #e9ecff; /* branco gelo */
-  filter: drop-shadow(0 0 8px rgba(233,236,255,.35));
-  transition: transform .2s ease, filter .2s ease;
-}
-
-.back-top:hover i {
-  transform: translateY(-2px) scale(1.05);
-  filter: drop-shadow(0 0 14px rgba(233,236,255,.6));
-}
-/* =========================================================
-   EFEITOS DO TÍTULO: teste rápido (NIPSCERN)
-   Use no HTML: class="titulo-diagrama fx-_____"
-   ========================================================= */
-
-/* base: deixa o título mais “premium” */
-.titulo-diagrama{
-  letter-spacing: 1px;
-}
-
-/* -----------------------
-   OPÇÃO 1 — glow sutil (recomendado)
-   ----------------------- */
-.titulo-diagrama.fx-glow{
-  text-shadow:
-    0 0 10px rgba(233,236,255,.20),
-    0 0 26px rgba(0,229,255,.12);
-}
-
-/* dá um glow leve também nas palavras coloridas */
-.titulo-diagrama.fx-glow .sapho-text{
-  text-shadow: 0 0 14px rgba(255,138,0,.35);
-}
-.titulo-diagrama.fx-glow .cern-text{
-  text-shadow: 0 0 14px rgba(0,229,255,.35);
-}
-
-/* -----------------------
-   OPÇÃO 2 — pulse lento (respiração)
-   ----------------------- */
-@keyframes nip-pulse{
-  0%,100%{
+@keyframes title-intro{
+  0%{
+    opacity: 0;
+    transform: translateY(14px);
     text-shadow:
-      0 0 10px rgba(233,236,255,.18),
-      0 0 24px rgba(0,229,255,.10);
-    transform: translateZ(0);
+      0 0 0 rgba(233,236,255,0),
+      0 0 0 rgba(0,229,255,0);
+    filter: blur(2px);
   }
-  50%{
+  60%{
+    opacity: 1;
+    transform: translateY(-2px);
     text-shadow:
-      0 0 14px rgba(233,236,255,.26),
-      0 0 34px rgba(0,229,255,.18);
+      0 0 14px rgba(233,236,255,.22),
+      0 0 28px rgba(0,229,255,.18);
+    filter: blur(0px);
+  }
+  100%{
+    opacity: 1;
+    transform: translateY(0);
+    text-shadow:
+      0 0 8px rgba(255,255,255,0.20);
+    filter: none;
   }
 }
 
-.titulo-diagrama.fx-pulse{
-  animation: nip-pulse 5.5s ease-in-out infinite;
-}
-
-/* respeita quem tem “reduzir movimento” */
+/* Acessibilidade */
 @media (prefers-reduced-motion: reduce){
-  .titulo-diagrama.fx-pulse{ animation: none; }
+  .titulo-diagrama.fx-intro{
+    opacity: 1;
+    transform: none;
+    animation: none;
+    filter: none;
+  }
+}
+/* ==========================================
+   EFEITO DE ENTRADA — da ESQUERDA → direita
+   (toca 1 vez e para)
+   Use: class="titulo-diagrama fx-intro"
+   ========================================== */
+
+.titulo-diagrama.fx-intro{
+  opacity: 0;
+  transform: translateX(-24px);
+  animation: title-intro-left 900ms cubic-bezier(.22,.61,.36,1) 120ms forwards;
+  will-change: transform, opacity, text-shadow, filter;
 }
 
-/* -----------------------
-   OPÇÃO 3 — gradiente SAPHO → CERN (conceitual)
-   ----------------------- */
-.titulo-diagrama.fx-gradient{
-  background: linear-gradient(90deg,
-    rgba(233,236,255,.95) 0%,
-    rgba(255,138,0,.95) 35%,
-    rgba(233,236,255,.95) 55%,
-    rgba(0,229,255,.95) 85%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: none;
+@keyframes title-intro-left{
+  0%{
+    opacity: 0;
+    transform: translateX(-28px);
+    text-shadow:
+      0 0 0 rgba(233,236,255,0),
+      0 0 0 rgba(0,229,255,0);
+    filter: blur(2px);
+  }
+  60%{
+    opacity: 1;
+    transform: translateX(4px);
+    text-shadow:
+      0 0 14px rgba(233,236,255,.22),
+      0 0 28px rgba(0,229,255,.18);
+    filter: blur(0);
+  }
+  100%{
+    opacity: 1;
+    transform: translateX(0);
+    text-shadow:
+      0 0 8px rgba(255,255,255,.20);
+    filter: none;
+  }
 }
 
-/* mantém SAPHO/CERN com cor forte (se quiser que continuem separados) */
-.titulo-diagrama.fx-gradient .sapho-text,
-.titulo-diagrama.fx-gradient .cern-text{
-  color: inherit;
+/* Acessibilidade */
+@media (prefers-reduced-motion: reduce){
+  .titulo-diagrama.fx-intro{
+    opacity: 1;
+    transform: none;
+    animation: none;
+    filter: none;
+  }
 }
 
-/* -----------------------
-   OPÇÃO 4 — shine (brilho passando, elegante)
-   ----------------------- */
-@keyframes nip-shine{
-  0%{ background-position: -200% 0; }
-  100%{ background-position: 200% 0; }
+/* ==========================================
+   FX-SMILE: entra + micro bounce “sorriso”
+   (toca 1 vez e para)
+   ========================================== */
+
+.titulo-diagrama.fx-smile{
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+  animation: title-smile 920ms cubic-bezier(.2,.9,.2,1) 120ms forwards;
+  will-change: transform, opacity, text-shadow;
 }
 
-.titulo-diagrama.fx-shine{
+@keyframes title-smile{
+  0%{
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+    text-shadow: 0 0 0 rgba(233,236,255,0), 0 0 0 rgba(0,229,255,0);
+  }
+  55%{
+    opacity: 1;
+    transform: translateY(-3px) scale(1.01); /* “sorriso” */
+    text-shadow: 0 0 16px rgba(233,236,255,.28), 0 0 34px rgba(0,229,255,.20);
+  }
+  78%{
+    transform: translateY(1px) scale(0.997); /* volta com charme */
+  }
+  100%{
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    text-shadow: 0 0 8px rgba(255,255,255,.20);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .titulo-diagrama.fx-smile{ opacity: 1; transform: none; animation: none; }
+}
+/* ==========================================
+   FX-GLINT: aparece + brilho passando 1 vez
+   (toca 1 vez e para)
+   ========================================== */
+
+.titulo-diagrama.fx-glint{
   position: relative;
   display: inline-block;
-  color: rgba(233,236,255,.92);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: glint-in 520ms ease-out 90ms forwards;
+  will-change: opacity, transform;
+}
 
-  background: linear-gradient(90deg,
-    rgba(233,236,255,.85) 0%,
-    rgba(255,255,255,1) 20%,
-    rgba(233,236,255,.85) 40%,
-    rgba(233,236,255,.85) 100%
+/* “brilho” por cima do texto */
+.titulo-diagrama.fx-glint::after{
+  content: "";
+  position: absolute;
+  inset: -6px -10px;
+  pointer-events: none;
+
+  background: linear-gradient(110deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.0) 35%,
+    rgba(255,255,255,0.55) 50%,
+    rgba(255,255,255,0.0) 65%,
+    rgba(255,255,255,0) 100%
   );
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  transform: translateX(-120%);
+  opacity: 0;
 
-  animation: nip-shine 6.5s ease-in-out infinite;
+  mix-blend-mode: screen;
+  filter: blur(0.2px);
+  animation: glint-sweep 780ms ease-in-out 260ms forwards;
+  -webkit-mask: linear-gradient(#000, #000);
 }
 
-/* reduz movimento */
+@keyframes glint-in{
+  to{ opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glint-sweep{
+  0%{ transform: translateX(-120%); opacity: 0; }
+  20%{ opacity: 1; }
+  70%{ opacity: 1; }
+  100%{ transform: translateX(120%); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce){
-  .titulo-diagrama.fx-shine{ animation: none; }
-}
-/* === TESTE DEFINITIVO DE EFEITO === */
-.titulo-diagrama{
-  display: inline-block;
-  font-weight: 600;
-  letter-spacing: 1px;
+  .titulo-diagrama.fx-glint{ opacity: 1; transform: none; animation: none; }
+  .titulo-diagrama.fx-glint::after{ display: none; }
 }
 
-@keyframes nip-pulse{
-  0%,100%{
-    text-shadow:
-      0 0 12px rgba(255,255,255,.25),
-      0 0 30px rgba(0,229,255,.18);
-  }
-  50%{
-    text-shadow:
-      0 0 20px rgba(255,255,255,.4),
-      0 0 46px rgba(0,229,255,.3);
-  }
+/* ===============================
+   Contador de cards carregados
+   =============================== */
+.loaded-counter{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 12px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(10,10,30,.45);
+  backdrop-filter: blur(10px);
+
+  color: var(--muted);
+  font-size: 0.92rem;
+  letter-spacing: .02em;
+
+  box-shadow: 0 0 16px rgba(255,255,255,.06);
 }
 
-.titulo-diagrama.fx-pulse{
-  animation: nip-pulse 5s ease-in-out infinite;
+/* ===============================
+   Marcador de progresso (15 em 15)
+   =============================== */
+.progress-row{
+  display: flex;
+  justify-content: center;   /* 🔥 centraliza */
+  margin: 8px 0 14px; /* respiro entre os cards */
+}
+
+
+.progress-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 8px 12px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(10,10,30,.55);
+  backdrop-filter: blur(10px);
+
+  color: var(--muted);
+  font-size: 0.92rem;
+  letter-spacing: .02em;
+
+  box-shadow: 0 0 16px rgba(255,255,255,.06);
 }
