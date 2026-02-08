@@ -38,6 +38,7 @@ html, body{
   z-index: 0;
   background: transparent;
   pointer-events: none;
+
 }
 
 /* ===== CABEÇALHO ===== */
@@ -96,11 +97,14 @@ html, body{
   text-decoration: none;
 }
 .header .home-fa{
-  font-size: 20px;
+  font-size: 2.2rem; /* igual ao logo-fa */
   color: #cfe9ff;
   opacity: .9;
+  line-height: 1;
+
   transition: transform .2s ease, opacity .2s ease, text-shadow .2s ease;
 }
+
 .header .home-link:hover .home-fa{
   opacity: 1;
   transform: scale(1.12);
@@ -858,4 +862,224 @@ select[hidden]{
   backdrop-filter: blur(10px);
 }
 
+/* ===============================
+   Botão flutuante: Voltar ao topo
+   =============================== */
+.back-top{
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
 
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(10, 10, 30, .75);
+  backdrop-filter: blur(10px);
+
+  color: #e9ecff;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+
+  z-index: 99999; /* 🔥 MAIS ALTO QUE HEADER E CANVAS */
+
+  transition:
+    opacity .25s ease,
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+
+.back-top i{
+  font-size: 18px;
+  line-height: 1;
+}
+
+.back-top.is-show{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-top:hover{
+  border-color: rgba(255,255,255,.65);
+  box-shadow: 0 0 18px rgba(255,255,255,.16);
+}
+
+/* não atrapalha no mobile */
+@media (max-width: 768px){
+  .back-top{ right: 14px; bottom: 14px; }
+}
+
+.back-top{ opacity: 1 !important; pointer-events: auto !important; }
+.back-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 1000;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+.back-top.is-show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.back-top i {
+  font-size: 36px;
+  color: #e9ecff; /* branco gelo */
+  filter: drop-shadow(0 0 8px rgba(233,236,255,.35));
+  transition: transform .2s ease, filter .2s ease;
+}
+
+.back-top:hover i {
+  transform: translateY(-2px) scale(1.05);
+  filter: drop-shadow(0 0 14px rgba(233,236,255,.6));
+}
+/* =========================================================
+   EFEITOS DO TÍTULO: teste rápido (NIPSCERN)
+   Use no HTML: class="titulo-diagrama fx-_____"
+   ========================================================= */
+
+/* base: deixa o título mais “premium” */
+.titulo-diagrama{
+  letter-spacing: 1px;
+}
+
+/* -----------------------
+   OPÇÃO 1 — glow sutil (recomendado)
+   ----------------------- */
+.titulo-diagrama.fx-glow{
+  text-shadow:
+    0 0 10px rgba(233,236,255,.20),
+    0 0 26px rgba(0,229,255,.12);
+}
+
+/* dá um glow leve também nas palavras coloridas */
+.titulo-diagrama.fx-glow .sapho-text{
+  text-shadow: 0 0 14px rgba(255,138,0,.35);
+}
+.titulo-diagrama.fx-glow .cern-text{
+  text-shadow: 0 0 14px rgba(0,229,255,.35);
+}
+
+/* -----------------------
+   OPÇÃO 2 — pulse lento (respiração)
+   ----------------------- */
+@keyframes nip-pulse{
+  0%,100%{
+    text-shadow:
+      0 0 10px rgba(233,236,255,.18),
+      0 0 24px rgba(0,229,255,.10);
+    transform: translateZ(0);
+  }
+  50%{
+    text-shadow:
+      0 0 14px rgba(233,236,255,.26),
+      0 0 34px rgba(0,229,255,.18);
+  }
+}
+
+.titulo-diagrama.fx-pulse{
+  animation: nip-pulse 5.5s ease-in-out infinite;
+}
+
+/* respeita quem tem “reduzir movimento” */
+@media (prefers-reduced-motion: reduce){
+  .titulo-diagrama.fx-pulse{ animation: none; }
+}
+
+/* -----------------------
+   OPÇÃO 3 — gradiente SAPHO → CERN (conceitual)
+   ----------------------- */
+.titulo-diagrama.fx-gradient{
+  background: linear-gradient(90deg,
+    rgba(233,236,255,.95) 0%,
+    rgba(255,138,0,.95) 35%,
+    rgba(233,236,255,.95) 55%,
+    rgba(0,229,255,.95) 85%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+/* mantém SAPHO/CERN com cor forte (se quiser que continuem separados) */
+.titulo-diagrama.fx-gradient .sapho-text,
+.titulo-diagrama.fx-gradient .cern-text{
+  color: inherit;
+}
+
+/* -----------------------
+   OPÇÃO 4 — shine (brilho passando, elegante)
+   ----------------------- */
+@keyframes nip-shine{
+  0%{ background-position: -200% 0; }
+  100%{ background-position: 200% 0; }
+}
+
+.titulo-diagrama.fx-shine{
+  position: relative;
+  display: inline-block;
+  color: rgba(233,236,255,.92);
+
+  background: linear-gradient(90deg,
+    rgba(233,236,255,.85) 0%,
+    rgba(255,255,255,1) 20%,
+    rgba(233,236,255,.85) 40%,
+    rgba(233,236,255,.85) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  animation: nip-shine 6.5s ease-in-out infinite;
+}
+
+/* reduz movimento */
+@media (prefers-reduced-motion: reduce){
+  .titulo-diagrama.fx-shine{ animation: none; }
+}
+/* === TESTE DEFINITIVO DE EFEITO === */
+.titulo-diagrama{
+  display: inline-block;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+@keyframes nip-pulse{
+  0%,100%{
+    text-shadow:
+      0 0 12px rgba(255,255,255,.25),
+      0 0 30px rgba(0,229,255,.18);
+  }
+  50%{
+    text-shadow:
+      0 0 20px rgba(255,255,255,.4),
+      0 0 46px rgba(0,229,255,.3);
+  }
+}
+
+.titulo-diagrama.fx-pulse{
+  animation: nip-pulse 5s ease-in-out infinite;
+}
