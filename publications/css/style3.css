@@ -272,9 +272,134 @@ main{
   user-select: none;
 }
 
-.chip.is-active{
-  box-shadow: 0 0 0 2px rgba(120,200,255,.25);
+/* =========================================================
+   CHIPS — ATIVO mais visível + cores por EIXO + fav "maré"
+   Cole após .chip (substitui o .chip.is-active antigo)
+   ========================================================= */
+
+.chip{
+  border: 1px solid rgba(120,200,255,.35);
+  background: rgba(6,6,18,.35);
+  color: #e9ecff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+
+  font-weight: 700;
+  letter-spacing: .04em;
+  transition: transform .15s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease, color .2s ease;
 }
+
+.chip:hover{
+  border-color: rgba(255,255,255,.28);
+  background: rgba(255,255,255,.06);
+  box-shadow: 0 0 16px rgba(255,255,255,.10);
+  transform: translateY(-1px);
+}
+
+.chip:focus-visible{
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.14),
+    0 0 0 6px rgba(0,229,255,.12);
+}
+
+/* ✅ padrão para filtros que NÃO são eixo (TIPO / etc): glow branco frio */
+.chip.is-active{
+  color: #ffffff;
+  border-color: rgba(255,255,255,.42);
+  background: rgba(255,255,255,.10);
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.18),
+    0 0 18px rgba(255,255,255,.14),
+    0 0 34px rgba(255,255,255,.08);
+}
+
+/* =========================================================
+   EIXO — cores fortes e inequívocas
+   ========================================================= */
+
+/* TODOS (branco) */
+#filterEixo .chip.is-active[data-eixo="all"]{
+  border-color: rgba(255,255,255,.45);
+  background: rgba(255,255,255,.06);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.18),
+    0 0 12px rgba(255,255,255,.12);
+}
+
+
+/* SAPHO (laranja de verdade) */
+#filterEixo .chip.is-active[data-eixo="sapho"]{
+  border-color: rgba(255,138,0,.80);
+  background: rgba(255,138,0,.14);
+  box-shadow:
+    0 0 0 2px rgba(255,138,0,.22),
+    0 0 22px rgba(255,138,0,.22),
+    0 0 46px rgba(255,138,0,.14);
+}
+
+/* CERN (ciano/azul tech) */
+#filterEixo .chip.is-active[data-eixo="cern"]{
+  border-color: rgba(0,229,255,.80);
+  background: rgba(0,229,255,.14);
+  box-shadow:
+    0 0 0 2px rgba(0,229,255,.22),
+    0 0 22px rgba(0,229,255,.22),
+    0 0 46px rgba(0,229,255,.14);
+}
+
+/* SC (lilás/roxo) */
+#filterEixo .chip.is-active[data-eixo="sc"]{
+  border-color: rgba(179,136,255,.82);
+  background: rgba(179,136,255,.14);
+  box-shadow:
+    0 0 0 2px rgba(179,136,255,.22),
+    0 0 22px rgba(179,136,255,.22),
+    0 0 46px rgba(179,136,255,.14);
+}
+
+/* (opcional, mas ajuda UX) Hover do eixo já “dá pista” da cor */
+#filterEixo .chip:not(.is-active)[data-eixo="sapho"]:hover{
+  border-color: rgba(255,138,0,.55);
+  box-shadow: 0 0 18px rgba(255,138,0,.14);
+}
+#filterEixo .chip:not(.is-active)[data-eixo="cern"]:hover{
+  border-color: rgba(0,229,255,.55);
+  box-shadow: 0 0 18px rgba(0,229,255,.14);
+}
+#filterEixo .chip:not(.is-active)[data-eixo="sc"]:hover{
+  border-color: rgba(179,136,255,.55);
+  box-shadow: 0 0 18px rgba(179,136,255,.14);
+}
+
+/* =========================================================
+   FAVORITOS (chip do filtro) — "maré azulada" + estrela amarelo
+   ========================================================= */
+#favOnlyBtn.chip-star.is-active{
+  /* BORDA AMARELA */
+  border-color: #ffd24a;
+  background: rgba(255, 210, 74, 0.14);
+
+  /* GLOW MARÉ (aura) */
+  box-shadow:
+    0 0 0 2px rgba(255, 210, 74, 0.35),
+    0 0 22px rgba(45, 226, 196, 0.22),
+    0 0 46px rgba(45, 226, 196, 0.14);
+}
+
+#favOnlyBtn.chip-star.is-active i{
+  color: #ffd24a; /* estrela amarelo puro */
+  text-shadow: 0 0 10px rgba(255, 210, 74, .35);
+}
+
+
+#favOnlyBtn.chip-star.is-active i{
+  color: #ffd24a; /* amarelo bem amarelo (não confunde com SAPHO) */
+  text-shadow: 0 0 10px rgba(255, 210, 74, .25);
+}
+
 
 .chip-star{
   width: 44px;
@@ -289,15 +414,25 @@ main{
   gap: 10px;
 }
 
+/* BUSCA — borda branco gelo */
 #pubSearch{
   width: min(560px, 100%);
   padding: 12px 14px;
   border-radius: 14px;
-  border: 1px solid rgba(120,200,255,.25);
+
+  border: 1px solid rgba(255,255,255,.38); /* branco gelo */
   background: rgba(6,6,18,.35);
   color: #e9ecff;
+
   outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
 }
+
+#pubSearch:focus{
+  border-color: rgba(255,255,255,.65);
+  box-shadow: 0 0 18px rgba(255,255,255,.18);
+}
+
 
 .results-bar{
   display: flex;
@@ -452,6 +587,17 @@ main{
    =============================== */
 .year-dd{ position: relative; width: 220px; }
 
+/* garante que o select compatível nunca apareça */
+#yearSelect.year-select,
+.year-select,
+select[hidden]{
+  display: none !important;
+}
+
+.year-dd{ position: relative; width: 220px; }
+.year-dd-btn{ display: inline-flex; }  /* botão do dropdown */
+
+
 .year-dd-btn{
   width: 100%;
   display: inline-flex;
@@ -461,7 +607,8 @@ main{
 
   padding: 12px 14px;
   border-radius: 14px;
-  border: 1px solid rgba(120,200,255,.30);
+
+  border: 1px solid rgba(255,255,255,.38); /* branco gelo */
   background: rgba(6,6,18,.55);
   color: #e9ecff;
 
@@ -471,8 +618,14 @@ main{
 
   cursor: pointer;
   box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
 }
-.year-dd-btn:hover{ border-color: rgba(0,229,255,.45); }
+
+.year-dd-btn:hover{
+  border-color: rgba(255,255,255,.65);
+  box-shadow: 0 0 18px rgba(255,255,255,.18);
+}
+
 
 .year-dd-menu{
   display: none;
@@ -512,16 +665,24 @@ main{
   font-weight: 700;
   letter-spacing: .06em;
 }
+
+/* ANO — hover e ativo em branco gelo (neutro) */
 .year-item:hover{
-  background: rgba(0,229,255,0.10);
-  border-color: rgba(0,229,255,0.45);
-  box-shadow: 0 0 18px rgba(0,229,255,0.18);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.45);
+  box-shadow: 0 0 14px rgba(255,255,255,0.14);
 }
+
 .year-item.is-active{
-  background: rgba(0,229,255,0.16);
-  border-color: rgba(0,229,255,0.70);
-  box-shadow: 0 0 0 2px rgba(0,229,255,0.18);
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.75);
+  color: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.20),
+    0 0 12px rgba(255,255,255,0.16);
 }
+
+
 
 /* ===============================
    SUBMENU TESE — SÓLIDO e 1 por linha
@@ -566,17 +727,26 @@ main{
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+/* =========================================================
+   SUBMENU TESE — branco gelo (neutro)
+   ========================================================= */
+
 .submenu-item:hover{
-  background: rgba(70, 90, 160, 0.95);
-  border-color: rgba(0, 229, 255, 0.65);
-  box-shadow: 0 0 18px rgba(0, 229, 255, 0.22);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.45);
+  box-shadow: 0 0 14px rgba(255,255,255,0.16);
 }
+
 .submenu-item.is-active{
-  background: rgba(0, 229, 255, 0.22);
-  border-color: rgba(0, 229, 255, 0.95);
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.75);
   color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.22),
+    0 0 12px rgba(255,255,255,0.18);
 }
+
 
 /* =========================================================
    RESPONSIVO ESSENCIAL
