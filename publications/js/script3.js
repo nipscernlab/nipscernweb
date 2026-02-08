@@ -197,6 +197,8 @@
   const searchEl = document.getElementById("pubSearch");
   const favOnlyBtn = document.getElementById("favOnlyBtn");
   const resultsMeta = document.getElementById("resultsMeta");
+const backTopBtn = document.getElementById("backToTop");
+
 
   const sentinelEl = document.getElementById("infiniteSentinel");
   const loaderEl = document.getElementById("pubLoader");
@@ -761,6 +763,37 @@
     state.limit = PAGE_SIZE;
     render();
   });
+
+
+// -----------------------
+// Botão "Voltar ao topo"
+// -----------------------
+(function setupBackToTop(){
+  if (!backTopBtn) return;
+
+  const SHOW_AFTER = 520; // px de scroll para aparecer
+
+  function onScroll(){
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    backTopBtn.classList.toggle("is-show", y > SHOW_AFTER);
+  }
+
+  backTopBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  document
+    .getElementById("filtersTop")
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+
+
+
 
   (async function initHub() {
     await loadPublicacoes();
