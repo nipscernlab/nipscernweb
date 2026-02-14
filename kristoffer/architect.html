@@ -15,6 +15,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
 <style>
     :root {
         --bg-body: #050505;
@@ -53,17 +54,6 @@
         background-image: radial-gradient(circle at top center, #1a1a1a 0%, #050505 60%);
     }
 
-    #viewport {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        overflow-y: auto; /* Permitir scroll */
-        overflow-x: hidden;
-    }
-
-    #content {
-        padding-bottom: 150px;
-        will-change: transform;
-    }
 
     h1, h2, h3 { font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
     .serif { font-family: 'Cormorant Garamond', serif; }
@@ -3129,34 +3119,63 @@
 </div>
 
 <script>
-    // --- MOMENTUM SCROLL ENGINE ---
-    const body = document.body;
-    const content = document.getElementById('content');
-    let sy = 0;
-    let dy = 0;
-    
+    // Lenis Smooth Scroll com mais aceleração/desaceleração
+    const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        wheelMultiplier: 1.2,
+        touchMultiplier: 2,
+        infinite: false
+    });
+
+    function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Background escurecimento progressivo
+    function updateBackgroundDarkness() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = Math.min(scrollTop / docHeight, 1);
+        
+        const topBrightness = 26;
+        const currentTop = Math.round(topBrightness - (scrollPercent * topBrightness));
+        
+        const baseBrightness = 5;
+        const currentBase = Math.round(baseBrightness - (scrollPercent * baseBrightness));
+        
+        const hexTop = currentTop.toString(16).padStart(2, '0');
+        const hexBase = currentBase.toString(16).padStart(2, '0');
+        
+        document.body.style.backgroundImage = `radial-gradient(circle at top center, #${hexTop}${hexTop}${hexTop} 0%, #${hexBase}${hexBase}${hexBase} 60%)`;
+    }
+
+    window.addEventListener('scroll', updateBackgroundDarkness);
+    updateBackgroundDarkness();
+
+    // --- ERA SELECTOR ---
     const mainContent = document.getElementById('content');
     const yearSelector = document.getElementById('year-selector');
     const yearMenu = document.getElementById('year-menu');
     let mdContainer = null;
 
-    // 1. CLICK LOGIC
-    // Use a single listener for the selector
+    // Click logic for year selector
     yearSelector.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevents immediate closing
+        e.stopPropagation();
         yearMenu.classList.toggle('active');
     });
 
-    // Close menu when clicking anywhere else
     document.addEventListener('click', (e) => {
         if (!yearMenu.contains(e.target)) {
             yearMenu.classList.remove('active');
         }
     });
 
-    // 2. NAVIGATION LOGIC
+    // Navigation logic
     async function loadYear(yearNumber) {
-        // Close menu immediately
         yearMenu.classList.remove('active');
         
         const url = `https://www.nipscern.com/kristoffer/year-${yearNumber}.md`;
@@ -3164,12 +3183,10 @@
         yearDisplay.innerText = `YR ${yearNumber}`;
         
         try {
-            // Hide main content (Preserves your checkboxes/scroll)
             mainContent.style.display = 'none';
             
             if (mdContainer) mdContainer.remove();
             
-            // Create MD container
             mdContainer = document.createElement('div');
             mdContainer.id = 'md-render-area';
             mdContainer.style.backgroundImage = 'radial-gradient(circle at top center, #1a1a1a 0%, #050505 60%)';
@@ -3181,7 +3198,6 @@
             if (!response.ok) throw new Error('Network response was not ok');
             const markdownText = await response.text();
             
-            // Render MD
             const htmlContent = marked.parse(markdownText);
             
             mdContainer.innerHTML = `
@@ -3195,7 +3211,6 @@
                 </div>
             `;
 
-            // Fade in effect
             setTimeout(() => {
                 const inner = mdContainer.querySelector('.container');
                 if(inner) {
@@ -3206,7 +3221,6 @@
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Success effect
             confetti({
                 particleCount: 100,
                 spread: 70,
@@ -3216,7 +3230,6 @@
 
         } catch (error) {
             console.error(error);
-            // Error handling with a return button
             if (mdContainer) {
                 mdContainer.innerHTML = `
                     <div class="container" style="text-align: center; padding-top: 100px;">
@@ -3238,39 +3251,19 @@
         mainContent.style.display = 'block';
         document.getElementById('year-study').innerText = 'SELECT';
         
-        // This ensures your Logic/Culture stats are still accurate
-        if (typeof updateStats === "function") updateStats();
+        if (typeof updateHUD === "function") updateHUD();
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function showToast(msg) {
-        const t = document.getElementById('toast') || alert(msg);
-        if(t.classList) {
-            t.innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
+        const toast = document.getElementById("toast");
+        if (toast) {
+            toast.innerText = msg;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
     }
-
-    function renderScroll() {
-        dy = dy + (sy - dy) * 0.1;
-        dy = Math.floor(dy * 100) / 100;
-        content.style.transform = `translate3d(0, -${dy}px, 0)`;
-        requestAnimationFrame(renderScroll);
-    }
-
-    window.addEventListener('scroll', () => {
-        sy = window.scrollY;
-    });
-
-    new ResizeObserver(entries => {
-        for (let entry of entries) {
-            body.style.height = entry.contentRect.height + 'px';
-        }
-    }).observe(content);
-
-    requestAnimationFrame(renderScroll);
 
     // --- APP DATA & LOGIC ---
     const quotes = {
@@ -3332,6 +3325,7 @@
     function checkYearCompletion(year) {
         if(yearStatus[year]) return;
         const yearBlock = document.getElementById(`year-${year}`);
+        if (!yearBlock) return;
         const total = yearBlock.querySelectorAll('.card').length;
         const done = yearBlock.querySelectorAll('.card.completed').length;
 
@@ -3340,13 +3334,6 @@
             setTimeout(() => openModal(year), 800);
             triggerBigConfetti();
         }
-    }
-
-    function showToast(msg) {
-        const toast = document.getElementById("toast");
-        toast.innerText = msg;
-        toast.className = "show";
-        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
     }
 
     function openModal(year) {
@@ -3417,5 +3404,6 @@
         updateHUD();
     }
 </script>
+    
 </body>
 </html>
