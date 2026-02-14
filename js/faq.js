@@ -1,13 +1,25 @@
-function toggleAnswer(questionElement) {
-    const answerElement = questionElement.nextElementSibling;
-    const iconElement = questionElement.querySelector('.icon');
+function toggleAnswer(button) {
+    const icon = button.querySelector('.icon');
+    const answer = button.nextElementSibling;
+    
+    // Fecha todos os outros (opcional - remova este bloco se quiser permitir múltiplos abertos)
+    const allQuestions = document.querySelectorAll('.faq-question');
+    allQuestions.forEach(item => {
+        if (item !== button && item.classList.contains('active')) {
+            item.classList.remove('active');
+            item.nextElementSibling.style.maxHeight = null;
+            item.nextElementSibling.style.opacity = '0';
+        }
+    });
 
-    // Toggle visibility of the answer
-    if (answerElement.style.display === "block") {
-        answerElement.style.display = "none";
-        iconElement.classList.remove('active');
+    // Alterna o atual
+    button.classList.toggle('active');
+
+    if (button.classList.contains('active')) {
+        answer.style.maxHeight = answer.scrollHeight + "px";
+        answer.style.opacity = "1";
     } else {
-        answerElement.style.display = "block";
-        iconElement.classList.add('active');
+        answer.style.maxHeight = null;
+        answer.style.opacity = "0";
     }
 }
