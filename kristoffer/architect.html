@@ -53,6 +53,16 @@
         overflow-x: hidden;
         background-image: radial-gradient(circle at top center, #1a1a1a 0%, #050505 60%);
     }
+    
+    body, #content {
+    /* Evita o efeito elástico nativo que briga com o Lenis */
+    overscroll-behavior: none; 
+    
+    /* Diz ao navegador que isso vai mudar, para ele otimizar a renderização */
+    
+    /* Garante que a pintura do pixel seja tratada com prioridade */
+    backface-visibility: hidden; 
+    }
 
 
     h1, h2, h3 { font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
