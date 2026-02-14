@@ -1,16 +1,69 @@
+
 // /publications/js/script3.js
 // =====================================================
 // NIPSCERN • Starfield + HUB de Publicações (OFICIAL)
 // - Multi-eixo (SAPHO/CERN/SC/CS)
 // - Tipo, Ano, Busca, Favoritos
-// - TESE com submenu (TCC/Mestrado/Doutorado) ✅ fix definitivo
-// - Infinite scroll (carrega automaticamente ao chegar no fim) ✅
+// - TESE com submenu (TCC/Mestrado/Doutorado)
+// - Infinite scroll (carrega automaticamente ao chegar no fim)
+// - Botão flutuante "Voltar aos filtros" (robusto) ✅
 // =====================================================
+
+
+// -----------------------------------------------------
+// 0) BOTÃO FLUTUANTE "VOLTAR AOS FILTROS" (ROBUSTO)
+// -----------------------------------------------------
+(function setupBackToTopGlobal() {
+  const btn = document.getElementById("backToTop");
+  if (!btn) return;
+
+  const SHOW_AFTER = 250;
+
+  function getScrollY() {
+  return (
+    window.scrollY ||
+    document.documentElement.scrollTop ||
+    document.body.scrollTop ||
+    0
+  );
+}
+window.addEventListener("scroll", onScroll, { passive: true });
+
+document.body.addEventListener("scroll", onScroll, { passive: true });
+onScroll();
+
+
+  function onScroll() {
+    btn.classList.toggle("is-show", getScrollY() > SHOW_AFTER);
+  }
+
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const target =
+      document.getElementById("filtersTop") ||
+      document.querySelector(".pubs-filters") ||
+      document.querySelector(".filters-container") ||
+      document.getElementById("pubs") ||
+      document.body;
+
+    if (target && target !== document.body) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  });
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+
 
 // -----------------------------------------------------
 // 1) FUNDO ESTRELADO + ESTRELAS CADENTES
 // -----------------------------------------------------
-(function () {
+(function starfield() {
   const canvas = document.getElementById("stars");
   if (!canvas) return;
 
@@ -172,17 +225,79 @@
   loop();
 })();
 
+
 // -----------------------------------------------------
 // 2) HUB de Publicações (OFICIAL)
 // -----------------------------------------------------
-(function () {
+(function hub() {
   const grid = document.getElementById("pubsGrid");
   if (!grid) return;
 
+  // ✅ NORMALIZAÇÃO (precisa existir ANTES do highlight)
+  const norm = (s) =>
+    (s || "")
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+
+  function escapeHTML(str) {
+    return (str ?? "")
+      .toString()
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  // realça a query no texto ORIGINAL (mantendo acentos), e é seguro (escapa HTML)
+  function highlight(text, query) {
+    const raw = (text ?? "").toString();
+    const q = (query ?? "").toString().trim();
+    if (!q) return escapeHTML(raw);
+
+    const rawNorm = norm(raw);
+    const qNorm = norm(q);
+    if (!qNorm) return escapeHTML(raw);
+
+    let out = "";
+    let i = 0;
+
+    while (i < raw.length) {
+      const sliceRaw = raw.slice(i);
+      const sliceNorm = norm(sliceRaw);
+
+      const idx = sliceNorm.indexOf(qNorm);
+      if (idx === -1) {
+        out += escapeHTML(sliceRaw);
+        break;
+      }
+
+      // converte idx (no normalizado) pra índice no original
+      let start = 0;
+      for (start = 0; start < sliceRaw.length; start++) {
+        const nextAcc = norm(sliceRaw.slice(0, start + 1));
+        if (nextAcc.length > idx) break;
+      }
+
+      let end = start;
+      for (end = start; end < sliceRaw.length; end++) {
+        const nextAcc = norm(sliceRaw.slice(0, end + 1));
+        if (nextAcc.length >= idx + qNorm.length) break;
+      }
+
+      out += escapeHTML(sliceRaw.slice(0, start));
+      out += `<span class="hl">${escapeHTML(sliceRaw.slice(start, end + 1))}</span>`;
+      i += end + 1;
+    }
+
+    return out;
+  }
+
   const PAGE_SIZE = 24;
   const LS_KEY = "nipscern_favs_v1";
-  let DATA = [];
-
   const SOURCES = ["/publications/data/publicacoes.json"];
 
   const eixoWrap = document.getElementById("filterEixo");
@@ -198,14 +313,13 @@
   const favOnlyBtn = document.getElementById("favOnlyBtn");
   const resultsMeta = document.getElementById("resultsMeta");
 
-const backTopBtn = document.getElementById("backToTop");
-
-
   const sentinelEl = document.getElementById("infiniteSentinel");
   const loaderEl = document.getElementById("pubLoader");
 
   const chipTeseBtn = document.getElementById("chipTeseBtn");
   const submenuTese = document.getElementById("submenuTese");
+
+  let DATA = [];
 
   function resolveHref(path, baseJsonUrl) {
     try {
@@ -222,8 +336,7 @@ const backTopBtn = document.getElementById("backToTop");
       return new Set();
     }
   };
-  const saveFavs = (set) =>
-    localStorage.setItem(LS_KEY, JSON.stringify([...set]));
+  const saveFavs = (set) => localStorage.setItem(LS_KEY, JSON.stringify([...set]));
   let favs = loadFavs();
 
   let state = {
@@ -239,58 +352,6 @@ const backTopBtn = document.getElementById("backToTop");
   let _io = null;
   let _isLoadingMore = false;
   let _lastFilteredTotal = 0;
-
-
-
-  const norm = (s) =>
-    (s || "")
-      .toString()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim();
-
-  // ✅ Atalho do Diagrama (agora no lugar certo)
-  document.addEventListener("click", (e) => {
-    const link = e.target.closest(".venn-link[data-eixo]");
-    if (!link) return;
-
-    e.preventDefault();
-
-    const eixo = (link.getAttribute("data-eixo") || "all").toLowerCase();
-
-    state.eixos = new Set([eixo]);
-    state.tipo = "all";
-    state.niveis.clear();
-    state.ano = "all";
-    state.q = "";
-    state.favOnly = false;
-    state.limit = PAGE_SIZE;
-
-    syncEixoChipsUI();
-    setActiveChips(tipoWrap, "data-tipo", "all");
-
-    if (searchEl) searchEl.value = "";
-
-    if (favOnlyBtn) {
-      favOnlyBtn.classList.remove("is-active");
-      favOnlyBtn.setAttribute("aria-pressed", "false");
-    }
-
-    if (yearSelect) yearSelect.value = "all";
-    if (yearBtnLabel) yearBtnLabel.textContent = "Todos";
-    if (yearMenu) {
-      yearMenu.querySelectorAll(".year-item").forEach((b) => {
-        b.classList.toggle("is-active", b.getAttribute("data-year") === "all");
-      });
-    }
-
-    closeYearMenu();
-    closeTeseMenu();
-    render();
-
-    document.getElementById("pubs")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
 
   function eixoLabel(eixo) {
     const e = (eixo || "").toLowerCase();
@@ -340,10 +401,7 @@ const backTopBtn = document.getElementById("backToTop");
 
     const ok = [];
     const fail = [];
-
-    settled.forEach((r) =>
-      r.status === "fulfilled" ? ok.push(r.value) : fail.push(r.reason)
-    );
+    settled.forEach((r) => (r.status === "fulfilled" ? ok.push(r.value) : fail.push(r.reason)));
     if (fail.length) console.warn("[HUB] Alguns JSONs falharam:", fail);
 
     DATA = ok.flatMap(({ json, baseJsonUrl }) => {
@@ -396,7 +454,9 @@ const backTopBtn = document.getElementById("backToTop");
     const q = norm(state.q);
     if (q) {
       const hay = norm(
-        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(" ")} ${item.eixo} ${item.tipo} ${item.ano} ${item.nivel || ""}`
+        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(
+          " "
+        )} ${item.eixo} ${item.tipo} ${item.ano} ${item.nivel || ""}`
       );
       if (!hay.includes(q)) return false;
     }
@@ -406,8 +466,6 @@ const backTopBtn = document.getElementById("backToTop");
 
   function cardHTML(item) {
     const isFav = favs.has(item.id);
-    const resumoHTML = item.resumo ? `<p class="pub-resumo">${item.resumo}</p>` : "";
-    const veicHTML = item.veiculo ? `<p class="pub-veic">${item.veiculo}</p>` : "";
 
     return `
       <article class="pub-card" data-id="${item.id}" data-eixo="${item.eixo}">
@@ -421,13 +479,15 @@ const backTopBtn = document.getElementById("backToTop");
           </button>
         </div>
 
-        <h3 class="pub-title">${item.titulo}</h3>
-        <p class="pub-meta">${item.autores}</p>
-        ${veicHTML}
-        ${resumoHTML}
+        <h3 class="pub-title">${highlight(item.titulo, state.q)}</h3>
+        <p class="pub-meta">${highlight(item.autores, state.q)}</p>
+        ${item.veiculo ? `<p class="pub-veic">${highlight(item.veiculo, state.q)}</p>` : ""}
+        ${item.resumo ? `<p class="pub-resumo">${highlight(item.resumo, state.q)}</p>` : ""}
 
         <div class="pub-actions">
-          <a class="pub-open" href="${item.arquivo}" target="_blank" rel="noopener">
+          <a class="pub-open"
+             href="/publications/viewer/index.html?file=${encodeURIComponent(item.arquivo)}"
+             target="_blank" rel="noopener">
             Abrir PDF
             <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
           </a>
@@ -437,6 +497,7 @@ const backTopBtn = document.getElementById("backToTop");
   }
 
   function setActiveChips(container, attr, activeValue) {
+    if (!container) return;
     container.querySelectorAll(`[${attr}]`).forEach((btn) => {
       const v = btn.getAttribute(attr);
       btn.classList.toggle("is-active", v === activeValue);
@@ -444,6 +505,7 @@ const backTopBtn = document.getElementById("backToTop");
   }
 
   function syncEixoChipsUI() {
+    if (!eixoWrap) return;
     const btns = eixoWrap.querySelectorAll("[data-eixo]");
     btns.forEach((btn) => {
       const v = btn.getAttribute("data-eixo");
@@ -451,32 +513,9 @@ const backTopBtn = document.getElementById("backToTop");
     });
   }
 
+  // -------------------------
   // ANO dropdown
-  function populateYears() {
-    const years = Array.from(new Set(DATA.map((d) => d.ano)))
-      .filter((y) => Number.isFinite(y))
-      .sort((a, b) => b - a);
-
-    yearSelect.innerHTML =
-      `<option value="all">Todos</option>` +
-      years.map((y) => `<option value="${y}">${y}</option>`).join("");
-
-    const items = [`all`, ...years.map(String)];
-    yearMenu.innerHTML = `
-      <div class="year-grid">
-        ${items
-          .map((v) => {
-            const label = v === "all" ? "Todos" : v;
-            const active = String(state.ano) === String(v) ? "is-active" : "";
-            return `<button type="button" class="year-item ${active}" data-year="${v}">${label}</button>`;
-          })
-          .join("")}
-      </div>
-    `;
-
-    yearBtnLabel.textContent = state.ano === "all" ? "Todos" : String(state.ano);
-  }
-
+  // -------------------------
   function reserveYearSpace(open) {
     const block = yearDD?.closest(".filter-block");
     if (!block) return;
@@ -507,22 +546,48 @@ const backTopBtn = document.getElementById("backToTop");
     requestAnimationFrame(() => reserveYearSpace(true));
   }
 
-  yearBtn.addEventListener("click", (ev) => {
+  function populateYears() {
+    if (!yearSelect || !yearMenu || !yearBtnLabel) return;
+
+    const years = Array.from(new Set(DATA.map((d) => d.ano)))
+      .filter((y) => Number.isFinite(y))
+      .sort((a, b) => b - a);
+
+    yearSelect.innerHTML =
+      `<option value="all">Todos</option>` +
+      years.map((y) => `<option value="${y}">${y}</option>`).join("");
+
+    const items = ["all", ...years.map(String)];
+    yearMenu.innerHTML = `
+      <div class="year-grid">
+        ${items
+          .map((v) => {
+            const label = v === "all" ? "Todos" : v;
+            const active = String(state.ano) === String(v) ? "is-active" : "";
+            return `<button type="button" class="year-item ${active}" data-year="${v}">${label}</button>`;
+          })
+          .join("")}
+      </div>
+    `;
+
+    yearBtnLabel.textContent = state.ano === "all" ? "Todos" : String(state.ano);
+  }
+
+  yearBtn?.addEventListener("click", (ev) => {
     ev.stopPropagation();
     const open = yearDD.classList.contains("is-open");
     if (open) closeYearMenu();
     else openYearMenu();
   });
 
-  yearMenu.addEventListener("click", (ev) => {
+  yearMenu?.addEventListener("click", (ev) => {
     const btn = ev.target.closest(".year-item");
     if (!btn) return;
 
     const v = btn.getAttribute("data-year") || "all";
     state.ano = v;
-    yearSelect.value = v;
-
-    yearBtnLabel.textContent = v === "all" ? "Todos" : v;
+    if (yearSelect) yearSelect.value = v;
+    if (yearBtnLabel) yearBtnLabel.textContent = v === "all" ? "Todos" : v;
 
     yearMenu.querySelectorAll(".year-item").forEach((b) => {
       b.classList.toggle("is-active", b.getAttribute("data-year") === v);
@@ -533,8 +598,11 @@ const backTopBtn = document.getElementById("backToTop");
     render();
   });
 
+  // -------------------------
   // TESE submenu
+  // -------------------------
   function markActiveNivelUI() {
+    if (!submenuTese) return;
     submenuTese.querySelectorAll(".submenu-item[data-nivel]").forEach((b) => {
       const n = String(b.getAttribute("data-nivel") || "").toLowerCase();
       b.classList.toggle("is-active", state.niveis.has(n));
@@ -542,11 +610,12 @@ const backTopBtn = document.getElementById("backToTop");
   }
 
   function closeTeseMenu() {
-    submenuTese.classList.remove("is-open");
-    chipTeseBtn.setAttribute("aria-expanded", "false");
+    submenuTese?.classList.remove("is-open");
+    chipTeseBtn?.setAttribute("aria-expanded", "false");
   }
 
   function openTeseMenu() {
+    if (!submenuTese || !chipTeseBtn) return;
     submenuTese.classList.add("is-open");
     chipTeseBtn.setAttribute("aria-expanded", "true");
 
@@ -556,7 +625,6 @@ const backTopBtn = document.getElementById("backToTop");
 
     const r = chipTeseBtn.getBoundingClientRect();
     const gap = 10;
-
     const top = Math.round(r.bottom + gap);
     let left = Math.round(r.left);
 
@@ -572,12 +640,13 @@ const backTopBtn = document.getElementById("backToTop");
   }
 
   function toggleTeseMenu() {
+    if (!submenuTese) return;
     const isOpen = submenuTese.classList.contains("is-open");
     if (isOpen) closeTeseMenu();
     else openTeseMenu();
   }
 
-  chipTeseBtn.addEventListener("click", (ev) => {
+  chipTeseBtn?.addEventListener("click", (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
 
@@ -590,7 +659,7 @@ const backTopBtn = document.getElementById("backToTop");
     render();
   });
 
-  submenuTese.addEventListener("click", (ev) => {
+  submenuTese?.addEventListener("click", (ev) => {
     ev.stopPropagation();
 
     const btn = ev.target.closest(".submenu-item[data-nivel]");
@@ -621,17 +690,20 @@ const backTopBtn = document.getElementById("backToTop");
   });
 
   window.addEventListener("resize", () => {
-    if (submenuTese.classList.contains("is-open")) openTeseMenu();
+    if (submenuTese?.classList.contains("is-open")) openTeseMenu();
   });
+
   window.addEventListener(
     "scroll",
     () => {
-      if (submenuTese.classList.contains("is-open")) openTeseMenu();
+      if (submenuTese?.classList.contains("is-open")) openTeseMenu();
     },
     true
   );
 
+  // -------------------------
   // Infinite scroll
+  // -------------------------
   function ensureInfiniteScroll() {
     if (!sentinelEl) return;
 
@@ -667,13 +739,16 @@ const backTopBtn = document.getElementById("backToTop");
     _io.observe(sentinelEl);
   }
 
+  // -------------------------
+  // Render
+  // -------------------------
   function render() {
     if (!DATA.length) {
-      resultsMeta.textContent = "Mostrando 0 de 0 resultado(s)";
+      if (resultsMeta) resultsMeta.textContent = "Mostrando 0 de 0 resultado(s)";
       grid.innerHTML = `
         <div class="no-results">
           Nenhuma publicação foi carregada. <br/>
-          Verifique se o arquivo existe em <code>/publications/data/publicacoes.json</code>.
+          Verifique se existe <code>/publications/data/publicacoes.json</code>.
         </div>
       `;
       _lastFilteredTotal = 0;
@@ -686,45 +761,21 @@ const backTopBtn = document.getElementById("backToTop");
       .sort((a, b) => b.ano - a.ano || norm(a.titulo).localeCompare(norm(b.titulo)));
 
     _lastFilteredTotal = filtered.length;
-
     const visible = filtered.slice(0, state.limit);
 
-    resultsMeta.textContent = `Mostrando ${visible.length} de ${filtered.length} resultado(s)`;
-
-
-    const STEP = 15; // ✅ de 15 em 15
-
-if (!visible.length) {
-  grid.innerHTML = `<div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>`;
-} else {
-  const parts = [];
-
-  for (let i = 0; i < visible.length; i++) {
-    parts.push(cardHTML(visible[i]));
-
-    const loadedSoFar = i + 1;
-
-    // ✅ coloca marcador quando fecha 15, 30, 45... ou no último carregado
-    const isMilestone = (loadedSoFar % STEP === 0) || (loadedSoFar === visible.length);
-
-    if (isMilestone) {
-      const from = Math.max(1, loadedSoFar - (loadedSoFar % STEP || STEP) + 1);
-      const to = loadedSoFar;
-
-      parts.push(`
-        <div class="progress-row">
-          <span class="progress-pill">
-            Vistos: ${to} / ${filtered.length} <span style="opacity:.7">(${from}–${to})</span>
-          </span>
-        </div>
-      `);
+    if (resultsMeta) {
+      resultsMeta.textContent = `Mostrando ${visible.length} de ${filtered.length} resultado(s)`;
     }
-  }
 
-  grid.innerHTML = parts.join("");
-}
+    if (!visible.length) {
+      grid.innerHTML = `<div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>`;
+      ensureInfiniteScroll();
+      return;
+    }
 
+    grid.innerHTML = visible.map(cardHTML).join("");
 
+    // favoritos
     grid.querySelectorAll(".fav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const card = btn.closest(".pub-card");
@@ -743,7 +794,10 @@ if (!visible.length) {
     ensureInfiniteScroll();
   }
 
-  eixoWrap.addEventListener("click", (e) => {
+  // -------------------------
+  // Eventos dos filtros
+  // -------------------------
+  eixoWrap?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-eixo]");
     if (!btn) return;
 
@@ -763,10 +817,9 @@ if (!visible.length) {
     render();
   });
 
-  tipoWrap.addEventListener("click", (e) => {
+  tipoWrap?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-tipo]");
     if (!btn) return;
-
     if (btn.id === "chipTeseBtn") return;
 
     const tipo = btn.getAttribute("data-tipo") || "all";
@@ -783,13 +836,13 @@ if (!visible.length) {
     render();
   });
 
-  searchEl.addEventListener("input", () => {
+  searchEl?.addEventListener("input", () => {
     state.q = searchEl.value;
     state.limit = PAGE_SIZE;
     render();
   });
 
-  favOnlyBtn.addEventListener("click", () => {
+  favOnlyBtn?.addEventListener("click", () => {
     state.favOnly = !state.favOnly;
     favOnlyBtn.setAttribute("aria-pressed", state.favOnly ? "true" : "false");
     favOnlyBtn.classList.toggle("is-active", state.favOnly);
@@ -797,42 +850,60 @@ if (!visible.length) {
     render();
   });
 
+  // Atalho do diagrama (venn)
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest(".venn-link[data-eixo]");
+    if (!link) return;
 
-// -----------------------
-// Botão "Voltar ao topo"
-// -----------------------
-(function setupBackToTop(){
-  if (!backTopBtn) return;
+    e.preventDefault();
+    const eixo = (link.getAttribute("data-eixo") || "all").toLowerCase();
 
-  const SHOW_AFTER = 520; // px de scroll para aparecer
+    state.eixos = new Set([eixo]);
+    state.tipo = "all";
+    state.niveis.clear();
+    state.ano = "all";
+    state.q = "";
+    state.favOnly = false;
+    state.limit = PAGE_SIZE;
 
-  function onScroll(){
-    const y = window.scrollY || document.documentElement.scrollTop || 0;
-    backTopBtn.classList.toggle("is-show", y > SHOW_AFTER);
-  }
-
-  backTopBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-
-  document
-    .getElementById("filtersTop")
-    ?.scrollIntoView({ behavior: "smooth", block: "start" });
-});
-
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
-})();
-
-
-
-
-  (async function initHub() {
-    await loadPublicacoes();
-    populateYears();
     syncEixoChipsUI();
-    setActiveChips(tipoWrap, "data-tipo", state.tipo);
+    setActiveChips(tipoWrap, "data-tipo", "all");
+    if (searchEl) searchEl.value = "";
+
+    if (favOnlyBtn) {
+      favOnlyBtn.classList.remove("is-active");
+      favOnlyBtn.setAttribute("aria-pressed", "false");
+    }
+
+    if (yearSelect) yearSelect.value = "all";
+    if (yearBtnLabel) yearBtnLabel.textContent = "Todos";
+    if (yearMenu) {
+      yearMenu.querySelectorAll(".year-item").forEach((b) => {
+        b.classList.toggle("is-active", b.getAttribute("data-year") === "all");
+      });
+    }
+
+    closeYearMenu();
+    closeTeseMenu();
     render();
+
+    document.getElementById("pubs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // -------------------------
+  // Init
+  // -------------------------
+  (async function initHub() {
+    try {
+      await loadPublicacoes();
+      populateYears();
+      syncEixoChipsUI();
+      setActiveChips(tipoWrap, "data-tipo", state.tipo);
+      render();
+    } catch (err) {
+      console.error("[HUB] Erro ao iniciar:", err);
+      if (resultsMeta) resultsMeta.textContent = "Mostrando 0 de 0 resultado(s)";
+      grid.innerHTML = `<div class="no-results">Erro ao carregar publicações. Veja o Console (F12).</div>`;
+    }
   })();
 })();
