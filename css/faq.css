@@ -1,50 +1,78 @@
 .faq-section {
-     background-color: #f7f9fc;
-     border-radius: 8px;
-     padding: 20px;
-     max-width: 600px;
-     margin: auto;
-     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    font-family: system-ui, -apple-system, sans-serif;
 }
- .faq-title {
-     text-align: center;
-     font-size: 24px;
-     color: #333;
-     margin-bottom: 20px;
+
+.faq-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 40px;
 }
- .faq-item {
-     border-bottom: 1px solid #e1e1e1;
-     margin-bottom: 15px;
+
+.faq-item {
+    margin-bottom: 16px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
 }
- .faq-question {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     padding: 15px;
-     cursor: pointer;
-     background-color: #0056b3;
-     color: white;
-     border-radius: 5px;
-     transition: background-color 0.3s;
+
+.faq-item:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
 }
- .faq-question:hover {
-     background-color: #004494;
+
+.faq-question {
+    width: 100%;
+    border: none;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    cursor: pointer;
+    text-align: left;
+    outline: none;
+    transition: background-color 0.2s;
 }
- .faq-answer {
-     display: none;
-    /* Initially hidden */
-     padding: 10px;
-     background-color: #f0f4ff;
-     border-radius: 5px;
-     margin-top: 5px;
-     color: #333;
+
+.question-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #334155;
 }
- .icon {
-     font-weight: bold;
-     transition: transform 0.3s;
+
+.icon {
+    font-size: 1.5rem;
+    color: #3b82f6;
+    line-height: 1;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
- .icon.active {
-     transform: rotate(45deg);
-    /* Rotate icon on active */
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
+    background-color: #ffffff;
 }
- 
+
+.faq-answer p {
+    padding: 0 24px 24px 24px;
+    margin: 0;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.faq-question.active .icon {
+    transform: rotate(45deg);
+    color: #ef4444;
+}
+
+.faq-question.active + .faq-answer {
+    opacity: 1;
+}
