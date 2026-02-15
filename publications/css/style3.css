@@ -148,25 +148,48 @@ main{
   text-shadow: 0 0 14px rgba(255, 138, 0, 0.55);
 }
 
-@keyframes nip-title-pulse{
-  0%,100%{
-    text-shadow:
-      0 0 10px rgba(233,236,255,.22),
-      0 0 26px rgba(0,229,255,.14);
-  }
-  50%{
-    text-shadow:
-      0 0 18px rgba(233,236,255,.38),
-      0 0 52px rgba(0,229,255,.28);
-  }
+.titulo-diagrama.fx-glint{
+  position: relative;
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: glint-in 520ms ease-out 90ms forwards;
+  will-change: opacity, transform;
 }
 
-.titulo-diagrama.fx-pulse{
-  animation: nip-title-pulse 1.8s ease-in-out infinite;
+.titulo-diagrama.fx-glint::after{
+  content: "";
+  position: absolute;
+  inset: -6px -10px;
+  pointer-events: none;
+
+  background: linear-gradient(110deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.0) 35%,
+    rgba(255,255,255,0.55) 50%,
+    rgba(255,255,255,0.0) 65%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: translateX(-120%);
+  opacity: 0;
+
+  mix-blend-mode: screen;
+  filter: blur(0.2px);
+  animation: glint-sweep 780ms ease-in-out 260ms forwards;
+  -webkit-mask: linear-gradient(#000, #000);
+}
+
+@keyframes glint-in{ to{ opacity: 1; transform: translateY(0); } }
+@keyframes glint-sweep{
+  0%{ transform: translateX(-120%); opacity: 0; }
+  20%{ opacity: 1; }
+  70%{ opacity: 1; }
+  100%{ transform: translateX(120%); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce){
-  .titulo-diagrama.fx-pulse{ animation: none; }
+  .titulo-diagrama.fx-glint{ opacity: 1; transform: none; animation: none; }
+  .titulo-diagrama.fx-glint::after{ display: none; }
 }
 
 /* ===== HOME — DIAGRAMA ===== */
@@ -293,7 +316,7 @@ main{
 .search-row{ width: 100%; }
 
 /* =========================================================
-   CHIPS — ATIVO + cores por EIXO + fav "maré"
+   CHIPS
    ========================================================= */
 .chip{
   border: 1px solid rgba(120,200,255,.35);
@@ -441,16 +464,6 @@ main{
   flex-wrap: wrap;
 }
 
-.load-more{
-  border: 1px solid rgba(120,200,255,.25);
-  background: rgba(6,6,18,.35);
-  color: #e9ecff;
-  border-radius: 14px;
-  padding: 10px 14px;
-  cursor: pointer;
-  display: inline-flex;
-}
-
 .pubs-grid{
   display: flex;
   flex-direction: column;
@@ -583,7 +596,6 @@ main{
    =============================== */
 .year-dd{ position: relative; width: 220px; }
 
-/* garante que o select compatível nunca apareça */
 #yearSelect.year-select,
 .year-select,
 select[hidden]{
@@ -747,7 +759,6 @@ select[hidden]{
 
 /* ===============================
    Botão flutuante: Voltar ao topo
-   (APENAS UMA VERSÃO)
    =============================== */
 .back-top{
   position: fixed;
@@ -888,239 +899,30 @@ select[hidden]{
 
   .back-top{ right: 14px; bottom: 14px; }
 }
-
-/* ==========================================
-   EFEITO DE ENTRADA (toca 1 vez e para)
-   Use: class="titulo-diagrama fx-intro"
-   ========================================== */
-
-.titulo-diagrama.fx-intro{
-  opacity: 0;
-  transform: translateY(10px);
-  animation: title-intro 900ms ease-out 120ms forwards;
-  will-change: transform, opacity, text-shadow, filter;
+/* Destaque da busca (grifado) */
+.hl{
+  font-weight: 800;
+  padding: 0 2px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 12px rgba(255,255,255,0.10);
+}
+.pub-card[data-eixo="sapho"] .hl{
+  background: rgba(255,138,0,0.22);
+  border: 1px solid rgba(255,138,0,0.6);
+  box-shadow: 0 0 14px rgba(255,138,0,0.6);
 }
 
-@keyframes title-intro{
-  0%{
-    opacity: 0;
-    transform: translateY(14px);
-    text-shadow:
-      0 0 0 rgba(233,236,255,0),
-      0 0 0 rgba(0,229,255,0);
-    filter: blur(2px);
-  }
-  60%{
-    opacity: 1;
-    transform: translateY(-2px);
-    text-shadow:
-      0 0 14px rgba(233,236,255,.22),
-      0 0 28px rgba(0,229,255,.18);
-    filter: blur(0px);
-  }
-  100%{
-    opacity: 1;
-    transform: translateY(0);
-    text-shadow:
-      0 0 8px rgba(255,255,255,0.20);
-    filter: none;
-  }
+.pub-card[data-eixo="cern"] .hl{
+  background: rgba(0,229,255,0.22);
+  border: 1px solid rgba(0,229,255,0.6);
+  box-shadow: 0 0 14px rgba(0,229,255,0.6);
 }
 
-/* Acessibilidade */
-@media (prefers-reduced-motion: reduce){
-  .titulo-diagrama.fx-intro{
-    opacity: 1;
-    transform: none;
-    animation: none;
-    filter: none;
-  }
-}
-/* ==========================================
-   EFEITO DE ENTRADA — da ESQUERDA → direita
-   (toca 1 vez e para)
-   Use: class="titulo-diagrama fx-intro"
-   ========================================== */
-
-.titulo-diagrama.fx-intro{
-  opacity: 0;
-  transform: translateX(-24px);
-  animation: title-intro-left 900ms cubic-bezier(.22,.61,.36,1) 120ms forwards;
-  will-change: transform, opacity, text-shadow, filter;
-}
-
-@keyframes title-intro-left{
-  0%{
-    opacity: 0;
-    transform: translateX(-28px);
-    text-shadow:
-      0 0 0 rgba(233,236,255,0),
-      0 0 0 rgba(0,229,255,0);
-    filter: blur(2px);
-  }
-  60%{
-    opacity: 1;
-    transform: translateX(4px);
-    text-shadow:
-      0 0 14px rgba(233,236,255,.22),
-      0 0 28px rgba(0,229,255,.18);
-    filter: blur(0);
-  }
-  100%{
-    opacity: 1;
-    transform: translateX(0);
-    text-shadow:
-      0 0 8px rgba(255,255,255,.20);
-    filter: none;
-  }
-}
-
-/* Acessibilidade */
-@media (prefers-reduced-motion: reduce){
-  .titulo-diagrama.fx-intro{
-    opacity: 1;
-    transform: none;
-    animation: none;
-    filter: none;
-  }
-}
-
-/* ==========================================
-   FX-SMILE: entra + micro bounce “sorriso”
-   (toca 1 vez e para)
-   ========================================== */
-
-.titulo-diagrama.fx-smile{
-  opacity: 0;
-  transform: translateY(10px) scale(0.985);
-  animation: title-smile 920ms cubic-bezier(.2,.9,.2,1) 120ms forwards;
-  will-change: transform, opacity, text-shadow;
-}
-
-@keyframes title-smile{
-  0%{
-    opacity: 0;
-    transform: translateY(14px) scale(0.98);
-    text-shadow: 0 0 0 rgba(233,236,255,0), 0 0 0 rgba(0,229,255,0);
-  }
-  55%{
-    opacity: 1;
-    transform: translateY(-3px) scale(1.01); /* “sorriso” */
-    text-shadow: 0 0 16px rgba(233,236,255,.28), 0 0 34px rgba(0,229,255,.20);
-  }
-  78%{
-    transform: translateY(1px) scale(0.997); /* volta com charme */
-  }
-  100%{
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    text-shadow: 0 0 8px rgba(255,255,255,.20);
-  }
-}
-
-@media (prefers-reduced-motion: reduce){
-  .titulo-diagrama.fx-smile{ opacity: 1; transform: none; animation: none; }
-}
-/* ==========================================
-   FX-GLINT: aparece + brilho passando 1 vez
-   (toca 1 vez e para)
-   ========================================== */
-
-.titulo-diagrama.fx-glint{
-  position: relative;
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(10px);
-  animation: glint-in 520ms ease-out 90ms forwards;
-  will-change: opacity, transform;
-}
-
-/* “brilho” por cima do texto */
-.titulo-diagrama.fx-glint::after{
-  content: "";
-  position: absolute;
-  inset: -6px -10px;
-  pointer-events: none;
-
-  background: linear-gradient(110deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.0) 35%,
-    rgba(255,255,255,0.55) 50%,
-    rgba(255,255,255,0.0) 65%,
-    rgba(255,255,255,0) 100%
-  );
-  transform: translateX(-120%);
-  opacity: 0;
-
-  mix-blend-mode: screen;
-  filter: blur(0.2px);
-  animation: glint-sweep 780ms ease-in-out 260ms forwards;
-  -webkit-mask: linear-gradient(#000, #000);
-}
-
-@keyframes glint-in{
-  to{ opacity: 1; transform: translateY(0); }
-}
-
-@keyframes glint-sweep{
-  0%{ transform: translateX(-120%); opacity: 0; }
-  20%{ opacity: 1; }
-  70%{ opacity: 1; }
-  100%{ transform: translateX(120%); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce){
-  .titulo-diagrama.fx-glint{ opacity: 1; transform: none; animation: none; }
-  .titulo-diagrama.fx-glint::after{ display: none; }
-}
-
-/* ===============================
-   Contador de cards carregados
-   =============================== */
-.loaded-counter{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 8px 12px;
-  border-radius: 999px;
-
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(10,10,30,.45);
-  backdrop-filter: blur(10px);
-
-  color: var(--muted);
-  font-size: 0.92rem;
-  letter-spacing: .02em;
-
-  box-shadow: 0 0 16px rgba(255,255,255,.06);
-}
-
-/* ===============================
-   Marcador de progresso (15 em 15)
-   =============================== */
-.progress-row{
-  display: flex;
-  justify-content: center;   /* 🔥 centraliza */
-  margin: 8px 0 14px; /* respiro entre os cards */
+.pub-card[data-eixo="sc"] .hl{
+  background: rgba(179,136,255,0.22);
+  border: 1px solid rgba(179,136,255,0.6);
+  box-shadow: 0 0 14px rgba(179,136,255,0.6);
 }
 
 
-.progress-pill{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-
-  padding: 8px 12px;
-  border-radius: 999px;
-
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(10,10,30,.55);
-  backdrop-filter: blur(10px);
-
-  color: var(--muted);
-  font-size: 0.92rem;
-  letter-spacing: .02em;
-
-  box-shadow: 0 0 16px rgba(255,255,255,.06);
-}
