@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- SEO Meta Tags -->
+    <title data-i18n="cgv_title">Calorimeter Geometry Viewer - Web | NIPSCERN Lab</title>
+    <meta name="description" content="CGV-WEB: Web-based 3D visualization tool for CERN ATLAS calorimeter events. Interactive detector geometry visualization for high-energy physics research and education.">
+    <meta name="keywords" content="CGV-WEB, CaloGeoView, calorimeter visualization, CERN, ATLAS detector, particle physics, 3D visualization, NIPSCERN, scientific computing, ROOT framework">
+    <meta name="author" content="NIPSCERN Lab">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://nipscern.com/projects/cgv">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nipscern.com/projects/cgv">
+    <meta property="og:title" content="Calorimeter Geometry Viewer - Web">
+    <meta property="og:description" content="Web-based 3D visualization tool for CERN ATLAS calorimeter events and detector geometries.">
+    <meta property="og:image" content="https://nipscern.com/assets/icons/icon_cgv_web.svg">
+    <meta property="og:site_name" content="NIPSCERN Lab">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Calorimeter Geometry Viewer - Web">
+    <meta name="twitter:description" content="Web-based 3D visualization tool for CERN ATLAS calorimeter events.">
+    <meta name="twitter:image" content="https://nipscern.com/assets/icons/icon_cgv_web.svg">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/icon_cgv_web.svg">
+    <link rel="apple-touch-icon" href="/assets/icons/icon_cgv_web.svg">
+    <meta name="msapplication-TileColor" content="#75fbfd">
+    <meta name="theme-color" content="#75fbfd">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/cgvweb.css">
+</head>
+<body>
+    
+    <main class="main-container">
+        
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="content-wrapper">
+                
+                <h1 class="main-title" data-i18n="cgv_main_title">
+                    Calorimeter Geometry Viewer
+                </h1>
+                
+                <p class="subtitle" data-i18n="cgv_subtitle">Web</p>
+                
+                <p class="lead-text" data-i18n="cgv_lead">
+                    A web-based 3D visualization tool for CERN ATLAS calorimeter events, enabling interactive exploration of detector geometries and energy deposits from particle collisions.
+                </p>
+                
+                <p class="secondary-text" data-i18n="cgv_secondary">
+                    Originally developed as CaloGeoView by Dr. Luciano Manhães de Andrade Filho, modernized by NIPSCERN for global accessibility through modern web technologies.
+                </p>
+                
+                <a href="https://nipscern.com/projects/cgv" 
+                   class="launch-btn" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   data-i18n="cgv_launch"
+                   aria-label="Launch CGV-WEB Visualization Tool">
+                    Launch Visualization
+                </a>
+                
+            </div>
+        </section>
+        
+        <!-- Technical Specs Section -->
+        <section class="specs-section">
+            <div class="specs-wrapper">
+                <h2 class="section-title" data-i18n="cgv_technical">Technical Overview</h2>
+                
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <h3>Detector Coverage</h3>
+                        <p>Visualizes the complete ATLAS calorimeter system: electromagnetic (LAr) and hadronic (TileCal, HEC) sections with over 100,000 readout channels across seven detection layers</p>
+                    </div>
+                    
+                    <div class="spec-item">
+                        <h3>Geometry Engine</h3>
+                        <p>Built using ROOT geometry package with approximately 200,000 primitive shapes representing individual calorimeter cells with precise η×φ segmentation</p>
+                    </div>
+                    
+                    <div class="spec-item">
+                        <h3>Real-Time Performance</h3>
+                        <p>Processing time under 300 milliseconds for typical events with fast cell selection, rotation, zoom, and energy threshold filtering capabilities</p>
+                    </div>
+                    
+                    <div class="spec-item">
+                        <h3>Energy Visualization</h3>
+                        <p>Color-coded energy mapping: green palette for electromagnetic showers, hot palette (yellow to dark red) for hadronic deposits with user-adjustable scales</p>
+                    </div>
+                    
+                    <div class="spec-item">
+                        <h3>Cell-Level Analysis</h3>
+                        <p>Interactive cell selection reveals detailed information including energy deposits, position coordinates, PMT channels, and pulse shape data with ADC counts</p>
+                    </div>
+                    
+                    <div class="spec-item">
+                        <h3>Commissioning Tool</h3>
+                        <p>Used online in ATLAS control room for cosmic ray commissioning, detector validation, and Level-2 trigger Region of Interest visualization</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Legacy & Development Section -->
+        <section class="legacy-section">
+            <div class="legacy-wrapper">
+                <h2 class="section-title" data-i18n="cgv_development">Development History</h2>
+                
+                <p class="legacy-text">
+                    CGV-WEB evolved from CaloGeoView, a ROOT-based 3D visualization tool originally developed as part of the PhD thesis of Dr. Prof. Luciano Manhães de Andrade Filho at the Federal University of Rio de Janeiro's Signal Processing Laboratory. The original CaloGeoView was designed as a Linux desktop application for visualizing CERN ATLAS calorimeter events during the detector commissioning phase with cosmic rays.
+                </p>
+                
+                <p class="legacy-text">
+                    The tool played a crucial role in commissioning the ATLAS calorimeter system, enabling visual inspection of cosmic muon tracks and corresponding activated cells. This facilitated the detection of problematic channels, validation of reconstruction algorithms, and verification of calibration constants across the highly segmented detector.
+                </p>
+                
+                <p class="legacy-text">
+                    NIPSCERN's modernization effort transformed CaloGeoView into a platform-independent web application, expanding accessibility for education, outreach, and scientific analysis worldwide while maintaining the sophisticated visualization capabilities of the original tool.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Technical Features Section -->
+        <section class="features-section">
+            <div class="features-wrapper">
+                <h2 class="section-title" data-i18n="cgv_capabilities">Key Capabilities</h2>
+                
+                <div class="feature-list">
+                    <div class="feature-row">
+                        <h3>ATLAS Detector Scale</h3>
+                        <p>Visualizes events from the 42-meter long, 11-meter radius ATLAS detector at CERN's Large Hadron Collider</p>
+                    </div>
+                    
+                    <div class="feature-row">
+                        <h3>Multi-Layer Segmentation</h3>
+                        <p>Electromagnetic calorimeter: three sampling layers (Strips, Middle, Back) with granularity from 0.0031×0.0245 to 0.05×0.0245 in η×φ coordinates</p>
+                    </div>
+                    
+                    <div class="feature-row">
+                        <h3>Hadronic Calorimeter</h3>
+                        <p>TileCal barrel and extended barrels (|η| < 1.7), HEC end-caps (1.5 < |η| < 3.2) with approximately 10,000 PMT readout channels</p>
+                    </div>
+                    
+                    <div class="feature-row">
+                        <h3>Event Reconstruction</h3>
+                        <p>Displays reconstructed cosmic muon tracks, trigger tower information, and Level-2 Regions of Interest with full detector response</p>
+                    </div>
+                    
+                    <div class="feature-row">
+                        <h3>Data Integration</h3>
+                        <p>Seamless integration with ATLAS Athena reconstruction framework and ROOT data files for offline and online monitoring</p>
+                    </div>
+                    
+                    <div class="feature-row">
+                        <h3>Commissioning Support</h3>
+                        <p>Instrumental in detecting dead channels, hot cells, calibration errors, and reconstruction algorithm issues during ATLAS commissioning</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer-section">
+            <p class="footer-credit" data-i18n="cgv_footer">
+                Developed by NIPSCERN Laboratory in collaboration with CERN
+            </p>
+            <a href="../index" class="footer-link" data-i18n="cgv_back_home">
+                Return to NIPSCERN
+            </a>
+        </footer>
+        
+    </main>
+    
+</body>
+</html>
