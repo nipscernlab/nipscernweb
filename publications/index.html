@@ -35,11 +35,12 @@
         target="_blank"
         rel="noopener"
       >
-        <i class="fa-solid fa-house home-fa"></i>
+        <i class="fa-solid fa-house home-fa" aria-hidden="true"></i>
       </a>
     </nav>
   </header>
 
+  <!-- Botão flutuante: Voltar aos filtros -->
   <button
     id="backToTop"
     class="back-top"
@@ -50,7 +51,7 @@
     <i class="fa-solid fa-circle-arrow-up" aria-hidden="true"></i>
   </button>
 
-  <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+  <!-- ===== CONTEÚDO PRINCIPAL (HOME) ===== -->
   <main>
     <h2 class="titulo-diagrama fx-glint">
       Sinergia entre <span class="sapho-text">SAPHO</span> e <span class="cern-text">CERN</span>
@@ -58,12 +59,17 @@
 
     <!-- ✅ Diagrama (filtra o HUB) -->
     <div class="diagram venn">
-      <a href="#pubs" class="circle sapho venn-link" data-eixo="sapho">SAPHO</a>
-      <a href="#pubs" class="circle cern venn-link" data-eixo="cern">CERN</a>
+      <a href="#pubs" class="circle sapho venn-link" data-eixo="sapho">
+        <span class="circle-label">SAPHO</span>
+      </a>
+
+      <a href="#pubs" class="circle cern venn-link" data-eixo="cern">
+        <span class="circle-label">CERN</span>
+      </a>
 
       <div class="intersection sc">
         <a href="#pubs" class="link-intersection venn-link" data-eixo="sc">
-          <span class="s">S</span><span class="c">C</span>
+          <span class="circle-label">SC</span>
         </a>
       </div>
     </div>
@@ -73,10 +79,11 @@
   <section id="pubs" class="pubs-hub" aria-label="Hub de publicações">
     <h2 class="pubs-title">Publicações</h2>
 
-    <!-- ✅ alvo da seta -->
+    <!-- ✅ alvo do botão flutuante -->
     <div id="filtersTop"></div>
 
     <div class="pubs-filters">
+
       <!-- EIXO -->
       <div class="filter-block">
         <div class="filter-line">
@@ -101,14 +108,27 @@
             <button class="chip" data-tipo="congresso">Congresso</button>
             <button class="chip" data-tipo="revista">Revista</button>
 
-            <!-- TESE -->
-            <button class="chip chip-tese" id="chipTeseBtn" data-tipo="tese" type="button" aria-expanded="false">
-              Tese <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
-            </button>
+            <!-- tipos diretos -->
+            <button class="chip" data-tipo="tcc">TCC</button>
+            <button class="chip" data-tipo="mestrado">Mestrado</button>
+            <button class="chip" data-tipo="doutorado">Doutorado</button>
 
             <button class="chip chip-star" id="favOnlyBtn" aria-pressed="false" title="Somente favoritos">
-              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star" aria-hidden="true"></i>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- IDIOMA -->
+      <div class="filter-block">
+        <div class="filter-line">
+          <p class="filters-label">IDIOMA DO PDF</p>
+
+          <div class="filter-row" id="filterIdioma" role="group" aria-label="Filtro de idioma">
+            <button class="chip is-active" data-idioma="all">Todos</button>
+            <button class="chip" data-idioma="pt">Português</button>
+            <button class="chip" data-idioma="en">Inglês</button>
           </div>
         </div>
       </div>
@@ -164,18 +184,6 @@
     <div class="pub-loader" id="pubLoader" hidden>Carregando mais resultados…</div>
   </section>
 
-  <!-- SUBMENU TESE -->
-  <div class="submenu" id="submenuTese" role="menu" aria-label="Filtro de nível de tese">
-    <div class="submenu-grid">
-      <button class="submenu-item" type="button" data-nivel="tcc">TCC</button>
-      <button class="submenu-item" type="button" data-nivel="mestrado">Mestrado</button>
-      <button class="submenu-item" type="button" data-nivel="doutorado">Doutorado</button>
-    </div>
-  </div>
-
   <script src="/publications/js/script3.js" defer></script>
-
-
-
 </body>
 </html>

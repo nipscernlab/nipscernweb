@@ -1,10 +1,6 @@
 /* /publications/viewer/style3.css */
 /* =====================================================
-   NIPSCERN — Viewer PDF (Canvas único)
-   - Header fixo (grid 3 colunas)
-   - Scroll interno no .pdf-shell
-   - Palco central com margens consistentes
-   - Toggle de margens (.margins-off)
+   NIPSCERN — Viewer PDF (isolado do HUB)
    ===================================================== */
 
 :root{
@@ -23,16 +19,15 @@
 
   --header-h: 56px;
   --shell-pad: 22px;
-  --paper-pad: 22px;
+  --paper-pad: 18px;
 }
 
-html, body{
-  height: 100%;
-  overflow: hidden; /* quem rola é o shell */
-}
-
+*{ box-sizing: border-box; }
+html, body{ height: 100%; margin: 0; }
 body{
   background: var(--v-bg);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  overflow: hidden; /* quem rola é o shell */
 }
 
 /* ===== HEADER ===== */
@@ -73,6 +68,7 @@ body{
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: nowrap;
 }
 
 .pdf-right{
@@ -89,8 +85,8 @@ body{
   margin: 0 2px;
 }
 
-/* Botão voltar (link) ficar igual ícone */
-.pdf-back{
+.pdf-back,
+.pdf-icon{
   width: 36px;
   height: 36px;
   border-radius: 10px;
@@ -101,22 +97,9 @@ body{
   align-items: center;
   justify-content: center;
   text-decoration: none;
-}
-.pdf-back:hover{ background: var(--v-btn-hov); }
-
-.pdf-icon{
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid rgba(0,0,0,.12);
-  background: var(--v-btn-bg);
-  color: var(--v-bar-ink);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
-
+.pdf-back:hover,
 .pdf-icon:hover{ background: var(--v-btn-hov); }
 
 .pdf-chip{
@@ -134,7 +117,6 @@ body{
   font-weight: 800;
   cursor: pointer;
 }
-
 .pdf-chip:hover{ background: var(--v-btn-hov); }
 
 .pdf-page{
@@ -167,14 +149,13 @@ body{
   overflow: auto;
   padding: var(--shell-pad);
 
-  /* fundo suave pra não dar “faixa” */
   background: radial-gradient(1200px 700px at 50% 10%,
     rgba(255,255,255,0.06),
     rgba(0,0,0,0) 60%
   );
 }
 
-/* ===== PALCO do PDF ===== */
+/* ===== PALCO ===== */
 .pdf-paper{
   width: fit-content;
   max-width: 100%;
@@ -185,12 +166,10 @@ body{
   background: var(--v-paper);
   border: 1px solid var(--v-paper-bd);
   box-shadow: 0 18px 70px rgba(0,0,0,0.45);
-
-  /* não corta o canvas (corte feio) */
   overflow: visible;
 }
 
-/* ===== CANVAS (papel) ===== */
+/* ===== CANVAS ===== */
 #pdfCanvas{
   display: block;
   margin: 0 auto;
@@ -202,20 +181,16 @@ body{
   height: auto;
 }
 
-/* ===== Margens liga/desliga ===== */
-.pdf-paper.margins-off{
-  padding: 8px !important;
-}
+/* Toggle Margens */
+.pdf-paper.margins-off{ padding: 8px !important; }
 
-/* ===== Tema escuro do viewer ===== */
+/* ===== Tema escuro ===== */
 .viewer-dark .pdf-header{
   background: rgba(6,6,18,.78);
   border-bottom-color: rgba(255,255,255,.10);
 }
 .viewer-dark .pdf-title,
-.viewer-dark .pdf-page{
-  color: var(--v-ink);
-}
+.viewer-dark .pdf-page{ color: var(--v-ink); }
 .viewer-dark .pdf-icon,
 .viewer-dark .pdf-chip,
 .viewer-dark .pdf-back{
@@ -225,16 +200,30 @@ body{
 }
 .viewer-dark .pdf-icon:hover,
 .viewer-dark .pdf-chip:hover,
-.viewer-dark .pdf-back:hover{
-  background: rgba(255,255,255,.06);
-}
-.viewer-dark .pdf-sep{
-  background: rgba(255,255,255,.14);
-}
+.viewer-dark .pdf-back:hover{ background: rgba(255,255,255,.06); }
+.viewer-dark .pdf-sep{ background: rgba(255,255,255,.14); }
 .viewer-dark #pageNumber{
   background: rgba(10,10,30,.55);
   border-color: rgba(255,255,255,.18);
   color: var(--v-ink);
 }
 
+/* ===== Mobile: enxuga botões longos e garante encaixe ===== */
+@media (max-width: 768px){
+  :root{ --shell-pad: 14px; --paper-pad: 12px; }
 
+  .pdf-header{
+    grid-template-columns: 1fr auto 1fr;
+    padding: 0 10px;
+  }
+
+  /* escondemos texto dos chips no mobile (fica só ícone) */
+  .pdf-chip{
+    padding: 0 10px;
+    gap: 0;
+  }
+  .pdf-chip{ font-size: 0; } /* some texto */
+  .pdf-chip i{ font-size: 14px; } /* mantém ícone */
+
+  #pageNumber{ width: 58px; }
+}

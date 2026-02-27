@@ -1,11 +1,11 @@
-
 // /publications/js/script3.js
 // =====================================================
 // NIPSCERN • Starfield + HUB de Publicações (OFICIAL)
 // - Multi-eixo (SAPHO/CERN/SC/CS)
-// - Tipo, Ano, Busca, Favoritos
-// - TESE com submenu (TCC/Mestrado/Doutorado)
-// - Infinite scroll (carrega automaticamente ao chegar no fim)
+// - Tipo (Congresso/Revista/TCC/Mestrado/Doutorado)
+// - Idioma (PT/EN) antes do Ano
+// - Ano, Busca, Favoritos
+// - Infinite scroll
 // - Botão flutuante "Voltar aos filtros" (robusto) ✅
 // =====================================================
 
@@ -20,22 +20,21 @@
   const SHOW_AFTER = 250;
 
   function getScrollY() {
-  return (
-    window.scrollY ||
-    document.documentElement.scrollTop ||
-    document.body.scrollTop ||
-    0
-  );
-}
-window.addEventListener("scroll", onScroll, { passive: true });
-
-document.body.addEventListener("scroll", onScroll, { passive: true });
-onScroll();
-
+    return (
+      window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0
+    );
+  }
 
   function onScroll() {
     btn.classList.toggle("is-show", getScrollY() > SHOW_AFTER);
   }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  document.body.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
   btn.addEventListener("click", (e) => {
     e.preventDefault();
@@ -54,9 +53,6 @@ onScroll();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   });
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
 })();
 
 
@@ -148,10 +144,7 @@ onScroll();
 
   function update() {
     tick++;
-
-    if (!reduceMotion && Math.random() < CFG.shootingProb) {
-      spawnShootingStar();
-    }
+    if (!reduceMotion && Math.random() < CFG.shootingProb) spawnShootingStar();
 
     shootingStars = shootingStars.filter((s) => {
       s.x += s.vx;
@@ -233,7 +226,6 @@ onScroll();
   const grid = document.getElementById("pubsGrid");
   if (!grid) return;
 
-  // ✅ NORMALIZAÇÃO (precisa existir ANTES do highlight)
   const norm = (s) =>
     (s || "")
       .toString()
@@ -252,7 +244,6 @@ onScroll();
       .replaceAll("'", "&#039;");
   }
 
-  // realça a query no texto ORIGINAL (mantendo acentos), e é seguro (escapa HTML)
   function highlight(text, query) {
     const raw = (text ?? "").toString();
     const q = (query ?? "").toString().trim();
@@ -275,7 +266,6 @@ onScroll();
         break;
       }
 
-      // converte idx (no normalizado) pra índice no original
       let start = 0;
       for (start = 0; start < sliceRaw.length; start++) {
         const nextAcc = norm(sliceRaw.slice(0, start + 1));
@@ -302,6 +292,7 @@ onScroll();
 
   const eixoWrap = document.getElementById("filterEixo");
   const tipoWrap = document.getElementById("filterTipo");
+  const idiomaWrap = document.getElementById("filterIdioma");
 
   const yearSelect = document.getElementById("yearSelect");
   const yearDD = document.getElementById("yearDD");
@@ -316,9 +307,6 @@ onScroll();
   const sentinelEl = document.getElementById("infiniteSentinel");
   const loaderEl = document.getElementById("pubLoader");
 
-  const chipTeseBtn = document.getElementById("chipTeseBtn");
-  const submenuTese = document.getElementById("submenuTese");
-
   let DATA = [];
 
   function resolveHref(path, baseJsonUrl) {
@@ -330,11 +318,8 @@ onScroll();
   }
 
   const loadFavs = () => {
-    try {
-      return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]"));
-    } catch {
-      return new Set();
-    }
+    try { return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]")); }
+    catch { return new Set(); }
   };
   const saveFavs = (set) => localStorage.setItem(LS_KEY, JSON.stringify([...set]));
   let favs = loadFavs();
@@ -342,7 +327,7 @@ onScroll();
   let state = {
     eixos: new Set(["all"]),
     tipo: "all",
-    niveis: new Set(),
+    idioma: "all",
     ano: "all",
     q: "",
     favOnly: false,
@@ -365,27 +350,51 @@ onScroll();
     const t = (tipo || "").toLowerCase();
     if (t === "congresso") return "CONGRESSO";
     if (t === "revista") return "REVISTA";
-    if (t === "tese") return "TESE";
+    if (t === "tcc") return "TCC";
+    if (t === "mestrado") return "MESTRADO";
+    if (t === "doutorado") return "DOUTORADO";
     return (tipo || "").toUpperCase();
   }
 
-  function nivelLabel(nivel) {
-    const n = (nivel || "").toLowerCase();
-    if (n === "tcc") return "TCC";
-    if (n === "mestrado") return "MESTRADO";
-    if (n === "doutorado") return "DOUTORADO";
-    return (nivel || "").toUpperCase();
+  function idiomaLabel(id) {
+    const v = (id || "").toLowerCase();
+    if (v === "pt") return "PT";
+    if (v === "en") return "EN";
+    return (id || "").toUpperCase();
   }
 
   function badge(item) {
     const eixo = eixoLabel(item.eixo);
     const tipo = tipoLabel(item.tipo);
     const ano = item.ano ?? "—";
+    const idi = idiomaLabel(item.idioma || "pt");
+    return `${eixo} • ${tipo} • ${idi} • ${ano}`;
+  }
 
-    if ((item.tipo || "").toLowerCase() === "tese" && item.nivel) {
-      return `${eixo} • ${tipo} (${nivelLabel(item.nivel)}) • ${ano}`;
+  function normalizeIdioma(p) {
+    const raw = (p?.idioma ?? p?.lingua ?? p?.language ?? "").toString().toLowerCase().trim();
+    if (!raw) return "pt"; // fallback
+    if (raw.startsWith("pt")) return "pt";
+    if (raw.startsWith("en")) return "en";
+    // se vier "portugues"/"inglês"
+    if (raw.includes("port")) return "pt";
+    if (raw.includes("ing")) return "en";
+    return "pt";
+  }
+
+  function normalizeTipoETese(p) {
+    const tipo = (p?.tipo || "").toString().toLowerCase().trim();
+    const nivel = (p?.nivel || "").toString().toLowerCase().trim();
+
+    // compatibilidade com JSON antigo: tipo=tese + nivel=tcc/mestrado/doutorado
+    if (tipo === "tese") {
+      if (nivel === "tcc" || nivel === "mestrado" || nivel === "doutorado") return nivel;
+      return "mestrado"; // fallback (se vier tese sem nivel, evita quebrar filtro)
     }
-    return `${eixo} • ${tipo} • ${ano}`;
+
+    // novo padrão: já pode vir direto
+    if (tipo === "tcc" || tipo === "mestrado" || tipo === "doutorado") return tipo;
+    return tipo || "congresso";
   }
 
   async function loadPublicacoes() {
@@ -416,14 +425,14 @@ onScroll();
         return {
           id: p.id,
           eixo: eixoItem,
-          tipo: (p.tipo || "").toLowerCase(),
+          tipo: normalizeTipoETese(p),
+          idioma: normalizeIdioma(p),
           ano: Number(p.ano || anoBase),
           titulo: p.titulo || "Sem título",
           autores: p.autores || "—",
           resumo: p.resumo || "",
           palavrasChave: Array.isArray(p.palavrasChave) ? p.palavrasChave : [],
           veiculo: p.veiculo || "",
-          nivel: p.nivel ? String(p.nivel).toLowerCase() : null,
           arquivo: resolveHref(p.arquivo, baseJsonUrl),
         };
       });
@@ -443,20 +452,17 @@ onScroll();
 
     if (state.tipo !== "all" && item.tipo !== state.tipo) return false;
 
-    if (state.niveis.size > 0) {
-      if (item.tipo !== "tese") return false;
-      if (!item.nivel || !state.niveis.has(item.nivel)) return false;
-    }
+    if (state.idioma !== "all" && (item.idioma || "pt") !== state.idioma) return false;
 
     if (state.ano !== "all" && String(item.ano) !== String(state.ano)) return false;
+
     if (state.favOnly && !favs.has(item.id)) return false;
 
     const q = norm(state.q);
     if (q) {
       const hay = norm(
-        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(
-          " "
-        )} ${item.eixo} ${item.tipo} ${item.ano} ${item.nivel || ""}`
+        `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(" ")} ` +
+        `${item.eixo} ${item.tipo} ${item.idioma} ${item.ano}`
       );
       if (!hay.includes(q)) return false;
     }
@@ -598,108 +604,13 @@ onScroll();
     render();
   });
 
-  // -------------------------
-  // TESE submenu
-  // -------------------------
-  function markActiveNivelUI() {
-    if (!submenuTese) return;
-    submenuTese.querySelectorAll(".submenu-item[data-nivel]").forEach((b) => {
-      const n = String(b.getAttribute("data-nivel") || "").toLowerCase();
-      b.classList.toggle("is-active", state.niveis.has(n));
-    });
-  }
-
-  function closeTeseMenu() {
-    submenuTese?.classList.remove("is-open");
-    chipTeseBtn?.setAttribute("aria-expanded", "false");
-  }
-
-  function openTeseMenu() {
-    if (!submenuTese || !chipTeseBtn) return;
-    submenuTese.classList.add("is-open");
-    chipTeseBtn.setAttribute("aria-expanded", "true");
-
-    if (submenuTese.parentElement !== document.body) {
-      document.body.appendChild(submenuTese);
-    }
-
-    const r = chipTeseBtn.getBoundingClientRect();
-    const gap = 10;
-    const top = Math.round(r.bottom + gap);
-    let left = Math.round(r.left);
-
-    submenuTese.style.top = `${top}px`;
-    submenuTese.style.left = `${left}px`;
-
-    const menuW = submenuTese.offsetWidth || 280;
-    const maxLeft = window.innerWidth - menuW - 12;
-    if (left > maxLeft) {
-      left = Math.max(12, maxLeft);
-      submenuTese.style.left = `${left}px`;
-    }
-  }
-
-  function toggleTeseMenu() {
-    if (!submenuTese) return;
-    const isOpen = submenuTese.classList.contains("is-open");
-    if (isOpen) closeTeseMenu();
-    else openTeseMenu();
-  }
-
-  chipTeseBtn?.addEventListener("click", (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-
-    state.tipo = "tese";
-    setActiveChips(tipoWrap, "data-tipo", "tese");
-
-    toggleTeseMenu();
-    markActiveNivelUI();
-    state.limit = PAGE_SIZE;
-    render();
-  });
-
-  submenuTese?.addEventListener("click", (ev) => {
-    ev.stopPropagation();
-
-    const btn = ev.target.closest(".submenu-item[data-nivel]");
-    if (!btn) return;
-
-    const nivel = String(btn.getAttribute("data-nivel") || "").toLowerCase();
-    if (state.niveis.has(nivel)) state.niveis.delete(nivel);
-    else state.niveis.add(nivel);
-
-    state.tipo = "tese";
-    setActiveChips(tipoWrap, "data-tipo", "tese");
-
-    markActiveNivelUI();
-    state.limit = PAGE_SIZE;
-    render();
-  });
-
   document.addEventListener("click", () => {
     closeYearMenu();
-    closeTeseMenu();
   });
 
   document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape") {
-      closeYearMenu();
-      closeTeseMenu();
-    }
+    if (ev.key === "Escape") closeYearMenu();
   });
-
-  window.addEventListener("resize", () => {
-    if (submenuTese?.classList.contains("is-open")) openTeseMenu();
-  });
-
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (submenuTese?.classList.contains("is-open")) openTeseMenu();
-    },
-    true
-  );
 
   // -------------------------
   // Infinite scroll
@@ -775,7 +686,6 @@ onScroll();
 
     grid.innerHTML = visible.map(cardHTML).join("");
 
-    // favoritos
     grid.querySelectorAll(".fav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const card = btn.closest(".pub-card");
@@ -820,19 +730,24 @@ onScroll();
   tipoWrap?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-tipo]");
     if (!btn) return;
-    if (btn.id === "chipTeseBtn") return;
 
     const tipo = btn.getAttribute("data-tipo") || "all";
     state.tipo = tipo;
 
-    if (tipo !== "tese") {
-      state.niveis.clear();
-      closeTeseMenu();
-      markActiveNivelUI();
-    }
-
     state.limit = PAGE_SIZE;
     setActiveChips(tipoWrap, "data-tipo", state.tipo);
+    render();
+  });
+
+  idiomaWrap?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-idioma]");
+    if (!btn) return;
+
+    const v = btn.getAttribute("data-idioma") || "all";
+    state.idioma = v;
+
+    state.limit = PAGE_SIZE;
+    setActiveChips(idiomaWrap, "data-idioma", state.idioma);
     render();
   });
 
@@ -860,7 +775,7 @@ onScroll();
 
     state.eixos = new Set([eixo]);
     state.tipo = "all";
-    state.niveis.clear();
+    state.idioma = "all";
     state.ano = "all";
     state.q = "";
     state.favOnly = false;
@@ -868,6 +783,8 @@ onScroll();
 
     syncEixoChipsUI();
     setActiveChips(tipoWrap, "data-tipo", "all");
+    setActiveChips(idiomaWrap, "data-idioma", "all");
+
     if (searchEl) searchEl.value = "";
 
     if (favOnlyBtn) {
@@ -884,7 +801,6 @@ onScroll();
     }
 
     closeYearMenu();
-    closeTeseMenu();
     render();
 
     document.getElementById("pubs")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -899,6 +815,7 @@ onScroll();
       populateYears();
       syncEixoChipsUI();
       setActiveChips(tipoWrap, "data-tipo", state.tipo);
+      setActiveChips(idiomaWrap, "data-idioma", state.idioma);
       render();
     } catch (err) {
       console.error("[HUB] Erro ao iniciar:", err);
