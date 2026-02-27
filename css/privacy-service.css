@@ -1,118 +1,326 @@
-/* General Styles */
-body {
-    font-family: 'Roboto', sans-serif;
+/* ============================================
+   NIPSCERN Lab - Modern Legal Pages Stylesheet
+   Color Scheme: Deep Blue & Elegant Gold
+   ============================================ */
+
+/* CSS Variables for consistent theming */
+:root {
+    --primary-blue: #0A2463;
+    --secondary-blue: #1B3A6E;
+    --dark-blue: #051837;
+    --accent-gold: #D4AF37;
+    --light-gold: #F4E5C3;
+    --text-light: #E8EAF6;
+    --text-muted: #B0B8D4;
+    --card-bg: #132B5A;
+    --border-color: rgba(212, 175, 55, 0.2);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* ============================================
+   Global Resets & Base Styles
+   ============================================ */
+* {
     margin: 0;
     padding: 0;
-    background-color: #1c243c; /* Light gray background for a softer look */
-    color: #eecc6e; /* Dark gray text for better readability */
-    line-height: 1.6; /* Improved line height for better text readability */
+    box-sizing: border-box;
 }
 
-
-h1, h2, h3 {
-    color: #eecc6e; /* Bright blue for headers */
-    transition: color 0.3s ease; /* Smooth color transition */
+html {
+    scroll-behavior: smooth;
 }
 
-h1:hover, h2:hover, h3:hover {
-    color: #eb9405; /* Darker blue on hover */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+    color: var(--text-light);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-header {
-    background-color: #2c344c; /* Deep blue for the header */
-    padding: 20px;
+/* ============================================
+   Page Container
+   ============================================ */
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================
+   Header Styles
+   ============================================ */
+.header {
+    background: linear-gradient(180deg, rgba(10, 36, 99, 0.95) 0%, rgba(27, 58, 110, 0.85) 100%);
+    backdrop-filter: blur(10px);
+    padding: 4rem 2rem 3rem;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.banner h1 {
-    font-family: "Roboto Slab", serif;
-    margin: 0;
-    font-size: 2.8rem; /* Larger title */
-    color: #eecc6e; /* White text */
-    animation: fadeIn 1s ease; /* Fade-in animation */
-}
-
-.content {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #2c344c; /* White background for the content area */
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s; /* Animation on hover */
-}
-
-.content:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
-}
-
-.content h2 {
-    font-size: 1.6rem;
-    border-bottom: 2px solid #007bff; /* Underline for subheading */
-    padding-bottom: 10px;
-    margin-top: 20px;
-}
-
-.content h3 {
-    margin-top: 20px;
-    font-size: 1.3rem; /* Slightly larger medium header */
-    transition: transform 0.3s; /* Animation on hover */
-}
-
-.content h3:hover {
-    transform: scale(1.01); /* Scale effect on hover */
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #343a40; /* Dark gray footer background */
-    color: #ffffff; /* White footer text */
     position: relative;
-    bottom: 0;
-    width: 100%;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
 }
 
-/* Responsive Styles */
-@media (max-width: 600px) {
-    .banner h1 {
-        font-size: 2.4rem; /* Adjusted title size for mobile */
-    }
-
-    .content {
-        margin: 20px;
-        padding: 15px; /* Reduced padding for smaller screens */
-    }
-
-    .content h2 {
-        font-size: 1.4rem; /* Adjusted font size for smaller screens */
-    }
-
-    .content h3 {
-        font-size: 1.2rem; /* Adjusted font size for smaller screens */
-    }
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-gold) 0%, var(--light-gold) 50%, var(--accent-gold) 100%);
 }
 
-.back-icon {
-    text-align: center;
-    padding: 20px;
+.header-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.header-badge {
     display: inline-block;
-    margin-top: 1rem;
-    color: #FFD700;
+    background: rgba(212, 175, 55, 0.15);
+    color: var(--accent-gold);
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+    animation: fadeInDown 0.6s ease;
+}
+
+.header-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+    animation: fadeInUp 0.8s ease;
+}
+
+.header-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    animation: fadeInUp 1s ease;
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+.main-content {
+    flex: 1;
+    padding: 3rem 2rem;
+}
+
+.content-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   Update Info Badge
+   ============================================ */
+.update-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(19, 43, 90, 0.6);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    animation: fadeIn 1.2s ease;
+}
+
+.update-info i {
+    color: var(--accent-gold);
+}
+
+/* ============================================
+   Intro Section
+   ============================================ */
+.intro-section {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 3rem;
+    box-shadow: var(--shadow-sm);
+    animation: fadeIn 1.4s ease;
+}
+
+.intro-section p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-light);
+    margin: 0;
+}
+
+/* ============================================
+   Terms Grid (Cards Layout)
+   ============================================ */
+.terms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.term-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease backwards;
+}
+
+.term-card:nth-child(1) { animation-delay: 0.1s; }
+.term-card:nth-child(2) { animation-delay: 0.2s; }
+.term-card:nth-child(3) { animation-delay: 0.3s; }
+.term-card:nth-child(4) { animation-delay: 0.4s; }
+.term-card:nth-child(5) { animation-delay: 0.5s; }
+.term-card:nth-child(6) { animation-delay: 0.6s; }
+.term-card:nth-child(7) { animation-delay: 0.7s; }
+
+.term-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-gold), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.term-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-gold);
+}
+
+.term-card:hover::before {
+    opacity: 1;
+}
+
+.term-number {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--light-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.term-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.term-content {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ============================================
+   Contact Link
+   ============================================ */
+.contact-link {
+    color: var(--accent-gold);
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.contact-link:hover {
+    border-bottom-color: var(--accent-gold);
+}
+
+/* ============================================
+   Back Link
+   ============================================ */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--accent-gold);
     text-decoration: none;
     font-size: 1rem;
-    transition: transform 0.3s, color 0.3s; /* Add transition for transform and color */
+    font-weight: 500;
+    padding: 1rem 2rem;
+    background: rgba(19, 43, 90, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    animation: fadeIn 1.6s ease;
 }
 
-.back-icon:hover {
-    color: #FAF0DC;
+.back-link:hover {
+    background: var(--card-bg);
+    border-color: var(--accent-gold);
     transform: translateX(-5px);
 }
 
-/* Animations */
+.back-link i {
+    transition: transform 0.3s ease;
+}
+
+.back-link:hover i {
+    transform: translateX(-3px);
+}
+
+/* ============================================
+   Custom Scrollbar
+   ============================================ */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dark-blue);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--accent-gold) 0%, var(--secondary-blue) 100%);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-gold);
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-gold) var(--dark-blue);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -122,33 +330,120 @@ footer {
     }
 }
 
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-/* Custom Scrollbar Styles */
- ::-webkit-scrollbar {
-     width: 12px;
-    /* Width of the scrollbar */
-     height: 12px;
-    /* Height of the scrollbar */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
- ::-webkit-scrollbar-thumb {
-     background-color: #960018;
-    /* Carmesin red for the thumb */
-    /* Rounded corners for the thumb */
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+    .header {
+        padding: 3rem 1.5rem 2rem;
+    }
+
+    .header-title {
+        font-size: 2rem;
+    }
+
+    .header-subtitle {
+        font-size: 1rem;
+    }
+
+    .main-content {
+        padding: 2rem 1rem;
+    }
+
+    .terms-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .intro-section {
+        padding: 1.5rem;
+    }
+
+    .intro-section p {
+        font-size: 1rem;
+    }
+
+    .term-card {
+        padding: 1.5rem;
+    }
+
+    .term-number {
+        font-size: 2.5rem;
+    }
+
+    .term-title {
+        font-size: 1.15rem;
+    }
+
+    .term-content {
+        font-size: 0.9rem;
+    }
+
+    .back-link {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.95rem;
+    }
 }
- ::-webkit-scrollbar-track {
-     background: rgba(255, 255, 255, 0.2);
-    /* Light background for the track */
-     border-radius: 6px;
-    /* Rounded corners for the track */
+
+@media (max-width: 480px) {
+    .header-title {
+        font-size: 1.75rem;
+    }
+
+    .header-badge {
+        font-size: 0.7rem;
+        padding: 0.4rem 1.2rem;
+    }
+
+    .update-info {
+        font-size: 0.85rem;
+        padding: 0.625rem 1.25rem;
+    }
+
+    .terms-grid {
+        gap: 1rem;
+    }
 }
- ::-webkit-scrollbar-thumb:hover {
-     background-color: #b22222;
-    /* Darker shade on hover */
-}
-/* Firefox scrollbar styles */
- * {
-     scrollbar-width: thin;
-    /* Thin scrollbar */
-     scrollbar-color: #2c344c rgba(255, 255, 255, 0.2);
-    /* Thumb and track colors */
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+
+    .header::before,
+    .back-link,
+    .header-badge {
+        display: none;
+    }
+
+    .term-card {
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+    }
 }

@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CGV Web | Documentação Técnica Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/icon_cgv.svg">
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --bg:        #040810;
+  --bg2:       #080d18;
+  --bg3:       #0d1525;
+  --bg4:       #111b2e;
+  --border:    #1a2540;
+  --border2:   #253358;
+  --text:      #9daec8;
+  --text2:     #c4d4ec;
+  --text3:     #e8f0fc;
+  --muted:     #3d5070;
+  --tile:      #f59e0b;
+  --tile2:     rgba(245,158,11,.12);
+  --hec:       #60a5fa;
+  --hec2:      rgba(96,165,250,.12);
+  --larb:      #4ade80;
+  --larb2:     rgba(74,222,128,.12);
+  --lare:      #f87171;
+  --lare2:     rgba(248,113,113,.12);
+  --acc:       #818cf8;
+  --acc2:      rgba(129,140,248,.12);
+  --wasm:      #e879f9;
+  --wasm2:     rgba(232,121,249,.12);
+  --gpu:       #fb923c;
+  --gpu2:      rgba(251,146,60,.12);
+  --ok:        #34d399;
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'Sora', sans-serif;
+  --body:      'DM Sans', sans-serif;
+  --r-sm:      5px;
+  --r-md:      8px;
+  --r-lg:      12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 15px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  line-height: 1.7;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════ */
+#sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 0 0 40px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.sb-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.sb-logo-title {
+  font-family: var(--sans);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text3);
+  letter-spacing: .02em;
+}
+.sb-logo-sub {
+  font-size: .72rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.sb-group-label {
+  font-size: .67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  padding: 14px 20px 6px;
+}
+.sb-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 20px;
+  font-size: .82rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 0;
+  transition: background .15s, color .15s;
+}
+.sb-link:hover { background: var(--bg3); color: var(--text3); }
+.sb-link.active { background: var(--acc2); color: var(--acc); border-left: 2px solid var(--acc); }
+.sb-link .material-icons-round { font-size: 15px; opacity: .7; flex-shrink: 0; }
+.sb-badge {
+  margin-left: auto;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: .65rem;
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+/* ═══════════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════════ */
+#main {
+  overflow-x: hidden;
+  padding: 0 0 80px;
+}
+
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero {
+  padding: 56px 56px 40px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--bg) 60%, #0a1030 100%);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 360px; height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129,140,248,.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--acc2);
+  border: 1px solid rgba(129,140,248,.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-family: var(--sans);
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--acc);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-bottom: 18px;
+}
+.hero h1 {
+  font-family: var(--sans);
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--text3);
+  line-height: 1.18;
+  margin-bottom: 14px;
+  max-width: 700px;
+}
+.hero-desc {
+  font-size: .95rem;
+  color: var(--text);
+  max-width: 620px;
+  line-height: 1.75;
+}
+.hero-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.hero-tag {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 10px;
+  font-family: var(--mono);
+  font-size: .72rem;
+  color: var(--muted);
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION LAYOUT
+═══════════════════════════════════════════════ */
+.section {
+  padding: 48px 56px;
+  border-bottom: 1px solid var(--border);
+}
+.section:last-child { border-bottom: none; }
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.section-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.si-html  { background: rgba(248,113,113,.12); color: #f87171; }
+.si-js    { background: rgba(245,198,11,.12);  color: #f5c60b; }
+.si-rust  { background: rgba(251,146,60,.12);  color: #fb923c; }
+.si-wasm  { background: rgba(232,121,249,.12); color: #e879f9; }
+.si-gpu   { background: rgba(96,165,250,.12);  color: #60a5fa; }
+.si-flow  { background: rgba(129,140,248,.12); color: #818cf8; }
+.si-geo   { background: rgba(74,222,128,.12);  color: #4ade80; }
+.si-filt  { background: rgba(245,158,11,.12);  color: #f59e0b; }
+
+.section-icon .material-icons-round { font-size: 19px; }
+
+.section-title-block {}
+.step-label {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+h2 {
+  font-family: var(--sans);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text3);
+  line-height: 1.25;
+}
+h3 {
+  font-family: var(--sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin: 24px 0 10px;
+}
+h4 {
+  font-family: var(--sans);
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin: 16px 0 8px;
+}
+p { margin-bottom: 12px; font-size: .9rem; }
+
+/* ═══════════════════════════════════════════════
+   CODE BLOCKS
+═══════════════════════════════════════════════ */
+.code-wrap {
+  background: #020508;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin: 14px 0;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: .72rem;
+  color: var(--muted);
+}
+.code-lang {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 7px;
+  font-size: .65rem;
+  margin-left: auto;
+}
+.lang-rust { color: #fb923c; }
+.lang-js   { color: #f5c60b; }
+.lang-html { color: #f87171; }
+.lang-glsl { color: #818cf8; }
+.lang-xml  { color: #34d399; }
+pre {
+  padding: 18px 20px;
+  font-family: var(--mono);
+  font-size: .79rem;
+  line-height: 1.85;
+  overflow-x: auto;
+  color: #7a9ec8;
+  white-space: pre;
+}
+/* syntax tokens */
+.k  { color: #c792ea; }
+.fn { color: #82aaff; }
+.n  { color: #f78c6c; }
+.s  { color: #c3e88d; }
+.c  { color: #3d5270; font-style: italic; }
+.hi { color: #ffcb6b; }
+.t  { color: #89ddff; }
+.str{ color: #c3e88d; }
+
+code {
+  font-family: var(--mono);
+  font-size: .83em;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 6px;
+  color: #89ddff;
+}
+
+/* ═══════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════ */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  margin: 12px 0;
+}
+.card.tile { border-left: 3px solid var(--tile); }
+.card.hec  { border-left: 3px solid var(--hec); }
+.card.larb { border-left: 3px solid var(--larb); }
+.card.lare { border-left: 3px solid var(--lare); }
+.card.acc  { border-left: 3px solid var(--acc); }
+.card.wasm { border-left: 3px solid var(--wasm); }
+.card.gpu  { border-left: 3px solid var(--gpu); }
+
+/* ═══════════════════════════════════════════════
+   GRID
+═══════════════════════════════════════════════ */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 12px 0; }
+@media(max-width:900px) { .grid2,.grid3 { grid-template-columns: 1fr; } body { grid-template-columns: 1fr; } #sidebar { display:none; } }
+
+/* ═══════════════════════════════════════════════
+   STATE SNAPSHOT PANELS
+═══════════════════════════════════════════════ */
+.snapshot {
+  background: #020610;
+  border: 1px solid var(--border2);
+  border-radius: var(--r-lg);
+  margin: 18px 0;
+  overflow: hidden;
+}
+.snapshot-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--sans);
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--ok);
+}
+.snapshot-header .material-icons-round { font-size: 15px; }
+.snapshot-body {
+  padding: 16px 20px;
+  font-family: var(--mono);
+  font-size: .78rem;
+  line-height: 2;
+}
+.snap-row {
+  display: flex;
+  gap: 12px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(26,37,64,.5);
+}
+.snap-row:last-child { border-bottom: none; }
+.snap-key {
+  color: var(--muted);
+  min-width: 200px;
+  flex-shrink: 0;
+}
+.snap-val { color: #ffcb6b; }
+.snap-note { color: var(--muted); font-size: .72rem; margin-left: 8px; font-style: italic; }
+
+/* ═══════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════ */
+.tab-bar {
+  display: flex;
+  gap: 3px;
+  margin-bottom: -1px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.tab-btn {
+  font-family: var(--sans);
+  font-size: .8rem;
+  font-weight: 600;
+  padding: 8px 18px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all .15s;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--text3); background: var(--bg2); border-top: 2px solid var(--acc); }
+.tab-btn.t-tile.active { border-top-color: var(--tile); color: var(--tile); }
+.tab-btn.t-hec.active  { border-top-color: var(--hec);  color: var(--hec); }
+.tab-btn.t-larb.active { border-top-color: var(--larb); color: var(--larb); }
+.tab-btn.t-lare.active { border-top-color: var(--lare); color: var(--lare); }
+.tab-pane {
+  display: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 0 var(--r-lg) var(--r-lg) var(--r-lg);
+  padding: 24px;
+}
+.tab-pane.active { display: block; }
+
+/* ═══════════════════════════════════════════════
+   MATRIX DISPLAY
+═══════════════════════════════════════════════ */
+.matrix-wrap {
+  background: #020508;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  margin: 12px 0;
+  font-family: var(--mono);
+  font-size: .77rem;
+  overflow-x: auto;
+}
+.matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px 8px;
+  max-width: 500px;
+}
+.matrix-cell { color: #c0d4f0; text-align: right; padding: 3px 0; }
+.matrix-cell.col0 { color: #82aaff; }
+.matrix-cell.col1 { color: #c3e88d; }
+.matrix-cell.col2 { color: #f78c6c; }
+.matrix-cell.col3 { color: #ffcb6b; }
+.matrix-label { color: var(--muted); font-size: .7rem; margin-bottom: 8px; }
+
+/* ═══════════════════════════════════════════════
+   PIPELINE FLOW
+═══════════════════════════════════════════════ */
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  margin: 18px 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+}
+.pipe-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--mono);
+  font-size: .73rem;
+  color: var(--text2);
+  text-align: center;
+  min-width: 90px;
+}
+.pipe-step .ps-label { color: var(--muted); font-size: .63rem; margin-top: 2px; }
+.pipe-arrow {
+  color: var(--muted);
+  font-size: 1.2rem;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   DEFINITION LIST
+═══════════════════════════════════════════════ */
+.def-list { margin: 10px 0; }
+.def-item {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .87rem;
+}
+.def-item:last-child { border-bottom: none; }
+.def-term {
+  font-family: var(--mono);
+  color: #89ddff;
+  font-size: .82rem;
+  padding-top: 1px;
+}
+.def-desc { color: var(--text); }
+
+/* ═══════════════════════════════════════════════
+   TABLE
+═══════════════════════════════════════════════ */
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: .82rem; }
+th {
+  background: var(--bg3);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: .69rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  font-family: var(--mono);
+  font-size: .78rem;
+  color: var(--text);
+}
+tr:hover td { background: var(--bg3); }
+td.td-tile { color: var(--tile); }
+td.td-hec  { color: var(--hec); }
+td.td-larb { color: var(--larb); }
+td.td-lare { color: var(--lare); }
+td.td-txt  { font-family: var(--body); font-size: .82rem; }
+
+/* ═══════════════════════════════════════════════
+   INFO / WARN BOXES
+═══════════════════════════════════════════════ */
+.info { background:var(--acc2); border:1px solid rgba(129,140,248,.25); border-radius:var(--r-md); padding:12px 16px; margin:12px 0; font-size:.87rem; }
+.warn { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.25); border-radius:var(--r-md); padding:12px 16px; margin:12px 0; font-size:.87rem; }
+.ok   { background:rgba(52,211,153,.08); border:1px solid rgba(52,211,153,.25); border-radius:var(--r-md); padding:12px 16px; margin:12px 0; font-size:.87rem; }
+
+/* ═══════════════════════════════════════════════
+   MATH BLOCK
+═══════════════════════════════════════════════ */
+.math {
+  background: #020508;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 18px;
+  margin: 10px 0;
+  font-family: var(--mono);
+  font-size: .8rem;
+  line-height: 2.1;
+}
+.math .ml { color: var(--muted); display: inline-block; min-width: 220px; }
+.math .mv { color: #ffcb6b; font-weight: 500; }
+.math .mc { color: var(--muted); font-size: .72rem; }
+
+/* ═══════════════════════════════════════════════
+   XML BLOCK
+═══════════════════════════════════════════════ */
+.xml-block {
+  background: #020508;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  font-family: var(--mono);
+  font-size: .8rem;
+  line-height: 2.1;
+  margin: 14px 0;
+}
+.xt { color: #89ddff; }
+.xa { color: #c792ea; }
+.xv { color: #c3e88d; }
+.xc { color: var(--muted); font-style: italic; }
+.xv-tile { color: var(--tile); }
+.xv-hec  { color: var(--hec); }
+.xv-larb { color: var(--larb); }
+.xv-lare { color: var(--lare); }
+
+/* ═══════════════════════════════════════════════
+   BADGE
+═══════════════════════════════════════════════ */
+.badge {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: .65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-right: 5px;
+}
+.badge.tile { background:var(--tile2); color:var(--tile); border:1px solid rgba(245,158,11,.3); }
+.badge.hec  { background:var(--hec2);  color:var(--hec);  border:1px solid rgba(96,165,250,.3); }
+.badge.larb { background:var(--larb2); color:var(--larb); border:1px solid rgba(74,222,128,.3); }
+.badge.lare { background:var(--lare2); color:var(--lare); border:1px solid rgba(248,113,113,.3); }
+.badge.wasm { background:var(--wasm2); color:var(--wasm); border:1px solid rgba(232,121,249,.3); }
+.badge.gpu  { background:var(--gpu2);  color:var(--gpu);  border:1px solid rgba(251,146,60,.3); }
+.badge.acc  { background:var(--acc2);  color:var(--acc);  border:1px solid rgba(129,140,248,.3); }
+.badge.js   { background:rgba(245,198,11,.12); color:#f5c60b; border:1px solid rgba(245,198,11,.3); }
+.badge.html { background:rgba(248,113,113,.12); color:#f87171; border:1px solid rgba(248,113,113,.3); }
+
+/* ═══════════════════════════════════════════════
+   FILE TAG
+═══════════════════════════════════════════════ */
+.file-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  padding: 2px 9px;
+  font-family: var(--mono);
+  font-size: .73rem;
+  color: var(--text2);
+  margin: 0 3px;
+}
+
+/* ═══════════════════════════════════════════════
+   RESULT ROW
+═══════════════════════════════════════════════ */
+.result-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.result-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: .75rem;
+}
+.result-box .rb-label { color: var(--muted); font-size: .68rem; display: block; }
+.result-box .rb-val   { color: #ffcb6b; font-size: .88rem; font-weight: 500; }
+
+/* ═══════════════════════════════════════════════
+   CHECKPOINT
+═══════════════════════════════════════════════ */
+.checkpoint {
+  background: linear-gradient(135deg, rgba(52,211,153,.06) 0%, transparent 60%);
+  border: 1px solid rgba(52,211,153,.2);
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  margin: 24px 0;
+}
+.checkpoint-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--ok);
+  margin-bottom: 12px;
+}
+.checkpoint-title .material-icons-round { font-size: 18px; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-title">CGV Web</div>
+    <div class="sb-logo-sub">Documentação Técnica Completa</div>
+  </div>
+
+  <div class="sb-group-label">Visão Geral</div>
+  <a href="#arch"     class="sb-link"><span class="material-icons-round">account_tree</span>Arquitetura</a>
+  <a href="#xml-ref"  class="sb-link"><span class="material-icons-round">data_object</span>XML de Referência</a>
+  <a href="#coords"   class="sb-link"><span class="material-icons-round">360</span>Coordenadas</a>
+
+  <div class="sb-group-label">Fluxo do Usuário</div>
+  <a href="#step0" class="sb-link"><span class="material-icons-round">html</span>index.html carrega<span class="sb-badge">0</span></a>
+  <a href="#step1" class="sb-link"><span class="material-icons-round">settings</span>Three.js / WASM init<span class="sb-badge">1</span></a>
+  <a href="#step2" class="sb-link"><span class="material-icons-round">folder_open</span>Usuário carrega XML<span class="sb-badge">2</span></a>
+  <a href="#step3" class="sb-link"><span class="material-icons-round">memory</span>WASM processa<span class="sb-badge">3</span></a>
+  <a href="#step4" class="sb-link"><span class="material-icons-round">view_in_ar</span>buildMesh()<span class="sb-badge">4</span></a>
+  <a href="#step5" class="sb-link"><span class="material-icons-round">developer_board</span>Shaders / GPU<span class="sb-badge">5</span></a>
+  <a href="#step6" class="sb-link"><span class="material-icons-round">loop</span>Render loop<span class="sb-badge">6</span></a>
+  <a href="#step7" class="sb-link"><span class="material-icons-round">touch_app</span>Interação / Hover<span class="sb-badge">7</span></a>
+
+  <div class="sb-group-label">Geometria</div>
+  <a href="#layers"   class="sb-link"><span class="material-icons-round">layers</span>26 Camadas</a>
+  <a href="#geo-tile" class="sb-link"><span class="material-icons-round">grid_on</span>Tile — tabela Z</a>
+  <a href="#geo-hec"  class="sb-link"><span class="material-icons-round">grid_on</span>HEC — tabela R</a>
+  <a href="#geo-larb" class="sb-link"><span class="material-icons-round">grid_on</span>LAr Barril — sinh</a>
+  <a href="#geo-lare" class="sb-link"><span class="material-icons-round">grid_on</span>LAr Tampa — inv.</a>
+  <a href="#matrix"   class="sb-link"><span class="material-icons-round">table_chart</span>Matriz 4×4</a>
+
+  <div class="sb-group-label">Filtros</div>
+  <a href="#extras"   class="sb-link"><span class="material-icons-round">widgets</span>Funcionalidades extras</a>
+  <a href="#filters"  class="sb-link"><span class="material-icons-round">filter_alt</span>Filtros em tempo real</a>
+  <a href="#postfx"   class="sb-link"><span class="material-icons-round">blur_on</span>Pós-processamento</a>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-pill">
+    <span class="material-icons-round" style="font-size:13px">science</span>
+    NIPSCERN Lab × ATLAS / CERN
+  </div>
+  <h1>CGV Web — Documentação Técnica Completa</h1>
+  <p class="hero-desc">
+    Guia passo a passo de todo o sistema: desde o carregamento do site no browser até a célula 3D renderizada na tela pela GPU. Cobre <strong>index.html</strong>, <strong>main.js</strong> e <strong>lib.rs</strong> (WASM), com um XML de referência mínimo que acompanha todo o fluxo com valores numéricos reais.
+  </p>
+  <div class="hero-tags">
+    <span class="hero-tag">index.html</span>
+    <span class="hero-tag">main.js</span>
+    <span class="hero-tag">lib.rs → cgv_web.wasm</span>
+    <span class="hero-tag">Three.js r160</span>
+    <span class="hero-tag">WebGL 2.0</span>
+    <span class="hero-tag">GLSL shaders</span>
+    <span class="hero-tag">InstancedMesh</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     ARCHITECTURE
+═══════════════════════════════════════════════ -->
+<section class="section" id="arch">
+  <div class="section-header">
+    <div class="section-icon si-flow"><span class="material-icons-round">account_tree</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Visão Geral</div>
+      <h2>Arquitetura do Sistema</h2>
+    </div>
+  </div>
+
+  <p>O CGV Web é composto por três responsabilidades claramente separadas. Cada arquivo tem um papel distinto e elas se comunicam por interfaces bem definidas.</p>
+
+  <div class="grid3">
+    <div class="card html" style="border-left-color:#f87171">
+      <h4 style="color:#f87171"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">html</span> index.html</h4>
+      <p style="font-size:.83rem">Define a estrutura visual da interface. Declara o <code>&lt;canvas&gt;</code> onde Three.js renderiza, o painel HUD, o drop zone de arquivos, tooltips, modais e controles. Não contém lógica — apenas estrutura semântica + referências a IDs que <code>main.js</code> usa.</p>
+    </div>
+    <div class="card js" style="border-left-color:#f5c60b">
+      <h4 style="color:#f5c60b"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">javascript</span> main.js</h4>
+      <p style="font-size:.83rem">Orquestra todo o sistema. Inicializa Three.js (renderer, scene, camera, post-processing, controles), recebe o XML do usuário, chama o WASM, constrói o <code>InstancedMesh</code>, gerencia filtros, raycasting, slider de energia e o loop de render.</p>
+    </div>
+    <div class="card wasm">
+      <h4 style="color:#e879f9"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">memory</span> lib.rs → cgv_web.wasm</h4>
+      <p style="font-size:.83rem">Código Rust compilado para WebAssembly. Parseia o XML, aplica toda a geometria física (tabelas de posição, fórmula sinh), gera as matrizes 4×4 e os arrays de cor. É chamado uma única vez por evento. Não toca o DOM nem o Three.js.</p>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipe-step" style="border-color:#f87171;color:#f87171">index.html<div class="ps-label">DOM + HUD</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="border-color:#f5c60b;color:#f5c60b">main.js<div class="ps-label">Orquestrador</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="border-color:#e879f9;color:#e879f9">cgv_web.wasm<div class="ps-label">Geometria</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="border-color:#fb923c;color:#fb923c">Float32Arrays<div class="ps-label">Dados da GPU</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="border-color:#60a5fa;color:#60a5fa">Three.js<div class="ps-label">InstancedMesh</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="border-color:#818cf8;color:#818cf8">WebGL / GPU<div class="ps-label">Renderização</div></div>
+  </div>
+
+  <h3>Por que WASM para a geometria?</h3>
+  <p>JavaScript não é adequado para processar loops pesados sobre milhares de células com aritmética de ponto flutuante dupla. Rust compilado para WASM executa como bytecode nativo do browser, sem GC pauses, tipagem forte, e com vetorização SIMD quando disponível. O resultado é tipicamente 5–20× mais rápido que JavaScript equivalente para este tipo de workload.</p>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     XML DE REFERÊNCIA
+═══════════════════════════════════════════════ -->
+<section class="section" id="xml-ref">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(52,211,153,.12);color:#34d399"><span class="material-icons-round">data_object</span></div>
+    <div class="section-title-block">
+      <div class="step-label">XML Mínimo</div>
+      <h2>XML de Referência — uma célula por detector</h2>
+    </div>
+  </div>
+
+  <p>Usaremos este XML ao longo de toda a documentação para rastrear valores reais em cada etapa. Contém exatamente quatro células — uma em cada subdetector.</p>
+
+  <div class="xml-block">
+<span class="xt">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="xt">&lt;calorimeter</span> <span class="xa">run=</span><span class="xv">"450001"</span> <span class="xa">event=</span><span class="xv">"1234"</span> <span class="xa">date=</span><span class="xv">"2024-07-04"</span><span class="xt">&gt;</span>
+
+  <span class="xc">&lt;!-- Célula 1: Tile Barril camada A — hadrônico central --&gt;</span>
+  <span class="xt">&lt;cell</span> <span class="xa">l=</span><span class="xv-tile">"0"</span> <span class="xa">eta=</span><span class="xv-tile">"2"</span> <span class="xa">phi=</span><span class="xv-tile">"5"</span> <span class="xa">e=</span><span class="xv-tile">"1500.0"</span> <span class="xt">/&gt;</span>
+
+  <span class="xc">&lt;!-- Célula 2: HEC camada 0 — hadrônico tampa --&gt;</span>
+  <span class="xt">&lt;cell</span> <span class="xa">l=</span><span class="xv-hec">"14"</span> <span class="xa">eta=</span><span class="xv-hec">"3"</span> <span class="xa">phi=</span><span class="xv-hec">"10"</span> <span class="xa">e=</span><span class="xv-hec">"3000.0"</span> <span class="xt">/&gt;</span>
+
+  <span class="xc">&lt;!-- Célula 3: LAr EM Barril camada 2 — eletromagnético barril --&gt;</span>
+  <span class="xt">&lt;cell</span> <span class="xa">l=</span><span class="xv-larb">"20"</span> <span class="xa">eta=</span><span class="xv-larb">"20"</span> <span class="xa">phi=</span><span class="xv-larb">"8"</span> <span class="xa">e=</span><span class="xv-larb">"800.0"</span> <span class="xt">/&gt;</span>
+
+  <span class="xc">&lt;!-- Célula 4: LAr EM Tampa camada 1 — eletromagnético tampa --&gt;</span>
+  <span class="xt">&lt;cell</span> <span class="xa">l=</span><span class="xv-lare">"23"</span> <span class="xa">eta=</span><span class="xv-lare">"20"</span> <span class="xa">phi=</span><span class="xv-lare">"12"</span> <span class="xa">e=</span><span class="xv-lare">"2200.0"</span> <span class="xt">/&gt;</span>
+
+<span class="xt">&lt;/calorimeter&gt;</span>
+  </div>
+
+  <h3>Os 4 atributos de cada &lt;cell&gt;</h3>
+  <div class="def-list">
+    <div class="def-item">
+      <span class="def-term">l  (layer)</span>
+      <span class="def-desc"><strong>Índice inteiro da camada lógica</strong>, 0 a 25. Mapeia diretamente para uma entrada em <code>build_layer_table()</code>. Determina qual subdetector, qual raio/Z-range, e quantas fatias de phi a célula tem.</span>
+    </div>
+    <div class="def-item">
+      <span class="def-term">eta</span>
+      <span class="def-desc"><strong>Índice inteiro de pseudorapidez</strong> — não é o valor físico de η diretamente. Por que índice e não valor real? Porque inteiros são chaves de HashMap muito mais eficientes. O valor físico de η é calculado por funções de lookup (<code>laba_eta</code>, <code>laeb_eta</code> etc.) a partir deste índice. Negativo = célula no lado C (Z negativo).</span>
+    </div>
+    <div class="def-item">
+      <span class="def-term">phi</span>
+      <span class="def-desc"><strong>Índice inteiro da fatia azimutal</strong>, de 0 até <code>phi_seg−1</code>. Assim como eta, é um índice. O ângulo real φ (em radianos) é calculado por <code>phi_center(phi_idx, phi_seg)</code>. O número de fatias depende da camada: 8, 64 ou 256.</span>
+    </div>
+    <div class="def-item">
+      <span class="def-term">e  (energy)</span>
+      <span class="def-desc"><strong>Energia depositada em MeV</strong>. Valor f64. Pode ser negativo (flutuações eletrônicas). O código ignora células com e ≤ 0.0. Se duas tags &lt;cell&gt; tiverem os mesmos (l, eta, phi), as energias são somadas — cada colisão pode ter múltiplas deposições na mesma célula.</span>
+    </div>
+  </div>
+
+  <div class="info">
+    <strong>Por que usar índices (l, eta, phi) em vez dos valores físicos como chave?</strong><br>
+    Três inteiros formam uma chave de HashMap muito mais eficiente que três floats. Comparar dois inteiros é O(1) sem risco de imprecisão de ponto flutuante. Além disso, os índices são o que o sistema de aquisição de dados do ATLAS efetivamente transmite — o mapeamento para posição física é responsabilidade do software de reconstrução (e do nosso WASM).
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     COORDENADAS
+═══════════════════════════════════════════════ -->
+<section class="section" id="coords">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(129,140,248,.12);color:#818cf8"><span class="material-icons-round">360</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Fundamentos</div>
+      <h2>Sistema de Coordenadas do ATLAS</h2>
+    </div>
+  </div>
+
+  <p>O ATLAS usa coordenadas cilíndricas alinhadas com o feixe de prótons. Entender este sistema é pré-requisito para toda a geometria que vem depois.</p>
+
+  <div class="grid2">
+    <div>
+      <h3>Eixos fundamentais</h3>
+      <div class="def-list">
+        <div class="def-item">
+          <span class="def-term">Z — eixo do feixe</span>
+          <span class="def-desc">Posição ao longo do feixe. Z = 0 é o ponto de interação (IP). Células com eta positivo ficam em Z positivo (lado A); eta negativo fica em Z negativo (lado C). Range: de −6050 mm a +6050 mm no calorímetro.</span>
+        </div>
+        <div class="def-item">
+          <span class="def-term">R — raio transversal</span>
+          <span class="def-desc">Distância do eixo Z. Mede o "quanto a célula está longe do feixe". O LAr começa em R ≈ 1422 mm; o Tile termina em R ≈ 3820 mm. No plano X-Y: R = √(x² + y²).</span>
+        </div>
+        <div class="def-item">
+          <span class="def-term">φ — ângulo azimutal</span>
+          <span class="def-desc">Ângulo no plano X-Y, de 0 a 2π. O detector é dividido em fatias iguais de φ (8, 64 ou 256 dependendo da camada). <strong>phi_idx</strong> é o índice da fatia; <code>phi_center()</code> converte para radianos.</span>
+        </div>
+        <div class="def-item">
+          <span class="def-term">η — pseudorapidez</span>
+          <span class="def-desc">η = −ln[tan(θ/2)], onde θ é o ângulo polar (entre a trajetória e o eixo Z). η = 0 aponta perpendicular ao feixe; η → ∞ é paralelo ao feixe. Importante: <strong>diferenças Δη são invariantes por boost de Lorentz</strong> ao longo de Z, tornando η ideal para física de colisores.</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Conversão polar → cartesiano</h3>
+      <p style="font-size:.84rem">O código usa a convenção ATLAS com offset de π/2 em φ:</p>
+      <div class="math">
+        <span class="ml">cx = −R · sin(φ)</span><span class="mc">← eixo X cartesiano</span><br>
+        <span class="ml">cy =  R · cos(φ)</span><span class="mc">← eixo Y cartesiano</span><br>
+        <span class="ml">cz =  z_sign · Z</span><span class="mc">← eixo do feixe</span>
+      </div>
+      <div class="warn" style="margin-top:10px">
+        <strong>Nota sobre o sinal:</strong> a fórmula padrão seria x = R·cos(φ) e y = R·sin(φ). O código usa −sin e cos (equivalente a rotação de 90°) para que o sistema Three.js fique orientado com φ=0 apontando para +Y, consistente com o offset +π/2 em <code>phi_center()</code>. O resultado 3D final é correto.
+      </div>
+
+      <h3>A fórmula fundamental</h3>
+      <div class="math">
+        <span class="ml">z = R · sinh(η)</span><span class="mc">← relação exata, não linear</span><br>
+        <span class="ml">sinh(η) = (eᵑ − e⁻ᵑ) / 2</span><br>
+        <span class="ml">r_perp = z / sinh(η)</span><span class="mc">← forma inversa</span>
+      </div>
+      <p style="font-size:.83rem">Esta fórmula vem da definição de η. É usada no LAr Barril (calcular Z a partir de η e R fixo) e invertida na LAr Tampa (calcular R a partir de Z fixo e η).</p>
+    </div>
+  </div>
+
+  <h3>Referência de imagem — diagrama R-Z do ATLAS</h3>
+  <p style="font-size:.85rem">A imagem abaixo mostra o corte longitudinal do detector ATLAS com os subdetectores marcados. As células do XML de referência ficam nas regiões coloridas.</p>
+  <img src="https://cds.cern.ch/record/2837191/files/ATLAS-Experiment-Schematic-2022-NoLabels-People.png?subformat=icon-1440"
+       alt="Seção transversal do detector ATLAS mostrando TileCal, HEC e LAr EM"
+       style="width:100%;max-width:700px;border-radius:var(--r-lg);border:1px solid var(--border);margin:12px 0;display:block"
+       onerror="this.style.display='none'">
+
+  <h3>cx, cy, cz, sx, sy, sz — o que cada variável significa</h3>
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">cx, cy, cz</span><span class="def-desc"><strong>Centro da célula</strong> em coordenadas cartesianas 3D, em milímetros (antes de scale×0.001) ou metros (depois). Estes são os valores que vão na coluna de translação da matriz 4×4.</span></div>
+    <div class="def-item"><span class="def-term">sx</span><span class="def-desc"><strong>Semi-extensão radial</strong> (metade da espessura em R). Para o Tile, sx = dr/2 = (h2−h1)/2. Define o tamanho da caixa na direção do raio.</span></div>
+    <div class="def-item"><span class="def-term">sy</span><span class="def-desc"><strong>Semi-extensão em φ</strong> (largura azimutal da célula). Calculada como sy = R · dphi / 2, onde dphi = 2π / phi_seg. É o arco da fatia no raio médio da célula.</span></div>
+    <div class="def-item"><span class="def-term">sz</span><span class="def-desc"><strong>Semi-extensão em Z</strong> (metade da espessura ao longo do feixe). Para o Tile e HEC vem das tabelas; para o LAr é calculada por dz = R · cosh(η) · dη / 2.</span></div>
+  </div>
+</section>
+
+<!-- ═══ STEP 0: index.html ═══ -->
+<section class="section" id="step0">
+  <div class="section-header">
+    <div class="section-icon si-html"><span class="material-icons-round">html</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Passo 0 — Arquivo: index.html</div>
+      <h2>Browser carrega index.html</h2>
+    </div>
+  </div>
+  <p>Quando o usuário abre a URL, o browser analisa o HTML e constrói a árvore DOM. Nenhum JavaScript executou ainda.</p>
+
+  <h3>Elementos DOM chave declarados no HTML</h3>
+  <table>
+    <thead><tr><th>ID no HTML</th><th>Elemento</th><th class="td-txt">Propósito</th></tr></thead>
+    <tbody>
+      <tr><td><code>gl-canvas</code></td><td><code>&lt;canvas&gt;</code></td><td class="td-txt">Surface WebGL onde Three.js renderiza tudo. Posicionado com CSS <code>position:fixed</code> cobrindo toda a janela. É o único elemento de desenho — toda a cena 3D vai aqui.</td></tr>
+      <tr><td><code>drop-zone</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Overlay visível antes de carregar dados. Contém os botões "Browse XML File" e "Load Sample Event". Hidden via CSS após arquivo carregado.</td></tr>
+      <tr><td><code>file-input</code></td><td><code>&lt;input type="file"&gt;</code></td><td class="td-txt">Input de arquivo oculto (<code>aria-hidden="true"</code>). Quando o usuário clica em "Browse", <code>main.js</code> chama <code>fileInput.click()</code> programaticamente para abrir o seletor de arquivos nativo.</td></tr>
+      <tr><td><code>ghost-lbl</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Label flutuante exibido sobre a ghost geometry antes dos dados serem carregados. Indica ao usuário que aquela geometria translúcida é apenas uma referência visual dos volumes do detector.</td></tr>
+      <tr><td><code>loading-bar</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Barra de progresso com label e fill. <code>loading-label</code> mostra texto ("Computing geometry…") e <code>loading-fill</code> é animado via CSS width para indicar progresso 0–100%.</td></tr>
+      <tr><td><code>toast</code></td><td><code>&lt;div role="alert"&gt;</code></td><td class="td-txt">Notificação breve que aparece e desaparece. Contém <code>toast-pip</code> (indicador colorido) e <code>toast-text</code> (mensagem). Role "assertive" garante que leitores de tela anunciem imediatamente.</td></tr>
+      <tr><td><code>cell-tooltip</code></td><td><code>&lt;div role="tooltip"&gt;</code></td><td class="td-txt">Tooltip que aparece ao passar o mouse sobre uma célula 3D. Contém 4 campos: <code>ct-energy</code>, <code>ct-layer</code>, <code>ct-eta</code>, <code>ct-phi</code>. Preenchido pelo raycaster em <code>showTooltip()</code>.</td></tr>
+      <tr><td><code>slider-tip</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Tooltip flutuante que segue o cursor enquanto o energy threshold slider é arrastado. Mostra <code>tip-val</code> (valor em MeV/GeV) e <code>tip-pct</code> (percentagem 0–100%).</td></tr>
+      <tr><td><code>hud</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Container de toda a interface sobreposta ao canvas — top bar, painel esquerdo, slider de energia, focus overlay e wiki panel.</td></tr>
+      <tr><td><code>top-bar</code></td><td><code>&lt;header&gt;</code></td><td class="td-txt">Barra superior com logo, nome do arquivo carregado, e botões de ação: wiki, help, focus, snapshot, reset.</td></tr>
+      <tr><td><code>filename-display</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Exibe o nome do arquivo XML carregado. Oculto (<code>.hidden</code>) até um arquivo ser carregado. Contém <code>filename-text</code> com o nome.</td></tr>
+      <tr><td><code>meta-card</code> / <code>meta-toggle-btn</code></td><td><code>&lt;div&gt; / &lt;button&gt;</code></td><td class="td-txt">Painel de metadados colapsável. O botão <code>meta-toggle-btn</code> aciona collapse/expand de <code>meta-body</code>. O ícone <code>meta-chevron</code> (seta) rotaciona 180° ao colapsar via CSS transform.</td></tr>
+      <tr><td><code>meta-body</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Corpo do painel de metadados com: <code>meta-filename</code> (nome do XML), <code>cell-count</code> (N de células), <code>xml-date</code> (data do evento), <code>info-energy-range</code> (range de energia) e <code>active-blocks</code> (subdetectores ativos).</td></tr>
+      <tr><td><code>geometry-panel</code> / <code>gp-toggle-btn</code></td><td><code>&lt;div&gt; / &lt;button&gt;</code></td><td class="td-txt">Painel de controles de geometria colapsável. Contém os toggles de subdetector, Z-slice e modo de visualização (solid/wire).</td></tr>
+      <tr><td><code>clip-slider</code></td><td><code>&lt;input type="range"&gt;</code></td><td class="td-txt">Slider do Z-axis slice. Range 0–100, valor 100 = sem corte (OFF). <code>clip-fill</code> é uma barra de preenchimento visual; <code>clip-val-display</code> mostra o valor atual em metros ou "OFF".</td></tr>
+      <tr><td><code>zdi-bar</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Depth Indicator Bar — barra visual dentro do painel de Z-slice que cresce/diminui proporcionalmente ao corte aplicado, dando feedback imediato da extensão do slice.</td></tr>
+      <tr><td><code>mode-solid</code> / <code>mode-wire</code></td><td><code>&lt;button&gt;</code></td><td class="td-txt">Botões de modo de visualização. Solid: renderiza o InstancedMesh normalmente. Wire: troca para o LineSegments overlay construído por <code>buildWireframeOverlay()</code>.</td></tr>
+      <tr><td><code>cell-hover-toggle</code></td><td><code>&lt;input type="checkbox"&gt;</code></td><td class="td-txt">Checkbox que habilita/desabilita o hover sobre células. Quando desligado, <code>cellHoverEnabled = false</code> e o raycaster retorna imediatamente sem processar hits, reduzindo carga de CPU para visualizações estáticas.</td></tr>
+      <tr><td><code>energy-panel</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Slider vertical de threshold de energia. <code>ep-max</code>/<code>ep-min</code> mostram os extremos; <code>grad-track</code> é o trilho arrastável; <code>track-handle</code> é o cursor; <code>threshold-display</code> mostra o valor atual.</td></tr>
+      <tr><td><code>focus-overlay</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Overlay de foco que esconde todo o HUD, deixando apenas o canvas visível. Ativado por <code>btn-focus</code> (atalho F). <code>btn-exit-focus</code> restaura o HUD.</td></tr>
+      <tr><td><code>wiki-panel</code></td><td><code>&lt;aside role="complementary"&gt;</code></td><td class="td-txt">Painel lateral de conhecimento com 4 abas: <em>Start</em> (boas-vindas), <em>NIPSCERN</em> (sobre o laboratório), <em>CERN/ATLAS</em> (física do detector) e <em>Referências</em>. Aberto por <code>wiki-toggle-btn</code>.</td></tr>
+      <tr><td><code>modal-overlay</code></td><td><code>&lt;div role="dialog"&gt;</code></td><td class="td-txt">Modal de help/atalhos. Ativado por <code>btn-help</code>. Contém lista de atalhos de teclado e descrições de funcionalidades. Fechado por <code>modal-close-btn</code> ou tecla Escape.</td></tr>
+      <tr><td><code>tour-overlay</code></td><td><code>&lt;div&gt;</code></td><td class="td-txt">Tour guiado exibido na primeira visita. Apresenta 9 passos com cards e popovers apontando para elementos da interface. Pode ser pulado (<code>tour-skip</code>) ou impedido de reaparecer (<code>tour-no-show</code>).</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">html</span>index.html — estrutura essencial<span class="code-lang lang-html">HTML</span></div>
+    <pre><span class="t">&lt;canvas</span> <span class="s">id</span>=<span class="str">"gl-canvas"</span><span class="t">&gt;&lt;/canvas&gt;</span>               <span class="c">&lt;!-- Surface WebGL, ocupa 100vw × 100vh --&gt;</span>
+
+<span class="t">&lt;div</span> <span class="s">id</span>=<span class="str">"drop-zone"</span><span class="t">&gt;</span>                              <span class="c">&lt;!-- Visível antes de carregar dados --&gt;</span>
+  <span class="t">&lt;button</span> <span class="s">id</span>=<span class="str">"dz-browse-btn"</span><span class="t">&gt;</span>Browse XML File<span class="t">&lt;/button&gt;</span>
+  <span class="t">&lt;button</span> <span class="s">id</span>=<span class="str">"dz-sample-btn"</span><span class="t">&gt;</span>Load Sample Event<span class="t">&lt;/button&gt;</span>
+<span class="t">&lt;/div&gt;</span>
+
+<span class="c">&lt;!-- Lucide icons: renderizados pelo main.js ao inicializar --&gt;</span>
+<span class="t">&lt;i</span> <span class="s">data-lucide</span>=<span class="str">"folder-open"</span><span class="t">&gt;&lt;/i&gt;</span>               <span class="c">&lt;!-- substituído por SVG em runtime --&gt;</span>
+
+<span class="c">&lt;!-- Módulos JS carregados como ES modules (defer implícito) --&gt;</span>
+<span class="t">&lt;script</span> <span class="s">type</span>=<span class="str">"module"</span> <span class="s">src</span>=<span class="str">"main.js"</span><span class="t">&gt;&lt;/script&gt;</span></pre>
+  </div>
+
+  <h3>Lucide Icons</h3>
+  <p style="font-size:.85rem">O HTML usa <code>data-lucide="nome-do-icone"</code> em tags <code>&lt;i&gt;</code>. Ao carregar, <code>main.js</code> chama <code>createIcons({ icons })</code> da biblioteca <strong>Lucide</strong>, que substitui cada elemento <code>&lt;i&gt;</code> por um SVG inline do ícone correspondente. Esta é uma abordagem tree-shakeable — só os ícones importados são incluídos no bundle.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — import e inicialização dos ícones<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">import</span> { createIcons, icons } <span class="k">from</span> <span class="str">'lucide'</span>;
+<span class="fn">createIcons</span>({ icons });   <span class="c">// percorre DOM, substitui &lt;i data-lucide="..."&gt; por SVG</span></pre>
+  </div>
+</section>
+
+<!-- ═══ STEP 1: Three.js / WASM init ═══ -->
+<section class="section" id="step1">
+  <div class="section-header">
+    <div class="section-icon si-js"><span class="material-icons-round">settings</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Passo 1 — Arquivo: main.js (inicialização)</div>
+      <h2>Three.js, WASM e Cena 3D inicializam</h2>
+    </div>
+  </div>
+  <p>O ES module <code>main.js</code> executa ao carregar. As primeiras linhas importam Three.js, seus addons de pós-processamento, e o módulo WASM gerado pelo wasm-bindgen.</p>
+
+  <h3>1.1 — Importações e await init()</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — imports<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">import</span> * <span class="k">as</span> THREE <span class="k">from</span> <span class="str">'three'</span>;
+<span class="k">import</span> { OrbitControls }   <span class="k">from</span> <span class="str">'three/addons/controls/OrbitControls.js'</span>;
+<span class="k">import</span> { EffectComposer }  <span class="k">from</span> <span class="str">'three/addons/postprocessing/EffectComposer.js'</span>;
+<span class="k">import</span> { RenderPass }      <span class="k">from</span> <span class="str">'three/addons/postprocessing/RenderPass.js'</span>;
+<span class="k">import</span> { UnrealBloomPass } <span class="k">from</span> <span class="str">'three/addons/postprocessing/UnrealBloomPass.js'</span>;
+<span class="k">import</span> { SMAAPass }        <span class="k">from</span> <span class="str">'three/addons/postprocessing/SMAAPass.js'</span>;
+<span class="k">import</span> { OutputPass }      <span class="k">from</span> <span class="str">'three/addons/postprocessing/OutputPass.js'</span>;
+<span class="k">import</span> init, { process_xml_data } <span class="k">from</span> <span class="str">'./pkg/cgv_web.js'</span>;  <span class="c">// glue code do wasm-bindgen</span>
+
+<span class="k">await</span> <span class="fn">init</span>();  <span class="c">// baixa e instancia o .wasm — AWAIT aqui bloqueia até WASM estar pronto</span></pre>
+  </div>
+
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">./pkg/cgv_web.js</span><span class="def-desc">Arquivo "glue code" gerado automaticamente pelo <strong>wasm-bindgen</strong> ao compilar o Rust. Contém o JavaScript que carrega o <code>.wasm</code>, inicializa a memória compartilhada e expõe a função <code>process_xml_data</code> como chamável de JS.</span></div>
+    <div class="def-item"><span class="def-term">await init()</span><span class="def-desc">Faz o fetch do binário <code>.wasm</code> (pode ter centenas de KB), chama <code>WebAssembly.instantiate()</code>, e prepara o módulo na memória. Sem este await, qualquer chamada a <code>process_xml_data</code> falharia.</span></div>
+  </div>
+
+  <h3>1.2 — WebGL Renderer</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — renderer<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">const</span> renderer = <span class="k">new</span> THREE.<span class="fn">WebGLRenderer</span>({
+  canvas,                      <span class="c">// o &lt;canvas id="gl-canvas"&gt; do HTML</span>
+  antialias: <span class="k">true</span>,             <span class="c">// MSAA nativo (4×), complementado depois pelo SMAA</span>
+  preserveDrawingBuffer: <span class="k">true</span>, <span class="c">// permite toBlob() para o snapshot 4K</span>
+  powerPreference: <span class="str">'high-performance'</span>, <span class="c">// força GPU dedicada em laptops dual-GPU</span>
+});
+renderer.setPixelRatio(window.devicePixelRatio);  <span class="c">// HiDPI (Retina)</span>
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(<span class="n">0x000811</span>);               <span class="c">// azul noturno quase preto</span>
+renderer.toneMapping = THREE.ACESFilmicToneMapping; <span class="c">// mapeamento de tonalidade cinematográfico</span>
+renderer.toneMappingExposure = <span class="n">1.08</span>;
+renderer.localClippingEnabled = <span class="k">true</span>;           <span class="c">// permite clipping planes (Z-slice)</span></pre>
+  </div>
+
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">ACESFilmicToneMapping</span><span class="def-desc">Mapeia as cores HDR (High Dynamic Range) do shader para o range [0,1] visível na tela usando a curva ACES (Academy Color Encoding System), que produz altas luzes naturais e sombras ricas. Sem tone mapping, valores acima de 1.0 seriam cortados para branco puro.</span></div>
+    <div class="def-item"><span class="def-term">localClippingEnabled</span><span class="def-desc">Necessário para que os <code>clippingPlanes</code> definidos no material ou no renderer funcionem. Permite o Z-axis slice (corte transversal do detector) do painel de controles.</span></div>
+  </div>
+
+  <h3>1.3 — Cena, Câmera e Controles</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — scene, camera, controls<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">const</span> scene = <span class="k">new</span> THREE.<span class="fn">Scene</span>();
+scene.fog   = <span class="k">new</span> THREE.<span class="fn">FogExp2</span>(<span class="n">0x000811</span>, <span class="n">0.006</span>); <span class="c">// névoa exponencial: objetos distantes desvanecem</span>
+
+<span class="k">const</span> camera = <span class="k">new</span> THREE.<span class="fn">PerspectiveCamera</span>(
+  <span class="n">42</span>,                                    <span class="c">// FOV vertical em graus</span>
+  window.innerWidth / window.innerHeight, <span class="c">// aspect ratio</span>
+  <span class="n">0.01</span>, <span class="n">300</span>                              <span class="c">// near/far clipping planes</span>
+);
+camera.position.set(<span class="n">10</span>, <span class="n">5</span>, <span class="n">16</span>);         <span class="c">// posição inicial: inclinada, em metros</span>
+camera.lookAt(<span class="n">0</span>, <span class="n">0</span>, <span class="n">0</span>);               <span class="c">// mira para o centro do detector</span>
+
+<span class="k">const</span> controls = <span class="k">new</span> OrbitControls(camera, renderer.domElement);
+controls.enableDamping   = <span class="k">true</span>;        <span class="c">// suaviza movimentos: sensação cinematográfica</span>
+controls.dampingFactor   = <span class="n">0.048</span>;
+controls.autoRotate      = <span class="k">true</span>;        <span class="c">// rotação lenta antes de dados carregados</span>
+controls.autoRotateSpeed = <span class="n">0.22</span>;</pre>
+  </div>
+
+  <div class="info">
+    <strong>Por que a câmera usa metros mas o detector está em milímetros?</strong><br>
+    Three.js não tem unidade intrínseca. O código usa a convenção "1 unidade = 1 metro", e aplica <code>scale = 0.001</code> ao converter as posições de mm para metros. A câmera em (10, 5, 16) metros fica a ~20m do centro, dando uma visão ampla do detector de ~16m de comprimento.
+  </div>
+
+  <div class="info" style="margin-top:8px">
+    <strong>Distância de câmera limitada:</strong> <code>controls.minDistance = 0.5</code> e <code>controls.maxDistance = 90</code> definem os limites de zoom. 0.5m evita que a câmera penetre dentro das células; 90m garante visibilidade completa do detector mesmo em zoom máximo.
+  </div>
+
+  <h3>1.3b — Iluminação da cena</h3>
+  <p style="font-size:.84rem">A cena usa 4 fontes de luz complementares para criar profundidade e aparência científica:</p>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — iluminação<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="c">// Luz ambiente: azul fria e suave — preenche sombras sem achatar a cena</span>
+scene.<span class="fn">add</span>(<span class="k">new</span> THREE.<span class="fn">AmbientLight</span>(<span class="n">0x001828</span>, <span class="n">1.4</span>));
+
+<span class="c">// Luz direcional principal (sol): branca intensa, vem do canto superior direito</span>
+<span class="k">const</span> sun = <span class="k">new</span> THREE.<span class="fn">DirectionalLight</span>(<span class="n">0xffffff</span>, <span class="n">1.75</span>);
+sun.position.<span class="fn">set</span>(<span class="n">8</span>, <span class="n">18</span>, <span class="n">10</span>);     <span class="c">// direção: de cima-direita-frente</span>
+scene.<span class="fn">add</span>(sun);
+
+<span class="c">// Fill quente: laranja suave de baixo-esquerda — simula reflexo do chão</span>
+<span class="k">const</span> warmFill = <span class="k">new</span> THREE.<span class="fn">DirectionalLight</span>(<span class="n">0xffc870</span>, <span class="n">0.28</span>);
+warmFill.position.<span class="fn">set</span>(<span class="n">-14</span>, <span class="n">-2</span>, <span class="n">9</span>);
+scene.<span class="fn">add</span>(warmFill);
+
+<span class="c">// Fill frio: azul escuro de trás — cria separação entre células e fundo</span>
+<span class="k">const</span> coolFill = <span class="k">new</span> THREE.<span class="fn">DirectionalLight</span>(<span class="n">0x1a3050</span>, <span class="n">0.36</span>);
+coolFill.position.<span class="fn">set</span>(<span class="n">-14</span>, <span class="n">-4</span>, <span class="n">-8</span>);
+scene.<span class="fn">add</span>(coolFill);</pre>
+  </div>
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">AmbientLight(0x001828, 1.4)</span><span class="def-desc">Luz global sem direção. A cor azul fria (#001828 = R:0, G:24, B:40) preenche sombras com tonalidade que combina com o fundo espacial. Intensidade 1.4 é suficiente para evitar sombras totalmente pretas.</span></div>
+    <div class="def-item"><span class="def-term">DirectionalLight branca (1.75)</span><span class="def-desc">Luz principal que simula o sol. Intensidade alta (1.75) cria sombras bem definidas e ilumina a face frontal das células. A posição (8, 18, 10) define a <em>direção</em> — DirectionalLight não tem posição real, só direção.</span></div>
+    <div class="def-item"><span class="def-term">warmFill (0xffc870, 0.28)</span><span class="def-desc">Preenchimento de baixo com tom dourado quente. Suaviza as sombras mais fortes da luz principal. Intensidade baixa (0.28) para não competir com a luz principal.</span></div>
+    <div class="def-item"><span class="def-term">coolFill (0x1a3050, 0.36)</span><span class="def-desc">Preenchimento frio de trás. Ajuda a separar visualmente células que estão na parte traseira do detector do fundo escuro. A cor azul-escura complementa a paleta do tema.</span></div>
+  </div>
+
+  <h3>1.4 — Post-processing chain</h3>
+  <p>Em vez de renderizar direto para a tela com <code>renderer.render(scene, camera)</code>, o código usa um <strong>EffectComposer</strong> — uma cadeia de passes que processam a imagem em sequência:</p>
+  <div class="pipeline">
+    <div class="pipe-step">RenderPass<div class="ps-label">Cena 3D normal</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="color:#818cf8">UnrealBloomPass<div class="ps-label">Brilho nas células</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="color:#60a5fa">SMAAPass<div class="ps-label">Anti-aliasing</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="color:#34d399">OutputPass<div class="ps-label">Tone map → tela</div></div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — post-processing<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">const</span> bloomPass = <span class="k">new</span> UnrealBloomPass(
+  <span class="k">new</span> THREE.<span class="fn">Vector2</span>(window.innerWidth, window.innerHeight),
+  <span class="n">0.22</span>,  <span class="c">// strength  — intensidade do brilho (pequena: look científico, não exagerado)</span>
+  <span class="n">0.38</span>,  <span class="c">// radius    — raio do halo ao redor de células brilhantes</span>
+  <span class="n">0.52</span>,  <span class="c">// threshold — só células com brilho &gt;0.52 recebem bloom</span>
+);</pre>
+  </div>
+
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">UnrealBloomPass</span><span class="def-desc">Cria um efeito de "glow" ao redor de pixels brilhantes. Funciona fazendo downsampling da cena em múltiplas resoluções, aplicando blur gaussiano, e misturando de volta. O threshold alto (0.52) garante que apenas células de alta energia brilham.</span></div>
+    <div class="def-item"><span class="def-term">SMAAPass — configuração avançada</span><span class="def-desc">Subpixel Morphological Anti-Aliasing. Além de ser construído, o código configura explicitamente: <code>edgeDetectionThreshold = 0.02</code> (sensibilidade para detectar bordas — valor baixo preserva bordas finas das células), <code>maxSearchSteps = 32</code> e <code>maxSearchStepsDiagonal = 16</code> (quanto o algoritmo busca ao longo de bordas antes de parar — valores maiores = anti-aliasing melhor em bordas longas diagonais).</span></div>
+    <div class="def-item"><span class="def-term">OutputPass</span><span class="def-desc">Aplica o tone mapping (ACES) e converte o resultado para o espaço de cor do monitor (sRGB). Deve ser sempre o último passe.</span></div>
+  </div>
+
+  <h3>1.5 — Ghost geometry (geometria de referência)</h3>
+  <p>Antes do usuário carregar qualquer dado, <code>buildGhost()</code> constrói cilindros e anéis semitransparentes representando os volumes dos subdetectores. Serve como referência visual para o usuário saber o que está vendo.</p>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — buildGhost() (trecho)<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="c">// shell(raio, meia_altura, centro_z, opacidade, cor)</span>
+<span class="k">const</span> shell = (r, hl, zc, op, col) => {
+  <span class="k">const</span> m = <span class="k">new</span> THREE.<span class="fn">Mesh</span>(
+    <span class="k">new</span> THREE.<span class="fn">CylinderGeometry</span>(r, r, hl * <span class="n">2</span>, <span class="n">80</span>, <span class="n">1</span>, <span class="k">true</span>), <span class="c">// openEnded=true</span>
+    <span class="k">new</span> THREE.<span class="fn">MeshBasicMaterial</span>({ color: col, transparent: <span class="k">true</span>, opacity: op, side: THREE.DoubleSide })
+  );
+  m.rotation.x = Math.PI / <span class="n">2</span>; <span class="c">// rotaciona para o cilindro ficar ao longo de Z</span>
+  m.position.z = zc;
+};
+<span class="c">// LAr EM: R=1.42m, altura=6.34m, centro z=0</span>
+<span class="fn">shell</span>(<span class="n">1.42</span>, <span class="n">3.17</span>, <span class="n">0</span>, G, EM);
+<span class="c">// Tile: R=2.30m, altura=7.64m, centro z=0</span>
+<span class="fn">shell</span>(<span class="n">2.30</span>, <span class="n">3.82</span>, <span class="n">0</span>, G * <span class="n">0.85</span>, TI);</pre>
+  </div>
+  <p style="font-size:.84rem">Quando os dados reais são carregados, <code>ghostGrp.visible = false</code> oculta esta geometria de referência. O reset a torna visível novamente.</p>
+
+  <div class="checkpoint">
+    <div class="checkpoint-title"><span class="material-icons-round">check_circle</span>Estado após Step 1</div>
+    <div class="snapshot-body">
+      <div class="snap-row"><span class="snap-key">renderer</span><span class="snap-val">WebGLRenderer criado, canvas ligado</span></div>
+      <div class="snap-row"><span class="snap-key">scene</span><span class="snap-val">Scene com fog, luzes, ghost geometry e eixo Z visíveis</span></div>
+      <div class="snap-row"><span class="snap-key">camera</span><span class="snap-val">PerspectiveCamera em (10, 5, 16) mirando (0,0,0)</span></div>
+      <div class="snap-row"><span class="snap-key">WASM</span><span class="snap-val">cgv_web.wasm instanciado na memória, process_xml_data disponível</span></div>
+      <div class="snap-row"><span class="snap-key">activeMesh</span><span class="snap-val">null (nenhum dado carregado)</span></div>
+      <div class="snap-row"><span class="snap-key">render loop</span><span class="snap-val">ativo — composer.render() a cada frame</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STEP 2: Usuário carrega XML ═══ -->
+<section class="section" id="step2">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(245,158,11,.12);color:#f59e0b"><span class="material-icons-round">folder_open</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Passo 2 — main.js: loadFile()</div>
+      <h2>Usuário seleciona o arquivo XML</h2>
+    </div>
+  </div>
+
+  <p>O usuário clica em "Browse XML File" ou dropa um arquivo. Ambos os caminhos convergem para a função assíncrona <code>loadFile(file)</code>.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — loadFile() completo<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">async function</span> <span class="fn">loadFile</span>(file, xmlTextOverride = <span class="k">null</span>) {
+  <span class="fn">toast</span>(<span class="str">`Reading ${fname}…`</span>);
+  <span class="fn">showLoading</span>(<span class="str">'Reading file…'</span>, <span class="n">15</span>);      <span class="c">// loading bar → 15%</span>
+  dropZone.classList.add(<span class="str">'hidden'</span>);     <span class="c">// esconde o drop zone</span>
+
+  <span class="k">let</span> bytes;
+  <span class="k">if</span> (xmlTextOverride) {
+    bytes = <span class="k">new</span> TextEncoder().<span class="fn">encode</span>(xmlTextOverride); <span class="c">// string → Uint8Array</span>
+  } <span class="k">else</span> {
+    bytes = <span class="k">new</span> Uint8Array(<span class="k">await</span> file.<span class="fn">arrayBuffer</span>()); <span class="c">// File API → bytes</span>
+  }
+
+  <span class="fn">showLoading</span>(<span class="str">'Computing geometry…'</span>, <span class="n">45</span>);
+  <span class="k">await new</span> Promise(r => setTimeout(r, <span class="n">30</span>)); <span class="c">// yield para UI atualizar</span>
+
+  <span class="fn">showLoading</span>(<span class="str">'Building mesh…'</span>, <span class="n">75</span>);
+  <span class="k">const</span> result = <span class="fn">process_xml_data</span>(bytes); <span class="c">// ← CHAMADA AO WASM</span>
+  <span class="k">await new</span> Promise(r => setTimeout(r, <span class="n">16</span>));
+
+  <span class="fn">showLoading</span>(<span class="str">'Uploading to GPU…'</span>, <span class="n">92</span>);
+  <span class="k">await new</span> Promise(r => setTimeout(r, <span class="n">16</span>));
+
+  <span class="fn">buildMesh</span>(result);                    <span class="c">// ← cria InstancedMesh na GPU</span>
+  ghostGrp.visible = <span class="k">false</span>;             <span class="c">// oculta geometria de referência</span>
+
+  <span class="fn">setPanel</span>(result.minEnergy, result.maxEnergy); <span class="c">// atualiza painel de energia</span>
+  cellCountEl.textContent = n.toLocaleString(); <span class="c">// exibe contagem</span>
+  controls.autoRotate = <span class="k">false</span>;          <span class="c">// para rotação automática</span>
+}</pre>
+  </div>
+
+  <div class="info">
+    <strong>Por que os await setTimeout(r, 16/30)?</strong><br>
+    JavaScript é single-threaded. O WASM executa de forma síncrona e pode bloquear a thread principal. Os <code>await</code> antes e depois da chamada ao WASM forçam o browser a processar eventos pendentes (atualizar a loading bar, desenhar o frame atual) antes de iniciar a computação pesada. Sem eles, o loading bar travaria visualmente em 75% durante todo o processamento.
+  </div>
+
+  <h3>O que é Uint8Array e por que é necessário</h3>
+  <p style="font-size:.85rem">O WASM recebe dados como bytes brutos (<code>&[u8]</code> no Rust). A API File do browser fornece o conteúdo como <code>ArrayBuffer</code>. O <code>new Uint8Array(buffer)</code> cria uma <em>view</em> tipada sobre esses bytes sem copiar — é o formato que o wasm-bindgen sabe transferir para a memória linear do WASM.</p>
+</section>
+
+<!-- ═══ STEP 3: WASM processa ═══ -->
+<section class="section" id="step3">
+  <div class="section-header">
+    <div class="section-icon si-wasm"><span class="material-icons-round">memory</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Passo 3 — lib.rs / cgv_web.wasm: process_xml_data()</div>
+      <h2>WASM processa XML e gera geometria</h2>
+    </div>
+  </div>
+
+  <p>Esta é a função pública exportada do módulo Rust. Ela recebe os bytes do XML e retorna um objeto JavaScript com os dados de geometria e cor prontos para a GPU.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — assinatura da função<span class="code-lang lang-rust">Rust</span></div>
+    <pre><span class="t">#[wasm_bindgen]</span>  <span class="c">// macro que expõe a função para JavaScript</span>
+<span class="k">pub fn</span> <span class="fn">process_xml_data</span>(xml_bytes: &[<span class="k">u8</span>]) -> <span class="t">Result</span>&lt;JsValue, JsValue&gt;</pre>
+  </div>
+
+  <h3>3.1 — Parsing XML com quick_xml (streaming)</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — loop de parsing<span class="code-lang lang-rust">Rust</span></div>
+    <pre><span class="k">let mut</span> <span class="s">energy_map</span>: HashMap&lt;(i32, i32, i32), f64&gt; = HashMap::new();
+<span class="k">let mut</span> reader = Reader::from_reader(xml_bytes);
+<span class="k">let mut</span> buf = Vec::new();  <span class="c">// buffer reutilizado a cada evento (zero-alloc por evento)</span>
+
+loop {
+  <span class="k">match</span> reader.read_event_into(&<span class="k">mut</span> buf) {
+    Ok(Event::Empty(e)) | Ok(Event::Start(e)) => {
+      <span class="k">if</span> e.name().as_ref() == b<span class="str">"cell"</span> {
+        <span class="c">// extrai l, eta, phi, e de e.attributes()</span>
+        *energy_map.entry((l, et, ph)).or_insert(<span class="n">0.0</span>) += en; <span class="c">// acumula</span>
+      }
+    }
+    Ok(Event::Eof) => <span class="k">break</span>,
+    <span class="k">_</span> => {}
+  }
+  buf.clear(); <span class="c">// OBRIGATÓRIO: reutiliza buffer sem realocar</span>
+}</pre>
+  </div>
+
+  <div class="snapshot">
+    <div class="snapshot-header"><span class="material-icons-round">stop_circle</span>Checkpoint A — após parsing do XML de referência</div>
+    <div class="snapshot-body">
+      <div class="snap-row"><span class="snap-key" style="color:var(--tile)">energy_map[(0, 2, 5)]</span><span class="snap-val">1500.0 MeV</span><span class="snap-note">Tile: camada 0, eta=2, phi=5</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--hec)"">energy_map[(14, 3, 10)]</span><span class="snap-val">3000.0 MeV</span><span class="snap-note">HEC: camada 14, eta=3, phi=10</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--larb)">energy_map[(20, 20, 8)]</span><span class="snap-val">800.0 MeV</span><span class="snap-note">LAr Barril: camada 20, eta=20, phi=8</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--lare)">energy_map[(23, 20, 12)]</span><span class="snap-val">2200.0 MeV</span><span class="snap-note">LAr Tampa: camada 23, eta=20, phi=12</span></div>
+    </div>
+  </div>
+
+  <h3>3.2 — Normalização de energia</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — min/max<span class="code-lang lang-rust">Rust</span></div>
+    <pre><span class="k">let</span> max_e = energy_map.values()
+    .filter(|e| *e > <span class="n">0.0</span>)
+    .fold(f64::NEG_INFINITY, f64::max).max(<span class="n">1.0</span>); <span class="c">// .max(1.0) evita div-by-zero</span>
+
+<span class="k">let</span> min_e = energy_map.values()
+    .filter(|e| *e > <span class="n">0.0</span>)
+    .fold(f64::INFINITY, f64::min);</pre>
+  </div>
+
+  <div class="math">
+    <span class="ml">max_e =</span><span class="mv"> 3000.0 MeV</span><br>
+    <span class="ml">min_e =</span><span class="mv"> 800.0 MeV</span><br>
+    <span class="ml">range =</span><span class="mv"> 2200.0 MeV</span><br>
+    <br>
+    <span class="ml">t_tile  = (1500−800)/2200 =</span><span class="mv"> 0.3182</span><span class="mc"> → cor: ciano</span><br>
+    <span class="ml">t_hec   = (3000−800)/2200 =</span><span class="mv"> 1.0000</span><span class="mc"> → cor: vermelho</span><br>
+    <span class="ml">t_larb  = (800 −800)/2200 =</span><span class="mv"> 0.0000</span><span class="mc"> → cor: azul</span><br>
+    <span class="ml">t_lare  = (2200−800)/2200 =</span><span class="mv"> 0.6364</span><span class="mc"> → cor: verde-amarelo</span>
+  </div>
+
+  <h3>3.3 — Mapeamento de cor energy_color(t)</h3>
+  <p style="font-size:.85rem">A escala "jet" divide [0,1] em 4 faixas iguais:</p>
+  <div style="display:flex;height:24px;border-radius:5px;overflow:hidden;border:1px solid var(--border);margin:8px 0 4px">
+    <div style="flex:1;background:linear-gradient(to right,#0000ff,#00ffff)"></div>
+    <div style="flex:1;background:linear-gradient(to right,#00ffff,#00ff00)"></div>
+    <div style="flex:1;background:linear-gradient(to right,#00ff00,#ffff00)"></div>
+    <div style="flex:1;background:linear-gradient(to right,#ffff00,#ff0000)"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-bottom:10px">
+    <span>t=0 azul</span><span>t=0.25 ciano</span><span>t=0.50 verde</span><span>t=0.75 amarelo</span><span>t=1 vermelho</span>
+  </div>
+
+  <table style="margin-bottom:0">
+    <thead><tr><th>Célula</th><th>t</th><th>Faixa</th><th>RGB resultante</th></tr></thead>
+    <tbody>
+      <tr><td class="td-tile">Tile</td><td>0.318</td><td>[0.25–0.50]: u = 0.273</td><td style="color:#00ffbb;font-family:var(--mono)">(0.00, 1.00, 0.73)</td></tr>
+      <tr><td class="td-hec">HEC</td><td>1.000</td><td>[0.75–1.00]: u = 1.000</td><td style="color:#ff0000;font-family:var(--mono)">(1.00, 0.00, 0.00)</td></tr>
+      <tr><td class="td-larb">LAr Barril</td><td>0.000</td><td>[0.00–0.25]: u = 0.000</td><td style="color:#0000ff;font-family:var(--mono)">(0.00, 0.00, 1.00)</td></tr>
+      <tr><td class="td-lare">LAr Tampa</td><td>0.636</td><td>[0.50–0.75]: u = 0.545</td><td style="color:#8cff00;font-family:var(--mono)">(0.55, 1.00, 0.00)</td></div></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════ 26 LAYERS TABLE ═══════ -->
+<section class="section" id="layers">
+  <div class="section-header">
+    <div class="section-icon si-geo"><span class="material-icons-round">layers</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Geometria — build_layer_table()</div>
+      <h2>As 26 Camadas do Detector</h2>
+    </div>
+  </div>
+  <p>A tabela abaixo mostra as 26 entradas retornadas por <code>build_layer_table()</code>. O campo <code>l</code> do XML mapeia diretamente para este índice. <strong>h1/h2 significam raio (Tile/LAr Barril) ou posição Z (HEC)</strong>.</p>
+
+  <table>
+    <thead><tr><th>l</th><th>SubDet</th><th>h1 (mm)</th><th>h2 (mm)</th><th>phi_seg</th><th>Células aprox.</th><th class="td-txt">Região física</th></tr></thead>
+    <tbody>
+      <tr><td class="td-tile">0</td><td class="td-tile">Tile</td><td>2300</td><td>2600</td><td>64</td><td>~640</td><td class="td-txt">Barril camada A — R 2.3–2.6m</td></tr>
+      <tr><td class="td-tile">1</td><td class="td-tile">Tile</td><td>2600</td><td>3440</td><td>64</td><td>~576</td><td class="td-txt">Barril BC merge — duas linhas de tabela</td></tr>
+      <tr><td class="td-tile">2</td><td class="td-tile">Tile</td><td>3440</td><td>3820</td><td>64</td><td>~512</td><td class="td-txt">Barril D — camada mais externa</td></tr>
+      <tr><td class="td-tile">3–5</td><td class="td-tile">Tile</td><td>2300–3140</td><td>2600–3820</td><td>64</td><td>~1200</td><td class="td-txt">Extensão do barril (ITC) — 0.8&lt;|η|&lt;1.7</td></tr>
+      <tr><td class="td-tile">6–11</td><td class="td-tile">Tile</td><td>1465–3440</td><td>1885–3820</td><td>64</td><td>~384</td><td class="td-txt">Células de gap/crack — região de transição barril↔tampa</td></tr>
+      <tr><td class="td-tile">12–13</td><td class="td-tile">Tile</td><td>153–426</td><td>426–876</td><td><strong>8</strong></td><td>~16</td><td class="td-txt">Cintiladores especiais E/MBI — apenas 8 fatias em φ</td></tr>
+      <tr><td class="td-hec">14</td><td class="td-hec">HEC</td><td>4350</td><td>4630</td><td>64</td><td>~896</td><td class="td-txt">HEC camada 0 — Z 4.35–4.63m</td></tr>
+      <tr><td class="td-hec">15</td><td class="td-hec">HEC</td><td>4630</td><td>5100</td><td>64</td><td>~832</td><td class="td-txt">HEC camada 1</td></tr>
+      <tr><td class="td-hec">16</td><td class="td-hec">HEC</td><td>5130</td><td>5590</td><td>64</td><td>~704</td><td class="td-txt">HEC camada 2</td></tr>
+      <tr><td class="td-hec">17</td><td class="td-hec">HEC</td><td>5590</td><td>6050</td><td>64</td><td>~704</td><td class="td-txt">HEC camada 3 — Z máximo 6.05m</td></tr>
+      <tr><td class="td-larb">18</td><td class="td-larb">LAr B</td><td>1421.73</td><td>1438.58</td><td>64</td><td>~3904</td><td class="td-txt">Pré-amostragem (layer 0) — R ~14mm de espessura</td></tr>
+      <tr><td class="td-larb">19</td><td class="td-larb">LAr B</td><td>1481.75</td><td>1579.00</td><td>64</td><td>~28864</td><td class="td-txt">Tiras (layer 1) — granularidade Δη=0.003125</td></tr>
+      <tr><td class="td-larb">20</td><td class="td-larb">LAr B</td><td>1581.00</td><td>1840.00</td><td><strong>256</strong></td><td>~14592</td><td class="td-txt">Células quadradas (layer 2) — 256 fatias φ</td></tr>
+      <tr><td class="td-larb">21</td><td class="td-larb">LAr B</td><td>1840.00</td><td>1984.70</td><td><strong>256</strong></td><td>~6912</td><td class="td-txt">Camada traseira (layer 3)</td></tr>
+      <tr><td class="td-lare">22</td><td class="td-lare">LAr E</td><td>—</td><td>—</td><td>64</td><td>~768</td><td class="td-txt">Tampa pré-amostragem (layer 0)</td></tr>
+      <tr><td class="td-lare">23</td><td class="td-lare">LAr E</td><td>—</td><td>—</td><td>64</td><td>~27648</td><td class="td-txt">Tampa tiras (layer 1) — estrutura η mais complexa</td></tr>
+      <tr><td class="td-lare">24</td><td class="td-lare">LAr E</td><td>—</td><td>—</td><td><strong>256</strong></td><td>~13056</td><td class="td-txt">Tampa células médias (layer 2)</td></tr>
+      <tr><td class="td-lare">25</td><td class="td-lare">LAr E</td><td>—</td><td>—</td><td><strong>256</strong></td><td>~8704</td><td class="td-txt">Tampa traseira (layer 3)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <strong>Regiões de gap (crack) — l = 6 a 13:</strong> estas camadas cobrem a transição física entre o barril e as tampas (~1.37 &lt; |η| &lt; 1.6). A geometria é complexa e as tabelas TILE_Z têm muitos zeros (células não existentes). O código verifica <code>z_val == 0.0</code> e retorna <code>None</code> nestas posições. O <code>in_barrel_crack()</code> também filtra células do LAr que caem nesta faixa.
+  </div>
+
+  <h3>phi_center() — ângulo real de cada fatia</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — phi_center()<span class="code-lang lang-rust">Rust</span></div>
+    <pre><span class="k">fn</span> <span class="fn">phi_center</span>(j: usize, phi_seg: usize) -> f64 {
+    <span class="k">let</span> dphi = <span class="n">2.0</span> * PI / phi_seg <span class="k">as</span> f64;  <span class="c">// tamanho angular de cada fatia</span>
+    dphi / <span class="n">2.0</span> + PI / <span class="n">2.0</span> + j <span class="k">as</span> f64 * dphi <span class="c">// centro da j-ésima fatia + offset 90°</span>
+}</pre>
+  </div>
+  <div class="math">
+    <span class="ml">Para phi=5, phi_seg=64:</span><br>
+    <span class="ml">  dphi =</span><span class="mv"> 2π/64 = 0.098175 rad = 5.625°</span><br>
+    <span class="ml">  φ =</span><span class="mv"> 0.04909 + 1.5708 + 5×0.09817 = 2.1108 rad = 120.94°</span><br>
+    <span class="ml">  sin(2.1108) =</span><span class="mv"> 0.8572</span><br>
+    <span class="ml">  cos(2.1108) =</span><span class="mv"> −0.5150</span>
+  </div>
+</section>
+
+<!-- ═══ GEOMETRIA: compute_cell por detector ═══ -->
+<section class="section" id="geo-tile">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--tile2);color:var(--tile)"><span class="material-icons-round">grid_on</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Geometria — SubDet::Tile</div>
+      <h2>Célula 1 — Tile Barril: l=0, eta=2, phi=5, E=1500 MeV</h2>
+    </div>
+  </div>
+
+  <p>O Tile usa tabelas estáticas de posição Z. O raio R vem da configuração da camada (h1/h2). Esta é a abordagem mais simples: lookup direto em arrays compile-time.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — ramo SubDet::Tile<span class="code-lang lang-rust">Rust</span></div>
+    <pre>SubDet::Tile => {
+  <span class="k">let</span> row = cfg.tile_row;          <span class="c">// = 0 (linha 0 das tabelas)</span>
+  <span class="k">if</span> eta_abs >= <span class="n">10</span> { <span class="k">return</span> None; } <span class="c">// Tile tem máximo 10 células em eta (0–9)</span>
+  <span class="k">let</span> z_val = TILE_Z [row][eta_abs]; <span class="c">// TILE_Z[0][2]  = 620.760 mm</span>
+  <span class="k">let</span> dz    = TILE_DZ[row][eta_abs]; <span class="c">// TILE_DZ[0][2] = 255.600 mm</span>
+  <span class="k">if</span> z_val == <span class="n">0.0</span> || dz == <span class="n">0.0</span> { <span class="k">return</span> None; } <span class="c">// 0.0 = célula não existe</span>
+
+  <span class="k">let</span> r_mid = (cfg.h1 + cfg.h2) / <span class="n">2.0</span>; <span class="c">// (2300 + 2600)/2 = 2450.0 mm</span>
+  <span class="k">let</span> dr    = cfg.h2 - cfg.h1;         <span class="c">// 2600 − 2300   = 300.0 mm</span>
+  <span class="c">// tile_row2 == tile_row → sem merge, dz_final = dz</span>
+  <span class="k">let</span> cx = -r_mid * sin_phi;            <span class="c">// −2450 × 0.8572 = −2100.1 mm</span>
+  <span class="k">let</span> cy =  r_mid * cos_phi;            <span class="c">// +2450 × (−0.515) = −1261.8 mm</span>
+  <span class="k">let</span> cz =  z_sign * z_val;             <span class="c">// +1 × 620.76 = +620.76 mm</span>
+  Some((cx, cy, cz, dr/<span class="n">2.0</span>, r_mid*dphi/<span class="n">2.0</span>, dz/<span class="n">2.0</span>))
+}</pre>
+  </div>
+
+  <div class="math">
+    <span class="ml">TILE_Z[0][2]  =</span><span class="mv"> 620.760 mm</span><span class="mc"> ← posição Z central tabelada</span><br>
+    <span class="ml">TILE_DZ[0][2] =</span><span class="mv"> 255.600 mm</span><span class="mc"> ← espessura Z tabelada</span><br>
+    <span class="ml">r_mid =</span><span class="mv"> (2300+2600)/2 = 2450.0 mm</span><br>
+    <span class="ml">cx = −2450×0.8572 =</span><span class="mv"> −2100.1 mm</span><br>
+    <span class="ml">cy = +2450×(−0.515) =</span><span class="mv"> −1261.8 mm</span><br>
+    <span class="ml">cz = +1×620.76 =</span><span class="mv"> +620.76 mm</span><br>
+    <span class="ml">sx (semi-radial) =</span><span class="mv"> 300/2 = 150.0 mm</span><br>
+    <span class="ml">sy (semi-phi) = 2450×0.098175/2 =</span><span class="mv"> 120.26 mm</span><br>
+    <span class="ml">sz (semi-Z) =</span><span class="mv"> 255.6/2 = 127.8 mm</span>
+  </div>
+
+  <p style="font-size:.84rem">Por que o Tile usa tabelas em vez de fórmulas? Porque a posição das telhas de cintilação é determinada por projeto mecânico, não por uma equação analítica. As constantes em <code>TILE_Z</code> são copiadas diretamente de <code>CaloGeoConst.h</code>, o arquivo de geometria oficial do ATLAS.</p>
+</section>
+
+<section class="section" id="geo-hec">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--hec2);color:var(--hec)"><span class="material-icons-round">grid_on</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Geometria — SubDet::Hec</div>
+      <h2>Célula 2 — HEC: l=14, eta=3, phi=10, E=3000 MeV</h2>
+    </div>
+  </div>
+  <p>O HEC é o inverso do Tile: o <strong>Z é fixo</strong> por camada (h1/h2 são posições Z) e o <strong>raio R vem da tabela</strong> HEC_R.</p>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — ramo SubDet::Hec<span class="code-lang lang-rust">Rust</span></div>
+    <pre>SubDet::Hec => {
+  <span class="c">// hec_row1 == hec_row2 = 0 → caso simples, acesso direto</span>
+  <span class="c">// HEC_SIZE[0] = 14, eta_abs=3 &lt; 14 → válido</span>
+  <span class="k">let</span> r_val  = HEC_R [<span class="n">0</span>][<span class="n">3</span>]; <span class="c">// 1437.47 mm ← raio transversal</span>
+  <span class="k">let</span> dr_val = HEC_DR[<span class="n">0</span>][<span class="n">3</span>]; <span class="c">// 150.788 mm ← largura radial</span>
+  <span class="k">let</span> z_mid = (cfg.h1 + cfg.h2) / <span class="n">2.0</span>; <span class="c">// (4350+4630)/2 = 4490.0 mm</span>
+  <span class="k">let</span> dz    = cfg.h2 - cfg.h1;          <span class="c">// 4630−4350 = 280.0 mm</span>
+  <span class="k">let</span> cx = -r_val * sin_phi; <span class="c">// −1437.47 × 0.5139 = −738.7 mm</span>
+  <span class="k">let</span> cy =  r_val * cos_phi; <span class="c">// +1437.47 × (−0.8577) = −1232.8 mm</span>
+  <span class="k">let</span> cz =  z_sign * z_mid;  <span class="c">// +4490.0 mm ← célula a 4.49m do IP</span>
+  Some((cx, cy, cz, dr_val/<span class="n">2.0</span>, r_val*dphi/<span class="n">2.0</span>, dz/<span class="n">2.0</span>))
+}</pre>
+  </div>
+  <div class="math">
+    <span class="ml">HEC_R[0][3]  =</span><span class="mv"> 1437.47 mm</span><span class="mc"> ← raio tabelado</span><br>
+    <span class="ml">HEC_DR[0][3] =</span><span class="mv"> 150.788 mm</span><br>
+    <span class="ml">z_mid =</span><span class="mv"> (4350+4630)/2 = 4490.0 mm</span><br>
+    <span class="ml">cx =</span><span class="mv"> −738.7 mm</span><br>
+    <span class="ml">cy =</span><span class="mv"> −1232.8 mm</span><br>
+    <span class="ml">cz =</span><span class="mv"> +4490.0 mm</span><br>
+    <span class="ml">sx =</span><span class="mv"> 75.4 mm</span><br>
+    <span class="ml">sy =</span><span class="mv"> 70.5 mm</span><br>
+    <span class="ml">sz =</span><span class="mv"> 140.0 mm</span>
+  </div>
+</section>
+
+<section class="section" id="geo-larb">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--larb2);color:var(--larb)"><span class="material-icons-round">grid_on</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Geometria — SubDet::LarBarrel</div>
+      <h2>Célula 3 — LAr Barril: l=20, eta=20, phi=8, E=800 MeV</h2>
+    </div>
+  </div>
+  <p>O LAr Barril não usa tabelas de Z. Calcula a posição Z pela fórmula física exata <strong>z = R · sinh(η)</strong>. O raio R é fixo por camada (h1/h2).</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — ramo SubDet::LarBarrel<span class="code-lang lang-rust">Rust</span></div>
+    <pre>SubDet::LarBarrel => {
+  <span class="k">let</span> lar = cfg.lar_layer; <span class="c">// = 2</span>
+  <span class="c">// laba_ncells(2) = 57, eta_abs=20 &lt; 57 → OK</span>
+  <span class="k">let</span> eta_c = <span class="fn">laba_eta</span>(lar, eta_abs);    <span class="c">// eta_c = 0.0125 + 0.025×20 = 0.5125  ← BUG-1 corrigido</span>
+  <span class="k">if</span> <span class="fn">in_barrel_crack</span>(eta_c.abs(), <span class="k">true</span>) { <span class="k">return</span> None; } <span class="c">// 0.525 > 1.475? NÃO</span>
+
+  <span class="k">let</span> r_mid = (cfg.h1 + cfg.h2) / <span class="n">2.0</span>; <span class="c">// (1581+1840)/2 = 1710.5 mm</span>
+  <span class="k">let</span> dr    = cfg.h2 - cfg.h1;         <span class="c">// 1840−1581 = 259.0 mm</span>
+
+  <span class="c">// FÍSICA: z = R·sinh(η)  —  sinh(0.525) = 0.54945</span>
+  <span class="k">let</span> cz = z_sign * <span class="fn">eta_to_z</span>(eta_c.abs(), r_mid); <span class="c">// 1710.5 × 0.54945 = 939.9 mm</span>
+  <span class="k">let</span> cx = -r_mid * sin_phi;  <span class="c">// −1710.5 × 0.9782 = −1673.1 mm</span>
+  <span class="k">let</span> cy =  r_mid * cos_phi;  <span class="c">// +1710.5 × (−0.2075) = −354.9 mm</span>
+
+  <span class="c">// sz: regra da cadeia  dz = R·cosh(η)·dη / 2</span>
+  <span class="k">let</span> deta = <span class="fn">laba_deta</span>(lar, eta_abs); <span class="c">// = 0.025</span>
+  <span class="k">let</span> sz = (r_mid * eta_c.abs().cosh() * deta / <span class="n">2.0</span>).min(<span class="n">800.0</span>);
+  <span class="c">// cosh(0.525) = 1.1410  →  sz = 1710.5 × 1.1410 × 0.025/2 = 24.4 mm</span>
+  Some((cx, cy, cz, dr/<span class="n">2.0</span>, r_mid*dphi/<span class="n">2.0</span>, sz.max(<span class="n">1.0</span>)))
+}</pre>
+  </div>
+
+  <div class="math">
+    <span class="ml">laba_eta(2, 20):</span><span class="mv"> 0.0125 + 0.025×20 = 0.5125</span><span class="mc"> ← eta físico (BUG-1 corrigido: antes 0.025+0.025×20=0.525)</span><br>
+    <span class="ml">Fórmula corrigida: para idx &lt; 56, η = 0.0125 + 0.025×idx (centro da 1ª célula é 0.0125, passo Δη=0.025)</span><br>
+    <span class="ml">sinh(0.5125) = (e^0.5125−e^−0.5125)/2:</span><br>
+    <span class="ml">  e^0.5125 =</span><span class="mv"> 1.66946</span><span class="ml">  e^−0.5125 =</span><span class="mv"> 0.59900</span><br>
+    <span class="ml">  sinh(0.5125) =</span><span class="mv"> (1.66946−0.59900)/2 = 0.53523</span><br>
+    <span class="ml">cz = +1×1710.5×0.53523 =</span><span class="mv"> +915.6 mm</span><span class="mc"> ← era +939.9 mm com bug</span><br>
+    <span class="ml">cx =</span><span class="mv"> −1673.1 mm</span><span class="ml">  cy =</span><span class="mv"> −354.9 mm</span><span class="mc"> ← inalterados (dependem só de φ)</span><br>
+    <span class="ml">cosh(0.5125) =</span><span class="mv"> 1.13423</span><br>
+    <span class="ml">sz = 1710.5×1.13423×0.025/2 =</span><span class="mv"> 24.3 mm</span><span class="mc"> ← era 24.4 mm (diferença mínima)</span><br>
+    <span class="ml">sx =</span><span class="mv"> 129.5 mm</span><span class="ml">  sy = 1710.5×0.024544/2 =</span><span class="mv"> 20.99 mm</span>
+  </div>
+
+  <div class="warn">
+    <strong>Por que sinh e não linear?</strong> Se usássemos z = R·η: z = 1710.5×0.5125 = 876.6mm. O sinh dá 915.6mm. Erro de 39.0mm (4.3%). Para η=1.4 (perto do limite do barril), o erro linear seria &gt;30%. A fórmula sinh é a definição matemática correta de η — não é uma aproximação.
+  </div>
+</section>
+
+<section class="section" id="geo-lare">
+  <div class="section-header">
+    <div class="section-icon" style="background:var(--lare2);color:var(--lare)"><span class="material-icons-round">grid_on</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Geometria — SubDet::LarEndCap</div>
+      <h2>Célula 4 — LAr Tampa: l=23, eta=20, phi=12, E=2200 MeV</h2>
+    </div>
+  </div>
+  <p>A tampa é o inverso do barril: o <strong>Z é fixo</strong> (a tampa é um disco plano) e o <strong>raio transversal R é calculado</strong> invertendo z = R·sinh(η) → R = z/sinh(η).</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — ramo SubDet::LarEndCap<span class="code-lang lang-rust">Rust</span></div>
+    <pre>SubDet::LarEndCap => {
+  <span class="k">let</span> lar = cfg.lar_layer;  <span class="c">// = 1 (camada de tiras)</span>
+  <span class="c">// eta_abs=20, laeb_ncells(1)=216  →  20 &lt; 216 OK</span>
+  <span class="k">let</span> eta_c = <span class="fn">laeb_eta</span>(lar, eta_abs);
+  <span class="c">// idx=20 ≥ 4, 20 &lt; 100: eta_c = 1.50984 + 0.003125×16 = 1.55984</span>
+  <span class="k">if</span> <span class="fn">in_barrel_crack</span>(eta_c.abs(), <span class="k">false</span>) { <span class="k">return</span> None; } <span class="c">// 1.559 &lt; 1.5? NÃO</span>
+
+  <span class="k">let</span> h1 = <span class="fn">laeb_h1</span>(lar, eta_abs); <span class="c">// 3754.24 mm ← face Z interna</span>
+  <span class="k">let</span> h2 = <span class="fn">laeb_h2</span>(lar, eta_abs); <span class="c">// 3800.73 mm ← face Z externa</span>
+  <span class="k">let</span> z_mid = (h1 + h2) / <span class="n">2.0</span>; <span class="c">// 3777.49 mm</span>
+  <span class="k">let</span> dz    = h2 - h1;           <span class="c">// 46.49 mm</span>
+
+  <span class="c">// FÍSICA INVERSA: r = z / sinh(η)</span>
+  <span class="k">let</span> sinh_eta = eta_c.abs().sinh().max(<span class="n">0.001</span>); <span class="c">// 2.2744</span>
+  <span class="k">let</span> r_perp   = z_mid / sinh_eta;               <span class="c">// 3777.49/2.2744 = 1660.5 mm</span>
+
+  <span class="k">let</span> cx = -r_perp * sin_phi; <span class="c">// −1660.5 × 0.3368 = −559.1 mm</span>
+  <span class="k">let</span> cy =  r_perp * cos_phi; <span class="c">// +1660.5 × (−0.9418) = −1563.6 mm</span>
+  <span class="k">let</span> cz =  z_sign * z_mid;   <span class="c">// +3777.49 mm</span>
+
+  <span class="k">let</span> deta = <span class="fn">laeb_deta</span>(lar, eta_abs); <span class="c">// 0.003125 (faixa fina)</span>
+  <span class="k">let</span> dr_approx = (z_mid * deta / (sinh_eta*sinh_eta) * eta_c.abs().cosh()).abs().min(<span class="n">500.0</span>);
+  <span class="c">// dr = 3777.49 × 0.003125 / 5.173 × 2.4845 = 5.67 mm (muito estreito!)</span>
+  Some((cx, cy, cz, dr_approx.max(<span class="n">5.0</span>), r_perp*dphi/<span class="n">2.0</span>, dz/<span class="n">2.0</span>))
+}</pre>
+  </div>
+  <div class="math">
+    <span class="ml">eta_c = 1.50984 + 0.003125×16 =</span><span class="mv"> 1.55984</span><br>
+    <span class="ml">sinh(1.55984) =</span><span class="mv"> 2.2744</span><br>
+    <span class="ml">r_perp = 3777.49 / 2.2744 =</span><span class="mv"> 1660.5 mm</span><br>
+    <span class="ml">cx =</span><span class="mv"> −559.1 mm</span><span class="ml">  cy =</span><span class="mv"> −1563.6 mm</span><span class="ml">  cz =</span><span class="mv"> +3777.5 mm</span><br>
+    <span class="ml">sx (radial) =</span><span class="mv"> 5.67 mm</span><span class="mc"> ← muito estreito (Δη=0.003125)</span><br>
+    <span class="ml">sy (phi) =</span><span class="mv"> 81.5 mm</span><span class="ml">  sz =</span><span class="mv"> 23.25 mm</span>
+  </div>
+</section>
+
+<!-- ═══ MATRIZ 4×4 ═══ -->
+<section class="section" id="matrix">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(129,140,248,.12);color:#818cf8"><span class="material-icons-round">table_chart</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Geometria — build_matrix()</div>
+      <h2>Construindo a Matriz 4×4 de Transformação</h2>
+    </div>
+  </div>
+
+  <p>Para cada célula válida, <code>build_matrix()</code> constrói uma única matriz 4×4 que combina <strong>translação</strong> (posição no espaço), <strong>rotação</strong> (orientação azimutal em φ) e <strong>escala não-uniforme</strong> (tamanho diferente nos 3 eixos). Esta matriz será passada diretamente para o <code>InstancedMesh</code> do Three.js.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>lib.rs — build_matrix()<span class="code-lang lang-rust">Rust</span></div>
+    <pre><span class="k">fn</span> <span class="fn">build_matrix</span>(cx:f64, cy:f64, cz:f64, sx:f64, sy:f64, sz:f64, phi:f64, scale:f64) -> [f32; <span class="n">16</span>] {
+    <span class="k">let</span> (s, c) = (phi.sin(), phi.cos());
+    <span class="k">let</span> sc = scale;
+    <span class="k">let</span> s32 = |v: f64| (v * sc) <span class="k">as</span> f32;  <span class="c">// mm × 0.001 → metros, depois f64→f32</span>
+    [
+        <span class="c">// Coluna 0 — "eixo X local" da célula (direção radial rotacionada)</span>
+        s32(-s * sx),  s32(c * sx),  <span class="n">0.0</span>, <span class="n">0.0</span>,
+        <span class="c">// Coluna 1 — "eixo Y local" (direção tangencial/phi rotacionada)</span>
+        s32(-c * sy), s32(-s * sy),  <span class="n">0.0</span>, <span class="n">0.0</span>,
+        <span class="c">// Coluna 2 — "eixo Z local" (direção ao longo do feixe)</span>
+        <span class="n">0.0</span>, <span class="n">0.0</span>, s32(sz), <span class="n">0.0</span>,
+        <span class="c">// Coluna 3 — translação (posição do centro da célula)</span>
+        s32(cx), s32(cy), s32(cz), <span class="n">1.0</span>,
+    ]
+}</pre>
+  </div>
+
+  <div class="info">
+    <strong>Column-major:</strong> Three.js armazena matrizes em formato <em>column-major</em> — cada coluna fica em 4 floats consecutivos na memória. O índice [i] do array corresponde à linha <code>i%4</code>, coluna <code>i/4</code>. Esta é a convenção de OpenGL/WebGL, diferente de algumas APIs que usam row-major.
+  </div>
+
+  <div class="info" style="margin-top:8px">
+    <strong>Por que elements[14] = translação Z?</strong><br>
+    Em column-major: a 4ª coluna (índice de coluna 3) ocupa os indices [12], [13], [14], [15]. Ela contém [tx, ty, tz, 1]. Portanto <code>elements[14] = tz = cz</code> (a translação Z da célula). Isto é usado em <code>buildMesh()</code> para extrair <code>cellZPositions[i] = m4tmp.elements[14]</code> para o Z-slicer.
+  </div>
+
+  <h3>O que cada coluna representa</h3>
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">Colunas 0 e 1</span><span class="def-desc">Definem como os eixos X e Y do cubo unitário são transformados. Como a célula deve estar orientada em φ no espaço, os eixos locais são rotacionados por φ usando sin e cos. A magnitude dos vetores é <code>sx</code> e <code>sy</code> — a escala da caixa.</span></div>
+    <div class="def-item"><span class="def-term">Coluna 2</span><span class="def-desc">O eixo Z local simplesmente escala por <code>sz</code> — as células são paralelas ao feixe no eixo Z, sem rotação adicional.</span></div>
+    <div class="def-item"><span class="def-term">Coluna 3</span><span class="def-desc">A translação: cx, cy, cz colocam o centro da célula na posição correta no mundo 3D. O quarto elemento é sempre 1.0 (convenção de coordenadas homogêneas).</span></div>
+  </div>
+
+  <h3>Exemplo completo — Célula Tile (l=0, eta=2, phi=5)</h3>
+  <p style="font-size:.84rem">Valores após scale × 0.001 (mm → metros), com φ = 2.1108 rad, s=0.8572, c=−0.5150:</p>
+
+  <div class="matrix-wrap">
+    <div class="matrix-label">Matriz resultante (column-major, [f32;16] — valores em metros):</div>
+    <div style="font-family:var(--mono);font-size:.78rem;line-height:2.1;overflow-x:auto">
+      <span style="color:var(--muted)">Índice:   </span>
+      <span style="color:#82aaff">[0]    [1]    [2]   [3]</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#c3e88d">[4]      [5]    [6]   [7]</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#f78c6c">[8]   [9]   [10]  [11]</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#ffcb6b">[12]    [13]    [14]   [15]</span><br>
+      <span style="color:var(--muted)">         </span>
+      <span style="color:#82aaff">−0.1286  −0.0773  0.0   0.0</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#c3e88d">0.0619  −0.1031  0.0   0.0</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#f78c6c">0.0   0.0   0.1278  0.0</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#ffcb6b">−2.1001  −1.2618  +0.6208  1.0</span><br>
+      <span style="color:var(--muted)">Coluna:   </span>
+      <span style="color:#82aaff">↑── col 0: eixo X local (sx=0.150m) ──↑</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#c3e88d">↑── col 1: eixo Y (sy=0.1203m) ──↑</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#f78c6c">↑── col 2: Z (sz=0.1278m) ──↑</span><span style="color:var(--muted)">  |</span>
+      <span style="color:#ffcb6b">↑── col 3: translação ──↑</span>
+    </div>
+  </div>
+
+  <h3>Checkpoint B — resultado para as 4 células</h3>
+  <div class="snapshot">
+    <div class="snapshot-header"><span class="material-icons-round">stop_circle</span>Float32Array de matrizes — 4 células × 16 floats = 64 floats totais</div>
+    <div class="snapshot-body">
+      <div class="snap-row"><span class="snap-key" style="color:var(--tile)">Tile  (0..15)</span><span class="snap-val">−0.1286, −0.0773, 0, 0, 0.0619, −0.1031, 0, 0, 0, 0, 0.1278, 0, −2.100, −1.262, +0.621, 1</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--hec)">HEC   (16..31)</span><span class="snap-val">−0.0387, −0.0645, 0, 0, 0.0808, −0.0456, 0, 0, 0, 0, 0.140, 0, −0.739, −1.233, +4.490, 1</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--larb)">LAr B (32..47)</span><span class="snap-val">−0.1269, −0.0270, 0, 0, 0.0043, −0.0206, 0, 0, 0, 0, 0.0243, 0, −1.673, −0.355, +0.916, 1</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--lare)">LAr E (48..63)</span><span class="snap-val">−0.0019, −0.0055, 0, 0, 0.0077, −0.0028, 0, 0, 0, 0, 0.0233, 0, −0.559, −1.564, +3.778, 1</span></div>
+      <div class="snap-row"><span class="snap-key">colors (12 floats)</span><span class="snap-val">[0.00, 1.00, 0.73,  1.00, 0.00, 0.00,  0.00, 0.00, 1.00,  0.55, 1.00, 0.00]</span></div>
+      <div class="snap-row"><span class="snap-key">energies (4 floats)</span><span class="snap-val">[0.3182, 1.0000, 0.0000, 0.6364]</span></div>
+      <div class="snap-row"><span class="snap-key">layers (4 floats)</span><span class="snap-val">[0, 14, 20, 23]</span></div>
+      <div class="snap-row"><span class="snap-key">etas (4 floats)</span><span class="snap-val">[2, 3, 20, 20]</span></div>
+      <div class="snap-row"><span class="snap-key">phis (4 floats)</span><span class="snap-val">[5, 10, 8, 12]</span></div>
+      <div class="snap-row"><span class="snap-key">count</span><span class="snap-val">4</span></div>
+      <div class="snap-row"><span class="snap-key">maxEnergy / minEnergy</span><span class="snap-val">3000.0 / 800.0 MeV</span></div>
+    </div>
+  </div>
+
+  <p style="font-size:.84rem">Este objeto JavaScript é o retorno de <code>process_xml_data(bytes)</code>. O WASM terminou seu trabalho. A partir daqui tudo é JavaScript e GPU.</p>
+
+  <div class="warn" style="margin-top:12px">
+    <strong>Impacto do BUG-1 corrigido na matriz LAr B:</strong> O elemento [14] (translação Z) da matriz LAr Barril mudou de +0.940 para +0.916 m (correção de ~24mm). O elemento [10] (escala Z = sz) mudou de 0.0244 para 0.0243 m (diferença negligenciável). Os elementos [12] e [13] (cx, cy) não mudam pois dependem apenas de φ, não de η.
+  </div>
+</section>
+
+<!-- ═══ STEP 4: buildMesh ═══ -->
+<section class="section" id="step4">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(251,146,60,.12);color:#fb923c"><span class="material-icons-round">view_in_ar</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Passo 4 — main.js: buildMesh(result)</div>
+      <h2>Construindo o InstancedMesh e enviando para a GPU</h2>
+    </div>
+  </div>
+
+  <p>Com os arrays prontos, <code>buildMesh(result)</code> cria o objeto Three.js que representa todas as células de uma vez com um único draw call. Esta é a chave da performance: em vez de milhares de objetos individuais, há apenas <strong>um único InstancedMesh</strong>.</p>
+
+  <h3>O que é InstancedMesh?</h3>
+  <p style="font-size:.85rem">Um <code>InstancedMesh</code> renderiza a mesma geometria (no nosso caso, um cubo unitário <code>BoxGeometry(1,1,1)</code>) em N posições/escalas diferentes com <strong>uma única chamada à GPU</strong> (draw call). Cada "instância" recebe sua própria matriz de transformação. Sem instancing, renderizar 100.000 células exigiria 100.000 draw calls — o que travaria qualquer GPU.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — buildMesh() completo<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">function</span> <span class="fn">buildMesh</span>(result) {
+  <span class="k">const</span> n = result.count;  <span class="c">// = 4 no nosso exemplo</span>
+  <span class="k">if</span> (!n) <span class="k">return</span>;
+
+  <span class="c">// Salva os metadados para uso no raycaster / filtros</span>
+  cellNormEnergies = result.energies;  <span class="c">// Float32Array(4) = [0.318, 1.0, 0.0, 0.636]</span>
+  cellLayerIds     = result.layers;    <span class="c">// Float32Array(4) = [0, 14, 20, 23]</span>
+  cellEtaIds       = result.etas;      <span class="c">// Float32Array(4) = [2, 3, 20, 20]</span>
+  cellPhiIds       = result.phis;      <span class="c">// Float32Array(4) = [5, 10, 8, 12]</span>
+
+  <span class="c">// ─── GEOMETRIA BASE (cubo unitário, compartilhado por TODAS as instâncias) ───</span>
+  <span class="k">const</span> geo = <span class="k">new</span> THREE.<span class="fn">BoxGeometry</span>(<span class="n">1</span>, <span class="n">1</span>, <span class="n">1</span>);
+  <span class="c">// BoxGeometry cria 8 vértices, 12 triângulos (6 faces × 2 tri), 36 índices</span>
+  <span class="c">// Vértices de um cubo de lado 1 centrado na origem — a matriz 4×4 faz o resto</span>
+
+  <span class="c">// ─── ATRIBUTOS POR INSTÂNCIA (enviados à GPU como InstancedBufferAttribute) ───</span>
+  <span class="c">// a_iid: ID único de cada instância (0, 1, 2, 3, ...) — para hover highlight</span>
+  <span class="k">const</span> iids = <span class="k">new</span> Float32Array(n);
+  <span class="k">for</span> (<span class="k">let</span> i = <span class="n">0</span>; i &lt; n; i++) iids[i] = i;
+  geo.setAttribute(<span class="str">'a_iid'</span>,    <span class="k">new</span> THREE.<span class="fn">InstancedBufferAttribute</span>(iids, <span class="n">1</span>));
+
+  <span class="c">// a_energy: energia normalizada [0,1] — usada pelo shader para brilho e filtro</span>
+  geo.setAttribute(<span class="str">'a_energy'</span>, <span class="k">new</span> THREE.<span class="fn">InstancedBufferAttribute</span>(cellNormEnergies.slice(), <span class="n">1</span>));
+
+  <span class="c">// a_active: 1=visível, 0=oculto — controlado pelos filtros de subdetector e Z-slice</span>
+  activeAttr = <span class="k">new</span> Float32Array(n).fill(<span class="n">1</span>);
+  geo.setAttribute(<span class="str">'a_active'</span>, <span class="k">new</span> THREE.<span class="fn">InstancedBufferAttribute</span>(activeAttr, <span class="n">1</span>));
+
+  <span class="c">// ─── MATERIAL: nosso ShaderMaterial customizado ───</span>
+  <span class="k">const</span> mat = <span class="k">new</span> THREE.<span class="fn">ShaderMaterial</span>({
+    vertexShader, fragmentShader, uniforms: shaderUniforms,
+    transparent: <span class="k">true</span>, depthWrite: <span class="k">true</span>, clipping: <span class="k">true</span>,
+  });
+
+  <span class="c">// ─── O INSTANCED MESH ───</span>
+  <span class="k">const</span> mesh = <span class="k">new</span> THREE.<span class="fn">InstancedMesh</span>(geo, mat, n);
+  mesh.instanceMatrix.usage = THREE.DynamicDrawUsage; <span class="c">// hint para driver GPU</span>
+
+  <span class="c">// Cores RGB por instância (do WASM — escala jet)</span>
+  mesh.instanceColor = <span class="k">new</span> THREE.<span class="fn">InstancedBufferAttribute</span>(result.colors.slice(), <span class="n">3</span>);
+
+  <span class="c">// ─── MATRIZES: carrega cada uma das 4 matrizes 4×4 no mesh ───</span>
+  <span class="k">const</span> m4 = <span class="k">new</span> THREE.<span class="fn">Matrix4</span>();
+  <span class="k">for</span> (<span class="k">let</span> i = <span class="n">0</span>; i &lt; n; i++) {
+    m4.<span class="fn">fromArray</span>(result.matrices, i * <span class="n">16</span>); <span class="c">// lê 16 floats a partir do offset i*16</span>
+    mesh.<span class="fn">setMatrixAt</span>(i, m4);
+  }
+  mesh.instanceMatrix.needsUpdate = <span class="k">true</span>; <span class="c">// sinaliza que GPU precisa reupload</span>
+
+  <span class="c">// ─── Z-positions para Z-slicer ───</span>
+  cellZPositions = <span class="k">new</span> Float32Array(n);
+  <span class="k">const</span> m4tmp = <span class="k">new</span> THREE.<span class="fn">Matrix4</span>();
+  <span class="k">for</span> (<span class="k">let</span> i = <span class="n">0</span>; i &lt; n; i++) {
+    m4tmp.<span class="fn">fromArray</span>(result.matrices, i * <span class="n">16</span>);   <span class="c">// carrega coluna por coluna (column-major)</span>
+    cellZPositions[i] = m4tmp.elements[<span class="n">14</span>];      <span class="c">// elements[14] = col 3, linha 2 = translação Z = cz</span>
+    <span class="c">// Equivalente a result.matrices[i*16 + 14] pois fromArray preserva a ordem</span>
+  }
+
+  scene.<span class="fn">add</span>(mesh);
+  activeMesh = mesh;
+}</pre>
+  </div>
+
+  <h3>O fluxo de dados até a GPU</h3>
+  <div class="pipeline">
+    <div class="pipe-step" style="color:#e879f9">Float32Array<br><span class="ps-label">result.matrices</span></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="color:#f5c60b">fromArray(m4)<div class="ps-label">JS Matrix4</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="color:#fb923c">setMatrixAt(i,m4)<div class="ps-label">instanceMatrix</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="color:#60a5fa">needsUpdate=true<div class="ps-label">flag de upload</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="color:#34d399">GPU Buffer<div class="ps-label">VRAM</div></div>
+  </div>
+
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">instanceMatrix</span><span class="def-desc">Buffer interno do Three.js que armazena todas as matrizes 4×4 em sequência (n × 16 floats). Quando <code>needsUpdate = true</code>, Three.js faz <code>gl.bufferData()</code> ou <code>gl.bufferSubData()</code> para enviar os dados para a VRAM da GPU.</span></div>
+    <div class="def-item"><span class="def-term">instanceColor</span><span class="def-desc">Buffer de cor RGB por instância (n × 3 floats). No vertex shader é acessado como <code>instanceColor</code> (built-in do Three.js). O valor vem do WASM — cor da escala jet.</span></div>
+    <div class="def-item"><span class="def-term">InstancedBufferAttribute</span><span class="def-desc">Diferente de <code>BufferAttribute</code> (que tem um valor por vértice), esta classe tem <strong>um valor por instância</strong>. É como o GPU sabe que <code>a_energy</code> = 0.318 pertence à instância 0 (Tile), não ao vértice 0.</span></div>
+    <div class="def-item"><span class="def-term">DynamicDrawUsage</span><span class="def-desc">Hint para o driver WebGL: diz que este buffer será atualizado com frequência (ao filtrar detectores, ao mudar o Z-slice etc.). O driver pode manter o buffer em memória de acesso rápido.</span></div>
+  </div>
+
+  <div class="checkpoint">
+    <div class="checkpoint-title"><span class="material-icons-round">check_circle</span>Estado após Step 4 — o que está na GPU agora</div>
+    <div class="snapshot-body">
+      <div class="snap-row"><span class="snap-key">instanceMatrix (VRAM)</span><span class="snap-val">64 floats — 4 matrizes 4×4 em metros</span></div>
+      <div class="snap-row"><span class="snap-key">instanceColor (VRAM)</span><span class="snap-val">12 floats — 4 cores RGB</span></div>
+      <div class="snap-row"><span class="snap-key">a_energy (VRAM)</span><span class="snap-val">4 floats — [0.318, 1.0, 0.0, 0.636]</span></div>
+      <div class="snap-row"><span class="snap-key">a_active (VRAM)</span><span class="snap-val">4 floats — [1, 1, 1, 1]</span></div>
+      <div class="snap-row"><span class="snap-key">a_iid (VRAM)</span><span class="snap-val">4 floats — [0, 1, 2, 3]</span></div>
+      <div class="snap-row"><span class="snap-key">ghostGrp.visible</span><span class="snap-val">false — geometria de referência escondida</span></div>
+      <div class="snap-row"><span class="snap-key">scene.children</span><span class="snap-val">axisGroup + mesh (InstancedMesh de 4 instâncias)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STEP 5: Shaders ═══ -->
+<section class="section" id="step5">
+  <div class="section-header">
+    <div class="section-icon si-gpu"><span class="material-icons-round">developer_board</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Passo 5 — GLSL: vertex e fragment shaders</div>
+      <h2>Shaders: processamento na GPU por vértice e por pixel</h2>
+    </div>
+  </div>
+
+  <p>Os shaders são programas que rodam <strong>diretamente na GPU</strong>, em paralelo para cada vértice e cada fragmento (pixel) da cena. Não há laço JavaScript — a GPU executa milhares de invocações simultaneamente.</p>
+
+  <h3>Uniforms — variáveis globais do shader</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — shaderUniforms<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">const</span> shaderUniforms = {
+  u_threshold: { value: <span class="n">0.0</span>  },  <span class="c">// threshold de energia [0,1] — slider do painel</span>
+  u_time:      { value: <span class="n">0.0</span>  },  <span class="c">// tempo em segundos — incrementado a cada frame</span>
+  u_highlight: { value: <span class="n">-1.0</span> },  <span class="c">// ID da célula sob o cursor (−1 = nenhuma)</span>
+};</pre>
+  </div>
+
+  <h3>5.1 — Vertex Shader</h3>
+  <p style="font-size:.85rem">Executado para cada um dos 8 vértices do cubo × 4 instâncias = 32 vezes por frame.</p>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>main.js — vertexShader (GLSL)<span class="code-lang lang-glsl">GLSL</span></div>
+    <pre><span class="c">// Atributos por instância (um valor por célula, não por vértice)</span>
+<span class="k">attribute float</span> a_energy;  <span class="c">// energia normalizada [0,1]</span>
+<span class="k">attribute float</span> a_active;  <span class="c">// 0 = oculto pelo filtro, 1 = visível</span>
+<span class="k">attribute float</span> a_iid;     <span class="c">// ID inteiro da instância</span>
+
+<span class="c">// Varyings: interpolados e passados ao fragment shader</span>
+<span class="k">varying float</span> v_energy;
+<span class="k">varying vec3</span>  v_col;       <span class="c">// cor instanceColor passada adiante</span>
+<span class="k">varying vec3</span>  v_normal;    <span class="c">// normal transformada para o espaço de visão</span>
+<span class="k">varying vec3</span>  v_worldPos;  <span class="c">// posição no espaço do mundo (para especular/rim)</span>
+
+<span class="k">void</span> main() {
+  v_energy   = a_energy;
+  v_col      = instanceColor;  <span class="c">// RGB da escala jet, injetado pelo Three.js</span>
+  v_normal   = normalize(normalMatrix * normal);
+
+  <span class="c">// TRANSFORMAÇÃO PRINCIPAL:</span>
+  <span class="c">// position = vértice do cubo unitário [-0.5, +0.5]</span>
+  <span class="c">// instanceMatrix = nossa matriz 4×4 (rotação + escala + translação)</span>
+  <span class="c">// modelMatrix = matriz do próprio mesh (identidade aqui)</span>
+  <span class="t">vec4</span> wp = modelMatrix * instanceMatrix * <span class="t">vec4</span>(position, <span class="n">1.0</span>);
+  v_worldPos  = wp.xyz;
+  gl_Position = projectionMatrix * viewMatrix * wp;
+}</pre>
+  </div>
+
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">instanceMatrix</span><span class="def-desc">Variável built-in do Three.js injetada automaticamente em shaders de InstancedMesh. Contém a matriz 4×4 específica da instância atual sendo processada.</span></div>
+    <div class="def-item"><span class="def-term">position</span><span class="def-desc">Atributo built-in: posição do vértice atual do cubo unitário. Valores entre [−0.5, +0.5] em X, Y e Z. Multiplicado pela instanceMatrix, fica na posição/tamanho corretos no mundo.</span></div>
+    <div class="def-item"><span class="def-term">projectionMatrix × viewMatrix × modelMatrix × instanceMatrix</span><span class="def-desc">A cadeia MVP (Model-View-Projection). Transforma o vértice do espaço do objeto → espaço da câmera → espaço de clip (NDC), que o rasterizador converte em pixels na tela.</span></div>
+  </div>
+
+  <h3>5.2 — Fragment Shader</h3>
+  <p style="font-size:.85rem">Executado para cada pixel coberto por alguma célula. Recebe os varyings interpolados do vertex shader e decide a cor final do pixel.</p>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">code</span>main.js — fragmentShader (GLSL)<span class="code-lang lang-glsl">GLSL</span></div>
+    <pre><span class="k">void</span> main() {
+  <span class="c">// DESCARTE: células ocultas ou abaixo do threshold</span>
+  <span class="k">if</span> (v_active  &lt; <span class="n">0.5</span>)         discard;  <span class="c">// filtro subdetector/Z-slice</span>
+  <span class="k">if</span> (v_energy  &lt; u_threshold) discard;  <span class="c">// slider de energia</span>
+
+  <span class="c">// ─── ILUMINAÇÃO Phong simplificada ───</span>
+  <span class="t">vec3</span> ld1 = normalize(<span class="t">vec3</span>(<span class="n">0.55</span>, <span class="n">1.0</span>, <span class="n">0.50</span>));  <span class="c">// direção luz principal</span>
+  <span class="t">vec3</span> ld2 = normalize(<span class="t">vec3</span>(<span class="n">-0.8</span>, <span class="n">-0.3</span>, <span class="n">-0.6</span>)); <span class="c">// luz de preenchimento</span>
+  <span class="k">float</span> d1 = max(dot(v_normal, ld1), <span class="n">0.0</span>) * <span class="n">0.60</span>; <span class="c">// difuso principal</span>
+  <span class="k">float</span> d2 = max(dot(v_normal, ld2), <span class="n">0.0</span>) * <span class="n">0.13</span>; <span class="c">// difuso fill</span>
+
+  <span class="c">// Rim light: brilho nas bordas (efeito de contorno)</span>
+  <span class="t">vec3</span> vd  = normalize(cameraPosition - v_worldPos);
+  <span class="k">float</span> rim = pow(<span class="n">1.0</span> - max(dot(vd, v_normal), <span class="n">0.0</span>), <span class="n">4.0</span>) * <span class="n">0.12</span>;
+
+  <span class="t">vec3</span> lit = v_col * (<span class="n">0.30</span> + d1 + d2) + <span class="t">vec3</span>(rim * <span class="n">0.30</span>);
+
+  <span class="c">// Especular dourado proporcional à energia</span>
+  <span class="k">float</span> sp = pow(max(dot(reflect(-ld1, v_normal), vd), <span class="n">0.0</span>), <span class="n">40.0</span>) * <span class="n">0.06</span> * v_energy;
+  lit += <span class="t">vec3</span>(<span class="n">0.88</span>, <span class="n">0.72</span>, <span class="n">0.24</span>) * sp;
+
+  <span class="c">// Brilho proporcional à energia² — células quentes brilham mais</span>
+  <span class="k">float</span> boost = <span class="n">1.0</span> + v_energy * v_energy * <span class="n">1.8</span>;
+  lit *= boost;
+
+  <span class="c">// Hover highlight: clareia 45% a célula sob o cursor</span>
+  <span class="k">float</span> isHot = step(u_highlight - <span class="n">0.5</span>, v_iid) * step(v_iid, u_highlight + <span class="n">0.5</span>);
+  lit = mix(lit, lit * <span class="n">1.45</span> + <span class="t">vec3</span>(<span class="n">0.06</span>, <span class="n">0.04</span>, <span class="n">0.0</span>), isHot * <span class="n">0.50</span>);
+
+  gl_FragColor = <span class="t">vec4</span>(lit, <span class="n">0.93</span>); <span class="c">// alpha=0.93: leve transparência</span>
+}</pre>
+  </div>
+
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">discard</span><span class="def-desc">Descarta completamente o fragmento — nenhum pixel é escrito. É assim que os filtros funcionam: o atributo <code>a_active</code> (0/1) é checado no shader para cada pixel, não apenas por célula. Eficiente pois não precisa remover instâncias do buffer.</span></div>
+    <div class="def-item"><span class="def-term">dot(v_normal, ld)</span><span class="def-desc">Produto escalar entre a normal da superfície e a direção da luz. Quanto mais paralelos (ângulo menor), mais iluminada a face. Clampado em [0,1] com max().</span></div>
+    <div class="def-item"><span class="def-term">Rim light</span><span class="def-desc">Brilho nas bordas de objetos — simula luz de contorno. Calculado como 1 − cos(ângulo entre normal e câmera). Máximo quando a normal é perpendicular ao vetor da câmera, ou seja, nas bordas do objeto.</span></div>
+    <div class="def-item"><span class="def-term">boost = 1 + energy² × 1.8</span><span class="def-desc">Uma célula com energia normalizada 1.0 tem brilho multiplicado por 2.8×. Uma célula com energia 0.5 tem boost de 1.45×. Isso faz células de alta energia parecerem literalmente mais quentes/brilhantes, complementando o bloom do pós-processamento.</span></div>
+  </div>
+</section>
+
+<!-- ═══ STEP 6: RENDER LOOP ═══ -->
+<section class="section" id="step6">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(52,211,153,.12);color:#34d399"><span class="material-icons-round">loop</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Passo 6 — main.js: render loop</div>
+      <h2>Loop de render — a cena é redesenhada a cada frame</h2>
+    </div>
+  </div>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — render loop<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">const</span> clock = <span class="k">new</span> THREE.<span class="fn">Clock</span>();
+
+(<span class="k">function</span> loop() {
+  requestAnimationFrame(loop);           <span class="c">// agenda próximo frame (≈60fps ou taxa do monitor)</span>
+  <span class="k">const</span> dt = clock.<span class="fn">getDelta</span>();           <span class="c">// tempo desde o último frame em segundos</span>
+  shaderUniforms.u_time.value += dt;     <span class="c">// atualiza uniform de tempo (animações)</span>
+  controls.<span class="fn">update</span>(dt);                   <span class="c">// aplica damping do OrbitControls</span>
+  composer.<span class="fn">render</span>();                     <span class="c">// executa a cadeia RenderPass→Bloom→SMAA→Output</span>
+})();</pre>
+  </div>
+
+  <h3>O que acontece em cada frame</h3>
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">requestAnimationFrame</span><span class="def-desc">API do browser que agenda uma função para executar antes do próximo repaint. Garante que o render acontece na taxa certa para o monitor (60fps, 120fps etc.) e pausa automaticamente quando a aba não está visível, economizando bateria.</span></div>
+    <div class="def-item"><span class="def-term">controls.update(dt)</span><span class="def-desc">Processa o damping do OrbitControls — aplica suavização aos movimentos de câmera e executa a rotação automática (<code>autoRotate</code>). Sem esta chamada, o damping não funciona.</span></div>
+    <div class="def-item"><span class="def-term">composer.render()</span><span class="def-desc">Executa a cadeia de pós-processamento: (1) RenderPass renderiza a cena 3D num framebuffer off-screen, (2) BloomPass aplica o glow, (3) SMAAPass aplica anti-aliasing, (4) OutputPass faz tone mapping e escreve no canvas.</span></div>
+  </div>
+
+  <h3>O que muda a cada frame</h3>
+  <p style="font-size:.84rem">Muito pouco. O InstancedMesh está na VRAM e não é retransmitido a cada frame. O que muda são: a posição da câmera (pelo OrbitControls), o uniform <code>u_time</code> (se usado para animações), e o uniform <code>u_highlight</code> quando o raycaster detecta hover. Nenhum dado do WASM é recalculado após o carregamento.</p>
+
+  <div class="checkpoint">
+    <div class="checkpoint-title"><span class="material-icons-round">check_circle</span>Estado final — células visíveis na tela</div>
+    <div class="snapshot-body">
+      <div class="snap-row"><span class="snap-key" style="color:var(--tile)">Célula Tile</span><span class="snap-val">Caixa ciano em (−2.10m, −1.26m, +0.62m), ~300×241×256mm</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--hec)">Célula HEC</span><span class="snap-val">Caixa vermelha em (−0.74m, −1.23m, +4.49m), ~151×141×280mm</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--larb)">Célula LAr Barril</span><span class="snap-val">Caixa azul em (−1.67m, −0.35m, +0.92m), ~259×42×49mm</span></div>
+      <div class="snap-row"><span class="snap-key" style="color:var(--lare)">Célula LAr Tampa</span><span class="snap-val">Caixa verde-amarela em (−0.56m, −1.56m, +3.78m), ~11×163×46mm</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STEP 7: RAYCASTER / HOVER ═══ -->
+<section class="section" id="step7">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(245,158,11,.12);color:#f59e0b"><span class="material-icons-round">touch_app</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Passo 7 — main.js: raycasting e tooltip</div>
+      <h2>Usuário passa o mouse — identificando a célula clicada</h2>
+    </div>
+  </div>
+
+  <p>O raycaster projeta um raio invisível da câmera através do ponto do cursor na tela. Se esse raio intersectar alguma instância do InstancedMesh, a célula correspondente é identificada e o tooltip é exibido.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — onMouseMove() + raycaster<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">const</span> raycaster = <span class="k">new</span> THREE.<span class="fn">Raycaster</span>();
+<span class="k">const</span> mouseNDC  = <span class="k">new</span> THREE.<span class="fn">Vector2</span>();
+<span class="k">const</span> RAY_GAP_MS = <span class="n">80</span>;  <span class="c">// throttle: roda no máximo a cada 80ms (≈12fps)</span>
+
+<span class="k">function</span> <span class="fn">onMouseMove</span>(e) {
+  <span class="c">// Throttle: evita rodar o raycaster a 60fps (muito custoso)</span>
+  <span class="k">const</span> now = performance.now();
+  <span class="k">if</span> (now - lastRayMs &lt; RAY_GAP_MS) <span class="k">return</span>;
+  lastRayMs = now;
+
+  <span class="c">// Converte posição do mouse para Normalized Device Coordinates (NDC)</span>
+  <span class="c">// NDC: (−1,−1) = canto inferior esquerdo, (+1,+1) = canto superior direito</span>
+  mouseNDC.x =  (e.clientX / window.innerWidth)  * <span class="n">2</span> - <span class="n">1</span>;
+  mouseNDC.y = -(e.clientY / window.innerHeight) * <span class="n">2</span> + <span class="n">1</span>;
+
+  raycaster.<span class="fn">setFromCamera</span>(mouseNDC, camera); <span class="c">// calcula raio a partir da câmera</span>
+  <span class="k">const</span> hits = raycaster.<span class="fn">intersectObject</span>(activeMesh);
+
+  <span class="k">if</span> (hits.length &gt; <span class="n">0</span> &amp;&amp; hits[<span class="n">0</span>].instanceId !== undefined) {
+    <span class="fn">showTooltip</span>(hits[<span class="n">0</span>].instanceId, e.clientX, e.clientY);
+    <span class="c">// também atualiza u_highlight para o fragment shader iluminar a célula</span>
+  }
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — showTooltip()<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">function</span> <span class="fn">showTooltip</span>(id, screenX, screenY) {
+  shaderUniforms.u_highlight.value = id;  <span class="c">// fragment shader ilumina esta célula</span>
+
+  <span class="c">// Reconstrói energia real a partir do valor normalizado</span>
+  <span class="k">const</span> normE   = cellNormEnergies[id];          <span class="c">// ex: 0.3182 (Tile)</span>
+  <span class="k">const</span> actualE = minE + normE * (maxE - minE);  <span class="c">// 800 + 0.3182×2200 = 1500 MeV</span>
+  ctEnergy.textContent = <span class="fn">fmtE</span>(actualE);          <span class="c">// "1.50 GeV"</span>
+
+  <span class="c">// Identifica subdetector a partir do layer ID</span>
+  <span class="k">const</span> layer  = cellLayerIds[id];               <span class="c">// 0</span>
+  <span class="k">const</span> detIdx = LAYER_DET[Math.min(layer, <span class="n">25</span>)]; <span class="c">// 0 = TileCal</span>
+  ctLayer.textContent = `${layer} (${DET_NAMES[detIdx]})`;
+
+  ctEta.textContent = String(cellEtaIds[id]);    <span class="c">// "2"</span>
+  ctPhi.textContent = String(cellPhiIds[id]);    <span class="c">// "5"</span>
+  cellTooltip.classList.add(<span class="str">'visible'</span>);
+}</pre>
+  </div>
+
+  <div class="info">
+    <strong>Por que o throttle de 80ms?</strong> O raycaster de InstancedMesh testa o raio contra os bounding boxes de todas as instâncias visíveis. Com 100.000 células, isso pode tomar 10–30ms por frame. Limitando a 12fps para o raycasting, o render loop de 60fps não é impactado.
+  </div>
+
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">NDC — Normalized Device Coordinates</span><span class="def-desc">Sistema de coordenadas normalizado: x e y variam de −1 a +1, com origem no centro da tela. É o sistema que o raycaster usa para projetar o raio a partir da câmera na direção correta.</span></div>
+    <div class="def-item"><span class="def-term">instanceId</span><span class="def-desc">Propriedade do resultado de <code>intersectObject</code>: o índice da instância intersectada (0, 1, 2...). É o mesmo índice usado para acessar <code>cellNormEnergies[id]</code>, <code>cellLayerIds[id]</code> etc.</span></div>
+  </div>
+</section>
+
+<!-- ═══ FUNCIONALIDADES ADICIONAIS ═══ -->
+<section class="section" id="extras">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(96,165,250,.12);color:#60a5fa"><span class="material-icons-round">widgets</span></div>
+    <div class="section-title-block">
+      <div class="step-label">main.js — Funcionalidades Complementares</div>
+      <h2>Hover Toggle, Focus Mode, Wiki Panel e Metadados</h2>
+    </div>
+  </div>
+
+  <p>Além do pipeline principal de renderização, o CGV Web tem várias funcionalidades de UX que melhoram a experiência sem afetar a geometria ou os shaders.</p>
+
+  <h3>Cell Hover Toggle — cellHoverEnabled</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — hover toggle<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">let</span> cellHoverEnabled = <span class="k">true</span>;
+cellHoverToggle?.<span class="fn">addEventListener</span>(<span class="str">'change'</span>, e => {
+  cellHoverEnabled = e.target.checked;
+  <span class="k">if</span> (!cellHoverEnabled) <span class="fn">clearTooltip</span>(); <span class="c">// limpa tooltip imediatamente ao desligar</span>
+});
+
+<span class="c">// No onMouseMove, a primeira coisa que faz:</span>
+<span class="k">if</span> (!cellHoverEnabled) { <span class="fn">clearTooltip</span>(); <span class="k">return</span>; } <span class="c">// retorna sem executar raycaster</span></pre>
+  </div>
+  <p style="font-size:.84rem">Com hover desligado, o raycaster não executa — nenhuma CPU desperdiçada a cada 80ms. Útil para capturar screenshots limpos ou explorar a cena com câmera sem o tooltip poluindo a visão.</p>
+
+  <h3>Modo Focus — btn-focus / focus-overlay</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — focus mode<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="c">// Atalho F ou botão btn-focus: esconde todo o HUD, apenas canvas visível</span>
+btnFocus?.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, () => {
+  focusOverlay.classList.<span class="fn">add</span>(<span class="str">'active'</span>);   <span class="c">// mostra overlay (que esconde HUD)</span>
+  hud.classList.<span class="fn">add</span>(<span class="str">'hidden'</span>);           <span class="c">// oculta painel esquerdo, top bar etc.</span>
+});
+btnExitFocus?.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, () => {
+  focusOverlay.classList.<span class="fn">remove</span>(<span class="str">'active'</span>);
+  hud.classList.<span class="fn">remove</span>(<span class="str">'hidden'</span>);
+});</pre>
+  </div>
+  <p style="font-size:.84rem">O focus mode é ideal para capturas 4K via Snapshot: sem o HUD, a imagem capturada mostra apenas o detector sobre o fundo escuro. O <code>btn-exit-focus</code> restaura a interface.</p>
+
+  <h3>Painel de Metadados Colapsável</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — meta panel collapse<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">let</span> metaCollapsed = <span class="k">false</span>;
+metaToggleBtn?.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, () => {
+  metaCollapsed = !metaCollapsed;
+  metaBody?.classList.<span class="fn">toggle</span>(<span class="str">'collapsed'</span>, metaCollapsed);
+  metaToggleBtn.<span class="fn">setAttribute</span>(<span class="str">'aria-expanded'</span>, String(!metaCollapsed));
+  <span class="k">if</span> (metaChevron) {
+    metaChevron.style.transform = metaCollapsed ? <span class="str">'rotate(180deg)'</span> : <span class="str">''</span>;
+    <span class="c">// Chevron vira 180° quando colapsado — feedback visual imediato</span>
+  }
+});</pre>
+  </div>
+
+  <div class="def-list">
+    <div class="def-item"><span class="def-term">meta-filename</span><span class="def-desc">Nome do arquivo XML carregado. Atualizado por <code>filenameText.textContent = file.name</code> após carregamento.</span></div>
+    <div class="def-item"><span class="def-term">cell-count</span><span class="def-desc">Número de células renderizadas (N válidas após filtro de crack e geometria). Atualizado por <code>cellCountEl.textContent = n.toLocaleString()</code>.</span></div>
+    <div class="def-item"><span class="def-term">xml-date</span><span class="def-desc">Data do evento lida do atributo <code>date</code> do XML (<code>&lt;calorimeter date="2024-07-04"&gt;</code>). Exibida no painel para contextualizar o evento.</span></div>
+    <div class="def-item"><span class="def-term">info-energy-range</span><span class="def-desc">Range de energia formatado como "800 MeV – 3.00 GeV". Calculado por <code>fmtE(minE) + '–' + fmtE(maxE)</code>. A função <code>fmtE(mev)</code> exibe em MeV se &lt;1000, em GeV com 2 casas decimais caso contrário.</span></div>
+    <div class="def-item"><span class="def-term">active-blocks</span><span class="def-desc">Lista dos subdetectores ativos, derivada dos layer IDs presentes nos dados. Exemplo: "TileCal · HEC · LAr EM".</span></div>
+  </div>
+
+  <h3>Wiki Panel — 4 abas de conhecimento</h3>
+  <p style="font-size:.84rem">O painel lateral wiki é um <code>&lt;aside id="wiki-panel"&gt;</code> com 4 abas (<em>tab-start</em>, <em>tab-nips</em>, <em>tab-cern</em>, <em>tab-refs</em>), cada uma com conteúdo informativo estático. O <code>wiki-toggle-btn</code> na top bar abre o painel deslizando via CSS transition; <code>wiki-close-btn</code> dentro do painel fecha. As abas usam classe <code>.active</code> para mostrar/ocultar painéis sem reload.</p>
+
+  <h3>Tour Guiado — tour-overlay</h3>
+  <p style="font-size:.84rem">Na primeira visita, o <code>#tour-overlay</code> é exibido com até 9 passos. Cada passo pode ser um card centralizado (<code>.tour-card</code>) ou um popover posicionado perto do elemento descrito (<code>.tour-popover</code>). O estado "não mostrar novamente" (<code>tour-no-show</code>) é salvo em <code>localStorage</code>. O tour pode ser pulado a qualquer momento por <code>tour-skip</code>.</p>
+</section>
+
+<!-- ═══ FILTERS ═══ -->
+<section class="section" id="filters">
+  <div class="section-header">
+    <div class="section-icon si-filt"><span class="material-icons-round">filter_alt</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Interatividade</div>
+      <h2>Filtros em Tempo Real</h2>
+    </div>
+  </div>
+
+  <p>O CGV Web tem três sistemas de filtro independentes que se combinam: <strong>subdetector toggle</strong>, <strong>Z-axis slice</strong> e <strong>energy threshold</strong>. Os dois primeiros operam no atributo <code>a_active</code>; o terceiro usa um uniform do shader.</p>
+
+  <h3>Filtro de subdetector e Z-slice — applyCombinedFilter()</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — applyCombinedFilter()<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">function</span> <span class="fn">applyCombinedFilter</span>() {
+  <span class="k">const</span> att = activeMesh.geometry.attributes.a_active;
+  <span class="k">for</span> (<span class="k">let</span> i = <span class="n">0</span>; i &lt; n; i++) {
+    <span class="k">const</span> detIdx = LAYER_DET[Math.min(cellLayerIds[i], <span class="n">25</span>)]; <span class="c">// 0=Tile, 1=HEC, 2=LAr</span>
+    <span class="k">const</span> detOk  = detEnabled[DET_KEYS[detIdx]];            <span class="c">// checkbox ligado?</span>
+    <span class="k">const</span> zOk    = Math.abs(cellZPositions[i]) &lt;= currentClipZ; <span class="c">// dentro do Z-slice?</span>
+    att.array[i] = (detOk &amp;&amp; zOk) ? <span class="n">1</span> : <span class="n">0</span>;               <span class="c">// 1=mostra, 0=esconde</span>
+  }
+  att.needsUpdate = <span class="k">true</span>; <span class="c">// re-upload do buffer a_active para a GPU</span>
+}</pre>
+  </div>
+
+  <p style="font-size:.84rem">Ao mudar um checkbox ou o Z-slider, o JS itera sobre todas as células, recalcula o valor de <code>a_active</code> para cada uma, e faz upload apenas deste buffer (muito menor que as matrizes). No fragment shader, <code>if (v_active &lt; 0.5) discard</code> descarta pixels de células ocultas.</p>
+
+  <h3>Energy threshold — slider direto no uniform</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — applyThreshold()<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="k">function</span> <span class="fn">applyThreshold</span>(f) {
+  frac = Math.max(<span class="n">0</span>, Math.min(<span class="n">1</span>, f));
+  shaderUniforms.u_threshold.value = frac;  <span class="c">// atualiza uniform — sem upload de buffers</span>
+  <span class="c">// No shader: if (v_energy &lt; u_threshold) discard;</span>
+}</pre>
+  </div>
+  <p style="font-size:.84rem">O threshold de energia é o filtro mais barato: modifica apenas um float nos uniforms. Como os uniforms são constantes globais do shader, <strong>nenhum dado por célula precisa ser retransmitido para a GPU</strong>.</p>
+
+  <h3>Wireframe — buildWireframeOverlay()</h3>
+  <div class="code-wrap">
+    <div class="code-header"><span class="material-icons-round" style="font-size:13px">javascript</span>main.js — wireframe<span class="code-lang lang-js">JS</span></div>
+    <pre><span class="c">// EdgesGeometry do cubo: 12 arestas × 2 vértices = 24 vértices, 72 floats</span>
+<span class="k">const</span> _baseEdgeGeo = <span class="k">new</span> THREE.<span class="fn">EdgesGeometry</span>(<span class="k">new</span> THREE.<span class="fn">BoxGeometry</span>(<span class="n">1</span>,<span class="n">1</span>,<span class="n">1</span>));
+<span class="k">const</span> _edgePos     = _baseEdgeGeo.getAttribute(<span class="str">'position'</span>).array; <span class="c">// 72 floats</span>
+<span class="k">const</span> _edgeVerts   = _edgePos.length / <span class="n">3</span>; <span class="c">// 24</span>
+
+<span class="c">// Para cada célula visível, aplica a matriz 4×4 sobre os 24 vértices das arestas</span>
+<span class="k">for</span> (<span class="k">let</span> i = <span class="n">0</span>; i &lt; n; i++) {
+  activeMesh.<span class="fn">getMatrixAt</span>(i, m4);
+  <span class="k">for</span> (<span class="k">let</span> j = <span class="n">0</span>; j &lt; _edgeVerts; j++) {
+    v.<span class="fn">set</span>(_edgePos[j*<span class="n">3</span>], _edgePos[j*<span class="n">3</span>+<span class="n">1</span>], _edgePos[j*<span class="n">3</span>+<span class="n">2</span>]).<span class="fn">applyMatrix4</span>(m4);
+    pos[off++] = v.x; pos[off++] = v.y; pos[off++] = v.z;
+  }
+}
+<span class="c">// Um único LineSegments com TODAS as arestas concatenadas — 1 draw call</span>
+wireLinesObj = <span class="k">new</span> THREE.<span class="fn">LineSegments</span>(geo, mat);</pre>
+  </div>
+
+  <div class="info">
+    <strong>Por que não <code>material.wireframe = true</code>?</strong> A propriedade wireframe nativa do Three.js tem limitações com InstancedMesh e pode causar crashes com muitas instâncias. A implementação manual garante 1 draw call para todas as arestas de todas as células visíveis, com suporte correto a clipping planes e filtros.
+  </div>
+</section>
+
+<!-- ═══ POST-FX ═══ -->
+<section class="section" id="postfx">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(129,140,248,.12);color:#818cf8"><span class="material-icons-round">blur_on</span></div>
+    <div class="section-title-block">
+      <div class="step-label">Pós-processamento</div>
+      <h2>Pipeline visual final — Bloom, SMAA, Tone Mapping</h2>
+    </div>
+  </div>
+
+  <p>Depois que o fragment shader escreveu as cores base de cada célula, a cadeia de pós-processamento aplica efeitos globais antes de exibir na tela.</p>
+
+  <h3>Por que o bloom não "sangra" em células normais?</h3>
+  <p style="font-size:.84rem">O <code>threshold</code> do bloom está em 0.52. Após o tone mapping ACES, apenas células com <code>boost = 1 + energy² × 1.8</code> suficientemente alto produzem pixels acima deste threshold. Uma célula com energia normalizada 0.3 tem boost ≈ 1.16 — cor base multiplicada por 1.16, insuficiente para disparar o bloom. Uma célula com energia 1.0 tem boost 2.8 — pixels muito brilhantes, bloom ativo.</p>
+
+  <h3>Snapshot 4K</h3>
+  <p style="font-size:.84rem">Ao clicar em Snapshot, um segundo renderer off-screen é criado em resolução 3840×2160, renderiza a mesma cena com a mesma cadeia de pós-processamento, e o resultado é convertido para PNG via <code>canvas.toBlob()</code>. O renderer original não é afetado.</p>
+
+  <div class="ok" style="margin-top:24px">
+    <strong>Resumo do fluxo completo — de um click a uma célula na tela:</strong><br><br>
+    1. <code>index.html</code> declara canvas, DOM, importa <code>main.js</code><br>
+    2. <code>main.js</code> inicializa renderer, scene, camera, post-FX, ghost geometry<br>
+    3. <code>await init()</code> carrega o binário WASM<br>
+    4. Usuário seleciona XML — <code>loadFile()</code> lê bytes<br>
+    5. <code>process_xml_data(bytes)</code> no WASM: parse → HashMap → normalização → geometria → matrizes → Float32Arrays<br>
+    6. <code>buildMesh(result)</code>: BoxGeometry + InstancedBufferAttributes + ShaderMaterial → InstancedMesh → GPU<br>
+    7. Render loop: <code>composer.render()</code> a cada frame — vertex shader transforma vértices, fragment shader calcula cor+iluminação, post-FX finaliza<br>
+    8. Hover: raycaster detecta instância → atualiza <code>u_highlight</code> + tooltip DOM
+  </div>
+</section>
+
+</div><!-- end #main -->
+</body>
+</html>
