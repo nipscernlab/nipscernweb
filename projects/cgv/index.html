@@ -1,800 +1,767 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>CGV-WEB | Interactive</title>
-    <link rel="icon" href="/assets/icon-projects/cgv-web.svg" type="image/svg+xml" sizes="256x256" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            overflow: hidden;
-            background: linear-gradient(135deg, #0a0a12 0%, #1a1a2e 100%);
-            overscroll-behavior: none;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        #canvas-container {
-            width: 100vw;
-            height: 100vh;
-            touch-action: none;
-            transform: translate3d(0, 0, 0);
-            -webkit-transform: translate3d(0, 0, 0);
-            will-change: transform;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
-        
-        #header {
-            position: absolute;
-            top: 24px;
-            left: 24px;
-            color: #fff;
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            opacity: 0.85;
-            pointer-events: none;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-            will-change: opacity;
-        }
-        
-        #controls {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background: rgba(10, 12, 20, 0.75);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid rgba(100, 180, 255, 0.12);
-            color: #e8eef5;
-            min-width: 260px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 
-                        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-            transform: translate3d(0, 0, 0);
-            will-change: transform;
-        }
-        
-        .control-group {
-            margin-bottom: 18px;
-        }
-        
-        .control-group:last-child {
-            margin-bottom: 0;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 10px;
-            font-weight: 600;
-            color: #7a8ba0;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-        }
-        
-        #slider-container {
-            position: relative;
-        }
-        
-        #slice-slider {
-            width: 100%;
-            height: 32px;
-            border-radius: 4px;
-            background: transparent;
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-            position: relative;
-            z-index: 2;
-        }
-        
-        #slice-slider::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, 
-                rgba(100, 180, 255, 0.08) 0%, 
-                rgba(100, 180, 255, 0.15) 100%);
-            border-radius: 3px;
-            transition: background 0.2s ease;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CGV Web | ATLAS Calorimeter Geometry Viewer</title>
+  <meta name="description" content="Browser-based 3D visualization of ATLAS calorimeter geometry. Developed by NIPSCERN Laboratory (UFJF) in collaboration with CERN ATLAS." />
 
-        #slice-slider:hover::-webkit-slider-runnable-track {
-            background: linear-gradient(90deg, 
-                rgba(100, 180, 255, 0.12) 0%, 
-                rgba(100, 180, 255, 0.22) 100%);
-        }
-
-        #slice-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            margin-top: -7px;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #64b4ff 0%, #4a8eff 100%);
-            cursor: grab;
-            box-shadow: 0 2px 12px rgba(100, 180, 255, 0.5),
-                        0 0 0 3px rgba(100, 180, 255, 0.1);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        #slice-slider:active::-webkit-slider-thumb {
-            cursor: grabbing;
-            transform: scale(1.15);
-            box-shadow: 0 4px 16px rgba(100, 180, 255, 0.7),
-                        0 0 0 5px rgba(100, 180, 255, 0.15);
-        }
-        
-        #slider-preview {
-            position: absolute;
-            top: -28px;
-            left: 0;
-            font-size: 11px;
-            font-weight: 600;
-            color: #64b4ff;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            pointer-events: none;
-            white-space: nowrap;
-            transform: translate3d(0, 0, 0);
-        }
-
-        #slice-slider:hover ~ #slider-preview,
-        #slice-slider:active ~ #slider-preview {
-            opacity: 1;
-        }
-        
-        #cube-count {
-            color: #64b4ff;
-            font-weight: 700;
-            font-size: 28px;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 20px rgba(100, 180, 255, 0.3);
-        }
-        
-        #tooltip {
-            position: absolute;
-            background: linear-gradient(135deg, #64b4ff 0%, #4a8eff 100%);
-            color: #0a0a12;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 700;
-            pointer-events: none;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 4px 16px rgba(100, 180, 255, 0.4);
-            transform: translate3d(0, 0, 0);
-            will-change: transform;
-            letter-spacing: 0.5px;
-        }
-
-        #color-palette {
-            position: absolute;
-            background: rgba(10, 12, 20, 0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(100, 180, 255, 0.18);
-            padding: 12px;
-            border-radius: 14px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6),
-                        0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.92) translate3d(0, 0, 0);
-            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
-                        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 2000;
-            will-change: transform, opacity;
-        }
-
-        #color-palette.active {
-            opacity: 1;
-            pointer-events: all;
-            transform: scale(1) translate3d(0, 0, 0);
-        }
-
-        .color-swatch {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-                        border 0.15s ease,
-                        box-shadow 0.15s ease;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            transform: translate3d(0, 0, 0);
-            will-change: transform;
-        }
-
-        .color-swatch:hover {
-            transform: translate3d(0, 0, 0) scale(1.08);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        .color-swatch:active {
-            transform: translate3d(0, 0, 0) scale(0.95);
-        }
-        
-        #instructions {
-            position: absolute;
-            bottom: 24px;
-            left: 24px;
-            background: rgba(10, 12, 20, 0.75);
-            padding: 16px 18px;
-            border-radius: 14px;
-            border: 1px solid rgba(100, 180, 255, 0.12);
-            color: #7a8ba0;
-            font-size: 10px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-                        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
-            line-height: 1.7;
-            pointer-events: none;
-            transform: translate3d(0, 0, 0);
-        }
-        
-        #instructions div { 
-            margin-bottom: 4px;
-            transition: color 0.2s ease;
-        }
-        #instructions strong { 
-            color: #e8eef5; 
-            font-weight: 600;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #controls, #instructions, #header {
-            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        #controls { animation-delay: 0.1s; }
-        #instructions { animation-delay: 0.2s; }
-    </style>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/projects/cgv/assets/camera_256dp_003153_FILL0_wght400_GRAD0_opsz48-BwItryo6.svg">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script type="module" crossorigin src="/projects/cgv/assets/index-m5TOz0JQ.js"></script>
+  <link rel="stylesheet" crossorigin href="/projects/cgv/assets/index-BAEitOtk.css">
 </head>
 <body>
-    <div id="canvas-container"></div>
-    
-    <div id="header">CGV-WEB</div>
-    
-    <div id="controls">
-        <div class="control-group">
-            <label for="slice-slider">Cube Density</label>
-            <div id="slider-container">
-                <input type="range" id="slice-slider" min="0" max="100" value="0" step="5">
-                <div id="slider-preview">0</div>
+
+  <canvas id="gl-canvas"></canvas>
+
+  <input type="file" id="file-input" accept=".xml" aria-hidden="true" />
+
+  <!-- Ghost label -->
+  <div id="ghost-lbl" aria-hidden="true">
+    <span class="ghost-title">ATLAS Calorimeter</span>
+    <span class="ghost-sub">Ghost reference geometry — load a calorimeter XML to begin</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       DROP ZONE
+  ═══════════════════════════════════════════════════════ -->
+  <div id="drop-zone" role="region" aria-label="File upload">
+    <div class="dz-inner">
+      <div class="dz-symbol" aria-hidden="true">
+        <img 
+          src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20height='256px'%20viewBox='0%20-960%20960%20960'%20width='256px'%20fill='%23005fa8'%3e%3cpath%20d='M454-602h345q-28-74-89-130.5T571-810L454-602Zm-93%2083%20174-299q-12-1-27-1.5t-28-.5q-72%200-132%2026t-108%2072l121%20203ZM150-393h237L217-696q-38%2045-57.5%20100.5T140-480q0%2021%202%2044t8%2043Zm240%20242%20120-207H162q28%2074%2088.5%20130.5T390-151Zm90%2011q72%200%20132.5-26T720-238L600-441%20425-142q13%201%2027.5%201.5t27.5.5Zm264-124q34-42%2055-99t21-117q0-22-2-44.5t-7-43.5H574l170%20304ZM480-480Zm0%20400q-82%200-155-31.5t-127.5-86Q143-252%20111.5-325T80-480q0-83%2031.5-155.5t86-127Q252-817%20325-848.5T480-880q83%200%20155.5%2031.5t127%2086q54.5%2054.5%2086%20127T880-480q0%2082-31.5%20155t-86%20127.5q-54.5%2054.5-127%2086T480-80Z'/%3e%3c/svg%3e" 
+          alt="Ícone de câmera"
+          width="48"
+          height="48"
+        >
+      </div>
+      <h2 class="dz-headline">Load Calorimeter Data</h2>
+      <p class="dz-sub">Drop an ATLAS calorimeter XML event file here, or use the options below. The file is processed entirely in your browser — nothing is uploaded.</p>
+      <div class="dz-actions">
+        <button id="dz-browse-btn" class="btn-primary" type="button">
+          <i data-lucide="folder-open" style="width:15px;height:15px"></i>
+          Browse XML File
+        </button>
+        <button id="dz-sample-btn" class="btn-ghost" type="button">
+          <i data-lucide="flask-conical" style="width:15px;height:15px"></i>
+          Load Sample Event
+        </button>
+      </div>
+      <p class="dz-formats">Accepts ATLAS calorimeter XML&ensp;·&ensp;<code>*.xml</code></p>
+    </div>
+  </div>
+
+  <!-- Loading bar -->
+  <div id="loading-bar" role="status" aria-live="polite">
+    <div class="lb-inner">
+      <span id="loading-label" class="lb-label">Initializing…</span>
+      <div class="lb-track"><div id="loading-fill" class="lb-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" role="alert" aria-live="assertive">
+    <span id="toast-pip" class="toast-pip"></span>
+    <span id="toast-text">Ready</span>
+  </div>
+
+  <!-- Cell tooltip -->
+  <div id="cell-tooltip" role="tooltip">
+    <div class="ct-header">
+      <i data-lucide="cpu" style="width:11px;height:11px;opacity:0.7"></i>
+      Cell Data
+    </div>
+    <div class="ct-rows">
+      <div class="ct-row"><span class="ct-label">Energy</span><span id="ct-energy" class="ct-val mono">—</span></div>
+      <div class="ct-row"><span class="ct-label">Layer / Detector</span><span id="ct-layer" class="ct-val mono">—</span></div>
+      <div class="ct-row"><span class="ct-label">η (pseudorapidity)</span><span id="ct-eta" class="ct-val mono">—</span></div>
+      <div class="ct-row"><span class="ct-label">φ (azimuth)</span><span id="ct-phi" class="ct-val mono">—</span></div>
+    </div>
+  </div>
+
+  <!-- Energy slider tip -->
+  <div id="slider-tip" aria-hidden="true">
+    <div id="tip-val" class="tip-val">All cells</div>
+    <div id="tip-pct" class="tip-pct">0%</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MAIN HUD
+  ═══════════════════════════════════════════════════════ -->
+  <div id="hud">
+
+    <!-- Top bar -->
+    <header id="top-bar">
+      <div class="tb-left">
+        <div class="tb-logo">
+          <span class="tb-wordmark">CGV</span>
+          <div class="tb-brand">
+            <span class="tb-brand-title">Calorimeter Geometry Viewer</span>
+            <span class="tb-brand-sub">NIPSCERN Laboratory &times; ATLAS / CERN</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="filename-display" class="tb-filename hidden" aria-live="polite">
+        <i data-lucide="file-code" style="width:12px;height:12px;opacity:0.6;flex-shrink:0"></i>
+        <span id="filename-text" class="fn-text mono">—</span>
+      </div>
+
+      <nav class="tb-actions" aria-label="Actions">
+        <!-- External links -->
+        <div class="tb-link-group">
+          <a href="https://nipscern.com" target="_blank" rel="noopener" class="tb-text-link" aria-label="NIPSCERN Lab">NIPS</a>
+          <a href="https://atlas.cern" target="_blank" rel="noopener" class="tb-text-link" aria-label="ATLAS CERN">ATLAS</a>
+        </div>
+
+        <!-- Separator -->
+        <div class="tb-sep" aria-hidden="true"></div>
+
+        <!-- Knowledge Tree -->
+        <div class="tb-btn-wrap">
+          <button id="wiki-toggle-btn" class="tb-icon-btn" aria-label="Open knowledge panel">
+            <i data-lucide="git-branch" style="width:16px;height:16px"></i>
+          </button>
+          <div class="tb-tooltip" role="tooltip">
+            <span class="tb-tt-title">Knowledge Tree</span>
+            <span class="tb-tt-desc">Educational panels about ATLAS, CERN, and NIPSCERN Lab</span>
+          </div>
+        </div>
+
+        <!-- Help -->
+        <div class="tb-btn-wrap">
+          <button id="btn-help" class="tb-icon-btn" aria-label="Help and shortcuts">
+            <i data-lucide="circle-help" style="width:16px;height:16px"></i>
+          </button>
+          <div class="tb-tooltip" role="tooltip">
+            <span class="tb-tt-title">Help &amp; Shortcuts</span>
+            <span class="tb-tt-desc">Keyboard shortcuts, navigation guide, and app information</span>
+          </div>
+        </div>
+
+
+        <!-- Separator -->
+        <div class="tb-sep" aria-hidden="true"></div>
+
+        <!-- Focus mode -->
+        <div class="tb-btn-wrap">
+          <button id="btn-focus" class="tb-icon-btn tb-btn-accent" aria-label="Focus mode (F)">
+            <i data-lucide="maximize" style="width:16px;height:16px"></i>
+          </button>
+          <div class="tb-tooltip" role="tooltip">
+            <span class="tb-tt-title">Focus Mode</span>
+            <span class="tb-tt-desc">Fullscreen auto-rotation — fades out all UI. Press <kbd>F</kbd> to toggle</span>
+          </div>
+        </div>
+
+        <!-- Snapshot -->
+        <div class="tb-btn-wrap">
+          <button id="btn-snapshot" class="tb-icon-btn" aria-label="4K snapshot">
+            <i data-lucide="camera" style="width:16px;height:16px"></i>
+          </button>
+          <div class="tb-tooltip" role="tooltip">
+            <span class="tb-tt-title">4K Snapshot</span>
+            <span class="tb-tt-desc">Download a 3840 × 2160 PNG of the current view</span>
+          </div>
+        </div>
+
+        <!-- Reset -->
+        <div class="tb-btn-wrap">
+          <button id="btn-reset" class="tb-icon-btn tb-btn-danger" aria-label="Reset scene">
+            <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>
+          </button>
+          <div class="tb-tooltip" role="tooltip">
+            <span class="tb-tt-title">Reset Scene</span>
+            <span class="tb-tt-desc">Clear loaded data and return to the ghost reference geometry</span>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Left panel -->
+    <aside id="left-panel" aria-label="Controls">
+
+      <!-- Event Metadata (collapsible) -->
+      <div class="panel-card" id="meta-card">
+        <button class="panel-card-hdr collapsible-hdr" id="meta-toggle-btn" aria-expanded="true" aria-controls="meta-body">
+          <span>Event Metadata</span>
+          <i data-lucide="chevron-up" style="width:13px;height:13px;color:var(--text-muted);transition:transform var(--t-mid)" id="meta-chevron"></i>
+        </button>
+        <div id="meta-body" class="meta-body">
+          <div class="meta-rows">
+            <div class="meta-row">
+              <span class="meta-label">File</span>
+              <span id="meta-filename" class="meta-val mono">—</span>
             </div>
+            <div class="meta-row">
+              <span class="meta-label">Cell count</span>
+              <span id="cell-count" class="meta-val mono">—</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Event date</span>
+              <span id="xml-date" class="meta-val mono">—</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Energy range</span>
+              <span id="info-energy-range" class="meta-val mono">—</span>
+            </div>
+            <div class="meta-row meta-row--wrap">
+              <span class="meta-label">Active blocks</span>
+              <span id="active-blocks" class="meta-val mono meta-val--wrap">—</span>
+            </div>
+          </div>
         </div>
-        <div class="control-group">
-            <label>Active Cubes</label>
-            <div id="cube-count">0</div>
+      </div>
+
+      <!-- Visualization panel -->
+      <div class="panel-card" id="geometry-panel">
+        <button id="gp-toggle-btn" class="gp-toggle" aria-expanded="true" aria-controls="gp-body">
+          <i data-lucide="layers" style="width:13px;height:13px;color:var(--accent);opacity:0.7;flex-shrink:0"></i>
+          <span class="gp-title">Visualization</span>
+          <i data-lucide="chevron-up" style="width:12px;height:12px" class="gp-chevron"></i>
+        </button>
+        <div id="gp-body" class="gp-body">
+
+          <!-- Sub-detectors -->
+          <div class="gp-section">
+            <div class="gp-section-label">Sub-detectors</div>
+            <div class="det-toggles">
+              <label class="det-toggle" title="Tile Calorimeter — hadronic barrel, |η| &lt; 1.7">
+                <input type="checkbox" class="det-check" data-det="tile" checked />
+                <span class="det-pill det-tile">
+                  <span class="det-dot"></span>TileCal
+                </span>
+              </label>
+              <label class="det-toggle" title="Hadronic End-Cap — copper/LAr, 1.5 &lt; |η| &lt; 3.2">
+                <input type="checkbox" class="det-check" data-det="hec" checked />
+                <span class="det-pill det-hec">
+                  <span class="det-dot"></span>HEC
+                </span>
+              </label>
+              <label class="det-toggle" title="LAr Electromagnetic — accordion lead/LAr, |η| &lt; 3.2">
+                <input type="checkbox" class="det-check" data-det="lar" checked />
+                <span class="det-pill det-lar">
+                  <span class="det-dot"></span>LAr EM
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Z-Axis Slice — redesigned -->
+          <div class="gp-section">
+            <div class="gp-section-label">
+              <i data-lucide="slice" style="width:11px;height:11px;opacity:0.6"></i>
+              Z-Axis Slice
+              <span id="clip-val-display" class="gp-val mono">OFF</span>
+            </div>
+            <div class="zslice-wrapper">
+              <div class="zslice-track-row">
+                <div class="zslice-icon-z">0</div>
+                <div class="zslice-bar-wrap">
+                  <div class="clip-track">
+                    <div id="clip-fill" class="clip-fill"></div>
+                    <input id="clip-slider" type="range" min="0" max="100" value="100" class="clip-slider" aria-label="Z-axis slice" />
+                  </div>
+                  <div class="zslice-labels">
+                    <span>Core</span><span>Full</span>
+                  </div>
+                </div>
+                <div class="zslice-icon-z">±z</div>
+              </div>
+              <div class="zslice-depth-indicator" id="zslice-depth-indicator">
+                <div class="zdi-bar" id="zdi-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Render Mode -->
+          <div class="gp-section">
+            <div class="gp-section-label">
+              <i data-lucide="box" style="width:11px;height:11px;opacity:0.6"></i>
+              Render Mode
+            </div>
+            <div class="mode-btns">
+              <button id="mode-solid" class="mode-btn active" aria-pressed="true">
+                <i data-lucide="box" style="width:12px;height:12px"></i>Solid
+              </button>
+              <button id="mode-wire" class="mode-btn" aria-pressed="false">
+                <i data-lucide="box-select" style="width:12px;height:12px"></i>Wireframe
+              </button>
+            </div>
+          </div>
+
+          <!-- Scene toggles (iOS switches) -->
+          <div class="gp-section">
+            <div class="gp-section-label">
+              <i data-lucide="eye" style="width:11px;height:11px;opacity:0.6"></i>
+              Scene
+            </div>
+            <div class="scene-toggles">
+              <div class="scene-toggle-row">
+                <span class="scene-toggle-label">Beam axis &amp; North marker</span>
+                <label class="ios-switch">
+                  <input type="checkbox" id="axis-toggle" checked />
+                  <span class="ios-thumb"></span>
+                </label>
+              </div>
+              <div class="scene-toggle-row">
+                <span class="scene-toggle-label">Cell data hover</span>
+                <label class="ios-switch">
+                  <input type="checkbox" id="cell-hover-toggle" checked />
+                  <span class="ios-thumb"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
         </div>
+      </div>
+
+      <!-- External links -->
+      <div class="ext-links">
+        <a href="https://nipscern.com" target="_blank" rel="noopener" class="ext-link">
+          <i data-lucide="external-link" style="width:10px;height:10px"></i>nipscern.com
+        </a>
+        <a href="https://nipscern.com/projects/cgvweb" target="_blank" rel="noopener" class="ext-link">
+          <i data-lucide="external-link" style="width:10px;height:10px"></i>CGV Project
+        </a>
+      </div>
+
+    </aside>
+
+    <!-- Energy rail -->
+    <aside id="energy-rail" aria-label="Energy threshold">
+      <div class="rail-label-top">E<sub>min</sub></div>
+
+      <div id="energy-panel" aria-live="polite">
+        <span id="ep-max" class="ep-val ep-max mono">—</span>
+        <div id="grad-track" class="grad-track" role="slider"
+             aria-label="Energy threshold" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="track-dim" class="track-dim"></div>
+          <div id="track-handle" class="track-handle" tabindex="0" aria-label="Energy threshold handle"></div>
+        </div>
+        <span id="ep-min" class="ep-val ep-min mono">—</span>
+      </div>
+
+      <div class="threshold-readout">
+        <span class="thr-label">Threshold</span>
+        <span id="threshold-display" class="thr-val mono">All</span>
+      </div>
+    </aside>
+
+  </div><!-- /#hud -->
+
+  <!-- Focus overlay -->
+  <div id="focus-overlay" aria-label="Focus mode">
+    <button id="btn-exit-focus" class="exit-focus-btn" aria-label="Exit focus mode">
+      <i data-lucide="minimize" style="width:15px;height:15px"></i> Exit Focus
+    </button>
+    <div class="focus-hint">Press <kbd>Esc</kbd> or <kbd>F</kbd> to exit</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       WIKI PANEL
+  ═══════════════════════════════════════════════════════ -->
+  <aside id="wiki-panel" role="complementary" aria-label="Knowledge panel">
+    <div class="wiki-header">
+      <div class="wiki-title">
+        <i data-lucide="git-branch" style="width:14px;height:14px;opacity:0.8"></i>
+        Knowledge Tree
+      </div>
+      <button id="wiki-close-btn" class="wiki-close" aria-label="Close">
+        <i data-lucide="x" style="width:14px;height:14px"></i>
+      </button>
     </div>
-    
-    <div id="tooltip"></div>
 
-    <div id="color-palette">
-        <div class="color-swatch" style="background: #ff5e57;" data-color="0xff5e57"></div>
-        <div class="color-swatch" style="background: #ffc048;" data-color="0xffc048"></div>
-        <div class="color-swatch" style="background: #0be881;" data-color="0x0be881"></div>
-        <div class="color-swatch" style="background: #4bcffa;" data-color="0x4bcffa"></div>
-        <div class="color-swatch" style="background: #575fcf;" data-color="0x575fcf"></div>
-        <div class="color-swatch" style="background: #ef5777;" data-color="0xef5777"></div>
-        <div class="color-swatch" style="background: #808e9b;" data-color="0x808e9b"></div>
-        <div class="color-swatch" style="background: #d2dae2;" data-color="0xd2dae2"></div>
-        <div class="color-swatch" style="background: #1e272e;" data-color="0x1e272e"></div>
-    </div>
-    
-    <div id="instructions">
-        <div><strong>Navigation</strong></div>
-        <div>• Left Click / 1-Finger — Rotate</div>
-        <div>• Right Click / 2-Fingers — Pan</div>
-        <div>• Scroll / Pinch — Zoom</div>
-        <div>• Click / Tap — Select Cube</div>
+    <div class="wiki-tabs" role="tablist">
+      <button class="wiki-tab active" data-tab="start" role="tab" aria-selected="true">Overview</button>
+      <button class="wiki-tab" data-tab="nips" role="tab" aria-selected="false">NIPS Lab</button>
+      <button class="wiki-tab" data-tab="cern" role="tab" aria-selected="false">CERN / ATLAS</button>
+      <button class="wiki-tab" data-tab="refs" role="tab" aria-selected="false">References</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0a12);
-        scene.fog = new THREE.Fog(0x0a0a12, 12, 35);
-        
-        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(5, 3, 7);
-        
-        const renderer = new THREE.WebGLRenderer({ 
-            antialias: true,
-            powerPreference: "high-performance",
-            alpha: false,
-            stencil: false,
-            depth: true
-        });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-        
-        const ambientLight = new THREE.AmbientLight(0x3a4a6a, 0.35);
-        scene.add(ambientLight);
-        
-        const mainLight = new THREE.DirectionalLight(0x88b8ff, 1.4);
-        mainLight.position.set(8, 6, 5);
-        mainLight.castShadow = true;
-        mainLight.shadow.mapSize.width = 1024;
-        mainLight.shadow.mapSize.height = 1024;
-        scene.add(mainLight);
-        
-        const fillLight = new THREE.DirectionalLight(0xff9966, 0.25);
-        fillLight.position.set(-5, 2, -3);
-        scene.add(fillLight);
-        
-        const rimLight = new THREE.DirectionalLight(0x6699ff, 0.5);
-        rimLight.position.set(-3, -4, 8);
-        scene.add(rimLight);
-        
-        const OUTER_RADIUS = 2.0;
-        const INNER_RADIUS = 0.8;
-        const CYLINDER_LENGTH = 6;
-        const MAX_CUBES = 200000;
-        const GAP_FACTOR = 0.82;
-        
-        const pivotGroup = new THREE.Group();
-        scene.add(pivotGroup);
-        
-        const hollowCylinderGroup = new THREE.Group();
-        const outerGeo = new THREE.CylinderGeometry(OUTER_RADIUS, OUTER_RADIUS, CYLINDER_LENGTH, 64, 1, true);
-        const innerGeo = new THREE.CylinderGeometry(INNER_RADIUS, INNER_RADIUS, CYLINDER_LENGTH, 64, 1, true);
-        
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x5a9fd4,
-            shininess: 95,
-            specular: 0x5599cc,
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: 0.93
-        });
-        
-        const outerCyl = new THREE.Mesh(outerGeo, material);
-        const innerCyl = new THREE.Mesh(innerGeo, material);
-        outerCyl.rotation.z = Math.PI / 2;
-        innerCyl.rotation.z = Math.PI / 2;
-        
-        const capShape = new THREE.Shape();
-        capShape.absarc(0, 0, OUTER_RADIUS, 0, Math.PI * 2, false);
-        const holePath = new THREE.Path();
-        holePath.absarc(0, 0, INNER_RADIUS, 0, Math.PI * 2, true);
-        capShape.holes.push(holePath);
-        
-        const capGeo = new THREE.ShapeGeometry(capShape);
-        const capLeft = new THREE.Mesh(capGeo, material);
-        const capRight = new THREE.Mesh(capGeo, material);
-        capLeft.position.x = -CYLINDER_LENGTH / 2;
-        capLeft.rotation.y = Math.PI / 2;
-        capRight.position.x = CYLINDER_LENGTH / 2;
-        capRight.rotation.y = -Math.PI / 2;
-        
-        hollowCylinderGroup.add(outerCyl, innerCyl, capLeft, capRight);
-        pivotGroup.add(hollowCylinderGroup);
-        
-        const highlightGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1));
-        const highlightMat = new THREE.LineBasicMaterial({ 
-            color: 0xffffff, 
-            linewidth: 2,
-            transparent: true,
-            opacity: 0.9
-        });
-        const highlightMesh = new THREE.LineSegments(highlightGeo, highlightMat);
-        highlightMesh.visible = false;
-        highlightMesh.matrixAutoUpdate = false;
-        pivotGroup.add(highlightMesh);
+    <div class="wiki-content">
 
-        let cubesGroup = null;
-        let instancedMesh = null;
-        let currentCubeCount = 0;
-        
-        const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const cubeMaterial = new THREE.MeshPhongMaterial({ 
-            color: 0xffffff,
-            shininess: 95,
-            specular: 0x999999
-        });
+      <!-- Overview tab -->
+      <div class="wiki-pane active" id="tab-start" role="tabpanel">
+        <h3 class="wiki-pane-title">About CGV Web</h3>
+        <p class="wiki-para">The <strong>Calorimeter Geometry Viewer</strong> is a browser-native 3D tool for exploring particle physics detector data from the ATLAS experiment at CERN's Large Hadron Collider — the world's highest-energy particle accelerator.</p>
+        <p class="wiki-para">It renders individual calorimeter cells — the ~190,000 readout units that measure energy deposited by particles emerging from proton–proton collisions. Each cell lights up in proportion to the energy it absorbed, letting physicists identify jets, electromagnetic showers, and hadronic activity at a glance.</p>
+        <p class="wiki-para">The tool runs entirely in your browser: XML event data is parsed by a Rust/WebAssembly module and rendered via Three.js with custom GLSL shaders. Nothing is uploaded to any server.</p>
 
-        const DEFAULT_COLOR = new THREE.Color(0x5a9fd4);
-        
-        function calculateGridDimensions(totalCubes) {
-            const volume = Math.PI * (OUTER_RADIUS * OUTER_RADIUS - INNER_RADIUS * INNER_RADIUS) * CYLINDER_LENGTH;
-            const volumePerCube = volume / totalCubes;
-            const cubeSize = Math.pow(volumePerCube, 1/3);
-            
-            const radialDivs = Math.max(1, Math.round((OUTER_RADIUS - INNER_RADIUS) / cubeSize));
-            const axialDivs = Math.max(1, Math.round(CYLINDER_LENGTH / cubeSize));
-            const angularDivs = Math.max(3, Math.round((2 * Math.PI * ((OUTER_RADIUS + INNER_RADIUS) / 2)) / cubeSize));
-            
-            return { radialDivs, angularDivs, axialDivs, cubeSize };
-        }
-        
-        function createCubes(count) {
-            if (cubesGroup) {
-                pivotGroup.remove(cubesGroup);
-                if (instancedMesh) {
-                    instancedMesh.geometry.dispose();
-                    instancedMesh.material.dispose();
-                    instancedMesh = null;
-                }
-                cubesGroup = null;
-            }
-            highlightMesh.visible = false;
+        <div class="wiki-tree">
+          <div class="branch">
+            <button class="branch-header" aria-expanded="true">
+              <span>Controls reference</span>
+              <i data-lucide="chevron-down" style="width:11px;height:11px" class="branch-arrow-icon"></i>
+            </button>
+            <div class="branch-body open">
+              <table class="wiki-table">
+                <tr><td><kbd>Left drag</kbd></td><td>Orbit the detector</td></tr>
+                <tr><td><kbd>Right drag</kbd></td><td>Pan camera</td></tr>
+                <tr><td><kbd>Scroll</kbd></td><td>Zoom in / out</td></tr>
+                <tr><td><kbd>F</kbd></td><td>Cinema / focus mode</td></tr>
+                <tr><td><kbd>W</kbd></td><td>Toggle wireframe</td></tr>
+                <tr><td><kbd>Esc</kbd></td><td>Exit mode / close panels</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="branch">
+            <button class="branch-header" aria-expanded="false">
+              <span>Workflow tips</span>
+              <i data-lucide="chevron-down" style="width:11px;height:11px" class="branch-arrow-icon"></i>
+            </button>
+            <div class="branch-body">
+              <ol class="branch-list">
+                <li>Load an XML event file via drag-and-drop or the Browse button.</li>
+                <li>Raise the energy threshold (right slider) to suppress electronic noise and highlight energetic clusters.</li>
+                <li>Deselect sub-detectors in the left panel to isolate specific calorimeter regions.</li>
+                <li>The Z-Axis slider hides cells beyond a given depth along the beam axis, revealing inner structure layer by layer.</li>
+                <li>Press <kbd>F</kbd> for a cinematic auto-rotating view suitable for presentations or outreach.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            if (count === 0) {
-                currentCubeCount = 0;
-                hollowCylinderGroup.visible = true;
-                return;
-            }
-            
-            hollowCylinderGroup.visible = false;
-            
-            const { radialDivs, angularDivs, axialDivs, cubeSize } = calculateGridDimensions(count);
-            const positions = [];
-            const actualCubeSize = cubeSize * GAP_FACTOR;
-            
-            for (let x = 0; x < axialDivs && positions.length < count; x++) {
-                const xPos = (x / axialDivs - 0.5) * CYLINDER_LENGTH;
-                for (let r = 0; r < radialDivs && positions.length < count; r++) {
-                    const radius = INNER_RADIUS + (r + 0.5) * (OUTER_RADIUS - INNER_RADIUS) / radialDivs;
-                    for (let a = 0; a < angularDivs && positions.length < count; a++) {
-                        const angle = (a / angularDivs) * Math.PI * 2;
-                        positions.push({
-                            x: xPos,
-                            y: Math.cos(angle) * radius,
-                            z: Math.sin(angle) * radius,
-                            size: actualCubeSize
-                        });
-                    }
-                }
-            }
-            
-            currentCubeCount = positions.length;
-            
-            cubesGroup = new THREE.Group();
-            instancedMesh = new THREE.InstancedMesh(cubeGeometry, cubeMaterial, currentCubeCount);
-            instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-            instancedMesh.frustumCulled = true;
-            
-            const matrix = new THREE.Matrix4();
-            for (let i = 0; i < currentCubeCount; i++) {
-                const cube = positions[i];
-                matrix.makeScale(cube.size, cube.size, cube.size);
-                matrix.setPosition(cube.x, cube.y, cube.z);
-                instancedMesh.setMatrixAt(i, matrix);
-                instancedMesh.setColorAt(i, DEFAULT_COLOR);
-            }
-            
-            instancedMesh.instanceMatrix.needsUpdate = true;
-            if (instancedMesh.instanceColor) {
-                instancedMesh.instanceColor.needsUpdate = true;
-            }
-            cubesGroup.add(instancedMesh);
-            pivotGroup.add(cubesGroup);
-        }
-        
-        const controls = {
-            target: new THREE.Vector3(0, 0, 0),
-            spherical: {
-                radius: 10,
-                theta: Math.atan2(5, 7),
-                phi: Math.acos(3 / Math.sqrt(5*5 + 3*3 + 7*7))
-            },
-            velocity: { 
-                theta: 0, 
-                phi: 0, 
-                pan: new THREE.Vector2(0, 0), 
-                zoom: 0 
-            },
-            damping: 0.88,
-            rotationSpeed: 0.004,
-            panSpeed: 0.004,
-            zoomSpeed: 0.003,
-            mobileZoomMult: 0.06
-        };
-        
-        let isInteraction = false;
-        let previousPointer = { x: 0, y: 0 };
-        const canvas = renderer.domElement;
+      <!-- NIPS Lab tab -->
+      <div class="wiki-pane" id="tab-nips" role="tabpanel">
+        <h3 class="wiki-pane-title">NIPSCERN Laboratory</h3>
+        <p class="wiki-para">The <strong>Núcleo de Instrumentação e Processamento de Sinais</strong> (NIPSCERN) is based at the Federal University of Juiz de Fora (UFJF), Minas Gerais, Brazil. Since 2008 the group has maintained a formal collaboration with the ATLAS detector operations team at CERN, focusing on calorimeter signal processing and energy reconstruction.</p>
+        <p class="wiki-para">Core research areas include optimal filtering algorithms for pulse shaping in the TileCal readout chain, FPGA-based real-time trigger systems for the first-level ATLAS trigger, and machine-learning methods for noise suppression in liquid-argon calorimeter channels. The group has published over 50 peer-reviewed papers in the field of particle physics instrumentation.</p>
+        <p class="wiki-para">CGV Web is an open-source outreach and research tool maintained by NIPSCERN, allowing physicists, students, and the public to explore real ATLAS event data directly in a modern browser — with no plugins or downloads required.</p>
+        <div class="wiki-link-row" style="margin-bottom:18px;">
+          <a href="https://nipscern.com" class="wiki-chip" target="_blank" rel="noopener">
+            <i data-lucide="external-link" style="width:11px;height:11px"></i>nipscern.com
+          </a>
+          <a href="https://nipscern.com/projects/cgvweb" class="wiki-chip" target="_blank" rel="noopener">
+            <i data-lucide="external-link" style="width:11px;height:11px"></i>CGV Project page
+          </a>
+        </div>
 
-        canvas.addEventListener('mousedown', (e) => {
-            if (e.button !== 0 && e.button !== 2) return;
-            isInteraction = true;
-            previousPointer = { x: e.clientX, y: e.clientY };
-            closePalette();
-        });
-        
-        canvas.addEventListener('mousemove', (e) => {
-            if (isInteraction) {
-                const deltaX = e.clientX - previousPointer.x;
-                const deltaY = e.clientY - previousPointer.y;
-                
-                if (e.buttons === 2) {
-                    controls.velocity.pan.x = deltaX * controls.panSpeed;
-                    controls.velocity.pan.y = deltaY * controls.panSpeed;
-                } else {
-                    controls.velocity.theta = -deltaX * controls.rotationSpeed;
-                    controls.velocity.phi = -deltaY * controls.rotationSpeed;
-                }
-                previousPointer = { x: e.clientX, y: e.clientY };
-            }
-            handleHover(e.clientX, e.clientY);
-        });
-        
-        canvas.addEventListener('mouseup', () => { isInteraction = false; });
-        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-        canvas.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            controls.velocity.zoom = e.deltaY * controls.zoomSpeed;
-            closePalette();
-        }, { passive: false });
+        <div class="wiki-tree">
+          <div class="branch">
+            <button class="branch-header" aria-expanded="true">
+              <span>CGV Web — technical architecture</span>
+              <i data-lucide="chevron-down" style="width:11px;height:11px" class="branch-arrow-icon"></i>
+            </button>
+            <div class="branch-body open">
+              <ul class="branch-list">
+                <li><strong>Parser:</strong> Rust compiled to WebAssembly via wasm-bindgen. Handles XML event files with &gt;100 k cells in under 100 ms on a modern laptop. The parser uses the <code>quick-xml</code> crate for streaming SAX-style parsing, minimising allocations.</li>
+                <li><strong>Renderer:</strong> Three.js InstancedMesh with a custom GLSL ShaderMaterial encoding cell energy as luminance via the TileCal colour map. Includes per-cell highlight on hover via a raycaster and instance ID uniform.</li>
+                <li><strong>Wireframe:</strong> GPU-optimised merged LineSegments from EdgesGeometry — a single draw call regardless of cell count, with active/threshold filtering applied before build.</li>
+                <li><strong>Post-processing:</strong> Subtle Unreal Bloom pass + SMAA anti-aliasing via EffectComposer. Bloom parameters are tuned for scientific legibility, not visual excess.</li>
+                <li><strong>Build:</strong> Vite + vite-plugin-wasm targeting ESNext. No legacy polyfills. COOP/COEP headers for SharedArrayBuffer.</li>
+              </ul>
+            </div>
+          </div>
 
-        canvas.addEventListener('click', (e) => {
-            if (e.button === 0) handleClick(e.clientX, e.clientY);
-        });
+          <!-- Sponsors -->
+          <div class="branch">
+            <button class="branch-header" aria-expanded="false">
+              <span>Sponsors &amp; Funding</span>
+              <i data-lucide="chevron-down" style="width:11px;height:11px" class="branch-arrow-icon"></i>
+            </button>
+            <div class="branch-body">
+              <p class="branch-text">This research is supported by Brazilian national and state funding agencies. The NIPSCERN–ATLAS collaboration is maintained through grants from:</p>
+              <div class="sponsor-grid">
+                <div class="sponsor-badge">
+                  <div class="sponsor-logo-placeholder" style="color:#1e7cbc">FAPEMIG</div>
+                  <span class="sponsor-label">Fundação de Amparo à Pesquisa do Estado de Minas Gerais</span>
+                </div>
+                <div class="sponsor-badge">
+                  <div class="sponsor-logo-placeholder" style="color:#006837">CNPq</div>
+                  <span class="sponsor-label">Conselho Nacional de Desenvolvimento Científico e Tecnológico</span>
+                </div>
+                <div class="sponsor-badge">
+                  <div class="sponsor-logo-placeholder" style="color:#003087">CAPES</div>
+                  <span class="sponsor-label">Coordenação de Aperfeiçoamento de Pessoal de Nível Superior</span>
+                </div>
+                <div class="sponsor-badge">
+                  <div class="sponsor-logo-placeholder" style="color:#007748">UFJF</div>
+                  <span class="sponsor-label">Universidade Federal de Juiz de Fora</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        let touchStartTime = 0;
-        let touchStartPos = { x: 0, y: 0 };
-        let prevDist = 0;
-        let prevMidpoint = { x: 0, y: 0 };
+      <!-- CERN tab -->
+      <div class="wiki-pane" id="tab-cern" role="tabpanel">
+        <h3 class="wiki-pane-title">CERN &amp; the ATLAS Detector</h3>
+        <p class="wiki-para">The <strong>European Organization for Nuclear Research</strong> (CERN) operates the Large Hadron Collider — a 27 km superconducting ring in which proton beams are accelerated to 6.8 TeV per beam and collided at four interaction points, yielding centre-of-mass energies up to 13.6 TeV in Run 3.
+        <sup><a href="https://home.cern/science/accelerators/large-hadron-collider" target="_blank" class="ref-link">[1]</a></sup></p>
+        <p class="wiki-para"><strong>ATLAS</strong> (<em>A Toroidal LHC ApparatuS</em>) is one of two general-purpose detectors at the LHC. At 46 m long, 25 m in diameter and approximately 7,000 tonnes, it is the largest detector ever built. ATLAS co-discovered the Higgs boson in July 2012, confirming the final missing piece of the Standard Model of particle physics.
+        <sup><a href="https://atlas.cern/discover/detector" target="_blank" class="ref-link">[2]</a></sup></p>
 
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            closePalette();
-            isInteraction = true;
-            touchStartTime = Date.now();
+        <div class="wiki-tree" style="margin-top:18px">
+          <div class="branch">
+            <button class="branch-header" aria-expanded="true">
+              <span>TileCal — Hadronic Tile Calorimeter</span>
+              <i data-lucide="chevron-down" style="width:11px;height:11px" class="branch-arrow-icon"></i>
+            </button>
+            <div class="branch-body open">
+              <p class="branch-text">The central hadronic calorimeter uses interlocked steel absorber plates and plastic scintillating tiles read out by wavelength-shifting (WLS) fibres and photomultiplier tubes. It surrounds the electromagnetic calorimeter and measures the energy of hadronic showers — cascades of pions, kaons and neutrons produced when quarks and gluons interact with matter. The barrel covers |η| &lt; 1.0 and two extended barrels cover 0.8 &lt; |η| &lt; 1.7.
+              <sup><a href="https://cds.cern.ch/record/331061" target="_blank" class="ref-link">[3]</a></sup></p>
+              <div class="spec-grid">
+                <div class="spec-item"><span class="spec-k">η coverage</span><span class="spec-v">|η| &lt; 1.7</span></div>
+                <div class="spec-item"><span class="spec-k">Layer indices</span><span class="spec-v">0 – 13</span></div>
+                <div class="spec-item"><span class="spec-k">Technology</span><span class="spec-v">Steel / Scintillator</span></div>
+                <div class="spec-item"><span class="spec-k">Readout</span><span class="spec-v">PMT + 10-bit ADC</span></div>
+                <div class="spec-item"><span class="spec-k">Total cells</span><span class="spec-v">~9,800</span></div>
+                <div class="spec-item"><span class="spec-k">Resolution</span><span class="spec-v">σ/E ≈ 50%/√E ⊕ 3%</span></div>
+              </div>
+            </div>
+          </div>
 
-            if (e.touches.length === 1) {
-                touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                previousPointer = { ...touchStartPos };
-            } else if (e.touches.length === 2) {
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                prevDist = Math.sqrt(dx * dx + dy * dy);
-                
-                prevMidpoint = {
-                    x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-                    y: (e.touches[0].clientY + e.touches[1].clientY) / 2
-                };
-            }
-        }, { passive: false });
+          <div class="branch">
+            <button class="branch-header" aria-expanded="false">
+              <span>HEC — Hadronic End-Cap</span>
+              <i data-lucide="chevron-down" style="width:11px;height:11px" class="branch-arrow-icon"></i>
+            </button>
+            <div class="branch-body">
+              <p class="branch-text">Two copper/liquid-argon wheels on each end-cap extend hadronic calorimetry into the forward region. Copper plates serve as passive absorber; liquid argon at 87 K is the active ionisation medium. The signal is induced on copper electrodes by drifting ionisation electrons. The HEC consists of two wheels per end-cap (HEC1 and HEC2), each with two longitudinal segments.
+              <sup><a href="https://atlas.cern/discover/detector/calorimeter" target="_blank" class="ref-link">[4]</a></sup></p>
+              <div class="spec-grid">
+                <div class="spec-item"><span class="spec-k">η coverage</span><span class="spec-v">1.5 – 3.2</span></div>
+                <div class="spec-item"><span class="spec-k">Layer indices</span><span class="spec-v">14 – 17</span></div>
+                <div class="spec-item"><span class="spec-k">Absorber</span><span class="spec-v">Copper plates</span></div>
+                <div class="spec-item"><span class="spec-k">Temperature</span><span class="spec-v">87 K (LAr)</span></div>
+              </div>
+            </div>
+          </div>
 
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            
-            if (e.touches.length === 1) {
-                const dx = e.touches[0].clientX - previousPointer.x;
-                const dy = e.touches[0].clientY - previousPointer.y;
-                
-                controls.velocity.theta = -dx * controls.rotationSpeed;
-                controls.velocity.phi = -dy * controls.rotationSpeed;
-                
-                previousPointer = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                
-            } else if (e.touches.length === 2) {
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                const deltaDist = dist - prevDist;
-                controls.velocity.zoom = -deltaDist * controls.mobileZoomMult;
-                
-                const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                
-                controls.velocity.pan.x = (midX - prevMidpoint.x) * controls.panSpeed;
-                controls.velocity.pan.y = (midY - prevMidpoint.y) * controls.panSpeed;
-                
-                prevDist = dist;
-                prevMidpoint = { x: midX, y: midY };
-            }
-        }, { passive: false });
+          <div class="branch">
+            <button class="branch-header" aria-expanded="false">
+              <span>LAr EM — Electromagnetic Calorimeter</span>
+              <i data-lucide="chevron-down" style="width:11px;height:11px" class="branch-arrow-icon"></i>
+            </button>
+            <div class="branch-body">
+              <p class="branch-text">Accordion-folded lead absorbers immersed in liquid argon provide full azimuthal symmetry without projective cracks. The accordion geometry yields fast charge collection and uniform response across φ. It is the primary tool for identifying electrons and photons, with energy resolution σ/E ≈ 10%/√E ⊕ 0.7%. The barrel covers |η| &lt; 1.475 and end-caps extend to |η| &lt; 3.2.
+              <sup><a href="https://atlas.cern/discover/detector/calorimeter" target="_blank" class="ref-link">[4]</a></sup></p>
+              <div class="spec-grid">
+                <div class="spec-item"><span class="spec-k">η coverage</span><span class="spec-v">|η| &lt; 3.2</span></div>
+                <div class="spec-item"><span class="spec-k">Layer indices</span><span class="spec-v">18 – 25</span></div>
+                <div class="spec-item"><span class="spec-k">Absorber</span><span class="spec-v">Lead accordion</span></div>
+                <div class="spec-item"><span class="spec-k">Resolution</span><span class="spec-v">σ/E ≈ 10%/√E</span></div>
+                <div class="spec-item"><span class="spec-k">Total cells</span><span class="spec-v">~101,000</span></div>
+                <div class="spec-item"><span class="spec-k">Sampling layers</span><span class="spec-v">3 longitudinal</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        canvas.addEventListener('touchend', (e) => {
-            isInteraction = false;
-            
-            if (e.touches.length === 0) {
-                const elapsed = Date.now() - touchStartTime;
-                if (elapsed < 300) {
-                    const touch = e.changedTouches[0];
-                    const distMoved = Math.sqrt(
-                        Math.pow(touch.clientX - touchStartPos.x, 2) + 
-                        Math.pow(touch.clientY - touchStartPos.y, 2)
-                    );
-                    
-                    if (distMoved < 12) {
-                        handleClick(touch.clientX, touch.clientY);
-                    }
-                }
-            }
-        });
+      <!-- References tab -->
+      <div class="wiki-pane" id="tab-refs" role="tabpanel">
+        <h3 class="wiki-pane-title">References</h3>
+        <p class="wiki-para" style="font-size:0.8rem;color:var(--text-muted)">Scientific references for the ATLAS detector, calorimeter systems, and NIPSCERN research.</p>
+        <ol class="ref-list-full">
+          <li>
+            <span class="ref-num">[1]</span>
+            <div>
+              <a href="https://home.cern/science/accelerators/large-hadron-collider" target="_blank" class="wiki-link">CERN — Large Hadron Collider overview</a>
+              <span class="ref-note">CERN official description of the LHC ring, injection chain, and physics programme.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[2]</span>
+            <div>
+              <a href="https://atlas.cern/discover/detector" target="_blank" class="wiki-link">ATLAS Collaboration — Detector description</a>
+              <span class="ref-note">Official description of the ATLAS detector subsystems, dimensions, and physics goals.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[3]</span>
+            <div>
+              <a href="https://cds.cern.ch/record/331061" target="_blank" class="wiki-link">ATLAS TileCal Technical Design Report (CERN/LHCC/96-42)</a>
+              <span class="ref-note">The TDR specifying the geometry, materials, and readout electronics of the hadronic tile calorimeter.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[4]</span>
+            <div>
+              <a href="https://atlas.cern/discover/detector/calorimeter" target="_blank" class="wiki-link">ATLAS — Calorimeter systems overview</a>
+              <span class="ref-note">Technical overview of TileCal, HEC, LAr EM, FCal and their η coverage and segmentation.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[5]</span>
+            <div>
+              <a href="https://cds.cern.ch/record/391176" target="_blank" class="wiki-link">ATLAS LAr EM Calorimeter TDR (CERN/LHCC/96-41)</a>
+              <span class="ref-note">Technical Design Report for the liquid-argon accordion electromagnetic calorimeter.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[6]</span>
+            <div>
+              <a href="https://doi.org/10.1088/1748-0221/3/08/S08003" target="_blank" class="wiki-link">ATLAS Collaboration, JINST 3 (2008) S08003</a>
+              <span class="ref-note">The ATLAS detector paper: complete description of all subsystems as built for Run 1.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[7]</span>
+            <div>
+              <a href="https://doi.org/10.1016/j.nima.2010.06.009" target="_blank" class="wiki-link">Aharrouche et al., NIM A 617 (2010)</a>
+              <span class="ref-note">TileCal signal reconstruction and noise filtering with optimal filtering algorithms. Foundational for NIPSCERN research.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[8]</span>
+            <div>
+              <a href="https://doi.org/10.1007/JHEP08(2012)098" target="_blank" class="wiki-link">ATLAS Collaboration, JHEP 08 (2012) 098</a>
+              <span class="ref-note">Higgs boson discovery paper: observation of a new boson with mass ~125 GeV with the ATLAS detector.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[9]</span>
+            <div>
+              <a href="https://doi.org/10.1140/epjc/s10052-021-09507-3" target="_blank" class="wiki-link">ATLAS TileCal Collaboration, Eur. Phys. J. C 81 (2021)</a>
+              <span class="ref-note">Operation and performance of the ATLAS Tile Calorimeter during Run 2 at the LHC.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[10]</span>
+            <div>
+              <a href="https://nipscern.com" target="_blank" class="wiki-link">NIPSCERN Laboratory — nipscern.com</a>
+              <span class="ref-note">Home page of the Nuclear Instrumentation and Signal Processing Laboratory at UFJF, Brazil.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[11]</span>
+            <div>
+              <a href="https://doi.org/10.1088/1748-0221/6/10/P10003" target="_blank" class="wiki-link">ATLAS Liquid Argon Calorimeter: Run 1 performance, JINST 6 (2011)</a>
+              <span class="ref-note">Complete performance evaluation of the LAr calorimeters (EM, HEC, FCal) during proton–proton collisions at 7 TeV.</span>
+            </div>
+          </li>
+          <li>
+            <span class="ref-num">[12]</span>
+            <div>
+              <a href="https://doi.org/10.1088/1748-0221/15/09/P09017" target="_blank" class="wiki-link">ATLAS Collaboration, JINST 15 (2020) P09017</a>
+              <span class="ref-note">Jet reconstruction and calibration with the ATLAS detector in Run 2, directly relevant to TileCal and HEC signals.</span>
+            </div>
+          </li>
+        </ol>
+      </div>
 
-        function updateCamera() {
-            controls.velocity.theta *= controls.damping;
-            controls.velocity.phi *= controls.damping;
-            controls.velocity.pan.multiplyScalar(controls.damping);
-            controls.velocity.zoom *= controls.damping;
-            
-            controls.spherical.theta += controls.velocity.theta;
-            controls.spherical.phi += controls.velocity.phi;
-            controls.spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, controls.spherical.phi));
-            
-            controls.spherical.radius += controls.velocity.zoom;
-            controls.spherical.radius = Math.max(2, Math.min(40, controls.spherical.radius));
-            
-            const right = new THREE.Vector3();
-            const up = new THREE.Vector3();
-            camera.getWorldDirection(right);
-            right.cross(camera.up).normalize();
-            up.copy(camera.up);
-            
-            controls.target.add(right.multiplyScalar(-controls.velocity.pan.x));
-            controls.target.add(up.multiplyScalar(controls.velocity.pan.y));
-            
-            const sinPhiRadius = Math.sin(controls.spherical.phi) * controls.spherical.radius;
-            camera.position.x = sinPhiRadius * Math.sin(controls.spherical.theta) + controls.target.x;
-            camera.position.y = Math.cos(controls.spherical.phi) * controls.spherical.radius + controls.target.y;
-            camera.position.z = sinPhiRadius * Math.cos(controls.spherical.theta) + controls.target.z;
-            
-            camera.lookAt(controls.target);
-        }
-        
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        const tooltip = document.getElementById('tooltip');
-        const palette = document.getElementById('color-palette');
-        
-        let hoveredInstanceId = -1;
-        let selectedInstanceId = -1;
+    </div>
+  </aside>
 
-        function getIntersect(x, y) {
-            if (!instancedMesh || currentCubeCount === 0) return null;
-            mouse.x = (x / window.innerWidth) * 2 - 1;
-            mouse.y = -(y / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(instancedMesh);
-            return intersects.length > 0 ? intersects[0] : null;
-        }
+  <!-- ═══════════════════════════════════════════════════════
+       HELP MODAL
+  ═══════════════════════════════════════════════════════ -->
+  <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="modal-title" class="modal-title">
+          <i data-lucide="circle-help" style="width:16px;height:16px;opacity:0.7"></i>
+          Help &amp; Shortcuts
+        </h2>
+        <button id="modal-close-btn" class="modal-close" aria-label="Close">
+          <i data-lucide="x" style="width:14px;height:14px"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <h3 class="modal-section-title">Keyboard shortcuts</h3>
+          <table class="shortcut-table">
+            <tr><td><kbd>F</kbd></td><td>Enter / exit Cinema mode</td></tr>
+            <tr><td><kbd>W</kbd></td><td>Toggle wireframe rendering</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Exit focus mode or close open panels</td></tr>
+          </table>
+        </div>
+        <div class="modal-section">
+          <h3 class="modal-section-title">3D navigation</h3>
+          <table class="shortcut-table">
+            <tr><td><kbd>Left drag</kbd></td><td>Orbit around the detector centre</td></tr>
+            <tr><td><kbd>Right drag</kbd></td><td>Pan the camera laterally</td></tr>
+            <tr><td><kbd>Scroll</kbd></td><td>Zoom in / out along view axis</td></tr>
+            <tr><td><kbd>Hover cell</kbd></td><td>Display energy and position data (visible cells only, when enabled)</td></tr>
+          </table>
+        </div>
+        <div class="modal-section">
+          <h3 class="modal-section-title">About CGV Web</h3>
+          <p class="modal-text">CGV Web is developed by the <strong>NIPSCERN Signal Processing Laboratory</strong> (Núcleo de Instrumentação e Processamento de Sinais) at UFJF, Brazil, in collaboration with the ATLAS experiment at CERN. The viewer uses Three.js, a Rust/WASM XML parser, and custom GLSL shaders. All processing happens locally — no server upload.</p>
+          <div class="modal-links">
+            <a href="https://nipscern.com" target="_blank" rel="noopener" class="modal-link">
+              <i data-lucide="external-link" style="width:11px;height:11px"></i>NIPS Lab
+            </a>
+            <a href="https://nipscern.com/projects/cgvweb" target="_blank" rel="noopener" class="modal-link">
+              <i data-lucide="external-link" style="width:11px;height:11px"></i>CGV Project
+            </a>
+            <a href="https://atlas.cern" target="_blank" rel="noopener" class="modal-link">
+              <i data-lucide="external-link" style="width:11px;height:11px"></i>ATLAS / CERN
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        function handleHover(clientX, clientY) {
-            if (!instancedMesh) return;
-            
-            const intersect = getIntersect(clientX, clientY);
-            
-            if (intersect) {
-                const instanceId = intersect.instanceId;
-                hoveredInstanceId = instanceId;
+  <!-- ═══════════════════════════════════════════════════════
+       TOUR OVERLAY
+  ═══════════════════════════════════════════════════════ -->
+  <div id="tour-overlay" aria-hidden="true">
 
-                tooltip.textContent = `CUBE #${instanceId}`;
-                tooltip.style.display = 'block';
-                tooltip.style.left = clientX + 15 + 'px';
-                tooltip.style.top = clientY + 15 + 'px';
+    <!-- Centered welcome card -->
+    <div id="tour-welcome" class="tour-card tour-centered">
+      <div class="tour-card-header">
+        <div class="tour-badge">CGV Web</div>
+        <div class="tour-step-indicator" id="tour-step-indicator">Step 1 / 9</div>
+      </div>
+      <div class="tour-orb" aria-hidden="true">⊕</div>
+      <h2 id="tour-title" class="tour-title"></h2>
+      <div id="tour-body" class="tour-body"></div>
+      <div class="tour-actions">
+        <button id="tour-skip" class="tour-btn-ghost" type="button">Skip tour</button>
+        <label class="tour-no-show">
+          <input type="checkbox" id="tour-no-show" />
+          <span>Don't show again</span>
+        </label>
+        <div class="tour-nav">
+          <button id="tour-prev" class="tour-btn-sec" type="button" style="display:none">←</button>
+          <button id="tour-next" class="tour-btn-pri" type="button">Next →</button>
+        </div>
+      </div>
+    </div>
 
-                const matrix = new THREE.Matrix4();
-                instancedMesh.getMatrixAt(instanceId, matrix);
-                highlightMesh.visible = true;
-                highlightMesh.matrix.copy(matrix);
-            } else {
-                hoveredInstanceId = -1;
-                tooltip.style.display = 'none';
-                highlightMesh.visible = false;
-            }
-        }
+    <!-- Floating popover -->
+    <div id="tour-popover" class="tour-popover">
+      <div class="pop-arrow" id="tour-arrow"></div>
+      <div class="pop-step-indicator" id="pop-step-indicator">Step 2 / 9</div>
+      <h3 id="tour-pop-title" class="pop-title"></h3>
+      <div id="tour-pop-body" class="pop-body"></div>
+      <div class="pop-actions">
+        <button id="pop-skip" class="tour-btn-ghost" type="button">Skip</button>
+        <div class="tour-nav">
+          <button id="pop-prev" class="tour-btn-sec" type="button">←</button>
+          <button id="pop-next" class="tour-btn-pri" type="button">Next →</button>
+        </div>
+      </div>
+    </div>
 
-        function handleClick(clientX, clientY) {
-            const intersect = getIntersect(clientX, clientY);
-            if (intersect) {
-                selectedInstanceId = intersect.instanceId;
-                openPalette(clientX, clientY);
-            } else {
-                closePalette();
-            }
-        }
+    <!-- Spotlight ring -->
+    <div id="tour-spotlight" aria-hidden="true"></div>
 
-        function openPalette(x, y) {
-            const width = 140; 
-            const height = 140; 
-            let posX = x + 10;
-            let posY = y + 10;
-
-            if (posX + width > window.innerWidth) posX = x - width - 10;
-            if (posY + height > window.innerHeight) posY = y - height - 10;
-
-            palette.style.left = `${posX}px`;
-            palette.style.top = `${posY}px`;
-            palette.classList.add('active');
-        }
-
-        function closePalette() {
-            palette.classList.remove('active');
-            selectedInstanceId = -1;
-        }
-
-        document.querySelectorAll('.color-swatch').forEach(swatch => {
-            const applyColor = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (selectedInstanceId !== -1 && instancedMesh) {
-                    const hexStr = swatch.getAttribute('data-color');
-                    const color = new THREE.Color(parseInt(hexStr));
-                    
-                    instancedMesh.setColorAt(selectedInstanceId, color);
-                    instancedMesh.instanceColor.needsUpdate = true;
-                    closePalette();
-                }
-            };
-            swatch.addEventListener('click', applyColor);
-            swatch.addEventListener('touchend', applyColor);
-        });
-
-        const slider = document.getElementById('slice-slider');
-        const cubeCountLabel = document.getElementById('cube-count');
-        const sliderPreview = document.getElementById('slider-preview');
-        
-        slider.addEventListener('input', (e) => {
-            const value = parseFloat(e.target.value);
-            const newTarget = Math.floor((value / 100) * MAX_CUBES);
-            
-            sliderPreview.textContent = newTarget.toLocaleString() + ' cubes';
-            sliderPreview.style.left = `calc(${value}% - 20px)`;
-            
-            if (newTarget !== currentCubeCount) {
-                cubeCountLabel.textContent = newTarget.toLocaleString();
-            }
-        });
-
-        slider.addEventListener('change', (e) => {
-            const value = parseFloat(e.target.value);
-            const newTarget = Math.floor((value / 100) * MAX_CUBES);
-            
-            if (newTarget !== currentCubeCount) {
-                closePalette();
-                createCubes(newTarget);
-            }
-        });
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            updateCamera();
-            renderer.render(scene, camera);
-        }
-        
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-        
-        animate();
-    </script>
+  </div>
+
+  <script>
+    // Initialise Lucide icons after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+    });
+    // Also run after modules load (icons added dynamically by JS)
+    window.addEventListener('load', () => {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
 </body>
 </html>
