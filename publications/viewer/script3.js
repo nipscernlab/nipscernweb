@@ -1,13 +1,16 @@
 // /publications/viewer/script3.js
 // =====================================================
-// NIPSCERN — VIEWER PDF (PDF.js local)
+// NIPSCERN — VIEWER PDF (PDF.js local)  ✅ v4
 // - Canvas único (1 página por vez)
-// - FitWidth / FitPage com base no container real
+// - FitWidth / FitPage com base no container REAL (desconta paddings)
+// - No mobile: reduz paddings do CSS via JS (PDF fica maior)
 // - Preserva scroll no zoom e fit
 // - Margens (toggle) ✅
-// - Scroll do mouse troca página SÓ quando "passa do limite" ✅
+// - Wheel troca página só se insistir no limite ✅
 // - Teclas: ←/→, +/-, Home/End, R, F
 // =====================================================
+
+console.log("[VIEWER] script3.js v4 (fit REAL + mobile pads)");
 
 // 0) Garantia: PDF.js carregou
 if (typeof window.pdfjsLib === "undefined") {
@@ -38,7 +41,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
     console.error("[VIEWER] #pdfCanvas não existe.");
     return;
   }
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d", { alpha: false });
 
   // Shell (scroll interno)
   const shell = $("pdfShell") || canvas.closest(".pdf-shell");
@@ -46,7 +49,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
     return shell || document.scrollingElement || document.documentElement;
   }
 
-  // Controles (IDs do seu HTML)
+  // Controles
   const pdfTitle = $("pdfTitle");
   const pageNumber = $("pageNumber");
   const pageCount = $("pageCount");
@@ -67,7 +70,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 
   const btnRotate = $("rotate");
 
-  // ✅ alinhados ao seu HTML
   const btnTheme = $("themeToggle");
   const btnFull = $("btnFullscreen");
   const btnOpen = $("btnOpen");
@@ -102,6 +104,38 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
   }
 
   // ==========
+  // Utils
+  // ==========
+  function clamp(n, a, b) {
+    return Math.max(a, Math.min(b, n));
+  }
+  function px(v) {
+    return Number(String(v || "0").replace("px", "")) || 0;
+  }
+
+  // ==========
+  // Ajuste de paddings do viewer no mobile (pra PDF ficar maior)
+  // ==========
+  function applyMobilePads() {
+    const root = document.documentElement;
+    const w = window.innerWidth;
+
+    // você pode ajustar esses valores se quiser ainda maior
+    if (w <= 430) {
+      root.style.setProperty("--shell-pad", "12px");
+      root.style.setProperty("--paper-pad", "10px");
+    } else if (w <= 768) {
+      root.style.setProperty("--shell-pad", "16px");
+      root.style.setProperty("--paper-pad", "14px");
+    } else {
+      // desktop: deixa o CSS mandar (remove override)
+      root.style.removeProperty("--shell-pad");
+      root.style.removeProperty("--paper-pad");
+    }
+  }
+  applyMobilePads();
+
+  // ==========
   // Preserve scroll (no container certo)
   // ==========
   async function preserveScroll(asyncWork) {
@@ -129,15 +163,10 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
     return;
   }
 
-  // Título “revista”
   function formatTitleFromFile(path) {
     const raw = path.split("/").pop() || "Documento";
     const clean = raw.replace(/\.pdf$/i, "");
     const spaced = clean.replace(/[-_]/g, " ");
-
-    // opcional: remove tokens muito técnicos do final (tcc/mestrado/etc) se quiser:
-    // return spaced.replace(/\b(pdf|final|versao|v\d+)\b/gi, "").trim()
-
     return spaced
       .split(" ")
       .filter(Boolean)
@@ -161,24 +190,31 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
   let scaleMode = "fitPage"; // manual | fitWidth | fitPage
 
   // ==========
-  // Fit scale baseado no shell real (PDF maior)
+  // Fit scale baseado no espaço REAL disponível
   // ==========
   function getFitBox() {
-    const box = shell || document.body;
-    const rect = box.getBoundingClientRect();
+    const scroller = getScroller();
+    const rect = scroller.getBoundingClientRect();
 
-    // margens bem pequenas (pra PDF ficar grande)
-    const padX = 24;
-    const padY = 18;
+    // desconta paddings do shell
+    const csShell = window.getComputedStyle(scroller);
+    const shellPadX = px(csShell.paddingLeft) + px(csShell.paddingRight);
+    const shellPadY = px(csShell.paddingTop) + px(csShell.paddingBottom);
+
+    // desconta paddings do paper (onde o canvas fica dentro)
+    const paper = paperEl || canvas.closest(".pdf-paper");
+    const csPaper = paper ? window.getComputedStyle(paper) : null;
+    const paperPadX = csPaper ? px(csPaper.paddingLeft) + px(csPaper.paddingRight) : 0;
+    const paperPadY = csPaper ? px(csPaper.paddingTop) + px(csPaper.paddingBottom) : 0;
+
+    // “folga” mínima só pra não encostar
+    const EXTRA_X = 6;
+    const EXTRA_Y = 6;
 
     return {
-      width: Math.max(220, rect.width - padX),
-      height: Math.max(220, rect.height - padY),
+      width: Math.max(220, rect.width - shellPadX - paperPadX - EXTRA_X),
+      height: Math.max(220, rect.height - shellPadY - paperPadY - EXTRA_Y),
     };
-  }
-
-  function clamp(n, a, b) {
-    return Math.max(a, Math.min(b, n));
   }
 
   function computeFitScale(page, mode) {
@@ -188,10 +224,10 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
     const sW = box.width / base.width;
     const sH = box.height / base.height;
 
-    if (mode === "fitWidth") return clamp(sW, 0.3, 6);
+    if (mode === "fitWidth") return clamp(sW, 0.25, 6);
 
-    // leve boost pra “encher” mais a tela
-    return clamp(Math.min(sW, sH) * 1.06, 0.3, 6);
+    // fitPage: sem boost (pra não estourar no mobile)
+    return clamp(Math.min(sW, sH), 0.25, 6);
   }
 
   // ==========
@@ -271,8 +307,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
         pageNumber.value = String(pageNum);
       }
 
+      // padrão: página inteira (maior possível)
       scaleMode = "fitPage";
       await renderPage(pageNum);
+      getScroller().scrollTop = 0;
+
       hideMsg();
     } catch (err) {
       console.error("[VIEWER] loadPdf error:", err);
@@ -386,7 +425,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
   });
 
   // ==========
-  // Scroll do mouse → troca página só se insistir no limite
+  // Wheel troca página só se insistir no limite
   // ==========
   let wheelLock = false;
   let wheelAccum = 0;
@@ -398,7 +437,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
     "wheel",
     async (e) => {
       if (!pdfDoc) return;
-      if (e.ctrlKey) return;
+      if (e.ctrlKey) return; // ctrl+wheel = zoom do browser
       if (wheelLock) return;
 
       const scroller = getScroller();
@@ -408,7 +447,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
       const atTop = pos <= EDGE;
       const atBottom = pos >= (maxScroll - EDGE);
 
-      // se ainda tem leitura/scroll, deixa rolar normal
       if (!atTop && !atBottom) {
         wheelAccum = 0;
         return;
@@ -416,9 +454,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 
       wheelAccum += e.deltaY;
 
-      // topo + scroll down => quer ler, não virar
       if (atTop && e.deltaY > 0) { wheelAccum = 0; return; }
-      // fundo + scroll up => quer voltar um pouco
       if (atBottom && e.deltaY < 0) { wheelAccum = 0; return; }
 
       if (atBottom && wheelAccum > TRIGGER) {
@@ -476,12 +512,13 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
     }
   });
 
-  // Resize
+  // Resize: reaplica pads e re-render
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      renderPage(pageNum);
+    resizeTimer = setTimeout(async () => {
+      applyMobilePads();
+      await renderPage(pageNum);
     }, 140);
   });
 
