@@ -756,14 +756,16 @@ select[hidden]{
     will-change: transform;
   }
 
-  /* SAPHO: vai para a esquerda */
+  /* ✅ AJUSTE (evita “corte” na interseção) */
   .diagram.venn .circle.sapho .circle-label{
-    transform: translateX(-92px); /* ajuste aqui */
+    transform: translateX(-43px);
   }
-
-  /* CERN: vai para a direita */
   .diagram.venn .circle.cern .circle-label{
-    transform: translateX(12px); /* ajuste aqui */
+    transform: translateX(43px);
+  }
+  .diagram.venn .intersection.sc .circle-label{
+    color: #ffffff !important;
+    text-shadow: 0 0 12px rgba(255,255,255,.35);
   }
 
   .header{ height: 82px; padding: 14px 16px; }
@@ -896,27 +898,65 @@ select[hidden]{
     z-index: 10;
   }
 
-  /* ===========================
-     ✅ AJUSTE FINO DO TEXTO
-     (move só a palavra)
-     =========================== */
-  .diagram.venn .circle-label{
-    display: inline-block;
-    transform: translateX(0);
-  }
+  /* ✅ IMPORTANTE:
+     Aqui NÃO redefinimos transform do texto,
+     para não "pisar" no ajuste do 768px. */
+}
 
-  /* SAPHO mais pra esquerda */
-  .diagram.venn .circle.sapho .circle-label{
-    transform: translateX(-10px); /* ajuste: -6px até -18px */
-  }
+/* SC (interseção) sempre branco — todas as telas */
+.diagram.venn .intersection.sc .circle-label{
+  color: #ffffff !important;
+  text-shadow: 0 0 12px rgba(255,255,255,.35);
+}
 
-  /* (opcional) CERN */
-  .diagram.venn .circle.cern .circle-label{
-    transform: translateX(0px);
-  }
+/* ===== Tooltip do eixo SC (SAPHO × CERN) ===== */
+.chip.has-tooltip{
+  position: relative;
+}
 
-  /* (opcional) SC */
-  .diagram.venn .intersection.sc .circle-label{
-    transform: translateX(0px);
-  }
+.chip.has-tooltip::after{
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px); /* acima do chip */
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+
+  padding: 6px 10px;
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+
+  color: #ffffff;
+  background: rgba(20, 20, 40, 0.95);
+  border: 1px solid rgba(179,136,255,.55); /* roxo SC */
+
+  box-shadow:
+    0 0 14px rgba(179,136,255,.35),
+    0 10px 24px rgba(0,0,0,.45);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+/* setinha */
+.chip.has-tooltip::before{
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(179,136,255,.55);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+/* aparece no hover */
+.chip.has-tooltip:hover::after,
+.chip.has-tooltip:hover::before{
+  opacity: 1;
 }
