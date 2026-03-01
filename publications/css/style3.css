@@ -749,7 +749,7 @@ select[hidden]{
    RESPONSIVO (TABLET/MOBILE)
    ========================================================= */
 @media (max-width: 768px){
-  
+
   /* garante que o texto possa se mover */
   .diagram.venn .circle-label{
     display: inline-block;
@@ -897,10 +897,6 @@ select[hidden]{
     transform: translate(-50%, -50%);
     z-index: 10;
   }
-
-  /* ✅ IMPORTANTE:
-     Aqui NÃO redefinimos transform do texto,
-     para não "pisar" no ajuste do 768px. */
 }
 
 /* SC (interseção) sempre branco — todas as telas */
@@ -917,7 +913,7 @@ select[hidden]{
 .chip.has-tooltip::after{
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 8px); /* acima do chip */
+  bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
@@ -931,7 +927,7 @@ select[hidden]{
 
   color: #ffffff;
   background: rgba(20, 20, 40, 0.95);
-  border: 1px solid rgba(179,136,255,.55); /* roxo SC */
+  border: 1px solid rgba(179,136,255,.55);
 
   box-shadow:
     0 0 14px rgba(179,136,255,.35),
@@ -942,7 +938,6 @@ select[hidden]{
   transition: opacity .2s ease, transform .2s ease;
 }
 
-/* setinha */
 .chip.has-tooltip::before{
   content: "";
   position: absolute;
@@ -955,8 +950,142 @@ select[hidden]{
   transition: opacity .2s ease;
 }
 
-/* aparece no hover */
 .chip.has-tooltip:hover::after,
 .chip.has-tooltip:hover::before{
   opacity: 1;
+}
+
+/* ===== Idioma da INTERFACE (PT / EN • texto puro) ===== */
+.lang-switch{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 14px; /* respiro antes do 🏠 */
+}
+
+.lang-btn{
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  font-family: inherit;
+  font-weight: 800;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+
+  color: #ffffff;
+  opacity: .62;
+
+  padding: 10px 8px; /* área de toque boa no mobile */
+  border-radius: 10px;
+
+  transition: opacity .18s ease, text-shadow .2s ease, transform .18s ease, background .18s ease;
+}
+
+.lang-btn:hover{
+  opacity: .92;
+  transform: translateY(-1px);
+  text-shadow: 0 0 10px rgba(255,255,255,.20);
+  background: rgba(255,255,255,.04);
+}
+
+.lang-btn.is-active{
+  opacity: 1;
+  text-shadow: 0 0 12px rgba(255,255,255,.28);
+  background: rgba(0,229,255,.06);
+  box-shadow: 0 0 0 2px rgba(0,229,255,.12);
+}
+
+@media (max-width: 768px){
+  .lang-switch{ gap: 8px; margin-right: 10px; }
+  .lang-btn{ padding: 10px 7px; letter-spacing: .20em; }
+}
+
+/* =========================================================
+   VENN • Opção 2 (convergência + SC aparece depois)
+   ========================================================= */
+
+.diagram.venn.venn-join-2 .circle.sapho,
+.diagram.venn.venn-join-2 .circle.cern{
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+/* SC: começa escondido e entra depois */
+.diagram.venn.venn-join-2 .intersection.sc{
+  will-change: opacity, transform;
+  opacity: 0;
+  animation: venn2-sc-in 360ms ease-out 720ms forwards;
+}
+
+/* Desktop/base */
+.diagram.venn.venn-join-2 .circle.sapho{
+  animation: venn2-sapho-desktop 780ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
+}
+.diagram.venn.venn-join-2 .circle.cern{
+  animation: venn2-cern-desktop 780ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
+}
+
+@keyframes venn2-sapho-desktop{
+  from{ opacity: 0; transform: translateX(-110px); }
+  to  { opacity: 1; transform: translateX(0); }
+}
+@keyframes venn2-cern-desktop{
+  from{ opacity: 0; transform: translateX(110px); }
+  to  { opacity: 1; transform: translateX(0); }
+}
+
+/* SC entra “formando” a interseção */
+@keyframes venn2-sc-in{
+  from{ opacity: 0; transform: translate(-50%, -50%) scale(.96); }
+  to  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Tablet/Mobile (<=768px): respeita seus transforms */
+@media (max-width: 768px){
+  .diagram.venn.venn-join-2 .circle.sapho{
+    animation: venn2-sapho-mobile 720ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
+  }
+  .diagram.venn.venn-join-2 .circle.cern{
+    animation: venn2-cern-mobile 720ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
+  }
+
+  @keyframes venn2-sapho-mobile{
+    from{ opacity: 0; transform: translate(-90%, -50%) translateX(-44px); }
+    to  { opacity: 1; transform: translate(-90%, -50%) translateX(0); }
+  }
+  @keyframes venn2-cern-mobile{
+    from{ opacity: 0; transform: translate(-10%, -50%) translateX(44px); }
+    to  { opacity: 1; transform: translate(-10%, -50%) translateX(0); }
+  }
+}
+
+/* Mobile pequeno (<=480px): respeita seus transforms */
+@media (max-width: 480px){
+  .diagram.venn.venn-join-2 .circle.sapho{
+    animation: venn2-sapho-mobile2 720ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
+  }
+  .diagram.venn.venn-join-2 .circle.cern{
+    animation: venn2-cern-mobile2 720ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
+  }
+
+  @keyframes venn2-sapho-mobile2{
+    from{ opacity: 0; transform: translate(-76%, -50%) translateX(-38px); }
+    to  { opacity: 1; transform: translate(-76%, -50%) translateX(0); }
+  }
+  @keyframes venn2-cern-mobile2{
+    from{ opacity: 0; transform: translate(-24%, -50%) translateX(38px); }
+    to  { opacity: 1; transform: translate(-24%, -50%) translateX(0); }
+  }
+}
+
+/* Acessibilidade */
+@media (prefers-reduced-motion: reduce){
+  .diagram.venn.venn-join-2 .circle.sapho,
+  .diagram.venn.venn-join-2 .circle.cern,
+  .diagram.venn.venn-join-2 .intersection.sc{
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
