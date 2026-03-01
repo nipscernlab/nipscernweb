@@ -7,6 +7,7 @@
 // - Ano, Busca, Favoritos
 // - Infinite scroll
 // - Botão flutuante "Voltar aos filtros" (robusto) ✅
+// - ✅ Idioma da INTERFACE via PT/EN (texto puro)
 // =====================================================
 
 
@@ -220,7 +221,7 @@
 
 
 // -----------------------------------------------------
-// 2) HUB de Publicações (OFICIAL)
+// 2) HUB de Publicações (OFICIAL) + i18n interface
 // -----------------------------------------------------
 (function hub() {
   const grid = document.getElementById("pubsGrid");
@@ -249,7 +250,6 @@
     const q = (query ?? "").toString().trim();
     if (!q) return escapeHTML(raw);
 
-    const rawNorm = norm(raw);
     const qNorm = norm(q);
     if (!qNorm) return escapeHTML(raw);
 
@@ -286,6 +286,133 @@
     return out;
   }
 
+  // -------------------------
+  // i18n (idioma da interface)
+  // -------------------------
+  const UI_LANG_KEY = "nipscern_ui_lang_v1";
+
+  const I18N = {
+    pt: {
+      site_title: "NIPSCERN — PUBLICAÇÕES",
+      hero_title: "Sinergia entre SAPHO e CERN",
+      pubs_title: "Publicações",
+      axis_label: "EIXO",
+      type_label: "TIPO",
+      pdf_lang_label: "IDIOMA DO PDF",
+      year_label: "ANO",
+      search_label: "BUSCA",
+      all: "Todos",
+
+      type_congresso: "Congresso",
+      type_revista: "Revista",
+      type_tcc: "TCC",
+      type_mestrado: "Mestrado",
+      type_doutorado: "Doutorado",
+
+      pdf_lang_pt: "Português",
+      pdf_lang_en: "Inglês",
+
+      search_ph: "Buscar por título, autor, ano...",
+      open_pdf: "Abrir PDF",
+      results_total: (n) => `${n} resultado(s)`,
+      no_results: "Nenhuma publicação encontrada com os filtros atuais.",
+      no_pubs_loaded:
+        `Nenhuma publicação foi carregada. <br/>Verifique se existe <code>/publications/data/publicacoes.json</code>.`,
+      loading_more: "Carregando mais resultados…",
+    },
+    en: {
+      site_title: "NIPSCERN — PUBLICATIONS",
+      hero_title: "Synergy between SAPHO and CERN",
+      pubs_title: "Publications",
+      axis_label: "AXIS",
+      type_label: "TYPE",
+      pdf_lang_label: "PDF LANGUAGE",
+      year_label: "YEAR",
+      search_label: "SEARCH",
+      all: "All",
+
+      type_congresso: "Conference",
+      type_revista: "Journal",
+      type_tcc: "Undergrad thesis",
+      type_mestrado: "Master’s",
+      type_doutorado: "PhD",
+
+      pdf_lang_pt: "Portuguese",
+      pdf_lang_en: "English",
+
+      search_ph: "Search by title, author, year...",
+      open_pdf: "Open PDF",
+      results_total: (n) => `${n} result(s)`,
+      no_results: "No publications found with the current filters.",
+      no_pubs_loaded:
+        `No publications loaded. <br/>Check if <code>/publications/data/publicacoes.json</code> exists.`,
+      loading_more: "Loading more results…",
+    },
+  };
+
+  let uiLang = (localStorage.getItem(UI_LANG_KEY) || "pt").toLowerCase();
+  if (!I18N[uiLang]) uiLang = "pt";
+
+  const t = (key, arg) => {
+    const v = I18N[uiLang]?.[key];
+    return typeof v === "function" ? v(arg) : (v ?? key);
+  };
+
+  function applyI18N() {
+    document.documentElement.lang = uiLang === "en" ? "en" : "pt-BR";
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const k = el.getAttribute("data-i18n");
+      if (!k) return;
+
+      if (k === "hero_title") {
+        if (uiLang === "en") {
+          el.innerHTML = `Synergy between <span class="sapho-text">SAPHO</span> and <span class="cern-text">CERN</span>`;
+        } else {
+          el.innerHTML = `Sinergia entre <span class="sapho-text">SAPHO</span> e <span class="cern-text">CERN</span>`;
+        }
+        return;
+      }
+
+      el.textContent = t(k);
+    });
+
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+      const k = el.getAttribute("data-i18n-placeholder");
+      if (!k) return;
+      el.setAttribute("placeholder", t(k));
+    });
+
+    const loader = document.getElementById("pubLoader");
+    if (loader) loader.textContent = t("loading_more");
+
+    document.querySelectorAll(".lang-btn[data-lang]").forEach((b) => {
+      b.classList.toggle(
+        "is-active",
+        (b.getAttribute("data-lang") || "").toLowerCase() === uiLang
+      );
+    });
+  }
+
+  function setUILang(lang) {
+    const next = (lang || "pt").toLowerCase();
+    if (!I18N[next]) return;
+    uiLang = next;
+    localStorage.setItem(UI_LANG_KEY, uiLang);
+    applyI18N();
+    populateYears();
+    render();
+  }
+
+  document.addEventListener("click", (ev) => {
+    const btn = ev.target.closest(".lang-btn[data-lang]");
+    if (!btn) return;
+    setUILang(btn.getAttribute("data-lang"));
+  });
+
+  // -------------------------
+  // HUB
+  // -------------------------
   const PAGE_SIZE = 24;
   const LS_KEY = "nipscern_favs_v1";
   const SOURCES = ["/publications/data/publicacoes.json"];
@@ -347,12 +474,12 @@
   }
 
   function tipoLabel(tipo) {
-    const t = (tipo || "").toLowerCase();
-    if (t === "congresso") return "CONGRESSO";
-    if (t === "revista") return "REVISTA";
-    if (t === "tcc") return "TCC";
-    if (t === "mestrado") return "MESTRADO";
-    if (t === "doutorado") return "DOUTORADO";
+    const tt = (tipo || "").toLowerCase();
+    if (tt === "congresso") return uiLang === "en" ? "CONFERENCE" : "CONGRESSO";
+    if (tt === "revista") return uiLang === "en" ? "JOURNAL" : "REVISTA";
+    if (tt === "tcc") return "TCC";
+    if (tt === "mestrado") return uiLang === "en" ? "MASTER’S" : "MESTRADO";
+    if (tt === "doutorado") return uiLang === "en" ? "PHD" : "DOUTORADO";
     return (tipo || "").toUpperCase();
   }
 
@@ -373,10 +500,9 @@
 
   function normalizeIdioma(p) {
     const raw = (p?.idioma ?? p?.lingua ?? p?.language ?? "").toString().toLowerCase().trim();
-    if (!raw) return "pt"; // fallback
+    if (!raw) return "pt";
     if (raw.startsWith("pt")) return "pt";
     if (raw.startsWith("en")) return "en";
-    // se vier "portugues"/"inglês"
     if (raw.includes("port")) return "pt";
     if (raw.includes("ing")) return "en";
     return "pt";
@@ -386,13 +512,11 @@
     const tipo = (p?.tipo || "").toString().toLowerCase().trim();
     const nivel = (p?.nivel || "").toString().toLowerCase().trim();
 
-    // compatibilidade com JSON antigo: tipo=tese + nivel=tcc/mestrado/doutorado
     if (tipo === "tese") {
       if (nivel === "tcc" || nivel === "mestrado" || nivel === "doutorado") return nivel;
-      return "mestrado"; // fallback (se vier tese sem nivel, evita quebrar filtro)
+      return "mestrado";
     }
 
-    // novo padrão: já pode vir direto
     if (tipo === "tcc" || tipo === "mestrado" || tipo === "doutorado") return tipo;
     return tipo || "congresso";
   }
@@ -451,11 +575,8 @@
     if (active && !active.has(item.eixo)) return false;
 
     if (state.tipo !== "all" && item.tipo !== state.tipo) return false;
-
     if (state.idioma !== "all" && (item.idioma || "pt") !== state.idioma) return false;
-
     if (state.ano !== "all" && String(item.ano) !== String(state.ano)) return false;
-
     if (state.favOnly && !favs.has(item.id)) return false;
 
     const q = norm(state.q);
@@ -494,7 +615,7 @@
           <a class="pub-open"
              href="/publications/viewer/index.html?file=${encodeURIComponent(item.arquivo)}"
              target="_blank" rel="noopener">
-            Abrir PDF
+            ${t("open_pdf")}
             <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
           </a>
         </div>
@@ -512,16 +633,12 @@
 
   function syncEixoChipsUI() {
     if (!eixoWrap) return;
-    const btns = eixoWrap.querySelectorAll("[data-eixo]");
-    btns.forEach((btn) => {
+    eixoWrap.querySelectorAll("[data-eixo]").forEach((btn) => {
       const v = btn.getAttribute("data-eixo");
       btn.classList.toggle("is-active", state.eixos.has(v));
     });
   }
 
-  // -------------------------
-  // ANO dropdown
-  // -------------------------
   function reserveYearSpace(open) {
     const block = yearDD?.closest(".filter-block");
     if (!block) return;
@@ -560,7 +677,7 @@
       .sort((a, b) => b - a);
 
     yearSelect.innerHTML =
-      `<option value="all">Todos</option>` +
+      `<option value="all">${t("all")}</option>` +
       years.map((y) => `<option value="${y}">${y}</option>`).join("");
 
     const items = ["all", ...years.map(String)];
@@ -568,7 +685,7 @@
       <div class="year-grid">
         ${items
           .map((v) => {
-            const label = v === "all" ? "Todos" : v;
+            const label = v === "all" ? t("all") : v;
             const active = String(state.ano) === String(v) ? "is-active" : "";
             return `<button type="button" class="year-item ${active}" data-year="${v}">${label}</button>`;
           })
@@ -576,7 +693,7 @@
       </div>
     `;
 
-    yearBtnLabel.textContent = state.ano === "all" ? "Todos" : String(state.ano);
+    yearBtnLabel.textContent = state.ano === "all" ? t("all") : String(state.ano);
   }
 
   yearBtn?.addEventListener("click", (ev) => {
@@ -593,7 +710,7 @@
     const v = btn.getAttribute("data-year") || "all";
     state.ano = v;
     if (yearSelect) yearSelect.value = v;
-    if (yearBtnLabel) yearBtnLabel.textContent = v === "all" ? "Todos" : v;
+    if (yearBtnLabel) yearBtnLabel.textContent = v === "all" ? t("all") : v;
 
     yearMenu.querySelectorAll(".year-item").forEach((b) => {
       b.classList.toggle("is-active", b.getAttribute("data-year") === v);
@@ -604,17 +721,9 @@
     render();
   });
 
-  document.addEventListener("click", () => {
-    closeYearMenu();
-  });
+  document.addEventListener("click", () => closeYearMenu());
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") closeYearMenu(); });
 
-  document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape") closeYearMenu();
-  });
-
-  // -------------------------
-  // Infinite scroll
-  // -------------------------
   function ensureInfiniteScroll() {
     if (!sentinelEl) return;
 
@@ -650,18 +759,10 @@
     _io.observe(sentinelEl);
   }
 
-  // -------------------------
-  // Render
-  // -------------------------
   function render() {
     if (!DATA.length) {
-      if (resultsMeta) resultsMeta.textContent = "Mostrando 0 de 0 resultado(s)";
-      grid.innerHTML = `
-        <div class="no-results">
-          Nenhuma publicação foi carregada. <br/>
-          Verifique se existe <code>/publications/data/publicacoes.json</code>.
-        </div>
-      `;
+      if (resultsMeta) resultsMeta.textContent = t("results_total", 0);
+      grid.innerHTML = `<div class="no-results">${t("no_pubs_loaded")}</div>`;
       _lastFilteredTotal = 0;
       ensureInfiniteScroll();
       return;
@@ -674,12 +775,10 @@
     _lastFilteredTotal = filtered.length;
     const visible = filtered.slice(0, state.limit);
 
-    if (resultsMeta) {
-      resultsMeta.textContent = `Mostrando ${visible.length} de ${filtered.length} resultado(s)`;
-    }
+    if (resultsMeta) resultsMeta.textContent = t("results_total", filtered.length);
 
     if (!visible.length) {
-      grid.innerHTML = `<div class="no-results">Nenhuma publicação encontrada com os filtros atuais.</div>`;
+      grid.innerHTML = `<div class="no-results">${t("no_results")}</div>`;
       ensureInfiniteScroll();
       return;
     }
@@ -704,9 +803,6 @@
     ensureInfiniteScroll();
   }
 
-  // -------------------------
-  // Eventos dos filtros
-  // -------------------------
   eixoWrap?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-eixo]");
     if (!btn) return;
@@ -765,7 +861,6 @@
     render();
   });
 
-  // Atalho do diagrama (venn)
   document.addEventListener("click", (e) => {
     const link = e.target.closest(".venn-link[data-eixo]");
     if (!link) return;
@@ -793,7 +888,7 @@
     }
 
     if (yearSelect) yearSelect.value = "all";
-    if (yearBtnLabel) yearBtnLabel.textContent = "Todos";
+    if (yearBtnLabel) yearBtnLabel.textContent = t("all");
     if (yearMenu) {
       yearMenu.querySelectorAll(".year-item").forEach((b) => {
         b.classList.toggle("is-active", b.getAttribute("data-year") === "all");
@@ -802,25 +897,43 @@
 
     closeYearMenu();
     render();
-
     document.getElementById("pubs")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // -------------------------
-  // Init
-  // -------------------------
   (async function initHub() {
     try {
+      applyI18N();
       await loadPublicacoes();
+
       populateYears();
       syncEixoChipsUI();
       setActiveChips(tipoWrap, "data-tipo", state.tipo);
       setActiveChips(idiomaWrap, "data-idioma", state.idioma);
+
       render();
     } catch (err) {
       console.error("[HUB] Erro ao iniciar:", err);
-      if (resultsMeta) resultsMeta.textContent = "Mostrando 0 de 0 resultado(s)";
+      if (resultsMeta) resultsMeta.textContent = t("results_total", 0);
       grid.innerHTML = `<div class="no-results">Erro ao carregar publicações. Veja o Console (F12).</div>`;
     }
   })();
+})();
+
+// -----------------------------------------------------
+// VENN • Opção 2: convergência + SC aparece depois
+// -----------------------------------------------------
+(function vennJoinOption2() {
+  const venn = document.querySelector(".diagram.venn");
+  if (!venn) return;
+
+  const reduceMotion =
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) return;
+
+  venn.classList.add("venn-join-2");
+
+  window.setTimeout(() => {
+    venn.classList.remove("venn-join-2");
+  }, 1300);
 })();
