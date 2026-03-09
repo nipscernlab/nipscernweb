@@ -291,8 +291,8 @@ main{
 }
 
 .filters-label{
-  width: 70px;
-  flex: 0 0 70px;
+  width: 110px;
+  flex: 0 0 110px;
   text-align: right;
   letter-spacing: .16em;
   opacity: .75;
@@ -351,7 +351,7 @@ main{
     0 0 34px rgba(255,255,255,.08);
 }
 
-/* EIXO — cores fortes */
+/* EIXO */
 #filterEixo .chip.is-active[data-eixo="all"]{
   border-color: rgba(255,255,255,.45);
   background: rgba(255,255,255,.06);
@@ -387,7 +387,26 @@ main{
     0 0 46px rgba(179,136,255,.14);
 }
 
-/* hover “dá pista” da cor */
+/* COLABORADORES */
+#filterColab .chip.is-active[data-colab="interno"]{
+  border-color: rgba(0,229,255,.80);
+  background: rgba(0,229,255,.14);
+  box-shadow:
+    0 0 0 2px rgba(0,229,255,.22),
+    0 0 20px rgba(0,229,255,.18),
+    0 0 40px rgba(0,229,255,.10);
+}
+
+#filterColab .chip.is-active[data-colab="externo"]{
+  border-color: rgba(255,138,0,.80);
+  background: rgba(255,138,0,.14);
+  box-shadow:
+    0 0 0 2px rgba(255,138,0,.22),
+    0 0 20px rgba(255,138,0,.18),
+    0 0 40px rgba(255,138,0,.10);
+}
+
+/* hovers */
 #filterEixo .chip:not(.is-active)[data-eixo="sapho"]:hover{
   border-color: rgba(255,138,0,.55);
   box-shadow: 0 0 18px rgba(255,138,0,.14);
@@ -401,7 +420,16 @@ main{
   box-shadow: 0 0 18px rgba(179,136,255,.14);
 }
 
-/* FAVORITOS chip */
+#filterColab .chip:not(.is-active)[data-colab="interno"]:hover{
+  border-color: rgba(0,229,255,.55);
+  box-shadow: 0 0 18px rgba(0,229,255,.14);
+}
+#filterColab .chip:not(.is-active)[data-colab="externo"]:hover{
+  border-color: rgba(255,138,0,.55);
+  box-shadow: 0 0 18px rgba(255,138,0,.14);
+}
+
+/* FAVORITOS */
 #favOnlyBtn.chip-star.is-active{
   border-color: #ffd24a;
   background: rgba(255, 210, 74, 0.14);
@@ -458,9 +486,7 @@ main{
   margin: 0 auto;
 }
 
-/* ===============================
-   Dropdown de ANO (2 colunas)
-   =============================== */
+/* Dropdown de ANO */
 .year-dd{ position: relative; width: 220px; }
 
 #yearSelect.year-select,
@@ -559,9 +585,7 @@ select[hidden]{
   backdrop-filter: blur(10px);
 }
 
-/* ===============================
-   Botão flutuante: Voltar ao topo
-   =============================== */
+/* Botão flutuante */
 .back-top{
   position: fixed;
   right: 22px;
@@ -610,7 +634,7 @@ select[hidden]{
   filter: drop-shadow(0 0 14px rgba(233,236,255,.6));
 }
 
-/* Destaque da busca (grifado) */
+/* Destaque da busca */
 .hl{
   font-weight: 800;
   padding: 0 2px;
@@ -634,9 +658,7 @@ select[hidden]{
   box-shadow: 0 0 14px rgba(179,136,255,0.6);
 }
 
-/* ===============================
-   CARDS (MODELO ANTERIOR)
-   =============================== */
+/* CARDS */
 .pub-card{
   position: relative;
   width: 100%;
@@ -652,15 +674,72 @@ select[hidden]{
 .pub-top{
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 10px;
   gap: 10px;
 }
 
+.pub-top-left{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 6px;
+  column-gap: 0;
+}
+
 .pub-badge{
+  display: inline-flex;
+  align-items: center;
   font-size: 12px;
   letter-spacing: .12em;
-  opacity: .85;
+  opacity: .86;
+  color: rgba(233,236,255,.92);
+}
+
+.pub-colab-pill{
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  margin-left: 10px;
+  min-height: auto;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: rgba(233,236,255,.66);
+  transition: color .22s ease, opacity .22s ease;
+}
+
+.pub-colab-pill::before{
+  content: "•";
+  margin-right: 10px;
+  color: rgba(255,255,255,.24);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.pub-colab-pill.is-interno{
+  color: rgba(207,233,255,.68);
+}
+
+.pub-colab-pill.is-externo{
+  color: rgba(255,222,196,.68);
+}
+
+.pub-card:hover .pub-colab-pill{
+  color: rgba(255,255,255,.84);
+}
+
+.pub-card:hover .pub-colab-pill.is-interno{
+  color: rgba(207,233,255,.88);
+}
+
+.pub-card:hover .pub-colab-pill.is-externo{
+  color: rgba(255,222,196,.88);
 }
 
 .pub-title{
@@ -670,6 +749,18 @@ select[hidden]{
 }
 
 .pub-meta{ margin: 0 0 6px; opacity: .85; }
+
+.pub-instituicao{
+  margin: 0 0 8px;
+  opacity: .95;
+  line-height: 1.4;
+}
+
+.pub-instituicao strong{
+  color: #ffffff;
+  font-weight: 700;
+}
+
 .pub-veic{ margin: 0 0 6px; opacity: .85; }
 
 .pub-resumo{
@@ -745,18 +836,22 @@ select[hidden]{
     0 18px 48px rgba(0,0,0,0.55);
 }
 
-/* =========================================================
-   RESPONSIVO (TABLET/MOBILE)
-   ========================================================= */
+/* Glow leve por colaborador */
+.pub-card[data-colab="interno"] .pub-title{
+  text-shadow: 0 0 10px rgba(0,229,255,.04);
+}
+.pub-card[data-colab="externo"] .pub-title{
+  text-shadow: 0 0 10px rgba(255,138,0,.04);
+}
+
+/* RESPONSIVO */
 @media (max-width: 768px){
 
-  /* garante que o texto possa se mover */
   .diagram.venn .circle-label{
     display: inline-block;
     will-change: transform;
   }
 
-  /* ✅ AJUSTE (evita “corte” na interseção) */
   .diagram.venn .circle.sapho .circle-label{
     transform: translateX(-43px);
   }
@@ -781,7 +876,6 @@ select[hidden]{
     font-size: clamp(1.05rem, 4.2vw, 1.35rem);
   }
 
-  /* Venn (classe no seu HTML é "diagram venn") */
   .diagram.venn{
     --venn: min(72vw, 300px);
     width: calc(var(--venn) * 1.55);
@@ -844,15 +938,19 @@ select[hidden]{
   #pubSearch{ width: min(560px, 92vw); }
   .year-dd{ width: min(260px, 92vw); }
 
+  .pub-top{
+    align-items: flex-start;
+  }
+
+  .pub-top-left{
+    width: 100%;
+  }
+
   .back-top{ right: 14px; bottom: 14px; }
 }
 
-/* =========================================================
-   MOBILE PEQUENO (até 480px)
-   ========================================================= */
 @media (max-width: 480px){
 
-  /* tira qualquer "shift" do desktop */
   :root{ --diagram-shift: 0px; }
 
   .titulo-diagrama{
@@ -881,7 +979,6 @@ select[hidden]{
     letter-spacing: 0.12em;
   }
 
-  /* posição dos círculos */
   .diagram.venn .circle.sapho{
     left: 50%;
     transform: translate(-76%,-50%);
@@ -897,15 +994,20 @@ select[hidden]{
     transform: translate(-50%, -50%);
     z-index: 10;
   }
+
+  .pub-colab-pill{
+    font-size: 10px;
+    letter-spacing: .10em;
+  }
 }
 
-/* SC (interseção) sempre branco — todas as telas */
+/* SC sempre branco */
 .diagram.venn .intersection.sc .circle-label{
   color: #ffffff !important;
   text-shadow: 0 0 12px rgba(255,255,255,.35);
 }
 
-/* ===== Tooltip do eixo SC (SAPHO × CERN) ===== */
+/* Tooltip do eixo SC */
 .chip.has-tooltip{
   position: relative;
 }
@@ -955,30 +1057,26 @@ select[hidden]{
   opacity: 1;
 }
 
-/* ===== Idioma da INTERFACE (PT / EN • texto puro) ===== */
+/* Idioma da INTERFACE */
 .lang-switch{
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-right: 14px; /* respiro antes do 🏠 */
+  margin-right: 14px;
 }
 
 .lang-btn{
   border: none;
   background: transparent;
   cursor: pointer;
-
   font-family: inherit;
   font-weight: 800;
   letter-spacing: .22em;
   text-transform: uppercase;
-
   color: #ffffff;
   opacity: .62;
-
-  padding: 10px 8px; /* área de toque boa no mobile */
+  padding: 10px 8px;
   border-radius: 10px;
-
   transition: opacity .18s ease, text-shadow .2s ease, transform .18s ease, background .18s ease;
 }
 
@@ -1001,24 +1099,19 @@ select[hidden]{
   .lang-btn{ padding: 10px 7px; letter-spacing: .20em; }
 }
 
-/* =========================================================
-   VENN • Opção 2 (convergência + SC aparece depois)
-   ========================================================= */
-
+/* VENN • Opção 2 */
 .diagram.venn.venn-join-2 .circle.sapho,
 .diagram.venn.venn-join-2 .circle.cern{
   will-change: transform, opacity;
   opacity: 0;
 }
 
-/* SC: começa escondido e entra depois */
 .diagram.venn.venn-join-2 .intersection.sc{
   will-change: opacity, transform;
   opacity: 0;
   animation: venn2-sc-in 360ms ease-out 720ms forwards;
 }
 
-/* Desktop/base */
 .diagram.venn.venn-join-2 .circle.sapho{
   animation: venn2-sapho-desktop 780ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
 }
@@ -1035,13 +1128,11 @@ select[hidden]{
   to  { opacity: 1; transform: translateX(0); }
 }
 
-/* SC entra “formando” a interseção */
 @keyframes venn2-sc-in{
   from{ opacity: 0; transform: translate(-50%, -50%) scale(.96); }
   to  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* Tablet/Mobile (<=768px): respeita seus transforms */
 @media (max-width: 768px){
   .diagram.venn.venn-join-2 .circle.sapho{
     animation: venn2-sapho-mobile 720ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
@@ -1060,7 +1151,6 @@ select[hidden]{
   }
 }
 
-/* Mobile pequeno (<=480px): respeita seus transforms */
 @media (max-width: 480px){
   .diagram.venn.venn-join-2 .circle.sapho{
     animation: venn2-sapho-mobile2 720ms cubic-bezier(.22,.9,.25,1) 90ms forwards;
