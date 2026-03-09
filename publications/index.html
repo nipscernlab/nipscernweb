@@ -28,13 +28,13 @@
     </div>
 
     <nav class="header-nav">
-      <!-- 🌍 Idioma da INTERFACE (texto puro) -->
+      <!-- 🌍 Idioma da INTERFACE -->
       <div class="lang-switch" aria-label="Idioma da interface">
         <button class="lang-btn" type="button" data-lang="pt" aria-label="Português" title="Português">PT</button>
         <button class="lang-btn" type="button" data-lang="en" aria-label="English" title="English">EN</button>
       </div>
 
-      <!-- 🏠 Casinha (sempre a última) -->
+      <!-- 🏠 Casinha -->
       <a
         href="https://www.nipscern.com/#current-research"
         class="home-link"
@@ -64,7 +64,6 @@
       Sinergia entre <span class="sapho-text">SAPHO</span> e <span class="cern-text">CERN</span>
     </h2>
 
-    <!-- ✅ Diagrama (filtra o HUB) -->
     <div class="diagram venn">
       <a href="#pubs" class="circle sapho venn-link" data-eixo="sapho">
         <span class="circle-label">SAPHO</span>
@@ -86,7 +85,6 @@
   <section id="pubs" class="pubs-hub" aria-label="Hub de publicações">
     <h2 class="pubs-title" data-i18n="pubs_title">Publicações</h2>
 
-    <!-- ✅ alvo do botão flutuante -->
     <div id="filtersTop"></div>
 
     <div class="pubs-filters">
@@ -105,6 +103,19 @@
         </div>
       </div>
 
+      <!-- COLABORADORES -->
+      <div class="filter-block">
+        <div class="filter-line">
+          <p class="filters-label" data-i18n="collab_label">COLABORADORES</p>
+
+          <div class="filter-row" id="filterColab" role="group" aria-label="Filtro de colaboradores">
+            <button class="chip is-active" data-colab="all" data-i18n="all">Todos</button>
+            <button class="chip" data-colab="interno" data-i18n="collab_internal">Interno</button>
+            <button class="chip" data-colab="externo" data-i18n="collab_external">Externo</button>
+          </div>
+        </div>
+      </div>
+
       <!-- TIPO -->
       <div class="filter-block">
         <div class="filter-line">
@@ -114,7 +125,6 @@
             <button class="chip is-active" data-tipo="all" data-i18n="all">Todos</button>
             <button class="chip" data-tipo="congresso" data-i18n="type_congresso">Congresso</button>
             <button class="chip" data-tipo="revista" data-i18n="type_revista">Revista</button>
-
             <button class="chip" data-tipo="tcc" data-i18n="type_tcc">TCC</button>
             <button class="chip" data-tipo="mestrado" data-i18n="type_mestrado">Mestrado</button>
             <button class="chip" data-tipo="doutorado" data-i18n="type_doutorado">Doutorado</button>
@@ -126,7 +136,7 @@
         </div>
       </div>
 
-      <!-- IDIOMA DO PDF (sem bandeiras) -->
+      <!-- IDIOMA DO PDF -->
       <div class="filter-block">
         <div class="filter-line">
           <p class="filters-label" data-i18n="pdf_lang_label">IDIOMA DO PDF</p>
