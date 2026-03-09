@@ -2,12 +2,13 @@
 // =====================================================
 // NIPSCERN • Starfield + HUB de Publicações (OFICIAL)
 // - Multi-eixo (SAPHO/CERN/SC/CS)
+// - Colaboradores (Interno/Externo)
 // - Tipo (Congresso/Revista/TCC/Mestrado/Doutorado)
-// - Idioma (PT/EN) antes do Ano
+// - Idioma do PDF (PT/EN)
 // - Ano, Busca, Favoritos
 // - Infinite scroll
 // - Botão flutuante "Voltar aos filtros" (robusto) ✅
-// - ✅ Idioma da INTERFACE via PT/EN (texto puro)
+// - Idioma da INTERFACE via PT/EN com detecção automática
 // =====================================================
 
 
@@ -289,14 +290,14 @@
   // -------------------------
   // i18n (idioma da interface)
   // -------------------------
-  const UI_LANG_KEY = "nipscern_ui_lang_v1";
-
+  const UI_LANG_KEY = "nipscern_ui_lang_v3";
   const I18N = {
     pt: {
       site_title: "NIPSCERN — PUBLICAÇÕES",
       hero_title: "Sinergia entre SAPHO e CERN",
       pubs_title: "Publicações",
       axis_label: "EIXO",
+      collab_label: "COLABORADORES",
       type_label: "TIPO",
       pdf_lang_label: "IDIOMA DO PDF",
       year_label: "ANO",
@@ -312,19 +313,28 @@
       pdf_lang_pt: "Português",
       pdf_lang_en: "Inglês",
 
-      search_ph: "Buscar por título, autor, ano...",
+      collab_internal: "Interno",
+      collab_external: "Externo",
+
+      institution_label: "Instituição",
+      collab_card_internal: "Interno",
+      collab_card_external: "Externo",
+
+      search_ph: "Buscar por título, autor, ano, instituição...",
       open_pdf: "Abrir PDF",
       results_total: (n) => `${n} resultado(s)`,
       no_results: "Nenhuma publicação encontrada com os filtros atuais.",
       no_pubs_loaded:
         `Nenhuma publicação foi carregada. <br/>Verifique se existe <code>/publications/data/publicacoes.json</code>.`,
       loading_more: "Carregando mais resultados…",
+      load_error: "Erro ao carregar publicações. Veja o Console (F12).",
     },
     en: {
       site_title: "NIPSCERN — PUBLICATIONS",
       hero_title: "Synergy between SAPHO and CERN",
       pubs_title: "Publications",
       axis_label: "AXIS",
+      collab_label: "COLLABORATORS",
       type_label: "TYPE",
       pdf_lang_label: "PDF LANGUAGE",
       year_label: "YEAR",
@@ -340,18 +350,38 @@
       pdf_lang_pt: "Portuguese",
       pdf_lang_en: "English",
 
-      search_ph: "Search by title, author, year...",
+      collab_internal: "Internal",
+      collab_external: "External",
+
+      institution_label: "Institution",
+      collab_card_internal: "Internal",
+      collab_card_external: "External",
+
+      search_ph: "Search by title, author, year, institution...",
       open_pdf: "Open PDF",
       results_total: (n) => `${n} result(s)`,
       no_results: "No publications found with the current filters.",
       no_pubs_loaded:
         `No publications loaded. <br/>Check if <code>/publications/data/publicacoes.json</code> exists.`,
       loading_more: "Loading more results…",
+      load_error: "Error loading publications. Check the Console (F12).",
     },
   };
 
-  let uiLang = (localStorage.getItem(UI_LANG_KEY) || "pt").toLowerCase();
-  if (!I18N[uiLang]) uiLang = "pt";
+  function detectBrowserLang() {
+    const langs = Array.isArray(navigator.languages) && navigator.languages.length
+      ? navigator.languages
+      : [navigator.language || navigator.userLanguage || "pt-BR"];
+
+    const joined = langs.join(" ").toLowerCase();
+    return joined.includes("pt") ? "pt" : "en";
+  }
+
+  let uiLang = (localStorage.getItem(UI_LANG_KEY) || "").toLowerCase();
+  if (!I18N[uiLang]) {
+    uiLang = detectBrowserLang();
+    localStorage.setItem(UI_LANG_KEY, uiLang);
+  }
 
   const t = (key, arg) => {
     const v = I18N[uiLang]?.[key];
@@ -397,6 +427,7 @@
   function setUILang(lang) {
     const next = (lang || "pt").toLowerCase();
     if (!I18N[next]) return;
+
     uiLang = next;
     localStorage.setItem(UI_LANG_KEY, uiLang);
     applyI18N();
@@ -418,6 +449,7 @@
   const SOURCES = ["/publications/data/publicacoes.json"];
 
   const eixoWrap = document.getElementById("filterEixo");
+  const colabWrap = document.getElementById("filterColab");
   const tipoWrap = document.getElementById("filterTipo");
   const idiomaWrap = document.getElementById("filterIdioma");
 
@@ -445,14 +477,19 @@
   }
 
   const loadFavs = () => {
-    try { return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]")); }
-    catch { return new Set(); }
+    try {
+      return new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]"));
+    } catch {
+      return new Set();
+    }
   };
+
   const saveFavs = (set) => localStorage.setItem(LS_KEY, JSON.stringify([...set]));
   let favs = loadFavs();
 
   let state = {
     eixos: new Set(["all"]),
+    colaborador: "all",
     tipo: "all",
     idioma: "all",
     ano: "all",
@@ -490,6 +527,12 @@
     return (id || "").toUpperCase();
   }
 
+  function colaboradorLabel(colaborador) {
+    const v = (colaborador || "").toLowerCase();
+    if (v === "externo") return t("collab_card_external");
+    return t("collab_card_internal");
+  }
+
   function badge(item) {
     const eixo = eixoLabel(item.eixo);
     const tipo = tipoLabel(item.tipo);
@@ -499,7 +542,11 @@
   }
 
   function normalizeIdioma(p) {
-    const raw = (p?.idioma ?? p?.lingua ?? p?.language ?? "").toString().toLowerCase().trim();
+    const raw = (p?.idioma ?? p?.lingua ?? p?.language ?? "")
+      .toString()
+      .toLowerCase()
+      .trim();
+
     if (!raw) return "pt";
     if (raw.startsWith("pt")) return "pt";
     if (raw.startsWith("en")) return "en";
@@ -519,6 +566,40 @@
 
     if (tipo === "tcc" || tipo === "mestrado" || tipo === "doutorado") return tipo;
     return tipo || "congresso";
+  }
+
+  function normalizeColaborador(p) {
+    const raw = (
+      p?.colaborador ??
+      p?.origem ??
+      p?.origin ??
+      p?.vinculo ??
+      p?.categoria ??
+      ""
+    )
+      .toString()
+      .toLowerCase()
+      .trim();
+
+    if (!raw) return "interno";
+    if (raw.includes("extern")) return "externo";
+    if (raw.includes("intern")) return "interno";
+    return "interno";
+  }
+
+  function normalizeInstituicao(p) {
+    const raw = (
+      p?.instituicao ??
+      p?.instituição ??
+      p?.institution ??
+      p?.afiliação ??
+      p?.afiliacao ??
+      p?.filiacao ??
+      ""
+    ).toString().trim();
+
+    if (raw) return raw;
+    return "UFJF";
   }
 
   async function loadPublicacoes() {
@@ -551,6 +632,8 @@
           eixo: eixoItem,
           tipo: normalizeTipoETese(p),
           idioma: normalizeIdioma(p),
+          colaborador: normalizeColaborador(p),
+          instituicao: normalizeInstituicao(p),
           ano: Number(p.ano || anoBase),
           titulo: p.titulo || "Sem título",
           autores: p.autores || "—",
@@ -574,6 +657,7 @@
     const active = getEixosActive();
     if (active && !active.has(item.eixo)) return false;
 
+    if (state.colaborador !== "all" && (item.colaborador || "interno") !== state.colaborador) return false;
     if (state.tipo !== "all" && item.tipo !== state.tipo) return false;
     if (state.idioma !== "all" && (item.idioma || "pt") !== state.idioma) return false;
     if (state.ano !== "all" && String(item.ano) !== String(state.ano)) return false;
@@ -583,7 +667,7 @@
     if (q) {
       const hay = norm(
         `${item.titulo} ${item.autores} ${item.resumo} ${item.veiculo} ${(item.palavrasChave || []).join(" ")} ` +
-        `${item.eixo} ${item.tipo} ${item.idioma} ${item.ano}`
+        `${item.eixo} ${item.tipo} ${item.idioma} ${item.ano} ${item.colaborador} ${item.instituicao}`
       );
       if (!hay.includes(q)) return false;
     }
@@ -595,9 +679,14 @@
     const isFav = favs.has(item.id);
 
     return `
-      <article class="pub-card" data-id="${item.id}" data-eixo="${item.eixo}">
+      <article class="pub-card" data-id="${item.id}" data-eixo="${item.eixo}" data-colab="${item.colaborador}">
         <div class="pub-top">
-          <span class="pub-badge">${badge(item)}</span>
+          <div class="pub-top-left">
+            <span class="pub-badge">${badge(item)}</span>
+            <span class="pub-colab-pill is-${escapeHTML(item.colaborador)}">
+              ${escapeHTML(colaboradorLabel(item.colaborador))}
+            </span>
+          </div>
 
           <button class="fav-btn ${isFav ? "is-fav" : ""}" type="button"
             aria-label="Favoritar" aria-pressed="${isFav ? "true" : "false"}"
@@ -608,6 +697,12 @@
 
         <h3 class="pub-title">${highlight(item.titulo, state.q)}</h3>
         <p class="pub-meta">${highlight(item.autores, state.q)}</p>
+
+        <p class="pub-instituicao">
+          <strong>${escapeHTML(t("institution_label"))}:</strong>
+          ${highlight(item.instituicao, state.q)}
+        </p>
+
         ${item.veiculo ? `<p class="pub-veic">${highlight(item.veiculo, state.q)}</p>` : ""}
         ${item.resumo ? `<p class="pub-resumo">${highlight(item.resumo, state.q)}</p>` : ""}
 
@@ -722,7 +817,9 @@
   });
 
   document.addEventListener("click", () => closeYearMenu());
-  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") closeYearMenu(); });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") closeYearMenu();
+  });
 
   function ensureInfiniteScroll() {
     if (!sentinelEl) return;
@@ -823,6 +920,18 @@
     render();
   });
 
+  colabWrap?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-colab]");
+    if (!btn) return;
+
+    const v = btn.getAttribute("data-colab") || "all";
+    state.colaborador = v;
+
+    state.limit = PAGE_SIZE;
+    setActiveChips(colabWrap, "data-colab", state.colaborador);
+    render();
+  });
+
   tipoWrap?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-tipo]");
     if (!btn) return;
@@ -869,6 +978,7 @@
     const eixo = (link.getAttribute("data-eixo") || "all").toLowerCase();
 
     state.eixos = new Set([eixo]);
+    state.colaborador = "all";
     state.tipo = "all";
     state.idioma = "all";
     state.ano = "all";
@@ -877,6 +987,7 @@
     state.limit = PAGE_SIZE;
 
     syncEixoChipsUI();
+    setActiveChips(colabWrap, "data-colab", "all");
     setActiveChips(tipoWrap, "data-tipo", "all");
     setActiveChips(idiomaWrap, "data-idioma", "all");
 
@@ -907,6 +1018,7 @@
 
       populateYears();
       syncEixoChipsUI();
+      setActiveChips(colabWrap, "data-colab", state.colaborador);
       setActiveChips(tipoWrap, "data-tipo", state.tipo);
       setActiveChips(idiomaWrap, "data-idioma", state.idioma);
 
@@ -914,7 +1026,7 @@
     } catch (err) {
       console.error("[HUB] Erro ao iniciar:", err);
       if (resultsMeta) resultsMeta.textContent = t("results_total", 0);
-      grid.innerHTML = `<div class="no-results">Erro ao carregar publicações. Veja o Console (F12).</div>`;
+      grid.innerHTML = `<div class="no-results">${t("load_error")}</div>`;
     }
   })();
 })();
