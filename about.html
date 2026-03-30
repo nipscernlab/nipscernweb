@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — NIPSCERN</title>
+  <meta name="description" content="Meet the team at NIPSCERN — researchers, engineers, and undergraduate students working at UFJF in collaboration with CERN. Learn about our mission, infrastructure, and leadership.">
+
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://nipscern.com/about.html">
+  <meta property="og:title"       content="About Us — NIPSCERN">
+  <meta property="og:description" content="Meet the team at NIPSCERN — researchers, engineers, and undergraduate students working in collaboration with CERN.">
+  <meta property="og:image"       content="https://nipscern.com/assets/images/og-about.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/about.html">
+
+  <link rel="icon" href="assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <!-- ======================================================
+         PAGE HERO
+         ====================================================== -->
+    <header class="page-hero" aria-labelledby="about-title">
+      <div class="page-hero-inner">
+        <div class="eyebrow fade-up">
+          <i class="ph ph-users" aria-hidden="true"></i>
+          <span data-i18n="about.hero.label">Who We Are</span>
+        </div>
+        <h1 class="display-lg fade-up" id="about-title" data-i18n="about.hero.title">
+          Science, Engineering, and Collaboration
+        </h1>
+        <p class="body-lg fade-up" style="max-width:640px;margin-top:var(--sp-5)" data-i18n="about.hero.subtitle">
+          NIPSCERN unites undergraduate students, researchers, and world-class scientists in the pursuit of knowledge at the edge of modern physics.
+        </p>
+      </div>
+    </header>
+
+    <!-- MEDIA SLOT — lab tour video or abstract SVG (replace/uncomment below) -->
+    <!--
+    <section style="padding:0;background:var(--bg-0)">
+      <div class="container container--narrow" style="padding-top:var(--sp-10);padding-bottom:var(--sp-10)">
+        <div style="aspect-ratio:16/9;border-radius:var(--r-xl);overflow:hidden">
+          <iframe src="YOUR_LAB_TOUR_VIDEO" allow="autoplay;fullscreen" style="width:100%;height:100%;border:0" loading="lazy" title="NIPSCERN Lab Tour"></iframe>
+        </div>
+      </div>
+    </section> -->
+
+    <!-- ======================================================
+         MISSION
+         ====================================================== -->
+    <section class="section" aria-labelledby="mission-title">
+      <div class="container container--narrow">
+        <div class="fade-up">
+          <div class="accent-line" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="mission-title" data-i18n="about.mission.title">Our Mission</h2>
+          <p class="body-lg" style="margin-top:var(--sp-5)" data-i18n="about.mission.text">
+            To integrate engineering, software development, particle physics, art, and logic into the creation of concrete tools, architectures, and systems that support scientific research — and to prepare the next generation of scientists by involving undergraduate students directly in real experiments alongside CERN researchers.
+          </p>
+
+          <div class="info-box" style="margin-top:var(--sp-8)">
+            <i class="ph ph-star" aria-hidden="true"></i>
+            <p>A defining aspect of NIPSCERN is the direct involvement of undergraduate students in real CERN experiments — working side by side with international researchers on active physics analyses and detector instrumentation projects.</p>
+          </div>
+
+          <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_research.svg -->
+          <figure style="text-align:center;margin:var(--sp-10) auto 0;max-width:300px;opacity:0.65" aria-hidden="true">
+            <img src="assets/images/undraw/undraw_research.svg" alt="" width="300" height="190" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         COORDINATOR
+         ====================================================== -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="coordinator-title">
+      <div class="container">
+        <div class="section-header fade-up">
+          <div class="eyebrow">
+            <i class="ph ph-medal" aria-hidden="true"></i>
+            <span data-i18n="about.coordinator.eyebrow">Leadership</span>
+          </div>
+          <h2 class="heading-lg" id="coordinator-title" data-i18n="about.coordinator.title">Laboratory Coordinator</h2>
+        </div>
+
+        <div class="coordinator-card fade-up" id="coordinator-card">
+          <!-- Populated dynamically from data/team.json -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         TEAM
+         ====================================================== -->
+    <section class="section" aria-labelledby="team-title">
+      <div class="container">
+        <div class="section-header fade-up">
+          <div class="eyebrow">
+            <i class="ph ph-users-three" aria-hidden="true"></i>
+            <span data-i18n="about.team.eyebrow">Researchers & Students</span>
+          </div>
+          <h2 class="heading-lg" id="team-title" data-i18n="about.team.title">Our Team</h2>
+          <p class="body-base" style="max-width:520px;margin-top:var(--sp-3)" data-i18n="about.team.subtitle">
+            Researchers, engineers, and students working together across disciplines.
+          </p>
+        </div>
+
+        <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_team.svg -->
+        <figure style="text-align:center;margin:0 auto var(--sp-8);max-width:280px;opacity:0.6" aria-hidden="true">
+          <img src="assets/images/undraw/undraw_team.svg" alt="" width="280" height="175" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
+        </figure>
+
+        <div class="grid grid-auto stagger-children" id="team-grid">
+          <!-- Populated by about-page script below -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         INFRASTRUCTURE
+         ====================================================== -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="infra-title">
+      <div class="container">
+        <div class="section-header fade-up">
+          <div class="eyebrow">
+            <i class="ph ph-buildings" aria-hidden="true"></i>
+            <span data-i18n="about.infrastructure.eyebrow">Facilities</span>
+          </div>
+          <h2 class="heading-lg" id="infra-title" data-i18n="about.infrastructure.title">Laboratory Infrastructure</h2>
+          <p class="body-base" style="max-width:520px;margin-top:var(--sp-3)" data-i18n="about.infrastructure.subtitle">
+            A state-of-the-art environment for hardware design, simulation, and computing.
+          </p>
+        </div>
+
+        <div class="infra-grid fade-up">
+          <div class="infra-card">
+            <div class="infra-image">
+              <i class="ph ph-desktop-tower" aria-hidden="true"></i>
+              <!-- <img src="assets/images/lab/workstations.jpg" alt="High-performance workstations at NIPSCERN"> -->
+            </div>
+            <div class="infra-caption" data-i18n="about.infrastructure.items.workstations">High-performance workstations for simulation and development</div>
+          </div>
+          <div class="infra-card">
+            <div class="infra-image">
+              <i class="ph ph-hard-drives" aria-hidden="true"></i>
+              <!-- <img src="assets/images/lab/server.jpg" alt="NIPSCERN dedicated server"> -->
+            </div>
+            <div class="infra-caption" data-i18n="about.infrastructure.items.server">Dedicated server for scientific computing workloads</div>
+          </div>
+          <div class="infra-card">
+            <div class="infra-image">
+              <i class="ph ph-circuit-board" aria-hidden="true"></i>
+              <!-- <img src="assets/images/lab/fpga.jpg" alt="FPGA development boards"> -->
+            </div>
+            <div class="infra-caption" data-i18n="about.infrastructure.items.fpga">FPGA development boards for hardware prototyping</div>
+          </div>
+          <div class="infra-card">
+            <div class="infra-image">
+              <i class="ph ph-door" aria-hidden="true"></i>
+              <!-- <img src="assets/images/lab/lab.jpg" alt="NIPSCERN laboratory space at UFJF"> -->
+            </div>
+            <div class="infra-caption" data-i18n="about.infrastructure.items.lab">Collaborative laboratory space at UFJF</div>
+          </div>
+        </div>
+
+        <!-- Lab history note -->
+        <div class="info-box fade-up" style="margin-top:var(--sp-6);display:flex;gap:var(--sp-4);align-items:flex-start;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-5)">
+          <i class="ph ph-clock-counter-clockwise" aria-hidden="true" style="font-size:24px;color:var(--text-muted);flex-shrink:0;margin-top:2px"></i>
+          <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
+            <strong style="color:var(--text-primary)">Formerly LAPTEL</strong> — The group was originally known as <em>LAPTEL</em> (Laboratório de Processamento de Sinais e Telecomunicações) before being renamed <em>NIPS</em> (Núcleo de Instrumentação e Processamento de Sinais) and later <em>NIPSCERN</em> following the formalization of the CERN collaboration. Our laboratory is located in the <strong style="color:var(--text-primary)">PPEE</strong> — Programa de Pós-Graduação em Engenharia Elétrica — building at UFJF.
+          </p>
+        </div>
+
+        <!-- 360° Tour placeholder -->
+        <div class="tour-placeholder fade-up" style="margin-top:var(--sp-8)">
+          <i class="ph ph-panorama" aria-hidden="true"></i>
+          <div>
+            <div class="heading-sm" data-i18n="about.infrastructure.tour_title">360° Lab Tour</div>
+            <p class="body-sm" style="margin-top:var(--sp-2);max-width:300px" data-i18n="about.infrastructure.tour_subtitle">Interactive panoramic tour coming soon.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         PARTNER INSTITUTIONS
+         ====================================================== -->
+    <section class="section" aria-labelledby="partners-title">
+      <div class="container">
+        <div class="section-header section-header--center fade-up">
+          <div class="eyebrow" style="justify-content:center">
+            <i class="ph ph-handshake" aria-hidden="true"></i>
+            <span data-i18n="about.partners.eyebrow">Support & Collaboration</span>
+          </div>
+          <h2 class="heading-lg" id="partners-title" data-i18n="about.partners.title">Partner Institutions</h2>
+        </div>
+
+        <div class="sponsors-logos fade-up">
+          <a href="https://fapemig.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="FAPEMIG">
+            <img src="assets/images/sponsors/fapemig.png" alt="FAPEMIG logo">
+          </a>
+          <a href="https://capes.gov.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CAPES">
+            <img src="assets/images/sponsors/capes.png" alt="CAPES logo">
+          </a>
+          <a href="https://cnpq.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CNPq">
+            <img src="assets/images/sponsors/cnpq.svg" alt="CNPq logo">
+          </a>
+          <a href="https://ufjf.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="UFJF - Universidade Federal de Juiz de Fora">
+            <img src="assets/images/sponsors/ufjf.png" alt="UFJF logo">
+          </a>
+          <a href="https://cern.ch" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CERN">
+            <img src="assets/images/sponsors/cern.svg" alt="CERN logo">
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <!-- VLibras -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <!-- Team loader -->
+  <script type="module">
+    import { initI18n, t } from './assets/js/i18n.js';
+
+    const ROLE_LABEL_KEYS = {
+      coordinator: 'about.team.roles.coordinator',
+      researcher:  'about.team.roles.researcher',
+      advisor:     'about.team.roles.advisor',
+      co_advisor:  'about.team.roles.co_advisor',
+      ic:          'about.team.roles.ic',
+      msc:         'about.team.roles.msc',
+      phd:         'about.team.roles.phd',
+    };
+
+    const LATTES_ICON = `<img src="assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px;vertical-align:middle;filter:brightness(0) saturate(100%) invert(65%) sepia(40%) saturate(800%) hue-rotate(185deg)" aria-hidden="true">`;
+
+    async function loadTeam() {
+      const res = await fetch('data/team.json');
+      return res.ok ? res.json() : [];
+    }
+
+    function roleClass(role) {
+      const map = { coordinator:'badge-blue', researcher:'badge-green', advisor:'badge-purple', co_advisor:'badge-amber', ic:'badge-cyan', msc:'badge-orange', phd:'badge-red' };
+      return map[role] || 'badge-gray';
+    }
+
+    function avatarHTML(member, size = 64) {
+      if (member.photo) {
+        return `<div class="team-avatar" style="width:${size}px;height:${size}px;overflow:hidden;border-radius:50%;flex-shrink:0" aria-label="Photo of ${member.name}">
+          <img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover">
+        </div>`;
+      }
+      return `<div class="team-avatar" style="width:${size}px;height:${size}px;font-size:${size/2.5}px;flex-shrink:0" aria-label="Photo placeholder for ${member.name}">
+        <i class="ph ph-user" aria-hidden="true"></i>
+      </div>`;
+    }
+
+    function renderCoordinator(member) {
+      const awardsHTML = Array.isArray(member.awards)
+        ? member.awards.map(a => {
+            if (typeof a === 'object') {
+              return `<div class="award-item">
+                <div class="award-year">${a.year}</div>
+                <div><div class="award-title">${a.title}</div><div class="award-body">${a.body}</div></div>
+              </div>`;
+            }
+            return `<div class="award-item"><div class="award-title" style="grid-column:1/-1">${a}</div></div>`;
+          }).join('')
+        : '';
+
+      return `
+        <div>
+          <div class="coordinator-avatar" style="overflow:hidden" aria-label="Photo of ${member.name}">
+            ${member.photo
+              ? `<img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover">`
+              : `<i class="ph ph-user" aria-hidden="true"></i>`}
+          </div>
+        </div>
+        <div>
+          <h3 class="coordinator-name">${member.title ? member.title + ' ' : ''}${member.name}</h3>
+          <div class="coordinator-role-badge" style="margin-bottom:var(--sp-4)">
+            <span class="badge role-coordinator" data-i18n="about.team.roles.coordinator">Coordinator</span>
+          </div>
+          <p class="coordinator-bio">${member.bio}</p>
+          <div class="team-links" style="margin-top:var(--sp-4);margin-bottom:var(--sp-6)">
+            ${member.lattes ? `<a href="${member.lattes}" target="_blank" rel="noopener" class="team-link">${LATTES_ICON} Lattes</a>` : ''}
+            ${member.github ? `<a href="${member.github}" target="_blank" rel="noopener" class="team-link"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a>` : ''}
+          </div>
+          ${awardsHTML ? `
+          <h4 style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);margin-bottom:var(--sp-4);text-transform:uppercase;letter-spacing:0.06em" data-i18n="about.coordinator.awards_title">Awards &amp; Recognitions</h4>
+          <div class="awards-list">${awardsHTML}</div>` : ''}
+        </div>`;
+    }
+
+    function renderTeamCard(member) {
+      if (member.role === 'coordinator') return '';
+      const areas = member.areas.map(a => `<span class="team-area-tag">${a}</span>`).join('');
+      const links = `
+        ${member.lattes ? `<a href="${member.lattes}" target="_blank" rel="noopener" class="team-link">${LATTES_ICON} Lattes</a>` : ''}
+        ${member.github ? `<a href="${member.github}" target="_blank" rel="noopener" class="team-link"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a>` : ''}
+      `;
+      return `
+        <article class="team-card" aria-labelledby="member-${member.id}">
+          <div style="display:flex;gap:var(--sp-4);align-items:flex-start">
+            ${avatarHTML(member, 64)}
+            <div style="flex:1">
+              <div class="team-name" id="member-${member.id}">${member.title ? member.title + ' ' : ''}${member.name}</div>
+              <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">
+                ${member.tags
+                  ? member.tags.map(t => `<span class="badge ${t.class}">${t.label}</span>`).join('')
+                  : `<span class="badge ${roleClass(member.role)}">${member.role}</span>`
+                }
+              </div>
+            </div>
+          </div>
+          ${member.bio ? `<p class="body-sm" style="color:var(--text-secondary)">${member.bio}</p>` : ''}
+          <div class="team-area-tags">${areas}</div>
+          <div class="team-links">${links}</div>
+        </article>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const team = await loadTeam();
+      if (!team) return;
+
+      // Coordinator card
+      const coordinator = team.find(m => m.role === 'coordinator');
+      const coordCard = document.getElementById('coordinator-card');
+      if (coordinator && coordCard) coordCard.innerHTML = renderCoordinator(coordinator);
+
+      // Team grid (non-coordinators)
+      const grid = document.getElementById('team-grid');
+      if (grid) {
+        grid.innerHTML = team.map(renderTeamCard).join('');
+        document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: document.documentElement.lang } }));
+        grid.querySelectorAll('.team-card').forEach((el, i) => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(16px)';
+          el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; }, i * 60 + 200);
+        });
+      }
+    });
+  </script>
+
+  <script type="module" src="assets/js/main.js"></script>
+
+</body>
+</html>

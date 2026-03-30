@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — NIPSCERN</title>
+  <meta name="description" content="The page you were looking for could not be found on the NIPSCERN website.">
+  <meta name="robots" content="noindex">
+
+  <link rel="icon" href="assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="assets/css/main.css">
+
+  <style>
+    .error-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--sp-12) var(--sp-6);
+    }
+    .error-code {
+      font-family: var(--font-mono);
+      font-size: clamp(5rem, 18vw, 12rem);
+      font-weight: 700;
+      line-height: 1;
+      color: transparent;
+      background: linear-gradient(90deg, #3a6ea8 0%, #5b9cf6 50%, #3a6ea8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      letter-spacing: -0.04em;
+      margin-bottom: var(--sp-4);
+      opacity: 0.8;
+    }
+    .error-title {
+      font-size: clamp(var(--text-xl), 4vw, var(--text-3xl));
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--sp-4);
+    }
+    .error-desc {
+      font-size: var(--text-base);
+      color: var(--text-secondary);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: var(--sp-8);
+    }
+    .error-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-3);
+      justify-content: center;
+    }
+    .error-icon {
+      font-size: 48px;
+      color: var(--text-muted);
+      margin-bottom: var(--sp-6);
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <div class="error-page">
+      <i class="ph ph-warning-circle error-icon" aria-hidden="true"></i>
+      <div class="error-code" aria-label="Error 404">404</div>
+      <h1 class="error-title">Page not found</h1>
+      <p class="error-desc">
+        The page you were looking for doesn't exist or has been moved.
+        Please check the URL or navigate back to the home page.
+      </p>
+      <div class="error-actions">
+        <a href="/" class="btn btn-primary">
+          <i class="ph ph-house" aria-hidden="true"></i>
+          Back to Home
+        </a>
+        <a href="/publications.html" class="btn btn-ghost">
+          <i class="ph ph-book-open" aria-hidden="true"></i>
+          Publications
+        </a>
+        <a href="/projects/" class="btn btn-ghost">
+          <i class="ph ph-code" aria-hidden="true"></i>
+          Projects
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
