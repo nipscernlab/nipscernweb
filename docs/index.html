@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — NIPSCERN</title>
+  <meta name="description" content="Developer documentation for all NIPSCERN open source projects: SAPHO processor, YANC compiler, POLARIS IDE, AURORA IDE, CGV calorimeter viewer.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://nipscern.com/docs/">
+  <meta property="og:title" content="Documentation — NIPSCERN">
+  <meta property="og:description" content="Developer documentation hub for NIPSCERN open source projects.">
+
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://nipscern.com/docs/">
+
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    .doc-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+      padding: var(--sp-6);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+    .doc-card:hover {
+      border-color: var(--border-mid);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .doc-card-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--r-lg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin-bottom: var(--sp-4);
+      flex-shrink: 0;
+    }
+    .doc-card-name {
+      font-family: var(--font-mono);
+      font-size: var(--text-lg);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: var(--sp-1);
+    }
+    .doc-card-full {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-bottom: var(--sp-3);
+    }
+    .doc-card-desc {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      flex: 1;
+    }
+    .doc-card-links {
+      display: flex;
+      gap: var(--sp-2);
+      margin-top: var(--sp-4);
+      flex-wrap: wrap;
+    }
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--sp-5);
+      margin-top: var(--sp-8);
+    }
+    .doc-section-title {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: var(--sp-4);
+      padding-bottom: var(--sp-3);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .quick-ref {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+      padding: var(--sp-6);
+    }
+    .quick-ref h3 {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--sp-3);
+    }
+    .quick-ref-list {
+      list-style: none;
+      padding: 0; margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .quick-ref-list li {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-2);
+      font-size: var(--text-xs);
+    }
+    .quick-ref-list .label {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--brand);
+      min-width: 72px;
+      flex-shrink: 0;
+    }
+    .quick-ref-list .desc {
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-12) var(--container-pad) var(--sp-8)">
+      <div style="max-width:var(--container-max);margin:0 auto">
+        <div class="eyebrow fade-up">
+          <i class="ph ph-book-open" aria-hidden="true"></i>
+          Developer Resources
+        </div>
+        <h1 class="heading-xl fade-up" style="margin-top:var(--sp-3)">Documentation</h1>
+        <p class="body-base fade-up" style="max-width:640px;color:var(--text-secondary);margin-top:var(--sp-4)">
+          All NIPSCERN open source projects in one place. Click a project card to visit its GitHub repository and detailed documentation, or browse the project pages on this website.
+        </p>
+        <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_developer.svg -->
+        <figure style="margin-top:var(--sp-6);max-width:240px;opacity:0.65" aria-hidden="true">
+          <img src="../assets/images/undraw/undraw_developer.svg" alt="" width="240" height="150" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
+        </figure>
+      </div>
+    </header>
+
+    <section class="section">
+      <div style="max-width:var(--container-max);margin:0 auto;padding:0 var(--container-pad)">
+
+        <!-- SAPHO Ecosystem -->
+        <div class="fade-up">
+          <p class="doc-section-title">The SAPHO Ecosystem</p>
+        </div>
+
+        <div class="doc-grid fade-up">
+
+          <!-- SAPHO -->
+          <div class="doc-card">
+            <div class="doc-card-icon" style="background:rgba(212,160,23,0.12);color:var(--accent-sapho)">
+              <i class="ph ph-cpu" aria-hidden="true"></i>
+            </div>
+            <div class="doc-card-name" style="color:var(--accent-sapho)">SAPHO</div>
+            <div class="doc-card-full">Simple Architecture for Processor Hardware and Organisation</div>
+            <p class="doc-card-desc">
+              A RISC-inspired 16-bit processor architecture designed for FPGA implementation and used in the DLP discipline at UFJF. Includes the CMM high-level language, a Verilog HDL implementation, and a complete digital design toolchain.
+            </p>
+            <div class="doc-card-links">
+              <a href="https://github.com/nipscernlab/sapho" target="_blank" rel="noopener" class="btn btn-sm" style="background:rgba(212,160,23,0.15);border:1px solid rgba(212,160,23,0.3);color:var(--accent-sapho)">
+                <i class="ph ph-github-logo" aria-hidden="true"></i> GitHub
+              </a>
+              <a href="../projects/sapho.html" class="btn btn-ghost btn-sm">Project Page</a>
+            </div>
+          </div>
+
+          <!-- YANC -->
+          <div class="doc-card">
+            <div class="doc-card-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)">
+              <i class="ph ph-terminal" aria-hidden="true"></i>
+            </div>
+            <div class="doc-card-name" style="color:var(--accent-yanc)">YANC</div>
+            <div class="doc-card-full">Yet Another NIPSCERN Compiler</div>
+            <p class="doc-card-desc">
+              Two-stage compiler toolchain for the SAPHO architecture. <strong>cmmcomp</strong> translates CMM (C-like) source code to SAPHO assembly; <strong>asmcomp</strong> assembles to machine code. Distributed as a self-contained executable.
+            </p>
+            <div class="doc-card-links">
+              <a href="https://github.com/nipscernlab/yanc" target="_blank" rel="noopener" class="btn btn-sm" style="background:rgba(0,180,166,0.15);border:1px solid rgba(0,180,166,0.3);color:var(--accent-yanc)">
+                <i class="ph ph-github-logo" aria-hidden="true"></i> GitHub
+              </a>
+              <a href="../projects/yanc.html" class="btn btn-ghost btn-sm">Project Page</a>
+            </div>
+          </div>
+
+          <!-- POLARIS -->
+          <div class="doc-card">
+            <div class="doc-card-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)">
+              <i class="ph ph-monitor" aria-hidden="true"></i>
+            </div>
+            <div class="doc-card-name" style="color:var(--accent-polaris)">POLARIS</div>
+            <div class="doc-card-full">Cross-platform IDE for SAPHO</div>
+            <p class="doc-card-desc">
+              Lightweight IDE for the SAPHO ecosystem. Runs on Linux and Windows. Includes YANC integration, YAWT built-in wave tracer, PRISM RTL viewer, and Monaco Editor. Starts in under 1 second and uses ~60 MB of RAM.
+            </p>
+            <div class="doc-card-links">
+              <a href="https://github.com/nipscernlab/polaris" target="_blank" rel="noopener" class="btn btn-sm" style="background:rgba(147,51,234,0.15);border:1px solid rgba(147,51,234,0.3);color:var(--accent-polaris)">
+                <i class="ph ph-github-logo" aria-hidden="true"></i> GitHub
+              </a>
+              <a href="../projects/polaris.html" class="btn btn-ghost btn-sm">Project Page</a>
+            </div>
+          </div>
+
+          <!-- AURORA -->
+          <div class="doc-card" style="opacity:0.75">
+            <div class="doc-card-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)">
+              <i class="ph ph-app-window" aria-hidden="true"></i>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-1)">
+              <div class="doc-card-name" style="color:var(--accent-aurora)">AURORA</div>
+              <span class="badge badge-red" style="font-size:10px">Legacy</span>
+            </div>
+            <div class="doc-card-full">Windows-only Electron IDE for SAPHO</div>
+            <p class="doc-card-desc">
+              The original Electron-based IDE for SAPHO (v1.0–v4.27.10, 2021–2023). Archived. Succeeded by POLARIS. Repository preserved for historical reference; includes 25 releases across two development years.
+            </p>
+            <div class="doc-card-links">
+              <a href="https://github.com/nipscernlab/aurora" target="_blank" rel="noopener" class="btn btn-sm" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);color:var(--accent-aurora)">
+                <i class="ph ph-github-logo" aria-hidden="true"></i> GitHub (Archived)
+              </a>
+              <a href="../projects/aurora.html" class="btn btn-ghost btn-sm">Project Page</a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CERN / Physics -->
+        <div class="fade-up" style="margin-top:var(--sp-12)">
+          <p class="doc-section-title">CERN Instrumentation</p>
+        </div>
+
+        <div class="doc-grid fade-up">
+
+          <!-- CGV -->
+          <div class="doc-card">
+            <div class="doc-card-icon" style="background:rgba(74,222,128,0.12);color:var(--accent-cgv)">
+              <i class="ph ph-atom" aria-hidden="true"></i>
+            </div>
+            <div class="doc-card-name" style="color:var(--accent-cgv)">CGV</div>
+            <div class="doc-card-full">Calorimeter Geometry Viewer</div>
+            <p class="doc-card-desc">
+              Interactive 3D visualisation of the ATLAS calorimeter system built with Three.js and Vite. Renders TileCal barrel, LAr electromagnetic barrel, and HEC endcaps. Supports event generation, wireframe toggle, and beam-axis view.
+            </p>
+            <div class="doc-card-links">
+              <a href="https://github.com/nipscernlab/cgv" target="_blank" rel="noopener" class="btn btn-sm" style="background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);color:var(--accent-cgv)">
+                <i class="ph ph-github-logo" aria-hidden="true"></i> GitHub
+              </a>
+              <a href="../projects/cgv.html" class="btn btn-ghost btn-sm">Project Page</a>
+              <a href="../projects/cgv/index.html" class="btn btn-ghost btn-sm">
+                <i class="ph ph-play" aria-hidden="true"></i> Live Demo
+              </a>
+            </div>
+          </div>
+
+          <!-- NIPSCERNWEB -->
+          <div class="doc-card">
+            <div class="doc-card-icon" style="background:rgba(91,156,246,0.12);color:var(--brand)">
+              <i class="ph ph-globe" aria-hidden="true"></i>
+            </div>
+            <div class="doc-card-name" style="color:var(--brand)">nipscernweb</div>
+            <div class="doc-card-full">This Website</div>
+            <p class="doc-card-desc">
+              Source code for nipscern.com — a vanilla HTML/CSS/JS institutional website built without a bundler. Includes responsive design, i18n (EN/PT/FR/NO), VLibras accessibility, GoatCounter analytics, and the CGV 3D preview.
+            </p>
+            <div class="doc-card-links">
+              <a href="https://github.com/nipscernlab/nipscernweb" target="_blank" rel="noopener" class="btn btn-sm" style="background:rgba(91,156,246,0.12);border:1px solid rgba(91,156,246,0.25);color:var(--brand)">
+                <i class="ph ph-github-logo" aria-hidden="true"></i> GitHub
+              </a>
+              <a href="../credits.html" class="btn btn-ghost btn-sm">Open Source Credits</a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="fade-up" style="margin-top:var(--sp-12)">
+          <p class="doc-section-title">Quick Reference</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--sp-5)">
+
+            <div class="quick-ref">
+              <h3><i class="ph ph-cpu" aria-hidden="true" style="color:var(--accent-sapho);margin-right:6px"></i>SAPHO Toolchain</h3>
+              <ul class="quick-ref-list">
+                <li><span class="label">cmmcomp</span><span class="desc">CMM → SAPHO assembly</span></li>
+                <li><span class="label">asmcomp</span><span class="desc">Assembly → machine code (.mem)</span></li>
+                <li><span class="label">iverilog</span><span class="desc">Verilog simulation (Icarus)</span></li>
+                <li><span class="label">GTKWave</span><span class="desc">Waveform viewer (legacy: AURORA)</span></li>
+                <li><span class="label">YAWT</span><span class="desc">Built-in wave tracer (POLARIS)</span></li>
+                <li><span class="label">PRISM</span><span class="desc">RTL viewer — schematic from netlist</span></li>
+              </ul>
+            </div>
+
+            <div class="quick-ref">
+              <h3><i class="ph ph-atom" aria-hidden="true" style="color:var(--accent-cgv);margin-right:6px"></i>CGV Geometry</h3>
+              <ul class="quick-ref-list">
+                <li><span class="label">TileCal</span><span class="desc">Hadronic tile calorimeter barrel</span></li>
+                <li><span class="label">LAr EM</span><span class="desc">Liquid Argon em barrel calorimeter</span></li>
+                <li><span class="label">HEC</span><span class="desc">Hadronic Endcap Calorimeter</span></li>
+                <li><span class="label">Three.js</span><span class="desc">WebGL rendering (v0.160.0)</span></li>
+                <li><span class="label">Vite</span><span class="desc">Build tool for CGV application</span></li>
+              </ul>
+            </div>
+
+            <div class="quick-ref">
+              <h3><i class="ph ph-globe" aria-hidden="true" style="color:var(--brand);margin-right:6px"></i>Website Stack</h3>
+              <ul class="quick-ref-list">
+                <li><span class="label">HTML/CSS/JS</span><span class="desc">Vanilla, no build tools</span></li>
+                <li><span class="label">ES Modules</span><span class="desc">type="module" throughout</span></li>
+                <li><span class="label">i18n</span><span class="desc">EN / PT / FR / NO via i18n.json</span></li>
+                <li><span class="label">VLibras</span><span class="desc">LIBRAS accessibility widget</span></li>
+                <li><span class="label">GoatCounter</span><span class="desc">Cookie-free page analytics</span></li>
+                <li><span class="label">Phosphor</span><span class="desc">Icon library v2.1.1 via CDN</span></li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- GitHub org link -->
+        <div class="info-box fade-up" style="margin-top:var(--sp-10)">
+          <i class="ph ph-github-logo" aria-hidden="true"></i>
+          <p>
+            All NIPSCERN projects are hosted on the <a href="https://github.com/nipscernlab" target="_blank" rel="noopener" class="text-link">nipscernlab GitHub organisation</a>. Contributions, issue reports, and pull requests are welcome on each repository.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
+</html>
