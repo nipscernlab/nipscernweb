@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YANC — Yet Another Compiler | NIPSCERN</title>
+  <meta name="description" content="YANC is the compiler toolchain powering the SAPHO ecosystem — including cmmcomp (CMM compiler) and asmcomp (assembly compiler). Written in C with Flex, Bison, and GCC.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://nipscern.com/projects/yanc.html">
+  <meta property="og:title" content="YANC — Yet Another Compiler | NIPSCERN">
+  <meta property="og:description" content="The compiler toolchain powering the SAPHO hardware design ecosystem.">
+  <meta property="og:image" content="https://nipscern.com/assets/images/projects/yanc.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/projects/yanc.html">
+
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    :root { --page-accent: var(--accent-yanc); --page-accent-dim: rgba(0,180,166,0.12); }
+
+    .pipeline-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .pipeline-node {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-4);
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+      position: relative;
+    }
+    .pipeline-arrow {
+      display: flex;
+      justify-content: flex-start;
+      padding-left: var(--sp-6);
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+    .pipeline-arrow i { color: var(--border-mid); }
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--r-full);
+      background: rgba(0,180,166,0.15);
+      color: var(--accent-yanc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .pipeline-node-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: var(--text-sm);
+      margin-bottom: 2px;
+    }
+    .pipeline-node-sub {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .tool-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg);
+    }
+    .tool-row + .tool-row { margin-top: var(--sp-2); }
+    .tool-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .tool-name {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .tool-desc {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+    .cmm-snippet {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-yanc);
+      border-radius: var(--r-lg);
+      padding: var(--sp-4) var(--sp-5);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .cmm-kw { color: #a78bfa; }
+    .cmm-type { color: #34d399; }
+    .cmm-comment { color: var(--text-muted); font-style: italic; }
+    .cmm-num { color: #fb923c; }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="project-hero" style="background: radial-gradient(ellipse 70% 50% at 0% 50%, rgba(0,180,166,0.07) 0%, transparent 70%), var(--bg-0)" aria-labelledby="yanc-title">
+      <div class="project-hero-inner">
+        <div class="project-hero-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)">
+          <i class="ph ph-code-block" aria-hidden="true"></i>
+        </div>
+        <div class="project-hero-text">
+          <div class="eyebrow fade-up">
+            <i class="ph ph-terminal" aria-hidden="true"></i>
+            Compiler Toolchain · Part of SAPHO
+          </div>
+          <h1 class="project-hero-name fade-up" id="yanc-title">
+            <span style="color:var(--accent-yanc)">YANC</span>
+          </h1>
+          <p class="project-hero-fullname fade-up" data-i18n="projects.yanc.full">Yet Another Compiler</p>
+          <p class="project-hero-desc fade-up" data-i18n="projects.yanc.desc">
+            YANC is the compilation backbone of the SAPHO ecosystem. It transforms high-level CMM processor descriptions into binary executables through a two-stage pipeline: <strong>cmmcomp</strong> (CMM → Assembly) and <strong>asmcomp</strong> (Assembly → Machine Code), plus the <strong>APP</strong> auxiliary pre-processor. Written in C using Flex, Bison, and GCC.
+          </p>
+          <div class="project-links fade-up">
+            <a href="https://github.com/nipscernlab/yanc" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-yanc);border-color:var(--accent-yanc)">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              <span data-i18n="projects.github">View on GitHub</span>
+            </a>
+            <a href="sapho.html" class="btn btn-ghost">
+              <i class="ph ph-cpu" aria-hidden="true"></i>
+              Part of SAPHO
+            </a>
+            <a href="index.html" class="btn btn-ghost">
+              <i class="ph ph-arrow-left" aria-hidden="true"></i>
+              All Projects
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Badge bar -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
+      <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+        <span class="badge badge-purple">C Language</span>
+        <span class="badge badge-purple">Flex</span>
+        <span class="badge badge-purple">Bison</span>
+        <span class="badge badge-purple">GCC</span>
+        <span class="badge badge-gray">Linux · Windows</span>
+        <span class="badge badge-green">Open Source</span>
+        <span class="badge badge-green">Active</span>
+      </div>
+    </div>
+
+    <!-- Pipeline + Tools -->
+    <section class="section">
+      <div class="container">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+
+          <!-- Left: compilation pipeline -->
+          <div class="fade-up">
+            <div class="accent-line" style="background:var(--accent-yanc)" aria-hidden="true"></div>
+            <h2 class="heading-lg">Compilation Pipeline</h2>
+            <p class="body-sm" style="margin-top:var(--sp-3);color:var(--text-secondary)">
+              YANC implements a classical two-stage compiler architecture. Source CMM code enters cmmcomp, where Flex tokenises the input and Bison parses the grammar into an AST. Code generation produces SAPHO assembly, which asmcomp then assembles into a binary hex file ready for FPGA loading or YAWT simulation.
+            </p>
+            <div class="pipeline-flow" style="margin-top:var(--sp-6)">
+              <div class="pipeline-node">
+                <div class="step-badge">1</div>
+                <div>
+                  <div class="pipeline-node-title">CMM Source</div>
+                  <div class="pipeline-node-sub">.cmm — processor description in C-like syntax</div>
+                </div>
+              </div>
+              <div class="pipeline-arrow"><i class="ph ph-arrow-down" aria-hidden="true"></i></div>
+              <div class="pipeline-node">
+                <div class="step-badge">2</div>
+                <div>
+                  <div class="pipeline-node-title">APP — Pre-Processor</div>
+                  <div class="pipeline-node-sub">Macro expansion, include directives, constant folding</div>
+                </div>
+              </div>
+              <div class="pipeline-arrow"><i class="ph ph-arrow-down" aria-hidden="true"></i></div>
+              <div class="pipeline-node">
+                <div class="step-badge">3</div>
+                <div>
+                  <div class="pipeline-node-title">cmmcomp — Frontend</div>
+                  <div class="pipeline-node-sub">Flex lexer + Bison parser → SAPHO Assembly (.asm)</div>
+                </div>
+              </div>
+              <div class="pipeline-arrow"><i class="ph ph-arrow-down" aria-hidden="true"></i></div>
+              <div class="pipeline-node">
+                <div class="step-badge">4</div>
+                <div>
+                  <div class="pipeline-node-title">asmcomp — Backend</div>
+                  <div class="pipeline-node-sub">Two-pass assembler → Binary / Hex (.hex, .mif)</div>
+                </div>
+              </div>
+              <div class="pipeline-arrow"><i class="ph ph-arrow-down" aria-hidden="true"></i></div>
+              <div class="pipeline-node" style="border-color:rgba(0,180,166,0.4)">
+                <div class="step-badge" style="background:rgba(0,180,166,0.25)">5</div>
+                <div>
+                  <div class="pipeline-node-title" style="color:var(--accent-yanc)">SAPHO Processor</div>
+                  <div class="pipeline-node-sub">Machine code → FPGA execution or YAWT simulation</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: toolchain components -->
+          <div class="fade-up">
+            <h3 class="heading-sm" style="margin-bottom:var(--sp-5)">Toolchain Components</h3>
+            <div>
+              <div class="tool-row">
+                <div class="tool-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-file-code" aria-hidden="true"></i></div>
+                <div>
+                  <div class="tool-name">cmmcomp</div>
+                  <div class="tool-desc">CMM high-level language compiler. Flex lexer + Bison LALR(1) parser. Emits SAPHO assembly with symbol table and error diagnostics.</div>
+                </div>
+              </div>
+              <div class="tool-row">
+                <div class="tool-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-binary" aria-hidden="true"></i></div>
+                <div>
+                  <div class="tool-name">asmcomp</div>
+                  <div class="tool-desc">Two-pass assembler for SAPHO instruction set. Resolves labels, encodes opcodes, outputs Intel HEX and Altera MIF formats.</div>
+                </div>
+              </div>
+              <div class="tool-row">
+                <div class="tool-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-funnel" aria-hidden="true"></i></div>
+                <div>
+                  <div class="tool-name">APP</div>
+                  <div class="tool-desc">Auxiliary Pre-Processor. Handles <code>#define</code>, <code>#include</code>, and constant-folding before cmmcomp ingests the source.</div>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="heading-sm" style="margin-top:var(--sp-8);margin-bottom:var(--sp-5)">CMM Language Sample</h3>
+            <div class="cmm-snippet"><span class="cmm-comment">// Fibonacci — SAPHO CMM</span>
+<span class="cmm-kw">processor</span> Fib {
+  <span class="cmm-kw">const</span> <span class="cmm-type">int</span> N = <span class="cmm-num">10</span>;
+  <span class="cmm-type">int</span> a = <span class="cmm-num">0</span>, b = <span class="cmm-num">1</span>, c;
+  <span class="cmm-type">int</span> i = <span class="cmm-num">0</span>;
+
+  <span class="cmm-kw">while</span> (i &lt; N) {
+    c = a + b;
+    a = b; b = c; i++;
+  }
+  <span class="cmm-comment">// result in register r0</span>
+  <span class="cmm-kw">output</span>(a);
+}</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Integration + Build info -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="grid grid-3 fade-up" style="gap:var(--sp-6)">
+
+          <div class="bg-card" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
+            <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(0,180,166,0.12);color:var(--accent-yanc);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:var(--sp-4)">
+              <i class="ph ph-plug" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--sp-2)">SAPHO Integration</h3>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary)">
+              YANC is the compilation engine called by SAPHO when a student clicks <em>Compile</em>. POLARIS bundles YANC binaries natively; AURORA relied on the same pipeline. The entire build is triggered from within the IDE with a single keystroke.
+            </p>
+          </div>
+
+          <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
+            <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(0,180,166,0.12);color:var(--accent-yanc);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:var(--sp-4)">
+              <i class="ph ph-wrench" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--sp-2)">Build Dependencies</h3>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary)">
+              YANC is self-contained: <strong>Flex</strong> generates the lexer C source, <strong>Bison</strong> generates the parser, and <strong>GCC</strong> compiles the resulting C files. No external runtime or library dependencies are required. A standard <code>make</code> invocation builds all three tools.
+            </p>
+          </div>
+
+          <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
+            <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:var(--sp-4)">
+              <i class="ph ph-graduation-cap" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--sp-2)">Teaching Use</h3>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary)">
+              YANC is taught as part of the <strong>Digital Logic Processors (DLP)</strong> discipline at UFJF. Students learn compiler theory by reading cmmcomp's Flex and Bison sources, tracing AST construction, and extending the grammar with new operators for course assignments.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section" style="border-top:1px solid var(--border-subtle)">
+      <div class="container container--narrow" style="text-align:center">
+        <div class="fade-up">
+          <div class="accent-line" style="background:var(--accent-yanc);margin:0 auto var(--sp-4)" aria-hidden="true"></div>
+          <h2 class="heading-lg">Explore YANC on GitHub</h2>
+          <p class="body-base" style="color:var(--text-secondary);margin:var(--sp-3) 0 var(--sp-6)">
+            The full YANC source — Flex grammars, Bison parser rules, and Makefile — is publicly available. Issues and pull requests are welcome.
+          </p>
+          <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
+            <a href="https://github.com/nipscernlab/yanc" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-yanc);border-color:var(--accent-yanc)">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              nipscernlab/yanc
+            </a>
+            <a href="sapho.html" class="btn btn-ghost">
+              <i class="ph ph-cpu" aria-hidden="true"></i>
+              Back to SAPHO
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
+</html>

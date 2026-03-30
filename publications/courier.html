@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CERN Courier — NIPSCERN</title>
+  <meta name="description" content="CERN Courier digital editions — the international journal of high energy physics, from January/February 2013 to January/February 2026. Curated by NIPSCERN.">
+
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://nipscern.com/publications/courier.html">
+  <meta property="og:title"       content="CERN Courier — NIPSCERN">
+  <meta property="og:description" content="CERN Courier digital editions curated by NIPSCERN — the international journal of high energy physics.">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/publications/courier.html">
+
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    .courier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: var(--sp-4);
+      margin-top: var(--sp-8);
+    }
+
+    .courier-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      background: var(--bg-card);
+      text-decoration: none;
+      transition: border-color var(--t-base), transform var(--t-base), box-shadow var(--t-base);
+    }
+    .courier-card:hover {
+      border-color: var(--border-mid);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .courier-cover {
+      aspect-ratio: 3/4;
+      background: var(--bg-elevated);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .courier-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .courier-cover-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      color: var(--text-muted);
+      padding: var(--sp-3);
+      text-align: center;
+    }
+    .courier-cover-placeholder i { font-size: 28px; opacity: 0.3; }
+    .courier-cover-placeholder span {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      opacity: 0.4;
+      line-height: 1.3;
+    }
+
+    .courier-meta {
+      padding: var(--sp-3);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .courier-issue { font-size: var(--text-xs); font-weight: 700; color: var(--text-primary); }
+    .courier-date  { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: var(--font-mono); }
+
+    .courier-pdf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--brand);
+      margin-top: var(--sp-2);
+      letter-spacing: 0.05em;
+    }
+    .courier-pdf-badge i { font-size: 10px; }
+
+    .year-group { margin-top: var(--sp-12); }
+    .year-group:first-child { margin-top: 0; }
+    .year-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: var(--sp-3);
+      margin-bottom: var(--sp-4);
+    }
+
+    .courier-filter {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--sp-6);
+    }
+    .courier-filter-btn {
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: var(--r-full);
+      border: 1px solid var(--border-mid);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--t-base);
+      letter-spacing: 0.04em;
+    }
+    .courier-filter-btn.active,
+    .courier-filter-btn:hover {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+
+    @media (max-width: 640px) {
+      .courier-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="page-hero" aria-labelledby="courier-title">
+      <div class="page-hero-inner">
+        <div class="eyebrow fade-up">
+          <i class="ph ph-newspaper" aria-hidden="true"></i>
+          <span>cerncourier.com</span>
+        </div>
+        <h1 class="display-lg fade-up" id="courier-title">CERN Courier</h1>
+        <p class="body-lg fade-up" style="max-width:600px;margin-top:var(--sp-5)">
+          The international journal of high energy physics — digital editions from January/February 2013 to January/February 2026, curated by NIPSCERN.
+        </p>
+        <div class="fade-up" style="margin-top:var(--sp-6)">
+          <a href="https://cerncourier.com" target="_blank" rel="noopener" class="btn btn-ghost">
+            <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+            Visit cerncourier.com
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="section" aria-label="CERN Courier editions">
+      <div class="container">
+
+        <div class="courier-filter fade-up" role="group" aria-label="Filter by year">
+          <span style="font-size:var(--text-xs);color:var(--text-muted);font-weight:600">Year:</span>
+          <button class="courier-filter-btn active" data-year="all">All</button>
+          <button class="courier-filter-btn" data-year="2026">2026</button>
+          <button class="courier-filter-btn" data-year="2025">2025</button>
+          <button class="courier-filter-btn" data-year="2024">2024</button>
+          <button class="courier-filter-btn" data-year="2023">2023</button>
+          <button class="courier-filter-btn" data-year="2022">2022</button>
+          <button class="courier-filter-btn" data-year="2021">2021</button>
+          <button class="courier-filter-btn" data-year="2020">2020</button>
+          <button class="courier-filter-btn" data-year="2019">2019</button>
+          <button class="courier-filter-btn" data-year="2018">2018</button>
+          <button class="courier-filter-btn" data-year="2017">2017</button>
+          <button class="courier-filter-btn" data-year="2016">2016</button>
+          <button class="courier-filter-btn" data-year="2015">2015</button>
+          <button class="courier-filter-btn" data-year="2014">2014</button>
+          <button class="courier-filter-btn" data-year="2013">2013</button>
+        </div>
+
+        <div id="courier-editions" class="fade-up">
+          <!-- Populated by script below -->
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <!-- VLibras -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <script type="module" src="../assets/js/main.js"></script>
+
+  <script>
+    // ============================================================
+    // CERN Courier issue data
+    // 2013–2018: 10 issues/year (Jan/Feb combined, Jul/Aug combined)
+    // 2019–2026: bimonthly = 6 issues/year
+    // URL for 2013–2018: upload path is always 2019/04
+    // URL for 2019+: upload path matches issue YYYY/MM
+    // ============================================================
+
+    const MONTHS_MONTHLY = [
+      { mon: '01', label: 'Jan/Feb',   pdfMon: 'JanFeb', imgMon: '01' },
+      { mon: '03', label: 'March',     pdfMon: 'Mar',    imgMon: '03' },
+      { mon: '04', label: 'April',     pdfMon: 'Apr',    imgMon: '04' },
+      { mon: '05', label: 'May',       pdfMon: 'May',    imgMon: '05' },
+      { mon: '06', label: 'June',      pdfMon: 'Jun',    imgMon: '06' },
+      { mon: '07', label: 'Jul/Aug',   pdfMon: 'JulAug', imgMon: '07' },
+      { mon: '09', label: 'September', pdfMon: 'Sep',    imgMon: '09' },
+      { mon: '10', label: 'October',   pdfMon: 'Oct',    imgMon: '10' },
+      { mon: '11', label: 'November',  pdfMon: 'Nov',    imgMon: '11' },
+      { mon: '12', label: 'December',  pdfMon: 'Dec',    imgMon: '12' },
+    ];
+
+    const MONTHS_BIMONTHLY = [
+      { mon: '01', label: 'Jan/Feb',  pdfMon: 'JanFeb', imgMon: '01' },
+      { mon: '03', label: 'Mar/Apr',  pdfMon: 'MarApr', imgMon: '03' },
+      { mon: '05', label: 'May/Jun',  pdfMon: 'MayJun', imgMon: '05' },
+      { mon: '07', label: 'Jul/Aug',  pdfMon: 'JulAug', imgMon: '07' },
+      { mon: '09', label: 'Sep/Oct',  pdfMon: 'SepOct', imgMon: '09' },
+      { mon: '11', label: 'Nov/Dec',  pdfMon: 'NovDec', imgMon: '11' },
+    ];
+
+    function pdfUrl(year, entry) {
+      if (year <= 2018) {
+        return 'https://cerncourier.com/wp-content/uploads/2019/04/CERNCourier' + year + entry.pdfMon + '-digitaledition.pdf';
+      }
+      return 'https://cerncourier.com/wp-content/uploads/' + year + '/' + entry.mon + '/CERNCourier' + year + entry.pdfMon + '-digitaledition.pdf';
+    }
+
+    function coverPath(year, entry) {
+      return '../assets/images/magazine/CERNCourier' + year + entry.pdfMon + '.jpg';
+    }
+
+    function buildIssues() {
+      var issues = [];
+      for (var year = 2013; year <= 2026; year++) {
+        var months = year <= 2018 ? MONTHS_MONTHLY : MONTHS_BIMONTHLY;
+        for (var i = 0; i < months.length; i++) {
+          var entry = months[i];
+          if (year === 2026 && entry.mon !== '01') break;
+          issues.push(Object.assign({ year: year }, entry));
+        }
+      }
+      return issues.reverse();
+    }
+
+    function makeCard(issue) {
+      var a = document.createElement('a');
+      a.href = pdfUrl(issue.year, issue);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'courier-card';
+      a.setAttribute('aria-label', 'CERN Courier ' + issue.label + ' ' + issue.year);
+
+      var cover = document.createElement('div');
+      cover.className = 'courier-cover';
+
+      var img = document.createElement('img');
+      img.src = coverPath(issue.year, issue);
+      img.alt = 'CERN Courier ' + issue.label + ' ' + issue.year + ' cover';
+      img.loading = 'lazy';
+      img.onerror = function() {
+        this.style.display = 'none';
+        this.nextElementSibling.style.display = 'flex';
+      };
+
+      var placeholder = document.createElement('div');
+      placeholder.className = 'courier-cover-placeholder';
+      placeholder.style.display = 'none';
+      var phIcon = document.createElement('i');
+      phIcon.className = 'ph ph-newspaper';
+      phIcon.setAttribute('aria-hidden', 'true');
+      var phSpan = document.createElement('span');
+      phSpan.appendChild(document.createTextNode(issue.label));
+      phSpan.appendChild(document.createElement('br'));
+      phSpan.appendChild(document.createTextNode(String(issue.year)));
+      placeholder.appendChild(phIcon);
+      placeholder.appendChild(phSpan);
+
+      cover.appendChild(img);
+      cover.appendChild(placeholder);
+
+      var meta = document.createElement('div');
+      meta.className = 'courier-meta';
+
+      var issueEl = document.createElement('div');
+      issueEl.className = 'courier-issue';
+      issueEl.textContent = issue.label + ' ' + issue.year;
+
+      var badge = document.createElement('div');
+      badge.className = 'courier-pdf-badge';
+      var badgeIcon = document.createElement('i');
+      badgeIcon.className = 'ph ph-file-pdf';
+      badgeIcon.setAttribute('aria-hidden', 'true');
+      badge.appendChild(badgeIcon);
+      badge.appendChild(document.createTextNode(' PDF'));
+
+      meta.appendChild(issueEl);
+      meta.appendChild(badge);
+
+      a.appendChild(cover);
+      a.appendChild(meta);
+      return a;
+    }
+
+    function makeYearGroup(year, issues) {
+      var group = document.createElement('div');
+      group.className = 'year-group';
+      group.dataset.year = String(year);
+
+      var label = document.createElement('div');
+      label.className = 'year-label';
+      label.textContent = String(year);
+
+      var grid = document.createElement('div');
+      grid.className = 'courier-grid';
+      for (var i = 0; i < issues.length; i++) {
+        grid.appendChild(makeCard(issues[i]));
+      }
+
+      group.appendChild(label);
+      group.appendChild(grid);
+      return group;
+    }
+
+    function renderIssues(issues) {
+      var container = document.getElementById('courier-editions');
+      if (!container) return;
+
+      var byYear = {};
+      for (var i = 0; i < issues.length; i++) {
+        var yr = issues[i].year;
+        if (!byYear[yr]) byYear[yr] = [];
+        byYear[yr].push(issues[i]);
+      }
+
+      var years = Object.keys(byYear).sort(function(a, b) { return b - a; });
+      container.replaceChildren();
+      for (var j = 0; j < years.length; j++) {
+        container.appendChild(makeYearGroup(years[j], byYear[years[j]]));
+      }
+
+      // Bypass IntersectionObserver timing — force visible on initial load
+      container.classList.add('visible');
+    }
+
+    function initFilter() {
+      document.querySelectorAll('.courier-filter-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.courier-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var year = btn.dataset.year;
+          document.querySelectorAll('.year-group').forEach(function(group) {
+            group.style.display = (year === 'all' || group.dataset.year === year) ? '' : 'none';
+          });
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderIssues(buildIssues());
+      initFilter();
+    });
+  </script>
+
+</body>
+</html>

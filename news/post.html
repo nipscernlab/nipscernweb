@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">News — NIPSCERN</title>
+  <meta name="description" id="page-desc" content="News post from NIPSCERN.">
+
+  <meta property="og:type"  content="article">
+  <meta property="og:url"   id="og-url" content="https://nipscern.com/news/post.html">
+  <meta property="og:title" id="og-title" content="News — NIPSCERN">
+  <meta property="og:description" id="og-desc" content="News post from NIPSCERN.">
+  <meta property="og:image" id="og-image" content="https://nipscern.com/assets/images/og-news.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <!-- Post header (populated dynamically) -->
+    <header class="post-header" id="post-header" aria-labelledby="post-title" style="display:none">
+      <div class="post-header-inner">
+        <div class="post-meta">
+          <a href="index.html" class="btn btn-ghost btn-sm" data-i18n="news.back">
+            <i class="ph ph-arrow-left" aria-hidden="true"></i>
+            Back to News
+          </a>
+          <span class="badge" id="post-category-badge"></span>
+          <time id="post-date" class="news-date"></time>
+        </div>
+        <h1 class="post-title" id="post-title"></h1>
+        <p class="post-excerpt" id="post-excerpt"></p>
+      </div>
+    </header>
+
+    <!-- Post not found -->
+    <div id="post-not-found" style="display:none;text-align:center;padding:var(--sp-32) var(--container-pad)">
+      <i class="ph ph-file-x" style="font-size:60px;color:var(--text-muted);margin-bottom:var(--sp-6)" aria-hidden="true"></i>
+      <h1 class="heading-lg" style="margin-bottom:var(--sp-4)">Post not found</h1>
+      <p class="body-base" style="margin-bottom:var(--sp-8)">The news post you are looking for does not exist or has been removed.</p>
+      <a href="index.html" class="btn btn-primary" data-i18n="news.back">
+        <i class="ph ph-arrow-left" aria-hidden="true"></i>
+        Back to News
+      </a>
+    </div>
+
+    <!-- Loading state -->
+    <div id="post-loading" style="text-align:center;padding:var(--sp-32) var(--container-pad);color:var(--text-muted)">
+      <div class="cgv-spinner" style="margin:0 auto var(--sp-4)" aria-hidden="true"></div>
+      <span data-i18n="common.loading">Loading…</span>
+    </div>
+
+    <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
+    <div id="post-cover" style="display:none;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"></div>
+
+    <!-- Post body -->
+    <div class="post-body" id="post-body" style="display:none"></div>
+
+    <!-- Related articles (populated by JS) -->
+    <div id="post-related" style="display:none;border-top:1px solid var(--border-subtle);padding:var(--sp-8) var(--container-pad)">
+      <div style="max-width:720px;margin:0 auto">
+        <p style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)">Related</p>
+        <div id="post-related-list" style="display:flex;flex-direction:column;gap:var(--sp-3)"></div>
+      </div>
+    </div>
+
+    <!-- Post footer / share -->
+    <div id="post-footer" style="display:none;border-top:1px solid var(--border-subtle);padding:var(--sp-8) var(--container-pad)">
+      <div style="max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-4)">
+        <a href="index.html" class="btn btn-ghost" data-i18n="news.back">
+          <i class="ph ph-arrow-left" aria-hidden="true"></i>
+          Back to News
+        </a>
+        <div style="display:flex;align-items:center;gap:var(--sp-2)">
+          <span id="share-toast" style="font-size:var(--text-xs);color:#39ff14;display:none;font-weight:700;text-shadow:0 0 8px rgba(57,255,20,0.6)">Link copied!</span>
+          <button id="share-btn" class="btn btn-ghost btn-sm" aria-label="Copy link to this post">
+            <i class="ph ph-link" aria-hidden="true"></i>
+            Copy link
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <script type="module">
+    import { formatDate } from '../assets/js/main.js';
+
+    function catClass(cat) {
+      const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
+      return m[cat] || 'badge-gray';
+    }
+
+    async function loadPost() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+
+      document.getElementById('post-loading').style.display = 'block';
+
+      let posts;
+      try {
+        const res = await fetch('../data/news.json');
+        posts = await res.json();
+      } catch (e) {
+        posts = [];
+      }
+
+      document.getElementById('post-loading').style.display = 'none';
+
+      const post = posts.find(p => p.id === id);
+      if (!post) {
+        document.getElementById('post-not-found').style.display = 'block';
+        return;
+      }
+
+      // Update meta
+      document.getElementById('page-title').textContent = post.title + ' — NIPSCERN';
+      document.getElementById('page-desc').content = post.excerpt;
+      document.getElementById('og-title').content = post.title;
+      document.getElementById('og-desc').content = post.excerpt;
+      document.getElementById('og-url').content = 'https://nipscern.com/news/post.html?id=' + post.id;
+
+      // Render header
+      const badge = document.getElementById('post-category-badge');
+      badge.className = 'badge ' + catClass(post.category);
+      badge.setAttribute('data-i18n', 'news.categories.' + post.category);
+      badge.textContent = post.category;
+
+      document.getElementById('post-date').textContent = formatDate(post.date);
+      document.getElementById('post-date').setAttribute('datetime', post.date);
+      document.getElementById('post-title').textContent = post.title;
+      document.getElementById('post-excerpt').textContent = post.excerpt;
+      document.getElementById('post-header').style.display = 'block';
+
+      // Cover image — overlaps post-header so the dark bg bleeds ~15% behind the image top
+      if (post.image) {
+        const coverEl = document.getElementById('post-cover');
+        const img = document.createElement('img');
+        img.src = '../' + post.image;
+        img.alt = post.title;
+        img.style.cssText = 'width:100%;max-height:460px;object-fit:cover;display:block;border-radius:var(--r-xl)';
+        img.loading = 'eager';
+        coverEl.appendChild(img);
+        coverEl.style.display = 'block';
+        document.getElementById('post-header').classList.add('has-cover');
+      }
+
+      // Render body
+      const bodyEl = document.getElementById('post-body');
+      const paragraphs = post.content.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+      bodyEl.innerHTML = paragraphs;
+      bodyEl.style.display = 'block';
+
+      // Embedded video (YouTube)
+      if (post.video) {
+        const ytId = post.video.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
+        if (ytId) {
+          bodyEl.innerHTML += `
+            <div class="post-video-wrap" style="margin:var(--sp-10) 0">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/${ytId}"
+                title="Video: ${post.title}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                loading="lazy"
+                style="width:100%;aspect-ratio:16/9;border:0;border-radius:var(--r-xl);display:block"
+              ></iframe>
+            </div>`;
+        }
+      }
+
+      // Tags
+      if (post.tags && post.tags.length) {
+        bodyEl.innerHTML += `<div class="pub-tags" style="margin-top:var(--sp-8)">${post.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`;
+      }
+
+      // Related articles
+      if (post.related_ids && post.related_ids.length) {
+        const relatedPosts = post.related_ids.map(rid => posts.find(p => p.id === rid)).filter(Boolean);
+        if (relatedPosts.length) {
+          const listEl = document.getElementById('post-related-list');
+          relatedPosts.forEach(rp => {
+            const a = document.createElement('a');
+            a.href = 'post.html?id=' + rp.id;
+            a.style.cssText = 'display:flex;gap:var(--sp-3);align-items:center;padding:var(--sp-3) var(--sp-4);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-lg);text-decoration:none;transition:border-color 0.15s';
+            a.onmouseover = () => { a.style.borderColor = 'var(--border-mid)'; };
+            a.onmouseout  = () => { a.style.borderColor = 'var(--border-subtle)'; };
+            const badgeEl = document.createElement('span');
+            badgeEl.className = 'badge ' + catClass(rp.category);
+            badgeEl.style.flexShrink = '0';
+            badgeEl.textContent = rp.category;
+            const titleEl = document.createElement('span');
+            titleEl.style.cssText = 'font-size:var(--text-sm);color:var(--text-primary);flex:1;line-height:1.4';
+            titleEl.textContent = rp.title;
+            const arrow = document.createElement('i');
+            arrow.className = 'ph ph-arrow-right';
+            arrow.style.cssText = 'color:var(--text-muted);flex-shrink:0';
+            a.appendChild(badgeEl);
+            a.appendChild(titleEl);
+            a.appendChild(arrow);
+            listEl.appendChild(a);
+          });
+          document.getElementById('post-related').style.display = 'block';
+        }
+      }
+
+      document.getElementById('post-footer').style.display = 'block';
+
+      // Share button — copy link to clipboard
+      const shareBtn = document.getElementById('share-btn');
+      const shareToast = document.getElementById('share-toast');
+      if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+          const url = window.location.href;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(() => showToast());
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = url;
+            ta.style.cssText = 'position:fixed;opacity:0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast();
+          }
+        });
+        function showToast() {
+          shareToast.style.display = 'inline';
+          setTimeout(() => { shareToast.style.display = 'none'; }, 2500);
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPost);
+  </script>
+
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
+</html>

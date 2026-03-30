@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CGV-WEB — Calorimeter Geometry Viewer Web | NIPSCERN</title>
+  <meta name="description" content="CGV-WEB renders CERN ATLAS calorimeter events in 3D in the browser. Built on Rust/WebAssembly and Three.js. Being integrated into the ATLAS Control Room at CERN.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://nipscern.com/projects/cgv.html">
+  <meta property="og:title" content="CGV-WEB — Calorimeter Geometry Viewer Web | NIPSCERN">
+  <meta property="og:description" content="3D calorimeter event visualisation for the ATLAS experiment — being integrated into the ATLAS Control Room at CERN.">
+  <meta property="og:image" content="https://nipscern.com/assets/images/projects/cgv.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/projects/cgv.html">
+
+  <!-- Three.js importmap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    :root { --page-accent: var(--accent-cgv); }
+
+    /* ATLAS Control Room highlight banner */
+    .atlas-cr-banner {
+      background: linear-gradient(135deg, rgba(29,78,137,0.08) 0%, rgba(59,130,246,0.08) 100%);
+      border: 1px solid rgba(29,78,137,0.3);
+      border-radius: var(--r-2xl);
+      padding: var(--sp-6) var(--sp-8);
+      display: flex;
+      gap: var(--sp-5);
+      align-items: flex-start;
+    }
+    .atlas-cr-icon {
+      width: 48px; height: 48px;
+      border-radius: var(--r-xl);
+      background: rgba(29,78,137,0.15);
+      color: var(--accent-cgv);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .atlas-cr-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--accent-cgv);
+      margin-bottom: var(--sp-2);
+    }
+    .atlas-cr-text {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* Tech stack cards */
+    .tech-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+      padding: var(--sp-5);
+    }
+    .tech-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-3);
+    }
+    .tech-card-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .tech-card-name {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .tech-card-role {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+    .tech-card-body {
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Sub-detector strip */
+    .subdet-row {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-4);
+      padding: var(--sp-4);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+    }
+    .subdet-row + .subdet-row { margin-top: var(--sp-3); }
+    .subdet-dot {
+      width: 12px; height: 12px;
+      border-radius: var(--r-full);
+      flex-shrink: 0;
+    }
+    .subdet-name {
+      font-weight: 600;
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+    }
+    .subdet-spec {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="project-hero" style="background: radial-gradient(ellipse 70% 50% at 0% 50%, rgba(29,78,137,0.07) 0%, transparent 70%), var(--bg-0)" aria-labelledby="cgv-title">
+      <div class="project-hero-inner">
+        <div class="project-hero-icon" style="background:rgba(29,78,137,0.12);color:var(--accent-cgv)">
+          <i class="ph ph-cube" aria-hidden="true"></i>
+        </div>
+        <div class="project-hero-text">
+          <div class="eyebrow fade-up">
+            <i class="ph ph-atom" aria-hidden="true"></i>
+            ATLAS · CERN · 3D Visualisation
+          </div>
+          <h1 class="project-hero-name fade-up" id="cgv-title">
+            <span style="color:var(--accent-cgv)">CGV-WEB</span>
+          </h1>
+          <p class="project-hero-fullname fade-up" data-i18n="projects.cgv.full">Calorimeter Geometry Viewer Web</p>
+          <p class="project-hero-desc fade-up" data-i18n="projects.cgv.desc">
+            CGV-WEB renders CERN ATLAS calorimeter collision events in real-time 3D, colour-coding each detector cell by energy deposit. Built on <strong>Rust/WebAssembly</strong>, <strong>Three.js</strong>, and backed by <strong>ROOT</strong> data pipelines, it is NIPSCERN's most technically ambitious project — led by <strong>Chrysthofer Arthur</strong> — and is being integrated into the <strong>ATLAS Control Room at CERN</strong>.
+          </p>
+          <div class="project-links fade-up">
+            <a href="cgv/index.html" class="btn btn-primary" style="background:var(--accent-cgv);border-color:var(--accent-cgv)">
+              <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+              <span data-i18n="projects.cgv.open">Open Full CGV</span>
+            </a>
+            <a href="https://github.com/nipscernlab/cgv-web" target="_blank" rel="noopener" class="btn btn-ghost">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              <span data-i18n="projects.github">View on GitHub</span>
+            </a>
+            <a href="index.html" class="btn btn-ghost">
+              <i class="ph ph-arrow-left" aria-hidden="true"></i>
+              All Projects
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Badge bar -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
+      <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+        <span class="badge badge-green">Rust / WebAssembly</span>
+        <span class="badge badge-green">Three.js</span>
+        <span class="badge badge-green">JavaScript</span>
+        <span class="badge badge-cyan">ROOT</span>
+        <span class="badge badge-gray">ATLAS TileCal · LAr · HEC</span>
+        <span class="badge badge-green">Open Source</span>
+        <span class="badge badge-green">Active</span>
+      </div>
+    </div>
+
+    <!-- ATLAS Control Room highlight -->
+    <section class="section">
+      <div class="container">
+
+        <div class="atlas-cr-banner fade-up">
+          <div class="atlas-cr-icon"><i class="ph ph-monitor" aria-hidden="true"></i></div>
+          <div>
+            <div class="atlas-cr-title">ATLAS Control Room Integration — CERN</div>
+            <div class="atlas-cr-text">
+              CGV-WEB is being integrated into the <strong>ATLAS Control Room at CERN</strong>, where it will appear on the main display screen used by researchers monitoring live particle collisions in the LHC. This milestone represents NIPSCERN's most direct contribution to the operational infrastructure of a major LHC detector, placing work produced at UFJF on the walls of one of the world's most advanced physics facilities.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3D Preview -->
+    <section class="cgv-section section" aria-labelledby="cgv-preview-title" style="border-top:1px solid var(--border-subtle)">
+      <div class="cgv-container">
+        <div class="cgv-header fade-up">
+          <div class="eyebrow" style="justify-content:center">
+            <i class="ph ph-cube" aria-hidden="true"></i>
+            Live Preview
+          </div>
+          <h2 class="display-md" id="cgv-preview-title">ATLAS Calorimeter — Interactive Preview</h2>
+          <p class="body-lg" style="max-width:520px;margin:var(--sp-4) auto 0" data-i18n="home.cgv.subtitle">
+            Interactive 3D rendering of the ATLAS calorimeter. Each coloured cell represents energy deposited by particles in a simulated collision.
+          </p>
+        </div>
+
+        <div class="cgv-canvas-wrapper fade-up" id="cgv-canvas-wrapper" role="img" aria-label="Interactive 3D ATLAS calorimeter display">
+          <canvas id="cgv-canvas" aria-hidden="true"></canvas>
+          <div class="cgv-loading" id="cgv-loading" aria-live="polite">
+            <div class="cgv-spinner" aria-hidden="true"></div>
+            <span data-i18n="home.cgv.loading">Initialising calorimeter geometry…</span>
+          </div>
+          <div class="cgv-cell-count" aria-live="polite">
+            <span id="cgv-cell-count">0</span>
+            <span style="margin-left:4px;color:var(--text-muted)" data-i18n="home.cgv.cells_label">active cells</span>
+          </div>
+          <a href="cgv/index.html" class="btn btn-ghost btn-sm cgv-open-btn" data-i18n="home.cgv.btn_fullcgv">
+            <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+            Open Full CGV
+          </a>
+          <div class="cgv-controls" role="toolbar" aria-label="Calorimeter controls">
+            <button class="cgv-btn" id="cgv-btn-event" data-i18n="home.cgv.btn_event">Generate Event</button>
+            <div class="cgv-divider" aria-hidden="true"></div>
+            <button class="cgv-btn" id="cgv-btn-wire" data-i18n="home.cgv.btn_wireframe">Wireframe</button>
+            <div class="cgv-divider" aria-hidden="true"></div>
+            <button class="cgv-btn" id="cgv-btn-beam" data-i18n="home.cgv.btn_beam">Beam Axis</button>
+            <div class="cgv-divider" aria-hidden="true"></div>
+            <button class="cgv-btn active" id="cgv-btn-tilecal" aria-pressed="true">TileCal</button>
+            <button class="cgv-btn active" id="cgv-btn-lar" aria-pressed="true">LAr</button>
+            <button class="cgv-btn active" id="cgv-btn-hec" aria-pressed="true">HEC</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technical Stack + Sub-detectors -->
+    <section class="section" style="border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+
+          <!-- Left: tech stack -->
+          <div class="fade-up">
+            <div class="accent-line" style="background:var(--accent-cgv)" aria-hidden="true"></div>
+            <h2 class="heading-lg">Technical Stack</h2>
+            <p class="body-sm" style="margin-top:var(--sp-3);color:var(--text-secondary)">
+              CGV-WEB is designed for zero-installation deployment: it runs entirely in the browser, yet achieves native-level performance through a Rust/WebAssembly core and hardware-accelerated Three.js rendering. The data pipeline reads ROOT files produced by ATLAS reconstruction software and converts them to a binary format optimised for the WASM engine.
+            </p>
+            <div style="display:flex;flex-direction:column;gap:var(--sp-3);margin-top:var(--sp-6)">
+
+              <div class="tech-card">
+                <div class="tech-card-header">
+                  <div class="tech-card-icon" style="background:rgba(29,78,137,0.12);color:var(--accent-cgv)"><i class="ph ph-gear-six" aria-hidden="true"></i></div>
+                  <div>
+                    <div class="tech-card-name">Rust / WebAssembly</div>
+                    <div class="tech-card-role">Core geometry & event engine</div>
+                  </div>
+                </div>
+                <div class="tech-card-body">Detector geometry construction, event data parsing, and energy-to-colour mapping are handled in a Rust crate compiled to WASM. Achieves near-native performance with a compact binary and no garbage-collection pauses.</div>
+              </div>
+
+              <div class="tech-card">
+                <div class="tech-card-header">
+                  <div class="tech-card-icon" style="background:rgba(29,78,137,0.12);color:var(--accent-cgv)"><i class="ph ph-cube" aria-hidden="true"></i></div>
+                  <div>
+                    <div class="tech-card-name">Three.js r160</div>
+                    <div class="tech-card-role">WebGL 3D rendering</div>
+                  </div>
+                </div>
+                <div class="tech-card-body">OrbitControls for interactive camera, custom MeshPhongMaterial shaders for energy colour gradients (blue → yellow → red), and per-frame frustum culling. Cell meshes are created or destroyed as events change.</div>
+              </div>
+
+              <div class="tech-card">
+                <div class="tech-card-header">
+                  <div class="tech-card-icon" style="background:rgba(59,130,246,0.12);color:var(--accent-cern)"><i class="ph ph-atom" aria-hidden="true"></i></div>
+                  <div>
+                    <div class="tech-card-name">ROOT</div>
+                    <div class="tech-card-role">ATLAS data pipeline</div>
+                  </div>
+                </div>
+                <div class="tech-card-body">Upstream data originates from ROOT files (.root) produced by ATLAS Athena reconstruction. A Python/C++ converter extracts calorimeter cell energies and writes a compact binary format consumed by the WASM engine.</div>
+              </div>
+
+              <div class="tech-card">
+                <div class="tech-card-header">
+                  <div class="tech-card-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-code" aria-hidden="true"></i></div>
+                  <div>
+                    <div class="tech-card-name">JavaScript Frontend</div>
+                    <div class="tech-card-role">UI, i18n, event bus</div>
+                  </div>
+                </div>
+                <div class="tech-card-body">ES-module orchestration layer: initialises WASM, wires Three.js scene, handles UI events (wireframe toggle, beam axis, layer visibility), renders HUD cell tooltip on hover, and applies NIPSCERN design system styling.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Right: sub-detectors + lead developer -->
+          <div class="fade-up">
+            <h3 class="heading-sm" style="margin-bottom:var(--sp-4)">Sub-Detectors Visualised</h3>
+            <div>
+              <div class="subdet-row">
+                <div class="subdet-dot" style="background:#fb923c"></div>
+                <div>
+                  <div class="subdet-name">TileCal Barrel</div>
+                  <div class="subdet-spec">3 radial layers · ±z · 10 η × 64 φ bins per layer</div>
+                </div>
+              </div>
+              <div class="subdet-row">
+                <div class="subdet-dot" style="background:#34d399"></div>
+                <div>
+                  <div class="subdet-name">LAr EM Barrel</div>
+                  <div class="subdet-spec">4 depth layers · ±z · 28–56 η × 64 φ bins per layer</div>
+                </div>
+              </div>
+              <div class="subdet-row">
+                <div class="subdet-dot" style="background:#22d3ee"></div>
+                <div>
+                  <div class="subdet-name">HEC Endcaps</div>
+                  <div class="subdet-spec">4 disk layers · ±z · 8 η × 32 φ bins per endcap</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lead developer card -->
+            <div style="margin-top:var(--sp-8);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
+              <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+                <div style="width:40px;height:40px;border-radius:var(--r-full);background:rgba(29,78,137,0.12);color:var(--accent-cgv);display:flex;align-items:center;justify-content:center;font-size:20px">
+                  <i class="ph ph-user-circle" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <div style="font-weight:700;font-size:var(--text-sm)">Lead Developer</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">CGV-WEB · NIPSCERN</div>
+                </div>
+              </div>
+              <p style="font-size:var(--text-sm);color:var(--text-secondary)">
+                <strong>Chrysthofer Arthur</strong> leads the development of CGV-WEB, co-advised by Prof. Luciano Manhães de Andrade Filho. He is responsible for the Rust/WASM engine architecture, the ROOT data pipeline integration, and the ATLAS Control Room deployment coordination.
+              </p>
+            </div>
+
+            <!-- Origin box -->
+            <div class="info-box" style="margin-top:var(--sp-6)">
+              <i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>
+              <p>
+                <strong>Origin — CaloGeoView:</strong> CGV-WEB is the online evolution of CaloGeoView, a desktop visualisation tool originally developed by Dr. Luciano Manhães de Andrade Filho during his PhD at UFJF. The Rust/WASM rewrite makes it accessible in any modern browser — no installation required.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container container--narrow">
+        <div class="fade-up">
+          <div class="accent-line" style="background:var(--accent-cgv)" aria-hidden="true"></div>
+          <h2 class="heading-lg">Development Roadmap</h2>
+          <p class="body-base" style="margin-top:var(--sp-3);color:var(--text-secondary)">
+            CGV-WEB is in active development. The priorities below are driven by the ATLAS Control Room deployment timeline.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:var(--sp-3);margin-top:var(--sp-6)">
+
+            <div style="display:flex;gap:var(--sp-4);align-items:flex-start;padding:var(--sp-4) var(--sp-5);background:var(--bg-card);border:1px solid rgba(29,78,137,0.35);border-radius:var(--r-xl)">
+              <span class="badge badge-green" style="flex-shrink:0">Done</span>
+              <div>
+                <div style="font-weight:600;font-size:var(--text-sm)">Three.js geometry rendering</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">TileCal barrel, LAr barrel, HEC endcaps fully rendered with energy colour-mapping.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:var(--sp-4);align-items:flex-start;padding:var(--sp-4) var(--sp-5);background:var(--bg-card);border:1px solid rgba(29,78,137,0.35);border-radius:var(--r-xl)">
+              <span class="badge badge-green" style="flex-shrink:0">Done</span>
+              <div>
+                <div style="font-weight:600;font-size:var(--text-sm)">Interactive controls & HUD</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Orbit camera, wireframe toggle, beam axis overlay, layer visibility, cell-hover tooltip with energy readout.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:var(--sp-4);align-items:flex-start;padding:var(--sp-4) var(--sp-5);background:var(--bg-card);border:1px solid rgba(212,160,23,0.35);border-radius:var(--r-xl)">
+              <span class="badge badge-orange" style="flex-shrink:0">In Progress</span>
+              <div>
+                <div style="font-weight:600;font-size:var(--text-sm)">Rust/WASM engine</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Porting geometry construction and event parser to a compiled Rust crate for maximum performance in the browser.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:var(--sp-4);align-items:flex-start;padding:var(--sp-4) var(--sp-5);background:var(--bg-card);border:1px solid rgba(212,160,23,0.35);border-radius:var(--r-xl)">
+              <span class="badge badge-orange" style="flex-shrink:0">In Progress</span>
+              <div>
+                <div style="font-weight:600;font-size:var(--text-sm)">ROOT data pipeline</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Python/C++ extractor converting ATLAS .root files to a compact binary format streamed to the WASM engine.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:var(--sp-4);align-items:flex-start;padding:var(--sp-4) var(--sp-5);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl)">
+              <span class="badge badge-gray" style="flex-shrink:0">Planned</span>
+              <div>
+                <div style="font-weight:600;font-size:var(--text-sm)">ATLAS Control Room deployment</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Final integration on the primary display in the ATLAS Control Room at CERN. Researchers will use CGV-WEB to inspect live collision events.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:var(--sp-4);align-items:flex-start;padding:var(--sp-4) var(--sp-5);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl)">
+              <span class="badge badge-gray" style="flex-shrink:0">Planned</span>
+              <div>
+                <div style="font-weight:600;font-size:var(--text-sm)">Forward calorimeter (FCal) support</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Extending geometry to include the FCal copper and tungsten electromagnetic and hadronic sections.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Open full app CTA -->
+    <section class="section" style="border-top:1px solid var(--border-subtle)">
+      <div class="container container--narrow" style="text-align:center">
+        <div class="fade-up">
+          <div class="accent-line" style="background:var(--accent-cgv);margin:0 auto var(--sp-4)" aria-hidden="true"></div>
+          <h2 class="heading-lg">Try CGV-WEB</h2>
+          <p class="body-base" style="color:var(--text-secondary);margin:var(--sp-3) 0 var(--sp-6)">
+            Load the full application — import a ROOT event file, interact with the 3D calorimeter geometry, and explore energy deposits cell by cell.
+          </p>
+          <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
+            <a href="cgv/index.html" class="btn btn-primary" style="background:var(--accent-cgv);border-color:var(--accent-cgv)">
+              <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+              Open Full CGV App
+            </a>
+            <a href="https://github.com/nipscernlab/cgv-web" target="_blank" rel="noopener" class="btn btn-ghost">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <script type="module">
+    import { initCGVPreview } from '../assets/js/cgv-preview.js';
+    document.addEventListener('DOMContentLoaded', () => initCGVPreview('cgv-canvas-wrapper'));
+  </script>
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
+</html>

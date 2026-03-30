@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POLARIS — Cross-Platform IDE for SAPHO | NIPSCERN</title>
+  <meta name="description" content="POLARIS is a modern, cross-platform graphical IDE built with Tauri and Rust for the SAPHO ecosystem. Features Monaco Editor, PRISM RTL Viewer, and YAWT Wave Tracer integration.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://nipscern.com/projects/polaris.html">
+  <meta property="og:title" content="POLARIS — Cross-Platform IDE for SAPHO | NIPSCERN">
+  <meta property="og:description" content="Modern, lightweight IDE built with Tauri and Rust. The successor to AURORA, now supporting Linux and Windows.">
+  <meta property="og:image" content="https://nipscern.com/assets/images/projects/polaris.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/projects/polaris.html">
+
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    :root { --page-accent: var(--accent-polaris); }
+
+    .comparison-table {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+    }
+    .ct-header {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+    }
+    .ct-cell {
+      padding: var(--sp-3) var(--sp-4);
+      font-size: var(--text-xs);
+    }
+    .ct-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .ct-label {
+      padding: var(--sp-3) var(--sp-4);
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+    }
+    .ct-val {
+      padding: var(--sp-3) var(--sp-4);
+      font-size: var(--text-xs);
+      text-align: center;
+      font-weight: 500;
+    }
+    .workflow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-4);
+      padding: var(--sp-4) var(--sp-5);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+    }
+    .workflow-step + .workflow-step { margin-top: var(--sp-3); }
+    .ws-num {
+      width: 28px; height: 28px;
+      border-radius: var(--r-full);
+      background: rgba(147,51,234,0.12);
+      color: var(--accent-polaris);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="project-hero" style="background: radial-gradient(ellipse 70% 50% at 0% 50%, rgba(147,51,234,0.07) 0%, transparent 70%), var(--bg-0)" aria-labelledby="polaris-title">
+      <div class="project-hero-inner">
+        <div class="project-hero-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)">
+          <i class="ph ph-desktop" aria-hidden="true"></i>
+        </div>
+        <div class="project-hero-text">
+          <div class="eyebrow fade-up">
+            <i class="ph ph-desktop" aria-hidden="true"></i>
+            Cross-Platform IDE · Part of SAPHO
+          </div>
+          <h1 class="project-hero-name fade-up" id="polaris-title">
+            <span style="color:var(--accent-polaris)">POLARIS</span>
+          </h1>
+          <p class="project-hero-fullname fade-up" data-i18n="projects.polaris.full">Cross-Platform Graphical IDE for SAPHO</p>
+          <p class="project-hero-desc fade-up" data-i18n="projects.polaris.desc">
+            POLARIS is a modern, lightweight graphical development environment for the SAPHO ecosystem. Built on <strong>Tauri + Rust</strong> with a <strong>Monaco Editor</strong> frontend, it integrates the YANC compiler, PRISM RTL Viewer, and YAWT Wave Tracer into a single native application. It succeeds AURORA with cross-platform support and a dramatically smaller footprint.
+          </p>
+          <div class="project-links fade-up">
+            <a href="https://github.com/nipscernlab/polaris" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-polaris);border-color:var(--accent-polaris)">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              <span data-i18n="projects.github">View on GitHub</span>
+            </a>
+            <a href="aurora.html" class="btn btn-ghost">
+              <i class="ph ph-arrow-clockwise" aria-hidden="true"></i>
+              Succeeded AURORA
+            </a>
+            <a href="index.html" class="btn btn-ghost">
+              <i class="ph ph-arrow-left" aria-hidden="true"></i>
+              All Projects
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Badge bar -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
+      <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+        <span class="badge badge-cyan"><i class="ph ph-windows-logo" aria-hidden="true"></i>&nbsp;Windows</span>
+        <span class="badge badge-cyan"><i class="ph ph-linux-logo" aria-hidden="true"></i>&nbsp;Linux</span>
+        <span class="badge badge-cyan">Tauri + Rust</span>
+        <span class="badge badge-cyan">Monaco Editor</span>
+        <span class="badge badge-gray">Open Source</span>
+        <span class="badge badge-green">Active</span>
+      </div>
+    </div>
+
+    <!-- Features + Comparison -->
+    <section class="section">
+      <div class="container">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+
+          <div class="fade-up">
+            <div class="accent-line" style="background:var(--accent-polaris)" aria-hidden="true"></div>
+            <h2 class="heading-lg">Key Features</h2>
+            <div class="feature-list" style="margin-top:var(--sp-6)">
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)"><i class="ph ph-package" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600">Tauri + Rust backend</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Native system calls with a WebView frontend. Starts in under one second. Memory footprint ~60 MB versus ~300 MB for Electron (AURORA).</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)"><i class="ph ph-code" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600">Monaco Editor</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">The same editor engine powering VS Code. Provides syntax highlighting, IntelliSense-style completions, and a fully featured CMM language extension.</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-terminal" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600">Integrated YANC Compiler</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Compiles CMM → Assembly → Hex through cmmcomp and asmcomp with a click. Error diagnostics surface inline in the editor margin.</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(212,160,23,0.12);color:var(--accent-sapho)"><i class="ph ph-graph" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600">PRISM RTL Viewer</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Embedded RTL schematic renderer. Displays the synthesised netlist graph of the designed processor without leaving the IDE.</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(91,156,246,0.12);color:var(--brand)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600">YAWT Wave Tracer</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Waveform viewer for simulation results. Replaces the external GTKWave dependency that AURORA required.</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(29,78,137,0.12);color:var(--accent-cgv)"><i class="ph ph-devices" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600">Native Linux and Windows</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Distributed as self-contained installers for both platforms. No runtime dependencies required on the target machine.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fade-up">
+            <h3 class="heading-sm" style="margin-bottom:var(--sp-5)">POLARIS vs. AURORA</h3>
+            <div class="comparison-table">
+              <div class="ct-header">
+                <div class="ct-cell" style="background:var(--bg-elevated);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:11px;color:var(--text-muted)">Feature</div>
+                <div class="ct-cell" style="background:rgba(147,51,234,0.1);color:var(--accent-polaris);font-weight:700;font-size:11px;text-align:center">POLARIS</div>
+                <div class="ct-cell" style="background:rgba(124,58,237,0.05);color:var(--accent-aurora);font-weight:700;font-size:11px;text-align:center">AURORA</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">Framework</div>
+                <div class="ct-val" style="color:var(--accent-polaris)">Tauri + Rust</div>
+                <div class="ct-val" style="color:var(--text-muted)">Electron</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">Platform</div>
+                <div class="ct-val" style="color:var(--accent-polaris)">Linux + Windows</div>
+                <div class="ct-val" style="color:var(--text-muted)">Windows only</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">Memory usage</div>
+                <div class="ct-val" style="color:var(--accent-polaris)">~60 MB</div>
+                <div class="ct-val" style="color:var(--text-muted)">~300 MB</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">Startup time</div>
+                <div class="ct-val" style="color:var(--accent-polaris)">&lt; 1 s</div>
+                <div class="ct-val" style="color:var(--text-muted)">3–5 s</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">Wave viewer</div>
+                <div class="ct-val" style="color:var(--accent-polaris)">YAWT (built-in)</div>
+                <div class="ct-val" style="color:var(--text-muted)">GTKWave (external)</div>
+              </div>
+              <div class="ct-row">
+                <div class="ct-label">Status</div>
+                <div class="ct-val">
+                  <span class="badge badge-green" style="font-size:11px">Active</span>
+                </div>
+                <div class="ct-val">
+                  <span class="badge badge-red" style="font-size:11px">Legacy</span>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="heading-sm" style="margin-top:var(--sp-8);margin-bottom:var(--sp-4)">Typical Workflow</h3>
+            <div>
+              <div class="workflow-step">
+                <div class="ws-num">1</div>
+                <div>
+                  <div style="font-weight:600;font-size:var(--text-sm)">Write CMM</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Use Monaco Editor with CMM syntax highlighting and auto-completion.</div>
+                </div>
+              </div>
+              <div class="workflow-step">
+                <div class="ws-num">2</div>
+                <div>
+                  <div style="font-weight:600;font-size:var(--text-sm)">Compile via YANC</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">One click runs cmmcomp → asmcomp; errors surface in the editor gutter.</div>
+                </div>
+              </div>
+              <div class="workflow-step">
+                <div class="ws-num">3</div>
+                <div>
+                  <div style="font-weight:600;font-size:var(--text-sm)">Simulate with YAWT</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Run the simulation and inspect signal waveforms in the built-in Wave Tracer.</div>
+                </div>
+              </div>
+              <div class="workflow-step">
+                <div class="ws-num">4</div>
+                <div>
+                  <div style="font-weight:600;font-size:var(--text-sm)">View RTL in PRISM</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Inspect the synthesised netlist graph without leaving the IDE.</div>
+                </div>
+              </div>
+              <div class="workflow-step">
+                <div class="ws-num">5</div>
+                <div>
+                  <div style="font-weight:600;font-size:var(--text-sm)">Deploy to FPGA</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Flash the .hex output to the target FPGA board from the IDE's terminal panel.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Screenshot placeholders -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <h2 class="heading-md fade-up" style="margin-bottom:var(--sp-6)">Screenshots</h2>
+        <div class="grid grid-2 fade-up" style="gap:var(--sp-4)">
+          <div style="aspect-ratio:16/9;background:var(--bg-card);border:1px solid var(--border-mid);border-radius:var(--r-xl);display:flex;align-items:center;justify-content:center;color:var(--text-muted)">
+            <div style="text-align:center">
+              <i class="ph ph-image" style="font-size:40px" aria-hidden="true"></i>
+              <p style="font-size:var(--text-xs);margin-top:8px">POLARIS IDE — CMM editor<br><code>assets/images/projects/polaris-editor.jpg</code></p>
+            </div>
+          </div>
+          <div style="aspect-ratio:16/9;background:var(--bg-card);border:1px solid var(--border-mid);border-radius:var(--r-xl);display:flex;align-items:center;justify-content:center;color:var(--text-muted)">
+            <div style="text-align:center">
+              <i class="ph ph-image" style="font-size:40px" aria-hidden="true"></i>
+              <p style="font-size:var(--text-xs);margin-top:8px">PRISM RTL Viewer + YAWT waveforms<br><code>assets/images/projects/polaris-prism.jpg</code></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section" style="border-top:1px solid var(--border-subtle)">
+      <div class="container container--narrow" style="text-align:center">
+        <div class="fade-up">
+          <div class="accent-line" style="background:var(--accent-polaris);margin:0 auto var(--sp-4)" aria-hidden="true"></div>
+          <h2 class="heading-lg">Get POLARIS</h2>
+          <p class="body-base" style="color:var(--text-secondary);margin:var(--sp-3) 0 var(--sp-6)">
+            Download pre-built binaries for Linux and Windows from the GitHub Releases page, or build from source with <code>cargo tauri build</code>.
+          </p>
+          <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
+            <a href="https://github.com/nipscernlab/polaris/releases" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-polaris);border-color:var(--accent-polaris)">
+              <i class="ph ph-download" aria-hidden="true"></i>
+              Download Releases
+            </a>
+            <a href="https://github.com/nipscernlab/polaris" target="_blank" rel="noopener" class="btn btn-ghost">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              View on GitHub
+            </a>
+            <a href="sapho.html" class="btn btn-ghost">
+              <i class="ph ph-cpu" aria-hidden="true"></i>
+              Back to SAPHO
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
+</html>
