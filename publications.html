@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publications — NIPSCERN</title>
+  <meta name="description" content="Scientific articles, conference papers, dissertations, and undergraduate theses from the NIPSCERN laboratory at UFJF, Brazil.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://nipscern.com/publications.html">
+  <meta property="og:title" content="Publications — NIPSCERN">
+  <meta property="og:description" content="Scientific output from NIPSCERN — peer-reviewed articles, conference papers, theses, and dissertations.">
+  <meta property="og:image" content="https://nipscern.com/assets/images/og-publications.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/publications.html">
+
+  <link rel="icon" href="assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="page-hero" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="eyebrow fade-up">
+          <i class="ph ph-book-open" aria-hidden="true"></i>
+          Research Output
+        </div>
+        <h1 class="display-lg fade-up" id="pub-title" data-i18n="publications.title">Publications</h1>
+        <p class="body-lg fade-up" style="max-width:560px;margin-top:var(--sp-5)" data-i18n="publications.subtitle">
+          Scientific articles, conference papers, dissertations, and undergraduate theses from NIPSCERN.
+        </p>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="container">
+
+        <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_reading.svg -->
+        <figure style="text-align:center;margin:0 auto var(--sp-8);max-width:260px;opacity:0.65" aria-hidden="true">
+          <img src="assets/images/undraw/undraw_reading.svg" alt="" width="260" height="165" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
+        </figure>
+
+        <!-- Controls -->
+        <div class="pub-controls fade-up" role="search" aria-label="Search and filter publications">
+          <div class="search-input-wrap">
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+            <input
+              type="search"
+              id="pub-search"
+              class="search-input"
+              data-i18n-placeholder="publications.search_placeholder"
+              placeholder="Search by title, author, or keyword…"
+              aria-label="Search publications"
+            >
+          </div>
+
+          <select id="pub-filter-type" class="select-filter" aria-label="Filter by type" data-i18n-aria="publications.filter_type">
+            <option value="" data-i18n="publications.filter_all">All types</option>
+            <option value="article" data-i18n="publications.types.article">Journal Article</option>
+            <option value="conference" data-i18n="publications.types.conference">Conference</option>
+            <option value="tcc" data-i18n="publications.types.tcc">Undergraduate Thesis</option>
+            <option value="dissertation" data-i18n="publications.types.dissertation">Dissertation</option>
+          </select>
+
+          <select id="pub-filter-year" class="select-filter" aria-label="Filter by year" data-i18n-aria="publications.filter_year">
+            <option value="" data-i18n="publications.all_years">All years</option>
+          </select>
+        </div>
+
+        <!-- Publication list -->
+        <div id="pub-list" class="pub-list" role="list" aria-label="Publications list" aria-live="polite">
+          <!-- Populated by publications.js -->
+          <div style="text-align:center;padding:var(--sp-16);color:var(--text-muted)">
+            <div class="cgv-spinner" style="margin:0 auto var(--sp-4)" aria-hidden="true"></div>
+            <span data-i18n="common.loading">Loading…</span>
+          </div>
+        </div>
+
+        <div id="pub-no-results" class="pub-no-results" style="display:none" aria-live="polite">
+          <i class="ph ph-magnifying-glass" style="font-size:40px;color:var(--text-muted);margin-bottom:var(--sp-4)" aria-hidden="true"></i>
+          <p data-i18n="publications.no_results">No publications match your search.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CERN Courier featured banner -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle);padding-bottom:var(--sp-20)">
+      <div class="container">
+        <div class="courier-banner fade-up" role="region" aria-label="CERN Courier">
+          <div class="courier-banner-icon" aria-hidden="true">
+            <i class="ph ph-newspaper-clipping"></i>
+          </div>
+          <div class="courier-banner-body">
+            <div class="eyebrow" style="justify-content:flex-start;margin-bottom:var(--sp-2)">
+              <i class="ph ph-books" aria-hidden="true"></i>
+              International Journal of High Energy Physics
+            </div>
+            <h2 class="heading-lg" style="margin-bottom:var(--sp-3)">CERN Courier</h2>
+            <p class="body-base" style="max-width:540px;color:var(--text-secondary);line-height:1.7;margin-bottom:var(--sp-6)">
+              Digital editions from 2013 to 2026 — curated and archived by NIPSCERN. Covering accelerator physics, detector technology, particle theory, and life at CERN.
+            </p>
+            <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center">
+              <a href="publications/courier.html" class="btn btn-primary btn-lg">
+                <i class="ph ph-newspaper" aria-hidden="true"></i>
+                Browse All Editions
+              </a>
+              <a href="https://cerncourier.com" target="_blank" rel="noopener" class="btn btn-ghost">
+                <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+                cerncourier.com
+              </a>
+            </div>
+          </div>
+          <div class="courier-banner-stat" aria-hidden="true">
+            <div class="courier-stat-number">100+</div>
+            <div class="courier-stat-label">Issues archived</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
+  <script type="module" src="assets/js/main.js"></script>
+  <script type="module">
+    import { initPublications } from './assets/js/publications.js';
+    // Defer until after DOMContentLoaded so main.js has already run
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
+    } else {
+      setTimeout(initPublications, 50);
+    }
+  </script>
+</body>
+</html>
