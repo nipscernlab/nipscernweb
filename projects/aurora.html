@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURORA — Windows IDE for SAPHO | NIPSCERN</title>
+  <meta name="description" content="AURORA was a powerful Windows-only IDE built with Electron for the SAPHO ecosystem. Now succeeded by POLARIS. 25 releases — latest v4.27.10.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://nipscern.com/projects/aurora.html">
+  <meta property="og:title" content="AURORA — Windows IDE for SAPHO | NIPSCERN">
+  <meta property="og:description" content="The original Electron-based IDE for SAPHO. Succeeded by POLARIS.">
+  <meta property="og:image" content="https://nipscern.com/assets/images/projects/aurora.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/projects/aurora.html">
+
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    :root { --page-accent: var(--accent-aurora); }
+
+    /* ── Night sky + Aurora hero ── */
+    .project-hero { position: relative; overflow: hidden; }
+
+    .aurora-bg {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      overflow: hidden;
+      /* Deep blue night sky — visible through the translucent aurora bands */
+      background: linear-gradient(180deg,
+        #010511 0%,
+        #020a1d 20%,
+        #031828 45%,
+        #062040 65%,
+        #0a2a55 80%,
+        #041930 100%
+      );
+    }
+
+    /* ── Aurora SVG ribbon ── */
+    .aurora-svg {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    /* ── Release table ── */
+    .release-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-4);
+      padding: var(--sp-3) var(--sp-4);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: var(--text-xs);
+    }
+    .release-row:last-child { border-bottom: none; }
+    .release-tag {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .release-date { color: var(--text-muted); }
+    .release-note { color: var(--text-secondary); flex: 1; }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="project-hero" style="background:var(--bg-0)" aria-labelledby="aurora-title">
+      <div class="aurora-bg" aria-hidden="true">
+        <svg class="aurora-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 520" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <!-- Horizontal colour gradients for the ribbons -->
+            <linearGradient id="ag1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="rgba(0,0,0,0)"/>
+              <stop offset="6%"   stop-color="rgba(57,255,20,0.28)"/>
+              <stop offset="20%"  stop-color="rgba(0,229,255,0.70)"/>
+              <stop offset="36%"  stop-color="rgba(57,255,20,0.85)"/>
+              <stop offset="52%"  stop-color="rgba(29,233,182,0.80)"/>
+              <stop offset="68%"  stop-color="rgba(0,229,255,0.65)"/>
+              <stop offset="83%"  stop-color="rgba(57,255,20,0.48)"/>
+              <stop offset="94%"  stop-color="rgba(0,200,255,0.22)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            </linearGradient>
+            <linearGradient id="ag2" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="rgba(0,0,0,0)"/>
+              <stop offset="8%"   stop-color="rgba(0,180,166,0.20)"/>
+              <stop offset="26%"  stop-color="rgba(57,255,20,0.50)"/>
+              <stop offset="46%"  stop-color="rgba(0,229,255,0.58)"/>
+              <stop offset="66%"  stop-color="rgba(29,233,182,0.46)"/>
+              <stop offset="86%"  stop-color="rgba(0,200,255,0.28)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            </linearGradient>
+            <!-- Vertical fade for the hanging rays -->
+            <linearGradient id="ag-rays" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="rgba(57,255,20,0.30)"/>
+              <stop offset="42%"  stop-color="rgba(0,229,255,0.12)"/>
+              <stop offset="100%" stop-color="rgba(0,229,255,0)"/>
+            </linearGradient>
+            <!-- Blur filters: tight on x, loose on y to keep ribbon narrow -->
+            <filter id="af1" x="-5%" y="-200%" width="110%" height="500%">
+              <feGaussianBlur stdDeviation="2 6"/>
+            </filter>
+            <filter id="af2" x="-5%" y="-150%" width="110%" height="400%">
+              <feGaussianBlur stdDeviation="4 9"/>
+            </filter>
+            <filter id="afr" x="-5%" y="-10%" width="110%" height="130%">
+              <feGaussianBlur stdDeviation="10 20"/>
+            </filter>
+          </defs>
+
+          <!-- Rays hanging below ribbon 1 -->
+          <path fill="url(#ag-rays)" filter="url(#afr)" opacity="0.72">
+            <animate attributeName="d" dur="22s" repeatCount="indefinite"
+              calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"
+              values="
+                M-180,118 C60,96 240,136 480,108 C720,80 960,118 1200,94 C1320,82 1400,90 1620,84 L1620,330 C1400,338 1320,322 1200,334 C960,350 720,316 480,338 C240,360 60,326 -180,344 Z;
+                M-180,140 C60,120 240,158 480,130 C720,102 960,140 1200,116 C1320,104 1400,112 1620,106 L1620,352 C1400,360 1320,344 1200,356 C960,372 720,338 480,360 C240,382 60,348 -180,366 Z;
+                M-180,118 C60,96 240,136 480,108 C720,80 960,118 1200,94 C1320,82 1400,90 1620,84 L1620,330 C1400,338 1320,322 1200,334 C960,350 720,316 480,338 C240,360 60,326 -180,344 Z
+              "/>
+          </path>
+
+          <!-- Main ribbon 1 — the primary aurora curtain -->
+          <path fill="url(#ag1)" filter="url(#af1)" opacity="0.95">
+            <animate attributeName="d" dur="22s" repeatCount="indefinite"
+              calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"
+              values="
+                M-180,116 C60,94 240,134 480,106 C720,78 960,116 1200,92 C1320,80 1400,88 1620,82 L1620,158 C1400,164 1320,156 1200,164 C960,178 720,144 480,166 C240,188 60,160 -180,176 Z;
+                M-180,138 C60,118 240,156 480,128 C720,100 960,138 1200,114 C1320,102 1400,110 1620,104 L1620,180 C1400,186 1320,178 1200,186 C960,200 720,166 480,188 C240,210 60,182 -180,198 Z;
+                M-180,116 C60,94 240,134 480,106 C720,78 960,116 1200,92 C1320,80 1400,88 1620,82 L1620,158 C1400,164 1320,156 1200,164 C960,178 720,144 480,166 C240,188 60,160 -180,176 Z
+              "/>
+          </path>
+
+          <!-- Secondary ribbon 2 — fainter, lower -->
+          <path fill="url(#ag2)" filter="url(#af2)" opacity="0.60">
+            <animate attributeName="d" dur="30s" repeatCount="indefinite"
+              calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"
+              values="
+                M-180,232 C60,216 240,244 480,222 C720,200 960,232 1200,212 C1320,202 1400,214 1620,208 L1620,264 C1400,270 1320,260 1200,268 C960,282 720,256 480,272 C240,288 60,268 -180,280 Z;
+                M-180,216 C60,234 240,218 480,238 C720,258 960,222 1200,244 C1320,256 1400,242 1620,250 L1620,248 C1400,256 1320,244 1200,252 C960,266 720,240 480,256 C240,272 60,252 -180,264 Z;
+                M-180,232 C60,216 240,244 480,222 C720,200 960,232 1200,212 C1320,202 1400,214 1620,208 L1620,264 C1400,270 1320,260 1200,268 C960,282 720,256 480,272 C240,288 60,268 -180,280 Z
+              "/>
+          </path>
+        </svg>
+      </div>
+      <canvas id="aurora-stars" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none"></canvas>
+      <div class="project-hero-inner" style="position:relative;z-index:2">
+        <div class="project-hero-icon" style="background:rgba(57,255,20,0.10);color:#a5f3b0;border:1px solid rgba(57,255,20,0.25)">
+          <i class="ph ph-app-window" aria-hidden="true"></i>
+        </div>
+        <div class="project-hero-text">
+          <div class="eyebrow fade-up" style="color:rgba(160,230,200,0.78)">
+            <i class="ph ph-archive" aria-hidden="true"></i>
+            Legacy Project · Part of SAPHO
+          </div>
+          <h1 class="project-hero-name fade-up" id="aurora-title">
+            <span style="color:#fff;text-shadow:0 0 28px rgba(57,255,20,0.65),0 0 60px rgba(0,229,255,0.35),0 0 3px rgba(255,255,255,0.9)">AURORA</span>
+          </h1>
+          <p class="project-hero-fullname fade-up" style="color:rgba(205,235,255,0.90)" data-i18n="projects.aurora.full">Windows IDE for the SAPHO Ecosystem</p>
+          <p class="project-hero-desc fade-up" style="color:rgba(185,220,255,0.80)" data-i18n="projects.aurora.desc">
+            AURORA was a powerful, Windows-native IDE built with Electron for the SAPHO ecosystem. It supported CMM programming with Monaco Editor, Icarus Verilog simulation, GTKWave waveform visualisation, and the PRISM RTL Viewer. Over 25 releases (latest v4.27.10), AURORA served as the primary development environment before being succeeded by POLARIS.
+          </p>
+          <div class="project-links fade-up">
+            <a href="https://github.com/nipscernlab/aurora" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-aurora);border-color:var(--accent-aurora)">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              <span data-i18n="projects.github">View on GitHub</span>
+            </a>
+            <a href="polaris.html" class="btn btn-ghost">
+              <i class="ph ph-arrow-right" aria-hidden="true"></i>
+              Succeeded by POLARIS
+            </a>
+            <a href="index.html" class="btn btn-ghost">
+              <i class="ph ph-arrow-left" aria-hidden="true"></i>
+              All Projects
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Badge bar -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
+      <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+        <span class="badge badge-red"><i class="ph ph-app-windows-logo" aria-hidden="true"></i>&nbsp;Windows Only</span>
+        <span class="badge badge-red">Electron</span>
+        <span class="badge badge-gray">v4.27.10 — Final Release</span>
+        <span class="badge badge-gray">25 Releases</span>
+        <span class="badge badge-red">Legacy</span>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container container--narrow">
+
+        <!-- Legacy banner -->
+        <div class="legacy-banner fade-up">
+          <i class="ph ph-archive" aria-hidden="true"></i>
+          <div>
+            <div class="legacy-banner-title" data-i18n="projects.aurora.legacy">Legacy Project — succeeded by POLARIS</div>
+            <div class="legacy-banner-text">
+              AURORA is no longer actively developed. Version 4.27.10 is the final release and the repository is archived for historical reference. All new development happens in <a href="polaris.html" style="color:var(--accent-polaris)">POLARIS</a>, which runs on Linux and Windows with a fraction of the memory footprint.
+            </div>
+          </div>
+        </div>
+
+        <!-- Features -->
+        <div class="fade-up" style="margin-top:var(--sp-8)">
+          <div class="accent-line" style="background:var(--accent-aurora)" aria-hidden="true"></div>
+          <h2 class="heading-lg" data-i18n="projects.aurora.features.title">What AURORA Provided</h2>
+          <p class="body-sm" style="margin-top:var(--sp-3);color:var(--text-secondary)">
+            During its active development lifecycle (approximately 2021–2023), AURORA was the reference IDE for SAPHO and was used by students in the DLP discipline at UFJF. It consolidated the entire toolchain into a single Windows installer.
+          </p>
+          <div class="feature-list" style="margin-top:var(--sp-6)">
+            <div class="feature-item">
+              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-file-code" aria-hidden="true"></i></div>
+              <div>
+                <div class="feature-text" style="font-weight:600">CMM Programming Environment</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Monaco Editor with CMM syntax highlighting, bracket matching, and compiler error underlines.</div>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-terminal" aria-hidden="true"></i></div>
+              <div>
+                <div class="feature-text" style="font-weight:600">YANC Compiler Integration</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">cmmcomp and asmcomp invoked from the UI. Build output displayed in an embedded terminal panel.</div>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-play-circle" aria-hidden="true"></i></div>
+              <div>
+                <div class="feature-text" style="font-weight:600">Icarus Verilog Simulation</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Bundled Icarus Verilog for simulation; AURORA piped the compiled .v testbench directly to iverilog and captured the resulting VCD file.</div>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
+              <div>
+                <div class="feature-text" style="font-weight:600">GTKWave Waveform Viewer</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">GTKWave launched as an embedded subprocess. Students could inspect digital signal timing without leaving the application.</div>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon" style="background:rgba(212,160,23,0.12);color:var(--accent-sapho)"><i class="ph ph-graph" aria-hidden="true"></i></div>
+              <div>
+                <div class="feature-text" style="font-weight:600">PRISM RTL Viewer</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Rendered the synthesised netlist as an interactive schematic. The same PRISM engine was later ported to POLARIS.</div>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-git-commit" aria-hidden="true"></i></div>
+              <div>
+                <div class="feature-text" style="font-weight:600">25 Releases Over Two Years</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Continuous updates from v1.0 through v4.27.10 responding to student and researcher feedback.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Release history -->
+        <div class="fade-up" style="margin-top:var(--sp-8)">
+          <h3 class="heading-sm" style="margin-bottom:var(--sp-4)">Notable Releases</h3>
+          <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);overflow:hidden">
+            <div class="release-row" style="background:var(--bg-elevated);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted)">
+              <span>Version</span>
+              <span class="release-note">Notes</span>
+              <span>Date</span>
+            </div>
+            <div class="release-row">
+              <span class="release-tag">v4.27.10</span>
+              <span class="release-note">Final release — PRISM stability improvements, legacy installer</span>
+              <span class="release-date">2023</span>
+            </div>
+            <div class="release-row">
+              <span class="release-tag">v4.0.0</span>
+              <span class="release-note">Major rewrite — PRISM RTL Viewer integrated natively</span>
+              <span class="release-date">2022</span>
+            </div>
+            <div class="release-row">
+              <span class="release-tag">v3.0.0</span>
+              <span class="release-note">Monaco Editor upgrade, embedded GTKWave subprocess</span>
+              <span class="release-date">2022</span>
+            </div>
+            <div class="release-row">
+              <span class="release-tag">v2.0.0</span>
+              <span class="release-note">Icarus Verilog bundled; automatic testbench simulation pipeline</span>
+              <span class="release-date">2021</span>
+            </div>
+            <div class="release-row">
+              <span class="release-tag">v1.0.0</span>
+              <span class="release-note">Initial release — Monaco Editor + YANC compiler integration</span>
+              <span class="release-date">2021</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Migration CTA -->
+        <div class="info-box fade-up" style="margin-top:var(--sp-8)">
+          <i class="ph ph-info" aria-hidden="true"></i>
+          <p>
+            Starting a new SAPHO project? Use <strong><a href="polaris.html" style="color:var(--accent-polaris)">POLARIS</a></strong> instead. It runs on both Linux and Windows, starts in under one second, uses ~60 MB of memory (vs ~300 MB for AURORA), and ships with YAWT as a built-in wave tracer — eliminating the external GTKWave dependency.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+  <!-- Aurora stars -->
+  <script>
+  (function () {
+    var canvas = document.getElementById('aurora-stars');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Freeze SVG aurora animations if reduced-motion is preferred
+    if (reduced) {
+      document.querySelectorAll('.aurora-svg animate').forEach(function(a) {
+        var vals = a.getAttribute('values');
+        if (vals) { var first = vals.split(';')[0].trim(); a.parentElement.setAttribute('d', first); }
+        a.remove();
+      });
+    }
+    var W, H, stars = [], shooting = null, shootTimer = 4;
+    var NUM_STARS = 120;
+    function resize() {
+      var hero = canvas.parentElement;
+      W = canvas.width  = hero.offsetWidth  || window.innerWidth;
+      H = canvas.height = hero.offsetHeight || Math.round(window.innerHeight * 0.72);
+      stars = [];
+      for (var i = 0; i < NUM_STARS; i++) {
+        stars.push({
+          x: Math.random() * W, y: Math.random() * H,
+          r: 0.3 + Math.random() * 1.4,
+          base: 0.15 + Math.random() * 0.55,
+          freq: 0.3 + Math.random() * 1.1,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+    function newShooter() {
+      var sx = Math.random() * W * 0.7;
+      var sy = Math.random() * H * 0.4;
+      var angle = (20 + Math.random() * 28) * Math.PI / 180;
+      var speed = 350 + Math.random() * 240;
+      return { x: sx, y: sy, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+               life: 1, tail: [] };
+    }
+    var last = 0;
+    function frame(ts) {
+      var dt = Math.min((ts - last) / 1000, 0.05);
+      last = ts;
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        var op = s.base + 0.28 * Math.sin(ts * 0.001 * s.freq * Math.PI * 2 + s.phase);
+        op = Math.max(0.04, Math.min(1, op));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(210,235,255,' + op.toFixed(2) + ')';
+        ctx.fill();
+      }
+      if (!reduced) {
+        shootTimer -= dt;
+        if (shootTimer <= 0 && !shooting) { shooting = newShooter(); shootTimer = 9 + Math.random() * 14; }
+        if (shooting) {
+          shooting.x += shooting.vx * dt;
+          shooting.y += shooting.vy * dt;
+          shooting.life -= dt * 1.2;
+          shooting.tail.push({ x: shooting.x, y: shooting.y, a: shooting.life });
+          if (shooting.tail.length > 18) shooting.tail.shift();
+          ctx.lineCap = 'round';
+          for (var j = 1; j < shooting.tail.length; j++) {
+            var p0 = shooting.tail[j-1], p1 = shooting.tail[j];
+            var a = (j / shooting.tail.length) * Math.max(0, shooting.life) * 0.7;
+            ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y);
+            ctx.strokeStyle = 'rgba(220,240,255,' + a.toFixed(2) + ')';
+            ctx.lineWidth = 1.4 * (j / shooting.tail.length);
+            ctx.stroke();
+          }
+          if (shooting.life <= 0 || shooting.x > W + 40 || shooting.y > H + 40) shooting = null;
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    requestAnimationFrame(frame);
+  })();
+  </script>
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
+</html>

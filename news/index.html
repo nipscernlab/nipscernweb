@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News & Updates — NIPSCERN</title>
+  <meta name="description" content="Lab updates, awards, publications, events, and milestones from the NIPSCERN laboratory at UFJF, Brazil.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://nipscern.com/news/">
+  <meta property="og:title" content="News & Updates — NIPSCERN">
+  <meta property="og:description" content="Lab news from NIPSCERN — publications, awards, events, and milestones.">
+  <meta property="og:image" content="https://nipscern.com/assets/images/og-news.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/news/">
+
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="page-hero" aria-labelledby="news-title">
+      <div class="page-hero-inner">
+        <div class="eyebrow fade-up">
+          <i class="ph ph-newspaper" aria-hidden="true"></i>
+          From the Lab
+        </div>
+        <h1 class="display-lg fade-up" id="news-title" data-i18n="news.title">News &amp; Updates</h1>
+        <p class="body-lg fade-up" style="max-width:560px;margin-top:var(--sp-5)" data-i18n="news.subtitle">
+          Publications, awards, events, and milestones from the NIPSCERN laboratory.
+        </p>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="container">
+        <div class="news-layout">
+
+          <!-- Main feed -->
+          <div id="news-feed" role="list" aria-label="News feed" aria-live="polite">
+            <!-- Populated by news-loader script -->
+            <div style="text-align:center;padding:var(--sp-16);color:var(--text-muted)">
+              <div class="cgv-spinner" style="margin:0 auto var(--sp-4)" aria-hidden="true"></div>
+              <span data-i18n="common.loading">Loading…</span>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <aside class="news-sidebar" aria-label="Recent awards">
+            <div class="sidebar-widget">
+              <div class="sidebar-widget-title" data-i18n="news.sidebar_awards">Recent Awards</div>
+              <div id="sidebar-awards">
+                <!-- Populated by script -->
+              </div>
+            </div>
+
+            <div class="sidebar-widget">
+              <div class="sidebar-widget-title">About the Lab</div>
+              <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_news.svg -->
+              <figure style="text-align:center;margin:0 auto var(--sp-4);max-width:180px;opacity:0.65" aria-hidden="true">
+                <img src="../assets/images/undraw/undraw_news.svg" alt="" width="180" height="115" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
+              </figure>
+              <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.65;margin-bottom:var(--sp-4)">
+                NIPSCERN is a research and development laboratory at UFJF, Brazil, working in collaboration with CERN on high energy physics and scientific computing.
+              </p>
+              <a href="../about.html" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" data-i18n="nav.about">About Us</a>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <script type="module">
+    import { formatDate } from '../assets/js/main.js';
+
+    async function loadNews() {
+      const res = await fetch('../data/news.json');
+      return res.ok ? res.json() : [];
+    }
+
+    function catClass(cat) {
+      const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
+      return m[cat] || 'badge-gray';
+    }
+
+    function makeNewsCard(post) {
+      const article = document.createElement('article');
+      article.className = 'news-card fade-up';
+      article.setAttribute('role', 'listitem');
+      article.id = post.id;
+      article.setAttribute('aria-labelledby', 'post-title-' + post.id);
+
+      // Image section — wraps in <a> so clicking the image also navigates
+      const imgDiv = document.createElement('a');
+      imgDiv.href = 'post.html?id=' + post.id;
+      imgDiv.className = 'news-card-image';
+      imgDiv.tabIndex = -1;         // skip-tab: the Read more link already covers keyboard nav
+      imgDiv.setAttribute('aria-hidden', 'true');
+      if (post.image) {
+        const img = document.createElement('img');
+        img.src = '../' + post.image;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+        const fallbackIcon = document.createElement('i');
+        fallbackIcon.className = 'ph ph-newspaper';
+        fallbackIcon.style.display = 'none';
+        img.onerror = function() { this.style.display = 'none'; fallbackIcon.style.display = ''; };
+        imgDiv.appendChild(img);
+        imgDiv.appendChild(fallbackIcon);
+      } else {
+        const icon = document.createElement('i');
+        icon.className = 'ph ph-newspaper';
+        imgDiv.appendChild(icon);
+      }
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'news-card-body';
+
+      const meta = document.createElement('div');
+      meta.className = 'news-card-meta';
+      const badge = document.createElement('span');
+      badge.className = 'badge ' + catClass(post.category);
+      badge.setAttribute('data-i18n', 'news.categories.' + post.category);
+      badge.textContent = post.category;
+      const dateEl = document.createElement('span');
+      dateEl.className = 'news-date';
+      dateEl.textContent = formatDate(post.date);
+      meta.appendChild(badge);
+      meta.appendChild(dateEl);
+
+      const title = document.createElement('h2');
+      title.className = 'news-title';
+      title.id = 'post-title-' + post.id;
+      title.textContent = post.title;
+
+      const excerpt = document.createElement('p');
+      excerpt.className = 'news-excerpt';
+      excerpt.textContent = post.excerpt;
+
+      const readMore = document.createElement('a');
+      readMore.href = 'post.html?id=' + post.id;
+      readMore.className = 'news-read-more';
+      readMore.setAttribute('data-i18n', 'news.read_more');
+      readMore.textContent = 'Read more ';
+      const arrow = document.createElement('i');
+      arrow.className = 'ph ph-arrow-right';
+      arrow.setAttribute('aria-hidden', 'true');
+      readMore.appendChild(arrow);
+
+      body.appendChild(meta);
+      body.appendChild(title);
+      body.appendChild(excerpt);
+      body.appendChild(readMore);
+
+      article.appendChild(imgDiv);
+      article.appendChild(body);
+      return article;
+    }
+
+    function makeSidebarAward(award) {
+      const div = document.createElement('div');
+      div.className = 'sidebar-award-item';
+      const yearEl = document.createElement('div');
+      yearEl.className = 'sidebar-award-year';
+      yearEl.textContent = String(award.year);
+      const inner = document.createElement('div');
+      const titleEl = document.createElement('div');
+      titleEl.className = 'sidebar-award-text';
+      titleEl.textContent = award.title;
+      const bodyEl = document.createElement('div');
+      bodyEl.style.cssText = 'font-size:11px;color:var(--text-muted);margin-top:2px';
+      bodyEl.textContent = award.body;
+      inner.appendChild(titleEl);
+      inner.appendChild(bodyEl);
+      div.appendChild(yearEl);
+      div.appendChild(inner);
+      return div;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const posts = await loadNews();
+      const feed = document.getElementById('news-feed');
+      const sidebarAwards = document.getElementById('sidebar-awards');
+
+      if (feed && posts) {
+        feed.replaceChildren();
+        posts.forEach((post, i) => {
+          const card = makeNewsCard(post);
+          feed.appendChild(card);
+          setTimeout(() => card.classList.add('visible'), i * 100 + 200);
+        });
+      }
+
+      if (sidebarAwards) {
+        const awards = posts.flatMap(p => (p.awards || []).map(a => ({ ...a, postId: p.id })));
+        sidebarAwards.replaceChildren();
+        if (awards.length > 0) {
+          awards.slice(0, 5).forEach(a => sidebarAwards.appendChild(makeSidebarAward(a)));
+        } else {
+          const p = document.createElement('p');
+          p.style.cssText = 'font-size:var(--text-xs);color:var(--text-muted)';
+          p.textContent = 'No awards listed yet.';
+          sidebarAwards.appendChild(p);
+        }
+      }
+    });
+  </script>
+
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
+</html>

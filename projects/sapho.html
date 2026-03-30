@@ -1,611 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="keywords" lang="en" content="sapho, cern, Scalable Architecture Processor for Hardware Optimization, ATLAS, AURA IDE, ALICE, compiler, cmm language, c+-, asm compiler, helvetia, Infinity Manager" />
-        <meta name="keywords" lang="pt" content="sapho, cern, Processador de Arquitetura Escalável para Otimização de Hardware, ATLAS, AURA IDE, ALICE, compilador, linguagem cmm, c+-, compilador asm, helvetia, Infinity Manager" />
-        <meta name="keywords" lang="fr" content="sapho, cern, processeur d'architecture évolutive pour l'optimisation matérielle, ATLAS, AURA IDE, ALICE, compilateur, langage cmm, c+-, compilateur asm, helvetia, Infinity Manager" />
-        <meta name="keywords" lang="no" content="sapho, cern, skalerbar arkitekturprosessor for maskinvareoptimalisering, ATLAS, AURA IDE, ALICE, kompilator, cmm-språk, c+-, asm-kompilator, helvetia, Infinity Manager" />
-        <meta name="google" content="notranslate">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAPHO — Scalable Architecture for Hardware Optimization | NIPSCERN</title>
+  <meta name="description" content="SAPHO is a scalable hardware architecture and toolchain for processor creation, experimentation, and hardware–software co-design. Includes YANC, POLARIS, YAWT, and PRISM. Developed at NIPSCERN/UFJF.">
 
-        <meta name="author" content="NIPSCERN" />
-        
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <meta name="description" lang="en" content="Explore SAPHO, a Scalable Processor Optimized for the new CERN upgrade. Discover how SAPHO provides advanced solutions for hardware optimization. Learn more now!" />
-        <meta name="description" lang="pt" content="Explore o SAPHO, um processador escalável otimizado para a nova atualização do CERN. Descubra como o SAPHO fornece soluções avançadas para otimização de hardware. Saiba mais agora!" />
-        <meta name="description" lang="fr" content="Découvrez SAPHO, un processeur évolutif optimisé pour la nouvelle mise à niveau du CERN. Découvrez comment SAPHO fournit des solutions avancées pour l'optimisation du matériel. Apprenez-en plus maintenant !" />
-        <meta name="description" lang="no" content="Utforsk SAPHO, en skalerbar prosessor optimalisert for den nye CERN-oppgraderingen. Oppdag hvordan SAPHO tilbyr avanserte løsninger for maskinvareoptimalisering. Lær mer nå!" />
-        <meta property="og:title" content=">SAPHO - Scalable Architecture Processor for Hardware Optimization | NIPSCERN Lab" />
-        <meta property="og:description" content="Explore SAPHO, a Scalable Processor Optimized for the new CERN upgrade. Discover how SAPHO provides advanced solutions for hardware optimization. Learn more now!" />
-        <meta property="og:image" content="/assets/icons/icon_sapho_memory_128.svg" />
-        <meta property="og:url" content="https://nipscern.com//projects//sapho" />
-        <meta property="og:type" content="website" />
-        <link rel="apple-touch-icon" href="/assets/icons/icon_sapho_memory_128.svg">
-        <meta name="msapplication-TileColor" content="#0033A0">
-        <meta name="theme-color" content="#0033A0">
-    
-        <link rel="icon" alt="Icon Representing Processor" href="/assets/icons/icon_sapho_memory_128.svg" type="image/svg+xml" sizes="128x128" />
-        <meta charset="UTF-8">
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://nipscern.com/projects/sapho.html">
+  <meta property="og:title" content="SAPHO — Scalable Architecture for Hardware Optimization">
+  <meta property="og:description" content="Complete toolchain for processor creation, experimentation, and hardware–software co-design. Built at NIPSCERN.">
+  <meta property="og:image" content="https://nipscern.com/assets/images/projects/sapho.jpg">
 
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        
-        <title data-i18n="sapho_title">SAPHO - Scalable Architecture Processor for Hardware Optimization | NIPSCERN Lab</title>
-    
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://nipscern.com/projects/sapho.html">
 
-        <!-- Bootstrap CSS for layout and components -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
 
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
 
-        <!-- AOS for animations -->
-        <link href="https://cdn.jsdelivr.net/npm/aos@next/dist/aos.css" rel="stylesheet">
+  <style>
+    :root { --page-accent: var(--accent-sapho); --page-accent-dim: rgba(212,160,23,0.12); }
+  </style>
+</head>
+<body>
 
-        <!-- Prism.js for syntax highlighting -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
 
-        <!-- FontAwesome for icons -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <main id="main">
 
-        
-        <!-- Custom CSS -->
-        <link rel="stylesheet" href="/css/sapho.css">
-        <link rel="stylesheet" href="/css/dark.css">
-        <link rel="stylesheet" href="/css/footer.css">
-        
-        <!-- Custom JS -->
-        <script src="/js/sapho.js"></script>
-    </head>
-    <body>
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-dark">
-                <div class="container-fluid">
-                    <!-- Navbar Brand (Logo or Icon) -->
-                    <span class="material-symbols-outlined" style="font-size: 40px; background: gold; -webkit-background-clip: text; color: transparent;">memory
-                    </span>
-                    <!-- Toggler for Mobile Menu -->
-                    <button class="navbar-toggler custom-toggler" id="navbarToggler" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <!-- Collapsible Navbar Menu -->
-                    <div class="navbar-collapse custom-collapse" id="navbarNav">
-                        <ul class="navbar-nav ms-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="../index.html"><i class="fa-solid fa-house"></i></a>
-                            </li>
-                            <li class="nav-item">
-                                <a data-i18n="sapho_nav_introduction" class="nav-link" href="#introduction">Introduction</a>
-                            </li>
-                            <li class="nav-item">
-                                <a data-i18n="sapho_nav_ide" class="nav-link" href="#ide">IDE</a>
-                            </li>
-                            <li class="nav-item">
-                                <a data-i18n="sapho_nav_compiler" class="nav-link" href="#compilers">Compilers</a>
-                            </li>
-                            <li class="nav-item">
-                                <a data-i18n="sapho_nav_media" class="nav-link" href="#media">Media &amp; Resources</a>
-                            </li>
-                            <li class="nav-item">
-                                <a data-i18n="sapho_nav_references" class="nav-link" href="#references">References</a>
-                            </li>
-                        </ul>
-                        <!-- Dark Mode Toggle Button -->
-                        <button class="theme-toggle" id="theme-toggle" title="Toggles light & dark" aria-label="auto" aria-live="polite">
-                            <svg class="sun-and-moon" aria-hidden="true">
-                                <mask class="moon" id="moon-mask">
-                                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
-                                    <circle cx="24" cy="10" r="6" fill="black" />
-                                </mask>
-                                <circle class="sun" cx="12" cy="12" r="6" mask="url(#moon-mask)" fill="currentColor" />
-                                <g class="sun-beams" stroke="currentColor">
-                                    <line x1="12" y1="1" x2="12" y2="3" />
-                                    <line x1="12" y1="21" x2="12" y2="23" />
-                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                                    <line x1="1" y1="12" x2="3" y2="12" />
-                                    <line x1="21" y1="12" x2="23" y2="12" />
-                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                                </g>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </nav>
-        </header>
-        <!-- Hero Section -->
-        <section class="hero" id="home">
-            <h1>SAPHO</h1>
-            <p data-i18n="sapho_subtitle" class="subtitle">Scalable Architecture Processor for Hardware Optimization.</p>
-            <div class="buttons mt-4">
-                <a aria-label="GitHub Button" href="https://github.com/chrysthofer/Alice" class="btn btn-primary">
-                <i  class="fab fa-github"></i> GitHub
-                </a>
-                <a aria-label="Download Button" href="/projects/sapho-download.html" class="btn btn-primary btn-circle">
-                <i class="fas fa-download"></i>
-                </a>
-                <a aria-label="Documentation Button" data-i18n="sapho_documentation" href="/projects/helvetia.html" class="btn btn-secondary">Go to Documentation</a>   
-            </div>
-        </section>
-        
-        <!-- SAPHO: an Introduction Section -->
-        <section class="content-section bg-light" id="introduction">
-            <div class="content">
-                <h2><span class="material-symbols-outlined">flag</span> <a data-i18n="sapho_introduction_title">SAPHO: an Introduction</a>
-                </h2>
-                <p data-i18n="sapho_introduction">
-                    The fixed architecture of currently available Processor Soft Cores (PSCs) is a common characteristic among them. This means that the same amount of hardware resources is allocated regardless of the embedded program. Furthermore, the word size is fixed and is typically oversized. This website presents a scalable soft-core processor developed at the Signal Processing and Instrumentation Core of the Engineering Faculty at UFJF (Federal University of Juiz de Fora).
-                </p>
-                <h3 data-i18n="sapho_overview_title">Overview of SAPHO</h3>
-                <p data-i18n="sapho_overview_open-source">
-                    SAPHO, which stands for Scalable Architecture Processor for Hardware Optimization, is an open-source soft-core processor designed to automatically allocate necessary hardware resources during the compile time of embedded programs. It is primarily used in multi-core processing frameworks and has been implemented in various established systems.
-                </p>
-                <p data-i18n="sapho_overview_compilers">
-                    The functionality of SAPHO is based on its two compilers, accessible through its main Integrated Development Environment (IDE). The first compiler, C+−, is responsible for interpreting programs written in a subset of the C language and converting them into Assembly language. The second compiler takes the Assembly code generated by the first compiler and translates it into machine code, allocating the required hardware resources and generating a configuration file in Verilog.
-                </p>
-                <br>
-                <p data-i18n="sapho_overview_assembler">
-                    The assembler first identifies the instructions produced by the user-written program and then creates only the hardware resources needed for execution. Most configurations, such as the development of internal circuits for the Arithmetic Logic Unit (ALU), are automated. Programmers can modify additional features, including word size, ALU type (fixed-point or floating-point), and the number of input and output ports, using compilation directives.
-                </p>
-                <p data-i18n="sapho_overview_psc">
-                    A key distinction between SAPHO and available PSCs lies in its ability to adjust its architecture based on the implemented program. However, it loses the ability to update the program during runtime. Nonetheless, in many current applications, the advantages of resource optimization justify this limitation.
-                </p>
-                <span class="memory-icon material-symbols-outlined" alt="Memory Icon" style="font-size: 48px;">memory</span><br><br>
-                <br>
-                <h3 data-i18n="sapho_description_title">Description of SAPHO</h3>
-                <p data-i18n="sapho_description_harvard">
-                    SAPHO is based on a Harvard architecture and features a Reduced Instruction Set Computer (RISC) design, which allows it to determine the necessary hardware resources based on the user's application. The Arithmetic Logic Unit (ALU) within SAPHO can be configured for both fixed-point and floating-point operations, and its memory systems—both data and program—feature self-scaling addresses.
-                </p>
-                <p data-i18n="sapho_description_tools">
-                    In addition to the processor itself, which includes its core and two memory units, several tools have been developed to facilitate programming. These tools include a development interface, a compiler that interprets a subset of the C language known as C+−, and an assembler.
-                </p>
-                <p data-i18n="sapho_advantages_title">
-                    Some of the advantages of using the SAPHO processor include:
-                </p>
-                <ul>
-                    <li><b data-i18n="sapho_advantages_instruction_title">Single Instruction Execution per Clock Cycle:</b> <a data-i18n="sapho_advantages_instruction">it can execute one instruction per clock cycle, even in routines with conditional jumps, without disrupting the pipeline, thanks to its three-stage pipeline architecture.</a></li>
-                    <li><b data-i18n="sapho_advantages_alu_title">Configurable ALU:</b> <a data-i18n="sapho_advantages_alu">the ALU can be adjusted for variable word sizes and can handle both fixed-point and floating-point operations.</a></li>
-                    <li><b data-i18n="sapho_advantages_resource_title">Parameterized Resource Allocation:</b> <a data-i18n="sapho_advantages_resource">resources are allocated in a parameterized manner at design time, tailored to the specific application developed.</a></li>
-                    <li><b data-i18n="sapho_advantages_flexibility_title">Programming Flexibility:</b> <a data-i18n="sapho_advantages_flexibility">users can program the processor using either a subset of the C language or directly in Assembly language.</a></li>
-                </ul>
-                <br>
-                <h3 data-i18n="sapho_architecture_title">Hardware Architecture of SAPHO</h3>
-                <p data-i18n="sapho_architecture_blocks">
-                    The primary blocks of the SAPHO architecture are illustrated in Figure 1, where solid lines indicate the flow of data, and dashed lines represent control signals. The light yellow blocks are instantiated automatically on demand, depending on the embedded program, while the light blue blocks are always instantiated. As both memory units are synchronous, the three pipeline stages required by the processor are depicted in Figure 2.
-                </p>
-                <p data-i18n="sapho_architecture_instructions">
-                    Logical-arithmetic instructions, such as addition, multiplication, or comparisons, typically require two arguments to execute. However, in SAPHO, the assembler is designed to operate with just one memory address, as the second parameter for the operation is the value previously stored in the main accumulator (ACC) from the output of the ALU.
-                </p>
-                <p data-i18n="sapho_architecture_data">
-                    Pointers for the data stack and instruction stack (Stack Pointer and Instruction Pointer) manage the read and write operations in their respective stacks, which are shared between the data and program memories. In the data memory, the stack is used for temporary data storage via PUSH and POP instructions and their variants. In the program memory, the stack enables the use of subroutines with CALL and RETURN instructions.
-                </p>
-                <p data-i18n="sapho_architecture_circuits">
-                    When the ALU is configured for floating-point operations, transformation circuits between fixed-point and floating-point representations are automatically instantiated on the input and output buses, allowing the processor to communicate with I/O devices using integers in two's complement notation.
-                </p>
-                <img alt="SAPHO Processor Block Diagram" src="/assets/images/image_sapho_block_diagram.svg">
-                <p data-i18n="sapho_architecture_block_image" class="image-description">Image: SAPHO Processor Block Diagram (1).</p>
-                
-                <img alt="Diagram of pipeline stages executed by SAPHO" src="/assets/images/image_sapho_pipeline.svg"  class="responsive-img">
-                <p data-i18n="sapho_architecture_pipeline_image" class="image-description">Image: diagram of pipeline stages executed by SAPHO (2).</p>
-                
-                <br>
-                <p data-i18n="sapho_architecture_explanation">Below you can see a more detailed explanation of each processor block shown in Figure 1.</p>
-                <ul class="collapsible">
-                    <li>
-                        <div class="collapsible-header">
-                            <i aria-label="Data and Program Memory" class="material-icons">arrow_drop_down</i><a data-i18n="sapho_architecture_program">Data and Program Memory</a>
-                        </div>
-                        <div class="collapsible-body">
-                            <span><a data-i18n="sapho_code">As previously mentioned, the sizes of the data and program memories are determined by the written code. The assembly compiler calculates the number of addresses required to store all instructions and variables from the program code, thus parameterizing the instance of the memories. The assembler generates the content of these memories and saves it in memory initialization files (with a .mif extension), which are instantiated in the FPGA along with the processor hardware.</a></span>
-                        </div>
-                    </li>
-                </ul>
-                <ul class="collapsible">
-                    <li>
-                        <div class="collapsible-header">
-                            <i aria-label="Program Counter - PC" class="material-icons">arrow_drop_down</i><a data-i18n="sapho_program_counter">Program Counter - PC</a>
-                        </div>
-                        <div class="collapsible-body">
-                            <span><a data-i18n="sapho_program_counter_text">This block points to the location of the instruction in memory to be read from the program memory. During normal program execution, it is incremented after each instruction. When a jump instruction is detected, it is loaded with a specific value that refers to the next instruction. The size, in bits, of the PC is defined by the assembly compiler based on the size of the program memory.</a></span>
-                        </div>
-                    </li>
-                </ul>
-                <ul class="collapsible">
-                    <li>
-                        <div class="collapsible-header"><i aria-label="Prefetch" class="material-icons">arrow_drop_down</i><a data-i18n="sapho_prefetch">Prefetch</a></div>
-                        <div class="collapsible-body"><span><a data-i18n="sapho_prefetch_text">While the processor executes the current instruction, it also fetches the next instruction from the program memory (ROM) (1st pipeline stage). It separates the opcode from the operand, which are concatenated in the ROM, and controls the instruction decoder and the program counter.</a></span></div>
-                    </li>
-                </ul>
-                <ul class="collapsible">
-                    <li>
-                        <div class="collapsible-header"><i aria-label="Instruction Decoder" class="material-icons">arrow_drop_down</i><a data-i18n="sapho_decoder_text">Instruction Decoder</a></div>
-                        <div class="collapsible-body"><span><a data-i18n="sapho_decoder">The instruction decoder receives the opcode, interprets it, and sends the correct control signals, such as those for the ALU operation, enabling data output, assigning values in the Register File when arrays are used, enabling data writing to memory, and sending PUSH and POP signals to the Stack Pointer, among others.</a></span></div>
-                    </li>
-                </ul>
-                <ul class="collapsible">
-                    <li>
-                        <div class="collapsible-header"><i aria-label="Stack Pointer" class="material-icons">arrow_drop_down</i><a data-i18n="sapho_pointer">Stack Pointer</a></div>
-                        <div class="collapsible-body"><span><a data-i18n="sapho_pointer_text">There are two Stack Pointers: one for data and one for instructions (identified in Figure 16 as Instruction Pointer). They point to the top of the stack, where the data and program memory receive the highest addresses. Assembly instructions PUSH and POP allow adding and removing elements from the top of the stack. The return address for a function call made using the CALL instruction fills the instruction stack. The instruction stack and its corresponding stack pointer are only generated when the use of subroutines (CALL and RETURN instructions) is recognized.</a></span></div>
-                    </li>
-                </ul>
-                <ul class="collapsible">
-                    <li>
-                        <div class="collapsible-header"><i aria-label="Register File" class="material-icons">arrow_drop_down</i><a data-i18n="sapho_register_text">Register File</a></div>
-                        <div class="collapsible-body"><span><a data-i18n="sapho_register">The Register File is created whenever arrays are used in the user's program. Its function is to correctly index the elements of the array, offsetting the memory position of the first element to access the desired element's position.</a></span></div>
-                    </li>
-                </ul>
-                <ul class="collapsible">
-                    <li>
-                        <div class="collapsible-header"><i aria-label="Arithmetic Logic Unit (ALU)" class="material-icons">arrow_drop_down</i><a data-i18n="sapho_alu">Arithmetic Logic Unit (ALU)</a></div>
-                        <div class="collapsible-body"><span><a data-i18n="sapho_alu_text">The ALU of this soft-core processor offers a significant degree of automated parameterization flexibility. As a result, the processor's structure can be modified to suit its intended purpose. The ALU is automatically parameterized by the assembly compiler based on the instructions produced by the C+− compiler, in addition to parameters selected by the user at design time, such as fixed-point or floating-point arithmetic and the bit size of the word. The circuits created automatically by the assembler can be found in Table 2. The third column indicates which circuits are created within the ALU, while the others are created externally. The following columns show which circuits are created for fixed-point or floating-point processors.</a></span></div>
-                    </li>
-                </ul>
-                <br>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th data-i18n="sapho_table_instruction">Instruction</th>
-                                <th data-i18n="sapho_table_circuit">Circuit</th>
-                                <th data-i18n="sapho_table_alu">ALU</th>
-                                <th data-i18n="sapho_table_fixed_point">Fixed Point</th>
-                                <th data-i18n="sapho_table_floating_point">Floating Point</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>DIV</td>
-                                <td data-i18n="sapho_table_division">Division</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td>X</td>
-                            </tr>
-                            <tr>
-                                <td>OR</td>
-                                <td data-i18n="sapho_table_bitwise_or">Bitwise OR</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>LOR</td>
-                                <td data-i18n="sapho_table_logical_or">Logical OR</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>GRE</td>
-                                <td data-i18n="sapho_table_greater">Greater than</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>MOD</td>
-                                <td data-i18n="sapho_table_mod">Modulo</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td>X</td>
-                            </tr>
-                            <tr>
-                                <td>MLT</td>
-                                <td data-i18n="sapho_table_mult">Multiplication</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td>X</td>
-                            </tr>
-                            <tr>
-                                <td>LES</td>
-                                <td data-i18n="sapho_table_less">Less than</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>EQU</td>
-                                <td data-i18n="sapho_table_equal">Equal to</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>AND</td>
-                                <td data-i18n="sapho_table_bitwise_and">Bitwise AND</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>LAN</td>
-                                <td data-i18n="sapho_table_logical_and">Logical AND</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>INV</td>
-                                <td data-i18n="sapho_table_bitwise_not">Bitwise NOT</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>LIN</td>
-                                <td data-i18n="sapho_table_logical_not">Logical NOT</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>SHR</td>
-                                <td data-i18n="sapho_table_shift_r">Shift Right</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>SHL</td>
-                                <td data-i18n="sapho_table_shift_l">Shift Left</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>SRS</td>
-                                <td data-i18n="sapho_table_arithmetic">Arithmetic Shift</td>
-                                <td>X</td>
-                                <td>X</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>CALL</td>
-                                <td data-i18n="sapho_table_stack">Stack Pointer</td>
-                                <td>X</td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>SRF</td>
-                                <td data-i18n="sapho_table_indirect">Indirect Addressing</td>
-                                <td>X</td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p data-i18n="sapho_table_note">Table: Instructions and respective circuits created automatically.</p>
-                <br>
-                <h3 data-i18n="sapho_software_overview">Software Overview of SAPHO</h3>
-                <p data-i18n="sapho_software_verilog">
-                    The SAPHO processor automatically generates Verilog code based on programs written in a language called C+−. This process is facilitated by an Integrated Development Environment (IDE) designed specifically for invoking two necessary compilers: the C+− compiler and the Assembly compiler. After invoking these compilers, the IDE produces parametrized hardware description code, with the data and program memories correctly initialized.
-                </p>
-                <p data-i18n="sapho_software_conversion">
-                    This streamlined approach allows developers to efficiently convert high-level C+− code into a low-level hardware description suitable for FPGA implementation, optimizing the process of hardware design and ensuring that the necessary memory structures are in place for the intended application.
-                </p>
-            </div>
-        </section>
-        
-        <!-- IDE Section -->
-        <section class="content-section" id="ide">
-            <div class="content">
-                <h2><span class="material-symbols-outlined">integration_instructions</span> <a data-i18n="sapho_ide_title">Integrated Development Environment (IDE) Overview</a>
-                </h2>
-                <p data-i18n="sapho_ide_subtitle">
-                    The SAPHO processor's IDE, developed in C#, provides essential features for parameterization and compiler invocation. The main interface includes five key areas:
-                </p>
-                <ul>
-                    <li><b data-i18n="sapho_ide_menu_title">Menu Bar:</b> <a data-i18n="sapho_ide_menu">offers options for creating new projects, managing the current project, or exiting the application.</a></li>
-                    <li><b data-i18n="sapho_ide_toolbar_title">Toolbar:</b> <a data-i18n="sapho_ide_toolbar">located below the menu bar, it features quick-access icons for adding new processors and invoking the C+− and Assembly compilers.</a></li>
-                    <li><b data-i18n="sapho_ide_tree_title">Project Hierarchy Tree:</b> <a data-i18n="sapho_ide_tree">displays all processors within the project and allows access to C+− and assembly files for each processor.</a></li>
-                    <li><b data-i18n="sapho_ide_window_title">Programming Window:</b> <a data-i18n="sapho_ide_window">enables users to write and view code in C+− and Assembly, organized through open tabs.</a></li>
-                    <li><b data-i18n="sapho_ide_console_title">Console Window:</b> <a data-i18n="sapho_ide_console">displays compilation messages, including errors and warnings, and shows the number of instructions and variables after successful compilation.</a></li>
-                </ul>
-                <br>
-                <h3 data-i18n="sapho_project_title">Creating a New Project</h3>
-                <p data-i18n="sapho_project_subtitle">
-                    Upon opening the IDE, users must create a new project by navigating to File > New Project, where they can name the project and select a directory (avoiding spaces or special characters). Once created, the project appears in the hierarchy tree, and options for adding processors become available.
-                </p>
-                <br>
-                <h3 data-i18n="sapho_project_ide_title">Adding a Processor in the IDE</h3>
-                <p data-i18n="sapho_project_ide_subtitle">After creating a project, users can add a processor by clicking the enabled button, which opens the processor configuration screen. This screen includes four main configuration fields:</p>
-                <ul>
-                    <li><b data-i18n="sapho_project_general_title">General Settings:</b> <a data-i18n="sapho_project_general_before">users provide a name for the processor, which will also be used for the generated</a> <code>.c</code> <a data-i18n="sapho_project_general_inter_after"> and</a> <code>.asm</code> <a data-i18n="sapho_project_general_after">files.</a></li>
-                    <li><b data-i18n="sapho_project_alu_title">ALU Settings:</b> <a data-i18n="sapho_project_alu">users can choose the number of bits for fixed-point representation or specify the number of bits for the mantissa and exponent in floating-point representation.</a></li>
-                    <li><b data-i18n="sapho_project_memory_title">Memory Stack Settings:</b> <a data-i18n="sapho_project_memory">the sizes of the Data and Instruction stacks are defined here if they are utilized.</a></li>
-                    <li><b data-i18n="sapho_project_io_title">Input/Output Settings:</b> <a data-i18n="sapho_project_io">users establish the number of input and output addresses.</a></li>
-                </ul>
-                <br>
-                <p>
-                    <a data-i18n="sapho_project_config_before">All configuration parameters are automatically written as compilation directives at the beginning of the</a> <code>.c</code> <a data-i18n="sapho_project_config_after">file, serving as a header and influencing the hardware resources used.</a>
-                </p>
-                <p>
-                    <a data-i18n="sapho_project_data_mif_before">Upon completing the compilation process (C+− followed by Assembly), two memory initialization files,</a> <code>data.mif</code> <a data-i18n="sapho_project_data_mif_inter">and</a> <code>inst.mif</code>, <a data-i18n="sapho_project_data_mif_after">are created, containing the contents of the data and program memories, respectively. Additionally, a Verilog file is generated, encapsulating the parameters specified in the SAPHO IDE for hardware instantiation.</a>
-                </p>
-                <p data-i18n="sapho_project_figure_title">
-                    Figures illustrate the processor configuration screen, the project folder structure, and a flowchart detailing the project creation process in SAPHO.
-                </p>
-                <img alt="Folder structure of a project in SAPHO" src="/assets/images/image_sapho_files.svg"  class="responsive-img">
-                <p data-i18n="sapho_project_folder_image">
-                    Image: folder structure of a project in SAPHO (3).
-                </p>
-                <br>
-                <img alt="Flowchart of the process of creating a project in SAPHO" src="/assets/images/image_sapho_flow_chart.svg" class="responsive-img flow-image">
-                <p data-i18n="sapho_project_flow_image">Image: flowchart of the process of creating a project in SAPHO (4).</p>
-                <br>
-            </div>
-        </section>
-        
-        <!-- Compilers -->
-        <section class="content-section" id="compilers">
-            <div class="content">
-                <h2><span class="material-symbols-outlined">computer</span> <a data-i18n="sapho_compilers_title">Compilers</a>
-                </h2>
-                <h3 data-i18n="sapho_c_compiler_title">C Compiler</h3>
-                <p data-i18n="sapho_c_compiler_subtitle">
-                    The C compiler for the SAPHO processor is developed using GNU Flex and Bison, focusing on keyword identification and pattern recognition. It employs a subset of the C language, incorporating specific keywords and operators to enhance syntax friendliness. Notably, the SAPHO compiler introduces additional operators not found in standard C, aimed at optimizing signal processing algorithms. Key features include:
-                </p>
-                <ul>
-                    <li><b data-i18n="sapho_sps_title">Single-file Program Structure:</b> <a data-i18n="sapho_sps">the program must be contained in one file and supports subroutines, enabling automatic instruction stack creation for function returns and recursive algorithms.</a></li>
-                    <li><b data-i18n="sapho_compiler_pointer_title">Pointer Limitations:</b> <a data-i18n="sapho_compiler_pointer">pointers are restricted to indexing fixed-size one-dimensional arrays to facilitate prior memory size calculation.</a></li>
-                    <li><b data-i18n="sapho_compiler_memory_title">No Dynamic Memory Allocation:</b> <a data-i18n="sapho_compiler_memory">this restriction ensures efficient hardware resource utilization. When arrays are declared, the compiler generates necessary indirect addressing circuits.</a></li>
-                </ul>
-                <br>
-                <p data-i18n="sapho_functions_title">
-                    Supported functions, keywords, and operators are summarized in a table, showcasing the capabilities of the C compiler.
-                </p>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th data-i18n="sapho_table_category_title">Category</th>
-                                <th data-i18n="table_content_title">Content</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td data-i18n="sapho_table_functions">Functions</td>
-                                <td>in(), out()</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="sapho_table_keywords">Keywords</td>
-                                <td>int,  float,  void,  return,  while,  if, else</td>
-                            </tr>
-                            <tr>
-                                <td data-i18n="sapho_table_operators">Operators</td>
-                                <td>&minus; &plus; &ast; &sol; &lt;&gt; &excl; &raquo; &laquo; &ge; &le; &equals;&equals; &ne; &amp;&amp; &vert;&vert;</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <br>
-                <h3 data-i18n="sapho_asm_compiler_title">Assembler Compiler</h3>
-                <p data-i18n="sapho_asm_compiler_subtitle">
-                    The assembler compiler features 49 instructions and generates the Verilog file that describes the processor's hardware, alongside initialization files for the associated memories. Built with GNU Flex, it effectively recognizes opcodes and operands. Key capabilities include:
-                </p>
-                <ul>
-                    <li><b data-i18n="sapho_asm_variable_title">Instruction and Variable Recognition:</b> <a data-i18n="sapho_asm_variable">it assesses the total number of program instructions and required variables to allocate the correct size for both program and data memory.</a></li>
-                </ul>
-                <br>
-                <h3 data-i18n="sapho_asm_fpf_title">Proposed Floating-Point Format</h3>
-                <p>
-                    <a data-i18n="sapho_asm_i3e_before">In digital circuits, floating-point numbers are typically represented according to the</a> <code>IEEE 754</code> <a data-i18n="sapho_asm_i3e_after">standard, using 32 bits for single precision and 64 bits for double precision. This standard includes special number representations and defines arithmetic operations.</a>
-                </p>
-                <p data-i18n="sapho_asm_754">
-                    The SAPHO processor adopts a simplified floating-point representation, designed for better hardware efficiency and data flow. This format maintains the essential structure of IEEE 754, consisting of a sign bit (S), mantissa (M), and exponent (E). However, the exponent is represented using two's complement, facilitating hardware implementation. This representation is described mathematically as follows:
-                </p>
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
-                    <mn>(</mn>
-                    <mo>-</mo>
-                    <mn>1</mn>
-                    <msup>
-                        <mn>)</mn>
-                        <mi>S</mi>
-                    </msup>
-                    <mo>&times;</mo>
-                    <mi>M</mi>
-                    <mo>&times;</mo>
-                    <msup>
-                        <mn>2</mn>
-                        <mi>E</mi>
-                    </msup>
-                </math>
-                <p data-i18n="sapho_asm_mantissa">
-                    This approach allows for a flexible range of mantissa and exponent values, optimizing the processor's performance in handling floating-point arithmetic.
-                </p>
-            </div>
-        </section>
-        
-        <!-- Media Section -->
-        <section class="content-section" id="media">
-            <div class="content">
-                <h2><span class="material-symbols-outlined">
-                    slideshow
-                    </span> <a data-i18n="sapho_media_resources">Media & Resources</a>
-                </h2>
-                <video alt="SAPHO IDE" autoplay loop muted playsinline class="video-loop">
-                    <source src="/assets/videos/video_sapho_ide_action.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-                <br>
-                <div class="video-container">
-                    <iframe aria-label="HARVARD Architecture vs Von Neumann Architecture" width="600" height="338" src="https://www.youtube.com/embed/4nY7mNHLrLk" title="ATLAS Experiment Video" frameborder="0" allowfullscreen></iframe>
-                </div>
-                <p data-i18n="sapho_media_resources_note">For more detailed insights into SAPHO, watch the videos above or explore additional articles and resources below.</p>
-            </div>
-        </section>
-        
-        <!-- References Section -->
-        <section class="content-section bg-light" id="references">
-            <div class="content">
-                <h2><span class="material-symbols-outlined">
-                    science
-                    </span> <a data-i18n="sapho_references_title">References</a>
-                </h2>
-                <p data-i18n="sapho_references_subtitle">This section includes resources on processor architecture, advancements in fast computation, and research articles for in-depth study:</p>
-                <ul class="references">
-                    <li><span class="material-symbols-outlined">hardware</span><a data-i18n="sapho_references_intel" href="https://www.intel.com/content/www/us/en/research/overview.html" target="_blank">Intel Research - Processor and Architecture</a></li>
-                    <li><span class="material-symbols-outlined">memory</span><a data-i18n="sapho_references_arm" href="https://www.arm.com/architecture" target="_blank">ARM - Processor Architecture</a></li>
-                    <li><span class="material-symbols-outlined">speed</span><a data-i18n="sapho_references_nature" href="https://www.nature.com/articles/d41586-020-02757-5" target="_blank">Nature - Quantum Computing Breakthroughs</a></li>
-                    <li><span class="material-symbols-outlined">auto_graph</span><a data-i18n="sapho_references_acm" href="https://dl.acm.org/journal/taco" target="_blank">ACM Journal on Computing Architectures</a></li>
-                    <li><span class="material-symbols-outlined">sync</span><a data-i18n="sapho_references_tom" href="https://www.tomshardware.com/pc-components/cpus" target="_blank">Tom's Hardware - Understanding CPUs</a></li>
-                    <li><span class="material-symbols-outlined">trending_up</span><a data-i18n="sapho_references_i3e" href="https://www.ieee.org/searchresults/index.html?q=computer+architecture#gsc.tab=0&gsc.q=computer%20architecture&gsc.page=1" target="_blank">IEEE - Computer Architecture</a></li>
-                    <li><span class="material-symbols-outlined">insights</span><a data-i18n="sapho_references_arxiv" href="https://arxiv.org/list/cs.AR/recent" target="_blank">arXiv - Latest in Computer Architecture</a></li>
-                    <li><span class="material-symbols-outlined">tune</span><a data-i18n="sapho_references_fct" href="https://dl.acm.org/doi/10.1145/3445815" target="_blank">ACM - Fast Computation Techniques</a></li>
-                    <li><span class="material-symbols-outlined">developer_mode</span><a  data-i18n="sapho_references_hpc" href="https://www.hpcwire.com/" target="_blank">HPC Wire - High-Performance Computing</a></li>
-                    <li><span class="material-symbols-outlined">settings_suggest</span><a data-i18n="sapho_references_wiki" href="https://en.wikipedia.org/wiki/Instruction_set_architecture" target="_blank">Wikipedia - Instruction Set Architecture</a></li>
-                </ul>
-            </div>
-            <button aria-label="Back Top Button" id="backToTopBtn">
-                <span class="material-symbols-outlined">navigation</span>
-            </button>
-        </section>
-        
-        <!-- Footer -->
-        <footer class="footer text-center py-4">
-            <div class="supporters">
-                <a href="https://home.cern/" target="_blank" class="supporter cern-logo">
-                <img src="/assets/icons/icon_home_CERN-Embleme.png" alt="CERN Logo">
-                </a>
-                <a href="https://www.ufjf.br/" target="_blank" class="supporter ufjf-logo">
-                <img src="/assets/icons/icon_home_brasao_UFJF.png" alt="UFJF Logo">
-                </a>
-                <a href="https://cnpq.br/" target="_blank" class="supporter cnpq-logo">
-                <img src="/assets/icons/icon_home_cnpq.svg" alt="CNPq Logo">
-                </a>
-            </div>
-            <p>NIPSCERN Lab.</p>
-            <p>
-                <a data-i18n="sapho_licensed">Licensed under</a> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a>.
+    <!-- ── Hero ──────────────────────────────────────────────── -->
+    <header class="project-hero" style="background: radial-gradient(ellipse 70% 50% at 0% 50%, rgba(212,160,23,0.07) 0%, transparent 70%), var(--bg-0)" aria-labelledby="sapho-title">
+      <div class="project-hero-inner">
+        <div class="project-hero-icon" style="background:rgba(212,160,23,0.12);color:var(--accent-sapho)">
+          <i class="ph ph-cpu" aria-hidden="true"></i>
+        </div>
+        <div class="project-hero-text">
+          <div class="eyebrow fade-up">
+            <i class="ph ph-code" aria-hidden="true"></i>
+            Hardware Architecture &amp; Toolchain
+          </div>
+          <h1 class="project-hero-name fade-up" id="sapho-title" style="color:var(--text-primary)">
+            <span style="color:var(--accent-sapho)">SAPHO</span>
+          </h1>
+          <p class="project-hero-fullname fade-up" data-i18n="projects.sapho.full">Scalable Architecture for Hardware Optimization</p>
+          <p class="project-hero-desc fade-up" data-i18n="projects.sapho.desc">
+            SAPHO is a scalable hardware architecture and integrated toolchain for processor creation, experimentation, and hardware–software co-design — designed to make custom processor development accessible from university classrooms to research labs.
+          </p>
+          <div class="project-links fade-up">
+            <a href="https://github.com/nipscernlab/sapho/releases" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
+              <i class="ph ph-download" aria-hidden="true"></i>
+              Download Latest Release
+            </a>
+            <a href="https://github.com/nipscernlab/sapho" target="_blank" rel="noopener" class="btn btn-ghost">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              View on GitHub
+            </a>
+            <a href="index.html" class="btn btn-ghost">
+              <i class="ph ph-arrow-left" aria-hidden="true"></i>
+              All Projects
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── Badge strip ───────────────────────────────────────── -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
+      <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+        <span class="badge badge-orange"><i class="ph ph-windows-logo" aria-hidden="true"></i> Windows</span>
+        <span class="badge badge-orange"><i class="ph ph-linux-logo" aria-hidden="true"></i> Linux</span>
+        <span class="badge badge-gray">Open Source</span>
+        <span class="badge badge-gray">MIT License</span>
+        <span class="badge badge-green">Active</span>
+        <span class="badge badge-orange">Used in UFJF — DLP discipline</span>
+      </div>
+    </div>
+
+    <!-- ── What SAPHO is ─────────────────────────────────────── -->
+    <section class="section">
+      <div class="container">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+
+          <!-- Left: Description -->
+          <div class="fade-up">
+            <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
+            <h2 class="heading-lg" data-i18n="projects.sapho.features.title">What SAPHO Includes</h2>
+            <p class="body-base" style="margin-top:var(--sp-4)">
+              SAPHO provides an end-to-end environment for processor design: from writing high-level CMM code to compiling, simulating, and visualising the resulting hardware. It bundles four major components — YANC, POLARIS, YAWT, and PRISM — into a single cohesive installer.
             </p>
-        </footer>
-        
-        
-        <!-- jQuery (for Bootstrap compatibility and smooth scroll) -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <p class="body-base" style="margin-top:var(--sp-4)">
+              The architecture is designed around a custom processor model that students and researchers can modify freely. SAPHO runs identically on Windows and Linux, and the entire compilation pipeline — from source to machine code — executes without any cloud dependency.
+            </p>
 
-        <!-- Bootstrap JS Bundle (includes Popper.js for dropdowns) -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            <div class="feature-list" style="margin-top:var(--sp-8)">
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-code-block" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">YANC toolchain</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">CMM compiler + assembly compiler — the compilation backbone</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)"><i class="ph ph-desktop" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">POLARIS IDE</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Cross-platform graphical interface with Monaco Editor, Tauri + Rust</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(91,156,246,0.12);color:var(--brand)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">YAWT Wave Tracer</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Signal timeline analysis and waveform inspection</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(212,160,23,0.12);color:var(--accent-sapho)"><i class="ph ph-graph" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">PRISM RTL Viewer</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Processor structure and datapath visualisation in RTL</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <!-- jQuery UI for additional UI effects -->
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+          <!-- Right: Ecosystem cards -->
+          <div class="fade-up">
+            <h3 class="heading-sm" style="margin-bottom:var(--sp-5)">The SAPHO Ecosystem</h3>
+            <div class="ecosystem-grid">
+              <a href="yanc.html" class="eco-card" style="--project-accent:var(--accent-yanc)">
+                <div style="font-size:24px;color:var(--accent-yanc);margin-bottom:var(--sp-2)"><i class="ph ph-code-block" aria-hidden="true"></i></div>
+                <div class="eco-card-name">YANC</div>
+                <div class="eco-card-desc">CMM + ASM compiler</div>
+              </a>
+              <a href="polaris.html" class="eco-card" style="--project-accent:var(--accent-polaris)">
+                <div style="font-size:24px;color:var(--accent-polaris);margin-bottom:var(--sp-2)"><i class="ph ph-desktop" aria-hidden="true"></i></div>
+                <div class="eco-card-name">POLARIS</div>
+                <div class="eco-card-desc">Cross-platform IDE</div>
+              </a>
+              <div class="eco-card">
+                <div style="font-size:24px;color:var(--brand);margin-bottom:var(--sp-2)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
+                <div class="eco-card-name">YAWT</div>
+                <div class="eco-card-desc">Wave Tracer</div>
+              </div>
+              <div class="eco-card">
+                <div style="font-size:24px;color:var(--accent-sapho);margin-bottom:var(--sp-2)"><i class="ph ph-graph" aria-hidden="true"></i></div>
+                <div class="eco-card-name">PRISM</div>
+                <div class="eco-card-desc">RTL Viewer</div>
+              </div>
+            </div>
 
-        <!-- AOS for animations -->
-        <script src="https://cdn.jsdelivr.net/npm/aos@next/dist/aos.js"></script>
-        <script>
-            AOS.init(); // Initialize AOS
-        </script>
+            <div style="margin-top:var(--sp-6);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-5)">
+              <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)">Supported Platforms</div>
+              <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+                <div style="display:flex;align-items:center;gap:var(--sp-3)">
+                  <i class="ph ph-windows-logo" style="color:var(--accent-sapho);font-size:18px" aria-hidden="true"></i>
+                  <span style="font-size:var(--text-sm);color:var(--text-secondary)">Windows 10 / 11 — 64-bit installer (.exe)</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--sp-3)">
+                  <i class="ph ph-linux-logo" style="color:var(--accent-sapho);font-size:18px" aria-hidden="true"></i>
+                  <span style="font-size:var(--text-sm);color:var(--text-secondary)">Linux x86_64 — binary tarball (.tar.gz)</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <!-- Prism.js for syntax highlighting -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
-        
-        <!-- Back to Top Button Script -->
-        <script src="/js/top.js"></script>
-        <script src="/js/dark.js"></script>
-    </body>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Education at UFJF ─────────────────────────────────── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+
+          <div class="fade-up">
+            <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
+            <h2 class="heading-lg">From the Lab to the Classroom</h2>
+            <p class="body-base" style="margin-top:var(--sp-4)">
+              SAPHO is being implemented as the core platform for the <strong>DLP (Dispositivos Lógicos Programáveis — Programmable Logic Devices)</strong> discipline at UFJF — Universidade Federal de Juiz de Fora. Every student enrolled in this course designs, compiles, and simulates custom processor architectures using SAPHO.
+            </p>
+            <p class="body-base" style="margin-top:var(--sp-4)">
+              This means NIPSCERN is directly shaping the next generation of hardware engineers graduating from UFJF. SAPHO bridges the gap between theoretical computer architecture concepts and hands-on hardware design experience.
+            </p>
+            <div style="margin-top:var(--sp-6);background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.2);border-radius:var(--r-xl);padding:var(--sp-5)">
+              <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-sapho);margin-bottom:var(--sp-3)">Impact</div>
+              <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
+                All students who take or will take the DLP discipline at UFJF work with our custom processor. NIPSCERN is forming a generation of engineers on our own platform, with our own tools, built in-house.
+              </p>
+            </div>
+          </div>
+
+          <div class="fade-up">
+            <h3 class="heading-sm" style="margin-bottom:var(--sp-5)">What Students Do with SAPHO</h3>
+            <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+              <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
+                <div style="min-width:32px;height:32px;border-radius:var(--r-md);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:16px">
+                  <i class="ph ph-file-code" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Write CMM Programs</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Design custom processor instruction sets and write programs in the CMM high-level language using POLARIS IDE</div>
+                </div>
+              </div>
+              <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
+                <div style="min-width:32px;height:32px;border-radius:var(--r-md);background:rgba(0,180,166,0.12);color:var(--accent-yanc);display:flex;align-items:center;justify-content:center;font-size:16px">
+                  <i class="ph ph-gear" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Compile with YANC</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Pass CMM source through cmmcomp and asmcomp, generating binary for their custom processor</div>
+                </div>
+              </div>
+              <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
+                <div style="min-width:32px;height:32px;border-radius:var(--r-md);background:rgba(91,156,246,0.12);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:16px">
+                  <i class="ph ph-wave-sine" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Simulate &amp; Analyse</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Verify signal behaviour with YAWT Wave Tracer and visualise datapath structure in PRISM</div>
+                </div>
+              </div>
+              <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
+                <div style="min-width:32px;height:32px;border-radius:var(--r-md);background:rgba(29,78,137,0.12);color:var(--accent-cgv);display:flex;align-items:center;justify-content:center;font-size:16px">
+                  <i class="ph ph-circuit-board" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Deploy to FPGA</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Synthesise the processor design onto FPGA boards available in the NIPSCERN laboratory</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Technical Architecture ────────────────────────────── -->
+    <section class="section" style="border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="section-header fade-up">
+          <h2 class="heading-lg">Technical Architecture</h2>
+          <p class="body-base" style="max-width:640px;margin-top:var(--sp-4)">SAPHO's design separates compilation, simulation, and visualisation into dedicated components, each independently usable yet tightly integrated through the POLARIS IDE.</p>
+        </div>
+
+        <div class="grid grid-2" style="gap:var(--sp-6)">
+          <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
+            <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(0,180,166,0.12);color:var(--accent-yanc);display:flex;align-items:center;justify-content:center;font-size:20px">
+                <i class="ph ph-code-block" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div style="font-weight:700;color:var(--text-primary)">YANC Compiler Suite</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Written in C · Flex · Bison · GCC</div>
+              </div>
+            </div>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
+              YANC bridges the gap between high-level description and machine execution. It includes <code style="font-family:var(--font-mono);font-size:var(--text-xs);background:var(--bg-elevated);padding:1px 4px;border-radius:3px;color:var(--accent-yanc)">cmmcomp</code> (CMM → assembly), <code style="font-family:var(--font-mono);font-size:var(--text-xs);background:var(--bg-elevated);padding:1px 4px;border-radius:3px;color:var(--accent-yanc)">asmcomp</code> (assembly → binary/hex), and <code style="font-family:var(--font-mono);font-size:var(--text-xs);background:var(--bg-elevated);padding:1px 4px;border-radius:3px;color:var(--accent-yanc)">APP</code> auxiliary tools.
+            </p>
+          </div>
+
+          <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
+            <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(147,51,234,0.12);color:var(--accent-polaris);display:flex;align-items:center;justify-content:center;font-size:20px">
+                <i class="ph ph-desktop" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div style="font-weight:700;color:var(--text-primary)">POLARIS IDE</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Tauri + Rust · Monaco Editor · API-driven</div>
+              </div>
+            </div>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
+              POLARIS is a lightweight native application built with Tauri and Rust. It embeds Monaco Editor (the engine behind VS Code) for code editing, and exposes a flexible API-driven system for integrating new tools and workflows.
+            </p>
+          </div>
+
+          <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
+            <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(91,156,246,0.12);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:20px">
+                <i class="ph ph-wave-sine" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div style="font-weight:700;color:var(--text-primary)">YAWT Wave Tracer</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Signal analysis &amp; simulation output</div>
+              </div>
+            </div>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
+              YAWT provides interactive inspection of simulation outputs — showing signal timelines, register states, and data flows over clock cycles. Fully integrated into POLARIS, it allows live analysis without switching tools.
+            </p>
+          </div>
+
+          <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
+            <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
+              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:20px">
+                <i class="ph ph-graph" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div style="font-weight:700;color:var(--text-primary)">PRISM RTL Viewer</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Processor structure visualisation</div>
+              </div>
+            </div>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
+              PRISM renders processor structure and datapaths as RTL diagrams, making it straightforward to understand and debug the hardware description. Students can visually trace how data moves through their processor design.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Download ───────────────────────────────────────────── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container container--narrow">
+        <div class="fade-up" style="background:var(--bg-card);border:1px solid rgba(212,160,23,0.3);border-radius:var(--r-2xl);padding:var(--sp-10);text-align:center">
+          <div style="width:56px;height:56px;border-radius:var(--r-2xl);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto var(--sp-5)">
+            <i class="ph ph-download" aria-hidden="true"></i>
+          </div>
+          <h2 class="heading-md" style="margin-bottom:var(--sp-4)">Download SAPHO</h2>
+          <p class="body-base" style="max-width:480px;margin:0 auto var(--sp-6)">
+            Download the latest SAPHO installer for Windows or Linux from the official GitHub Releases page. The installer bundles YANC, POLARIS, YAWT, and PRISM into a single setup.
+          </p>
+          <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
+            <a href="https://github.com/nipscernlab/sapho/releases" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
+              <i class="ph ph-download" aria-hidden="true"></i>
+              GitHub Releases
+            </a>
+            <a href="https://github.com/nipscernlab/sapho" target="_blank" rel="noopener" class="btn btn-ghost">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              Source Code
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
 </html>

@@ -1,358 +1,664 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" >
-        <meta name="keywords" lang="en" content="sapho, cern, Scalable Architecture Processor for Hardware Optimization" />
-        <meta name="keywords" lang="pt" content="sapho, cern, Processador de Arquitetura Escalável para Otimização de Hardware" />
-        <meta name="keywords" lang="fr" content="sapho, cern, Processeur d'Architecture Évolutive pour l'Optimisation du Matériel" />
-        <meta name="keywords" lang="no" content="sapho, cern, Skalerbar Arkitekturprosessor for Maskinvareoptimalisering" />
-        <meta name="author" content="nipscern" />
-        <meta name="description" lang="en" content="NIPSCERN, a research lab at UFJF in collaboration with CERN, contributes to the ATLAS experiment, developing advanced processors and optimization methods to push the boundaries of observable science. Explore our pioneering tools like AURA IDE, SAPHO, and ALICE for cutting-edge research in hardware and signal processing.">
-        <meta name="description" lang="pt" content="O NIPSCERN, um laboratório de pesquisa da UFJF em colaboração com o CERN, contribui para o experimento ATLAS, desenvolvendo processadores avançados e métodos de otimização para expandir os limites da ciência observável. Explore nossas ferramentas pioneiras como AURA IDE, SAPHO e ALICE para pesquisa de ponta em hardware e processamento de sinais.">        
-        <meta name="description" lang="fr" content="NIPSCERN, un laboratoire de recherche de l'UFJF en collaboration avec le CERN, contribue à l'expérience ATLAS en développant des processeurs avancés et des méthodes d'optimisation pour repousser les limites de la science observable. Découvrez nos outils pionniers comme AURA IDE, SAPHO et ALICE pour des recherches de pointe dans le domaine du matériel et du traitement du signal.">
-        <meta name="description" lang="no" content="NIPSCERN, et forskningslaboratorium ved UFJF i samarbeid med CERN, bidrar til ATLAS-eksperimentet, og utvikler avanserte prosessorer og optimaliseringsmetoder for å flytte grensene for observerbar vitenskap. Utforsk våre banebrytende verktøy som AURA IDE, SAPHO og ALICE for banebrytende forskning innen maskinvare og signalbehandling.">        
-        <meta property="og:title" content="NIPSCERN - Research and Innovation | NIPSCERN Lab" />
-        <meta property="og:description" content="NIPSCERN, a research lab at UFJF in collaboration with CERN, contributes to the ATLAS experiment, developing advanced processors and optimization methods to push the boundaries of observable science. Learn more now!" />
-        <meta property="og:image" content="/assets/icons/icon_home_nipscern.svg" />
-        <meta property="og:url" content="https://nipscern.com" />
-        <meta property="og:type" content="website" />
-        <script>
-            (function (w, d, s, l, i) {
-                w[l] = w[l] || [];
-                w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-                var f = d.getElementsByTagName(s)[0],
-                    j = d.createElement(s),
-                    dl = l != "dataLayer" ? "&l=" + l : "";
-                j.async = true;
-                j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-                f.parentNode.insertBefore(j, f);
-            })(window, document, "script", "dataLayer", "GTM-WV6QJWVX");
-        </script>
-        <title data-i18n="home_title">NIPSCERN - Research and Innovation | NIPSCERN Lab</title>
-        <link rel="alternate" type="application/rdf+xml" href="https://nipscern.com/nipscern-metadata.rdf" />
-        <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml" sizes="128x128" />
-        <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml" sizes="64x64" />
-        <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml" sizes="32x32" />
-        <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml" sizes="16x16" />
-        <!-- Tailwind CSS for modern design -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- AOS Library for Scroll Animations -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
-        <link rel="stylesheet" href="/css/styles.css">
-        <link rel="stylesheet" href="/css/language.css">
-        <link rel="stylesheet" href="/css/faq.css">
-        <link rel="stylesheet" href="/css/contact.css">
-        <link rel="stylesheet" href="/css/header.css">
-        <link rel="stylesheet" href="/css/menu.css">
-        <link rel="stylesheet" href="/css/cards.css">
-        <link rel="stylesheet" href="/css/footer-old.css">
-        <link rel="stylesheet" href="/css/search.css">
-        <link rel="stylesheet" href="/css/iframe.css">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NIPSCERN — Research & Development Laboratory | UFJF · CERN</title>
+  <meta name="description" content="NIPSCERN is a research and development laboratory at the Federal University of Juiz de Fora (UFJF), Brazil, working in collaboration with CERN on high energy physics, scientific computing, and advanced hardware systems.">
 
-    </head>
-    <body class="bg-white text-gray-800">
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WV6QJWVX" title="Google Tag" height="0" width="0" style="display: none; visibility: hidden;"></iframe></noscript>
-        <div vw class="enabled">
-            <div vw-access-button class="active"></div>
-            <div vw-plugin-wrapper>
-                <div class="vw-plugin-top-wrapper"></div>
-            </div>
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://nipscern.com/">
+  <meta property="og:title"       content="NIPSCERN — Research & Development Laboratory">
+  <meta property="og:description" content="Research and Development Laboratory at UFJF, Brazil — working at the frontier of high energy physics and scientific computing in collaboration with CERN.">
+  <meta property="og:image"       content="https://nipscern.com/assets/images/og-home.jpg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="NIPSCERN — Research & Development Laboratory">
+  <meta name="twitter:description" content="Research and Development Laboratory at UFJF, Brazil — in collaboration with CERN, Geneva.">
+  <meta name="twitter:image"       content="https://nipscern.com/assets/images/og-home.jpg">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://nipscern.com/">
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+
+  <!-- Three.js importmap (must come before any module scripts) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/main.css">
+
+  <!-- Schema.org Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "NIPSCERN",
+    "alternateName": "Núcleo de Instrumentação para Física de Partículas e Computação Científica",
+    "url": "https://nipscern.com",
+    "logo": "https://nipscern.com/assets/images/logo.png",
+    "description": "Research and development laboratory at the Federal University of Juiz de Fora, working in collaboration with CERN on high energy physics and scientific computing.",
+    "parentOrganization": {
+      "@type": "CollegeOrUniversity",
+      "name": "Universidade Federal de Juiz de Fora",
+      "url": "https://www.ufjf.br"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "contact@nipscern.com",
+      "contactType": "research"
+    },
+    "sameAs": [
+      "https://github.com/nipscernlab"
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Skip to content -->
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+
+  <!-- Navigation (injected by main.js) -->
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <!-- ======================================================
+         HERO
+         ====================================================== -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-bg" aria-hidden="true">
+        <canvas id="hero-stars"></canvas>
+      </div>
+      <div class="hero-content">
+        <div class="hero-label" aria-label="Federal University of Juiz de Fora and CERN collaboration">
+          <span class="dot" aria-hidden="true"></span>
+          <span data-i18n="home.hero.label">Federal University of Juiz de Fora · CERN</span>
         </div>
-        <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-        <script>
-            new window.VLibras.Widget('https://vlibras.gov.br/app');
-        </script>
-        <main>
-            <input type="checkbox" id="menu_checkbox">
-            <label for="menu_checkbox">
+        <h1 class="hero-title" id="hero-title">NIPS<i class="ph ph-atom hero-atom" aria-hidden="true"></i>CERN</h1>
+        <p class="hero-subtitle" data-i18n="home.hero.subtitle">
+          Research and Development Laboratory at UFJF, Brazil — working at the frontier of high energy physics, scientific computing, and advanced hardware systems in collaboration with CERN, Geneva.
+        </p>
+        <div class="hero-actions">
+          <a href="about.html" class="btn btn-primary btn-lg" data-i18n="home.hero.cta_primary">
+            <i class="ph ph-flask" aria-hidden="true"></i>
+            Explore Our Work
+          </a>
+          <a href="projects/index.html" class="btn btn-ghost btn-lg" data-i18n="home.hero.cta_secondary">
+            <i class="ph ph-grid-four" aria-hidden="true"></i>
+            View Projects
+          </a>
+        </div>
+        <!-- Discrete view counter — loaded asynchronously from GoatCounter -->
+        <div class="hero-viewcount" id="hero-viewcount" aria-label="Page views" hidden>
+          <i class="ph ph-eye" aria-hidden="true"></i>
+          <span id="view-count">—</span>
+          <span data-i18n="home.hero.views">visitors</span>
+        </div>
+      </div>
+    </section>
 
-            </label>
-            <nav class="section-nav">
-                <ol>
-                    <li><a data-i18n="home_btn_search" href="#search">Search</a></li>
-                    <li><a data-i18n="home_welcome" href="#introduction">Welcome to NIPSCERN</a></li>
-                    <li><a data-i18n="home_current_research" href="#current-research">Current Research</a></li>
-                    <li><a data-i18n="home_supporters" href="#supporters">Supporters</a></li>
-                    <li><a data-i18n="home_about_us" href="#about-us">About Us</a></li>
-                    <li><a data-i18n="home_faq" href="#faq">FAQ</a></li>
-                    <li><a data-i18n="home_contact_us" href="#contact">Contact Us</a></li>
-                    <div class="language-switcher relative">
-                        <img id="selected-flag" src="/assets/icons/icon_home_language_united_kingdom.svg" alt="flag" class="language-logo inline-block w-4 h-4 mr-2">
-                        <button id="language-button" class="bg-blue-700 text-white p-2 rounded-md transition duration-200 hover:bg-blue-600">
-                        <span class="selected-language">🇬🇧 English</span>
-                        </button>
-                        <div id="language-dropdown" class="dropdown-menu hidden absolute left-0 bg-white text-black shadow-lg rounded-lg mt-2 w-40 z-10 transition-all duration-300 opacity-0 transform scale-95">
-                            <a href="#" class="block px-4 py-3 hover:bg-blue-900 hover:text-white transition duration-200" data-lang="en" data-logo="/assets/icons/icon_home_language_united_kingdom.svg">🇬🇧 English</a>
-                            <a href="#" class="block px-4 py-3 hover:bg-blue-900 hover:text-white transition duration-200" data-lang="pt" data-logo="/assets/icons/icon_home_language_brazil.svg">🇧🇷 Português</a>
-                            <a href="#" class="block px-4 py-3 hover:bg-blue-900 hover:text-white transition duration-200" data-lang="no" data-logo="/assets/icons/icon_home_language_norway.svg">🇳🇴 Norge</a>
-                            <a href="#" class="block px-4 py-3 hover:bg-blue-900 hover:text-white transition duration-200" data-lang="fr" data-logo="/assets/icons/icon_home_language_france.svg">🇫🇷 Français</a>
-                        </div>
-                    </div>
-                </ol>
-            </nav>
-        </main>
-        <!-- Hero Section -->
-        <section id="introduction" class="hero-bg text-center text-white py-32" data-aos="fade-up">
-            <div class="max-w-3xl mx-auto">
-                <h1 class="text-5xl font-bold mb-4 animate__animated animate__bounceInDown flex-container">
-                    <span class="icon-container">
-                    <img src="/assets/icons/icon_home_nipscern.svg" alt="Psychology Icon" class="inline-icon" />
-                    </span>
-                    <span data-i18n="home_title_text" class="title-text">The Fusion of High Energy Physics and Advanced Computing</span>
-                    <span class="vertical-bar"></span>
-                </h1>
-                <p data-i18n="home_subtitle_text" class="text-xl mb-8">Collaborating globally to push the boundaries of physics, technology, and innovation.</p>
-                
-                <!-- Vídeo do YouTube -->
-                <div class="video-wrapper" data-aos="zoom-in" data-aos-delay="300">
-                    <div class="video-container" onclick="window.open('https://www.youtube.com/watch?v=gYWpNuHMmJA', '_blank')">
-                        <img src="https://img.youtube.com/vi/gYWpNuHMmJA/maxresdefault.jpg" alt="NIPSCERN Lab Video" class="video-thumbnail">
-                        <div class="play-button-overlay">
-                            <div class="play-button"></div>
-                        </div>
-                    </div>
-                    <p class="video-caption">Watch our video about Fractals &amp; FPGAs on YouTube.</p>
-                </div>
-                
-                <div class="flex justify-center space-x-4 mt-8">
-                    <a data-i18n="home_btn_explore_projects" href="#current-research" class="btn-primary px-6 py-3 rounded-full">Explore Projects</a>
-                </div>
-            </div>
-        </section>
-        <!-- Current Research Section -->
-        <section id="current-research" class="py-20 bg-light-gray" data-aos="fade-right">
-    <div class="max-w-6xl mx-auto text-center mb-12">
-        <h2 data-i18n="home_current_research" class="text-4xl font-bold text-blue-900">Current Research</h2>
+    <!-- ======================================================
+         MEDIA SLOT — place a video, reel, or SVG here
+         (remove the placeholder div and drop in your content)
+         ====================================================== -->
+    <!-- MEDIA-SLOT-HOME: replace or remove this block -->
+  <!--
+  <section class="section" style="padding:0;background:var(--bg-0)">
+    <div class="container container--narrow" style="padding-top:var(--sp-12);padding-bottom:var(--sp-12)">
+      <div style="aspect-ratio:16/9;border-radius:var(--r-xl);overflow:hidden">
+
+        <video 
+          src="./assets/videos/CERN-FOOTAGE-2014-050-011-2160p.mp4"
+          autoplay 
+          muted 
+          loop 
+          playsinline
+          controls
+          style="width:100%;height:100%;object-fit:cover">
+        </video>
+
+      </div>
     </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up">
-            <a href="/projects/sapho">
-                <img src="/assets/icons/icon_sapho_memory_128.svg" alt="SAPHO Logo" class="project-image sapho-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">SAPHO</h3>
-            <p data-i18n="home_sapho_card" class="mb-4">Program processors in C&plusmn; with SAPHO: Scalable Architecture Processor for Hardware Optimization.</p>
-            <a data-i18n="home_read_more" href="/projects/sapho" class="text-blue-900 font-bold hover:underline">Read More</a>
-        </div>
+  </section> -->
+   
 
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up" data-aos-delay="100">
-            <a href="/projects/polaris">
-                <img src="/assets/icons/icon_polaris_ide.svg" alt="POLARIS IDE" class="project-image polaris-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">POLARIS IDE</h3>
-            <p data-i18n="home_polaris_card" class="mb-4">Powerful and modern processor development interface built in Rust with Tauri for Windows and Linux. For advanced users.</p>
-            <a data-i18n="home_read_more" href="/projects/polaris" class="text-blue-900 font-bold hover:underline">Read More</a>
-        </div>
+    <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_explore.svg -->
+    <figure style="text-align:center;margin:var(--sp-10) auto var(--sp-2);max-width:280px;opacity:0.65" aria-hidden="true">
+      <img src="assets/images/undraw/undraw_explore.svg" alt="" width="280" height="175" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
+    </figure>
 
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up" data-aos-delay="400">
-            <a href="/projects/yanc">
-                <img src="/assets/icons/icon_yanc_comp.svg" alt="YANC" class="project-image yanc-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">YANC</h3>
-            <p data-i18n="home_yanc_card" class="mb-4">YANC is a collection of compilers developed by NIPSCERN that form the core toolchain powering the SAPHO ecosystem.</p>
-            <a data-i18n="home_read_more" href="/projects/yanc" class="text-blue-900 font-bold hover:underline">Read More</a>
+    <!-- ======================================================
+         STATS STRIP
+         ====================================================== -->
+    <div class="stats-strip" aria-label="Laboratory statistics">
+      <div class="stats-strip-inner stagger-children">
+        <div class="stat-item">
+          <div class="stat-number"><span class="accent">20</span>+</div>
+          <div class="stat-label" data-i18n="home.stats.years">Years of Research</div>
         </div>
-
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up" data-aos-delay="500">
-            <a href="/projects/cgvweb">
-                <img src="/assets/icons/icon_cgv.svg" alt="CGV-WEB" class="project-image cgv-web-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">CGV-WEB</h3>
-            <p data-i18n="home_cgv_web_card" class="mb-4">CGV-WEB is the web-based evolution of CaloGeoView, a scientific visualization tool originally developed as part of the PhD thesis of Dr. Prof. Luciano Manhães de Andrade Filho.</p>
-            <a data-i18n="home_read_more" href="/projects/cgv" class="text-blue-900 font-bold hover:underline">Read More</a>
+        <div class="stat-item">
+          <div class="stat-number"><span class="accent">1200</span>+</div>
+          <div class="stat-label" data-i18n="home.stats.publications">Publications</div>
         </div>
-
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up" data-aos-delay="600">
-            <a href="https://github.com/nipscernlab" target="_blank" rel="noopener noreferrer">
-                <img src="/assets/icons/icon_nipscernweb.svg" alt="NIPSCERNWEB" class="project-image nipscernweb-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">NIPSCERNWEB</h3>
-            <p data-i18n="home_nipscernweb_card" class="mb-4">NIPSCERNWEB is the official web repository of the NIPSCERN Laboratory, containing all assets and source files used to build and deliver nipscern.com.</p>
-            <a data-i18n="home_read_more" href="https://github.com/nipscernlab" target="_blank" rel="noopener noreferrer" class="text-blue-900 font-bold hover:underline">Read More</a>
+        <div class="stat-item">
+          <div class="stat-number"><span class="accent">30</span>+</div>
+          <div class="stat-label" data-i18n="home.stats.students">IC Students</div>
         </div>
-
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up" data-aos-delay="700">
-            <a href="/publications/">
-                <img src="/assets/icons/icon_helvetia_history.svg" alt="Publications" class="project-image helvetia-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">Publications</h3>
-            <p data-i18n="home_helvetia_card" class="mb-4">A comprehensive archive of NIPSCERN's research history, including papers, dissertations, and academic theses.</p>
-            <a data-i18n="home_read_more" href="/projects/helvetia" class="text-blue-900 font-bold hover:underline">Read More</a>
+        <div class="stat-item">
+          <div class="stat-number"><span class="accent">12</span>+</div>
+          <div class="stat-label" data-i18n="home.stats.countries">Collaborating Countries</div>
         </div>
-
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up" data-aos-delay="800">
-            <a href="/projects/cern">
-                <img src="/assets/icons/icon_cern_atom-solid.svg" alt="CERN" class="project-image cern-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">CERN</h3>
-            <p data-i18n="home_cern_card" class="mb-4">Learn more about CERN, the European Organization for Nuclear Research.</p>
-            <a data-i18n="home_read_more" href="/projects/cern" class="text-blue-900 font-bold hover:underline">Read More</a>
-        </div>
-        
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up" data-aos-delay="900">
-            <a href="/projects/aurora">
-                <img src="/assets/icons/icon_aurora_ide.svg" alt="AURORA IDE" class="project-image aurora-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">AURORA IDE</h3>
-            <p data-i18n="home_aurora_card" class="mb-4">Processor programming interface built in Electron for Windows. Ideal for SAPHO beginners.</p>
-            <a data-i18n="home_read_more" href="/projects/aurora" class="text-blue-900 font-bold hover:underline">Read More</a>
-        </div>
-
-        <div class="shadow-neumorphism p-6 bg-white rounded-lg" data-aos="fade-up" data-aos-delay="1000">
-            <a href="/projects/alice">
-                <img src="/assets/icons/icon_alice_star-of-life-solid.svg" alt="ALICE" class="project-image alice-logo mb-4">
-            </a>
-            <h3 class="text-2xl font-bold mb-2">ALICE</h3>
-            <p data-i18n="home_alice_card" class="mb-4">A new optimized way to translate K code to Assembly. Fast and reliable.</p>
-            <a data-i18n="home_read_more" href="/projects/alice" class="text-blue-900 font-bold hover:underline">Read More</a>
-        </div>
-
+      </div>
     </div>
 
-    <div id="supporters" href="supporters" class="logo-container mt-12">
-        <img class="logo-home-fapemig" src="/assets/icons/icon_home_fapemig.png" alt="FAPEMIG Logo">
-        <img class="logo-home" src="/assets/icons/icon_home_cnpq.svg" alt="CNPq Logo">
-        <img class="logo-home" src="/assets/icons/icon_home_brasao_UFJF.png" alt="UFJF Logo">
-        <img class="logo-home" src="/assets/icons/icon_home_CERN.svg" alt="CERN Logo">
-    </div>
-</section>
-        <!-- About Us Section -->
-        <section id="about-us" class="py-20 bg-white" data-aos="fade-up">
-            <div class="max-w-6xl mx-auto text-center mb-12">
-                <h2 data-i18n="home_about_us" class="text-4xl font-bold text-blue-900">About Us</h2>
-                <p data-i18n="home_text_about_us" class="text-xl mt-4 mb-6">NIPSCERN is a Research & Development hub at UFJF, working in direct collaboration with CERN.</p>
-            </div>
-            <div class="flex flex-col md:flex-row justify-center items-center gap-10">
-                <div class="shadow-lg p-6 bg-gray-100 rounded-lg max-w-sm" data-aos="fade-up" data-aos-delay="100">
-                    <h3 data-i18n="home_title_our_mission" class="text-2xl font-bold mb-2">Our Mission</h3>
-                    <p data-i18n="home_text_our_mission" class="mb-4">To integrate engineering, logic, and particle physics into the creation of concrete systems.</p>
-                </div>
-                <div class="shadow-lg p-6 bg-gray-100 rounded-lg max-w-sm" data-aos="fade-up" data-aos-delay="200">
-                    <h3 data-i18n="home_title_our_vision" class="text-2xl font-bold mb-2">Our Vision</h3>
-                    <p data-i18n="home_text_our_vision" class="mb-4">We strive to immerse undergraduate students in world-class research, fostering innovation at the intersection of hardware design, software engineering, and fundamental physics.</p>
-                </div>
-            </div>
-            <div id="join-us" class="mt-12 text-center">
-                <h4 data-i18n="home_title_join_us" class="text-2xl font-bold text-blue-900">Join Us in Our Journey!</h4>
-                <p data-i18n="home_text_join_us" class="mt-4">Whether you are interested in compiler design, processor architecture, or particle physics, NIPSCERN offers the opportunity to work on real-world challenges alongside CERN researchers.</p>
-            </div>
-        </section>
-        <!-- FAQ Section -->
-       <section id="faq" class="faq-section">
-    <h2 data-i18n="home_title_faq" class="faq-title">Frequently Asked Questions</h2>
-    
-    <div class="faq-item">
-        <button class="faq-question" onclick="toggleAnswer(this)">
-            <span data-i18n="home_text_faq_q_1" class="question-text">Where is NIPSCERN Lab located?</span>
-            <span class="icon">+</span>
-        </button>
-        <div class="faq-answer">
-            <p data-i18n="home_text_faq_a_1">NIPSCERN Lab is located at Universidade Federal de Juiz de Fora, in the state of Minas Gerais, Brazil.</p>
+    <!-- ======================================================
+         3D CALORIMETER PREVIEW
+         ====================================================== -->
+    <section class="cgv-section section" aria-labelledby="cgv-title">
+      <div class="cgv-container">
+        <div class="cgv-header fade-up">
+          <div class="eyebrow" style="justify-content:center">
+            <i class="ph ph-atom" aria-hidden="true"></i>
+            ATLAS Calorimeter
+          </div>
+          <h2 class="display-md" id="cgv-title" data-i18n="home.cgv.title">Live Collision Event</h2>
+          <p class="body-lg" style="max-width:560px;margin:var(--sp-4) auto 0" data-i18n="home.cgv.subtitle">
+            Interactive 3D rendering of the ATLAS calorimeter. Each colored cell represents energy deposited by particles in a simulated collision.
+          </p>
         </div>
+
+        <div class="cgv-canvas-wrapper fade-up" id="cgv-canvas-wrapper" role="img" aria-label="Interactive 3D ATLAS calorimeter event display">
+          <canvas id="cgv-canvas" aria-hidden="true"></canvas>
+
+          <div class="cgv-loading" id="cgv-loading" aria-live="polite">
+            <div class="cgv-spinner" aria-hidden="true"></div>
+            <span data-i18n="home.cgv.loading">Initialising calorimeter geometry…</span>
+          </div>
+
+          <!-- Cell count badge -->
+          <div class="cgv-cell-count" aria-live="polite" aria-label="Active cells">
+            <span id="cgv-cell-count">0</span>
+            <span style="margin-left:4px;color:var(--text-muted)" data-i18n="home.cgv.cells_label">active cells</span>
+          </div>
+
+          <!-- Open Full CGV -->
+          <a href="https://nipscern.com/projects/cgv" target="_blank" rel="noopener"
+             class="btn btn-ghost btn-sm cgv-open-btn" id="cgv-open-btn"
+             data-i18n="home.cgv.btn_fullcgv">
+            <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+            Open Full CGV
+          </a>
+
+          <!-- Controls -->
+          <div class="cgv-controls" role="toolbar" aria-label="Calorimeter controls">
+            <button class="cgv-btn" id="cgv-btn-event" data-i18n="home.cgv.btn_event" aria-label="Generate new collision event">
+              Generate Event
+            </button>
+            <div class="cgv-divider" aria-hidden="true"></div>
+            <button class="cgv-btn" id="cgv-btn-wire" data-i18n="home.cgv.btn_wireframe" aria-pressed="false">
+              Wireframe
+            </button>
+            <div class="cgv-divider" aria-hidden="true"></div>
+            <button class="cgv-btn" id="cgv-btn-beam" data-i18n="home.cgv.btn_beam" aria-pressed="false">
+              Beam Axis
+            </button>
+            <div class="cgv-divider" aria-hidden="true"></div>
+            <button class="cgv-btn active" id="cgv-btn-tilecal" aria-pressed="true">TileCal</button>
+            <button class="cgv-btn active" id="cgv-btn-lar" aria-pressed="true">LAr</button>
+            <button class="cgv-btn active" id="cgv-btn-hec" aria-pressed="true">HEC</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         LATEST FROM THE LAB
+         ====================================================== -->
+    <section class="section" aria-labelledby="latest-title">
+      <div class="container">
+        <div class="section-header section-header--center fade-up">
+          <div class="eyebrow" style="justify-content:center">
+            <i class="ph ph-newspaper" aria-hidden="true"></i>
+            From the Lab
+          </div>
+          <h2 class="display-md" id="latest-title" data-i18n="home.latest.title">Latest From the Lab</h2>
+        </div>
+
+        <div class="grid grid-2 stagger-children latest-lab-grid" style="max-width:960px;margin:0 auto">
+          <div>
+            <p class="label-sm" style="margin-bottom:var(--sp-4)" data-i18n="home.latest.news_label">Latest News</p>
+            <div id="latest-news-card" style="height:100%">
+              <!-- Populated by main.js -->
+              <div class="card card-body" style="height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-muted)">
+                <i class="ph ph-spinner" aria-hidden="true" style="font-size:24px;opacity:0.5"></i>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="label-sm" style="margin-bottom:var(--sp-4)" data-i18n="home.latest.publication_label">Latest Publication</p>
+            <div id="latest-pub-card" style="height:100%">
+              <div class="card card-body" style="height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-muted)">
+                <i class="ph ph-spinner" aria-hidden="true" style="font-size:24px;opacity:0.5"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         PROJECTS GRID
+         ====================================================== -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="projects-title">
+      <div class="container">
+        <div class="section-header section-header--center fade-up">
+          <div class="eyebrow" style="justify-content:center">
+            <i class="ph ph-code" aria-hidden="true"></i>
+            Projects
+          </div>
+          <h2 class="display-md" id="projects-title" data-i18n="home.projects.title">Our Projects</h2>
+          <p class="body-lg" style="max-width:520px;margin:var(--sp-4) auto 0" data-i18n="home.projects.subtitle">
+            Tools, architectures, and systems built at NIPSCERN.
+          </p>
+        </div>
+
+        <div class="grid grid-3 stagger-children" id="projects-grid">
+
+          <!-- SAPHO -->
+          <a href="projects/sapho.html" class="project-card" style="--project-accent:var(--accent-sapho);--project-accent-dim:rgba(249,115,22,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon">
+                <i class="ph ph-cpu" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title">SAPHO</div>
+                <div class="project-card-full-name">Scalable Architecture for Hardware Optimization</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc" data-i18n="projects.sapho.short">Complete toolchain for processor creation and hardware–software co-design.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-orange">Hardware</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+          <!-- YANC -->
+          <a href="projects/yanc.html" class="project-card" style="--project-accent:var(--accent-yanc);--project-accent-dim:rgba(139,92,246,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-yanc);background:rgba(139,92,246,0.1)">
+                <i class="ph ph-code-block" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title">YANC</div>
+                <div class="project-card-full-name">Yet Another Compiler</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc" data-i18n="projects.yanc.short">The compiler toolchain powering the SAPHO ecosystem.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-purple">Compiler</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+          <!-- POLARIS -->
+          <a href="projects/polaris.html" class="project-card" style="--project-accent:var(--accent-polaris);--project-accent-dim:rgba(6,182,212,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-polaris);background:rgba(6,182,212,0.1)">
+                <i class="ph ph-desktop" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title">POLARIS</div>
+                <div class="project-card-full-name">Cross-Platform IDE for SAPHO</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc" data-i18n="projects.polaris.short">Modern, lightweight IDE built with Tauri and Rust.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-cyan">IDE · Tauri</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+          <!-- AURORA -->
+          <a href="projects/aurora.html" class="project-card" style="--project-accent:var(--accent-aurora);--project-accent-dim:rgba(244,63,94,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-aurora);background:rgba(244,63,94,0.1)">
+                <i class="ph ph-window" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title">AURORA</div>
+                <div class="project-card-full-name">Windows IDE for SAPHO</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc" data-i18n="projects.aurora.short">Powerful Electron-based IDE — predecessor to POLARIS, with 25 releases.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-red">Legacy · Electron</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+          <!-- CGV-WEB -->
+          <a href="projects/cgv.html" class="project-card" style="--project-accent:var(--accent-cgv);--project-accent-dim:rgba(16,185,129,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-cgv);background:rgba(16,185,129,0.1)">
+                <i class="ph ph-cube" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title">CGV-WEB</div>
+                <div class="project-card-full-name">Calorimeter Geometry Viewer Web</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc" data-i18n="projects.cgv.short">3D calorimeter event visualisation — accessible worldwide.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-green">Rust · WASM · Three.js</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+          <!-- CERN & ATLAS -->
+          <a href="cern.html" class="project-card" style="--project-accent:var(--accent-cern);--project-accent-dim:rgba(59,130,246,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-cern);background:rgba(59,130,246,0.1)">
+                <i class="ph ph-atom" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title">CERN &amp; ATLAS</div>
+                <div class="project-card-full-name">High Energy Physics</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc">The ATLAS experiment at the LHC — where NIPSCERN contributes to particle physics research.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-blue">LHC · TileCal</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+          <!-- Publications -->
+          <a href="publications.html" class="project-card" style="--project-accent:var(--accent-pubs);--project-accent-dim:rgba(245,158,11,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-pubs);background:rgba(245,158,11,0.1)">
+                <i class="ph ph-book-open" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title" data-i18n="nav.publications">Publications</div>
+                <div class="project-card-full-name">Scientific Articles & Theses</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc">Peer-reviewed articles, conference papers, dissertations, and undergraduate theses.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-amber">JINST · IEEE · SBESC</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+          <!-- News -->
+          <a href="news/index.html" class="project-card" style="--project-accent:var(--accent-news);--project-accent-dim:rgba(236,72,153,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-news);background:rgba(236,72,153,0.1)">
+                <i class="ph ph-newspaper" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title" data-i18n="nav.news">News</div>
+                <div class="project-card-full-name">Lab Updates & Events</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc">Awards, publications, events, and milestones from the NIPSCERN laboratory.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-pink">Blog</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+          <!-- About Us -->
+          <a href="about.html" class="project-card" style="--project-accent:var(--accent-about);--project-accent-dim:rgba(168,85,247,0.1)">
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-about);background:rgba(168,85,247,0.1)">
+                <i class="ph ph-users" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="project-card-title" data-i18n="nav.about">About Us</div>
+                <div class="project-card-full-name">Team & Infrastructure</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc">Meet the researchers, engineers, and students behind NIPSCERN's work.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge" style="background:rgba(168,85,247,0.15);color:#c084fc">Team · Lab</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+        </div>
+
+        <div style="text-align:center;margin-top:var(--sp-10)">
+          <a href="projects/index.html" class="btn btn-ghost" data-i18n="home.projects.view_all">
+            View all projects
+            <i class="ph ph-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         SPONSORS STRIP
+         ====================================================== -->
+    <div class="sponsors-strip" aria-labelledby="sponsors-label">
+      <div class="sponsors-inner">
+        <p class="sponsors-label" id="sponsors-label" data-i18n="home.sponsors.title">Supported By</p>
+        <div class="sponsors-logos fade-up">
+          <a href="https://fapemig.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="FAPEMIG">
+            <img src="assets/images/sponsors/fapemig.png" alt="FAPEMIG" width="56" height="56">
+          </a>
+          <a href="https://capes.gov.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CAPES">
+            <img src="assets/images/sponsors/capes.png" alt="CAPES" width="56" height="56">
+          </a>
+          <a href="https://cnpq.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CNPq">
+            <img src="assets/images/sponsors/cnpq.svg" alt="CNPq" width="56" height="56">
+          </a>
+          <a href="https://ufjf.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="UFJF">
+            <img src="assets/images/sponsors/ufjf.png" alt="UFJF" width="56" height="56">
+          </a>
+          <a href="https://cern.ch" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CERN">
+            <img src="assets/images/sponsors/cern.svg" alt="CERN" width="56" height="56">
+          </a>
+        </div>
+      </div>
     </div>
 
-    <div class="faq-item">
-        <button class="faq-question" onclick="toggleAnswer(this)">
-            <span data-i18n="home_text_faq_q_2" class="question-text">Which projects has NIPSCERN developed?</span>
-            <span class="icon">+</span>
-        </button>
-        <div class="faq-answer">
-            <p data-i18n="home_text_faq_a_2">We have developed a variety of projects like POLARIS IDE, AURORA IDE, SAPHO, and much more.</p>
-        </div>
-    </div>
+  </main>
 
-    <div class="faq-item">
-        <button class="faq-question" onclick="toggleAnswer(this)">
-            <span data-i18n="home_text_faq_q_3" class="question-text">How can I help the lab?</span>
-            <span class="icon">+</span>
-        </button>
-        <div class="faq-answer">
-            <p data-i18n="home_text_faq_a_3">You can join us on our GitHub located at the footer.</p>
-        </div>
+  <!-- Footer (injected by main.js) -->
+  <footer id="footer" role="contentinfo"></footer>
+
+  <!-- VLibras — Brazilian Sign Language Widget -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
     </div>
-</section>
-        <br><br>
-        <!-- Contact Us Section
-        <section id="contact" href="contact" class="contact-section">
-            <h2 data-i18n="home_title_get_touch" class="contact-title">Get in Touch</h2>
-            <div class="contact-container">
-                <form class="contact-form" action="https://formspree.io/f/xdkoavjq" method="POST" onsubmit="handleFormSubmit(event)">
-                    <div class="form-group">
-                        <input type="text" id="name" name="name" placeholder="Your Name" required />
-                    </div>
-                    <div class="form-group">
-                        <input type="email" id="email" name="email" placeholder="Your Email" required />
-                    </div>
-                    <div class="form-group">
-                        <textarea id="message" name="message" placeholder="Your Message" required></textarea>
-                    </div>
-                    <button data-i18n="home_text_send_message" type="submit" class="submit-button">Send Message</button>
-                </form>
-                <div class="contact-info">
-                    <h3 data-i18n="home_text_contact_info">Contact Information</h3>
-                    <p><strong>Email:</strong> contact@nipscern.com</p>
-                </div>
-            </div>
-            <div class="contact-background"></div>
-            <br><br>
-        </section> -->
-        <br><br><br><br>
-        <!-- Footer -->
-        <footer href="footer" class="bg-blue-900 text-white py-10">
-            <div class="max-w-6xl mx-auto text-center">
-                <!-- Links to Privacy Policy and Terms of Service -->
-                <p class="mb-4">
-                    <a data-i18n="home_privacy_policy" href="/projects/privacy" class="hover:underline">Privacy Policy</a> | 
-                    <a data-i18n="home_terms_service" href="/projects/service" class="hover:underline">Terms of Service</a>
-                </p>
-                <!-- Social & Organizational Icons -->
-                <div class="flex justify-center items-center space-x-6 mb-6">
-                    <a href="https://fapemig.br/" target="_blank">
-                    <img src="/assets/icons/icon_home_fapemig.png" alt="FAPEMIG" class="icon-footer fapemig-icon">
-                    </a>
-                    <a href="https://github.com/nipscernlab" target="_blank">
-                    <img src="/assets/icons/icon_home_github-mark-white.svg" alt="GitHub" class="icon-footer github-icon">
-                    </a>
-                    <a href="https://www.gov.br/cnpq/pt-br" target="_blank">
-                    <img src="/assets/icons/icon_home_cnpq_esc.svg" alt="CNPq" class="icon-footer cnpq-icon">
-                    </a>
-                    <a href="https://www.ufjf.br" target="_blank">
-                    <img src="/assets/icons/icon_home_brasao_UFJF.png" alt="UFJF" class="icon-footer ufjf-icon">
-                    </a>
-                    <a href="https://www.cern.ch" target="_blank">
-                    <img src="/assets/icons/icon_home_CERN-Embleme.png" alt="CERN" class="icon-footer cern-icon">
-                    </a>
-                </div>
-                <!-- CC License -->
-                <div class="mb-6">
-                    <p class="inline-block mb-2"><a data-i18n="home_footer_license">This work is licensed under a</a>
-                        <a id="license-link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" target="_blank" rel="license noopener noreferrer"> 
-                        CC BY-NC-SA 4.0
-                        </a>
-                    </p>
-                    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" target="_blank" rel="license noopener noreferrer">
-                    <img alt="Icon CC" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" class="cc-icon">
-                    <img alt="Icon BY" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" class="cc-icon">
-                    <img alt="Icon NC" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" class="cc-icon">
-                    <img alt="Icon SA" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" class="cc-icon">
-                    </a>
-                </div>
-            </div>
-        </footer>
-        <!-- AOS Animations and GSAP Script -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-        <script>
-            AOS.init({
-              duration: 1200,
-            });
-        </script>
-        <script src="/js/main.js"></script>
-        <script src="/js/faq.js"></script>
-        <script src="/js/language.js"></script>
-        <script src="/js/contact.js"></script>
-        <script src="/js/header.js"></script>
-        <script src="/js/search.js"></script>
-    </body>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+
+  <!-- CGV Preview (Three.js) -->
+  <script type="module">
+    import { initCGVPreview } from './assets/js/cgv-preview.js';
+    document.addEventListener('DOMContentLoaded', () => initCGVPreview('cgv-canvas-wrapper'));
+  </script>
+
+  <!-- Starry sky -->
+  <script>
+  (function(){
+    var canvas = document.getElementById('hero-stars');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var W, H, stars = [], shooting = null, shootTimer = 0;
+    var NUM_STARS = 130;
+
+    function resize() {
+      var hero = canvas.parentElement.parentElement;
+      W = canvas.width  = hero.offsetWidth  || window.innerWidth;
+      H = canvas.height = hero.offsetHeight || window.innerHeight;
+      stars = [];
+      for (var i = 0; i < NUM_STARS; i++) {
+        stars.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: 0.4 + Math.random() * 1.5,
+          base: 0.25 + Math.random() * 0.65,
+          freq: 0.3 + Math.random() * 1.2,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function newShooter() {
+      var edge = Math.random() < 0.5 ? 0 : 1;
+      var sx = edge === 0 ? Math.random() * W * 0.6 : W * 0.3 + Math.random() * W * 0.4;
+      var sy = Math.random() * H * 0.5;
+      var angle = (25 + Math.random() * 30) * Math.PI / 180;
+      var speed = 380 + Math.random() * 260;
+      return { x: sx, y: sy, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+               len: 90 + Math.random() * 60, life: 1, tail: [] };
+    }
+
+    var last = 0;
+    function frame(ts) {
+      var dt = Math.min((ts - last) / 1000, 0.05);
+      last = ts;
+      ctx.clearRect(0, 0, W, H);
+
+      // Stars
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        var t  = ts * 0.001;
+        var op = s.base + 0.28 * Math.sin(t * s.freq * Math.PI * 2 + s.phase);
+        op = Math.max(0.05, Math.min(1, op));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(210,225,255,' + op.toFixed(2) + ')';
+        ctx.fill();
+      }
+
+      if (!reduced) {
+        // Shooting star timer
+        shootTimer -= dt;
+        if (shootTimer <= 0 && !shooting) {
+          shooting = newShooter();
+          shootTimer = 8 + Math.random() * 14;
+        }
+
+        // Draw shooting star
+        if (shooting) {
+          shooting.x += shooting.vx * dt;
+          shooting.y += shooting.vy * dt;
+          shooting.life -= dt * 1.3;
+          shooting.tail.push({ x: shooting.x, y: shooting.y, a: shooting.life });
+          if (shooting.tail.length > 18) shooting.tail.shift();
+
+          ctx.lineCap = 'round';
+          for (var j = 1; j < shooting.tail.length; j++) {
+            var p0 = shooting.tail[j - 1], p1 = shooting.tail[j];
+            var a = (j / shooting.tail.length) * Math.max(0, shooting.life) * 0.75;
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.strokeStyle = 'rgba(220,235,255,' + a.toFixed(2) + ')';
+            ctx.lineWidth = 1.5 * (j / shooting.tail.length);
+            ctx.stroke();
+          }
+
+          if (shooting.life <= 0 || shooting.x > W + 40 || shooting.y > H + 40) {
+            shooting = null;
+          }
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    requestAnimationFrame(frame);
+  })();
+  </script>
+
+  <!-- Main module -->
+  <script type="module" src="assets/js/main.js"></script>
+
+  <script data-goatcounter="https://nipscern.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+  <script>
+    (function () {
+      const el = document.getElementById('view-count');
+      const wrap = document.getElementById('hero-viewcount');
+      if (!el || !wrap) return;
+      fetch('https://nipscern.goatcounter.com/api/v0/stats/pages?start=2020-01-01&end=2099-12-31', {
+        headers: { 'Authorization': 'Bearer 16lybalelyf5defd6xtscc3jn1ndwr9wtrr6p2t08yhq3i5fct' }
+      })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data) return;
+          var count = data.total_hits;
+          if (count == null && Array.isArray(data.pages)) {
+            count = data.pages.reduce(function (s, p) { return s + (p.count || 0); }, 0);
+          }
+          if (count) { el.textContent = Number(count).toLocaleString(); wrap.removeAttribute('hidden'); }
+        })
+        .catch(function () {});
+    })();
+  </script>
+</body>
 </html>
