@@ -132,12 +132,6 @@ function initNav() {
 
   nav.innerHTML = buildNav();
 
-  // Move mobile overlay to <body> so that the backdrop-filter on #nav.scrolled
-  // does not create a new containing block that makes position:fixed children
-  // lose their viewport reference (causing the transparent-background bug).
-  const mobileOverlay = nav.querySelector('#nav-mobile');
-  if (mobileOverlay) document.body.appendChild(mobileOverlay);
-
   // Scroll state
   const onScroll = () => {
     nav.classList.toggle('scrolled', window.scrollY > 20);
