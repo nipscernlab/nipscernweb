@@ -659,24 +659,33 @@
 
   <script data-goatcounter="https://nipscern.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
-  <script>
+<script>
     (function () {
       const el = document.getElementById('view-count');
       const wrap = document.getElementById('hero-viewcount');
       if (!el || !wrap) return;
-      fetch('https://nipscern.goatcounter.com/api/v0/stats/pages?start=2020-01-01&end=2099-12-31', {
-        headers: { 'Authorization': 'Bearer 16lybalelyf5defd6xtscc3jn1ndwr9wtrr6p2t08yhq3i5fct' }
-      })
+
+      // ATENÇÃO: Substitua a URL abaixo pela URL do seu Cloudflare Worker
+      const workerUrl = 'https://goatcounter-proxy.nipscernlab.workers.dev/';
+
+      fetch(workerUrl) // Não precisa mais enviar o cabeçalho de Authorization aqui!
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           if (!data) return;
+          
           var count = data.total_hits;
           if (count == null && Array.isArray(data.pages)) {
             count = data.pages.reduce(function (s, p) { return s + (p.count || 0); }, 0);
           }
-          if (count) { el.textContent = Number(count).toLocaleString(); wrap.removeAttribute('hidden'); }
+          
+          if (count) { 
+            el.textContent = Number(count).toLocaleString(); 
+            wrap.removeAttribute('hidden'); 
+          }
         })
-        .catch(function () {});
+        .catch(function (err) {
+          console.error("Erro ao buscar contagem de visualizações:", err);
+        });
     })();
   </script>
 </body>
