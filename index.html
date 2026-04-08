@@ -660,33 +660,48 @@
   <script data-goatcounter="https://nipscern.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
 <script>
-    (function () {
+    // Garante que o script só rode depois que todo o HTML estiver na tela
+    document.addEventListener("DOMContentLoaded", function() {
       const el = document.getElementById('view-count');
       const wrap = document.getElementById('hero-viewcount');
-      if (!el || !wrap) return;
+      
+      if (!el || !wrap) {
+        console.warn("Aviso: Elementos do contador (view-count ou hero-viewcount) não foram encontrados no HTML.");
+        return;
+      }
 
-      // ATENÇÃO: Substitua a URL abaixo pela URL do seu Cloudflare Worker
-      const workerUrl = 'https://goatcounter-proxy.nipscernlab.workers.dev/';
+      const workerUrl = 'https://goatcounter-proxy.nipscernlab.workers.dev';
 
-      fetch(workerUrl) // Não precisa mais enviar o cabeçalho de Authorization aqui!
-        .then(function (r) { return r.ok ? r.json() : null; })
+      fetch(workerUrl)
+        .then(function (r) { 
+          if (!r.ok) throw new Error("Erro na resposta do Worker: " + r.status);
+          return r.json(); 
+        })
         .then(function (data) {
-          if (!data) return;
+          console.log("Sucesso! Dados recebidos do GoatCounter:", data);
           
-          var count = data.total_hits;
-          if (count == null && Array.isArray(data.pages)) {
-            count = data.pages.reduce(function (s, p) { return s + (p.count || 0); }, 0);
-          }
+          if (!data || data.total === undefined) return;
           
-          if (count) { 
+          var count = data.total;
+          
+          if (count > 0) { 
+            // 1. Escreve o número (ex: 151)
             el.textContent = Number(count).toLocaleString(); 
+            
+            // 2. Remove o atributo hidden
             wrap.removeAttribute('hidden'); 
+            
+            // 3. Força a exibição caso o CSS esteja escondendo
+            // (Use 'flex' se o seu layout usar flexbox para alinhar o ícone e o texto, ou 'block'/'inline-block')
+            wrap.style.display = 'flex'; 
+            
+            console.log("Contador atualizado e visível na tela!");
           }
         })
         .catch(function (err) {
-          console.error("Erro ao buscar contagem de visualizações:", err);
+          console.error("Erro ao processar o contador:", err);
         });
-    })();
+    });
   </script>
 </body>
 </html>
