@@ -1,7 +1,12 @@
 import * as THREE         from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
-import wasmInit, { parse_atlas_id } from '../parser/pkg/atlas_id_parser.js';
+import wasmInit, { parse_atlas_ids_bulk } from '../parser/pkg/atlas_id_parser.js';
+
+// Subsystem codes returned by parse_atlas_ids_bulk (slot [0] of each 6-i32 record)
+const SUBSYS_TILE     = 1;
+const SUBSYS_LAR_EM   = 2;
+const SUBSYS_LAR_HEC  = 3;
 
 let LivePoller = null;
 try { ({ LivePoller } = await import('../live_atlas/live_cern/live_poller.js')); } catch (_) {}
@@ -723,23 +728,20 @@ function hecMeshPath(be, sampling, region, eta, phi) {
 }
 
 // ── XML parsers ───────────────────────────────────────────────────────────────
-function parseTile(xmlText) {
-  const doc  = new DOMParser().parseFromString(xmlText, 'application/xml');
-  const pe   = doc.querySelector('parsererror');
-  if (pe) throw new Error('XML parse error: ' + pe.textContent.slice(0,120));
-  const tiles = [...doc.getElementsByTagName('TILE')];
-  if (!tiles.length) return [];   // no TILE block — not an error, LAr may still exist
+// ── Shared XML cell extractor (operates on a pre-parsed Document) ─────────────
+function extractCells(doc, tagName) {
+  const els = doc.getElementsByTagName(tagName);
   const cells = [];
-  for (const tile of tiles) {
+  for (const el of els) {
     let n = 0;
-    for (const ch of tile.children) {
+    for (const ch of el.children) {
       const id = ch.getAttribute('id') ?? ch.getAttribute('cellID');
       const ev = ch.getAttribute('energy') ?? ch.getAttribute('e');
       if (id && ev) { const e = parseFloat(ev); if (isFinite(e)) { cells.push({ id: id.trim(), energy: e }); n++; } }
     }
     if (n) continue;
-    const idEl = tile.querySelector('id, cellID');
-    const eEl  = tile.querySelector('energy, e');
+    const idEl = el.querySelector('id, cellID');
+    const eEl  = el.querySelector('energy, e');
     if (idEl && eEl) {
       const ids = idEl.textContent.trim().split(/\s+/);
       const ens = eEl.textContent.trim().split(/\s+/).map(Number);
@@ -750,56 +752,25 @@ function parseTile(xmlText) {
   return cells;
 }
 
-function parseLAr(xmlText) {
-  const doc    = new DOMParser().parseFromString(xmlText, 'application/xml');
-  const larEls = [...doc.getElementsByTagName('LAr')]
-                   .filter(el => el.getAttribute('storeGateKey') === 'AllCalo');
-  if (!larEls.length) return [];
-  const cells = [];
-  for (const lar of larEls) {
-    let n = 0;
-    for (const ch of lar.children) {
-      const id = ch.getAttribute('id') ?? ch.getAttribute('cellID');
-      const ev = ch.getAttribute('energy') ?? ch.getAttribute('e');
-      if (id && ev) { const e = parseFloat(ev); if (isFinite(e)) { cells.push({ id: id.trim(), energy: e }); n++; } }
-    }
-    if (n) continue;
-    const idEl = lar.querySelector('id, cellID');
-    const eEl  = lar.querySelector('energy, e');
-    if (idEl && eEl) {
-      const ids = idEl.textContent.trim().split(/\s+/);
-      const ens = eEl.textContent.trim().split(/\s+/).map(Number);
-      const m   = Math.min(ids.length, ens.length);
-      for (let i = 0; i < m; i++) if (ids[i] && isFinite(ens[i])) cells.push({ id: ids[i], energy: ens[i] });
-    }
-  }
-  return cells;
+// ── Single-pass XML parse — returns one Document for all detectors ────────────
+function parseXmlDoc(xmlText) {
+  const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+  const pe  = doc.querySelector('parsererror');
+  if (pe) throw new Error('XML parse error: ' + pe.textContent.slice(0, 120));
+  return doc;
 }
 
-function parseHec(xmlText) {
-  const doc    = new DOMParser().parseFromString(xmlText, 'application/xml');
-  // Find HEC block with any storeGateKey — count is read dynamically, not hardcoded
-  const hecEls = [...doc.getElementsByTagName('HEC')];
-  if (!hecEls.length) return [];
-  const cells = [];
-  for (const hec of hecEls) {
-    let n = 0;
-    for (const ch of hec.children) {
-      const id = ch.getAttribute('id') ?? ch.getAttribute('cellID');
-      const ev = ch.getAttribute('energy') ?? ch.getAttribute('e');
-      if (id && ev) { const e = parseFloat(ev); if (isFinite(e)) { cells.push({ id: id.trim(), energy: e }); n++; } }
-    }
-    if (n) continue;
-    const idEl = hec.querySelector('id, cellID');
-    const eEl  = hec.querySelector('energy, e');
-    if (idEl && eEl) {
-      const ids = idEl.textContent.trim().split(/\s+/);
-      const ens = eEl.textContent.trim().split(/\s+/).map(Number);
-      const m   = Math.min(ids.length, ens.length);
-      for (let i = 0; i < m; i++) if (ids[i] && isFinite(ens[i])) cells.push({ id: ids[i], energy: ens[i] });
-    }
-  }
-  return cells;
+function parseTile(doc) {
+  const cells = extractCells(doc, 'TILE');
+  return cells; // empty array is fine — LAr may still exist
+}
+
+function parseLAr(doc) {
+  return extractCells(doc, 'LAr');
+}
+
+function parseHec(doc) {
+  return extractCells(doc, 'HEC');
 }
 
 // ── LAr EM ID → mesh path (tries cell_ then cell2_ as fallback) ───────────────
@@ -841,12 +812,13 @@ function processXml(xmlText) {
   if (!wasmOk) return;
   const t0 = performance.now();
 
-  // Parse TILE, LAr EM and HEC blocks
-  let tileCells, larCells, hecCells;
-  try { tileCells = parseTile(xmlText); }
+  // Parse XML once — all detectors share the same Document
+  let doc, tileCells, larCells, hecCells;
+  try { doc = parseXmlDoc(xmlText); }
   catch (e) { setStatus(`<span class="err">${esc(e.message)}</span>`); addLog(e.message, 'err'); return; }
-  try { larCells = parseLAr(xmlText); } catch { larCells = []; }
-  try { hecCells = parseHec(xmlText); } catch { hecCells = []; }
+  try { tileCells = parseTile(doc); } catch { tileCells = []; }
+  try { larCells  = parseLAr(doc);  } catch { larCells  = []; }
+  try { hecCells  = parseHec(doc);  } catch { hecCells  = []; }
 
   const total = tileCells.length + larCells.length + hecCells.length;
   if (!total) { setStatus('<span class="warn">No TILE, LAr or HEC cells found</span>'); addLog('No cells in XML', 'warn'); return; }
@@ -854,31 +826,39 @@ function processXml(xmlText) {
   setStatus(`Decoding ${total} cells…`);
   resetScene();
 
-  // Per-detector energy ranges (first pass)
-  const tileMevs = tileCells.map(c => c.energy * 1000).filter(v => isFinite(v) && v > 0);
-  const larMevs  = larCells .map(c => c.energy * 1000).filter(v => isFinite(v) && v > 0);
-  const hecMevs  = hecCells .map(c => c.energy * 1000).filter(v => isFinite(v) && v > 0);
-  tileMinMev = tileMevs.length ? Math.min(...tileMevs) : 0;
-  tileMaxMev = tileMevs.length ? Math.max(...tileMevs) : 1;
-  larMinMev  = larMevs.length  ? Math.min(...larMevs)  : 0;
-  larMaxMev  = larMevs.length  ? Math.max(...larMevs)  : 1;
-  hecMinMev  = hecMevs.length  ? Math.min(...hecMevs)  : 0;
-  hecMaxMev  = hecMevs.length  ? Math.max(...hecMevs)  : 1;
+  // Per-detector energy ranges — single loop per detector, avoids spread stack overflow
+  function minMax(cells) {
+    let mn = Infinity, mx = -Infinity;
+    for (const { energy } of cells) { const v = energy * 1000; if (isFinite(v) && v > 0) { if (v < mn) mn = v; if (v > mx) mx = v; } }
+    return mn === Infinity ? [0, 1] : [mn, mx];
+  }
+  [tileMinMev, tileMaxMev] = minMax(tileCells);
+  [larMinMev,  larMaxMev]  = minMax(larCells);
+  [hecMinMev,  hecMaxMev]  = minMax(hecCells);
 
   let nTile = 0, nLAr = 0, nHec = 0, nMiss = 0, nSkip = 0;
   let nHecMiss = 0;
 
+  // ── Bulk decode: one WASM call per detector replaces N individual FFI calls ──
+  const tilePacked = tileCells.length ? parse_atlas_ids_bulk(tileCells.map(c => c.id).join(' ')) : null;
+  const larPacked  = larCells.length  ? parse_atlas_ids_bulk(larCells.map(c => c.id).join(' '))  : null;
+  const hecPacked  = hecCells.length  ? parse_atlas_ids_bulk(hecCells.map(c => c.id).join(' '))  : null;
+
   // ── TileCal cells ─────────────────────────────────────────────────────────
-  for (const { id, energy } of tileCells) {
+  for (let i = 0; i < tileCells.length; i++) {
+    const base = i * 6;
+    if (tilePacked[base] !== SUBSYS_TILE) { nSkip++; continue; }
+    const section  = tilePacked[base + 1];
+    const side     = tilePacked[base + 2];
+    const module   = tilePacked[base + 3];
+    const tower    = tilePacked[base + 4];
+    const sampling = tilePacked[base + 5];
+    const { id, energy } = tileCells[i];
     const eMev = energy * 1000;
-    let p;
-    try { p = parse_atlas_id(id); } catch { nSkip++; continue; }
-    if (!p?.valid || p.subsystem !== 'TILECAL') { nSkip++; continue; }
-    const f = Object.fromEntries(p.fields.map(({ name, value }) => [name, value]));
-    const x = compX(f.section, f.sampling, f.tower); if (x === null) { const s = `[TILE] id=${id} | compX failed | section=${f.section} sampling=${f.sampling} tower=${f.tower}`; console.warn(s); _missLog.push(s); nMiss++; continue; }
-    const k = compK(f.tower, f.sampling, x);         if (k === null) { const s = `[TILE] id=${id} | compK failed | tower=${f.tower} sampling=${f.sampling} x=${x}`;               console.warn(s); _missLog.push(s); nMiss++; continue; }
-    const y    = f.side < 0 ? 'p' : 'n';
-    const path = `Calorimeter\u2192Tile${x}${y}_0\u2192Tile${x}${y}${k}_${k}\u2192cell_${f.module}`;
+    const x = compX(section, sampling, tower); if (x === null) { const s = `[TILE] id=${id} | compX failed | section=${section} sampling=${sampling} tower=${tower}`; console.warn(s); _missLog.push(s); nMiss++; continue; }
+    const k = compK(tower, sampling, x);       if (k === null) { const s = `[TILE] id=${id} | compK failed | tower=${tower} sampling=${sampling} x=${x}`;             console.warn(s); _missLog.push(s); nMiss++; continue; }
+    const y    = side < 0 ? 'p' : 'n';
+    const path = `Calorimeter\u2192Tile${x}${y}_0\u2192Tile${x}${y}${k}_${k}\u2192cell_${module}`;
     const mesh = meshByName.get(path);
     if (!mesh) { const s = `[TILE] id=${id} | ${path}`; console.warn(s); _missLog.push(s); nMiss++; continue; }
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
@@ -887,60 +867,58 @@ function processXml(xmlText) {
   }
 
   // ── LAr EM cells ──────────────────────────────────────────────────────────
-  for (const { id, energy } of larCells) {
+  for (let i = 0; i < larCells.length; i++) {
+    const base = i * 6;
+    if (larPacked[base] !== SUBSYS_LAR_EM) { nSkip++; continue; }
+    const bec      = larPacked[base + 1];
+    const sampling = larPacked[base + 2];
+    const region   = larPacked[base + 3];
+    const eta      = larPacked[base + 4];
+    const phi      = larPacked[base + 5];
+    const { id, energy } = larCells[i];
     const eMev = energy * 1000;
-    let p;
-    try { p = parse_atlas_id(id); } catch { nSkip++; continue; }
-    if (!p?.valid || p.subsystem !== 'LAr EM') { nSkip++; continue; }
-    if (p.debug_log?.length) p.debug_log.forEach(msg => addLog(msg, 'info'));
-    const f = Object.fromEntries(p.fields.map(({ name, value }) => [name, value]));
-    const bec = f['barrel-endcap'];
-    if (bec === undefined || f.sampling === undefined || f.eta === undefined || f.phi === undefined) { const s = `[LAr EM] id=${id} | missing fields | bec=${bec} sampling=${f.sampling} eta=${f.eta} phi=${f.phi}`; console.warn(s); _missLog.push(s); nMiss++; continue; }
-    const path = larMeshPath(bec, f.sampling, f.region, f.eta, f.phi);
+    const path = larMeshPath(bec, sampling, region, eta, phi);
     if (!path) {
       const X = (bec === -1 || bec === 1) ? 'Barrel' : 'EndCap';
       const W = X === 'Barrel' ? 0 : 1;
       const Z = bec > 0 ? 'p' : 'n';
-      const R  = X === 'EndCap' ? Math.abs(bec) : f.region;
-      const s = `[LAr EM] id=${id} | Calorimeter\u2192EM${X}_${f.sampling}_${R}_${Z}_${W}\u2192EM${X}_${f.sampling}_${R}_${Z}_${f.eta}_${f.eta}\u2192cell_${f.phi}`;
+      const R = X === 'EndCap' ? Math.abs(bec) : region;
+      const s = `[LAr EM] id=${id} | Calorimeter\u2192EM${X}_${sampling}_${R}_${Z}_${W}\u2192EM${X}_${sampling}_${R}_${Z}_${eta}_${eta}\u2192cell_${phi}`;
       console.warn(s); _missLog.push(s); nMiss++; continue;
     }
     const mesh = meshByName.get(path);
     if (!mesh) { const s = `[LAr EM] id=${id} | ${path}`; console.warn(s); _missLog.push(s); nMiss++; continue; }
     mesh.material = palMatLAr(eMev); mesh.visible = true; mesh.renderOrder = 2;
-    active.set(path, { energyGev: energy, energyMev: eMev, cellName: p.cell_name ?? `LAr η=${f.eta} φ=${f.phi}`, det: 'LAR' });
+    const rName = Math.abs(bec) === 1 ? (bec > 0 ? 'EMBA' : 'EMBC') : Math.abs(bec) === 2 ? (bec > 0 ? 'EMECA' : 'EMECC') : (bec > 0 ? 'EMECA (inner)' : 'EMECC (inner)');
+    active.set(path, { energyGev: energy, energyMev: eMev, cellName: `${rName} s=${sampling} r=${region} η=${eta} φ=${phi}`, det: 'LAR' });
     nLAr++;
   }
 
   // ── LAr HEC cells ─────────────────────────────────────────────────────────
-  for (const { id, energy } of hecCells) {
+  for (let i = 0; i < hecCells.length; i++) {
+    const base = i * 6;
+    if (hecPacked[base] !== SUBSYS_LAR_HEC) { nSkip++; continue; }
+    const be       = hecPacked[base + 1];
+    const sampling = hecPacked[base + 2];
+    const region   = hecPacked[base + 3];
+    const eta      = hecPacked[base + 4];
+    const phi      = hecPacked[base + 5];
+    const { id, energy } = hecCells[i];
     const eMev = energy * 1000;
-    let p;
-    try { p = parse_atlas_id(id); } catch { nSkip++; continue; }
-    if (!p?.valid || p.subsystem !== 'LAr HEC') { nSkip++; continue; }
-    const f = Object.fromEntries(p.fields.map(({ name, value }) => [name, value]));
-    const be = f['barrel-endcap'];
-    if (be === undefined || f.sampling === undefined || f.region === undefined ||
-        f.eta === undefined || f.phi === undefined) { const s = `[HEC] id=${id} | missing fields | be=${be} sampling=${f.sampling} region=${f.region} eta=${f.eta} phi=${f.phi}`; console.warn(s); _missLog.push(s); nHecMiss++; continue; }
-    const path = hecMeshPath(be, f.sampling, f.region, f.eta, f.phi);
+    const path = hecMeshPath(be, sampling, region, eta, phi);
     if (!path) {
-      const g = HEC_GROUPS_MAP[f.sampling];
+      const g = HEC_GROUPS_MAP[sampling];
       const Z = be > 0 ? 'p' : 'n';
-      const cum = f.region === 0 ? f.eta : (g ? g.innerBins + f.eta : f.eta);
-      const B = cum;
-      const s = g ? `[HEC] id=${id} | Calorimeter\u2192HEC_${g.name}_${f.region}_${Z}_0\u2192HEC_${g.name}_${f.region}_${Z}_${cum}_${B}\u2192cell_${f.phi}` : `[HEC] id=${id} | sampling=${f.sampling} (no group)`;
+      const cum = region === 0 ? eta : (g ? g.innerBins + eta : eta);
+      const s = g ? `[HEC] id=${id} | Calorimeter\u2192HEC_${g.name}_${region}_${Z}_0\u2192HEC_${g.name}_${region}_${Z}_${cum}_${cum}\u2192cell_${phi}` : `[HEC] id=${id} | sampling=${sampling} (no group)`;
       console.warn(s); _missLog.push(s); nHecMiss++; continue;
     }
     const mesh = meshByName.get(path);
     if (!mesh) { const s = `[HEC] id=${id} | ${path}`; console.warn(s); _missLog.push(s); nHecMiss++; continue; }
     mesh.material = palMatHec(eMev); mesh.visible = true; mesh.renderOrder = 2;
-    const side  = be > 0 ? 'HECA' : 'HECC';
-    const sLabel = ['front','middle','back','rear'][f.sampling] ?? `s${f.sampling}`;
-    active.set(path, {
-      energyGev: energy, energyMev: eMev,
-      cellName: `${side} ${sLabel} η=${f.eta} φ=${f.phi}`,
-      det: 'HEC'
-    });
+    const side   = be > 0 ? 'HECA' : 'HECC';
+    const sLabel = ['front','middle','back','rear'][sampling] ?? `s${sampling}`;
+    active.set(path, { energyGev: energy, energyMev: eMev, cellName: `${side} ${sLabel} η=${eta} φ=${phi}`, det: 'HEC' });
     nHec++;
   }
 
