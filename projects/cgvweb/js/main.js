@@ -717,7 +717,7 @@ function hecMeshPath(be, sampling, region, eta, phi) {
   if (!g) return null;
   const Z   = be > 0 ? 'p' : 'n';
   const cum = region === 0 ? eta : g.innerBins + eta;
-  const B   = g.name === '1' ? cum : Math.max(0, cum - 1);
+  const B   = cum;
   const path = `Calorimeter\u2192HEC_${g.name}_${region}_${Z}_0\u2192HEC_${g.name}_${region}_${Z}_${cum}_${B}\u2192cell_${phi}`;
   return meshByName.has(path) ? path : null;
 }
@@ -927,7 +927,7 @@ function processXml(xmlText) {
       const g = HEC_GROUPS_MAP[f.sampling];
       const Z = be > 0 ? 'p' : 'n';
       const cum = f.region === 0 ? f.eta : (g ? g.innerBins + f.eta : f.eta);
-      const B = g?.name === '1' ? cum : Math.max(0, cum - 1);
+      const B = cum;
       const s = g ? `[HEC] id=${id} | Calorimeter\u2192HEC_${g.name}_${f.region}_${Z}_0\u2192HEC_${g.name}_${f.region}_${Z}_${cum}_${B}\u2192cell_${f.phi}` : `[HEC] id=${id} | sampling=${f.sampling} (no group)`;
       console.warn(s); _missLog.push(s); nHecMiss++; continue;
     }
