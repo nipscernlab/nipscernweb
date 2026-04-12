@@ -1,42 +1,7 @@
 # ── Build artifacts ────────────────────────────────────────────────────────────
 node_modules/
-atlas-id-parser/target/
-atlas-id-parser/src/
-atlas-id-parser/www/
-atlas-id-parser/Cargo.toml
-atlas-id-parser/Cargo.lock
-atlas-id-parser/serve.mjs
-
-# ── wasm-pack output: allow the two runtime files, ignore the rest ────────────
-atlas-id-parser/pkg/*
-!atlas-id-parser/pkg/atlas_id_parser.js
-!atlas-id-parser/pkg/atlas_id_parser_bg.wasm
-
-# ── Large / binary source data ─────────────────────────────────────────────────
-*.root
-*.cgv
 
 # ── Node.js project files (not needed for static site) ────────────────────────
-package.json
 package-lock.json
 
-# ── Build / dev scripts ────────────────────────────────────────────────────────
-build_tile_names.mjs
-decode_tile_ids.js
-root2scene.mjs
-optimize_glb.mjs
-setup.mjs
-rascunho.C
-
-# ── Generated text outputs ─────────────────────────────────────────────────────
-tile_names.txt
-tile_names_debug.txt
-tile_names_labeled.txt
-tile_id_statistics.txt
-
-# ── Unused JS library (not imported by index.html) ────────────────────────────
-lib/
-
-# ── Python scripts (server-side tools, not part of the web app) ───────────────
-live_atlas/live_cern/atlas_jivexml_downloader.py
-live_atlas/live_cern/extractor_5000.py
+parser/target
