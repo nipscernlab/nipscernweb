@@ -58,8 +58,8 @@
   <script type="importmap">
   {
     "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      "three": "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"
     }
   }
   </script>
@@ -67,7 +67,7 @@
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 
   <!-- CSS -->
   <link rel="stylesheet" href="assets/css/main.css">
@@ -121,7 +121,7 @@
           <span class="dot" aria-hidden="true"></span>
           <span data-i18n="home.hero.label">Federal University of Juiz de Fora · CERN</span>
         </div>
-        <h1 class="hero-title" id="hero-title">NIPS<i class="ph ph-atom hero-atom" aria-hidden="true"></i>CERN</h1>
+        <h1 class="hero-title" id="hero-title">NIPS<span class="hero-atom" aria-hidden="true"></span>CERN</h1>
         <p class="hero-subtitle" data-i18n="home.hero.subtitle">
           Research and Development Laboratory at UFJF, Brazil — working at the frontier of high energy physics, scientific computing, and advanced hardware systems in collaboration with CERN, Geneva.
         </p>
@@ -222,12 +222,6 @@
             <span data-i18n="home.cgv.loading">Initialising calorimeter geometry…</span>
           </div>
 
-          <!-- Cell count badge -->
-          <div class="cgv-cell-count" aria-live="polite" aria-label="Active cells">
-            <span id="cgv-cell-count">0</span>
-            <span style="margin-left:4px;color:var(--text-muted)" data-i18n="home.cgv.cells_label">active cells</span>
-          </div>
-
           <!-- Open Full CGV -->
           <a href="https://nipscern.com/projects/cgvweb" target="_blank" rel="noopener"
              class="btn btn-ghost btn-sm cgv-open-btn" id="cgv-open-btn"
@@ -235,25 +229,6 @@
             <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
             Open Full CGV
           </a>
-
-          <!-- Controls -->
-          <div class="cgv-controls" role="toolbar" aria-label="Calorimeter controls">
-            <button class="cgv-btn" id="cgv-btn-event" data-i18n="home.cgv.btn_event" aria-label="Generate new collision event">
-              Generate Event
-            </button>
-            <div class="cgv-divider" aria-hidden="true"></div>
-            <button class="cgv-btn" id="cgv-btn-wire" data-i18n="home.cgv.btn_wireframe" aria-pressed="false">
-              Wireframe
-            </button>
-            <div class="cgv-divider" aria-hidden="true"></div>
-            <button class="cgv-btn" id="cgv-btn-beam" data-i18n="home.cgv.btn_beam" aria-pressed="false">
-              Beam Axis
-            </button>
-            <div class="cgv-divider" aria-hidden="true"></div>
-            <button class="cgv-btn active" id="cgv-btn-tilecal" aria-pressed="true">TileCal</button>
-            <button class="cgv-btn active" id="cgv-btn-lar" aria-pressed="true">LAr</button>
-            <button class="cgv-btn active" id="cgv-btn-hec" aria-pressed="true">HEC</button>
-          </div>
         </div>
       </div>
     </section>
@@ -549,10 +524,10 @@
 })();
 </script>
 
-  <!-- CGV Preview (Three.js) -->
+  <!-- CGV Full ATLAS Scene (Three.js + GLB + WASM) -->
   <script type="module">
-    import { initCGVPreview } from './assets/js/cgv-preview.js';
-    document.addEventListener('DOMContentLoaded', () => initCGVPreview('cgv-canvas-wrapper'));
+    import { initATLASScene } from './assets/js/cgv-preview.js';
+    document.addEventListener('DOMContentLoaded', () => initATLASScene('cgv-canvas-wrapper'));
   </script>
 
   <!-- Starry sky -->
