@@ -574,17 +574,24 @@
       .edl      { width: 28px; height: 28px; }
       .mbtn     { padding: 7px 4px; }
 
-      /* Toolbar: hidden on load; toggled by #btn-toolbar-toggle */
+      /* Toolbar: fully hidden on load; toggled by #btn-toolbar-toggle */
       #toolbar {
         bottom: 8px; padding: 5px 8px; gap: 2px;
         max-width: calc(100vw - 24px);
         border-radius: 20px;
-        transform: translateX(-50%) translateY(calc(100% + 20px));
-        opacity: 1;
+        /* Push it well off-screen and fade out so it's truly invisible */
+        transform: translateX(-50%) translateY(calc(100% + 60px));
+        opacity: 0;
+        pointer-events: none;
       }
-      #toolbar.tb-visible { transform: translateX(-50%) translateY(0); }
-      /* Inside-toolbar close button visible only in mobile landscape */
-      #btn-toolbar-close, #toolbar-close-sep { display: flex; }
+      #toolbar.tb-visible {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      /* On mobile, the in-toolbar close button is replaced by the toggle pill
+         which slides above the toolbar — so keep it hidden. */
+      #btn-toolbar-close, #toolbar-close-sep { display: none !important; }
 
       /* Right panel */
       .strak { height: 120px; }
@@ -945,7 +952,8 @@
 
     /* ── Mobile toolbar toggle (landscape only) ───────────── */
     #btn-toolbar-toggle {
-      display: none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: none; position: fixed; bottom: 10px; left: 50%;
+      transform: translateX(-50%) translateY(0);
       z-index: 46; background: rgba(2,9,24,.94);
       backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border2); border-radius: 20px;
@@ -953,13 +961,17 @@
       align-items: center; justify-content: center; gap: 6px;
       color: var(--text); font: 500 .62rem var(--font);
       box-shadow: 0 4px 18px rgba(0,0,0,.55);
-      transition: background .15s, opacity 0.28s ease, transform 0.28s ease;
+      transition: background .15s, bottom 0.28s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.28s cubic-bezier(0.4,0,0.2,1);
     }
     #btn-toolbar-toggle i { font-size: 13px; }
     #btn-toolbar-toggle:hover { background: rgba(26,82,192,.18); }
-    #btn-toolbar-toggle.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(120%); }
+    /* When toolbar is open the toggle slides up above it (acts as close) */
+    #btn-toolbar-toggle.tb-open { bottom: 58px; }
+    #btn-toolbar-toggle.tb-open i.ti-layout-navbar { transform: rotate(180deg); }
+    #btn-toolbar-toggle i.ti-layout-navbar { transition: transform 0.28s ease; }
     /* Toolbar transition on mobile */
-    #toolbar { transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.36s ease; }
+    #toolbar { transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease; }
     /* Default: hide the in-toolbar close button (only shown in mobile landscape) */
     #btn-toolbar-close, #toolbar-close-sep { display: none; }
     /* Show toggle only in landscape small screens */
