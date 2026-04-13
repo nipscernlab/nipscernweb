@@ -1,616 +1,686 @@
 /**
- * NIPSCERN CGV-Preview — Interactive 3D ATLAS Calorimeter
- * Three.js — ES Module
- *
- * Coordinate convention (matches ATLAS):
- *   Three.js X  = ATLAS X  (transverse, horizontal)
- *   Three.js Y  = ATLAS Y  (transverse, vertical)
- *   Three.js Z  = ATLAS Z  (beam axis — HORIZONTAL in view)
- *
- * Geometry from CaloGeoConst.h (mm → m):
- *   TileCal barrel:  r = 2.30–3.82 m,  |z| ≤ 2.82 m,  64φ × 10η × 3 layers
- *   TileCal ext:     r = 2.30–3.82 m,  3.56 ≤ |z| ≤ 6.15 m, same binning
- *   LAr barrel:      r = 1.421–1.985 m, |z| ≤ 3.25 m, 32φ × 16η × 4 layers
- *   HEC endcaps:     r = 0.303–2.034 m, 4 discs ±z, 32φ × 8η
- *
- * Event generation: 3–5 jets + diffuse pileup → 5 000–8 000 active cells.
- * Uses THREE.InstancedMesh per subdetector for GPU performance.
+ * NIPSCERN CGV-Preview — Full ATLAS Calorimeter Scene
+ * Loads the complete geometry from projects/cgvweb/nipscern/
+ * Three.js ES Module — GLB + WASM + XML event data
  */
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-// ============================================================
-// Geometry constants (metres, from CaloGeoConst.h)
-// ============================================================
-const TILE_LAYERS = [
-  { rMin: 2.30, rMax: 2.60 },   // A
-  { rMin: 2.60, rMax: 3.44 },   // BC
-  { rMin: 3.44, rMax: 3.82 },   // D
-];
-const TILE_Z_HALF    = 2.82;
-const TILE_ETA_BINS  = 10;
-const TILE_ETA_MAX   = 1.0;
-const TILE_PHI_BINS  = 64;
-
-const TILE_EXT_Z_MIN  = 3.56;
-const TILE_EXT_Z_MAX  = 6.15;
-const TILE_EXT_ETA_MIN = 1.0;
-const TILE_EXT_ETA_MAX = 1.7;
-const TILE_EXT_ETA_BINS = 8;
-
-const LAR_LAYERS = [
-  { rMin: 1.421, rMax: 1.52  },   // Strip
-  { rMin: 1.52,  rMax: 1.67  },   // Middle
-  { rMin: 1.67,  rMax: 1.83  },   // Back
-  { rMin: 1.83,  rMax: 1.985 },   // Presampler ext
-];
-const LAR_Z_HALF   = 3.25;
-const LAR_ETA_BINS = 16;
-const LAR_ETA_MAX  = 1.475;
-const LAR_PHI_BINS = 32;
-
-const HEC_DISC_Z   = [4.52, 4.96, 5.46, 5.88];
-const HEC_R_MIN    = 0.303;
-const HEC_R_MAX    = 2.034;
-const HEC_ETA_BINS = 8;
-const HEC_PHI_BINS = 32;
-const HEC_ETA_MIN  = 1.5;
-const HEC_ETA_MAX  = 3.2;
-
-// ============================================================
-// Energy → colour  (blue → cyan → green → yellow → red)
-// ============================================================
-function energyToColour(e) {
-  const t = Math.max(0, Math.min(1, e));
-  const stops = [
-    [0.00, 0x0a, 0x3a, 0x8f],
-    [0.20, 0x00, 0xaa, 0xff],
-    [0.45, 0x00, 0xe0, 0x60],
-    [0.70, 0xff, 0xee, 0x00],
-    [1.00, 0xff, 0x22, 0x00],
-  ];
-  let i = 0;
-  while (i < stops.length - 2 && t > stops[i + 1][0]) i++;
-  const [t0, r0, g0, b0] = stops[i];
-  const [t1, r1, g1, b1] = stops[i + 1];
-  const f = (t - t0) / (t1 - t0);
-  return new THREE.Color(
-    (r0 + f * (r1 - r0)) / 255,
-    (g0 + f * (g1 - g0)) / 255,
-    (b0 + f * (b1 - b0)) / 255,
-  );
-}
-
-// ============================================================
-// Gaussian and delta-phi helpers
-// ============================================================
-function gauss(x, sigma) { return Math.exp(-0.5 * (x / sigma) ** 2); }
-
-function wrapPhi(d) {
-  while (d >  Math.PI) d -= 2 * Math.PI;
-  while (d < -Math.PI) d += 2 * Math.PI;
-  return d;
-}
-
-// ============================================================
-// Pre-compute cell pool (called once on init)
-// Each cell: { x, y, z, dr, darc, dz, phi, eta }
-// Coordinate system: ATLAS X→Three.jsX, ATLAS Y→Three.jsY, ATLAS Z→Three.jsZ
-// ============================================================
-function buildCellPool() {
-  const tile = [];   // TileCal barrel + extended
-  const lar  = [];   // LAr barrel
-  const hec  = [];   // HEC endcaps
-
-  const tilePhiStep = (2 * Math.PI) / TILE_PHI_BINS;
-  const tileEtaStep = (2 * TILE_ETA_MAX) / TILE_ETA_BINS;
-
-  // TileCal barrel (eta covers both ±z halves automatically)
-  for (const layer of TILE_LAYERS) {
-    const rMid = (layer.rMin + layer.rMax) / 2;
-    const dr   = (layer.rMax - layer.rMin) * 0.90;
-    for (let ie = 0; ie < TILE_ETA_BINS; ie++) {
-      const eta = -TILE_ETA_MAX + (ie + 0.5) * tileEtaStep;
-      const z   = rMid * Math.sinh(eta);
-      const dz  = rMid * Math.cosh(eta) * tileEtaStep * 0.90;
-      for (let ip = 0; ip < TILE_PHI_BINS; ip++) {
-        const phi  = -Math.PI + (ip + 0.5) * tilePhiStep;
-        const darc = rMid * tilePhiStep * 0.86;
-        tile.push({ x: rMid * Math.cos(phi), y: rMid * Math.sin(phi), z, dr, darc, dz, phi, eta, rMid });
-      }
-    }
-  }
-
-  // TileCal extended barrel (both ±z sides)
-  const extEtaStep = (TILE_EXT_ETA_MAX - TILE_EXT_ETA_MIN) / TILE_EXT_ETA_BINS;
-  for (const layer of TILE_LAYERS) {
-    const rMid = (layer.rMin + layer.rMax) / 2;
-    const dr   = (layer.rMax - layer.rMin) * 0.90;
-    for (let side = -1; side <= 1; side += 2) {
-      for (let ie = 0; ie < TILE_EXT_ETA_BINS; ie++) {
-        const absEta = TILE_EXT_ETA_MIN + (ie + 0.5) * extEtaStep;
-        const eta    = side * absEta;
-        const z      = side * rMid * Math.sinh(absEta);
-        const dz     = rMid * Math.cosh(absEta) * extEtaStep * 0.90;
-        for (let ip = 0; ip < TILE_PHI_BINS; ip++) {
-          const phi  = -Math.PI + (ip + 0.5) * tilePhiStep;
-          const darc = rMid * tilePhiStep * 0.86;
-          tile.push({ x: rMid * Math.cos(phi), y: rMid * Math.sin(phi), z, dr, darc, dz, phi, eta, rMid });
-        }
-      }
-    }
-  }
-
-  // LAr barrel
-  const larPhiStep = (2 * Math.PI) / LAR_PHI_BINS;
-  const larEtaStep = (2 * LAR_ETA_MAX) / LAR_ETA_BINS;
-  for (const layer of LAR_LAYERS) {
-    const rMid = (layer.rMin + layer.rMax) / 2;
-    const dr   = (layer.rMax - layer.rMin) * 0.90;
-    for (let ie = 0; ie < LAR_ETA_BINS; ie++) {
-      const eta = -LAR_ETA_MAX + (ie + 0.5) * larEtaStep;
-      const z   = rMid * Math.sinh(eta);
-      const dz  = rMid * Math.cosh(eta) * larEtaStep * 0.90;
-      for (let ip = 0; ip < LAR_PHI_BINS; ip++) {
-        const phi  = -Math.PI + (ip + 0.5) * larPhiStep;
-        const darc = rMid * larPhiStep * 0.86;
-        lar.push({ x: rMid * Math.cos(phi), y: rMid * Math.sin(phi), z, dr, darc, dz, phi, eta, rMid });
-      }
-    }
-  }
-
-  // HEC endcaps (both ±z sides)
-  const hecPhiStep = (2 * Math.PI) / HEC_PHI_BINS;
-  const hecRStep   = (HEC_R_MAX - HEC_R_MIN) / HEC_ETA_BINS;
-  const hecEtaStep = (HEC_ETA_MAX - HEC_ETA_MIN) / HEC_ETA_BINS;
-  for (const discZ of HEC_DISC_Z) {
-    for (let side = -1; side <= 1; side += 2) {
-      for (let ie = 0; ie < HEC_ETA_BINS; ie++) {
-        const rMin = HEC_R_MIN + ie * hecRStep;
-        const rMax = rMin + hecRStep;
-        const rMid = (rMin + rMax) / 2;
-        const dr   = hecRStep * 0.86;
-        const eta  = side * (HEC_ETA_MIN + (ie + 0.5) * hecEtaStep);
-        const z    = side * discZ;
-        const dz   = 0.20;
-        for (let ip = 0; ip < HEC_PHI_BINS; ip++) {
-          const phi  = -Math.PI + (ip + 0.5) * hecPhiStep;
-          const darc = rMid * hecPhiStep * 0.86;
-          hec.push({ x: rMid * Math.cos(phi), y: rMid * Math.sin(phi), z, dr, darc, dz, phi, eta, rMid });
-        }
-      }
-    }
-  }
-
-  return { tile, lar, hec };
-}
-
-// ============================================================
-// Build InstancedMesh per subdetector
-// Unit cube geometry; scale/rotate/translate per instance
-// ============================================================
-function buildInstancedMeshes(scene) {
-  const pool = buildCellPool();
-  const unitGeo = new THREE.BoxGeometry(1, 1, 1);
-
-  function makeMesh(count, layer) {
-    const mat = new THREE.MeshPhongMaterial({ transparent: true, opacity: 0.88 });
-    const inst = new THREE.InstancedMesh(unitGeo, mat, count);
-    inst.count = 0;
-    inst.userData.isInstCell = true;
-    inst.userData.layer = layer;
-    scene.add(inst);
-    return inst;
-  }
-
-  return {
-    pool,
-    tileInst: makeMesh(pool.tile.length, 'tilecal'),
-    larInst:  makeMesh(pool.lar.length,  'lar'),
-    hecInst:  makeMesh(pool.hec.length,  'hec'),
-  };
-}
-
-// ============================================================
-// Build wireframe shells (static detector outline)
-// ============================================================
-function buildShells(scene) {
-  const wireMat = () => new THREE.MeshBasicMaterial({
-    color: 0x1a2a4a, wireframe: true, transparent: true, opacity: 0.20,
-  });
-
-  // TileCal barrel (outer + inner cylinder, axis along Z)
-  [[3.82, 'tilecal'], [2.30, 'tilecal'], [2.28, 'lar'], [1.421, 'lar']].forEach(([r, layer]) => {
-    const geo = new THREE.CylinderGeometry(r, r, TILE_Z_HALF * 2, 64, 1, true);
-    const m = new THREE.Mesh(geo, wireMat());
-    m.rotation.x = Math.PI / 2;   // cylinder axis → world Z (beam)
-    m.userData.isShell = true;
-    m.userData.layer = layer;
-    scene.add(m);
-  });
-
-  // TileCal extended barrel (both ±z)
-  const extHalf = (TILE_EXT_Z_MAX - TILE_EXT_Z_MIN) / 2;
-  const extCentre = (TILE_EXT_Z_MAX + TILE_EXT_Z_MIN) / 2;
-  [-1, 1].forEach(side => {
-    [3.82, 2.30].forEach(r => {
-      const geo = new THREE.CylinderGeometry(r, r, extHalf * 2, 64, 1, true);
-      const m = new THREE.Mesh(geo, wireMat());
-      m.rotation.x = Math.PI / 2;
-      m.position.z = side * extCentre;
-      m.userData.isShell = true;
-      m.userData.layer = 'tilecal';
-      scene.add(m);
-    });
-  });
-
-  // HEC endcap rings (discs perpendicular to beam axis)
-  HEC_DISC_Z.forEach(discZ => {
-    [-1, 1].forEach(side => {
-      const geo = new THREE.RingGeometry(HEC_R_MIN, HEC_R_MAX, 32);
-      const m = new THREE.Mesh(geo, wireMat());
-      // RingGeometry is in XY plane by default → normal along Z → perpendicular to beam ✓
-      m.position.z = side * discZ;
-      m.userData.isShell = true;
-      m.userData.layer = 'hec';
-      scene.add(m);
-    });
-  });
-
-  // Beam axis line (along Z)
-  const beamGeo = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(0, 0, -8),
-    new THREE.Vector3(0, 0,  8),
-  ]);
-  const beamLine = new THREE.Line(beamGeo,
-    new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.4 }));
-  beamLine.userData.isBeamAxis = true;
-  beamLine.visible = false;
-  scene.add(beamLine);
-
-  // Z-axis north indicator — red cone at +Z end (always visible)
-  const zConeMat = new THREE.MeshBasicMaterial({ color: 0xff2222 });
-  const zConeGeo = new THREE.ConeGeometry(0.12, 0.42, 14);
-  const zCone    = new THREE.Mesh(zConeGeo, zConeMat);
-  // ConeGeometry points along +Y by default; rotate -90° around X → points along +Z
-  zCone.rotation.x = -Math.PI / 2;
-  // Position so the cone base sits at z≈8.0 and tip points outward
-  zCone.position.set(0, 0, 8.21);
-  zCone.userData.isZNorth = true;
-  zCone.visible = false;          // shown only when beam axis is on
-  scene.add(zCone);
-}
-
-// ============================================================
-// Event generation — fills InstancedMesh arrays
-// 8 distinct topologies chosen at random for visual variety
-// ============================================================
-const _pos   = new THREE.Vector3();
-const _quat  = new THREE.Quaternion();
-const _scale = new THREE.Vector3();
-const _mat4  = new THREE.Matrix4();
-const _axis  = new THREE.Vector3(0, 0, 1);   // rotation about Z axis
-
-function setInstance(inst, idx, cell, energy) {
-  const col = energyToColour(energy);
-  _pos.set(cell.x, cell.y, cell.z);
-  _quat.setFromAxisAngle(_axis, cell.phi);   // radial orientation in XY plane
-  _scale.set(cell.dr, cell.darc, cell.dz);   // width=radial, height=phi-arc, depth=beam-z
-  _mat4.compose(_pos, _quat, _scale);
-  inst.setMatrixAt(idx, _mat4);
-  inst.setColorAt(idx, col);
-}
-
-/**
- * Choose a random collision topology.
- * Each topology returns:
- *   jets   — array of { eta, phi, energy, isEM, sEta, sPhi }
- *   pileup — fraction of cells receiving random pileup noise
- *   pileupE — max pileup energy per noisy cell
- *   thTile/thLar/thHec — energy thresholds below which cells are hidden
- */
-function pickTopology() {
-  const r = Math.random();
-
-  if (r < 0.125) {
-    // 1 — Hadronic di-jet (back-to-back, symmetric)
-    const phi0 = -Math.PI + Math.random() * 2 * Math.PI;
-    const eta0 = (Math.random() - 0.5) * 2.0;
-    return {
-      jets: [
-        { eta: eta0,  phi: phi0,                       energy: 0.65 + Math.random() * 0.35, isEM: false, sEta: 0.16 + Math.random() * 0.08, sPhi: 0.18 + Math.random() * 0.08 },
-        { eta: -eta0 + (Math.random() - 0.5) * 0.3,
-          phi: wrapPhi(phi0 + Math.PI),                 energy: 0.55 + Math.random() * 0.35, isEM: false, sEta: 0.16 + Math.random() * 0.08, sPhi: 0.18 + Math.random() * 0.08 },
-      ],
-      pileup: 0.28, pileupE: 0.09, thTile: 0.024, thLar: 0.026, thHec: 0.020,
-    };
-  }
-  if (r < 0.250) {
-    // 2 — EM shower (electron / photon — narrow cluster mostly in LAr)
-    const nEM = Math.random() < 0.5 ? 1 : 2;
-    return {
-      jets: Array.from({ length: nEM }, () => ({
-        eta: (Math.random() - 0.5) * 2.2, phi: -Math.PI + Math.random() * 2 * Math.PI,
-        energy: 0.80 + Math.random() * 0.20, isEM: true,
-        sEta: 0.04 + Math.random() * 0.03, sPhi: 0.04 + Math.random() * 0.03,
-      })),
-      pileup: 0.07, pileupE: 0.04, thTile: 0.044, thLar: 0.016, thHec: 0.048,
-    };
-  }
-  if (r < 0.375) {
-    // 3 — Multi-jet spray (4–6 jets, mix of EM and hadronic)
-    const n = 4 + Math.floor(Math.random() * 3);
-    return {
-      jets: Array.from({ length: n }, () => ({
-        eta: (Math.random() - 0.5) * 2.8, phi: -Math.PI + Math.random() * 2 * Math.PI,
-        energy: 0.22 + Math.random() * 0.55, isEM: Math.random() < 0.28,
-        sEta: 0.13 + Math.random() * 0.10, sPhi: 0.13 + Math.random() * 0.10,
-      })),
-      pileup: 0.32, pileupE: 0.09, thTile: 0.018, thLar: 0.020, thHec: 0.015,
-    };
-  }
-  if (r < 0.500) {
-    // 4 — Forward event (high |η|, HEC-dominated, very few barrel cells)
-    return {
-      jets: [
-        { eta:  2.0 + Math.random() * 1.1, phi: -Math.PI + Math.random() * 2 * Math.PI, energy: 0.5 + Math.random() * 0.5, isEM: false, sEta: 0.22, sPhi: 0.28 },
-        { eta: -2.0 - Math.random() * 1.1, phi: -Math.PI + Math.random() * 2 * Math.PI, energy: 0.4 + Math.random() * 0.4, isEM: false, sEta: 0.22, sPhi: 0.28 },
-      ],
-      pileup: 0.11, pileupE: 0.05, thTile: 0.050, thLar: 0.044, thHec: 0.015,
-    };
-  }
-  if (r < 0.590) {
-    // 5 — Minimum bias (very few, low-energy cells scattered across the detector)
-    const n = 1 + Math.floor(Math.random() * 3);
-    return {
-      jets: Array.from({ length: n }, () => ({
-        eta: (Math.random() - 0.5) * 4.8, phi: -Math.PI + Math.random() * 2 * Math.PI,
-        energy: 0.05 + Math.random() * 0.14, isEM: Math.random() < 0.5,
-        sEta: 0.42 + Math.random() * 0.28, sPhi: 0.42 + Math.random() * 0.28,
-      })),
-      pileup: 0.05, pileupE: 0.04, thTile: 0.013, thLar: 0.013, thHec: 0.011,
-    };
-  }
-  if (r < 0.700) {
-    // 6 — Heavy-ion central collision (very high multiplicity, fills the whole detector)
-    const n = 9 + Math.floor(Math.random() * 6);
-    return {
-      jets: Array.from({ length: n }, () => ({
-        eta: (Math.random() - 0.5) * 5.4, phi: -Math.PI + Math.random() * 2 * Math.PI,
-        energy: 0.06 + Math.random() * 0.40, isEM: Math.random() < 0.42,
-        sEta: 0.28 + Math.random() * 0.28, sPhi: 0.32 + Math.random() * 0.32,
-      })),
-      pileup: 0.66, pileupE: 0.20, thTile: 0.009, thLar: 0.009, thHec: 0.007,
-    };
-  }
-  if (r < 0.820) {
-    // 7 — Single narrow hadronic jet (clean, isolated)
-    return {
-      jets: [{
-        eta: (Math.random() - 0.5) * 1.8, phi: -Math.PI + Math.random() * 2 * Math.PI,
-        energy: 0.85 + Math.random() * 0.15, isEM: false,
-        sEta: 0.08 + Math.random() * 0.06, sPhi: 0.09 + Math.random() * 0.06,
-      }],
-      pileup: 0.16, pileupE: 0.07, thTile: 0.030, thLar: 0.032, thHec: 0.038,
-    };
-  }
-  // 8 — Boosted / fat jet (one large-R jet with sub-structure)
-  const phi0 = -Math.PI + Math.random() * 2 * Math.PI;
-  const eta0 = (Math.random() - 0.5) * 1.5;
-  return {
-    jets: [
-      { eta: eta0,         phi: phi0,                  energy: 0.92, isEM: false, sEta: 0.44, sPhi: 0.46 },
-      { eta: eta0 + 0.14,  phi: wrapPhi(phi0 + 0.22),  energy: 0.62, isEM: false, sEta: 0.18, sPhi: 0.18 },
-      { eta: eta0 - 0.18,  phi: wrapPhi(phi0 - 0.20),  energy: 0.48, isEM: true,  sEta: 0.06, sPhi: 0.06 },
-    ],
-    pileup: 0.22, pileupE: 0.08, thTile: 0.019, thLar: 0.019, thHec: 0.017,
-  };
-}
-
-function generateEvent(instData) {
-  const { pool, tileInst, larInst, hecInst } = instData;
-  const { jets, pileup, pileupE, thTile, thLar, thHec } = pickTopology();
-
-  // ---- TileCal ----
-  let ti = 0;
-  for (const cell of pool.tile) {
-    let E = 0;
-    for (const j of jets) {
-      const dPhi = wrapPhi(cell.phi - j.phi);
-      if (j.isEM) {
-        E += j.energy * 0.07 * gauss(cell.eta - j.eta, j.sEta) * gauss(dPhi, j.sPhi);
-      } else {
-        E += j.energy       * gauss(cell.eta - j.eta, j.sEta) * gauss(dPhi, j.sPhi);
-      }
-    }
-    if (Math.random() < pileup) E += Math.random() * pileupE;
-    if (E < thTile) continue;
-    setInstance(tileInst, ti++, cell, Math.min(E, 1));
-  }
-  tileInst.count = ti;
-  tileInst.instanceMatrix.needsUpdate = true;
-  if (tileInst.instanceColor) tileInst.instanceColor.needsUpdate = true;
-
-  // ---- LAr ----
-  let li = 0;
-  for (const cell of pool.lar) {
-    let E = 0;
-    for (const j of jets) {
-      const dPhi = wrapPhi(cell.phi - j.phi);
-      const sE   = j.isEM ? j.sEta      : j.sEta * 1.5;
-      const sP   = j.isEM ? j.sPhi      : j.sPhi * 1.5;
-      const w    = j.isEM ? 1.0         : 0.35;
-      E += j.energy * w * gauss(cell.eta - j.eta, sE) * gauss(dPhi, sP);
-    }
-    if (Math.random() < pileup * 0.62) E += Math.random() * pileupE * 0.72;
-    if (E < thLar) continue;
-    setInstance(larInst, li++, cell, Math.min(E * 1.1, 1));
-  }
-  larInst.count = li;
-  larInst.instanceMatrix.needsUpdate = true;
-  if (larInst.instanceColor) larInst.instanceColor.needsUpdate = true;
-
-  // ---- HEC ----
-  let hi = 0;
-  for (const cell of pool.hec) {
-    let E = 0;
-    for (const j of jets) {
-      const absEtaDiff = Math.abs(cell.eta) - Math.abs(j.eta);
-      const dPhi = wrapPhi(cell.phi - j.phi);
-      E += j.energy * 0.55 * gauss(absEtaDiff, j.sEta * 1.3) * gauss(dPhi, j.sPhi * 1.3);
-    }
-    if (Math.random() < pileup * 0.33) E += Math.random() * pileupE * 0.52;
-    if (E < thHec) continue;
-    setInstance(hecInst, hi++, cell, Math.min(E * 0.85, 1));
-  }
-  hecInst.count = hi;
-  hecInst.instanceMatrix.needsUpdate = true;
-  if (hecInst.instanceColor) hecInst.instanceColor.needsUpdate = true;
-
-  return ti + li + hi;
-}
+// Base path for nipscern assets
+const NIPSCERN_BASE = new URL('../../projects/cgvweb/nipscern/', import.meta.url).href;
 
 // ============================================================
 // Main export
 // ============================================================
-export function initCGVPreview(containerId = 'cgv-canvas-wrapper') {
+export function initATLASScene(containerId = 'cgv-canvas-wrapper') {
   const wrapper = document.getElementById(containerId);
   if (!wrapper) return;
 
   const canvas  = wrapper.querySelector('#cgv-canvas');
   const loading = wrapper.querySelector('.cgv-loading');
 
-  // ---- Renderer ----
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+  // ── Renderer ──────────────────────────────────────────────
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
+    powerPreference: 'high-performance',
+    precision: 'mediump',
+    preserveDrawingBuffer: false,
+    stencil: false,
+    depth: true,
+  });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
-  renderer.setClearColor(0x05070f, 1);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.sortObjects = false;
 
-  // ---- Scene ----
+  // ── Scene ─────────────────────────────────────────────────
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x05070f, 0.025);
+  scene.background = new THREE.Color(0x05070f);
+  scene.matrixAutoUpdate = false;
 
-  // ---- Camera — positioned to show beam axis horizontal ----
-  const camera = new THREE.PerspectiveCamera(52, wrapper.clientWidth / wrapper.clientHeight, 0.1, 120);
-  camera.position.set(5, 7, 12);
-  camera.lookAt(0, 0, 0);
+  // ── Camera ────────────────────────────────────────────────
+  const camera = new THREE.PerspectiveCamera(
+    45,
+    wrapper.clientWidth / wrapper.clientHeight,
+    10,
+    100_000
+  );
+  camera.position.set(0, 0, 12_000);
 
-  // ---- Lights ----
-  scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-  const d1 = new THREE.DirectionalLight(0xffffff, 0.9);
-  d1.position.set(6, 10, 8);
-  scene.add(d1);
-  const d2 = new THREE.DirectionalLight(0x4466ff, 0.3);
-  d2.position.set(-6, -4, -6);
-  scene.add(d2);
+  // ── Controls ──────────────────────────────────────────────
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.14;
+  controls.zoomSpeed = 1.2;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.3;
 
-  // ---- Controls ----
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping  = true;
-  controls.dampingFactor  = 0.06;
-  controls.rotateSpeed    = 0.7;
-  controls.zoomSpeed      = 0.8;
-  controls.panSpeed       = 0.6;
-  controls.minDistance    = 3;
-  controls.maxDistance    = 30;
-  controls.autoRotate     = true;
-  controls.autoRotateSpeed = 0.35;
+  // ── State ─────────────────────────────────────────────────
+  let dirty = true;
+  let wasmOk = false;
+  let sceneOk = false;
+  let parse_atlas_ids_bulk = null;
 
-  // ---- Geometry ----
-  buildShells(scene);
-  const instData = buildInstancedMeshes(scene);
+  const meshByName = new Map();
+  const origMat = new Map();
+  let active = new Map();
+  let rayTargets = [];
+  let beamGroup = null;
+  let beamOn = false;
+  let allOutlinesMesh = null;
+  let trackGroup = null;
+  let showGhostTile = false;
+  let ghostPhiGroup = null;
 
-  // ---- State ----
-  let wireframeMode   = false;
-  let beamAxisVisible = false;
-  const layerVisible  = { tilecal: true, lar: true, hec: true };
+  const SUBSYS_TILE = 1;
+  const SUBSYS_LAR_EM = 2;
+  const SUBSYS_LAR_HEC = 3;
+  const PAL_N = 256;
+  const DEF_THR = 200;
+  let thrTileMev = DEF_THR;
+  let thrLArMev = DEF_THR;
+  let thrHecMev = 1000;
+  let showTile = true;
+  let showLAr = true;
+  let showHec = true;
 
-  // ---- UI refs ----
-  const btnEvent   = wrapper.querySelector('#cgv-btn-event');
-  const btnWire    = wrapper.querySelector('#cgv-btn-wire');
-  const btnBeam    = wrapper.querySelector('#cgv-btn-beam');
-  const btnTilecal = wrapper.querySelector('#cgv-btn-tilecal');
-  const btnLar     = wrapper.querySelector('#cgv-btn-lar');
-  const btnHec     = wrapper.querySelector('#cgv-btn-hec');
-  const countEl    = wrapper.querySelector('#cgv-cell-count');
+  controls.addEventListener('change', () => { dirty = true; });
 
-  function updateCount(n) {
-    if (countEl) countEl.textContent = n.toLocaleString();
-  }
+  // ── Render loop ───────────────────────────────────────────
+  let frameId;
+  (function loop() {
+    frameId = requestAnimationFrame(loop);
+    controls.update();
+    if (controls.autoRotate) dirty = true;
+    if (!dirty) return;
+    renderer.render(scene, camera);
+    dirty = false;
+  })();
 
-  function setWireframe(on) {
-    wireframeMode = on;
-    [instData.tileInst, instData.larInst, instData.hecInst].forEach(inst => {
-      if (inst.material) { inst.material.wireframe = on; inst.material.opacity = on ? 0.65 : 0.88; }
-    });
-    scene.children.forEach(c => {
-      if (c.userData.isShell && c.material) c.material.opacity = on ? 0.45 : 0.20;
-    });
-    btnWire?.classList.toggle('active', on);
-    btnWire?.setAttribute('aria-pressed', String(on));
-  }
-
-  function setBeamAxis(on) {
-    beamAxisVisible = on;
-    scene.children.forEach(c => { if (c.userData.isBeamAxis || c.userData.isZNorth) c.visible = on; });
-    btnBeam?.classList.toggle('active', on);
-    btnBeam?.setAttribute('aria-pressed', String(on));
-  }
-
-  function setLayerVisible(layer, on) {
-    layerVisible[layer] = on;
-    [instData.tileInst, instData.larInst, instData.hecInst].forEach(inst => {
-      if (inst.userData.layer === layer) inst.visible = on;
-    });
-    scene.children.forEach(c => {
-      if (c.userData.isShell && c.userData.layer === layer) c.visible = on;
-    });
-    const btn = wrapper.querySelector('#cgv-btn-' + layer);
-    btn?.classList.toggle('active', on);
-    btn?.setAttribute('aria-pressed', String(on));
-  }
-
-  function doGenerate() {
-    const n = generateEvent(instData);
-    updateCount(n);
-    if (wireframeMode) setWireframe(true);
-    Object.entries(layerVisible).forEach(([layer, on]) => { if (!on) setLayerVisible(layer, false); });
-  }
-
-  btnEvent?.addEventListener('click', doGenerate);
-  btnWire?.addEventListener('click',  () => setWireframe(!wireframeMode));
-  btnBeam?.addEventListener('click',  () => setBeamAxis(!beamAxisVisible));
-  btnTilecal?.addEventListener('click', () => setLayerVisible('tilecal', !layerVisible.tilecal));
-  btnLar?.addEventListener('click',     () => setLayerVisible('lar',     !layerVisible.lar));
-  btnHec?.addEventListener('click',     () => setLayerVisible('hec',     !layerVisible.hec));
-
-  // Initial event
-  doGenerate();
-
-  // Hide loading
-  loading?.classList.add('hidden');
-
-  // ---- Resize ----
+  // ── Resize ────────────────────────────────────────────────
   const onResize = () => {
     const w = wrapper.clientWidth;
     const h = wrapper.clientHeight;
     renderer.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    dirty = true;
   };
   window.addEventListener('resize', onResize);
 
-  // ---- Render loop ----
-  let frameId;
-  function animate() {
-    frameId = requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
+  // ── Palettes ──────────────────────────────────────────────
+  function palColorTile(t) {
+    t = Math.max(0, Math.min(1, t));
+    return new THREE.Color(1.0 + t * (0.502 - 1.0), 1.0 + t * (0.0 - 1.0), 0.0);
   }
-  animate();
+  const PAL_TILE = Array.from({ length: PAL_N }, (_, i) => {
+    const c = palColorTile(i / (PAL_N - 1));
+    c.offsetHSL(0, 0.35, 0);
+    return new THREE.MeshBasicMaterial({ color: c, side: THREE.FrontSide });
+  });
+  const TILE_SCALE = 2000;
+  function palMatTile(eMev) {
+    return PAL_TILE[Math.round(Math.max(0, Math.min(1, eMev / TILE_SCALE)) * (PAL_N - 1))];
+  }
 
-  // ---- Cleanup ----
+  function palColorHec(t) {
+    t = Math.max(0, Math.min(1, t));
+    return new THREE.Color(0.4 + t * (0.0471 - 0.4), 0.8784 + t * (0.0118 - 0.8784), 0.9647 + t * (0.4078 - 0.9647));
+  }
+  const PAL_HEC = Array.from({ length: PAL_N }, (_, i) => {
+    const c = palColorHec(i / (PAL_N - 1));
+    c.offsetHSL(0, 0.35, 0);
+    return new THREE.MeshBasicMaterial({ color: c, side: THREE.FrontSide });
+  });
+  const HEC_SCALE = 5000;
+  function palMatHec(eMev) {
+    return PAL_HEC[Math.round(Math.max(0, Math.min(1, eMev / HEC_SCALE)) * (PAL_N - 1))];
+  }
+
+  function palColorLAr(t) {
+    t = Math.max(0, Math.min(1, t));
+    return new THREE.Color(0.0902 + t * (0.1529 - 0.0902), 0.8118 + t * (0.0 - 0.8118), 0.2588);
+  }
+  const PAL_LAR = Array.from({ length: PAL_N }, (_, i) => {
+    const c = palColorLAr(i / (PAL_N - 1));
+    c.offsetHSL(0, 0.35, 0);
+    return new THREE.MeshBasicMaterial({ color: c, side: THREE.FrontSide });
+  });
+  const LAR_SCALE = 1000;
+  function palMatLAr(eMev) {
+    return PAL_LAR[Math.round(Math.max(0, Math.min(1, eMev / LAR_SCALE)) * (PAL_N - 1))];
+  }
+
+  // ── Ghost ─────────────────────────────────────────────────
+  const GHOST_TILE_NAMES = [
+    'Calorimeter\u2192LBTile_0', 'Calorimeter\u2192LBTileLArg_0',
+    'Calorimeter\u2192EBTilep_0', 'Calorimeter\u2192EBTilen_0',
+    'Calorimeter\u2192EBTileHECp_0', 'Calorimeter\u2192EBTileHECn_0',
+  ];
+  const ghostSolidMat = new THREE.MeshBasicMaterial({
+    color: 0x5C5F66, transparent: true, opacity: 0.04,
+    depthWrite: false, side: THREE.DoubleSide,
+  });
+  const ghostPhiMat = new THREE.LineBasicMaterial({
+    color: 0xFFFFFF, transparent: true, opacity: 0.04, depthWrite: false,
+  });
+
+  const TILE_PHI_SEGS = [
+    { rIn: 2288, rOut: 3835, zMin: -2820, zMax: 2820 },
+    { rIn: 2288, rOut: 3835, zMin: 3600, zMax: 6050 },
+    { rIn: 2288, rOut: 3835, zMin: -6050, zMax: -3600 },
+  ];
+  const N_PHI = 64;
+
+  function buildPhiLines() {
+    if (ghostPhiGroup) { scene.remove(ghostPhiGroup); ghostPhiGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+    ghostPhiGroup = new THREE.Group();
+    ghostPhiGroup.renderOrder = 6;
+    ghostPhiGroup.visible = false;
+    for (let i = 0; i < N_PHI; i++) {
+      const phi = (i / N_PHI) * Math.PI * 2;
+      const cx = Math.cos(phi), cy = Math.sin(phi);
+      for (const { rIn, rOut, zMin, zMax } of TILE_PHI_SEGS) {
+        const pts = [
+          new THREE.Vector3(cx * rIn, cy * rIn, zMin),
+          new THREE.Vector3(cx * rIn, cy * rIn, zMax),
+          new THREE.Vector3(cx * rOut, cy * rOut, zMax),
+          new THREE.Vector3(cx * rOut, cy * rOut, zMin),
+          new THREE.Vector3(cx * rIn, cy * rIn, zMin),
+        ];
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        ghostPhiGroup.add(new THREE.Line(geo, ghostPhiMat));
+      }
+    }
+    scene.add(ghostPhiGroup);
+  }
+
+  function applyGhostMesh(visible) {
+    for (const name of GHOST_TILE_NAMES) {
+      const mesh = meshByName.get(name);
+      if (!mesh) continue;
+      if (visible) {
+        mesh.material = ghostSolidMat;
+        mesh.renderOrder = 5;
+        mesh.visible = true;
+      } else {
+        mesh.material = origMat.get(name) ?? mesh.material;
+        mesh.renderOrder = 0;
+        mesh.visible = false;
+      }
+    }
+    if (ghostPhiGroup) ghostPhiGroup.visible = visible;
+    dirty = true;
+  }
+
+  function toggleAllGhosts() {
+    showGhostTile = !showGhostTile;
+    buildPhiLines();
+    applyGhostMesh(showGhostTile);
+  }
+
+  // ── Beam indicator ────────────────────────────────────────
+  function buildBeamIndicator() {
+    if (beamGroup) return;
+    beamGroup = new THREE.Group();
+    const axisGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, -13000), new THREE.Vector3(0, 0, 13000)]);
+    beamGroup.add(new THREE.Line(axisGeo, new THREE.LineBasicMaterial({ color: 0x4a7fcc, transparent: true, opacity: 0.50, depthWrite: false })));
+    const northMesh = new THREE.Mesh(new THREE.ConeGeometry(90, 520, 24, 1, false), new THREE.MeshBasicMaterial({ color: 0xee2222 }));
+    northMesh.rotation.x = Math.PI / 2; northMesh.position.z = 13260; beamGroup.add(northMesh);
+    const ringN = new THREE.Mesh(new THREE.TorusGeometry(90, 8, 8, 24), new THREE.MeshBasicMaterial({ color: 0xff6666, transparent: true, opacity: 0.55 }));
+    ringN.rotation.x = Math.PI / 2; ringN.position.z = 13000; beamGroup.add(ringN);
+    const southMesh = new THREE.Mesh(new THREE.ConeGeometry(90, 520, 24, 1, false), new THREE.MeshBasicMaterial({ color: 0x2244ee }));
+    southMesh.rotation.x = -Math.PI / 2; southMesh.position.z = -13260; beamGroup.add(southMesh);
+    const ringS = new THREE.Mesh(new THREE.TorusGeometry(90, 8, 8, 24), new THREE.MeshBasicMaterial({ color: 0x6699ff, transparent: true, opacity: 0.55 }));
+    ringS.rotation.x = Math.PI / 2; ringS.position.z = -13000; beamGroup.add(ringS);
+    beamGroup.visible = false; scene.add(beamGroup);
+  }
+  function toggleBeam() {
+    buildBeamIndicator();
+    beamOn = !beamOn;
+    beamGroup.visible = beamOn;
+    dirty = true;
+  }
+
+  // ── Outline caches ────────────────────────────────────────
+  const eGeoCache = new Map();
+  const outlineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+  let outlineMesh = null;
+  function clearOutline() {
+    if (!outlineMesh) return; scene.remove(outlineMesh); outlineMesh = null; dirty = true;
+  }
+  function showOutline(mesh) {
+    if (outlineMesh?.userData.src === mesh.name) return;
+    clearOutline();
+    mesh.updateWorldMatrix(true, false);
+    const uid = mesh.geometry.uuid;
+    if (!eGeoCache.has(uid)) eGeoCache.set(uid, new THREE.EdgesGeometry(mesh.geometry, 30));
+    outlineMesh = new THREE.LineSegments(eGeoCache.get(uid), outlineMat);
+    outlineMesh.matrixAutoUpdate = false;
+    outlineMesh.matrix.copy(mesh.matrixWorld);
+    outlineMesh.matrixWorld.copy(mesh.matrixWorld);
+    outlineMesh.renderOrder = 999; outlineMesh.userData.src = mesh.name;
+    scene.add(outlineMesh); dirty = true;
+  }
+
+  const outlineAllMat = new THREE.LineBasicMaterial({ color: 0x000000 });
+  const _edgeWorldCache = new Map();
+
+  function _getWorldEdges(mesh) {
+    const cached = _edgeWorldCache.get(mesh.name);
+    if (cached) return cached;
+    mesh.updateWorldMatrix(true, false);
+    const uid = mesh.geometry.uuid;
+    if (!eGeoCache.has(uid)) eGeoCache.set(uid, new THREE.EdgesGeometry(mesh.geometry, 30));
+    const src = eGeoCache.get(uid).getAttribute('position').array;
+    const m = mesh.matrixWorld.elements;
+    const out = new Float32Array(src.length);
+    for (let i = 0; i < src.length; i += 3) {
+      const x = src[i], y = src[i + 1], z = src[i + 2];
+      out[i] = m[0] * x + m[4] * y + m[8] * z + m[12];
+      out[i + 1] = m[1] * x + m[5] * y + m[9] * z + m[13];
+      out[i + 2] = m[2] * x + m[6] * y + m[10] * z + m[14];
+    }
+    _edgeWorldCache.set(mesh.name, out);
+    return out;
+  }
+
+  function clearAllOutlines() {
+    if (!allOutlinesMesh) return;
+    scene.remove(allOutlinesMesh);
+    allOutlinesMesh.geometry.dispose();
+    allOutlinesMesh = null;
+    dirty = true;
+  }
+
+  function rebuildAllOutlines() {
+    clearAllOutlines();
+    if (!rayTargets.length) return;
+    let total = 0;
+    const edgeArrays = new Array(rayTargets.length);
+    for (let i = 0; i < rayTargets.length; i++) {
+      const arr = _getWorldEdges(rayTargets[i]);
+      edgeArrays[i] = arr;
+      total += arr.length;
+    }
+    const buf = new Float32Array(total);
+    let offset = 0;
+    for (let i = 0; i < edgeArrays.length; i++) {
+      buf.set(edgeArrays[i], offset);
+      offset += edgeArrays[i].length;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(buf, 3));
+    allOutlinesMesh = new THREE.LineSegments(geo, outlineAllMat);
+    allOutlinesMesh.matrixAutoUpdate = false;
+    allOutlinesMesh.frustumCulled = false;
+    allOutlinesMesh.renderOrder = 3;
+    scene.add(allOutlinesMesh);
+    dirty = true;
+  }
+
+  // ── Raycasting ────────────────────────────────────────────
+  const raycast = new THREE.Raycaster();
+  raycast.firstHitOnly = true;
+  const mxy = new THREE.Vector2();
+  let lastRay = 0;
+  function doRaycast(clientX, clientY) {
+    if (!active.size) { clearOutline(); return; }
+    const topEl = document.elementFromPoint(clientX, clientY);
+    if (topEl && topEl !== canvas) { clearOutline(); return; }
+    const rect = canvas.getBoundingClientRect();
+    if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+      clearOutline(); return;
+    }
+    mxy.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
+    camera.updateMatrixWorld();
+    raycast.setFromCamera(mxy, camera);
+    const hits = raycast.intersectObjects(rayTargets, false);
+    if (hits.length && active.has(hits[0].object.name)) {
+      showOutline(hits[0].object);
+    } else {
+      clearOutline();
+    }
+  }
+  document.addEventListener('mousemove', e => {
+    const now = Date.now(); if (now - lastRay < 50) return; lastRay = now;
+    doRaycast(e.clientX, e.clientY);
+  });
+  canvas.addEventListener('mouseleave', () => { clearOutline(); });
+
+  // ── Cell ID helpers ───────────────────────────────────────
+  function compX(sec, samp, tow) {
+    if (sec < 3) {
+      if (samp === 0) return sec === 1 ? 1 : 5;
+      if (samp === 1) return sec === 1 ? 23 : 6;
+      if (samp === 2) return sec === 1 ? 4 : 7;
+    } else {
+      if (tow === 8) return 8; if (tow === 9) return 9;
+      if (tow === 10) return 10; if (tow === 11) return 11;
+      if (tow === 13) return 12; if (tow === 15) return 13;
+    }
+    return null;
+  }
+  function compK(tow, samp, x) {
+    if (tow < 8) return samp === 2 ? Math.floor(tow / 2) : tow;
+    if (tow === 8) return (x === 0 || x === 1) ? 8 : 0;
+    if (tow === 9) { if (x === 1) return 9; if (x === 9) return 0; return null; }
+    if (tow === 10) return 0;
+    if (tow === 11) { if (x === 11 || x === 5) return 0; if (x === 6) return 1; return null; }
+    if (tow === 12) { if (x === 5) return 1; if (x === 6) return 2; if (x === 7) return 1; return null; }
+    if (tow === 13) { if (x === 12) return 0; if (x === 5) return 2; if (x === 6) return 3; return null; }
+    if (tow === 14) { if (x === 5) return 3; if (x === 6) return 4; return null; }
+    if (tow === 15) { if (x === 13) return 0; if (x === 5) return 4; return null; }
+    return null;
+  }
+
+  // ── HEC mesh path ─────────────────────────────────────────
+  const HEC_GROUPS_MAP = [
+    { name: '1', innerBins: 10 },
+    { name: '23', innerBins: 10 },
+    { name: '45', innerBins: 9 },
+    { name: '67', innerBins: 8 },
+  ];
+  function hecMeshPath(be, sampling, region, eta, phi) {
+    const g = HEC_GROUPS_MAP[sampling];
+    if (!g) return null;
+    const Z = be > 0 ? 'p' : 'n';
+    const cum = region === 0 ? eta : g.innerBins + eta;
+    const B = cum;
+    const path = `Calorimeter\u2192HEC_${g.name}_${region}_${Z}_0\u2192HEC_${g.name}_${region}_${Z}_${cum}_${B}\u2192cell_${phi}`;
+    return meshByName.has(path) ? path : null;
+  }
+
+  // ── MBTS mesh path ────────────────────────────────────────
+  function mbtsMeshPath(label) {
+    const m = /^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
+    if (!m) return null;
+    const side = m[1] === '1' ? 'p' : 'n';
+    const tileNum = m[2] === '0' ? 14 : 15;
+    const mod = m[3];
+    const path = `Calorimeter\u2192Tile${tileNum}${side}_0\u2192Tile${tileNum}${side}0_0\u2192cell_${mod}`;
+    return meshByName.has(path) ? path : null;
+  }
+
+  // ── LAr EM mesh path ──────────────────────────────────────
+  function larMeshPath(bec, samp, region, eta, phi) {
+    const X = (bec === -1 || bec === 1) ? 'Barrel' : 'EndCap';
+    const W = X === 'Barrel' ? 0 : 1;
+    const Z = bec > 0 ? 'p' : 'n';
+    const R = X === 'EndCap' ? Math.abs(bec) : region;
+    const prefix = `Calorimeter\u2192EM${X}_${samp}_${R}_${Z}_${W}\u2192EM${X}_${samp}_${R}_${Z}_${eta}_${eta}\u2192`;
+    if (meshByName.has(prefix + `cell_${phi}`)) return prefix + `cell_${phi}`;
+    if (meshByName.has(prefix + `cell2_${phi}`)) return prefix + `cell2_${phi}`;
+    return null;
+  }
+
+  // ── XML parsers ───────────────────────────────────────────
+  function extractCells(doc, tagName) {
+    const els = doc.getElementsByTagName(tagName);
+    const cells = [];
+    for (const el of els) {
+      let n = 0;
+      for (const ch of el.children) {
+        const id = ch.getAttribute('id') ?? ch.getAttribute('cellID');
+        const ev = ch.getAttribute('energy') ?? ch.getAttribute('e');
+        if (id && ev) { const e = parseFloat(ev); if (isFinite(e)) { cells.push({ id: id.trim(), energy: e }); n++; } }
+      }
+      if (n) continue;
+      const idEl = el.querySelector('id, cellID');
+      const eEl = el.querySelector('energy, e');
+      if (idEl && eEl) {
+        const ids = idEl.textContent.trim().split(/\s+/);
+        const ens = eEl.textContent.trim().split(/\s+/).map(Number);
+        const m2 = Math.min(ids.length, ens.length);
+        for (let i = 0; i < m2; i++) if (ids[i] && isFinite(ens[i])) cells.push({ id: ids[i], energy: ens[i] });
+      }
+    }
+    return cells;
+  }
+
+  function parseTracks(doc) {
+    const tracks = [];
+    for (const el of doc.getElementsByTagName('Track')) {
+      const numPolyEl = el.querySelector('numPolyline');
+      const pxEl = el.querySelector('polylineX');
+      const pyEl = el.querySelector('polylineY');
+      const pzEl = el.querySelector('polylineZ');
+      if (!numPolyEl || !pxEl || !pyEl || !pzEl) continue;
+      const numPoly = numPolyEl.textContent.trim().split(/\s+/).map(Number);
+      const xs = pxEl.textContent.trim().split(/\s+/).map(Number);
+      const ys = pyEl.textContent.trim().split(/\s+/).map(Number);
+      const zs = pzEl.textContent.trim().split(/\s+/).map(Number);
+      const ptEl = el.querySelector('pt');
+      const ptArr = ptEl ? ptEl.textContent.trim().split(/\s+/).map(Number) : [];
+      let off = 0;
+      for (let i = 0; i < numPoly.length; i++) {
+        const n = numPoly[i];
+        if (n >= 2) {
+          const pts = [];
+          for (let j = 0; j < n; j++) {
+            const k = off + j;
+            pts.push(new THREE.Vector3(-xs[k] * 10, -ys[k] * 10, zs[k] * 10));
+          }
+          tracks.push({ pts, ptGev: i < ptArr.length ? Math.abs(ptArr[i]) : 0 });
+        }
+        off += n;
+      }
+    }
+    return tracks;
+  }
+
+  // ── Track rendering ───────────────────────────────────────
+  const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffea00, depthWrite: false });
+  function drawTracks(tracks) {
+    if (trackGroup) {
+      trackGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+      scene.remove(trackGroup);
+    }
+    trackGroup = null;
+    if (!tracks.length) return;
+    trackGroup = new THREE.Group();
+    trackGroup.renderOrder = 5;
+    for (const { pts } of tracks) {
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      trackGroup.add(new THREE.Line(geo, TRACK_MAT));
+    }
+    scene.add(trackGroup);
+  }
+
+  // ── Scene reset / threshold ───────────────────────────────
+  function resetScene() {
+    for (const [name, mesh] of meshByName) {
+      mesh.visible = false; mesh.material = origMat.get(name) ?? mesh.material; mesh.renderOrder = 0;
+    }
+    active.clear(); rayTargets = [];
+    clearOutline(); clearAllOutlines();
+    if (trackGroup) { trackGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); scene.remove(trackGroup); trackGroup = null; }
+    dirty = true;
+  }
+  function applyThreshold() {
+    rayTargets = [];
+    for (const [name, { energyMev, det }] of active) {
+      const mesh = meshByName.get(name); if (!mesh) continue;
+      const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
+      const detOn = det === 'LAR' ? showLAr : det === 'HEC' ? showHec : showTile;
+      const vis = detOn && (!isFinite(thr) || energyMev >= thr);
+      mesh.visible = vis; if (vis) rayTargets.push(mesh);
+    }
+    rebuildAllOutlines();
+    dirty = true;
+  }
+
+  // ── Process XML ───────────────────────────────────────────
+  function processXml(xmlText) {
+    if (!wasmOk) return;
+    const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+    const pe = doc.querySelector('parsererror');
+    if (pe) { console.error('XML parse error:', pe.textContent.slice(0, 120)); return; }
+
+    const tileCells = extractCells(doc, 'TILE');
+    const larCells = extractCells(doc, 'LAr');
+    const hecCells = extractCells(doc, 'HEC');
+
+    const mbtsCells = [];
+    const mbtsEls = doc.getElementsByTagName('MBTS');
+    for (const el of mbtsEls) {
+      let n = 0;
+      for (const ch of el.children) {
+        const label = ch.getAttribute('label');
+        const ev = ch.getAttribute('energy') ?? ch.getAttribute('e');
+        if (label && ev) { const e = parseFloat(ev); if (isFinite(e)) { mbtsCells.push({ label: label.trim(), energy: e }); n++; } }
+      }
+      if (n) continue;
+      const lblEl = el.querySelector('label');
+      const eEl = el.querySelector('energy, e');
+      if (lblEl && eEl) {
+        const labels = lblEl.textContent.trim().split(/\s+/);
+        const ens = eEl.textContent.trim().split(/\s+/).map(Number);
+        const m2 = Math.min(labels.length, ens.length);
+        for (let i = 0; i < m2; i++) if (labels[i] && isFinite(ens[i])) mbtsCells.push({ label: labels[i], energy: ens[i] });
+      }
+    }
+
+    const total = tileCells.length + larCells.length + hecCells.length + mbtsCells.length;
+    if (!total) { console.warn('No cells found in XML'); return; }
+
+    resetScene();
+
+    // Tracks
+    try { drawTracks(parseTracks(doc)); } catch (e) { console.warn('Track error', e); }
+
+    // Bulk WASM decode
+    function idsToStr(cells) {
+      let s = cells[0].id;
+      for (let i = 1; i < cells.length; i++) s += ' ' + cells[i].id;
+      return s;
+    }
+    const tilePacked = tileCells.length ? parse_atlas_ids_bulk(idsToStr(tileCells)) : null;
+    const larPacked = larCells.length ? parse_atlas_ids_bulk(idsToStr(larCells)) : null;
+    const hecPacked = hecCells.length ? parse_atlas_ids_bulk(idsToStr(hecCells)) : null;
+
+    // TileCal
+    for (let i = 0; i < tileCells.length; i++) {
+      const base = i * 6;
+      if (tilePacked[base] !== SUBSYS_TILE) continue;
+      const section = tilePacked[base + 1], side = tilePacked[base + 2],
+        module = tilePacked[base + 3], tower = tilePacked[base + 4], sampling = tilePacked[base + 5];
+      const eMev = tileCells[i].energy * 1000;
+      const x = compX(section, sampling, tower); if (x === null) continue;
+      const k = compK(tower, sampling, x); if (k === null) continue;
+      const y = side < 0 ? 'n' : 'p';
+      const path = `Calorimeter\u2192Tile${x}${y}_0\u2192Tile${x}${y}${k}_${k}\u2192cell_${module}`;
+      const mesh = meshByName.get(path);
+      if (!mesh) continue;
+      mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
+      active.set(path, { energyMev: eMev, det: 'TILE' });
+    }
+
+    // LAr EM
+    for (let i = 0; i < larCells.length; i++) {
+      const base = i * 6;
+      if (larPacked[base] !== SUBSYS_LAR_EM) continue;
+      const bec = larPacked[base + 1], sampling = larPacked[base + 2],
+        region = larPacked[base + 3], eta = larPacked[base + 4], phi = larPacked[base + 5];
+      const eMev = larCells[i].energy * 1000;
+      const path = larMeshPath(bec, sampling, region, eta, phi);
+      if (!path) continue;
+      const mesh = meshByName.get(path);
+      if (!mesh) continue;
+      mesh.material = palMatLAr(eMev); mesh.visible = true; mesh.renderOrder = 2;
+      active.set(path, { energyMev: eMev, det: 'LAR' });
+    }
+
+    // HEC
+    for (let i = 0; i < hecCells.length; i++) {
+      const base = i * 6;
+      if (hecPacked[base] !== SUBSYS_LAR_HEC) continue;
+      const be = hecPacked[base + 1], sampling = hecPacked[base + 2],
+        region = hecPacked[base + 3], eta = hecPacked[base + 4], phi = hecPacked[base + 5];
+      const eMev = hecCells[i].energy * 1000;
+      const path = hecMeshPath(be, sampling, region, eta, phi);
+      if (!path) continue;
+      const mesh = meshByName.get(path);
+      if (!mesh) continue;
+      mesh.material = palMatHec(eMev); mesh.visible = true; mesh.renderOrder = 2;
+      active.set(path, { energyMev: eMev, det: 'HEC' });
+    }
+
+    // MBTS
+    for (let i = 0; i < mbtsCells.length; i++) {
+      const { label, energy } = mbtsCells[i];
+      const eMev = energy * 1000;
+      const path = mbtsMeshPath(label);
+      if (!path) continue;
+      const mesh = meshByName.get(path);
+      if (!mesh) continue;
+      mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
+      active.set(path, { energyMev: eMev, det: 'TILE' });
+    }
+
+    applyThreshold();
+
+    if (showGhostTile) applyGhostMesh(true);
+  }
+
+  // ── Boot ──────────────────────────────────────────────────
+  let _glbDone = false, _wasmDone = false;
+
+  function tryStart() {
+    if (!_glbDone || !_wasmDone) return;
+    // Hide loading overlay
+    loading?.classList.add('hidden');
+
+    toggleAllGhosts();
+    toggleBeam();
+    fetch(NIPSCERN_BASE + 'JiveXML_518084_14173642443.xml')
+      .then(r => r.text())
+      .then(xml => { processXml(xml); dirty = true; })
+      .catch(e => console.error('Failed to load XML:', e));
+  }
+
+  // Load GLB geometry
+  new GLTFLoader().load(
+    NIPSCERN_BASE + 'CaloGeometry.glb',
+    ({ scene: g }) => {
+      const meshes = [];
+      g.traverse(o => { if (o.isMesh) meshes.push(o); });
+      for (const m of meshes) {
+        m.updateWorldMatrix(true, false);
+        m.matrix.copy(m.matrixWorld);
+        m.matrixAutoUpdate = false;
+        m.frustumCulled = false;
+        m.visible = false;
+        meshByName.set(m.name, m);
+        origMat.set(m.name, m.material);
+        scene.add(m);
+      }
+      sceneOk = true; dirty = true;
+      _glbDone = true;
+      tryStart();
+    },
+    undefined,
+    (err) => { console.error('GLB load error:', err); _glbDone = true; tryStart(); }
+  );
+
+  // Load WASM parser — dynamic import resolves import.meta.url correctly
+  const parserUrl = NIPSCERN_BASE + 'atlas_id_parser.js';
+  import(/* webpackIgnore: true */ parserUrl)
+    .then(async (mod) => {
+      // Init the WASM (default export is the init function)
+      await mod.default();
+      // Now parse_atlas_ids_bulk is ready to use
+      parse_atlas_ids_bulk = mod.parse_atlas_ids_bulk;
+      wasmOk = true;
+      _wasmDone = true;
+      tryStart();
+    })
+    .catch(e => { console.error('WASM init error:', e); _wasmDone = true; tryStart(); });
+
+  // ── Cleanup ───────────────────────────────────────────────
   return () => {
     cancelAnimationFrame(frameId);
     window.removeEventListener('resize', onResize);
