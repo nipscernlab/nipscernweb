@@ -3,17 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
   <title>CGV — ATLAS Calorimeter Viewer</title>
   <link rel="icon" type="image/svg+xml" href="./assets/cgvweb_icon.svg">
+  <!-- Preconnect to all external origins for faster resource loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <!-- Preload critical geometry file (largest asset) -->
+  <link rel="preload" href="./geometry_data/CaloGeometry.glb" as="fetch" crossorigin>
+  <!-- Preload WASM parser -->
+  <link rel="preload" href="./parser/pkg/atlas_id_parser_bg.wasm" as="fetch" crossorigin type="application/wasm">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <!-- Tabler Icons webfont (for ghost icon) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
   <!-- flag-icons CSS (for language picker flags) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
   <script type="importmap">
-  { 
+  {
     "imports": {
       "three":         "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js",
       "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"
@@ -284,11 +291,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:5px">
         <span class="badge" id="req-badge" data-tip="Total requests this session">0 req</span>
-        <button class="icon-btn" id="btn-log-dl"
-          data-tip="Download larMeshPath debug log as .txt" style="width:22px;height:22px">
-          <i class="ti ti-download" style="font-size:12px"></i>
-        </button>
-        <button class="icon-btn" id="btn-log-min"
+<button class="icon-btn" id="btn-log-min"
           data-tip="Minimize session log" style="width:22px;height:22px">
           <i class="ti ti-chevron-down" id="log-min-icon" style="font-size:12px"></i>
         </button>
@@ -325,15 +328,16 @@
 <aside id="rpanel">
 
   <div id="det-tab-bar">
-    <button class="det-tab on" id="tab-tile" style="--tab-col:#c87c18">TILE</button>
-    <button class="det-tab"    id="tab-lar"  style="--tab-col:#27b568">LAr</button>
-    <button class="det-tab"    id="tab-hec"  style="--tab-col:#66e0f6">HEC</button>
+    <button class="det-tab on" id="tab-tile"  style="--tab-col:#c87c18">TILE</button>
+    <button class="det-tab"    id="tab-lar"   style="--tab-col:#27b568">LAr</button>
+    <button class="det-tab"    id="tab-hec"   style="--tab-col:#66e0f6">HEC</button>
+    <button class="det-tab"    id="tab-track" style="--tab-col:#ffd700">Track</button>
   </div>
 
   <!-- ── TILE pane ──────────────────────────────────────── -->
   <div class="det-pane" id="pane-tile">
     <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#c87c18"></span>
+      <span class="pane-det-dot" style="background:#ff8c00"></span>
       <span class="pane-det-name">TileCal</span>
     </div>
     <div class="sval">2.00 GeV</div>
@@ -351,7 +355,7 @@
   <!-- ── LAr pane ───────────────────────────────────────── -->
   <div class="det-pane" id="pane-lar" style="display:none">
     <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#27b568"></span>
+      <span class="pane-det-dot" style="background:#00ff40"></span>
       <span class="pane-det-name">LAr EM</span>
     </div>
     <div class="sval">1.00 GeV</div>
@@ -369,7 +373,7 @@
   <!-- ── HEC pane ───────────────────────────────────────── -->
   <div class="det-pane" id="pane-hec" style="display:none">
     <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#66e0f6"></span>
+      <span class="pane-det-dot" style="background:#00e0ff"></span>
       <span class="pane-det-name">LAr HEC</span>
     </div>
     <div class="sval">5.00 GeV</div>
@@ -382,6 +386,24 @@
     <input id="hec-thr-input" class="thr-input" type="text"
       autocomplete="off" spellcheck="false"
       data-i18n-ph="thr-placeholder" placeholder="e.g. 200 MeV">
+  </div>
+
+  <!-- ── Track pane ──────────────────────────────────────── -->
+  <div class="det-pane" id="pane-track" style="display:none">
+    <div class="pane-det-row">
+      <span class="pane-det-dot" style="background:#ffd700"></span>
+      <span class="pane-det-name">Tracks</span>
+    </div>
+    <div class="sval" id="track-sval-max">– GeV</div>
+    <div class="strak" id="track-strak"
+      style="background:linear-gradient(to top,#665500 0%,#ffd700 100%)">
+      <div class="sthumb" id="track-sthumb"></div>
+    </div>
+    <div class="sval" id="track-sval-min">– GeV</div>
+    <div class="slbl">Min |p<sub>T</sub>|</div>
+    <input id="track-thr-input" class="thr-input" type="text"
+      autocomplete="off" spellcheck="false"
+      placeholder="e.g. 1.5 GeV">
   </div>
 
   <!-- Ghost controls kept in DOM (referenced by JS) but never shown via tabs -->
