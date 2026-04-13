@@ -370,11 +370,23 @@ h1, h2, h3, h4, h5, h6 {
   gap: 2px;
 }
 .nav-logo-atom {
-  color: var(--brand);
   opacity: 0.85;
   flex-shrink: 0;
   position: relative;
   top: -1px;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  background: var(--brand);
+  -webkit-mask-image: url('../icons/atom.svg');
+  mask-image: url('../icons/atom.svg');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
 }
 
 .nav-logo-sub {
@@ -1068,16 +1080,39 @@ h1, h2, h3, h4, h5, h6 {
   animation: foil-shimmer 6s ease-in-out infinite alternate-reverse;
 }
 
-/* Atom icon inside hero title — needs explicit color since parent uses color:transparent */
+/* Atom icon inside hero title — uses mask-image so the shimmer gradient shows through,
+   exactly like a font glyph would with background-clip: text. */
 .hero-atom {
-  font-size: 0.30em;
+  width: 0.30em;
+  height: 0.30em;
   display: inline-block;
   vertical-align: middle;
   position: relative;
   top: -0.10em;
-  color: var(--brand);
   opacity: 0.9;
   margin: 0 0.1em;
+  /* Mask clips to the atom SVG shape */
+  -webkit-mask-image: url('../icons/atom.svg');
+  mask-image: url('../icons/atom.svg');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  /* Same gradient as .hero-title but WITHOUT background-clip:text
+     (the mask handles the clipping instead) */
+  background: linear-gradient(
+    90deg,
+    #1a4a8a 0%, #3a72c8 15%, #5b9cf6 30%, #5b9cf6 40%,
+    #88bdff 46%, #c2dcff 50%, #ffffff 52%, #c2dcff 54%,
+    #88bdff 58%, #5b9cf6 65%, #5b9cf6 75%, #3a72c8 88%, #1a4a8a 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: initial;
+  animation: foil-shimmer 6s ease-in-out infinite alternate-reverse;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1086,6 +1121,9 @@ h1, h2, h3, h4, h5, h6 {
     background: none;
     -webkit-text-fill-color: var(--text-primary);
     color: var(--text-primary);
+  }
+  .hero-atom {
+    background: var(--text-primary);
   }
 }
 
@@ -2015,6 +2053,29 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 900px) {
   .nav-links { display: none; }
   .nav-hamburger { display: flex; }
+  /* Solid opaque background on mobile — persists even when scrolling */
+  #nav {
+    background: #0b0f1c;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  /* Give hamburger icon more breathing room */
+  .nav-inner {
+    padding-right: var(--sp-4);
+  }
+  .nav-right {
+    gap: var(--sp-2);
+    flex-shrink: 0;
+    min-width: 0;
+  }
+  .nav-hamburger {
+    min-width: 44px;
+    min-height: 44px;
+    flex-shrink: 0;
+  }
+  .lang-switcher {
+    flex-shrink: 1;
+    overflow: hidden;
+  }
   .grid-3 { grid-template-columns: 1fr 1fr; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .experiments-grid { grid-template-columns: 1fr; }
