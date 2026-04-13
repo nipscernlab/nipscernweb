@@ -166,6 +166,25 @@
       <div class="logo-full" data-i18n="logo-full">Calorimeter Geometry Viewer</div>
       <div class="logo-lab" data-i18n="logo-lab">NIPSCERN · ATLAS</div>
     </div>
+    <!-- External links strip — inline with CGV logo -->
+    <div id="ext-links-top">
+      <a href="https://atlas-live.cern.ch" target="_blank" rel="noopener"
+        data-tip="ATLAS Live — ATLANTIS project">
+        <i class="ti ti-radio"></i>
+      </a>
+      <a href="https://atlas.cern" target="_blank" rel="noopener"
+        data-tip="ATLAS Experiment at CERN">
+        <i class="ti ti-atom-2"></i>
+      </a>
+      <a href="https://home.cern" target="_blank" rel="noopener"
+        data-tip="CERN — European Organisation for Nuclear Research">
+        <i class="ti ti-building-arch"></i>
+      </a>
+      <a href="https://nipscern.com" target="_blank" rel="noopener"
+        data-tip="NIPSCERN Laboratory — UFJF">
+        <i class="ti ti-microscope"></i>
+      </a>
+    </div>
     <div class="head-btns">
       <button class="icon-btn" id="btn-about"
         data-tip="About — project credits" data-i18n-tip="tip-about">
@@ -176,26 +195,6 @@
         <svg class="ic" id="pin-icon"><use href="#i-panel-pin"/></svg>
       </button>
     </div>
-  </div>
-
-  <!-- External links strip — moved up near pin -->
-  <div id="ext-links-top">
-    <a href="https://atlas-live.cern.ch" target="_blank" rel="noopener"
-      data-tip="ATLAS Live — ATLANTIS project">
-      <i class="ti ti-radio"></i>
-    </a>
-    <a href="https://atlas.cern" target="_blank" rel="noopener"
-      data-tip="ATLAS Experiment at CERN">
-      <i class="ti ti-atom-2"></i>
-    </a>
-    <a href="https://home.cern" target="_blank" rel="noopener"
-      data-tip="CERN — European Organisation for Nuclear Research">
-      <i class="ti ti-building-arch"></i>
-    </a>
-    <a href="https://nipscern.com" target="_blank" rel="noopener"
-      data-tip="NIPSCERN Laboratory — UFJF">
-      <i class="ti ti-microscope"></i>
-    </a>
   </div>
 
   <div id="mode-bar">
@@ -254,18 +253,15 @@
       <div class="carousel-row">
         <button class="icon-btn" id="btn-carousel-play"
           data-tip="Start carousel — auto-load files in sequence"
-          style="width:26px;height:26px">
+          style="width:24px;height:24px;flex-shrink:0">
           <i class="ti ti-player-play" style="font-size:12px"></i>
         </button>
         <button class="icon-btn" id="btn-carousel-stop"
           data-tip="Stop carousel playback"
-          style="width:26px;height:26px" hidden>
+          style="width:24px;height:24px;flex-shrink:0" hidden>
           <i class="ti ti-player-stop-filled" style="font-size:12px;color:var(--warn)"></i>
         </button>
         <span id="carousel-status">–</span>
-      </div>
-      <div class="carousel-delay-row">
-        <span class="carousel-delay-label">Interval</span>
         <div class="carousel-delay-steps">
           <button class="cdstep" data-s="2">2s</button>
           <button class="cdstep on" data-s="5">5s</button>
@@ -282,7 +278,7 @@
     <div id="sample-list"></div>
   </div>
 
-  <!-- Session log -->
+  <!-- Session log / terminal — commented out; only request counter kept
   <div id="log-sec">
     <div id="log-resize" data-tip="Drag to resize log"></div>
     <div id="log-head">
@@ -291,7 +287,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:5px">
         <span class="badge" id="req-badge" data-tip="Total requests this session">0 req</span>
-<button class="icon-btn" id="btn-log-min"
+        <button class="icon-btn" id="btn-log-min"
           data-tip="Minimize session log" style="width:22px;height:22px">
           <i class="ti ti-chevron-down" id="log-min-icon" style="font-size:12px"></i>
         </button>
@@ -299,7 +295,6 @@
     </div>
     <div id="log-body">
       <div id="log-list"></div>
-      <!-- Download progress bar (visible during XML fetch) -->
       <div id="dl-progress" hidden>
         <div class="dl-stages">
           <div class="dl-stage" id="dlst-request"><div class="dl-dot"></div>Request</div>
@@ -316,6 +311,26 @@
       </div>
     </div>
   </div>
+  -->
+  <!-- Download / load progress bar (only visible while loading) -->
+  <div id="dl-progress" hidden>
+    <div class="dl-stages">
+      <div class="dl-stage" id="dlst-request"><div class="dl-dot"></div>Request</div>
+      <div class="dl-arrow">›</div>
+      <div class="dl-stage" id="dlst-recogn"><div class="dl-dot"></div>Recognize</div>
+      <div class="dl-arrow">›</div>
+      <div class="dl-stage" id="dlst-download"><div class="dl-dot"></div>Download</div>
+      <div class="dl-arrow">›</div>
+      <div class="dl-stage" id="dlst-acquire"><div class="dl-dot"></div>Acquire</div>
+      <div class="dl-arrow">›</div>
+      <div class="dl-stage" id="dlst-load"><div class="dl-dot"></div>Load</div>
+    </div>
+    <div id="dl-bar-track"><div id="dl-bar-fill"></div></div>
+  </div>
+
+  <div id="req-strip">
+    <span class="badge" id="req-badge" data-tip="Total requests this session">0 req</span>
+  </div>
 
   <div id="statusbar" data-i18n="status-init">Initializing…</div>
   <div id="panel-resizer"></div>
@@ -331,7 +346,7 @@
     <button class="det-tab on" id="tab-tile"  style="--tab-col:#c87c18">TILE</button>
     <button class="det-tab"    id="tab-lar"   style="--tab-col:#27b568">LAr</button>
     <button class="det-tab"    id="tab-hec"   style="--tab-col:#66e0f6">HEC</button>
-    <button class="det-tab"    id="tab-track" style="--tab-col:#ffd700">Track</button>
+    <button class="det-tab"    id="tab-track" style="--tab-col:#ffea00">Track</button>
   </div>
 
   <!-- ── TILE pane ──────────────────────────────────────── -->
@@ -391,12 +406,12 @@
   <!-- ── Track pane ──────────────────────────────────────── -->
   <div class="det-pane" id="pane-track" style="display:none">
     <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#ffd700"></span>
+      <span class="pane-det-dot" style="background:#ffea00"></span>
       <span class="pane-det-name">Tracks</span>
     </div>
     <div class="sval" id="track-sval-max">– GeV</div>
     <div class="strak" id="track-strak"
-      style="background:linear-gradient(to top,#665500 0%,#ffd700 100%)">
+      style="background:linear-gradient(to top,#665500 0%,#ffea00 100%)">
       <div class="sthumb" id="track-sthumb"></div>
     </div>
     <div class="sval" id="track-sval-min">– GeV</div>
@@ -649,6 +664,7 @@
 <!-- ── Cell hover tooltip ────────────────────────────────── -->
 <div id="tip" hidden>
   <div id="tip-cell">—</div>
+  <div id="tip-coords"></div>
   <hr class="tdiv">
   <div class="trow">
     <span class="tkey" data-i18n="tip-energy-key">Energy</span>
