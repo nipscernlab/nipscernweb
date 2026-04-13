@@ -18,7 +18,7 @@
       --blur:    blur(20px) saturate(1.7);
       --r:       10px;
       --pw:      250px;
-      --rpw:     200px;
+      --rpw:     100px;
       --pt:      0.34s;
     }
 
@@ -336,80 +336,79 @@
     }
     .about-close:hover { color: var(--bright); border-color: var(--accent); }
 
-    /* ── Right retractable panel — floating card ─────────── */
+    /* ── Right retractable panel — floating slim card ───── */
     #rpanel {
       position: fixed; top: 14px; right: 14px;
       width: var(--rpw); max-height: calc(100vh - 28px);
       background: var(--panel);
       backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 12px;
       display: flex; flex-direction: column;
       z-index: 30;
       overflow-y: auto;
       box-shadow: 4px 4px 32px rgba(0,0,0,.45);
-      transform: translateX(calc(var(--rpw) + 18px));
+      transform: translateX(0);
       transition: transform var(--pt) cubic-bezier(0.4, 0, 0.2, 1);
       will-change: transform;
     }
-    #rpanel.open { transform: translateX(0); }
+    #rpanel.collapsed { transform: translateX(calc(var(--rpw) + 18px)); }
     #rpanel::-webkit-scrollbar { width: 3px; }
     #rpanel::-webkit-scrollbar-thumb { background: rgba(36,103,224,.22); border-radius: 2px; }
 
     /* ── Detector tab bar ────────────────────────────────── */
     #det-tab-bar {
-      display: flex; flex-shrink: 0;
-      border-bottom: 2px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
     }
     .det-tab {
-      flex: 1; padding: 9px 2px 7px;
-      font: 600 .60rem var(--mono); letter-spacing: .04em;
-      color: var(--muted); border: none;
-      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      flex: none; padding: 5px 8px;
+      font: 600 .54rem var(--mono); letter-spacing: .04em;
+      color: var(--muted); border: none; text-align: center;
+      border-left: 2px solid transparent;
       cursor: pointer; transition: color .14s, border-color .14s, background .14s;
     }
     .det-tab:hover { color: var(--text); }
     .det-tab.on {
       color: var(--bright);
-      border-bottom-color: var(--tab-col, var(--accent2));
+      border-left-color: var(--tab-col, var(--accent2));
       background: rgba(36,103,224,.06);
     }
 
-    /* ── Detector pane — compact centred layout ──────────── */
+    /* ── Detector pane — slim compact layout ───���─────────── */
     .det-pane {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 5px; padding: 10px 0 12px;
+      gap: 3px; padding: 6px 0 8px;
     }
-    /* Tiny detector label + dot above the slider */
     .pane-det-row {
-      display: flex; align-items: center; gap: 6px; margin-bottom: 2px;
+      display: flex; align-items: center; gap: 5px; margin-bottom: 1px;
     }
-    .pane-det-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .pane-det-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
     .pane-det-name {
-      font: 500 .56rem var(--font); color: var(--text); letter-spacing: .03em;
+      font: 500 .50rem var(--font); color: var(--text); letter-spacing: .03em;
     }
     .slbl {
-      font: 400 .55rem var(--font); letter-spacing: .13em;
+      font: 400 .48rem var(--font); letter-spacing: .13em;
       color: var(--muted); text-transform: uppercase; text-align: center;
     }
-    .sval { font: 400 .62rem var(--mono); color: var(--muted); text-align: center; }
+    .sval { font: 400 .54rem var(--mono); color: var(--muted); text-align: center; }
     .strak {
-      position: relative; width: 14px; height: 200px;
-      border-radius: 7px; cursor: ns-resize; user-select: none; touch-action: none;
+      position: relative; width: 12px; height: 160px;
+      border-radius: 6px; cursor: ns-resize; user-select: none; touch-action: none;
       border: 1px solid rgba(255,255,255,.13);
       box-shadow: inset 0 1px 8px rgba(0,0,0,.50);
     }
     .sthumb {
-      position: absolute; left: -10px; right: -10px; height: 3px;
+      position: absolute; left: -8px; right: -8px; height: 3px;
       border-radius: 2px; background: rgba(255,255,255,.96);
       box-shadow: 0 0 10px rgba(255,255,255,.90), 0 0 4px rgba(255,255,255,.60);
       pointer-events: none; top: 50%;
     }
     .thr-input {
-      width: 78px; padding: 4px 7px;
+      width: 68px; padding: 3px 4px;
       background: rgba(2,11,28,.90); border: 1px solid var(--border);
-      border-radius: 5px; color: var(--text); font: 400 .61rem var(--mono);
+      border-radius: 4px; color: var(--text); font: 400 .54rem var(--mono);
       text-align: center; transition: border-color .15s;
     }
     .thr-input:focus { border-color: var(--accent2); color: var(--bright); }
@@ -556,7 +555,7 @@
        user is expected to rotate to landscape. A small tip can be shown
        by the UI if needed. */
     @media (orientation: landscape) and (max-height: 520px) {
-      :root { --pw: 240px; --rpw: 180px; }
+      :root { --pw: 240px; --rpw: 100px; }
 
       /* Panel: full height, edge-attached */
       #panel {
@@ -594,7 +593,7 @@
         top: 8px; right: 8px; max-height: calc(100vh - 16px);
         border-radius: 12px;
       }
-      #rpanel.open { transform: translateX(0); }
+      #rpanel.collapsed { transform: translateX(calc(var(--rpw) + 12px)); }
       .pane-det-name { font-size: .55rem; }
       .slbl { font-size: .50rem; }
       .sval { font-size: .57rem; }

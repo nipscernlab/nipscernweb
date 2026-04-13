@@ -270,11 +270,8 @@ function applyLang(lang) {
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const PAL_N   = 2048;
+const PAL_N   = 256;
 const DEF_THR = 200;
-
-// ── Unmapped cells log buffer ─────────────────────────────────────────────────
-const _missLog = [];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const meshByName = new Map();
@@ -304,6 +301,7 @@ let panelPinned  = true;
 let panelHovered = false;
 let reqCount     = 0;
 let allOutlinesMesh = null;
+let trackGroup   = null;
 let _readyFired  = false;
 
 // ── Loading screen helpers ─────────────────────────────────────────────────────
@@ -342,65 +340,56 @@ function bumpReq(label = '') {
 function palColorTile(t) {
   t = Math.max(0, Math.min(1, t));
   return new THREE.Color(
-    1.000 + t * (0.502 - 1.000), // R: 1.0 → 0.502
-    1.000 + t * (0.000 - 1.000), // G: 1.0 → 0.0
-    0.0                           // B: always 0
+    1.000 + t * (0.502 - 1.000),       // R: 1.0 → 0.502
+    1.000 + t * (0.000 - 1.000),       // G: 1.0 → 0.0
+    0.0                                 // B: always 0
   );
 }
 const PAL_TILE = Array.from({ length: PAL_N }, (_, i) => {
   const c = palColorTile(i / (PAL_N - 1));
-  return new THREE.MeshPhongMaterial({
-    color: c, emissive: c, emissiveIntensity: 0.42,
-    shininess: 6, side: THREE.FrontSide,
-  });
+  c.offsetHSL(0, 0.35, 0);  // boost saturation, keep hue & lightness
+  return new THREE.MeshBasicMaterial({ color: c, side: THREE.FrontSide });
 });
-const TILE_SCALE = 2000; // MeV — fixed 0–2 GeV
+const TILE_SCALE = 2000;
 function palMatTile(eMev) {
   const tv = Math.max(0, Math.min(1, eMev / TILE_SCALE));
   return PAL_TILE[Math.round(tv * (PAL_N - 1))];
 }
 
-// ── Palette HEC: #66e0f6 (min) → #0c0368 (max), linear ──────────────────────
-// #66e0f6 = [102,224,246]/255 = [0.4000,0.8784,0.9647]
-// #0c0368 = [12,3,104]/255   = [0.0471,0.0118,0.4078]
+// ── Palette HEC: #66e0f6 (min) → #0c0368 (max), linear ─────────────────────
 function palColorHec(t) {
   t = Math.max(0, Math.min(1, t));
   return new THREE.Color(
-    0.4000 + t * (0.0471 - 0.4000), // R: ~0.40 → ~0.05
-    0.8784 + t * (0.0118 - 0.8784), // G: ~0.88 → ~0.01
-    0.9647 + t * (0.4078 - 0.9647)  // B: ~0.96 → ~0.41
+    0.4000 + t * (0.0471 - 0.4000),   // R: 0.40 → 0.05
+    0.8784 + t * (0.0118 - 0.8784),   // G: 0.88 → 0.01
+    0.9647 + t * (0.4078 - 0.9647)    // B: 0.96 → 0.41
   );
 }
-const PAL_HEC = Array.from({ length: PAL_N }, (_, i) =>
-  new THREE.MeshPhongMaterial({
-    color: palColorHec(i / (PAL_N - 1)),
-    emissive: palColorHec(i / (PAL_N - 1)), emissiveIntensity: 0.30,
-    shininess: 20, side: THREE.FrontSide,
-  })
-);
-const HEC_SCALE = 5000; // MeV — fixed 0–5 GeV; values above 5 GeV → max colour
+const PAL_HEC = Array.from({ length: PAL_N }, (_, i) => {
+  const c = palColorHec(i / (PAL_N - 1));
+  c.offsetHSL(0, 0.35, 0);
+  return new THREE.MeshBasicMaterial({ color: c, side: THREE.FrontSide });
+});
+const HEC_SCALE = 5000;
 function palMatHec(eMev) {
   const tv = Math.max(0, Math.min(1, eMev / HEC_SCALE));
   return PAL_HEC[Math.round(tv * (PAL_N - 1))];
 }
 
-// ── Palette LAr: #17cf42 (min) → #270042 (max), linear ───────────────────────
-// #17cf42 = [23,207,66]/255 = [0.0902,0.8118,0.2588]
-// #270042 = [39,0,66]/255   = [0.1529,0.0000,0.2588]
+// ── Palette LAr: #17cf42 (min) → #270042 (max), linear ──────────────────────
 function palColorLAr(t) {
   t = Math.max(0, Math.min(1, t));
   return new THREE.Color(
-    0.0902 + t * (0.1529 - 0.0902), // R: ~0.09 → ~0.15
-    0.8118 + t * (0.0000 - 0.8118), // G: ~0.81 → 0
-    0.2588                           // B: constant
+    0.0902 + t * (0.1529 - 0.0902),   // R: 0.09 → 0.15
+    0.8118 + t * (0.0000 - 0.8118),   // G: 0.81 → 0
+    0.2588                              // B: constant
   );
 }
-const PAL_LAR = Array.from({ length: PAL_N }, (_, i) =>
-  new THREE.MeshPhongMaterial({
-    color: palColorLAr(i / (PAL_N - 1)),
-    shininess: 25, side: THREE.FrontSide,
-  })
-);
+const PAL_LAR = Array.from({ length: PAL_N }, (_, i) => {
+  const c = palColorLAr(i / (PAL_N - 1));
+  c.offsetHSL(0, 0.35, 0);
+  return new THREE.MeshBasicMaterial({ color: c, side: THREE.FrontSide });
+});
 const LAR_SCALE = 1000; // MeV — fixed 0–1 GeV
 function palMatLAr(eMev) {
   const tv = Math.max(0, Math.min(1, eMev / LAR_SCALE));
@@ -553,8 +542,8 @@ const GHOST_NAMES = { tile: GHOST_TILE_NAMES, lar: [], hec: [] };
 
 // ── Renderer ──────────────────────────────────────────────────────────────────
 const canvas   = document.getElementById('c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', precision: 'mediump', preserveDrawingBuffer: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', precision: 'mediump', preserveDrawingBuffer: true, stencil: false, depth: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.sortObjects = false;
@@ -562,6 +551,7 @@ renderer.sortObjects = false;
 // ── Scene / Camera / Controls ─────────────────────────────────────────────────
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020d1c);
+scene.matrixAutoUpdate = false;  // we manage transforms manually
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 100_000);
 camera.position.set(0, 0, 12_000);
 const controls = new OrbitControls(camera, canvas);
@@ -579,16 +569,27 @@ controls.addEventListener('change', () => {
   if (!cinemaMode && _ctrlActive) { tooltip.hidden = true; clearOutline(); }
 });
 
-// Ambient base + directional key light attached to camera (follows the viewer)
-scene.add(new THREE.AmbientLight(0xffffff, 0.68));
-const camLight = new THREE.DirectionalLight(0xffffff, 1.1);
-camLight.position.set(0, 0, 1); // +Z in camera space = behind camera = toward scene
-camera.add(camLight);
-scene.add(camera); // camera must be in scene for child lights to update
+// No lights needed — all cell materials are MeshBasicMaterial (unlit)
+
+// ── FPS counter ──────────────────────────────────────────────────────────────
+const fpsEl = document.createElement('div');
+Object.assign(fpsEl.style, {
+  position: 'fixed', bottom: '8px', left: '8px', zIndex: '9999',
+  fontFamily: 'monospace', fontSize: '13px', color: '#66ccff',
+  opacity: '0.45', pointerEvents: 'none', userSelect: 'none',
+});
+document.body.appendChild(fpsEl);
+let _fpsFrames = 0, _fpsLast = performance.now();
 
 // ── Render loop ───────────────────────────────────────────────────────────────
 (function loop() {
   requestAnimationFrame(loop);
+  _fpsFrames++;
+  const now = performance.now();
+  if (now - _fpsLast >= 500) {
+    fpsEl.textContent = ((_fpsFrames / (now - _fpsLast)) * 1000).toFixed(0) + ' FPS';
+    _fpsFrames = 0; _fpsLast = now;
+  }
   controls.update();
   if (controls.autoRotate) dirty = true;
   if (!dirty) return;
@@ -629,13 +630,19 @@ setLoadProgress(5, 'Loading geometry…');
 new GLTFLoader().load(
   './geometry_data/CaloGeometry.glb',
   ({ scene: g }) => {
-    g.traverse(o => {
-      if (!o.isMesh) return;
-      o.visible = false;
-      meshByName.set(o.name, o);
-      origMat.set(o.name, o.material);
-    });
-    scene.add(g);
+    // Flatten: move all meshes directly under the root scene for fewer traversals
+    const meshes = [];
+    g.traverse(o => { if (o.isMesh) meshes.push(o); });
+    for (const m of meshes) {
+      m.updateWorldMatrix(true, false);
+      m.matrix.copy(m.matrixWorld);
+      m.matrixAutoUpdate = false;
+      m.frustumCulled = false;  // all cells inside camera bounds always
+      m.visible = false;
+      meshByName.set(m.name, m);
+      origMat.set(m.name, m.material);
+      scene.add(m);
+    }
     sceneOk = true; dirty = true;
     setLoadProgress(wasmOk ? 100 : 70, 'Geometry loaded');
     addLog(t('log-glb-loaded'), 'ok');
@@ -773,6 +780,79 @@ function parseHec(doc) {
   return extractCells(doc, 'HEC');
 }
 
+function parseMBTS(doc) {
+  const cells = [];
+  const els = doc.getElementsByTagName('MBTS');
+  for (const el of els) {
+    let n = 0;
+    for (const ch of el.children) {
+      const label = ch.getAttribute('label');
+      const ev    = ch.getAttribute('energy') ?? ch.getAttribute('e');
+      if (label && ev) { const e = parseFloat(ev); if (isFinite(e)) { cells.push({ label: label.trim(), energy: e }); n++; } }
+    }
+    if (n) continue;
+    const lblEl = el.querySelector('label');
+    const eEl   = el.querySelector('energy, e');
+    if (lblEl && eEl) {
+      const labels = lblEl.textContent.trim().split(/\s+/);
+      const ens    = eEl.textContent.trim().split(/\s+/).map(Number);
+      const m      = Math.min(labels.length, ens.length);
+      for (let i = 0; i < m; i++) if (labels[i] && isFinite(ens[i])) cells.push({ label: labels[i], energy: ens[i] });
+    }
+  }
+  return cells;
+}
+
+// ── Track polylines ───────────────────────────────────────────────────────────
+// JiveXML stores polyline coordinates in cm; the Three.js scene uses mm → ×10.
+// numPolyline[i] = number of points for track i.
+// polylineX/Y/Z are the flattened point arrays (one segment per track).
+function parseTracks(doc) {
+  const tracks = [];
+  for (const el of doc.getElementsByTagName('Track')) {
+    const numPolyEl = el.querySelector('numPolyline');
+    const pxEl      = el.querySelector('polylineX');
+    const pyEl      = el.querySelector('polylineY');
+    const pzEl      = el.querySelector('polylineZ');
+    if (!numPolyEl || !pxEl || !pyEl || !pzEl) continue;
+    const numPoly = numPolyEl.textContent.trim().split(/\s+/).map(Number);
+    const xs      = pxEl.textContent.trim().split(/\s+/).map(Number);
+    const ys      = pyEl.textContent.trim().split(/\s+/).map(Number);
+    const zs      = pzEl.textContent.trim().split(/\s+/).map(Number);
+    const ptEl    = el.querySelector('pt');
+    const ptArr   = ptEl ? ptEl.textContent.trim().split(/\s+/).map(Number) : [];
+    let offset = 0;
+    for (let i = 0; i < numPoly.length; i++) {
+      const n = numPoly[i];
+      if (n >= 2) {
+        const pts = [];
+        for (let j = 0; j < n; j++) {
+          const k = offset + j;
+          pts.push(new THREE.Vector3(-xs[k] * 10, -ys[k] * 10, zs[k] * 10));
+        }
+        // pt in XML is in GeV (may be signed — use absolute value)
+        const ptGev = i < ptArr.length ? Math.abs(ptArr[i]) : 0;
+        tracks.push({ pts, ptGev });
+      }
+      offset += n;
+    }
+  }
+  return tracks;
+}
+
+// ── MBTS label → mesh path ────────────────────────────────────────────────────
+// label format: type_{±1}_ch_{0|1}_mod_{0-7}
+// type=+1→p, type=-1→n; ch=0→Tile14, ch=1→Tile15; mod→cell index
+function mbtsMeshPath(label) {
+  const m = /^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
+  if (!m) return null;
+  const side    = m[1] === '1' ? 'p' : 'n';
+  const tileNum = m[2] === '0' ? 14 : 15;
+  const mod     = m[3];
+  const path    = `Calorimeter\u2192Tile${tileNum}${side}_0\u2192Tile${tileNum}${side}0_0\u2192cell_${mod}`;
+  return meshByName.has(path) ? path : null;
+}
+
 // ── LAr EM ID → mesh path (tries cell_ then cell2_ as fallback) ───────────────
 function larMeshPath(bec, samp, region, eta, phi) {
   const X      = (bec === -1 || bec === 1) ? 'Barrel' : 'EndCap';
@@ -785,6 +865,43 @@ function larMeshPath(bec, samp, region, eta, phi) {
   return null;
 }
 
+// ── Track rendering ───────────────────────────────────────────────────────────
+let thrTrackGev   = 0;
+let trackPtMinGev = 0;
+let trackPtMaxGev = 1;
+
+const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffd700, depthWrite: false });
+
+function clearTracks() {
+  if (!trackGroup) return;
+  trackGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+  scene.remove(trackGroup);
+  trackGroup = null;
+}
+
+function applyTrackThreshold() {
+  if (!trackGroup) return;
+  for (const child of trackGroup.children) {
+    child.visible = child.userData.ptGev >= thrTrackGev;
+  }
+  dirty = true;
+}
+
+function drawTracks(tracks) {
+  clearTracks();
+  if (!tracks.length) return;
+  trackGroup = new THREE.Group();
+  trackGroup.renderOrder = 5;
+  for (const { pts, ptGev } of tracks) {
+    const geo  = new THREE.BufferGeometry().setFromPoints(pts);
+    const line = new THREE.Line(geo, TRACK_MAT);
+    line.userData.ptGev = ptGev;
+    trackGroup.add(line);
+  }
+  scene.add(trackGroup);
+  applyTrackThreshold();
+}
+
 // ── Scene reset ───────────────────────────────────────────────────────────────
 function resetScene() {
   for (const [name, mesh] of meshByName) {
@@ -792,6 +909,7 @@ function resetScene() {
   }
   active.clear(); rayTargets = [];
   clearOutline(); clearAllOutlines();
+  clearTracks();
   tooltip.hidden = true; dirty = true;
 }
 function applyThreshold() {
@@ -813,18 +931,33 @@ function processXml(xmlText) {
   const t0 = performance.now();
 
   // Parse XML once — all detectors share the same Document
-  let doc, tileCells, larCells, hecCells;
+  let doc, tileCells, larCells, hecCells, mbtsCells;
   try { doc = parseXmlDoc(xmlText); }
   catch (e) { setStatus(`<span class="err">${esc(e.message)}</span>`); addLog(e.message, 'err'); return; }
   try { tileCells = parseTile(doc); } catch { tileCells = []; }
   try { larCells  = parseLAr(doc);  } catch { larCells  = []; }
   try { hecCells  = parseHec(doc);  } catch { hecCells  = []; }
+  try { mbtsCells = parseMBTS(doc); } catch { mbtsCells = []; }
 
-  const total = tileCells.length + larCells.length + hecCells.length;
-  if (!total) { setStatus('<span class="warn">No TILE, LAr or HEC cells found</span>'); addLog('No cells in XML', 'warn'); return; }
+  const total = tileCells.length + larCells.length + hecCells.length + mbtsCells.length;
+  if (!total) { setStatus('<span class="warn">No TILE, LAr, HEC or MBTS cells found</span>'); addLog('No cells in XML', 'warn'); return; }
 
   setStatus(`Decoding ${total} cells…`);
   resetScene();
+
+  // ── Particle tracks ─────────────────────────────────────────────────────────
+  try {
+    const raw = parseTracks(doc);
+    if (raw.length) {
+      let mn = Infinity, mx = -Infinity;
+      for (const { ptGev } of raw) { if (ptGev < mn) mn = ptGev; if (ptGev > mx) mx = ptGev; }
+      trackPtMinGev = mn === Infinity  ? 0 : mn;
+      trackPtMaxGev = mx === -Infinity ? 1 : mx;
+      thrTrackGev   = trackPtMinGev;
+      trackPtSlider.update(trackPtMinGev, trackPtMaxGev);
+    }
+    drawTracks(raw);
+  } catch (e) { console.warn('Track parse error', e); }
 
   // Per-detector energy ranges — single loop per detector, avoids spread stack overflow
   function minMax(cells) {
@@ -832,17 +965,25 @@ function processXml(xmlText) {
     for (const { energy } of cells) { const v = energy * 1000; if (isFinite(v) && v > 0) { if (v < mn) mn = v; if (v > mx) mx = v; } }
     return mn === Infinity ? [0, 1] : [mn, mx];
   }
-  [tileMinMev, tileMaxMev] = minMax(tileCells);
+  // MBTS shares the Tile palette — merge its range with Tile's
+  const allTileCells = tileCells.concat(mbtsCells);
+  [tileMinMev, tileMaxMev] = minMax(allTileCells);
   [larMinMev,  larMaxMev]  = minMax(larCells);
   [hecMinMev,  hecMaxMev]  = minMax(hecCells);
 
-  let nTile = 0, nLAr = 0, nHec = 0, nMiss = 0, nSkip = 0;
-  let nHecMiss = 0;
+  let nTile = 0, nLAr = 0, nHec = 0, nMbts = 0, nMiss = 0, nSkip = 0;
+  let nHecMiss = 0, nMbtsMiss = 0;
 
   // ── Bulk decode: one WASM call per detector replaces N individual FFI calls ──
-  const tilePacked = tileCells.length ? parse_atlas_ids_bulk(tileCells.map(c => c.id).join(' ')) : null;
-  const larPacked  = larCells.length  ? parse_atlas_ids_bulk(larCells.map(c => c.id).join(' '))  : null;
-  const hecPacked  = hecCells.length  ? parse_atlas_ids_bulk(hecCells.map(c => c.id).join(' '))  : null;
+  // Build ID strings without intermediate array allocation
+  function idsToStr(cells) {
+    let s = cells[0].id;
+    for (let i = 1; i < cells.length; i++) s += ' ' + cells[i].id;
+    return s;
+  }
+  const tilePacked = tileCells.length ? parse_atlas_ids_bulk(idsToStr(tileCells)) : null;
+  const larPacked  = larCells.length  ? parse_atlas_ids_bulk(idsToStr(larCells))  : null;
+  const hecPacked  = hecCells.length  ? parse_atlas_ids_bulk(idsToStr(hecCells))  : null;
 
   // ── TileCal cells ─────────────────────────────────────────────────────────
   for (let i = 0; i < tileCells.length; i++) {
@@ -855,12 +996,12 @@ function processXml(xmlText) {
     const sampling = tilePacked[base + 5];
     const { id, energy } = tileCells[i];
     const eMev = energy * 1000;
-    const x = compX(section, sampling, tower); if (x === null) { const s = `[TILE] id=${id} | compX failed | section=${section} sampling=${sampling} tower=${tower}`; console.warn(s); _missLog.push(s); nMiss++; continue; }
-    const k = compK(tower, sampling, x);       if (k === null) { const s = `[TILE] id=${id} | compK failed | tower=${tower} sampling=${sampling} x=${x}`;             console.warn(s); _missLog.push(s); nMiss++; continue; }
-    const y    = side < 0 ? 'p' : 'n';
+    const x = compX(section, sampling, tower); if (x === null) { console.warn(`[TILE] id=${id} | compX failed | section=${section} sampling=${sampling} tower=${tower}`); nMiss++; continue; }
+    const k = compK(tower, sampling, x);       if (k === null) { console.warn(`[TILE] id=${id} | compK failed | tower=${tower} sampling=${sampling} x=${x}`);             nMiss++; continue; }
+    const y    = side < 0 ? 'n' : 'p';
     const path = `Calorimeter\u2192Tile${x}${y}_0\u2192Tile${x}${y}${k}_${k}\u2192cell_${module}`;
     const mesh = meshByName.get(path);
-    if (!mesh) { const s = `[TILE] id=${id} | ${path}`; console.warn(s); _missLog.push(s); nMiss++; continue; }
+    if (!mesh) { console.warn(`[TILE] id=${id} | ${path}`); nMiss++; continue; }
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
     active.set(path, { energyGev: energy, energyMev: eMev, cellName: cellLabel(x, k), det: 'TILE' });
     nTile++;
@@ -883,11 +1024,11 @@ function processXml(xmlText) {
       const W = X === 'Barrel' ? 0 : 1;
       const Z = bec > 0 ? 'p' : 'n';
       const R = X === 'EndCap' ? Math.abs(bec) : region;
-      const s = `[LAr EM] id=${id} | Calorimeter\u2192EM${X}_${sampling}_${R}_${Z}_${W}\u2192EM${X}_${sampling}_${R}_${Z}_${eta}_${eta}\u2192cell_${phi}`;
-      console.warn(s); _missLog.push(s); nMiss++; continue;
+      console.warn(`[LAr EM] id=${id} | Calorimeter\u2192EM${X}_${sampling}_${R}_${Z}_${W}\u2192EM${X}_${sampling}_${R}_${Z}_${eta}_${eta}\u2192cell_${phi}`);
+      nMiss++; continue;
     }
     const mesh = meshByName.get(path);
-    if (!mesh) { const s = `[LAr EM] id=${id} | ${path}`; console.warn(s); _missLog.push(s); nMiss++; continue; }
+    if (!mesh) { console.warn(`[LAr EM] id=${id} | ${path}`); nMiss++; continue; }
     mesh.material = palMatLAr(eMev); mesh.visible = true; mesh.renderOrder = 2;
     const rName = Math.abs(bec) === 1 ? (bec > 0 ? 'EMBA' : 'EMBC') : Math.abs(bec) === 2 ? (bec > 0 ? 'EMECA' : 'EMECC') : (bec > 0 ? 'EMECA (inner)' : 'EMECC (inner)');
     active.set(path, { energyGev: energy, energyMev: eMev, cellName: `${rName} s=${sampling} r=${region} η=${eta} φ=${phi}`, det: 'LAR' });
@@ -910,11 +1051,11 @@ function processXml(xmlText) {
       const g = HEC_GROUPS_MAP[sampling];
       const Z = be > 0 ? 'p' : 'n';
       const cum = region === 0 ? eta : (g ? g.innerBins + eta : eta);
-      const s = g ? `[HEC] id=${id} | Calorimeter\u2192HEC_${g.name}_${region}_${Z}_0\u2192HEC_${g.name}_${region}_${Z}_${cum}_${cum}\u2192cell_${phi}` : `[HEC] id=${id} | sampling=${sampling} (no group)`;
-      console.warn(s); _missLog.push(s); nHecMiss++; continue;
+      console.warn(g ? `[HEC] id=${id} | Calorimeter\u2192HEC_${g.name}_${region}_${Z}_0\u2192HEC_${g.name}_${region}_${Z}_${cum}_${cum}\u2192cell_${phi}` : `[HEC] id=${id} | sampling=${sampling} (no group)`);
+      nHecMiss++; continue;
     }
     const mesh = meshByName.get(path);
-    if (!mesh) { const s = `[HEC] id=${id} | ${path}`; console.warn(s); _missLog.push(s); nHecMiss++; continue; }
+    if (!mesh) { console.warn(`[HEC] id=${id} | ${path}`); nHecMiss++; continue; }
     mesh.material = palMatHec(eMev); mesh.visible = true; mesh.renderOrder = 2;
     const side   = be > 0 ? 'HECA' : 'HECC';
     const sLabel = ['front','middle','back','rear'][sampling] ?? `s${sampling}`;
@@ -922,36 +1063,46 @@ function processXml(xmlText) {
     nHec++;
   }
 
-  initDetPanel(nTile > 0, nLAr > 0, nHec > 0);
+  // ── MBTS cells (direct label→path, no WASM needed) ────────────────────────
+  for (let i = 0; i < mbtsCells.length; i++) {
+    const { label, energy } = mbtsCells[i];
+    const eMev = energy * 1000;
+    const path = mbtsMeshPath(label);
+    if (!path) { console.warn(`[MBTS] label=${label} | no mesh`); nMbtsMiss++; continue; }
+    const mesh = meshByName.get(path);
+    if (!mesh) { console.warn(`[MBTS] label=${label} | ${path}`); nMbtsMiss++; continue; }
+    mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
+    active.set(path, { energyGev: energy, energyMev: eMev, cellName: `MBTS ${label}`, det: 'TILE' });
+    nMbts++;
+  }
+
+  initDetPanel(nTile > 0, nLAr > 0, nHec > 0, trackGroup && trackGroup.children.length > 0);
   applyThreshold();
   const dt = ((performance.now() - t0) / 1000).toFixed(2);
 
   const hitParts = [];
-  if (nTile) hitParts.push(`TILE: ${nTile} (${fmtMev(tileMinMev)}–${fmtMev(tileMaxMev)})`);
+  if (nTile || nMbts) hitParts.push(`TILE: ${nTile + nMbts} (${fmtMev(tileMinMev)}–${fmtMev(tileMaxMev)})`);
   if (nLAr)  hitParts.push(`LAr: ${nLAr} (${fmtMev(larMinMev)}–${fmtMev(larMaxMev)})`);
   if (nHec)  hitParts.push(`HEC: ${nHec} (${fmtMev(hecMinMev)}–${fmtMev(hecMaxMev)})`);
   const hitStr  = hitParts.join(' · ') || '0';
-  const nHit    = nTile + nLAr + nHec;
-  const allMiss = nMiss + nHecMiss;
+  const nHit    = nTile + nMbts + nLAr + nHec;
+  const allMiss = nMiss + nHecMiss + nMbtsMiss;
   const missStr = allMiss ? ` · <span class="warn">${allMiss} unmapped</span>` : '';
   setStatus(`<span class="ok">${nHit} cells</span>${missStr} · ${hitStr}`);
-  if (nHecMiss) addLog(`HEC: ${nHec} mapped · ${nHecMiss} unmapped`, 'warn');
+  if (nHecMiss)  addLog(`HEC: ${nHec} mapped · ${nHecMiss} unmapped`, 'warn');
+  if (nMbtsMiss) addLog(`MBTS: ${nMbts} mapped · ${nMbtsMiss} unmapped`, 'warn');
   addLog(`${nHit} cells — ${hitStr}${allMiss ? ` · ${allMiss} unmapped` : ''} (${dt}s)`, 'ok');
 }
 
-// ── Right panel (rpanel) toggle ───────────────────────────────────────────────
-// Simplified state machine:
-//   - rpanelPinned: user explicitly opened via the toolbar button (or 'E' key)
-//   - rpanelHovered: temporarily open from edge-hover (auto-closes on leave)
-// Button click => toggle pinned. Hover is only active when NOT pinned.
+// ── Right panel (rpanel) toggle — mirrors left panel behavior ────────────────
 const rpanel = document.getElementById('rpanel');
 const btnRpanel = document.getElementById('btn-rpanel');
-let rpanelPinned = false;
+let rpanelPinned = true;
 let rpanelHovered = false;
 
 function syncRPanelUI() {
   const open = rpanelPinned || rpanelHovered;
-  rpanel.classList.toggle('open', open);
+  rpanel.classList.toggle('collapsed', !open);
   btnRpanel.classList.toggle('on', rpanelPinned);
   document.body.classList.toggle('rpanel-unpinned', !rpanelPinned);
 }
@@ -967,16 +1118,20 @@ rpanelEdge.addEventListener('mouseenter', () => {
 rpanel.addEventListener('mouseleave', () => {
   if (!rpanelPinned && rpanelHovered) { rpanelHovered = false; syncRPanelUI(); }
 });
-// Toolbar button — toggle pinned state (single source of truth)
+// Canvas click closes the right panel if it was hovered (not pinned)
+canvas.addEventListener('click', () => {
+  if (!rpanelPinned && rpanelHovered) { rpanelHovered = false; syncRPanelUI(); }
+});
+// Toolbar button — toggle pinned state
 btnRpanel.addEventListener('click', e => {
   e.stopPropagation();
   setPinnedR(!rpanelPinned);
 });
-// Start unpinned (edge hover available)
+// Start collapsed
 setPinnedR(false);
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
-const TAB_IDS = ['tile', 'lar', 'hec']; // Ghost tab removed (item 8)
+const TAB_IDS = ['tile', 'lar', 'hec', 'track'];
 function switchTab(det) {
   TAB_IDS.forEach(d => {
     document.getElementById('pane-' + d).style.display = d === det ? 'flex' : 'none';
@@ -1046,17 +1201,83 @@ const larSlider  = makeDetSlider('lar-strak',  'lar-sthumb',  'lar-thr-input',
 const hecSlider  = makeDetSlider('hec-strak',  'hec-sthumb',  'hec-thr-input',
   () => thrHecMev,  v => { thrHecMev = v; },  HEC_SCALE);
 
+// ── Track pT slider (dynamic range — updates each event) ─────────────────────
+function makeTrackPtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
+  const trackEl  = document.getElementById(trackId);
+  const thumbEl  = document.getElementById(thumbId);
+  const inputEl  = document.getElementById(inputId);
+  const maxLblEl = document.getElementById(maxLblId);
+  const minLblEl = document.getElementById(minLblId);
+  let drag = false;
+
+  function fmtGev(v) { return v.toFixed(2) + ' GeV'; }
+
+  function updateUI() {
+    const span = trackPtMaxGev - trackPtMinGev;
+    const r    = span > 0 ? Math.max(0, Math.min(1, (thrTrackGev - trackPtMinGev) / span)) : 0;
+    thumbEl.style.top = ((1 - r) * 100) + '%';
+    if (document.activeElement !== inputEl)
+      inputEl.value = thrTrackGev > trackPtMinGev + 1e-9 ? fmtGev(thrTrackGev) : '';
+  }
+
+  function setFromRatio(r) {
+    const span = trackPtMaxGev - trackPtMinGev;
+    thrTrackGev = r <= 0 ? trackPtMinGev : trackPtMinGev + span * r;
+    updateUI();
+    applyTrackThreshold();
+  }
+
+  trackEl.addEventListener('pointerdown', e => {
+    drag = true; rpanel.classList.add('dragging'); trackEl.setPointerCapture(e.pointerId);
+    setFromRatio(ratioFromPtr(e, trackEl));
+  });
+  trackEl.addEventListener('pointermove', e => { if (drag) setFromRatio(ratioFromPtr(e, trackEl)); });
+  ['pointerup', 'pointercancel'].forEach(ev =>
+    trackEl.addEventListener(ev, () => { drag = false; rpanel.classList.remove('dragging'); })
+  );
+  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') inputEl.blur(); });
+  inputEl.addEventListener('blur', () => {
+    const s = inputEl.value.trim().toLowerCase();
+    if (!s || s === 'all') {
+      thrTrackGev = trackPtMinGev;
+    } else {
+      const g = s.match(/^([\d.]+)\s*gev$/i);
+      const v = g ? parseFloat(g[1]) : parseFloat(s);
+      if (isFinite(v)) thrTrackGev = Math.max(trackPtMinGev, Math.min(trackPtMaxGev, v));
+    }
+    updateUI();
+    applyTrackThreshold();
+  });
+
+  function update(minGev, maxGev) {
+    trackPtMinGev = minGev;
+    trackPtMaxGev = maxGev;
+    thrTrackGev   = minGev; // reset to show all on new event
+    if (maxLblEl) maxLblEl.textContent = fmtGev(maxGev);
+    if (minLblEl) minLblEl.textContent = fmtGev(minGev);
+    updateUI();
+  }
+
+  return { updateUI, update };
+}
+
+const trackPtSlider = makeTrackPtSlider(
+  'track-strak', 'track-sthumb', 'track-thr-input',
+  'track-sval-max', 'track-sval-min'
+);
+
 // Initialize thumb positions at default threshold
 tileSlider.updateUI(thrTileMev);
 larSlider.updateUI(thrLArMev);
 hecSlider.updateUI(thrHecMev);
 
-function initDetPanel(hasTile, hasLAr, hasHec) {
+function initDetPanel(hasTile, hasLAr, hasHec, hasTracks) {
   tileSlider.updateUI(thrTileMev);
   larSlider.updateUI(thrLArMev);
   hecSlider.updateUI(thrHecMev);
   openRPanel();
   if (hasTile) switchTab('tile'); else if (hasLAr) switchTab('lar'); else if (hasHec) switchTab('hec');
+  else if (hasTracks) switchTab('track');
 }
 
 // (ghost functions defined above near GHOST_TILE_NAMES)
@@ -1096,45 +1317,76 @@ function showOutline(mesh) {
   clearOutline();
   mesh.updateWorldMatrix(true, false);
   const uid = mesh.geometry.uuid;
-  if (!eGeoCache.has(uid)) eGeoCache.set(uid, new THREE.EdgesGeometry(mesh.geometry, 15));
+  if (!eGeoCache.has(uid)) eGeoCache.set(uid, new THREE.EdgesGeometry(mesh.geometry, 30));
   outlineMesh = new THREE.LineSegments(eGeoCache.get(uid), outlineMat);
-  outlineMesh.matrix.copy(mesh.matrixWorld); outlineMesh.matrixAutoUpdate = false;
+  outlineMesh.matrixAutoUpdate = false;
+  outlineMesh.matrix.copy(mesh.matrixWorld);
+  outlineMesh.matrixWorld.copy(mesh.matrixWorld);
   outlineMesh.renderOrder = 999; outlineMesh.userData.src = mesh.name;
   scene.add(outlineMesh); dirty = true;
 }
 
-// ── All-cells outline (single merged draw call) ───────────────────────────────
+// ── All-cells outline (optimised: cached world-space edges per mesh) ─────────
 const outlineAllMat = new THREE.LineBasicMaterial({ color: 0x000000 });
+const _edgeWorldCache = new Map();  // mesh.name → Float32Array (world-space positions)
+let _outlineTimer = 0;
+
+function _getWorldEdges(mesh) {
+  const cached = _edgeWorldCache.get(mesh.name);
+  if (cached) return cached;
+  mesh.updateWorldMatrix(true, false);
+  const uid = mesh.geometry.uuid;
+  if (!eGeoCache.has(uid)) eGeoCache.set(uid, new THREE.EdgesGeometry(mesh.geometry, 30));
+  const src = eGeoCache.get(uid).getAttribute('position').array;
+  const m = mesh.matrixWorld.elements;
+  const out = new Float32Array(src.length);
+  for (let i = 0; i < src.length; i += 3) {
+    const x = src[i], y = src[i + 1], z = src[i + 2];
+    out[i]     = m[0] * x + m[4] * y + m[8]  * z + m[12];
+    out[i + 1] = m[1] * x + m[5] * y + m[9]  * z + m[13];
+    out[i + 2] = m[2] * x + m[6] * y + m[10] * z + m[14];
+  }
+  _edgeWorldCache.set(mesh.name, out);
+  return out;
+}
+
 function clearAllOutlines() {
+  clearTimeout(_outlineTimer);
   if (!allOutlinesMesh) return;
   scene.remove(allOutlinesMesh);
   allOutlinesMesh.geometry.dispose();
   allOutlinesMesh = null;
   dirty = true;
 }
+
 function rebuildAllOutlines() {
   clearAllOutlines();
   if (!rayTargets.length) return;
-  // Merge all visible cells' edge positions (world space) into one geometry
-  const allPos = [];
-  for (const mesh of rayTargets) {
-    mesh.updateWorldMatrix(true, false);
-    const uid = mesh.geometry.uuid;
-    if (!eGeoCache.has(uid)) eGeoCache.set(uid, new THREE.EdgesGeometry(mesh.geometry, 15));
-    const posArr = eGeoCache.get(uid).getAttribute('position').array;
-    const m = mesh.matrixWorld.elements;
-    for (let i = 0; i < posArr.length; i += 3) {
-      const x = posArr[i], y = posArr[i+1], z = posArr[i+2];
-      allPos.push(
-        m[0]*x + m[4]*y + m[8]*z  + m[12],
-        m[1]*x + m[5]*y + m[9]*z  + m[13],
-        m[2]*x + m[6]*y + m[10]*z + m[14]
-      );
-    }
+  _buildOutlinesNow();
+}
+
+function _buildOutlinesNow() {
+  if (!rayTargets.length) return;
+  // Count total floats needed
+  let total = 0;
+  const edgeArrays = new Array(rayTargets.length);
+  for (let i = 0; i < rayTargets.length; i++) {
+    const arr = _getWorldEdges(rayTargets[i]);
+    edgeArrays[i] = arr;
+    total += arr.length;
+  }
+  // Single allocation, memcpy each cached array
+  const buf = new Float32Array(total);
+  let offset = 0;
+  for (let i = 0; i < edgeArrays.length; i++) {
+    buf.set(edgeArrays[i], offset);
+    offset += edgeArrays[i].length;
   }
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(allPos), 3));
+  geo.setAttribute('position', new THREE.BufferAttribute(buf, 3));
   allOutlinesMesh = new THREE.LineSegments(geo, outlineAllMat);
+  allOutlinesMesh.matrixAutoUpdate = false;
+  allOutlinesMesh.frustumCulled = false;
   allOutlinesMesh.renderOrder = 3;
   scene.add(allOutlinesMesh);
   dirty = true;
@@ -1142,6 +1394,7 @@ function rebuildAllOutlines() {
 
 // ── Hover tooltip — raycasting fix ───────────────────────────────────────────
 const raycast  = new THREE.Raycaster();
+raycast.firstHitOnly = true;  // stop after first intersection (much faster)
 const mxy      = new THREE.Vector2();
 const tooltip  = document.getElementById('tip');
 let   lastRay  = 0;
@@ -1174,7 +1427,7 @@ function doRaycast(clientX, clientY) {
   clearOutline(); tooltip.hidden = true;
 }
 document.addEventListener('mousemove', e => {
-  const now = Date.now(); if (now-lastRay < 30) return; lastRay = now;
+  const now = Date.now(); if (now-lastRay < 50) return; lastRay = now;
   doRaycast(e.clientX, e.clientY);
 });
 canvas.addEventListener('mouseleave', () => { clearOutline(); tooltip.hidden = true; });
@@ -1471,14 +1724,6 @@ document.getElementById('ibtn-stop').addEventListener('click', () => {
   setLiveDot('stopped'); addLog(t('log-poll-paused'));
 });
 
-// ── Unmapped cells log download ───────────────────────────────────────────────
-document.getElementById('btn-log-dl').addEventListener('click', () => {
-  if (_missLog.length === 0) { alert('No unmapped cells recorded yet (load an event first).'); return; }
-  const header = `# Unmapped cells — strings not found in CaloGeometry.cgv\n# Generated: ${new Date().toISOString()}\n# Format: [DET] id=<raw_id> | <attempted_path>\n#\n`;
-  const blob = new Blob([header + _missLog.join('\n') + '\n'], { type: 'text/plain' });
-  const a    = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'unmapped_cells.txt' });
-  a.click(); URL.revokeObjectURL(a.href);
-});
 
 // ── Log collapse ──────────────────────────────────────────────────────────────
 document.getElementById('btn-log-min').addEventListener('click', () => {
