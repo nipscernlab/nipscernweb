@@ -892,6 +892,7 @@ function drawTracks(tracks) {
   if (!tracks.length) return;
   trackGroup = new THREE.Group();
   trackGroup.renderOrder = 5;
+  trackGroup.visible = (typeof tracksVisible === 'undefined') ? true : tracksVisible;
   for (const { pts, ptGev } of tracks) {
     const geo  = new THREE.BufferGeometry().setFromPoints(pts);
     const line = new THREE.Line(geo, TRACK_MAT);
@@ -1518,6 +1519,19 @@ document.getElementById('btn-layers').addEventListener('click', e => {
   e.stopPropagation();
   layersPanelOpen ? closeLayersPanel() : openLayersPanel();
 });
+
+// ── Particle tracks (collision tracer) toggle ───────────────────────────────
+let tracksVisible = true;
+function syncTracksBtn() {
+  document.getElementById('btn-tracks').classList.toggle('on', tracksVisible);
+}
+function toggleTracks() {
+  tracksVisible = !tracksVisible;
+  if (trackGroup) trackGroup.visible = tracksVisible;
+  syncTracksBtn();
+  dirty = true;
+}
+document.getElementById('btn-tracks').addEventListener('click', toggleTracks);
 document.addEventListener('click', () => { if (layersPanelOpen) closeLayersPanel(); });
 layersPanel.addEventListener('click', e => e.stopPropagation());
 
@@ -2194,6 +2208,9 @@ document.getElementById('btn-about').addEventListener('click', () => {
 });
 
 // ── Mobile toolbar toggle (landscape-only) ────────────────────────────────────
+// The toggle pill acts as both opener and closer:
+//  • toolbar hidden → pill sits at the bottom, click slides toolbar up.
+//  • toolbar open  → pill slides above the toolbar (.tb-open), click hides it.
 (function () {
   const tb  = document.getElementById('toolbar');
   const btn = document.getElementById('btn-toolbar-toggle');
@@ -2206,16 +2223,21 @@ document.getElementById('btn-about').addEventListener('click', () => {
 
   function apply() {
     tb.classList.toggle('tb-visible', tbVisible);
-    // Hide the toggle pill while the toolbar is open (close button takes over)
-    btn.classList.toggle('hidden', tbVisible && isLandscapeMobile());
+    // The toggle pill slides above the toolbar when open (only on mobile).
+    btn.classList.toggle('tb-open', tbVisible && isLandscapeMobile());
   }
   // Apply initial state without animation
   tb.style.transition = 'none';
   apply();
   setTimeout(() => tb.style.transition = '', 50);
 
-  btn.addEventListener('click', () => { tbVisible = true; apply(); });
-  closeBtn.addEventListener('click', e => {
+  btn.addEventListener('click', () => {
+    if (isLandscapeMobile()) { tbVisible = !tbVisible; apply(); }
+    else                     { tbVisible = true;       apply(); }
+  });
+  // Legacy in-toolbar close button (hidden by CSS on mobile, but keep a handler
+  // in case it's exposed elsewhere or on non-mobile widths).
+  if (closeBtn) closeBtn.addEventListener('click', e => {
     e.stopPropagation();
     if (isLandscapeMobile()) { tbVisible = false; apply(); }
   });
@@ -2278,6 +2300,9 @@ document.addEventListener('keydown', e => {
       break;
     case 'H':
       document.getElementById('ltog-hec').click();
+      break;
+    case 'J':
+      document.getElementById('btn-tracks').click();
       break;
     case 'ESCAPE':
       if (cinemaMode)          { exitCinema(); return; }
