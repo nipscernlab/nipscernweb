@@ -449,7 +449,7 @@
       placeholder="e.g. 1.5 GeV">
   </div>
 
-  <!-- Ghost controls kept in DOM (referenced by JS) but never shown via tabs -->
+  <!-- Hidden legacy ghost controls (still referenced by JS for colour/alpha). -->
   <div id="pane-ghost" style="display:none" aria-hidden="true">
     <input type="range" id="ghost-alpha-slider" min="0" max="100" value="94">
     <label><input type="color" id="ghost-solid-color" value="#5C5F66">
@@ -457,8 +457,6 @@
     <label><input type="color" id="ghost-phi-color" value="#FFFFFF">
     <span id="ghost-phi-swatch" style="background:#FFFFFF"></span></label>
     <span id="ghost-alpha-val">94%</span>
-    <button class="gswitch" id="gtog-tile" role="switch" aria-checked="false"
-      style="--gswitch-col:#c87c18"></button>
   </div>
 </aside>
 
@@ -595,6 +593,44 @@
       <div class="layer-sub">Hadronic end-cap</div>
     </div>
     <button class="gswitch on" id="ltog-hec" role="switch" aria-checked="true"
+      style="--gswitch-col:#66e0f6"></button>
+  </div>
+</div>
+
+<!-- ── Ghost panel — mirrors Detector Layers panel ─────── -->
+<div id="ghost-panel">
+  <div class="layers-head">
+    <span class="layers-title">ATLAS Ghost</span>
+    <div class="layers-quick">
+      <button class="layers-qbtn" id="gbtn-all">All</button>
+      <button class="layers-qbtn" id="gbtn-none">None</button>
+    </div>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#c87c18"></span>
+    <div class="layer-info">
+      <div class="layer-name">TILE</div>
+      <div class="layer-sub">TileCal envelope &amp; φ lines</div>
+    </div>
+    <button class="gswitch" id="gtog-tile" role="switch" aria-checked="false"
+      style="--gswitch-col:#c87c18"></button>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#27b568"></span>
+    <div class="layer-info">
+      <div class="layer-name">LAr</div>
+      <div class="layer-sub">EM calorimeter envelope</div>
+    </div>
+    <button class="gswitch" id="gtog-lar" role="switch" aria-checked="false"
+      style="--gswitch-col:#27b568"></button>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#66e0f6"></span>
+    <div class="layer-info">
+      <div class="layer-name">HEC</div>
+      <div class="layer-sub">Hadronic end-cap envelope</div>
+    </div>
+    <button class="gswitch" id="gtog-hec" role="switch" aria-checked="false"
       style="--gswitch-col:#66e0f6"></button>
   </div>
 </div>
