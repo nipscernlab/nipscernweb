@@ -339,7 +339,35 @@
 <div id="panel-edge"></div>
 <div id="rpanel-edge"></div>
 
-<!-- ── Right retractable panel ────────────────────────────── -->
+<!-- ── Right retractable panels ───────────────────────────── -->
+<div id="rpanel-wrap">
+<!-- ── Cluster panel (top) ─────────────────────────────────── -->
+<aside id="rpanel2">
+  <div id="det-tab-bar-cluster" style="border-bottom:1px solid var(--border);flex-shrink:0">
+    <div class="det-tab on" style="--tab-col:#ff4400;pointer-events:none">Cluster</div>
+  </div>
+  <div class="det-pane" id="pane-cluster">
+    <div class="pane-det-row">
+      <span class="pane-det-dot" style="background:#ff4400"></span>
+      <span class="pane-det-name">Clusters</span>
+    </div>
+    <div class="sval" id="cluster-sval-max">– GeV</div>
+    <div class="strak" id="cluster-strak"
+      style="background:linear-gradient(to top,#661a00 0%,#ff4400 100%)">
+      <div class="sthumb" id="cluster-sthumb"></div>
+    </div>
+    <div class="sval" id="cluster-sval-min">– GeV</div>
+    <div class="slbl">Min E<sub>T</sub></div>
+    <input id="cluster-thr-input" class="thr-input" type="text"
+      autocomplete="off" spellcheck="false"
+      placeholder="e.g. 1.5 GeV">
+    <button class="cluster-filter-btn on" id="cluster-filter-toggle" type="button" role="switch" aria-checked="true">
+      Cluster Threshold
+    </button>
+  </div>
+</aside>
+
+<!-- ── Detector panel (bottom) ────────────────────────────── -->
 <aside id="rpanel">
 
   <div id="det-tab-bar">
@@ -434,6 +462,9 @@
   </div>
 </aside>
 
+
+</div><!-- #rpanel-wrap -->
+
 <!-- ── Bottom toolbar ─────────────────────────────────────── -->
 <div id="toolbar">
   <button class="tbtn" id="btn-panel"
@@ -470,6 +501,11 @@
   <button class="tbtn on" id="btn-tracks"
     data-tip="Particle tracks — toggle collision path/tracer (J)">
     <i class="ti ti-route" style="font-size:15px"></i>
+  </button>
+  <div class="tbtn-sep"></div>
+  <button class="tbtn on" id="btn-cluster"
+    data-tip="Clusters — toggle η/φ cluster lines (K)">
+    <i class="ti ti-focus-2" style="font-size:15px"></i>
   </button>
   <div class="tbtn-sep"></div>
   <button class="tbtn" id="btn-rpanel"
@@ -602,6 +638,7 @@
       <span class="sk-key">L / A</span><span class="sk-desc">Toggle LAr</span>
       <span class="sk-key">H</span><span class="sk-desc">Toggle HEC</span>
       <span class="sk-key">J</span><span class="sk-desc">Toggle particle tracks</span>
+      <span class="sk-key">K</span><span class="sk-desc">Toggle clusters</span>
       <span class="sk-key">Esc</span><span class="sk-desc">Close / exit</span>
     </div>
   </div>

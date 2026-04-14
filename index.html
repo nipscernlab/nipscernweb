@@ -215,12 +215,13 @@
         </div>
 
         <div class="cgv-canvas-wrapper fade-up" id="cgv-canvas-wrapper" role="img" aria-label="Interactive 3D ATLAS calorimeter event display">
-          <canvas id="cgv-canvas" aria-hidden="true"></canvas>
-
-          <div class="cgv-loading" id="cgv-loading" aria-live="polite">
-            <div class="cgv-spinner" aria-hidden="true"></div>
-            <span data-i18n="home.cgv.loading">Initialising calorimeter geometry…</span>
-          </div>
+          <iframe
+            id="cgv-iframe"
+            src="projects/cgvweb/nipscern/index.html"
+            loading="lazy"
+            title="ATLAS Calorimeter 3D Preview"
+            style="width:100%;height:100%;border:0;display:block;background:#05070f"
+            referrerpolicy="no-referrer"></iframe>
 
           <!-- Open Full CGV -->
           <a href="https://nipscern.com/projects/cgvweb" target="_blank" rel="noopener"
@@ -524,25 +525,7 @@
 })();
 </script>
 
-  <!-- CGV Full ATLAS Scene — lazy-init when section scrolls near viewport -->
-  <script type="module">
-    const startScene = () => {
-      if (window.__atlasSceneStarted) return;
-      window.__atlasSceneStarted = true;
-      import('./assets/js/cgv-preview.js').then(m => m.initATLASScene('cgv-canvas-wrapper'));
-    };
-    document.addEventListener('DOMContentLoaded', () => {
-      const wrap = document.getElementById('cgv-canvas-wrapper');
-      if (!wrap) return;
-      if (!('IntersectionObserver' in window)) { startScene(); return; }
-      const io = new IntersectionObserver((entries) => {
-        for (const e of entries) if (e.isIntersecting) { startScene(); io.disconnect(); break; }
-      }, { rootMargin: '400px 0px' });
-      io.observe(wrap);
-    });
-  </script>
-
-  <!-- Starry sky -->
+<!-- Starry sky -->
   <script>
   (function(){
     var canvas = document.getElementById('hero-stars');
