@@ -1,7 +1,7 @@
     /* ── Prussian Blue Variables ─────────────────────────── */
     :root {
       --bg:      #020d1c;
-      --panel:   rgba(2, 16, 38, 0.93);
+      --panel:   rgba(2, 16, 38, 0.62);
       --border:  rgba(22, 72, 168, 0.22);
       --border2: rgba(22, 72, 168, 0.42);
       --text:    #93bade;
@@ -15,7 +15,7 @@
       --err:     #c42e2e;
       --font:    'Inter', system-ui, sans-serif;
       --mono:    'JetBrains Mono', 'Courier New', monospace;
-      --blur:    blur(20px) saturate(1.7);
+      --blur:    blur(26px) saturate(1.8);
       --r:       10px;
       --pw:      250px;
       --rpw:     100px;
@@ -309,8 +309,26 @@
       border-top: 1px solid var(--border);
       display: flex; align-items: center; gap: 8px;
     }
-    #status-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #status-txt {
+      flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
     #statusbar #req-badge { flex-shrink: 0; }
+    /* Event metadata pills inside the statusbar */
+    .ev-dt {
+      font: 500 .66rem var(--mono); color: var(--bright);
+      letter-spacing: .02em; flex-shrink: 0;
+    }
+    .ev-meta {
+      font: 400 .58rem var(--font); color: var(--muted);
+      letter-spacing: .03em; flex-shrink: 0;
+    }
+    .ev-meta b {
+      font: 500 .60rem var(--mono); color: var(--text);
+      font-weight: 500;
+    }
+    .ev-sep { color: var(--dim); flex-shrink: 0; font-size: .7rem; }
     .ok   { color: var(--ok); }
     .warn { color: var(--warn); }
     .err  { color: var(--err); }
@@ -554,7 +572,7 @@
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
       z-index: 9000;
       display: flex; align-items: center; gap: 3px; padding: 5px 10px;
-      background: rgba(2, 9, 24, 0.86);
+      background: rgba(2, 9, 24, 0.55);
       backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border); border-radius: 26px;
       opacity: 0.22; transition: opacity 0.36s ease;
@@ -580,7 +598,7 @@
     #lang-menu {
       position: fixed; z-index: 50;
       display: flex; flex-direction: column; gap: 2px; padding: 6px;
-      background: rgba(2, 9, 24, 0.97);
+      background: rgba(2, 9, 24, 0.68);
       backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border2); border-radius: 10px;
       box-shadow: 0 8px 28px rgba(0,0,0,.55);
@@ -656,7 +674,7 @@
     /* Target landscape phones/small tablets. Portrait is NOT optimized;
        user is expected to rotate to landscape. */
     @media (orientation: landscape) and (max-height: 520px) {
-      :root { --pw: 220px; --rpw: 190px; }
+      :root { --pw: 220px; --rpw: 130px; }
 
       .mobile-only { display: flex !important; }
       .desktop-only { display: none !important; }
@@ -716,47 +734,38 @@
         pointer-events: auto;
       }
       #btn-toolbar-close, #toolbar-close-sep { display: none !important; }
-      /* Cluster toolbar button is redundant on mobile (cluster is now a tab
-         inside the right panel); the K shortcut still works. */
-      #btn-cluster { display: none !important; }
 
-      /* ─── Right panel: unified with horizontal tabs ───── */
-      #rpanel-wrap { top: 8px; right: 8px; gap: 0; }
+      /* ─── Right panel: cluster on top, detectors below, stacked ────── */
+      /* Both panels visible simultaneously. If total content exceeds the
+         viewport height, the wrap itself scrolls so the user can reach both. */
+      #rpanel-wrap {
+        top: 8px; right: 8px;
+        gap: 8px;
+        max-height: calc(100vh - 74px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+      #rpanel-wrap::-webkit-scrollbar { width: 3px; }
+      #rpanel-wrap::-webkit-scrollbar-thumb { background: rgba(36,103,224,.22); border-radius: 2px; }
       #rpanel-wrap.collapsed { transform: translateX(calc(var(--rpw) + 12px)); }
-      /* Hide the standalone cluster panel; its pane is moved into #rpanel by JS. */
-      #rpanel2 { display: none !important; }
 
-      #rpanel {
-        max-height: calc(100vh - 16px);
+      #rpanel, #rpanel2 {
+        max-height: none;
+        flex-shrink: 0;
         border-radius: 12px;
         width: var(--rpw);
       }
-      /* Tabs go horizontal on mobile (desktop keeps them vertical/stacked).
-         Cluster is the first/primary tab on mobile via flex order. */
-      #det-tab-bar {
-        flex-direction: row;
-        overflow-x: auto;
-      }
-      #det-tab-bar::-webkit-scrollbar { display: none; }
-      .det-tab {
-        flex: 1 1 0; padding: 7px 4px;
-        border-left: none;
-        border-bottom: 2px solid transparent;
-        font-size: .52rem;
-      }
-      #tab-cluster { order: -1; }
-      .det-tab.on {
-        border-left-color: transparent;
-        border-bottom-color: var(--tab-col, var(--accent2));
-      }
+      /* Cluster tab stays desktop-only (cluster lives in its own panel here). */
+      #tab-cluster { display: none !important; }
 
       /* Right-panel pane contents — keep vertical sliders compact */
       .strak { height: 110px; }
       .pane-det-name { font-size: .58rem; }
       .slbl { font-size: .50rem; }
       .sval { font-size: .57rem; }
-      .thr-input { width: 80px; font-size: .58rem; }
-      .cluster-filter-btn { width: 92px; font-size: .48rem; }
+      .thr-input { width: 72px; font-size: .58rem; }
+      .cluster-filter-btn { width: 86px; font-size: .48rem; }
 
       /* ─── Misc ──────────────────────────────────────── */
       #log-sec { max-height: 80px; }
@@ -767,6 +776,18 @@
       .shot-res[data-w="10240"] { display: none; }
 
       #cinema-exit { bottom: 56px; }
+
+      /* Bigger edge-tap zones on mobile (opens left/right panels). Always
+         visible when the corresponding panel is collapsed. */
+      #panel-edge, #rpanel-edge {
+        width: 32px;
+        display: block !important;
+        touch-action: manipulation;
+      }
+      /* When a panel is pinned (open), hide its edge strip so it doesn't
+         block touches on the panel's own interactive controls. */
+      body:not(.panel-unpinned) #panel-edge { display: none !important; }
+      body:not(.rpanel-unpinned) #rpanel-edge { display: none !important; }
     }
 
     /* Extremely narrow landscape — drop separators */
@@ -918,11 +939,11 @@
     .cdstep:hover { color: var(--text); border-color: rgba(36,103,224,.45); background: rgba(26,82,192,.10); }
     .cdstep.on { color: #7ab8ff; border-color: var(--accent); background: rgba(26,82,192,.18); }
 
-    /* ── Layers (geometry toggle) floating panel ─────────── */
-    #layers-panel {
+    /* ── Layers / Ghost (geometry toggle) floating panel ─────────── */
+    #layers-panel, #ghost-panel {
       position: fixed; z-index: 50;
       padding: 10px 12px 12px;
-      background: rgba(2, 9, 24, 0.97);
+      background: rgba(2, 9, 24, 0.68);
       backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border2); border-radius: 12px;
       box-shadow: 0 10px 32px rgba(0,0,0,.60);
@@ -930,7 +951,7 @@
       opacity: 0; transform: translateY(8px); pointer-events: none;
       transition: opacity 0.17s ease, transform 0.17s ease;
     }
-    #layers-panel.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #layers-panel.open, #ghost-panel.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .layers-head {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 8px; padding-bottom: 8px;

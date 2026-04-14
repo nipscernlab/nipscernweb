@@ -487,7 +487,7 @@ const ghostSolidMat = new THREE.MeshBasicMaterial({
 // Phi lines: fixed white + high transparency (90%), independent of the alpha
 // slider which only affects the solid envelope. This keeps them as subtle
 // segmentation guides regardless of envelope opacity.
-const GHOST_PHI_FIXED_OPACITY = 0.10;
+const GHOST_PHI_FIXED_OPACITY = 0.06;
 const ghostPhiMat = new THREE.LineBasicMaterial({
   color: 0xFFFFFF, transparent: true, opacity: GHOST_PHI_FIXED_OPACITY, depthWrite: false,
 });
@@ -531,42 +531,60 @@ function buildPhiLines() {
 }
 
 function applyGhostMesh(visible) {
-  // Solid envelope is intentionally NOT rendered — only the phi segmentation
-  // lines make up the ghost. Keep envelope meshes hidden at all times; the
-  // material is restored to original so they don't interfere with anything else.
   for (const name of GHOST_TILE_NAMES) {
     const mesh = meshByName.get(name);
     if (!mesh) continue;
-    mesh.material    = origMat.get(name) ?? mesh.material;
-    mesh.renderOrder = 0;
-    mesh.visible     = false;
+    if (visible) {
+      mesh.material  = ghostSolidMat;
+      mesh.renderOrder = 5;
+      mesh.visible   = true;
+    } else {
+      mesh.material  = origMat.get(name) ?? mesh.material;
+      mesh.renderOrder = 0;
+      mesh.visible   = false;
+    }
   }
   if (ghostPhiGroup) ghostPhiGroup.visible = visible;
   dirty = true;
 }
 
-function toggleGhostType(type) {
-  // Only TILE is active; ignore lar/hec calls silently
-  if (type !== 'tile') return;
-  showGhostTile = !showGhostTile;
-  buildPhiLines();
-  applyGhostMesh(showGhostTile);
-  const btn = document.getElementById('gtog-tile');
-  btn.classList.toggle('on', showGhostTile);
-  btn.setAttribute('aria-checked', showGhostTile);
-  document.getElementById('btn-ghost').classList.toggle('on', showGhostTile);
+function syncGhostToggles() {
+  const tTile = document.getElementById('gtog-tile');
+  const tLAr  = document.getElementById('gtog-lar');
+  const tHec  = document.getElementById('gtog-hec');
+  if (tTile) { tTile.classList.toggle('on', showGhostTile); tTile.setAttribute('aria-checked', showGhostTile); }
+  if (tLAr)  { tLAr .classList.toggle('on', showGhostLAr);  tLAr .setAttribute('aria-checked', showGhostLAr);  }
+  if (tHec)  { tHec .classList.toggle('on', showGhostHec);  tHec .setAttribute('aria-checked', showGhostHec);  }
+  document.getElementById('btn-ghost').classList.toggle('on', showGhostTile || showGhostLAr || showGhostHec);
 }
 
-function toggleAllGhosts() {
-  const next = !showGhostTile;
-  showGhostTile = next;
-  showGhostLAr = false; showGhostHec = false;
+function toggleGhostType(type) {
+  if (type === 'tile') {
+    showGhostTile = !showGhostTile;
+    buildPhiLines();
+    applyGhostMesh(showGhostTile);
+  } else if (type === 'lar') {
+    // LAr ghost envelope not yet shipped — track state only (no-op visually).
+    showGhostLAr = !showGhostLAr;
+  } else if (type === 'hec') {
+    showGhostHec = !showGhostHec;
+  }
+  syncGhostToggles();
+}
+
+function setAllGhosts(on) {
+  showGhostTile = on;
+  showGhostLAr  = on;
+  showGhostHec  = on;
   buildPhiLines();
-  applyGhostMesh(next);
-  const btn = document.getElementById('gtog-tile');
-  btn.classList.toggle('on', next);
-  btn.setAttribute('aria-checked', next);
-  document.getElementById('btn-ghost').classList.toggle('on', next);
+  applyGhostMesh(showGhostTile);
+  syncGhostToggles();
+}
+
+// Retained for the keyboard shortcut (G) — toggles the combined ghost state.
+function toggleAllGhosts() {
+  const anyOn = showGhostTile || showGhostLAr || showGhostHec;
+  setAllGhosts(!anyOn);
 }
 
 function updateGhostColors() {
@@ -685,8 +703,9 @@ function checkReady() {
   if (!_readyFired) {
     _readyFired = true;
     setLoadProgress(100, 'Ready');
-    // Enable ghost frame and beam axis on startup
-    toggleAllGhosts();
+    // Enable ghost frame (TILE only — LAr/HEC envelopes aren't rendered yet)
+    // and beam axis on startup.
+    toggleGhostType('tile');
     toggleBeam();
     // Dismiss loading screen after a brief moment so 100% is visible
     setTimeout(dismissLoadingScreen, 280);
@@ -894,6 +913,36 @@ function parseXmlDoc(xmlText) {
   const pe  = doc.querySelector('parsererror');
   if (pe) throw new Error('XML parse error: ' + pe.textContent.slice(0, 120));
   return doc;
+}
+
+// Extract top-level <Event> attributes (run/event/lumi/dateTime etc.)
+function parseEventInfo(doc) {
+  const ev = doc.querySelector('Event');
+  if (!ev) return null;
+  return {
+    runNumber:   ev.getAttribute('runNumber')   || '',
+    eventNumber: ev.getAttribute('eventNumber') || '',
+    lumiBlock:   ev.getAttribute('lumiBlock')   || '',
+    dateTime:    ev.getAttribute('dateTime')    || '',
+    version:     ev.getAttribute('version')     || '',
+  };
+}
+
+function showEventInfo(info) {
+  if (!info) { setStatus('<span class="muted">No event metadata</span>'); return; }
+  const dt  = info.dateTime   || '—';
+  const run = info.runNumber  || '—';
+  const evt = info.eventNumber|| '—';
+  const lb  = info.lumiBlock  || '—';
+  setStatus(
+    `<span class="ev-dt">${esc(dt)}</span>` +
+    `<span class="ev-sep">·</span>` +
+    `<span class="ev-meta">Run <b>${esc(run)}</b></span>` +
+    `<span class="ev-sep">·</span>` +
+    `<span class="ev-meta">Evt <b>${esc(evt)}</b></span>` +
+    `<span class="ev-sep">·</span>` +
+    `<span class="ev-meta">LB <b>${esc(lb)}</b></span>`
+  );
 }
 
 function parseTile(doc) {
@@ -1237,6 +1286,7 @@ function applyThreshold() {
 }
 
 // ── Process XML ───────────────────────────────────────────────────────────────
+let currentEventInfo = null;
 function processXml(xmlText) {
   if (!wasmOk) return;
   const t0 = performance.now();
@@ -1245,6 +1295,7 @@ function processXml(xmlText) {
   let doc, tileCells, larCells, hecCells, mbtsCells;
   try { doc = parseXmlDoc(xmlText); }
   catch (e) { setStatus(`<span class="err">${esc(e.message)}</span>`); addLog(e.message, 'err'); return; }
+  currentEventInfo = parseEventInfo(doc);
   try { tileCells = parseTile(doc); } catch { tileCells = []; }
   try { larCells  = parseLAr(doc);  } catch { larCells  = []; }
   try { hecCells  = parseHec(doc);  } catch { hecCells  = []; }
@@ -1411,8 +1462,9 @@ function processXml(xmlText) {
 
   const nHit    = nTile + nMbts + nLAr + nHec;
   const allMiss = nMiss + nHecMiss + nMbtsMiss;
-  const missStr = allMiss ? ` · <span class="warn">${allMiss} unmapped</span>` : '';
-  setStatus(`<span class="ok">${nHit} cells</span>${missStr}`);
+  // Statusbar now shows event metadata instead of cell counts.
+  // Cell counts still go to the log for diagnostics.
+  showEventInfo(currentEventInfo);
   if (nHecMiss)  addLog(`HEC: ${nHec} mapped · ${nHecMiss} unmapped`, 'warn');
   if (nMbtsMiss) addLog(`MBTS: ${nMbts} mapped · ${nMbtsMiss} unmapped`, 'warn');
   addLog(`${nHit} cells${allMiss ? ` · ${allMiss} unmapped` : ''} (${dt}s)`, 'ok');
@@ -1476,31 +1528,40 @@ document.getElementById('tab-cluster').addEventListener('click', () => switchTab
 // Initialize: TILE pane visible, others hidden
 switchTab('tile');
 
-// ── Mobile layout: merge cluster panel into right panel as a tab ─────────────
-// On mobile landscape, the dedicated cluster panel (#rpanel2) is hidden via CSS.
-// Its pane is moved into #rpanel so the existing tab system shows it.
+// ── Mobile: edge-TAP zones to open side panels ────────────────────────────────
+// Dragging interferes with the ATLAS 3D orbit, so we use stationary taps
+// instead. Tapping the left/right edge strip opens the respective panel.
 const mobileMQ = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
-const paneCluster = document.getElementById('pane-cluster');
-const rpanelEl    = document.getElementById('rpanel');
-const rpanel2El   = document.getElementById('rpanel2');
-const paneClusterHome = paneCluster.parentElement; // original home (inside #rpanel2)
-function applyMobileLayout(isMobile) {
-  if (isMobile) {
-    if (paneCluster.parentElement !== rpanelEl) rpanelEl.appendChild(paneCluster);
-  } else {
-    if (paneCluster.parentElement !== paneClusterHome) paneClusterHome.appendChild(paneCluster);
-    paneCluster.style.display = 'flex';
+(function setupEdgeTaps() {
+  const panelEdgeEl  = document.getElementById('panel-edge');
+  const rpanelEdgeEl = document.getElementById('rpanel-edge');
+
+  // A "tap" means touch down + up at roughly the same point within 350ms.
+  function tapOpener(el, openFn) {
+    let sx = 0, sy = 0, st = 0, tracking = false;
+    el.addEventListener('touchstart', e => {
+      if (!mobileMQ.matches) return;
+      const t = e.touches[0];
+      sx = t.clientX; sy = t.clientY; st = Date.now();
+      tracking = true;
+    }, { passive: true });
+    el.addEventListener('touchend', e => {
+      if (!tracking) return;
+      tracking = false;
+      const t  = e.changedTouches[0];
+      const dx = Math.abs(t.clientX - sx);
+      const dy = Math.abs(t.clientY - sy);
+      const dt = Date.now() - st;
+      if (dt <= 350 && dx <= 12 && dy <= 12) {
+        openFn();
+        e.preventDefault();
+      }
+    });
+    el.addEventListener('click', () => { if (mobileMQ.matches) openFn(); });
   }
-  // Re-apply tab selection. On mobile, Cluster is the primary tab; on desktop,
-  // fall back to TILE if Cluster was active (cluster is not a tab on desktop).
-  let cur = document.querySelector('#det-tab-bar .det-tab.on');
-  let curId = cur ? cur.id.replace('tab-', '') : 'tile';
-  if (isMobile && curId === 'tile') curId = 'cluster';
-  if (!isMobile && curId === 'cluster') curId = 'tile';
-  switchTab(curId);
-}
-applyMobileLayout(mobileMQ.matches);
-mobileMQ.addEventListener('change', e => applyMobileLayout(e.matches));
+  tapOpener(panelEdgeEl,  () => setPinned(true));
+  tapOpener(rpanelEdgeEl, () => setPinnedR(true));
+})();
 
 // ── Slider helpers ────────────────────────────────────────────────────────────
 function parseMevInput(s) {
@@ -1951,8 +2012,45 @@ document.getElementById('btn-info').addEventListener('click', () => {
   document.querySelector('#btn-info use').setAttribute('href', showInfo ? '#i-eye' : '#i-eye-off');
   if (!showInfo) { clearOutline(); tooltip.hidden = true; }
 });
-document.getElementById('btn-ghost').addEventListener('click', toggleAllGhosts);
+// Ghost panel: floating popover mirroring the Detector Layers panel.
+const ghostPanel = document.getElementById('ghost-panel');
+let ghostPanelOpen = false;
+function openGhostPanel() {
+  ghostPanelOpen = true;
+  ghostPanel.classList.add('open');
+  document.getElementById('btn-ghost').classList.add('on');
+  const br = document.getElementById('btn-ghost').getBoundingClientRect();
+  requestAnimationFrame(() => {
+    const pw = ghostPanel.offsetWidth  || 210;
+    const ph = ghostPanel.offsetHeight || 170;
+    let left = br.left + br.width / 2 - pw / 2;
+    let top  = br.top - ph - 10;
+    left = Math.max(6, Math.min(left, window.innerWidth  - pw - 6));
+    top  = Math.max(6, top);
+    ghostPanel.style.left = left + 'px';
+    ghostPanel.style.top  = top  + 'px';
+  });
+}
+function closeGhostPanel() {
+  ghostPanelOpen = false;
+  ghostPanel.classList.remove('open');
+  syncGhostToggles(); // keep btn-ghost lit state accurate
+}
+document.getElementById('btn-ghost').addEventListener('click', e => {
+  e.stopPropagation();
+  ghostPanelOpen ? closeGhostPanel() : openGhostPanel();
+});
 document.getElementById('gtog-tile').addEventListener('click', () => toggleGhostType('tile'));
+document.getElementById('gtog-lar') .addEventListener('click', () => toggleGhostType('lar'));
+document.getElementById('gtog-hec') .addEventListener('click', () => toggleGhostType('hec'));
+document.getElementById('gbtn-all') .addEventListener('click', () => setAllGhosts(true));
+document.getElementById('gbtn-none').addEventListener('click', () => setAllGhosts(false));
+// Click outside closes the ghost panel
+document.addEventListener('click', e => {
+  if (!ghostPanelOpen) return;
+  if (ghostPanel.contains(e.target) || e.target.closest('#btn-ghost')) return;
+  closeGhostPanel();
+});
 document.getElementById('btn-beam').addEventListener('click', toggleBeam);
 document.getElementById('btn-reset').addEventListener('click', resetCamera);
 
@@ -2085,7 +2183,7 @@ panelEl.addEventListener('mouseleave', () => {
 canvas.addEventListener('click', () => {
   if (!panelPinned && panelHovered) { panelEl.classList.add('collapsed'); panelHovered = false; }
 });
-if (window.innerWidth < 640) setPinned(false);
+if (window.innerWidth < 640 || mobileMQ.matches) setPinned(false);
 
 // ── Panel toggle button in toolbar (L key) — pin/unpin ───────────────────────
 document.getElementById('btn-panel').addEventListener('click', () => {
