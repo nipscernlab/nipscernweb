@@ -478,14 +478,18 @@ const GHOST_TILE_NAMES = [
 // RGB(92,95,102) = #5C5F66; 90% transparency = 10% opacity
 let ghostSolidColor = 0x5C5F66;
 let ghostPhiColor   = 0xFFFFFF;
-let ghostSolidOpacity = 0.10;  // 90% transparent
+let ghostSolidOpacity = 0.06;  // 94% transparent
 
 const ghostSolidMat = new THREE.MeshBasicMaterial({
   color: ghostSolidColor, transparent: true, opacity: ghostSolidOpacity,
   depthWrite: false, side: THREE.DoubleSide,
 });
+// Phi lines: fixed white + high transparency (90%), independent of the alpha
+// slider which only affects the solid envelope. This keeps them as subtle
+// segmentation guides regardless of envelope opacity.
+const GHOST_PHI_FIXED_OPACITY = 0.06;
 const ghostPhiMat = new THREE.LineBasicMaterial({
-  color: ghostPhiColor, transparent: true, opacity: ghostSolidOpacity, depthWrite: false,
+  color: 0xFFFFFF, transparent: true, opacity: GHOST_PHI_FIXED_OPACITY, depthWrite: false,
 });
 
 // ── Phi-segmentation lines (TileCal) ─────────────────────────────────────────
@@ -571,8 +575,9 @@ function toggleAllGhosts() {
 function updateGhostColors() {
   ghostSolidMat.color.set(ghostSolidColor);
   ghostSolidMat.opacity = ghostSolidOpacity;
-  ghostPhiMat.opacity   = ghostSolidOpacity;
-  ghostPhiMat.color.set(ghostPhiColor);
+  // Phi lines stay locked at white + high transparency — don't inherit from slider.
+  ghostPhiMat.opacity = GHOST_PHI_FIXED_OPACITY;
+  ghostPhiMat.color.set(0xFFFFFF);
   if (ghostPhiGroup) ghostPhiGroup.traverse(o => { if (o.material) o.material.needsUpdate = true; });
   dirty = true;
 }
@@ -675,7 +680,8 @@ window.addEventListener('resize', () => {
 
 // ── Status bar ────────────────────────────────────────────────────────────────
 const statusEl = document.getElementById('statusbar');
-function setStatus(h) { statusEl.innerHTML = h; }
+const statusTxtEl = document.getElementById('status-txt');
+function setStatus(h) { statusTxtEl.innerHTML = h; }
 function checkReady() {
   if (!wasmOk || !sceneOk) return;
   setStatus(t('status-ready'));
@@ -1198,6 +1204,10 @@ function resetScene() {
   for (const [name, mesh] of meshByName) {
     mesh.visible = false; mesh.material = origMat.get(name) ?? mesh.material; mesh.renderOrder = 0;
   }
+  // Re-apply ghost state: resetScene hides all meshes (including ghost envelopes),
+  // which would desync the visible state from `showGhostTile` and make the ghost
+  // look transparent/recolored on next toggle because only phi lines are visible.
+  applyGhostMesh(showGhostTile);
   active.clear(); rayTargets = [];
   clearOutline(); clearAllOutlines();
   clearTracks();
@@ -1450,17 +1460,49 @@ setPinnedR(false);
 // ── Tab switching ─────────────────────────────────────────────────────────────
 const TAB_IDS = ['tile', 'lar', 'hec', 'track'];
 function switchTab(det) {
-  TAB_IDS.forEach(d => {
-    document.getElementById('pane-' + d).style.display = d === det ? 'flex' : 'none';
-    document.getElementById('tab-'  + d).classList.toggle('on', d === det);
+  const tabs = [...TAB_IDS];
+  // Include 'cluster' only when its pane has been moved into #rpanel (mobile mode).
+  const pc = document.getElementById('pane-cluster');
+  if (pc && pc.parentElement && pc.parentElement.id === 'rpanel') tabs.push('cluster');
+  tabs.forEach(d => {
+    const pane = document.getElementById('pane-' + d);
+    const tab  = document.getElementById('tab-'  + d);
+    if (pane) pane.style.display = d === det ? 'flex' : 'none';
+    if (tab)  tab.classList.toggle('on', d === det);
   });
   // Keep ghost pane always hidden
   const gp = document.getElementById('pane-ghost');
   if (gp) gp.style.display = 'none';
 }
 TAB_IDS.forEach(d => document.getElementById('tab-' + d).addEventListener('click', () => switchTab(d)));
+document.getElementById('tab-cluster').addEventListener('click', () => switchTab('cluster'));
 // Initialize: TILE pane visible, others hidden
 switchTab('tile');
+
+// ── Mobile layout: merge cluster panel into right panel as a tab ─────────────
+// On mobile landscape, the dedicated cluster panel (#rpanel2) is hidden via CSS.
+// Its pane is moved into #rpanel so the existing tab system shows it.
+const mobileMQ = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
+const paneCluster = document.getElementById('pane-cluster');
+const rpanelEl    = document.getElementById('rpanel');
+const rpanel2El   = document.getElementById('rpanel2');
+const paneClusterHome = paneCluster.parentElement; // original home (inside #rpanel2)
+function applyMobileLayout(isMobile) {
+  if (isMobile) {
+    if (paneCluster.parentElement !== rpanelEl) rpanelEl.appendChild(paneCluster);
+  } else {
+    if (paneCluster.parentElement !== paneClusterHome) paneClusterHome.appendChild(paneCluster);
+    paneCluster.style.display = 'flex';
+  }
+  // Re-apply tab selection. If coming back to desktop while cluster was active,
+  // fall back to the TILE tab (cluster is not a tab on desktop).
+  let cur = document.querySelector('#det-tab-bar .det-tab.on');
+  let curId = cur ? cur.id.replace('tab-', '') : 'tile';
+  if (!isMobile && curId === 'cluster') curId = 'tile';
+  switchTab(curId);
+}
+applyMobileLayout(mobileMQ.matches);
+mobileMQ.addEventListener('change', e => applyMobileLayout(e.matches));
 
 // ── Slider helpers ────────────────────────────────────────────────────────────
 function parseMevInput(s) {

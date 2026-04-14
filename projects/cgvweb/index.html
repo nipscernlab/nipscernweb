@@ -328,11 +328,10 @@
     <div id="dl-bar-track"><div id="dl-bar-fill"></div></div>
   </div>
 
-  <div id="req-strip">
+  <div id="statusbar">
+    <span id="status-txt" data-i18n="status-init">Initializing…</span>
     <span class="badge" id="req-badge" data-tip="Total requests this session">0 req</span>
   </div>
-
-  <div id="statusbar" data-i18n="status-init">Initializing…</div>
   <div id="panel-resizer"></div>
 </aside>
 
@@ -375,6 +374,7 @@
     <button class="det-tab"    id="tab-lar"   style="--tab-col:#27b568">LAr</button>
     <button class="det-tab"    id="tab-hec"   style="--tab-col:#66e0f6">HEC</button>
     <button class="det-tab"    id="tab-track" style="--tab-col:#ffea00">Track</button>
+    <button class="det-tab mobile-only" id="tab-cluster" style="--tab-col:#ff4400">Cluster</button>
   </div>
 
   <!-- ── TILE pane ──────────────────────────────────────── -->
@@ -451,12 +451,12 @@
 
   <!-- Ghost controls kept in DOM (referenced by JS) but never shown via tabs -->
   <div id="pane-ghost" style="display:none" aria-hidden="true">
-    <input type="range" id="ghost-alpha-slider" min="0" max="100" value="90">
+    <input type="range" id="ghost-alpha-slider" min="0" max="100" value="94">
     <label><input type="color" id="ghost-solid-color" value="#5C5F66">
     <span id="ghost-solid-swatch" style="background:#5C5F66"></span></label>
     <label><input type="color" id="ghost-phi-color" value="#FFFFFF">
     <span id="ghost-phi-swatch" style="background:#FFFFFF"></span></label>
-    <span id="ghost-alpha-val">90%</span>
+    <span id="ghost-alpha-val">94%</span>
     <button class="gswitch" id="gtog-tile" role="switch" aria-checked="false"
       style="--gswitch-col:#c87c18"></button>
   </div>

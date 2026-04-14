@@ -307,7 +307,10 @@
       padding: 7px 12px; font-size: .63rem; color: var(--muted);
       line-height: 1.6; min-height: 30px; flex-shrink: 0;
       border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
     }
+    #status-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #statusbar #req-badge { flex-shrink: 0; }
     .ok   { color: var(--ok); }
     .warn { color: var(--warn); }
     .err  { color: var(--err); }
@@ -316,30 +319,84 @@
     #about-overlay {
       position: fixed; inset: 0; z-index: 100;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(1, 6, 16, 0.76); backdrop-filter: blur(6px);
+      background: rgba(1, 6, 16, 0.78); backdrop-filter: blur(8px);
       opacity: 0; pointer-events: none; transition: opacity 0.26s ease;
+      padding: 20px;
     }
     #about-overlay.open { opacity: 1; pointer-events: auto; }
     .about-card {
-      background: rgba(2, 9, 24, 0.97);
-      border: 1px solid var(--border2); border-radius: 14px;
-      padding: 26px 30px; max-width: 400px; width: 92%;
-      box-shadow: 0 20px 60px rgba(0,0,0,.65);
+      background: linear-gradient(160deg, rgba(4,14,34,.98) 0%, rgba(2,9,24,.98) 100%);
+      border: 1px solid var(--border2); border-radius: 16px;
+      padding: 24px 28px; max-width: 440px; width: 100%;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      box-shadow: 0 24px 70px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.04);
+      display: flex; flex-direction: column;
     }
-    .about-title { font: 600 .96rem var(--font); color: var(--bright); margin-bottom: 3px; }
-    .about-sub   { font: 400 .62rem var(--font); color: var(--muted); margin-bottom: 16px; letter-spacing: .07em; text-transform: uppercase; }
-    .about-body  { font: 400 .70rem var(--font); color: var(--text); line-height: 1.75; }
+    .about-card::-webkit-scrollbar { width: 4px; }
+    .about-card::-webkit-scrollbar-thumb { background: rgba(36,103,224,.28); border-radius: 2px; }
+    .about-title {
+      font: 600 1.05rem var(--font); color: var(--bright);
+      margin-bottom: 4px; letter-spacing: .01em;
+    }
+    .about-sub {
+      font: 500 .58rem var(--font); color: var(--accent2);
+      margin-bottom: 18px; letter-spacing: .16em; text-transform: uppercase;
+    }
+    .about-body {
+      font: 400 .70rem var(--font); color: var(--text); line-height: 1.7;
+    }
+    .about-body p { margin-bottom: 4px; }
     .about-body strong { color: var(--bright); font-weight: 500; }
-    .about-meta  { margin-top: 11px; }
-    .about-lab   { margin-top: 10px; font-size: .63rem; color: var(--muted); line-height: 1.6; }
-    .about-close {
-      display: flex; align-items: center; justify-content: center; gap: 5px;
-      margin-top: 20px; padding: 7px 18px;
-      border: 1px solid var(--border); border-radius: 20px;
-      color: var(--muted); font: 500 .62rem var(--font); letter-spacing: .08em;
-      cursor: pointer; transition: all .16s; width: fit-content;
+    .about-meta {
+      margin-top: 14px; padding: 10px 12px;
+      background: rgba(36,103,224,.06);
+      border-left: 2px solid var(--accent2);
+      border-radius: 0 6px 6px 0;
+      font-size: .66rem; line-height: 1.55;
     }
-    .about-close:hover { color: var(--bright); border-color: var(--accent); }
+    .about-meta strong {
+      display: block; font: 600 .54rem var(--font);
+      color: var(--muted); letter-spacing: .10em; text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .about-lab {
+      margin-top: 14px; padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: .62rem; color: var(--muted); line-height: 1.7;
+    }
+    .about-close {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 18px; padding: 8px 20px;
+      background: rgba(36,103,224,.10);
+      border: 1px solid var(--border2); border-radius: 20px;
+      color: var(--text); font: 500 .62rem var(--font); letter-spacing: .09em;
+      cursor: pointer; transition: all .16s;
+      align-self: center;
+    }
+    .about-close:hover {
+      color: var(--bright); background: rgba(36,103,224,.20);
+      border-color: var(--accent2);
+    }
+
+    /* About — mobile (landscape) tightening */
+    @media (orientation: landscape) and (max-height: 520px) {
+      #about-overlay { padding: 10px; }
+      .about-card {
+        padding: 14px 18px; max-width: 560px;
+        max-height: calc(100vh - 20px);
+      }
+      .about-title { font-size: .88rem; margin-bottom: 2px; }
+      .about-sub { font-size: .50rem; margin-bottom: 10px; letter-spacing: .14em; }
+      .about-body { font-size: .62rem; line-height: 1.55; }
+      .about-meta { margin-top: 10px; padding: 7px 10px; font-size: .58rem; }
+      .about-meta strong { font-size: .48rem; margin-bottom: 2px; }
+      .about-lab { margin-top: 10px; padding-top: 9px; font-size: .56rem; line-height: 1.55; }
+      .about-close { margin-top: 12px; padding: 6px 16px; font-size: .56rem; }
+      #about-watermark { margin-top: 12px; padding-top: 10px; }
+      #wm-cgv { width: 24px; height: 24px; }
+      #wm-eye { width: 72px; height: 50px; }
+    }
 
     /* ── Right retractable panel — floating slim card ───── */
     #rpanel-wrap {
@@ -589,36 +646,66 @@
     body.cinema #cinema-exit { opacity: 0.45; pointer-events: auto; }
     #cinema-exit:hover { opacity: 1 !important; color: #d8eeff; border-color: rgba(255,255,255,.28); }
 
+    /* ── Mobile-only helpers ─────────────────────────────── */
+    /* Elements marked .mobile-only are hidden on desktop; shown on mobile
+       landscape (handled inside the mobile media query below). */
+    .mobile-only { display: none !important; }
+    .mobile-only-inline { display: none !important; }
+
     /* ── Mobile (landscape-only optimization) ─────────────── */
     /* Target landscape phones/small tablets. Portrait is NOT optimized;
-       user is expected to rotate to landscape. A small tip can be shown
-       by the UI if needed. */
+       user is expected to rotate to landscape. */
     @media (orientation: landscape) and (max-height: 520px) {
-      :root { --pw: 240px; --rpw: 100px; }
+      :root { --pw: 220px; --rpw: 190px; }
 
-      /* Panel: full height, edge-attached */
+      .mobile-only { display: flex !important; }
+      .desktop-only { display: none !important; }
+
+      /* ─── Left panel ─────────────────────────────────── */
+      /* Shortened so the statusbar + dl-progress at the bottom sit above the
+         toolbar/toggle-pill (which float at bottom: 8-10px, ~52px tall). */
       #panel {
-        top: 0; left: 0; height: 100vh;
+        top: 0; left: 0; height: calc(100vh - 58px);
         border-radius: 0 12px 12px 0;
         box-shadow: 6px 0 30px rgba(0,0,0,.65);
       }
       #panel.collapsed { transform: translateX(calc(-1 * var(--pw))); }
       #panel-resizer { display: none; }
 
-      /* Larger touch targets (but compact height) */
+      /* Compact header: keep only the logo mark + ext-links + head-btns on one row.
+         Hide the long subtitles (Calorimeter Geometry Viewer / NIPSCERN · ATLAS). */
+      #panel-head {
+        padding: 6px 8px;
+        gap: 4px;
+        flex-wrap: nowrap;
+      }
+      .logo-full, .logo-lab { display: none; }
+      .logo { font-size: .82rem; }
+      .logo-block { flex: 0 0 auto; }
+      #ext-links-top { flex: 1; display: flex; gap: 4px; justify-content: flex-end; }
+      #ext-links-top a { font-size: 13px; }
+      .head-btns { gap: 2px; }
+
+      /* Mode bar: tighter */
+      #mode-bar { padding: 5px 6px; gap: 3px; }
+      .mbtn { padding: 6px 3px; font-size: .60rem; letter-spacing: .02em; }
+
+      /* Statusbar: compact, badge stays inline at the right */
+      #statusbar { padding: 5px 9px; font-size: .55rem; min-height: 24px; gap: 6px; }
+      #statusbar #req-badge { font-size: .55rem; padding: 0 6px; }
+
+      /* Touch targets */
       .tbtn { width: 34px; height: 34px; border-radius: 8px; }
       .tbtn .ti { font-size: 14px; }
-      .icon-btn { width: 30px; height: 30px; }
+      .icon-btn { width: 28px; height: 28px; }
       .ctrl-btn { width: 28px; height: 28px; }
       .edl      { width: 28px; height: 28px; }
-      .mbtn     { padding: 7px 4px; }
 
-      /* Toolbar: fully hidden on load; toggled by #btn-toolbar-toggle */
+      /* ─── Toolbar ───────────────────────────────────── */
       #toolbar {
-        bottom: 8px; padding: 5px 8px; gap: 2px;
+        bottom: 8px; padding: 4px 8px; gap: 2px;
         max-width: calc(100vw - 24px);
         border-radius: 20px;
-        /* Push it well off-screen and fade out so it's truly invisible */
         transform: translateX(-50%) translateY(calc(100% + 60px));
         opacity: 0;
         pointer-events: none;
@@ -628,35 +715,56 @@
         opacity: 1;
         pointer-events: auto;
       }
-      /* On mobile, the in-toolbar close button is replaced by the toggle pill
-         which slides above the toolbar — so keep it hidden. */
       #btn-toolbar-close, #toolbar-close-sep { display: none !important; }
+      /* Cluster toolbar button is redundant on mobile (cluster is now a tab
+         inside the right panel); the K shortcut still works. */
+      #btn-cluster { display: none !important; }
 
-      /* Right panel */
-      .strak { height: 120px; }
-      #rpanel-wrap { top: 8px; right: 8px; }
+      /* ─── Right panel: unified with horizontal tabs ───── */
+      #rpanel-wrap { top: 8px; right: 8px; gap: 0; }
       #rpanel-wrap.collapsed { transform: translateX(calc(var(--rpw) + 12px)); }
-      #rpanel, #rpanel2 { max-height: calc(100vh - 16px); border-radius: 12px; }
-      .pane-det-name { font-size: .55rem; }
+      /* Hide the standalone cluster panel; its pane is moved into #rpanel by JS. */
+      #rpanel2 { display: none !important; }
+
+      #rpanel {
+        max-height: calc(100vh - 16px);
+        border-radius: 12px;
+        width: var(--rpw);
+      }
+      /* Tabs go horizontal on mobile (desktop keeps them vertical/stacked) */
+      #det-tab-bar {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      #det-tab-bar::-webkit-scrollbar { display: none; }
+      .det-tab {
+        flex: 1 1 0; padding: 7px 4px;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        font-size: .52rem;
+      }
+      .det-tab.on {
+        border-left-color: transparent;
+        border-bottom-color: var(--tab-col, var(--accent2));
+      }
+
+      /* Right-panel pane contents — keep vertical sliders compact */
+      .strak { height: 110px; }
+      .pane-det-name { font-size: .58rem; }
       .slbl { font-size: .50rem; }
       .sval { font-size: .57rem; }
-      .thr-input { width: 64px; font-size: .58rem; }
+      .thr-input { width: 80px; font-size: .58rem; }
+      .cluster-filter-btn { width: 92px; font-size: .48rem; }
 
-      /* Compact log */
+      /* ─── Misc ──────────────────────────────────────── */
       #log-sec { max-height: 80px; }
-      #statusbar { padding: 4px 10px; font-size: .55rem; min-height: 22px; }
 
-      /* Hide screenshots above 2K */
+      /* Hide very-large screenshot options */
       .shot-res[data-w="3840"],
       .shot-res[data-w="7680"],
       .shot-res[data-w="10240"] { display: none; }
 
-      /* Cinema exit button */
       #cinema-exit { bottom: 56px; }
-
-      /* About card */
-      .about-card { padding: 16px 18px; width: 86%; max-width: 460px; }
-      .about-title { font-size: .82rem; }
     }
 
     /* Extremely narrow landscape — drop separators */
@@ -1093,16 +1201,5 @@
       background: rgba(36,103,224,.08);
     }
 
-    /* ── Request counter strip (replaces session log/terminal) ── */
-    #req-strip {
-      flex-shrink: 0;
-      padding: 8px 10px;
-      border-top: 1px solid var(--border);
-      display: flex; justify-content: flex-end; align-items: center;
-    }
-    #req-strip #req-badge {
-      font: 500 .62rem var(--mono);
-      color: var(--muted);
-      letter-spacing: .06em;
-    }
+    /* Req badge (now lives inline with statusbar) */
 
