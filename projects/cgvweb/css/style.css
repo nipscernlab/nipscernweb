@@ -342,22 +342,27 @@
     .about-close:hover { color: var(--bright); border-color: var(--accent); }
 
     /* ── Right retractable panel — floating slim card ───── */
-    #rpanel {
+    #rpanel-wrap {
       position: fixed; top: 14px; right: 14px;
-      width: var(--rpw); max-height: calc(100vh - 28px);
+      display: flex; flex-direction: column; gap: 8px;
+      z-index: 30;
+      transform: translateX(0);
+      transition: transform var(--pt) cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+    #rpanel-wrap.collapsed { transform: translateX(calc(var(--rpw) + 18px)); }
+    #rpanel, #rpanel2 {
+      width: var(--rpw);
       background: var(--panel);
       backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border);
       border-radius: 12px;
       display: flex; flex-direction: column;
-      z-index: 30;
       overflow-y: auto;
       box-shadow: 4px 4px 32px rgba(0,0,0,.45);
-      transform: translateX(0);
-      transition: transform var(--pt) cubic-bezier(0.4, 0, 0.2, 1);
-      will-change: transform;
     }
-    #rpanel.collapsed { transform: translateX(calc(var(--rpw) + 18px)); }
+    #rpanel { max-height: calc(100vh - 28px); }
+    #rpanel2 { max-height: calc(100vh - 28px); }
     #rpanel::-webkit-scrollbar { width: 3px; }
     #rpanel::-webkit-scrollbar-thumb { background: rgba(36,103,224,.22); border-radius: 2px; }
 
@@ -418,6 +423,34 @@
     }
     .thr-input:focus { border-color: var(--accent2); color: var(--bright); }
     .thr-input::placeholder { color: var(--dim); }
+    .cluster-filter-btn {
+      width: 78px; padding: 4px 6px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 6px;
+      color: var(--muted);
+      font: 600 .47rem var(--mono);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s, box-shadow .15s, opacity .15s;
+    }
+    .cluster-filter-btn:hover { color: var(--text); border-color: rgba(255,255,255,.18); }
+    .cluster-filter-btn.on {
+      color: var(--muted);
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.10);
+      box-shadow: none;
+    }
+    #pane-cluster.cluster-filter-disabled .sval,
+    #pane-cluster.cluster-filter-disabled .slbl,
+    #pane-cluster.cluster-filter-disabled .thr-input,
+    #pane-cluster.cluster-filter-disabled .strak {
+      opacity: .38;
+    }
+    #pane-cluster.cluster-filter-disabled .strak {
+      cursor: default;
+    }
 
     /* ── Ghost switches (no text inside buttons) ─────────── */
     .ghost-switches-wrap {
@@ -540,7 +573,7 @@
     /* ── Cinema mode ──────────────────────────────────────── */
     body.cinema #panel       { opacity: 0 !important; pointer-events: none; }
     body.cinema #toolbar     { opacity: 0 !important; pointer-events: none; }
-    body.cinema #rpanel      { opacity: 0 !important; pointer-events: none; }
+    body.cinema #rpanel-wrap { opacity: 0 !important; pointer-events: none; }
     body.cinema #tip         { display: none; }
     #cinema-exit {
       position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%);
@@ -601,12 +634,9 @@
 
       /* Right panel */
       .strak { height: 120px; }
-      #rpanel {
-        width: var(--rpw);
-        top: 8px; right: 8px; max-height: calc(100vh - 16px);
-        border-radius: 12px;
-      }
-      #rpanel.collapsed { transform: translateX(calc(var(--rpw) + 12px)); }
+      #rpanel-wrap { top: 8px; right: 8px; }
+      #rpanel-wrap.collapsed { transform: translateX(calc(var(--rpw) + 12px)); }
+      #rpanel, #rpanel2 { max-height: calc(100vh - 16px); border-radius: 12px; }
       .pane-det-name { font-size: .55rem; }
       .slbl { font-size: .50rem; }
       .sval { font-size: .57rem; }

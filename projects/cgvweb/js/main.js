@@ -323,9 +323,9 @@ function meshNameToKey(name) {
 let tileMaxMev = 1, tileMinMev = 0;
 let larMaxMev  = 1, larMinMev  = 0;
 let hecMaxMev  = 1, hecMinMev  = 0;
-let thrTileMev = DEF_THR;
-let thrLArMev  = DEF_THR;
-let thrHecMev  = 1000; // 1 GeV default (HEC energies are typically higher)
+let thrTileMev = 50;    // 0.05 GeV default
+let thrLArMev  = 0;    // 0 GeV default
+let thrHecMev  = 600;  // 0.6 GeV default
 let showHec    = true;
 let wasmOk     = false;
 let sceneOk    = false;
@@ -343,7 +343,12 @@ let panelPinned  = true;
 let panelHovered = false;
 let reqCount     = 0;
 let allOutlinesMesh = null;
-let trackGroup   = null;
+let trackGroup    = null;
+let clusterGroup  = null;
+let lastClusterData       = null;  // { collections: [{key, clusters: [{eta,phi,etGev,cells:{TILE,LAR_EM,HEC,OTHER}}]}] }
+let activeClusterCellIds  = null;  // null = no cluster filter; Set<string> = only these cell IDs are visible
+let activeMbtsLabels      = null;  // null = no cluster filter; Set<string> = MBTS labels activated by cluster eta/phi
+let clusterFilterEnabled  = true;
 let _readyFired  = false;
 
 // ── Loading screen helpers ─────────────────────────────────────────────────────
@@ -942,18 +947,28 @@ function parseTracks(doc) {
     const zs      = pzEl.textContent.trim().split(/\s+/).map(Number);
     const ptEl    = el.querySelector('pt');
     const ptArr   = ptEl ? ptEl.textContent.trim().split(/\s+/).map(Number) : [];
-    let offset = 0;
+
+    // Hit IDs (subdet=2): numHits[i] hits belong to track i, flattened in <hits>
+    const numHitsEl  = el.querySelector('numHits');
+    const hitsEl     = el.querySelector('hits');
+    const numHitsArr = numHitsEl ? numHitsEl.textContent.trim().split(/\s+/).map(Number) : [];
+    const allHitStrs = hitsEl    ? hitsEl.textContent.trim().split(/\s+/)                : [];
+
+    const storeGateKey = el.getAttribute('storeGateKey') ?? '';
+    let offset = 0, hitOffset = 0;
     for (let i = 0; i < numPoly.length; i++) {
-      const n = numPoly[i];
+      const n  = numPoly[i];
+      const nh = numHitsArr[i] ?? 0;
+      const hitIds = allHitStrs.slice(hitOffset, hitOffset + nh);
+      hitOffset += nh;
       if (n >= 2) {
         const pts = [];
         for (let j = 0; j < n; j++) {
           const k = offset + j;
           pts.push(new THREE.Vector3(-xs[k] * 10, -ys[k] * 10, zs[k] * 10));
         }
-        // pt in XML is in GeV (may be signed — use absolute value)
         const ptGev = i < ptArr.length ? Math.abs(ptArr[i]) : 0;
-        tracks.push({ pts, ptGev });
+        tracks.push({ pts, ptGev, hitIds, storeGateKey });
       }
       offset += n;
     }
@@ -963,12 +978,91 @@ function parseTracks(doc) {
 
 
 
+// ── Cell-ID subdetector decoder ───────────────────────────────────────────────
+// Uses BigInt to safely handle 64-bit IDs.
+// Bit layout (MSB-first, per ATLAS IdDict / lib.rs):
+//   bits 63-61 (3 bits): subdet index → maps to [2,4,5,7,10,11,12,13]
+//     4 = LArCalorimeter, 5 = TileCalorimeter
+//   bits 60-58 (3 bits, only when subdet=4): part index → maps to [-3,-2,-1,1,2,3,4,5]
+//     |part|=1 → LAr EM,  |part|=2 → LAr HEC
+const _CELL_SUBDET_MAP = [2, 4, 5, 7, 10, 11, 12, 13];
+const _CELL_PART_MAP   = [-3, -2, -1, 1, 2, 3, 4, 5];
+
+function decodeCellSubdet(idStr) {
+  const id     = BigInt(idStr);
+  const sdIdx  = Number((id >> 61n) & 7n);
+  const subdet = _CELL_SUBDET_MAP[sdIdx];
+  if (subdet === 5) return 'TILE';
+  if (subdet === 2) return 'TRACK';
+  if (subdet === 4) {
+    const ptIdx = Number((id >> 58n) & 7n);
+    const part  = Math.abs(_CELL_PART_MAP[ptIdx] ?? 0);
+    if (part === 1) return 'LAR_EM';
+    if (part === 2) return 'HEC';
+  }
+  return 'OTHER';
+}
+
+// ── Cluster (eta/phi) parser ──────────────────────────────────────────────────
+// Returns flat [{eta, phi, etGev, cells, storeGateKey}] where cells is:
+//   { TILE: string[], LAR_EM: string[], HEC: string[], OTHER: string[] }
+function parseClusters(doc) {
+  const flat        = [];
+  const collections = [];
+
+  for (const el of doc.getElementsByTagName('Cluster')) {
+    const key        = el.getAttribute('storeGateKey') ?? '';
+    const etaEl      = el.querySelector('eta');
+    const phiEl      = el.querySelector('phi');
+    const etEl       = el.querySelector('et');
+    const numCellsEl = el.querySelector('numCells');
+    const cellsEl    = el.querySelector('cells');
+    if (!etaEl || !phiEl) continue;
+
+    const etas        = etaEl.textContent.trim().split(/\s+/).map(Number);
+    const phis        = phiEl.textContent.trim().split(/\s+/).map(Number);
+    const ets         = etEl       ? etEl.textContent.trim().split(/\s+/).map(Number) : [];
+    const numCellsArr = numCellsEl ? numCellsEl.textContent.trim().split(/\s+/).map(Number) : [];
+    const allCellStrs = cellsEl    ? cellsEl.textContent.trim().split(/\s+/)            : [];
+
+    const m = Math.min(etas.length, phis.length);
+    const collClusters = [];
+    let offset = 0;
+    for (let i = 0; i < m; i++) {
+      const nc      = numCellsArr[i] ?? 0;
+      const rawIds  = allCellStrs.slice(offset, offset + nc);
+      offset += nc;
+      if (!isFinite(etas[i]) || !isFinite(phis[i])) continue;
+
+      // Group cell IDs by subdetector
+      const cells = { TILE: [], LAR_EM: [], HEC: [], TRACK: [], OTHER: [] };
+      for (const idStr of rawIds) {
+        if (!idStr) continue;
+        cells[decodeCellSubdet(idStr)].push(idStr);
+      }
+
+      const entry = { eta: etas[i], phi: phis[i], etGev: isFinite(ets[i]) ? ets[i] : 0, cells };
+      collClusters.push(entry);
+      flat.push({ ...entry, storeGateKey: key });
+    }
+    if (collClusters.length) collections.push({ key, clusters: collClusters });
+  }
+
+  lastClusterData = { collections };
+  return flat;
+}
+
 // ── Track rendering ───────────────────────────────────────────────────────────
 let thrTrackGev   = 2;
 let trackPtMinGev = 0;
 let trackPtMaxGev = 5;
 
-const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffea00, depthWrite: false });
+// ── Cluster Et threshold ──────────────────────────────────────────────────────
+let thrClusterEtGev   = 0;
+let clusterEtMinGev   = 0;
+let clusterEtMaxGev   = 1;
+
+const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffea00, linewidth: 2 });
 
 function clearTracks() {
   if (!trackGroup) return;
@@ -979,9 +1073,8 @@ function clearTracks() {
 
 function applyTrackThreshold() {
   if (!trackGroup) return;
-  for (const child of trackGroup.children) {
+  for (const child of trackGroup.children)
     child.visible = child.userData.ptGev >= thrTrackGev;
-  }
   dirty = true;
 }
 
@@ -991,14 +1084,113 @@ function drawTracks(tracks) {
   trackGroup = new THREE.Group();
   trackGroup.renderOrder = 5;
   trackGroup.visible = (typeof tracksVisible === 'undefined') ? true : tracksVisible;
-  for (const { pts, ptGev } of tracks) {
+  for (const { pts, ptGev, hitIds, storeGateKey } of tracks) {
     const geo  = new THREE.BufferGeometry().setFromPoints(pts);
     const line = new THREE.Line(geo, TRACK_MAT);
-    line.userData.ptGev = ptGev;
+    line.userData.ptGev        = ptGev;
+    line.userData.hitIds       = hitIds;
+    line.userData.storeGateKey = storeGateKey;
+    line.matrixAutoUpdate = false;
     trackGroup.add(line);
   }
+  trackGroup.matrixAutoUpdate = false;
   scene.add(trackGroup);
   applyTrackThreshold();
+}
+
+// ── Cluster line rendering ────────────────────────────────────────────────────
+// Lines are drawn from the origin in the η/φ direction, 5 m = 5000 mm long.
+// Coordinate convention matches tracks: Three.js X = −ATLAS x, Y = −ATLAS y.
+const CLUSTER_MAT = new THREE.LineDashedMaterial({
+  color: 0xff4400, transparent: true, opacity: 0.55,
+  dashSize: 40, gapSize: 60, depthWrite: false,
+});
+// Inner cylinder (start): r = 1.4 m, h = 6.4 m
+const CLUSTER_CYL_IN_R      = 1400;
+const CLUSTER_CYL_IN_HALF_H = 3200;
+// Outer cylinder (end):   r = 4.25 m, h = 12 m
+const CLUSTER_CYL_OUT_R      = 3820;
+const CLUSTER_CYL_OUT_HALF_H = 6000;
+
+// Returns t at which the unit-direction ray (dx,dy,dz) from the origin hits
+// the surface of a cylinder with given radius and half-height.
+function _cylIntersect(dx, dy, dz, r, halfH) {
+  const rT = Math.sqrt(dx * dx + dy * dy);
+  if (rT > 1e-9) {
+    const tBarrel = r / rT;
+    if (Math.abs(dz * tBarrel) <= halfH) return tBarrel;
+  }
+  return halfH / Math.abs(dz);
+}
+
+function clearClusters() {
+  if (!clusterGroup) return;
+  clusterGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+  scene.remove(clusterGroup);
+  clusterGroup = null;
+}
+
+function rebuildActiveClusterCellIds() {
+  if (!clusterFilterEnabled || !lastClusterData) { activeClusterCellIds = null; activeMbtsLabels = null; return; }
+  const ids  = new Set();
+  const mbts = new Set();
+  for (const { clusters } of lastClusterData.collections) {
+    for (const { eta, phi: rawPhi, etGev, cells } of clusters) {
+      if (etGev < thrClusterEtGev) continue;
+      for (const k of ['TILE', 'LAR_EM', 'HEC', 'TRACK', 'OTHER'])
+        for (const id of cells[k]) ids.add(id);
+      // MBTS activation: map cluster (eta, phi) → type_X_ch_Y_mod_Z
+      const absEta = Math.abs(eta);
+      let ch;
+      if      (absEta >= 2.78 && absEta <= 3.86) ch = 1;
+      else if (absEta >= 2.08 && absEta <  2.78) ch = 0;
+      else continue; // outside MBTS eta range
+      const type    = eta >= 0 ? 1 : -1;
+      const phiPos  = rawPhi < 0 ? rawPhi + 2 * Math.PI : rawPhi;
+      const mod     = Math.floor(phiPos / (2 * Math.PI / 8)) % 8;
+      mbts.add(`type_${type}_ch_${ch}_mod_${mod}`);
+    }
+  }
+  activeClusterCellIds = ids;
+  activeMbtsLabels     = mbts;
+}
+
+function applyClusterThreshold() {
+  if (clusterGroup)
+    for (const child of clusterGroup.children)
+      child.visible = clusterFilterEnabled && child.userData.etGev >= thrClusterEtGev;
+  rebuildActiveClusterCellIds();
+  applyThreshold();
+  applyTrackThreshold();
+}
+
+function drawClusters(clusters) {
+  clearClusters();
+  if (!clusters.length) return;
+  clusterGroup = new THREE.Group();
+  clusterGroup.renderOrder = 6;
+  clusterGroup.visible = (typeof clustersVisible === 'undefined') ? true : clustersVisible;
+  for (const { eta, phi, etGev, storeGateKey } of clusters) {
+    const theta = 2 * Math.atan(Math.exp(-eta));
+    const sinT  = Math.sin(theta);
+    const dx = -sinT * Math.cos(phi);
+    const dy = -sinT * Math.sin(phi);
+    const dz =  Math.cos(theta);
+    const t0 = _cylIntersect(dx, dy, dz, CLUSTER_CYL_IN_R,  CLUSTER_CYL_IN_HALF_H);
+    const t1 = _cylIntersect(dx, dy, dz, CLUSTER_CYL_OUT_R, CLUSTER_CYL_OUT_HALF_H);
+    const start = new THREE.Vector3(dx * t0, dy * t0, dz * t0);
+    const end   = new THREE.Vector3(dx * t1, dy * t1, dz * t1);
+    const geo  = new THREE.BufferGeometry().setFromPoints([start, end]);
+    const line = new THREE.Line(geo, CLUSTER_MAT);
+    line.computeLineDistances();
+    line.userData.etGev        = etGev;
+    line.userData.storeGateKey = storeGateKey ?? '';
+    line.matrixAutoUpdate = false;
+    clusterGroup.add(line);
+  }
+  clusterGroup.matrixAutoUpdate = false;
+  scene.add(clusterGroup);
+  applyClusterThreshold();
 }
 
 // ── Scene reset ───────────────────────────────────────────────────────────────
@@ -1009,14 +1201,28 @@ function resetScene() {
   active.clear(); rayTargets = [];
   clearOutline(); clearAllOutlines();
   clearTracks();
+  clearClusters();
+  lastClusterData      = null;
+  activeClusterCellIds = null;
+  activeMbtsLabels     = null;
   tooltip.hidden = true; dirty = true;
 }
 function applyThreshold() {
   rayTargets = [];
-  for (const [mesh, { energyMev, det }] of active) {
-    const thr   = det === 'LAR' ? thrLArMev  : det === 'HEC' ? thrHecMev : thrTileMev;
-    const detOn = det === 'LAR' ? showLAr    : det === 'HEC' ? showHec   : showTile;
-    const vis = detOn && (!isFinite(thr) || energyMev >= thr);
+  for (const [mesh, { energyMev, det, cellId, mbtsLabel }] of active) {
+    const thr    = det === 'LAR' ? thrLArMev  : det === 'HEC' ? thrHecMev : thrTileMev;
+    const detOn  = det === 'LAR' ? showLAr    : det === 'HEC' ? showHec   : showTile;
+    let inCluster;
+    if (activeClusterCellIds === null) {
+      inCluster = true;                                           // no cluster data → no filter
+    } else if (mbtsLabel != null) {
+      inCluster = activeMbtsLabels !== null && activeMbtsLabels.has(mbtsLabel); // MBTS: cluster eta/phi match
+    } else if (cellId != null) {
+      inCluster = activeClusterCellIds.has(cellId);              // normal cell: ID match
+    } else {
+      inCluster = true;                                           // no ID and not MBTS → always pass
+    }
+    const vis = detOn && (!isFinite(thr) || energyMev >= thr) && inCluster;
     mesh.visible = vis; if (vis) rayTargets.push(mesh);
   }
   rebuildAllOutlines();
@@ -1054,6 +1260,25 @@ function processXml(xmlText) {
     }
     drawTracks(raw);
   } catch (e) { console.warn('Track parse error', e); }
+
+  // ── Cluster η/φ lines ────────────────────────────────────────────────────────
+  try {
+    const rawClusters = parseClusters(doc);
+    if (rawClusters.length) {
+      let etMin = Infinity, etMax = -Infinity;
+      for (const { etGev } of rawClusters) {
+        if (etGev < etMin) etMin = etGev;
+        if (etGev > etMax) etMax = etGev;
+      }
+      clusterEtSlider.update(
+        etMin === Infinity ? 0 : Math.max(0, etMin),
+        etMax === -Infinity ? 1 : etMax,
+      );
+    }
+    drawClusters(rawClusters);
+    rebuildActiveClusterCellIds();
+  } catch (e) { console.warn('Cluster parse error', e); }
+
 
   // Per-detector energy ranges — single loop per detector, avoids spread stack overflow
   function minMax(cells) {
@@ -1100,7 +1325,7 @@ function processXml(xmlText) {
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
     const tEta = physTileEta(section, side, tower, sampling);
     const tPhi = physTilePhi(module);
-    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: cellLabel(x, k), coords: `η = ${tEta.toFixed(3)}   φ = ${tPhi.toFixed(3)} rad`, det: 'TILE' });
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: cellLabel(x, k), coords: `η = ${tEta.toFixed(3)}   φ = ${tPhi.toFixed(3)} rad`, det: 'TILE', cellId: id });
     nTile++;
   }
 
@@ -1128,7 +1353,7 @@ function processXml(xmlText) {
     const bec   = abs_be * (z_pos ? 1 : -1);
     const lEta  = physLarEmEta(bec, sampling, region, eta);
     const lPhi  = physLarEmPhi(bec, sampling, region, phi);
-    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: rName, coords: `η = ${lEta.toFixed(3)}   φ = ${lPhi.toFixed(3)} rad`, det: 'LAR' });
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: rName, coords: `η = ${lEta.toFixed(3)}   φ = ${lPhi.toFixed(3)} rad`, det: 'LAR', cellId: id });
     nLAr++;
   }
 
@@ -1154,7 +1379,7 @@ function processXml(xmlText) {
     const hLabel  = `HEC${group + 1}`;
     const hEta    = physLarHecEta(be, group, region, eta_idx);
     const hPhi    = physLarHecPhi(region, phi);
-    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: hLabel, coords: `η = ${hEta.toFixed(3)}   φ = ${hPhi.toFixed(3)} rad`, det: 'HEC' });
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: hLabel, coords: `η = ${hEta.toFixed(3)}   φ = ${hPhi.toFixed(3)} rad`, det: 'HEC', cellId: id });
     nHec++;
   }
 
@@ -1169,11 +1394,11 @@ function processXml(xmlText) {
     if (!mesh) { console.warn(`[MBTS] label=${label} | no mesh`); nMbtsMiss++; continue; }
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
     const mbtsCoords = `η = ${((s_bit?1:-1)*(_m[2]==='0'?2.76:3.84)).toFixed(3)}   φ = ${_wrapPhi(2*Math.PI/16+mod*2*Math.PI/8).toFixed(3)} rad`;
-    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: 'MBTS', coords: mbtsCoords, det: 'TILE' });
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: 'MBTS', coords: mbtsCoords, det: 'TILE', mbtsLabel: label });
     nMbts++;
   }
 
-  initDetPanel(nTile > 0, nLAr > 0, nHec > 0, trackGroup && trackGroup.children.length > 0);
+  initDetPanel(nTile > 0, nLAr > 0, nHec > 0, trackGroup && trackGroup.children.length > 0, clusterGroup && clusterGroup.children.length > 0);
   applyThreshold();
   const dt = ((performance.now() - t0) / 1000).toFixed(2);
 
@@ -1187,14 +1412,14 @@ function processXml(xmlText) {
 }
 
 // ── Right panel (rpanel) toggle — mirrors left panel behavior ────────────────
-const rpanel = document.getElementById('rpanel');
-const btnRpanel = document.getElementById('btn-rpanel');
+const rpanelWrap = document.getElementById('rpanel-wrap');
+const btnRpanel  = document.getElementById('btn-rpanel');
 let rpanelPinned = true;
 let rpanelHovered = false;
 
 function syncRPanelUI() {
   const open = rpanelPinned || rpanelHovered;
-  rpanel.classList.toggle('collapsed', !open);
+  rpanelWrap.classList.toggle('collapsed', !open);
   btnRpanel.classList.toggle('on', rpanelPinned);
   document.body.classList.toggle('rpanel-unpinned', !rpanelPinned);
 }
@@ -1207,7 +1432,7 @@ const rpanelEdge = document.getElementById('rpanel-edge');
 rpanelEdge.addEventListener('mouseenter', () => {
   if (!rpanelPinned && autoOpenEnabled) { rpanelHovered = true; syncRPanelUI(); }
 });
-rpanel.addEventListener('mouseleave', () => {
+rpanelWrap.addEventListener('mouseleave', () => {
   if (!rpanelPinned && rpanelHovered) { rpanelHovered = false; syncRPanelUI(); }
 });
 // Canvas click closes the right panel if it was hovered (not pinned)
@@ -1264,7 +1489,7 @@ function makeDetSlider(trackId, thumbId, inputId, getThr, setThr, maxMev) {
   }
 
   track.addEventListener('pointerdown', e => {
-    drag = true; rpanel.classList.add('dragging'); track.setPointerCapture(e.pointerId);
+    drag = true; rpanelWrap.classList.add('dragging'); track.setPointerCapture(e.pointerId);
     const r = ratioFromPtr(e, track); setThr(r <= 0 ? -Infinity : maxMev * r);
     updateUI(getThr()); applyThreshold();
   });
@@ -1274,7 +1499,7 @@ function makeDetSlider(trackId, thumbId, inputId, getThr, setThr, maxMev) {
     updateUI(getThr()); applyThreshold();
   });
   ['pointerup', 'pointercancel'].forEach(ev =>
-    track.addEventListener(ev, () => { drag = false; rpanel.classList.remove('dragging'); })
+    track.addEventListener(ev, () => { drag = false; rpanelWrap.classList.remove('dragging'); })
   );
   input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
   input.addEventListener('blur', () => {
@@ -1320,12 +1545,12 @@ function makeTrackPtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
   }
 
   trackEl.addEventListener('pointerdown', e => {
-    drag = true; rpanel.classList.add('dragging'); trackEl.setPointerCapture(e.pointerId);
+    drag = true; rpanelWrap.classList.add('dragging'); trackEl.setPointerCapture(e.pointerId);
     setFromRatio(ratioFromPtr(e, trackEl));
   });
   trackEl.addEventListener('pointermove', e => { if (drag) setFromRatio(ratioFromPtr(e, trackEl)); });
   ['pointerup', 'pointercancel'].forEach(ev =>
-    trackEl.addEventListener(ev, () => { drag = false; rpanel.classList.remove('dragging'); })
+    trackEl.addEventListener(ev, () => { drag = false; rpanelWrap.classList.remove('dragging'); })
   );
   inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') inputEl.blur(); });
   inputEl.addEventListener('blur', () => {
@@ -1358,6 +1583,88 @@ const trackPtSlider = makeTrackPtSlider(
   'track-sval-max', 'track-sval-min'
 );
 
+// ── Cluster Et slider (dynamic range — updates each event) ───────────────────
+function makeClusterEtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
+  const trackEl  = document.getElementById(trackId);
+  const thumbEl  = document.getElementById(thumbId);
+  const inputEl  = document.getElementById(inputId);
+  const maxLblEl = document.getElementById(maxLblId);
+  const minLblEl = document.getElementById(minLblId);
+  let drag = false;
+
+  function fmtGev(v) { return v.toFixed(2) + ' GeV'; }
+
+  function updateUI() {
+    const span = clusterEtMaxGev - clusterEtMinGev;
+    const r    = span > 0 ? Math.max(0, Math.min(1, (thrClusterEtGev - clusterEtMinGev) / span)) : 0;
+    thumbEl.style.top = ((1 - r) * 100) + '%';
+    if (document.activeElement !== inputEl)
+      inputEl.value = thrClusterEtGev > clusterEtMinGev + 1e-9 ? fmtGev(thrClusterEtGev) : '';
+  }
+
+  function setFromRatio(r) {
+    if (!clusterFilterEnabled) return;
+    const span = clusterEtMaxGev - clusterEtMinGev;
+    thrClusterEtGev = r <= 0 ? clusterEtMinGev : clusterEtMinGev + span * r;
+    updateUI();
+    applyClusterThreshold();
+  }
+
+  trackEl.addEventListener('pointerdown', e => {
+    drag = true; rpanelWrap.classList.add('dragging'); trackEl.setPointerCapture(e.pointerId);
+    setFromRatio(ratioFromPtr(e, trackEl));
+  });
+  trackEl.addEventListener('pointermove', e => { if (drag) setFromRatio(ratioFromPtr(e, trackEl)); });
+  ['pointerup', 'pointercancel'].forEach(ev =>
+    trackEl.addEventListener(ev, () => { drag = false; rpanelWrap.classList.remove('dragging'); })
+  );
+  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') inputEl.blur(); });
+  inputEl.addEventListener('blur', () => {
+    if (!clusterFilterEnabled) {
+      updateUI();
+      return;
+    }
+    const s = inputEl.value.trim().toLowerCase();
+    if (!s || s === 'all') {
+      thrClusterEtGev = clusterEtMinGev;
+    } else {
+      const g = s.match(/^([\d.]+)\s*gev$/i);
+      const v = g ? parseFloat(g[1]) : parseFloat(s);
+      if (isFinite(v)) thrClusterEtGev = Math.max(clusterEtMinGev, Math.min(clusterEtMaxGev, v));
+    }
+    updateUI();
+    applyClusterThreshold();
+  });
+
+  function update(minGev, maxGev) {
+    clusterEtMinGev   = minGev;
+    clusterEtMaxGev   = maxGev;
+    thrClusterEtGev   = Math.max(3, minGev); // default 3 GeV
+    if (maxLblEl) maxLblEl.textContent = fmtGev(maxGev);
+    if (minLblEl) minLblEl.textContent = fmtGev(minGev);
+    updateUI();
+  }
+
+  return { updateUI, update };
+}
+
+const clusterEtSlider = makeClusterEtSlider(
+  'cluster-strak', 'cluster-sthumb', 'cluster-thr-input',
+  'cluster-sval-max', 'cluster-sval-min'
+);
+
+function syncClusterFilterToggle() {
+  const btn  = document.getElementById('cluster-filter-toggle');
+  const pane = document.getElementById('pane-cluster');
+  const input = document.getElementById('cluster-thr-input');
+  if (!btn || !pane) return;
+  btn.classList.toggle('on', clusterFilterEnabled);
+  btn.setAttribute('aria-checked', clusterFilterEnabled ? 'true' : 'false');
+  btn.textContent = clusterFilterEnabled ? 'On' : 'Off';
+  pane.classList.toggle('cluster-filter-disabled', !clusterFilterEnabled);
+  if (input) input.disabled = !clusterFilterEnabled;
+}
+
 // Initialize thumb positions at default threshold
 tileSlider.updateUI(thrTileMev);
 larSlider.updateUI(thrLArMev);
@@ -1367,6 +1674,8 @@ function initDetPanel(hasTile, hasLAr, hasHec, hasTracks) {
   tileSlider.updateUI(thrTileMev);
   larSlider.updateUI(thrLArMev);
   hecSlider.updateUI(thrHecMev);
+  clusterEtSlider.updateUI();
+  syncClusterFilterToggle();
   openRPanel();
   if (hasTile) switchTab('tile'); else if (hasLAr) switchTab('lar'); else if (hasHec) switchTab('hec');
   else if (hasTracks) switchTab('track');
@@ -1487,13 +1796,16 @@ function _buildOutlinesNow() {
 // ── Hover tooltip — raycasting fix ───────────────────────────────────────────
 const raycast  = new THREE.Raycaster();
 raycast.firstHitOnly = true;  // stop after first intersection (much faster)
+raycast.params.Line = { threshold: 25 };  // 25 mm hit zone for track lines
 const mxy      = new THREE.Vector2();
 const tooltip  = document.getElementById('tip');
 let   lastRay  = 0;
 let   mousePos = { x: 0, y: 0 };
 document.addEventListener('mousemove', e => { mousePos.x = e.clientX; mousePos.y = e.clientY; });
 function doRaycast(clientX, clientY) {
-  if (!showInfo || cinemaMode || !active.size) { tooltip.hidden = true; clearOutline(); return; }
+  const hasTrackLines   = trackGroup   && trackGroup.visible   && trackGroup.children.length   > 0;
+  const hasClusterLines = clusterGroup && clusterGroup.visible && clusterGroup.children.length > 0;
+  if (!showInfo || cinemaMode || (!active.size && !hasTrackLines && !hasClusterLines)) { tooltip.hidden = true; clearOutline(); return; }
   // Don't show cell info when the pointer is over any UI element (panels, toolbar, overlays)
   const topEl = document.elementFromPoint(clientX, clientY);
   if (topEl && topEl !== canvas) { tooltip.hidden = true; clearOutline(); return; }
@@ -1504,14 +1816,56 @@ function doRaycast(clientX, clientY) {
   mxy.set(((clientX-rect.left)/rect.width)*2-1, -((clientY-rect.top)/rect.height)*2+1);
   camera.updateMatrixWorld();
   raycast.setFromCamera(mxy, camera);
-  const hits = raycast.intersectObjects(rayTargets, false);
-  if (hits.length) {
-    const data = active.get(hits[0].object);
-    if (data) {
-      showOutline(hits[0].object);
-      document.getElementById('tip-cell').textContent  = data.cellName;
-      document.getElementById('tip-coords').textContent = data.coords ?? '';
-      document.getElementById('tip-e').textContent      = `${data.energyGev.toFixed(4)} GeV`;
+  const tipEKeyEl = document.querySelector('#tip .tkey');
+  // ── Cell hit ──────────────────────────────────────────────────────────────
+  if (active.size) {
+    const hits = raycast.intersectObjects(rayTargets, false);
+    if (hits.length) {
+      const data = active.get(hits[0].object);
+      if (data) {
+        showOutline(hits[0].object);
+        document.getElementById('tip-cell').textContent   = data.cellName;
+        document.getElementById('tip-coords').textContent = data.coords ?? '';
+        document.getElementById('tip-e').textContent      = `${data.energyGev.toFixed(4)} GeV`;
+        if (tipEKeyEl) tipEKeyEl.textContent = t('tip-energy-key');
+        tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
+        tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
+        tooltip.hidden = false; dirty = true; return;
+      }
+    }
+  }
+  // ── Track hit ─────────────────────────────────────────────────────────────
+  if (hasTrackLines) {
+    const visibleTracks = trackGroup.children.filter(c => c.visible);
+    const trackHits = raycast.intersectObjects(visibleTracks, false);
+    if (trackHits.length) {
+      const line         = trackHits[0].object;
+      const ptGev        = line.userData.ptGev        ?? 0;
+      const storeGateKey = line.userData.storeGateKey ?? '';
+      clearOutline();
+      document.getElementById('tip-cell').textContent   = 'Track';
+      document.getElementById('tip-coords').textContent = storeGateKey;
+      document.getElementById('tip-e').textContent      = `${ptGev.toFixed(3)} GeV`;
+      if (tipEKeyEl) tipEKeyEl.textContent = 'pT';
+      tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
+      tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
+      tooltip.hidden = false; dirty = true; return;
+    }
+  }
+  // ── Cluster hit ───────────────────────────────────────────────────────────
+  if (hasClusterLines) {
+    const visibleClusters = clusterGroup.children.filter(c => c.visible);
+    const clusterHits = raycast.intersectObjects(visibleClusters, false);
+    if (clusterHits.length) {
+      const line         = clusterHits[0].object;
+      console.log('[cluster hit] userData:', JSON.stringify(line.userData));
+      const etGev        = line.userData.etGev        ?? 0;
+      const storeGateKey = line.userData.storeGateKey ?? '';
+      clearOutline();
+      document.getElementById('tip-cell').textContent   = 'Cluster';
+      document.getElementById('tip-coords').textContent = storeGateKey;
+      document.getElementById('tip-e').textContent      = `${etGev.toFixed(3)} GeV`;
+      if (tipEKeyEl) tipEKeyEl.innerHTML = 'E<sub>T</sub>';
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
       tooltip.hidden = false; dirty = true; return;
@@ -1580,6 +1934,11 @@ document.getElementById('ltog-lar') .addEventListener('click', () => { showLAr  
 document.getElementById('ltog-hec') .addEventListener('click', () => { showHec  = !showHec;  syncLayerToggles(); applyThreshold(); });
 document.getElementById('lbtn-all') .addEventListener('click', () => { showTile = showLAr = showHec = true;  syncLayerToggles(); applyThreshold(); });
 document.getElementById('lbtn-none').addEventListener('click', () => { showTile = showLAr = showHec = false; syncLayerToggles(); applyThreshold(); });
+document.getElementById('cluster-filter-toggle').addEventListener('click', () => {
+  clusterFilterEnabled = !clusterFilterEnabled;
+  syncClusterFilterToggle();
+  applyClusterThreshold();
+});
 
 // Layers panel open / close
 const layersPanel = document.getElementById('layers-panel');
@@ -1624,6 +1983,19 @@ function toggleTracks() {
   dirty = true;
 }
 document.getElementById('btn-tracks').addEventListener('click', toggleTracks);
+
+// ── Cluster η/φ lines toggle ────────────────────────────────────────────────
+let clustersVisible = true;
+function syncClustersBtn() {
+  document.getElementById('btn-cluster').classList.toggle('on', clustersVisible);
+}
+function toggleClusters() {
+  clustersVisible = !clustersVisible;
+  if (clusterGroup) clusterGroup.visible = clustersVisible;
+  syncClustersBtn();
+  dirty = true;
+}
+document.getElementById('btn-cluster').addEventListener('click', toggleClusters);
 document.addEventListener('click', () => { if (layersPanelOpen) closeLayersPanel(); });
 layersPanel.addEventListener('click', e => e.stopPropagation());
 
@@ -2451,6 +2823,9 @@ document.addEventListener('keydown', e => {
       break;
     case 'J':
       document.getElementById('btn-tracks').click();
+      break;
+    case 'K':
+      document.getElementById('btn-cluster').click();
       break;
     case 'ESCAPE':
       if (cinemaMode)          { exitCinema(); return; }
