@@ -478,7 +478,7 @@ const GHOST_TILE_NAMES = [
 // RGB(92,95,102) = #5C5F66; 90% transparency = 10% opacity
 let ghostSolidColor = 0x5C5F66;
 let ghostPhiColor   = 0xFFFFFF;
-let ghostSolidOpacity = 0.06;  // 94% transparent
+let ghostSolidOpacity = 0.01;  // 94% transparent
 
 const ghostSolidMat = new THREE.MeshBasicMaterial({
   color: ghostSolidColor, transparent: true, opacity: ghostSolidOpacity,
