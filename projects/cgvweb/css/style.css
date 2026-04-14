@@ -731,7 +731,8 @@
         border-radius: 12px;
         width: var(--rpw);
       }
-      /* Tabs go horizontal on mobile (desktop keeps them vertical/stacked) */
+      /* Tabs go horizontal on mobile (desktop keeps them vertical/stacked).
+         Cluster is the first/primary tab on mobile via flex order. */
       #det-tab-bar {
         flex-direction: row;
         overflow-x: auto;
@@ -743,6 +744,7 @@
         border-bottom: 2px solid transparent;
         font-size: .52rem;
       }
+      #tab-cluster { order: -1; }
       .det-tab.on {
         border-left-color: transparent;
         border-bottom-color: var(--tab-col, var(--accent2));

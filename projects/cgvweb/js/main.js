@@ -487,7 +487,7 @@ const ghostSolidMat = new THREE.MeshBasicMaterial({
 // Phi lines: fixed white + high transparency (90%), independent of the alpha
 // slider which only affects the solid envelope. This keeps them as subtle
 // segmentation guides regardless of envelope opacity.
-const GHOST_PHI_FIXED_OPACITY = 0.06;
+const GHOST_PHI_FIXED_OPACITY = 0.10;
 const ghostPhiMat = new THREE.LineBasicMaterial({
   color: 0xFFFFFF, transparent: true, opacity: GHOST_PHI_FIXED_OPACITY, depthWrite: false,
 });
@@ -531,18 +531,15 @@ function buildPhiLines() {
 }
 
 function applyGhostMesh(visible) {
+  // Solid envelope is intentionally NOT rendered — only the phi segmentation
+  // lines make up the ghost. Keep envelope meshes hidden at all times; the
+  // material is restored to original so they don't interfere with anything else.
   for (const name of GHOST_TILE_NAMES) {
     const mesh = meshByName.get(name);
     if (!mesh) continue;
-    if (visible) {
-      mesh.material  = ghostSolidMat;
-      mesh.renderOrder = 5;
-      mesh.visible   = true;
-    } else {
-      mesh.material  = origMat.get(name) ?? mesh.material;
-      mesh.renderOrder = 0;
-      mesh.visible   = false;
-    }
+    mesh.material    = origMat.get(name) ?? mesh.material;
+    mesh.renderOrder = 0;
+    mesh.visible     = false;
   }
   if (ghostPhiGroup) ghostPhiGroup.visible = visible;
   dirty = true;
@@ -1494,10 +1491,11 @@ function applyMobileLayout(isMobile) {
     if (paneCluster.parentElement !== paneClusterHome) paneClusterHome.appendChild(paneCluster);
     paneCluster.style.display = 'flex';
   }
-  // Re-apply tab selection. If coming back to desktop while cluster was active,
-  // fall back to the TILE tab (cluster is not a tab on desktop).
+  // Re-apply tab selection. On mobile, Cluster is the primary tab; on desktop,
+  // fall back to TILE if Cluster was active (cluster is not a tab on desktop).
   let cur = document.querySelector('#det-tab-bar .det-tab.on');
   let curId = cur ? cur.id.replace('tab-', '') : 'tile';
+  if (isMobile && curId === 'tile') curId = 'cluster';
   if (!isMobile && curId === 'cluster') curId = 'tile';
   switchTab(curId);
 }
