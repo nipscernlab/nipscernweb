@@ -83,6 +83,7 @@ export function initATLASScene(containerId = 'cgv-canvas-wrapper') {
   let thrTileMev = DEF_THR;
   let thrLArMev = DEF_THR;
   let thrHecMev = 1000;
+  const thrTrackMev = 510;
   let showTile = true;
   let showLAr = true;
   let showHec = true;
@@ -483,7 +484,8 @@ export function initATLASScene(containerId = 'cgv-canvas-wrapper') {
     if (!tracks.length) return;
     trackGroup = new THREE.Group();
     trackGroup.renderOrder = 5;
-    for (const { pts } of tracks) {
+    for (const { pts, ptGev } of tracks) {
+      if ((ptGev * 1000) < thrTrackMev) continue;
       const geo = new THREE.BufferGeometry().setFromPoints(pts);
       trackGroup.add(new THREE.Line(geo, TRACK_MAT));
     }
