@@ -27,23 +27,6 @@ async function loadPublications() {
     .sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
 }
 
-/**
- * Build a sorted author list with publication counts.
- */
-function buildAuthorStats(publications) {
-  const counts = new Map();
-  for (const pub of publications) {
-    for (const raw of pub.authors) {
-      const name = raw.trim();
-      if (!name) continue;
-      counts.set(name, (counts.get(name) || 0) + 1);
-    }
-  }
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([name, count]) => ({ name, count }));
-}
-
 function renderCard(pub) {
   const typeClass = TYPE_BADGE[pub.type] || 'badge-gray';
   const typeKey = `publications.types.${pub.type}`;
@@ -94,12 +77,10 @@ export async function initPublications() {
   const typeEl      = document.getElementById('pub-filter-type');
   const yearEl      = document.getElementById('pub-filter-year');
   const noResultsEl = document.getElementById('pub-no-results');
-  const authorWrap  = document.getElementById('pub-author-list');
 
   if (!listEl) return;
 
   const publications = await loadPublications();
-  const authorStats  = buildAuthorStats(publications);
 
   // Populate year filter
   if (yearEl) {
@@ -112,20 +93,9 @@ export async function initPublications() {
     });
   }
 
-  // Populate author filter chips
-  if (authorWrap) {
-    authorWrap.innerHTML = authorStats.map(a =>
-      `<button class="author-chip" data-author="${a.name.replace(/"/g, '&quot;')}" title="${a.name}">
-        <span class="author-chip-name">${a.name}</span>
-        <span class="author-chip-count">${a.count}</span>
-      </button>`
-    ).join('');
-  }
-
   let currentSearch = '';
   let currentType   = '';
   let currentYear   = '';
-  let currentAuthor = '';
 
   function render() {
     const query = currentSearch.toLowerCase().trim();
@@ -134,10 +104,6 @@ export async function initPublications() {
     const filtered = publications.filter(pub => {
       if (currentType && pub.type !== currentType) return false;
       if (currentYear && String(pub.year) !== currentYear) return false;
-      if (currentAuthor) {
-        const hasAuthor = pub.authors.some(a => a.trim() === currentAuthor);
-        if (!hasAuthor) return false;
-      }
       if (tokens.length) {
         const haystack = [pub.title, ...pub.authors, pub.journal, ...pub.tags, String(pub.year)].join(' ').toLowerCase();
         if (!tokens.every(tok => haystack.includes(tok))) return false;
@@ -173,26 +139,6 @@ export async function initPublications() {
   // Type/Year selects
   typeEl?.addEventListener('change', e => { currentType = e.target.value; render(); });
   yearEl?.addEventListener('change', e => { currentYear = e.target.value; render(); });
-
-  // Author chips
-  if (authorWrap) {
-    authorWrap.addEventListener('click', e => {
-      const chip = e.target.closest('.author-chip');
-      if (!chip) return;
-      const author = chip.dataset.author;
-      if (currentAuthor === author) {
-        // Deselect
-        currentAuthor = '';
-        chip.classList.remove('active');
-      } else {
-        // Select new
-        currentAuthor = author;
-        authorWrap.querySelectorAll('.author-chip.active').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-      }
-      render();
-    });
-  }
 
   render();
 }
