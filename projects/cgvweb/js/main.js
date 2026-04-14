@@ -274,10 +274,52 @@ const PAL_N   = 256;
 const DEF_THR = 200;
 
 // ── State ─────────────────────────────────────────────────────────────────────
-const meshByName = new Map();
+const meshByName = new Map();   // string → Mesh  (non-hot-path: origMat restore, debug)
+const meshByKey  = new Map();   // int    → Mesh  (hot-path: event loop lookup)
 const origMat    = new Map();
-let   active     = new Map();
+let   active     = new Map();   // Mesh → tooltip data  (keyed by object reference)
 let   rayTargets = [];
+
+// ── Integer key encoding — avoids string construction in the per-cell hot path ─
+// Bits [1:0] = detector type tag: TILE=0b00, LAr EM=0b01, HEC=0b10 (no cross-type collision).
+// TILE:   x(5b<<2) | side(1b<<7) | k(4b<<8) | module(6b<<12)       — 18 bits total
+// LAr EM: (abs_be-1)(2b<<2) | samp(2b<<4) | R(3b<<6) | z_pos(1b<<9) | eta(9b<<10) | phi(8b<<19) | cell2(1b<<27)
+// HEC:    group(2b<<2) | region(1b<<4) | z_pos(1b<<5) | cum_eta(5b<<6) | phi(6b<<11)
+const _tileKey  = (x, s, k, mod) => (x<<2)|(s<<7)|(k<<8)|(mod<<12);
+const _larEmKey = (ab, sa, R, z, eta, phi, c2) => 1|((ab-1)<<2)|(sa<<4)|(R<<6)|(z<<9)|(eta<<10)|(phi<<19)|(c2<<27);
+const _hecKey   = (g, r, z, cum, phi) => 2|(g<<2)|(r<<4)|(z<<5)|(cum<<6)|(phi<<11);
+
+// Parse a GLB mesh name string into its integer key (called once per mesh at load time).
+function meshNameToKey(name) {
+  const S = '\u2192';
+  const a = name.indexOf(S); if (a < 0) return null;
+  const b = name.indexOf(S, a+1); if (b < 0) return null;
+  const c = name.indexOf(S, b+1); if (c < 0) return null;
+  const l1 = name.slice(a+1, b), l2 = name.slice(b+1, c), l3 = name.slice(c+1);
+  let m;
+  // TILE / MBTS — Tile{x}{y}_0 → Tile{x}{y}{k}_{k} → cell_{mod}
+  if ((m = /^Tile(\d+)([pn])_0$/.exec(l1))) {
+    const x = +m[1], s = m[2]==='p' ? 1 : 0;
+    const m2 = /^Tile\d+[pn](\d+)_\d+$/.exec(l2); if (!m2) return null;
+    const m3 = /^cell_(\d+)$/.exec(l3);            if (!m3) return null;
+    return _tileKey(x, s, +m2[1], +m3[1]);
+  }
+  // LAr EM — EM{X}_{samp}_{R}_{Z}_{W} → EM{X}_{samp}_{R}_{Z}_{eta}_{eta} → cell[2]_{phi}
+  if ((m = /^EM(Barrel|EndCap)_(\d+)_(\d+)_([pn])_\d+$/.exec(l1))) {
+    const ab = m[1]==='Barrel' ? 1 : +m[3], sa = +m[2], R = +m[3], z = m[4]==='p' ? 1 : 0;
+    const m2 = /^EM(?:Barrel|EndCap)_\d+_\d+_[pn]_(\d+)_\d+$/.exec(l2); if (!m2) return null;
+    const m3 = /^cell(2?)_(\d+)$/.exec(l3);                               if (!m3) return null;
+    return _larEmKey(ab, sa, R, z, +m2[1], +m3[2], m3[1]==='2' ? 1 : 0);
+  }
+  // HEC — HEC_{name}_{region}_{Z}_0 → HEC_{name}_{region}_{Z}_{cum}_{cum} → cell_{phi}
+  if ((m = /^HEC_(\w+)_(\d+)_([pn])_0$/.exec(l1))) {
+    const g = HEC_NAMES.indexOf(m[1]); if (g < 0) return null;
+    const m2 = /^HEC_\w+_\d+_[pn]_(\d+)_\d+$/.exec(l2); if (!m2) return null;
+    const m3 = /^cell_(\d+)$/.exec(l3);                   if (!m3) return null;
+    return _hecKey(g, +m[2], m[3]==='p' ? 1 : 0, +m2[1], +m3[1]);
+  }
+  return null;
+}
 let tileMaxMev = 1, tileMinMev = 0;
 let larMaxMev  = 1, larMinMev  = 0;
 let hecMaxMev  = 1, hecMinMev  = 0;
@@ -307,19 +349,35 @@ let _readyFired  = false;
 // ── Loading screen helpers ─────────────────────────────────────────────────────
 const _loadBar = document.getElementById('loading-bar');
 const _loadMsg = document.getElementById('loading-msg');
+
+// RAF loop: eases _barCurrent toward _barTarget, plus an asymptotic creep so
+// the bar is never truly frozen during the GLB parse phase.
+// Creep ceiling: 79% — success callback jumps to 100%.
+let _barTarget  = 0;
+let _barCurrent = 0;
+let _barRafId   = null;
+function _barTick() {
+  // Asymptotic creep toward 79% (visible during parse phase, never freezes)
+  if (_barTarget < 79) {
+    _barTarget += (79 - _barTarget) * 0.003;
+  }
+  const gap = _barTarget - _barCurrent;
+  _barCurrent += gap > 0.05 ? gap * 0.1 : gap;
+  if (_loadBar) _loadBar.style.width = _barCurrent.toFixed(2) + '%';
+  _barRafId = requestAnimationFrame(_barTick);
+}
+_barRafId = requestAnimationFrame(_barTick);
+
 function setLoadProgress(pct, msg) {
-  if (_loadBar) _loadBar.style.width = Math.round(pct) + '%';
+  _barTarget = Math.max(_barTarget, Math.min(100, pct));
   if (_loadMsg && msg) _loadMsg.textContent = msg;
 }
-const _loadState = { wasm: 0, glb: 0 };
-function updateLoadProgress(msg) {
-  // Weighted: WASM 25%, geometry 75% (geometry is the largest asset)
-  const pct = _loadState.wasm * 0.25 + _loadState.glb * 0.75;
-  setLoadProgress(pct, msg);
-}
+
 function dismissLoadingScreen() {
   const overlay = document.getElementById('loading-overlay');
   if (!overlay) return;
+  cancelAnimationFrame(_barRafId); _barRafId = null;
+  if (_loadBar) _loadBar.style.width = '100%';
   overlay.classList.add('done');
   setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 750);
 }
@@ -618,7 +676,6 @@ function checkReady() {
   setStatus(t('status-ready'));
   if (!_readyFired) {
     _readyFired = true;
-    _loadState.wasm = 100; _loadState.glb = 100;
     setLoadProgress(100, 'Ready');
     // Enable ghost frame and beam axis on startup
     toggleAllGhosts();
@@ -634,55 +691,69 @@ function checkReady() {
 }
 
 // ── GLB loader ────────────────────────────────────────────────────────────────
-updateLoadProgress('Loading geometry…');
-new GLTFLoader().load(
-  './geometry_data/CaloGeometry.glb',
-  ({ scene: g }) => {
-    // Flatten: move all meshes directly under the root scene for fewer traversals
-    const meshes = [];
-    g.traverse(o => { if (o.isMesh) meshes.push(o); });
-    for (const m of meshes) {
-      m.updateWorldMatrix(true, false);
-      m.matrix.copy(m.matrixWorld);
-      m.matrixAutoUpdate = false;
-      m.frustumCulled = false;  // all cells inside camera bounds always
-      m.visible = false;
-      meshByName.set(m.name, m);
-      origMat.set(m.name, m.material);
-      scene.add(m);
-    }
-    sceneOk = true; dirty = true;
-    _loadState.glb = 100;
-    updateLoadProgress('Geometry loaded');
-    addLog(t('log-glb-loaded'), 'ok');
-    checkReady();
-  },
-  x => {
-    if (x.total) {
-      _loadState.glb = (x.loaded / x.total) * 100;
-    } else {
-      // Estimate when Content-Length unavailable: smooth ramp up to 90%
-      _loadState.glb = Math.min(90, _loadState.glb + 3);
-    }
-    updateLoadProgress(`Loading geometry… ${Math.round(_loadState.glb)}%`);
-    setStatus(`Loading geometry: ${Math.round(_loadState.glb)}%`);
-  },
-  () => {
-    setStatus('<span class="warn">CaloGeometry.glb not found.</span>');
+// Fetches CaloGeometry.glb.gz, stream-decompresses via DecompressionStream (native
+// browser API, no extra library), then parses with GLTFLoader.parse().
+// Progress tracks the compressed download bytes → 0–40% of the loading bar.
+setLoadProgress(0, 'Downloading geometry…');
+(async () => {
+  let buffer;
+  try {
+    const res = await fetch('./geometry_data/CaloGeometry.glb.gz');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const total  = parseInt(res.headers.get('Content-Length') || '0', 10);
+    let   loaded = 0;
+    // TransformStream counts compressed bytes for the progress bar,
+    // then DecompressionStream inflates the gzip payload on the fly.
+    const counter = new TransformStream({ transform(chunk, ctrl) {
+      loaded += chunk.byteLength;
+      if (total) {
+        const pct = loaded / total;
+        setLoadProgress(pct * 40, `Downloading geometry… ${Math.round(pct * 100)}%`);
+        setStatus(`Downloading geometry: ${Math.round(pct * 100)}%`);
+      }
+      ctrl.enqueue(chunk);
+    }});
+    buffer = await new Response(
+      res.body.pipeThrough(counter).pipeThrough(new DecompressionStream('gzip'))
+    ).arrayBuffer();
+  } catch (e) {
+    setStatus('<span class="warn">CaloGeometry.glb.gz not found.</span>');
     addLog(t('log-glb-notfound'), 'warn');
-    _loadState.glb = 100;
-    updateLoadProgress('Geometry skipped');
+    setLoadProgress(100, 'Geometry skipped');
     sceneOk = true; checkReady();
+    return;
   }
-);
+  new GLTFLoader().parse(
+    buffer, './',
+    ({ scene: g }) => {
+      // Add the GLB root as a single scene child instead of N individual scene.add(mesh) calls.
+      scene.add(g);
+      g.traverse(o => {
+        if (!o.isMesh) return;
+        o.matrixAutoUpdate = false;
+        o.frustumCulled = false;  // all cells inside camera bounds always
+        o.visible = false;
+        meshByName.set(o.name, o);
+        const mkey = meshNameToKey(o.name);
+        if (mkey !== null) meshByKey.set(mkey, o);
+        origMat.set(o.name, o.material);
+      });
+      sceneOk = true; dirty = true;
+      setLoadProgress(100, 'Geometry loaded');
+      addLog(t('log-glb-loaded'), 'ok');
+      checkReady();
+    },
+    e => {
+      setStatus(`<span class="warn">GLB parse error: ${esc(e.message)}</span>`);
+      addLog('GLB parse error: ' + e.message, 'err');
+    }
+  );
+})();
 
 // ── WASM ──────────────────────────────────────────────────────────────────────
-updateLoadProgress('Loading WASM parser…');
 wasmInit()
   .then(() => {
     wasmOk = true;
-    _loadState.wasm = 100;
-    updateLoadProgress('WASM parser ready');
     addLog(t('log-wasm-ready'), 'ok');
     checkReady();
   })
@@ -691,31 +762,7 @@ wasmInit()
     addLog(t('log-wasm-error') + e.message, 'err');
   });
 
-// ── TileCal ID → cell name ────────────────────────────────────────────────────
-function compX(sec, samp, tow) {
-  if (sec < 3) {
-    if (samp === 0) return sec === 1 ?  1 :  5;
-    if (samp === 1) return sec === 1 ? 23 :  6;
-    if (samp === 2) return sec === 1 ?  4 :  7;
-  } else {
-    if (tow ===  8) return  8; if (tow ===  9) return  9;
-    if (tow === 10) return 10; if (tow === 11) return 11;
-    if (tow === 13) return 12; if (tow === 15) return 13;
-  }
-  return null;
-}
-function compK(tow, samp, x) {
-  if (tow < 8) return samp === 2 ? Math.floor(tow/2) : tow;
-  if (tow ===  8) { return (x===0||x===1) ? 8 : 0; }
-  if (tow ===  9) { if (x===1) return 9; if (x===9) return 0; return null; }
-  if (tow === 10) return 0;
-  if (tow === 11) { if (x===11||x===5) return 0; if (x===6) return 1; return null; }
-  if (tow === 12) { if (x===5) return 1; if (x===6) return 2; if (x===7) return 1; return null; }
-  if (tow === 13) { if (x===12) return 0; if (x===5) return 2; if (x===6) return 3; return null; }
-  if (tow === 14) { if (x===5) return 3; if (x===6) return 4; return null; }
-  if (tow === 15) { if (x===13) return 0; if (x===5) return 4; return null; }
-  return null;
-}
+// ── TileCal cell display label ────────────────────────────────────────────────
 function cellLabel(x, k) {
   switch (x) {
     case  1: return `A${k+1}`;  case 23: return `BC${k+1}`;
@@ -728,25 +775,9 @@ function cellLabel(x, k) {
   }
 }
 
-// ── HEC ID → mesh path ────────────────────────────────────────────────────────
-// sampling 0→HEC1(inner10), 1→HEC23(inner10), 2→HEC45(inner9), 3→HEC67(inner8)
-// cumulative eta = (region===0) ? eta : innerBins + eta
-// subgroup B: HEC1 → B=cum;  HEC23/45/67 → B=max(0, cum-1)
-const HEC_GROUPS_MAP = [
-  { name: '1',  innerBins: 10 },
-  { name: '23', innerBins: 10 },
-  { name: '45', innerBins: 9  },
-  { name: '67', innerBins: 8  },
-];
-function hecMeshPath(be, sampling, region, eta, phi) {
-  const g = HEC_GROUPS_MAP[sampling];
-  if (!g) return null;
-  const Z   = be > 0 ? 'p' : 'n';
-  const cum = region === 0 ? eta : g.innerBins + eta;
-  const B   = cum;
-  const path = `Calorimeter\u2192HEC_${g.name}_${region}_${Z}_0\u2192HEC_${g.name}_${region}_${Z}_${cum}_${B}\u2192cell_${phi}`;
-  return meshByName.has(path) ? path : null;
-}
+// ── HEC group name/innerBins — used for physLarHecEta reconstruction ──────────
+const HEC_NAMES  = ['1', '23', '45', '67'];
+const HEC_INNER  = [10, 10, 9, 8];
 
 // ── Physical η / φ coordinate helpers ────────────────────────────────────────
 // Mirror the formulas from parser/src/lib.rs so the tooltip shows real values.
@@ -930,35 +961,12 @@ function parseTracks(doc) {
   return tracks;
 }
 
-// ── MBTS label → mesh path ────────────────────────────────────────────────────
-// label format: type_{±1}_ch_{0|1}_mod_{0-7}
-// type=+1→p, type=-1→n; ch=0→Tile14, ch=1→Tile15; mod→cell index
-function mbtsMeshPath(label) {
-  const m = /^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
-  if (!m) return null;
-  const side    = m[1] === '1' ? 'p' : 'n';
-  const tileNum = m[2] === '0' ? 14 : 15;
-  const mod     = m[3];
-  const path    = `Calorimeter\u2192Tile${tileNum}${side}_0\u2192Tile${tileNum}${side}0_0\u2192cell_${mod}`;
-  return meshByName.has(path) ? path : null;
-}
 
-// ── LAr EM ID → mesh path (tries cell_ then cell2_ as fallback) ───────────────
-function larMeshPath(bec, samp, region, eta, phi) {
-  const X      = (bec === -1 || bec === 1) ? 'Barrel' : 'EndCap';
-  const W      = X === 'Barrel' ? 0 : 1;
-  const Z      = bec > 0 ? 'p' : 'n';
-  const R      = X === 'EndCap' ? Math.abs(bec) : region;
-  const prefix = `Calorimeter\u2192EM${X}_${samp}_${R}_${Z}_${W}\u2192EM${X}_${samp}_${R}_${Z}_${eta}_${eta}\u2192`;
-  if (meshByName.has(prefix + `cell_${phi}`))  return prefix + `cell_${phi}`;
-  if (meshByName.has(prefix + `cell2_${phi}`)) return prefix + `cell2_${phi}`;
-  return null;
-}
 
 // ── Track rendering ───────────────────────────────────────────────────────────
-let thrTrackGev   = 0;
+let thrTrackGev   = 2;
 let trackPtMinGev = 0;
-let trackPtMaxGev = 1;
+let trackPtMaxGev = 5;
 
 const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffea00, depthWrite: false });
 
@@ -1005,8 +1013,7 @@ function resetScene() {
 }
 function applyThreshold() {
   rayTargets = [];
-  for (const [name, { energyMev, det }] of active) {
-    const mesh = meshByName.get(name); if (!mesh) continue;
+  for (const [mesh, { energyMev, det }] of active) {
     const thr   = det === 'LAR' ? thrLArMev  : det === 'HEC' ? thrHecMev : thrTileMev;
     const detOn = det === 'LAR' ? showLAr    : det === 'HEC' ? showHec   : showTile;
     const vis = detOn && (!isFinite(thr) || energyMev >= thr);
@@ -1040,12 +1047,10 @@ function processXml(xmlText) {
   try {
     const raw = parseTracks(doc);
     if (raw.length) {
-      let mn = Infinity, mx = -Infinity;
-      for (const { ptGev } of raw) { if (ptGev < mn) mn = ptGev; if (ptGev > mx) mx = ptGev; }
-      trackPtMinGev = mn === Infinity  ? 0 : mn;
-      trackPtMaxGev = mx === -Infinity ? 1 : mx;
-      thrTrackGev   = trackPtMinGev;
-      trackPtSlider.update(trackPtMinGev, trackPtMaxGev);
+      trackPtMinGev = 0;
+      trackPtMaxGev = 5;
+      thrTrackGev   = 2;
+      trackPtSlider.update(0, 5);
     }
     drawTracks(raw);
   } catch (e) { console.warn('Track parse error', e); }
@@ -1078,99 +1083,93 @@ function processXml(xmlText) {
 
   // ── TileCal cells ─────────────────────────────────────────────────────────
   for (let i = 0; i < tileCells.length; i++) {
-    const base = i * 6;
+    const base = i * 8;
     if (tilePacked[base] !== SUBSYS_TILE) { nSkip++; continue; }
-    const section  = tilePacked[base + 1];
-    const side     = tilePacked[base + 2];
-    const module   = tilePacked[base + 3];
-    const tower    = tilePacked[base + 4];
-    const sampling = tilePacked[base + 5];
+    const x       = tilePacked[base + 1];
+    const k       = tilePacked[base + 2];
+    const side    = tilePacked[base + 3];
+    const module  = tilePacked[base + 4];
+    const section = tilePacked[base + 5];
+    const tower   = tilePacked[base + 6];
+    const sampling= tilePacked[base + 7];
     const { id, energy } = tileCells[i];
     const eMev = energy * 1000;
-    const x = compX(section, sampling, tower); if (x === null) { console.warn(`[TILE] id=${id} | compX failed | section=${section} sampling=${sampling} tower=${tower}`); nMiss++; continue; }
-    const k = compK(tower, sampling, x);       if (k === null) { console.warn(`[TILE] id=${id} | compK failed | tower=${tower} sampling=${sampling} x=${x}`);             nMiss++; continue; }
-    const y    = side < 0 ? 'n' : 'p';
-    const path = `Calorimeter\u2192Tile${x}${y}_0\u2192Tile${x}${y}${k}_${k}\u2192cell_${module}`;
-    const mesh = meshByName.get(path);
-    if (!mesh) { console.warn(`[TILE] id=${id} | ${path}`); nMiss++; continue; }
+    const s_bit = side < 0 ? 0 : 1;
+    const mesh  = meshByKey.get(_tileKey(x, s_bit, k, module));
+    if (!mesh) { console.warn(`[TILE] id=${id} | Tile${x}${s_bit?'p':'n'} k=${k} mod=${module}`); nMiss++; continue; }
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
     const tEta = physTileEta(section, side, tower, sampling);
     const tPhi = physTilePhi(module);
-    active.set(path, { energyGev: energy, energyMev: eMev, cellName: cellLabel(x, k), coords: `η = ${tEta.toFixed(3)}   φ = ${tPhi.toFixed(3)} rad`, det: 'TILE' });
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: cellLabel(x, k), coords: `η = ${tEta.toFixed(3)}   φ = ${tPhi.toFixed(3)} rad`, det: 'TILE' });
     nTile++;
   }
 
   // ── LAr EM cells ──────────────────────────────────────────────────────────
   for (let i = 0; i < larCells.length; i++) {
-    const base = i * 6;
+    const base    = i * 8;
     if (larPacked[base] !== SUBSYS_LAR_EM) { nSkip++; continue; }
-    const bec      = larPacked[base + 1];
-    const sampling = larPacked[base + 2];
-    const region   = larPacked[base + 3];
-    const eta      = larPacked[base + 4];
-    const phi      = larPacked[base + 5];
+    const abs_be  = larPacked[base + 1];
+    const sampling= larPacked[base + 2];
+    const region  = larPacked[base + 3];
+    const z_pos   = larPacked[base + 4];
+    const R       = larPacked[base + 5];
+    const eta     = larPacked[base + 6];
+    const phi     = larPacked[base + 7];
     const { id, energy } = larCells[i];
     const eMev = energy * 1000;
-    const path = larMeshPath(bec, sampling, region, eta, phi);
-    if (!path) {
-      const X = (bec === -1 || bec === 1) ? 'Barrel' : 'EndCap';
-      const W = X === 'Barrel' ? 0 : 1;
-      const Z = bec > 0 ? 'p' : 'n';
-      const R = X === 'EndCap' ? Math.abs(bec) : region;
-      console.warn(`[LAr EM] id=${id} | Calorimeter\u2192EM${X}_${sampling}_${R}_${Z}_${W}\u2192EM${X}_${sampling}_${R}_${Z}_${eta}_${eta}\u2192cell_${phi}`);
+    let mesh = meshByKey.get(_larEmKey(abs_be, sampling, R, z_pos, eta, phi, 0));
+    if (!mesh) mesh = meshByKey.get(_larEmKey(abs_be, sampling, R, z_pos, eta, phi, 1));
+    if (!mesh) {
+      console.warn(`[LAr EM] id=${id} | abs_be=${abs_be} samp=${sampling} R=${R} z=${z_pos} η=${eta} φ=${phi}`);
       nMiss++; continue;
     }
-    const mesh = meshByName.get(path);
-    if (!mesh) { console.warn(`[LAr EM] id=${id} | ${path}`); nMiss++; continue; }
     mesh.material = palMatLAr(eMev); mesh.visible = true; mesh.renderOrder = 2;
-    const rName = Math.abs(bec) === 1 ? `EMB${sampling}` : Math.abs(bec) === 2 ? `EMEC${sampling}` : `EMEC${sampling} (inner)`;
-    const lEta = physLarEmEta(bec, sampling, region, eta);
-    const lPhi = physLarEmPhi(bec, sampling, region, phi);
-    active.set(path, { energyGev: energy, energyMev: eMev, cellName: rName, coords: `η = ${lEta.toFixed(3)}   φ = ${lPhi.toFixed(3)} rad`, det: 'LAR' });
+    const rName = abs_be === 1 ? `EMB${sampling}` : abs_be === 2 ? `EMEC${sampling}` : `EMEC${sampling} (inner)`;
+    const bec   = abs_be * (z_pos ? 1 : -1);
+    const lEta  = physLarEmEta(bec, sampling, region, eta);
+    const lPhi  = physLarEmPhi(bec, sampling, region, phi);
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: rName, coords: `η = ${lEta.toFixed(3)}   φ = ${lPhi.toFixed(3)} rad`, det: 'LAR' });
     nLAr++;
   }
 
   // ── LAr HEC cells ─────────────────────────────────────────────────────────
   for (let i = 0; i < hecCells.length; i++) {
-    const base = i * 6;
+    const base     = i * 8;
     if (hecPacked[base] !== SUBSYS_LAR_HEC) { nSkip++; continue; }
-    const be       = hecPacked[base + 1];
-    const sampling = hecPacked[base + 2];
-    const region   = hecPacked[base + 3];
-    const eta      = hecPacked[base + 4];
+    const group    = hecPacked[base + 1];
+    const region   = hecPacked[base + 2];
+    const z_pos    = hecPacked[base + 3];
+    const cum_eta  = hecPacked[base + 4];
     const phi      = hecPacked[base + 5];
     const { id, energy } = hecCells[i];
     const eMev = energy * 1000;
-    const path = hecMeshPath(be, sampling, region, eta, phi);
-    if (!path) {
-      const g = HEC_GROUPS_MAP[sampling];
-      const Z = be > 0 ? 'p' : 'n';
-      const cum = region === 0 ? eta : (g ? g.innerBins + eta : eta);
-      console.warn(g ? `[HEC] id=${id} | Calorimeter\u2192HEC_${g.name}_${region}_${Z}_0\u2192HEC_${g.name}_${region}_${Z}_${cum}_${cum}\u2192cell_${phi}` : `[HEC] id=${id} | sampling=${sampling} (no group)`);
+    const mesh = meshByKey.get(_hecKey(group, region, z_pos, cum_eta, phi));
+    if (!mesh) {
+      console.warn(`[HEC] id=${id} | group=${group} region=${region} z=${z_pos} cumη=${cum_eta} φ=${phi}`);
       nHecMiss++; continue;
     }
-    const mesh = meshByName.get(path);
-    if (!mesh) { console.warn(`[HEC] id=${id} | ${path}`); nHecMiss++; continue; }
     mesh.material = palMatHec(eMev); mesh.visible = true; mesh.renderOrder = 2;
-    const hLabel = `HEC${sampling + 1}`;
-    const hEta = physLarHecEta(be, sampling, region, eta);
-    const hPhi = physLarHecPhi(region, phi);
-    active.set(path, { energyGev: energy, energyMev: eMev, cellName: hLabel, coords: `η = ${hEta.toFixed(3)}   φ = ${hPhi.toFixed(3)} rad`, det: 'HEC' });
+    const be      = z_pos ? 2 : -2;
+    const eta_idx = region === 0 ? cum_eta : cum_eta - HEC_INNER[group];
+    const hLabel  = `HEC${group + 1}`;
+    const hEta    = physLarHecEta(be, group, region, eta_idx);
+    const hPhi    = physLarHecPhi(region, phi);
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: hLabel, coords: `η = ${hEta.toFixed(3)}   φ = ${hPhi.toFixed(3)} rad`, det: 'HEC' });
     nHec++;
   }
 
-  // ── MBTS cells (direct label→path, no WASM needed) ────────────────────────
+  // ── MBTS cells (direct label→key, no WASM needed) ────────────────────────
   for (let i = 0; i < mbtsCells.length; i++) {
     const { label, energy } = mbtsCells[i];
     const eMev = energy * 1000;
-    const path = mbtsMeshPath(label);
-    if (!path) { console.warn(`[MBTS] label=${label} | no mesh`); nMbtsMiss++; continue; }
-    const mesh = meshByName.get(path);
-    if (!mesh) { console.warn(`[MBTS] label=${label} | ${path}`); nMbtsMiss++; continue; }
+    const _m = /^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
+    if (!_m) { console.warn(`[MBTS] label=${label} | bad format`); nMbtsMiss++; continue; }
+    const tileNum = _m[2]==='0' ? 14 : 15, s_bit = _m[1]==='1' ? 1 : 0, mod = +_m[3];
+    const mesh = meshByKey.get(_tileKey(tileNum, s_bit, 0, mod));
+    if (!mesh) { console.warn(`[MBTS] label=${label} | no mesh`); nMbtsMiss++; continue; }
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
-    const _mbts = /^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
-    const mbtsCoords = _mbts ? `η = ${((_mbts[1]==='1'?1:-1)*(_mbts[2]==='0'?2.76:3.84)).toFixed(3)}   φ = ${_wrapPhi(2*Math.PI/16+parseInt(_mbts[3])*2*Math.PI/8).toFixed(3)} rad` : '';
-    active.set(path, { energyGev: energy, energyMev: eMev, cellName: 'MBTS', coords: mbtsCoords, det: 'TILE' });
+    const mbtsCoords = `η = ${((s_bit?1:-1)*(_m[2]==='0'?2.76:3.84)).toFixed(3)}   φ = ${_wrapPhi(2*Math.PI/16+mod*2*Math.PI/8).toFixed(3)} rad`;
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: 'MBTS', coords: mbtsCoords, det: 'TILE' });
     nMbts++;
   }
 
@@ -1345,7 +1344,7 @@ function makeTrackPtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
   function update(minGev, maxGev) {
     trackPtMinGev = minGev;
     trackPtMaxGev = maxGev;
-    thrTrackGev   = minGev; // reset to show all on new event
+    thrTrackGev   = 2; // fixed initial threshold
     if (maxLblEl) maxLblEl.textContent = fmtGev(maxGev);
     if (minLblEl) minLblEl.textContent = fmtGev(minGev);
     updateUI();
@@ -1507,7 +1506,7 @@ function doRaycast(clientX, clientY) {
   raycast.setFromCamera(mxy, camera);
   const hits = raycast.intersectObjects(rayTargets, false);
   if (hits.length) {
-    const data = active.get(hits[0].object.name);
+    const data = active.get(hits[0].object);
     if (data) {
       showOutline(hits[0].object);
       document.getElementById('tip-cell').textContent  = data.cellName;

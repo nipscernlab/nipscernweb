@@ -875,8 +875,19 @@
     .loading-bar-fill {
       height: 100%; width: 0%; border-radius: 2px;
       background: linear-gradient(90deg, var(--accent) 0%, #4a9eff 100%);
-      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 0 8px rgba(36, 103, 224, 0.6);
+      position: relative; overflow: hidden;
+    }
+    .loading-bar-fill::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.22) 50%, transparent 100%);
+      animation: bar-shimmer 1.6s ease-in-out infinite;
+      transform: translateX(-100%);
+    }
+    @keyframes bar-shimmer {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
     }
     .loading-msg {
       font: 400 .60rem var(--mono); color: var(--muted);

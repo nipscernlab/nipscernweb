@@ -524,10 +524,22 @@
 })();
 </script>
 
-  <!-- CGV Full ATLAS Scene (Three.js + GLB + WASM) -->
+  <!-- CGV Full ATLAS Scene — lazy-init when section scrolls near viewport -->
   <script type="module">
-    import { initATLASScene } from './assets/js/cgv-preview.js';
-    document.addEventListener('DOMContentLoaded', () => initATLASScene('cgv-canvas-wrapper'));
+    const startScene = () => {
+      if (window.__atlasSceneStarted) return;
+      window.__atlasSceneStarted = true;
+      import('./assets/js/cgv-preview.js').then(m => m.initATLASScene('cgv-canvas-wrapper'));
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+      const wrap = document.getElementById('cgv-canvas-wrapper');
+      if (!wrap) return;
+      if (!('IntersectionObserver' in window)) { startScene(); return; }
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) if (e.isIntersecting) { startScene(); io.disconnect(); break; }
+      }, { rootMargin: '400px 0px' });
+      io.observe(wrap);
+    });
   </script>
 
   <!-- Starry sky -->
