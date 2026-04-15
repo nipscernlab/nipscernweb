@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NIPSCERN · Bake scene_data.bin</title>
+<style>
+  body { font-family: system-ui, sans-serif; background:#111; color:#eee; padding:24px; }
+  pre  { background:#000; padding:12px; white-space:pre-wrap; max-height:60vh; overflow:auto; border:1px solid #333; }
+  button { padding:10px 18px; font-size:14px; cursor:pointer; }
+  button:disabled { opacity:0.5; cursor:not-allowed; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+  <h1>Bake scene_data.bin</h1>
+  <p>Este utilitário roda uma vez no navegador. Ele carrega <code>CaloGeometry.glb</code>,
+     <code>JiveXML_*.xml</code> e o WASM parser, aplica os thresholds,
+     assa (<i>bake</i>) os mesh/edges/ghosts/tracks em um único binário compacto e
+     faz download de <code>scene_data.bin</code>.</p>
+  <p>Depois disso, coloque <code>scene_data.bin</code> na pasta <code>nipscern/</code> e você
+     pode excluir com segurança: <code>CaloGeometry.glb</code>, o XML, <code>atlas_id_parser.js</code> e <code>atlas_id_parser_bg.wasm</code>.</p>
+  <button id="go">Start bake</button>
+  <pre id="log"></pre>
+  <script type="module" src="bake.js"></script>
+</body>
+</html>

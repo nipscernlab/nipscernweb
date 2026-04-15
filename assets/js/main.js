@@ -49,7 +49,7 @@ const FLAG_SVGS = {
 </svg>`,
 };
 
-const atomIcon = `<i class="ph ph-atom nav-logo-atom" aria-hidden="true"></i>`;
+const atomIcon = `<span class="nav-logo-atom" aria-hidden="true"></span>`;
 
 function buildNav() {
   const path = window.location.pathname;
