@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -66,7 +66,8 @@
 
           <select id="pub-filter-type" class="select-filter" aria-label="Filter by type" data-i18n-aria="publications.filter_type">
             <option value="" data-i18n="publications.filter_all">All types</option>
-            <option value="article" data-i18n="publications.types.article">Journal Article</option>
+            <option value="journal" data-i18n="publications.types.journal">Journal Article</option>
+            <option value="revista" data-i18n="publications.types.revista">Conference / Revista</option>
             <option value="conference" data-i18n="publications.types.conference">Conference</option>
             <option value="tcc" data-i18n="publications.types.tcc">Undergraduate Thesis</option>
             <option value="dissertation" data-i18n="publications.types.dissertation">Dissertation</option>
@@ -75,6 +76,11 @@
           <select id="pub-filter-year" class="select-filter" aria-label="Filter by year" data-i18n-aria="publications.filter_year">
             <option value="" data-i18n="publications.all_years">All years</option>
           </select>
+        </div>
+
+        <!-- Result count -->
+        <div class="pub-result-bar fade-up">
+          <span id="pub-result-count" class="pub-result-count"></span>
         </div>
 
         <!-- Publication list -->
