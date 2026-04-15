@@ -147,25 +147,25 @@
         <div class="infra-grid fade-up">
           <div class="infra-card">
             <div class="infra-image">
-              <img src="assets/lab/cern/Teste_de_PMTs.jpg" alt="PMT testing setup at CERN" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+              <img src="assets/lab/cern/Teste_de_PMTs.jpg" alt="PMT testing setup at CERN" loading="lazy" class="lightbox-trigger" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.workstations">PMT testing setup</div>
           </div>
           <div class="infra-card">
             <div class="infra-image">
-              <img src="assets/lab/cern/Mother_Boards.jpg" alt="ATLAS TileCal mother boards" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+              <img src="assets/lab/cern/Mother_Boards.jpg" alt="ATLAS TileCal mother boards" loading="lazy" class="lightbox-trigger" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.server">ATLAS TileCal mother boards</div>
           </div>
           <div class="infra-card">
             <div class="infra-image">
-              <img src="assets/lab/cern/Detector_de_muons_com_simbolo_da_UFJF.jpg" alt="Muon detector featuring the UFJF logo" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+              <img src="assets/lab/cern/Detector_de_muons_com_simbolo_da_UFJF.jpg" alt="Muon detector featuring the UFJF logo" loading="lazy" class="lightbox-trigger" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.fpga">Muon detector featuring the UFJF logo</div>
           </div>
           <div class="infra-card">
             <div class="infra-image">
-              <img src="assets/lab/cern/Modulo_TileCal.jpg" alt="TileCal module at CERN" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+              <img src="assets/lab/cern/Modulo_TileCal.jpg" alt="TileCal module at CERN" loading="lazy" class="lightbox-trigger" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.lab">TileCal module at CERN</div>
           </div>
@@ -179,20 +179,23 @@
           </p>
         </div>
 
-        <!-- 360° Tour -->
-        <div class="fade-up" style="margin-top:var(--sp-8)">
+        <!-- 360° Tour (desktop/tablet only) -->
+        <div class="fade-up tour-360" style="margin-top:var(--sp-8)">
           <div style="margin-bottom:var(--sp-4)">
             <div class="heading-sm" data-i18n="about.infrastructure.tour_title">360° Lab Tour</div>
             <p class="body-sm" style="margin-top:var(--sp-2);max-width:520px" data-i18n="about.infrastructure.tour_subtitle">Explore our workspace at CERN in an interactive panoramic tour.</p>
           </div>
-          <div style="aspect-ratio:16/9;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border-subtle)">
+          <div class="tour-360__frame" style="aspect-ratio:16/9;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border-subtle)">
             <iframe src="https://my.matterport.com/show/?m=WS1wChijXcN" allow="autoplay; fullscreen; web-share; xr-spatial-tracking" allowfullscreen loading="lazy" style="width:100%;height:100%;border:0" title="NIPSCERN 360° Lab Tour at CERN"></iframe>
           </div>
         </div>
+        <style>
+          @media (max-width: 768px) { .tour-360 { display: none !important; } }
+        </style>
 
         <!-- Panoramic photo -->
         <figure class="fade-up" style="margin-top:var(--sp-8);border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border-subtle)">
-          <img src="assets/lab/cern/Panoramica.jpg" alt="Panoramic view of the UFJF laboratory at CERN" loading="lazy" style="width:100%;height:auto;display:block">
+          <img src="assets/lab/cern/Panoramica.jpg" alt="Panoramic view of the UFJF laboratory at CERN" loading="lazy" class="lightbox-trigger" style="width:100%;height:auto;display:block;cursor:zoom-in">
         </figure>
       </div>
     </section>
@@ -229,6 +232,43 @@
         </div>
       </div>
     </section>
+
+    <!-- Lightbox modal -->
+    <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+      <button class="lightbox__close" type="button" aria-label="Close">&times;</button>
+      <img class="lightbox__img" alt="">
+    </div>
+    <style>
+      .lightbox{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity 280ms ease,visibility 0s linear 280ms;padding:24px;cursor:zoom-out}
+      .lightbox.is-open{opacity:1;visibility:visible;transition:opacity 280ms ease}
+      .lightbox__img{max-width:min(1400px,96vw);max-height:92vh;width:auto;height:auto;object-fit:contain;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:scale(0.94);opacity:0;transition:transform 320ms cubic-bezier(.2,.8,.2,1),opacity 280ms ease}
+      .lightbox.is-open .lightbox__img{transform:scale(1);opacity:1}
+      .lightbox__close{position:absolute;top:18px;right:22px;background:rgba(255,255,255,0.12);color:#fff;border:0;width:44px;height:44px;border-radius:50%;font-size:28px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 200ms ease}
+      .lightbox__close:hover{background:rgba(255,255,255,0.24)}
+    </style>
+    <script>
+      (function(){
+        const lb = document.getElementById('lightbox');
+        const lbImg = lb.querySelector('.lightbox__img');
+        const lbClose = lb.querySelector('.lightbox__close');
+        function open(src, alt){
+          lbImg.src = src; lbImg.alt = alt || '';
+          lb.classList.add('is-open'); lb.setAttribute('aria-hidden','false');
+          document.body.style.overflow = 'hidden';
+        }
+        function close(){
+          lb.classList.remove('is-open'); lb.setAttribute('aria-hidden','true');
+          document.body.style.overflow = '';
+          setTimeout(()=>{ lbImg.src=''; }, 300);
+        }
+        document.addEventListener('click', (e)=>{
+          const t = e.target.closest('.lightbox-trigger');
+          if(t){ e.preventDefault(); open(t.currentSrc || t.src, t.alt); }
+        });
+        lb.addEventListener('click', (e)=>{ if(e.target === lb || e.target === lbClose) close(); });
+        document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && lb.classList.contains('is-open')) close(); });
+      })();
+    </script>
 
   </main>
 
