@@ -372,6 +372,7 @@
   <div id="det-tab-bar">
     <button class="det-tab on" id="tab-tile"  style="--tab-col:#c87c18">TILE</button>
     <button class="det-tab"    id="tab-lar"   style="--tab-col:#27b568">LAr</button>
+    <button class="det-tab"    id="tab-fcal"  style="--tab-col:#b87333">FCAL</button>
     <button class="det-tab"    id="tab-hec"   style="--tab-col:#66e0f6">HEC</button>
     <button class="det-tab"    id="tab-track" style="--tab-col:#ffea00">Track</button>
     <button class="det-tab mobile-only" id="tab-cluster" style="--tab-col:#ff4400">Cluster</button>
@@ -409,6 +410,24 @@
     <div class="sval">0 GeV</div>
     <div class="slbl" data-i18n="slbl-threshold">Threshold</div>
     <input id="lar-thr-input" class="thr-input" type="text"
+      autocomplete="off" spellcheck="false"
+      data-i18n-ph="thr-placeholder" placeholder="e.g. 200 MeV">
+  </div>
+
+  <!-- ── FCAL pane ──────────────────────────────────────── -->
+  <div class="det-pane" id="pane-fcal" style="display:none">
+    <div class="pane-det-row">
+      <span class="pane-det-dot" style="background:#b87333"></span>
+      <span class="pane-det-name">LAr FCAL</span>
+    </div>
+    <div class="sval">10.00 GeV</div>
+    <div class="strak" id="fcal-strak"
+      style="background:linear-gradient(to top,#e8a06a 0%,#3d1000 100%)">
+      <div class="sthumb" id="fcal-sthumb"></div>
+    </div>
+    <div class="sval">0 GeV</div>
+    <div class="slbl" data-i18n="slbl-threshold">Threshold</div>
+    <input id="fcal-thr-input" class="thr-input" type="text"
       autocomplete="off" spellcheck="false"
       data-i18n-ph="thr-placeholder" placeholder="e.g. 200 MeV">
   </div>
@@ -597,7 +616,7 @@
   </div>
 </div>
 
-<!-- ── Ghost panel — mirrors Detector Layers panel ─────── -->
+<!-- ── Ghost panel — per-envelope toggles ──────────────── -->
 <div id="ghost-panel">
   <div class="layers-head">
     <span class="layers-title">ATLAS Ghost</span>
@@ -609,28 +628,82 @@
   <div class="layer-row">
     <span class="layer-dot" style="background:#c87c18"></span>
     <div class="layer-info">
-      <div class="layer-name">TILE</div>
-      <div class="layer-sub">TileCal envelope &amp; φ lines</div>
+      <div class="layer-name">LB Tile</div>
+      <div class="layer-sub">Long barrel · Tile</div>
     </div>
-    <button class="gswitch" id="gtog-tile" role="switch" aria-checked="false"
+    <button class="gswitch" id="gtog-LBTile" role="switch" aria-checked="false"
       style="--gswitch-col:#c87c18"></button>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#9b8a30"></span>
+    <div class="layer-info">
+      <div class="layer-name">LB Tile·LAr</div>
+      <div class="layer-sub">Long barrel · Tile/LAr</div>
+    </div>
+    <button class="gswitch" id="gtog-LBTileLArg" role="switch" aria-checked="false"
+      style="--gswitch-col:#9b8a30"></button>
   </div>
   <div class="layer-row">
     <span class="layer-dot" style="background:#27b568"></span>
     <div class="layer-info">
-      <div class="layer-name">LAr</div>
-      <div class="layer-sub">EM calorimeter envelope</div>
+      <div class="layer-name">LB LAr</div>
+      <div class="layer-sub">Long barrel · LAr</div>
     </div>
-    <button class="gswitch" id="gtog-lar" role="switch" aria-checked="false"
+    <button class="gswitch" id="gtog-LBLArg" role="switch" aria-checked="false"
       style="--gswitch-col:#27b568"></button>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#c87c18"></span>
+    <div class="layer-info">
+      <div class="layer-name">EB Tile +</div>
+      <div class="layer-sub">Extended barrel + · Tile</div>
+    </div>
+    <button class="gswitch" id="gtog-EBTilep" role="switch" aria-checked="false"
+      style="--gswitch-col:#c87c18"></button>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#c87c18"></span>
+    <div class="layer-info">
+      <div class="layer-name">EB Tile −</div>
+      <div class="layer-sub">Extended barrel − · Tile</div>
+    </div>
+    <button class="gswitch" id="gtog-EBTilen" role="switch" aria-checked="false"
+      style="--gswitch-col:#c87c18"></button>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#a47042"></span>
+    <div class="layer-info">
+      <div class="layer-name">EB Tile·HEC +</div>
+      <div class="layer-sub">Ext. barrel + · Tile/HEC</div>
+    </div>
+    <button class="gswitch" id="gtog-EBTileHECp" role="switch" aria-checked="false"
+      style="--gswitch-col:#a47042"></button>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#a47042"></span>
+    <div class="layer-info">
+      <div class="layer-name">EB Tile·HEC −</div>
+      <div class="layer-sub">Ext. barrel − · Tile/HEC</div>
+    </div>
+    <button class="gswitch" id="gtog-EBTileHECn" role="switch" aria-checked="false"
+      style="--gswitch-col:#a47042"></button>
   </div>
   <div class="layer-row">
     <span class="layer-dot" style="background:#66e0f6"></span>
     <div class="layer-info">
-      <div class="layer-name">HEC</div>
-      <div class="layer-sub">Hadronic end-cap envelope</div>
+      <div class="layer-name">EB HEC +</div>
+      <div class="layer-sub">Extended barrel + · HEC</div>
     </div>
-    <button class="gswitch" id="gtog-hec" role="switch" aria-checked="false"
+    <button class="gswitch" id="gtog-EBHECp" role="switch" aria-checked="false"
+      style="--gswitch-col:#66e0f6"></button>
+  </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#66e0f6"></span>
+    <div class="layer-info">
+      <div class="layer-name">EB HEC −</div>
+      <div class="layer-sub">Extended barrel − · HEC</div>
+    </div>
+    <button class="gswitch" id="gtog-EBHECn" role="switch" aria-checked="false"
       style="--gswitch-col:#66e0f6"></button>
   </div>
 </div>
