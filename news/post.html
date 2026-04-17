@@ -7,7 +7,7 @@
   <meta name="description" id="page-desc" content="News post from NIPSCERN.">
 
   <meta property="og:type"  content="article">
-  <meta property="og:url"   id="og-url" content="https://nipscern.com/news/post.html">
+  <meta property="og:url"   id="og-url" content="https://nipscern.com/news/post">
   <meta property="og:title" id="og-title" content="News — NIPSCERN">
   <meta property="og:description" id="og-desc" content="News post from NIPSCERN.">
   <meta property="og:image" id="og-image" content="https://nipscern.com/assets/images/og-news.jpg">
@@ -32,7 +32,7 @@
     <header class="post-header" id="post-header" aria-labelledby="post-title" style="display:none">
       <div class="post-header-inner">
         <div class="post-meta">
-          <a href="index.html" class="btn btn-ghost btn-sm" data-i18n="news.back">
+          <a href="./" class="btn btn-ghost btn-sm" data-i18n="news.back">
             <i class="ph ph-arrow-left" aria-hidden="true"></i>
             Back to News
           </a>
@@ -49,7 +49,7 @@
       <i class="ph ph-file-x" style="font-size:60px;color:var(--text-muted);margin-bottom:var(--sp-6)" aria-hidden="true"></i>
       <h1 class="heading-lg" style="margin-bottom:var(--sp-4)">Post not found</h1>
       <p class="body-base" style="margin-bottom:var(--sp-8)">The news post you are looking for does not exist or has been removed.</p>
-      <a href="index.html" class="btn btn-primary" data-i18n="news.back">
+      <a href="./" class="btn btn-primary" data-i18n="news.back">
         <i class="ph ph-arrow-left" aria-hidden="true"></i>
         Back to News
       </a>
@@ -78,7 +78,7 @@
     <!-- Post footer / share -->
     <div id="post-footer" style="display:none;border-top:1px solid var(--border-subtle);padding:var(--sp-8) var(--container-pad)">
       <div style="max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-4)">
-        <a href="index.html" class="btn btn-ghost" data-i18n="news.back">
+        <a href="./" class="btn btn-ghost" data-i18n="news.back">
           <i class="ph ph-arrow-left" aria-hidden="true"></i>
           Back to News
         </a>
@@ -155,7 +155,7 @@
       document.getElementById('page-desc').content = post.excerpt;
       document.getElementById('og-title').content = post.title;
       document.getElementById('og-desc').content = post.excerpt;
-      document.getElementById('og-url').content = 'https://nipscern.com/news/post.html?id=' + post.id;
+      document.getElementById('og-url').content = 'https://nipscern.com/news/post?id=' + post.id;
 
       // Render header
       const badge = document.getElementById('post-category-badge');
@@ -218,7 +218,7 @@
           const listEl = document.getElementById('post-related-list');
           relatedPosts.forEach(rp => {
             const a = document.createElement('a');
-            a.href = 'post.html?id=' + rp.id;
+            a.href = 'post?id=' + rp.id;
             a.style.cssText = 'display:flex;gap:var(--sp-3);align-items:center;padding:var(--sp-3) var(--sp-4);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-lg);text-decoration:none;transition:border-color 0.15s';
             a.onmouseover = () => { a.style.borderColor = 'var(--border-mid)'; };
             a.onmouseout  = () => { a.style.borderColor = 'var(--border-subtle)'; };
@@ -273,5 +273,6 @@
   </script>
 
   <script type="module" src="../assets/js/main.js"></script>
+  <script>(function(){var l=window.location,c=l.pathname.replace(/\/index\.html$/i,'/').replace(/\.html$/i,'');if(c!==l.pathname){try{history.replaceState(null,'',c+l.search+l.hash)}catch(e){}}window.goatcounter=window.goatcounter||{};window.goatcounter.path=function(p){return p.replace(/\/index\.html$/i,'/').replace(/\.html$/i,'')};var s=document.createElement('script');s.setAttribute('data-goatcounter','https://nipscern.goatcounter.com/count');s.async=true;s.src='https://gc.zgo.at/count.js';(document.head||document.documentElement).appendChild(s);})();</script>
 </body>
 </html>

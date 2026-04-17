@@ -73,7 +73,7 @@
               <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.65;margin-bottom:var(--sp-4)">
                 NIPSCERN is a research and development laboratory at UFJF, Brazil, working in collaboration with CERN on high energy physics and scientific computing.
               </p>
-              <a href="../about.html" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" data-i18n="nav.about">About Us</a>
+              <a href="../about" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" data-i18n="nav.about">About Us</a>
             </div>
           </aside>
 
@@ -131,7 +131,7 @@
 
       // Image section — wraps in <a> so clicking the image also navigates
       const imgDiv = document.createElement('a');
-      imgDiv.href = 'post.html?id=' + post.id;
+      imgDiv.href = 'post?id=' + post.id;
       imgDiv.className = 'news-card-image';
       imgDiv.tabIndex = -1;         // skip-tab: the Read more link already covers keyboard nav
       imgDiv.setAttribute('aria-hidden', 'true');
@@ -179,7 +179,7 @@
       excerpt.textContent = post.excerpt;
 
       const readMore = document.createElement('a');
-      readMore.href = 'post.html?id=' + post.id;
+      readMore.href = 'post?id=' + post.id;
       readMore.className = 'news-read-more';
       readMore.setAttribute('data-i18n', 'news.read_more');
       readMore.textContent = 'Read more ';
@@ -248,5 +248,6 @@
   </script>
 
   <script type="module" src="../assets/js/main.js"></script>
+  <script>(function(){var l=window.location,c=l.pathname.replace(/\/index\.html$/i,'/').replace(/\.html$/i,'');if(c!==l.pathname){try{history.replaceState(null,'',c+l.search+l.hash)}catch(e){}}window.goatcounter=window.goatcounter||{};window.goatcounter.path=function(p){return p.replace(/\/index\.html$/i,'/').replace(/\.html$/i,'')};var s=document.createElement('script');s.setAttribute('data-goatcounter','https://nipscern.goatcounter.com/count');s.async=true;s.src='https://gc.zgo.at/count.js';(document.head||document.documentElement).appendChild(s);})();</script>
 </body>
 </html>

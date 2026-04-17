@@ -10,12 +10,12 @@ import { initI18n, getLang, setLanguage } from './i18n.js';
 // ============================================================
 
 const NAV_LINKS = [
-  { key: 'nav.home',         href: 'index.html',         paths: ['/'] },
-  { key: 'nav.about',        href: 'about.html',         paths: ['/about.html'] },
-  { key: 'nav.cern',         href: 'cern.html',          paths: ['/cern.html'] },
-  { key: 'nav.projects',     href: 'projects/',          paths: ['/projects/', '/projects/index.html', '/projects/sapho.html', '/projects/yanc.html', '/projects/polaris.html', '/projects/aurora.html', '/projects/cgv.html'] },
-  { key: 'nav.publications', href: 'publications.html',  paths: ['/publications.html'] },
-  { key: 'nav.news',         href: 'news/',              paths: ['/news/', '/news/index.html', '/news/post.html'] },
+  { key: 'nav.home',         href: '',           paths: ['/'] },
+  { key: 'nav.about',        href: 'about',      paths: ['/about', '/about.html'] },
+  { key: 'nav.cern',         href: 'cern',       paths: ['/cern', '/cern.html'] },
+  { key: 'nav.projects',     href: 'projects/',  paths: ['/projects/', '/projects/index.html', '/projects', '/projects/sapho', '/projects/sapho.html', '/projects/yanc', '/projects/yanc.html', '/projects/polaris', '/projects/polaris.html', '/projects/aurora', '/projects/aurora.html', '/projects/cgv', '/projects/cgv.html'] },
+  { key: 'nav.publications', href: 'publications', paths: ['/publications', '/publications.html'] },
+  { key: 'nav.news',         href: 'news/',      paths: ['/news/', '/news/index.html', '/news', '/news/post', '/news/post.html'] },
 ];
 
 /**
@@ -58,7 +58,7 @@ function buildNav() {
   function isActivePath(link) {
     return link.paths.some(p => {
       if (p === '/') {
-        const segs = path.split('/').filter(s => s && s !== 'index.html');
+        const segs = path.split('/').filter(s => s && s !== 'index.html' && s !== 'index');
         return segs.length === 0;
       }
       return path.endsWith(p);
@@ -84,7 +84,7 @@ function buildNav() {
 
   return `
     <div class="nav-inner">
-      <a href="${ROOT}index.html" class="nav-logo" aria-label="NIPSCERN Home">
+      <a href="${ROOT}" class="nav-logo" aria-label="NIPSCERN Home">
         <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPSCERN Logo" class="nav-logo-mark">
         <span class="nav-logo-text">NIPS${atomIcon}CERN</span>
       </a>
@@ -106,7 +106,7 @@ function buildNav() {
     <!-- Mobile overlay -->
     <div class="nav-mobile" id="nav-mobile" role="dialog" aria-modal="true" aria-label="Navigation menu">
       <div class="nav-mobile-header">
-        <a href="${ROOT}index.html" class="nav-logo">
+        <a href="${ROOT}" class="nav-logo">
           <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPSCERN Logo" class="nav-logo-mark">
           <span class="nav-logo-text">NIPS${atomIcon}CERN</span>
         </a>
@@ -221,11 +221,11 @@ function buildFooter() {
       <p data-i18n="footer.copyright">© 2025 NIPSCERN — Federal University of Juiz de Fora. All rights reserved.</p>
       <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--text-xs);color:var(--text-muted)">
-          <a href="${ROOT}credits.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Credits</a>
+          <a href="${ROOT}credits" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Credits</a>
           <span aria-hidden="true">·</span>
-          <a href="${ROOT}terms.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Terms</a>
+          <a href="${ROOT}terms" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Terms</a>
           <span aria-hidden="true">·</span>
-          <a href="${ROOT}privacy.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Privacy</a>
+          <a href="${ROOT}privacy" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Privacy</a>
         </div>
         <div class="footer-social">
           <a href="https://github.com/nipscernlab" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitHub">
@@ -323,7 +323,7 @@ async function initHomeLatest() {
     }
 
     const link = document.createElement('a');
-    link.href = rootPath('news/index.html') + '#' + post.id;
+    link.href = rootPath('news/') + '#' + post.id;
     link.className = 'news-card';
     link.style.height = '100%';
     link.appendChild(imgDiv);
@@ -376,7 +376,7 @@ async function initHomeLatest() {
     const pub = pubData[0];
     const typeMap = { article: 'badge-blue', conference: 'badge-green', tcc: 'badge-amber', dissertation: 'badge-purple' };
     pubEl.innerHTML = `
-      <a href="${rootPath('publications.html')}" class="pub-card" style="height:100%;display:block;text-decoration:none">
+      <a href="${rootPath('publications')}" class="pub-card" style="height:100%;display:block;text-decoration:none">
         <div class="pub-card-body">
           <div class="pub-card-meta">
             <span class="badge ${typeMap[pub.type] || 'badge-gray'}" data-i18n="publications.types.${pub.type}">${pub.type}</span>

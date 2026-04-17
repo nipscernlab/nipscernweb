@@ -38,7 +38,7 @@ function renderCard(pub) {
     ? `<a href="https://doi.org/${pub.doi}" target="_blank" rel="noopener" class="text-brand" style="font-size:var(--text-xs);margin-top:4px;display:inline-block">${pub.doi}</a>`
     : '';
   const pdfViewerUrl = pub.pdf
-    ? 'pdf-viewer.html?src=' + encodeURIComponent(pub.pdf)
+    ? '/pdf-viewer?src=' + encodeURIComponent(pub.pdf)
       + '&title=' + encodeURIComponent(pub.title)
       + '&authors=' + encodeURIComponent(pub.authors.join('; '))
       + '&journal=' + encodeURIComponent(pub.journal)
