@@ -7,13 +7,13 @@
   <meta name="description" content="CGV-WEB renders CERN ATLAS calorimeter events in 3D in the browser. Built on Rust/WebAssembly and Three.js. Being integrated into the ATLAS Control Room at CERN.">
 
   <meta property="og:type"  content="website">
-  <meta property="og:url"   content="https://nipscern.com/projects/cgv.html">
+  <meta property="og:url"   content="https://nipscern.com/projects/cgv">
   <meta property="og:title" content="CGV-WEB — Calorimeter Geometry Viewer Web | NIPSCERN">
   <meta property="og:description" content="3D calorimeter event visualisation for the ATLAS experiment — being integrated into the ATLAS Control Room at CERN.">
   <meta property="og:image" content="https://nipscern.com/assets/images/projects/cgv.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="https://nipscern.com/projects/cgv.html">
+  <link rel="canonical" href="https://nipscern.com/projects/cgv">
 
   <!-- Three.js importmap -->
   <script type="importmap">
@@ -153,7 +153,7 @@
             CGV-WEB renders CERN ATLAS calorimeter collision events in real-time 3D, colour-coding each detector cell by energy deposit. Built on <strong>Rust/WebAssembly</strong>, <strong>Three.js</strong>, and backed by <strong>ROOT</strong> data pipelines, it is NIPSCERN's most technically ambitious project — led by <strong>Chrysthofer Arthur</strong> — and is being integrated into the <strong>ATLAS Control Room at CERN</strong>.
           </p>
           <div class="project-links fade-up">
-            <a href="cgvweb/index.html" class="btn btn-primary" style="background:var(--accent-cgv);border-color:var(--accent-cgv)">
+            <a href="cgvweb/" class="btn btn-primary" style="background:var(--accent-cgv);border-color:var(--accent-cgv)">
               <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
               <span data-i18n="projects.cgv.open">Open Full CGV</span>
             </a>
@@ -161,7 +161,7 @@
               <i class="ph ph-github-logo" aria-hidden="true"></i>
               <span data-i18n="projects.github">View on GitHub</span>
             </a>
-            <a href="index.html" class="btn btn-ghost">
+            <a href="./" class="btn btn-ghost">
               <i class="ph ph-arrow-left" aria-hidden="true"></i>
               All Projects
             </a>
@@ -224,7 +224,7 @@
             <span id="cgv-cell-count">0</span>
             <span style="margin-left:4px;color:var(--text-muted)" data-i18n="home.cgv.cells_label">active cells</span>
           </div>
-          <a href="cgvweb/index.html" class="btn btn-ghost btn-sm cgv-open-btn" data-i18n="home.cgv.btn_fullcgv">
+          <a href="cgvweb/" class="btn btn-ghost btn-sm cgv-open-btn" data-i18n="home.cgv.btn_fullcgv">
             <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
             Open Full CGV
           </a>
@@ -435,7 +435,7 @@
             Load the full application — import a ROOT event file, interact with the 3D calorimeter geometry, and explore energy deposits cell by cell.
           </p>
           <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
-            <a href="cgvweb/index.html" class="btn btn-primary" style="background:var(--accent-cgv);border-color:var(--accent-cgv)">
+            <a href="cgvweb/" class="btn btn-primary" style="background:var(--accent-cgv);border-color:var(--accent-cgv)">
               <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
               Open Full CGV App
             </a>
@@ -481,5 +481,6 @@
     document.addEventListener('DOMContentLoaded', () => initCGVPreview('cgv-canvas-wrapper'));
   </script>
   <script type="module" src="./../assets/js/main.js"></script>
+  <script>(function(){var l=window.location,c=l.pathname.replace(/\/index\.html$/i,'/').replace(/\.html$/i,'');if(c!==l.pathname){try{history.replaceState(null,'',c+l.search+l.hash)}catch(e){}}window.goatcounter=window.goatcounter||{};window.goatcounter.path=function(p){return p.replace(/\/index\.html$/i,'/').replace(/\.html$/i,'')};var s=document.createElement('script');s.setAttribute('data-goatcounter','https://nipscern.goatcounter.com/count');s.async=true;s.src='https://gc.zgo.at/count.js';(document.head||document.documentElement).appendChild(s);})();</script>
 </body>
 </html>
