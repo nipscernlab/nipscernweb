@@ -1,0 +1,90 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Getting Started
+
+%TOC%
+
+---++ Opening the viewer
+
+The standard entry point is the deployed instance. From any Control
+Room terminal, ATLAS laptop or personal machine with a modern browser,
+open:
+
+   * [[https://nipscern.com/projects/cgvweb][nipscern.com/projects/cgvweb]]
+
+On first load the page fetches =CaloGeometry.glb.gz= (~45 MB) and the
+ATLAS-ID WASM parser. The loading card tracks the five pipeline stages
+&mdash; _Request_, _Recognise_, _Download_, _Acquire_, _Load_ &mdash;
+and the scene becomes interactive as soon as the parser is ready and
+the first glTF chunk is parsed. On a typical Control-Room connection
+the viewer is usable in *4&ndash;8 seconds*; repeat visits are
+sub-second thanks to browser caching.
+
+<img src="images/loading-card.png" alt="CGV Web loading card" width="760" />
+
+---++ First paint
+
+Once the overlay clears, the full ATLAS calorimeter envelope is shown
+with the current event overlaid (or an empty scene if no event has
+arrived yet).
+
+<img src="images/ui-overview.png" alt="CGV Web — main interface" width="960" />
+
+   * _Left side_ &mdash; mode panel (_Live_ / _Local_ / _Samples_) and event list.
+   * _Right side_ &mdash; per-sub-detector threshold sliders.
+   * _Bottom_ &mdash; main toolbar (layers, ghost, cinema, reset, slicer, all cells, screenshot, settings, language).
+   * _Top-left_ &mdash; CGV logo, sidebar pin, external links (ATLAS Live, atlas.cern, home.cern, nipscern.com).
+
+---++ Your first event
+
+   1 If the viewer starts in [[DataModes][Live]] mode (default), wait for the first event to arrive. A green pulsing dot in the left panel means the feed is connected.
+   1 To try a known-good event, click =Samples= and choose one of the bundled JiveXML files.
+   1 Drag the canvas to orbit the camera, scroll to zoom, right-drag to pan.
+   1 Hover any cell to see its compact ATLAS-ID, =η=, =φ= and energy tooltip.
+   1 Tune the [[EnergyThresholds][thresholds]] on the right panel if the event is washed out by low-energy noise hits or saturated by a single high-energy cell.
+   1 Press =V= to toggle _All cells_ if you want to visualise the geometry even where the event has no deposit.
+   1 Press =P= for a screenshot; =R= to recentre the camera; =C= for cinema mode.
+
+---++ Loading your own file
+
+   1 Click =Local= in the left-hand mode bar.
+   1 Either =Select Folder= to pick a whole directory of JiveXML files, or =Upload XML= for a single event.
+   1 For multi-event folders a carousel appears &mdash; press &#9654; to auto-advance with a 2, 5, 10 or 30&nbsp;s delay between events.
+
+Drag-and-drop of =.xml= (or gzipped =.xml.gz=) files directly onto the
+canvas is also accepted. Files never leave your machine &mdash; the
+parse happens entirely in-browser.
+
+---++ Sidebar collapsed &mdash; collision HUD
+
+When you unpin the left panel (pin icon or =M=), a compact read-out of
+the current event metadata (timestamp, run, event, lumi block, version)
+is drawn in the top-left corner of the canvas in the same accent colour
+as the FPS counter. It lets you verify event provenance during cinema
+or during a screenshot session without re-opening the sidebar.
+
+The same overlay is available in the [[UserInterface#Screenshot_dialog][screenshot dialog]] as an optional
+compositing toggle.
+
+%BR%
+
+---++ Running from source (developers only)
+
+The shift workflow is always the hosted viewer above. This section is
+for developers who want to hack on the code, run offline or host a
+private instance.
+
+<verbatim>
+git clone https://github.com/nipscern/cgv-web.git
+cd cgv-web
+python -m http.server 8080
+</verbatim>
+
+Then open =http://localhost:8080/=. A =build.bat= / =deploy.bat= are
+included for Windows environments. See
+[[https://nipscern.com/projects/cgv][nipscern.com/projects/cgv]] for the
+developer guide and the geometry-exporter pipeline, and the
+[[Developers][Developers]] topic for the one-shot Windows build script
+and the Rust&rarr;WASM parser workflow.
+
+%BR% %BR%
+<em>Next: [[UserInterface][User Interface &rarr;]]</em>

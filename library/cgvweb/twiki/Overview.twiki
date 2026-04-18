@@ -1,0 +1,86 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Overview
+
+%TOC%
+
+CGV Web is a zero-install, browser-native event display for the ATLAS
+calorimeter system. It loads the real detector geometry exported from
+the ATLAS GeoModel database, and draws on top of it the quantities that
+shifters and analysers care about during a run: energy deposits per
+cell, topological clusters, reconstructed inner-detector tracks and the
+associated kinematic summary.
+
+<img src="images/geometry-active-cells.png" alt="Tile + LAr + HEC + FCAL active cells" width="960" />
+
+The viewer runs entirely in WebGL2 via [[https://threejs.org/][Three.js]].
+Cell identifiers are decoded by a Rust-compiled-to-WebAssembly module,
+so mapping a 32-bit =caloId= to =(subDet, side, sampling, η-bin, φ-bin)=
+costs a few microseconds and never blocks the main thread. The
+geometry payload (=CaloGeometry.glb.gz=, &asymp; 45 MB compressed) is
+fetched once and cached by the browser service worker; subsequent loads
+are sub-second.
+
+---++ What it renders
+
+   * Tile Calorimeter &mdash; long barrel (LB) and the two extended barrels (EB&plusmn;).
+   * LAr EM &mdash; barrel (EMB) and end-caps (EMEC&plusmn;).
+   * HEC &mdash; four-wheel hadronic end-cap.
+   * FCAL &mdash; three forward modules (FCAL1 / FCAL2 / FCAL3).
+   * ATLAS Ghost &mdash; nine inactive-material envelopes for spatial context (cryostats, supports, interfaces).
+   * Reconstructed tracks from the ATLAS inner-detector chain.
+   * Topological clusters from the =CaloTopoCluster= algorithm.
+
+---++ Colour convention
+
+The colour palette is consistent across the scene, the panel headers
+and the threshold sliders. Keep it in mind when reading a capture:
+
+| *Sub-detector / object* | *Accent* | *Hex*     |
+| TileCal                 | orange   | =#c87c18= |
+| LAr EM                  | green    | =#27b568= |
+| HEC                     | cyan     | =#66e0f6= |
+| FCAL                    | copper   | =#b87333= |
+| Tracks                  | yellow   | =#ffea00= |
+| Clusters                | red      | =#ff4400= |
+
+Active cells use a per-sub-detector cold-to-hot gradient between their
+minimum-palette accent (low =E=) and a bright saturated shade (high
+=E=). Track lines are thin and solid; cluster outlines are dashed.
+Inactive ghost envelopes are a shared semi-transparent grey, rendered
+at 15&nbsp;% opacity so they never compete with the active data.
+
+---++ Typical shifter workflow
+
+   1 Open CGV Web in the Control Room browser.
+   1 [[DataModes][Live mode]] auto-connects to the ATLAS Live feed via ATLANTIS; events arrive every few seconds.
+   1 Drag, scroll and right-drag the canvas to orbit, zoom and pan around the detector.
+   1 Use the right-hand [[EnergyThresholds][threshold panel]] to cut on TILE, LAr, HEC, FCAL, track =p_{T}= or cluster =E_{T}=.
+   1 Click a cell to read its compact ATLAS-ID, =η=, =φ= and energy in the cell tooltip.
+   1 Press =Shift+S= to drop the cylindrical-wedge slicer if a shower is buried under outer cells; drag the handle to sweep the carve.
+   1 Press =V= to enable _All cells_ and verify the geometry layout when an event is sparse.
+   1 Press =C= for a hands-free camera sweep &mdash; with the =Guided tour= preference on, cinema mode becomes a scripted fly-through of the detector.
+   1 Press =P= to save a screenshot at up to 10K resolution for logbook entries; enable the transparent-background toggle for slide decks, or keep the collision-info overlay on to preserve event provenance.
+
+---++ Offline analysis
+
+The same page accepts local JiveXML files (folder picker or
+drag-and-drop) and bundled sample events. Multi-event XML is supported
+with a carousel that auto-advances between files &mdash; useful during a
+shift debrief or for building a quick training deck from a list of
+flagged events.
+
+<img src="images/local-mode.png" alt="Local mode with the carousel bar" width="900" />
+
+---++ Relationship to ATLANTIS
+
+CGV Web is not a replacement for ATLANTIS; it is a lightweight,
+modern complement. It consumes the same JiveXML payload produced by
+ATHENA's =JiveXML= algorithm and, in _Live_ mode, subscribes to the
+same long-poll endpoint as the Java ATLANTIS client
+(=atlas-live.cern.ch=). Shifters who need the full reconstruction
+inspection capabilities of ATLANTIS can run both side-by-side; CGV Web
+focuses on fast, publication-ready calorimeter visualisation with no
+local install.
+
+%BR% %BR%
+<em>Next: [[GettingStarted][Getting Started &rarr;]]</em>

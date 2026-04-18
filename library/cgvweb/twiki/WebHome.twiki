@@ -1,0 +1,69 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+!! CGV Web &mdash; Calorimeter Geometry Viewer
+
+%TOC%
+
+<img src="assets/cgvweb_icon.svg" alt="CGV Web" style="float:right;width:120px;height:120px;margin:0 0 1em 1em;" />
+
+_CGV Web_ (Calorimeter Geometry Viewer) is a browser-based event
+display that renders the real ATLAS calorimeter geometry &mdash; Tile,
+LAr EM, HEC and FCAL &mdash; reconstructed cell-by-cell from the ATLAS
+GeoModel and shipped as a single glTF-binary payload. Over that
+geometry it overlays reconstructed tracks, topological clusters and
+per-cell energy deposits from [[EventData][JiveXML]] events supplied by
+ATHENA's =JiveXML= algorithm, and it can connect live to the ATLAS Live
+event feed served by ATLANTIS.
+
+<img src="images/ui-overview.png" alt="CGV Web main interface" width="960" />
+
+The tool is optimised for the Run&nbsp;3 workflow of the ATLAS Control
+Room: open the page, see the most recent event rotating in, filter by
+sub-detector or energy threshold, and grab a publication-quality
+screenshot in one click. No install, no ROOT, no Athena &mdash; any
+modern browser with WebGL2 is enough.
+
+This TWiki is the end-user manual. For developer documentation (build
+steps, geometry exporter, parser internals) see
+[[https://nipscern.com/projects/cgv][nipscern.com/projects/cgv]].
+
+---++ Status and roadmap
+
+CGV Web is being prepared to serve as the official CERN event-display
+tool for the ATLAS experiment during Run&nbsp;4, succeeding the legacy
+ATLANTIS client. The current code base is the candidate build for that
+role: the geometry, parser, live-feed ingestion and UI are feature-ready
+and are being validated against Run&nbsp;3 Control Room operations
+ahead of the Run&nbsp;4 integration window.
+
+---++ Contents
+
+| *Topic*                         | *What you will find*                                                    |
+| [[Overview]]                    | Scope, sub-detectors rendered, colour convention                        |
+| [[GettingStarted]]              | Opening the viewer, loading an event, first interaction                 |
+| [[UserInterface]]               | Every panel, toolbar button, tooltip and keyboard shortcut              |
+| [[DataModes]]                   | Live, Local folder / upload and bundled samples                         |
+| [[EnergyThresholds]]            | Per-sub-detector threshold sliders, P97 auto-scaling, cluster min =E_{T}= |
+| [[Geometry]]                    | Active sub-detectors, nine ATLAS-Ghost envelopes, GeoModel provenance   |
+| [[EventData]]                   | JiveXML layout, compact ATLAS-ID, WASM decoder, coordinate frame        |
+| [[KeyboardShortcuts]]           | Full hotkey reference                                                   |
+| [[Developers]]                  | Clone, install, =build.bat=, geometry rebuild, parser WASM              |
+| [[Troubleshooting]]             | Quick fixes for the issues shifters hit most often                      |
+| [[Glossary]]                    | ATLAS and calorimeter terminology                                       |
+| [[References]]                  | External links and source documents                                     |
+
+---++ Project links
+
+   * Project site &nbsp; &mdash; [[https://nipscern.com/projects/cgvweb][nipscern.com/projects/cgvweb]]
+   * Extended documentation &nbsp; &mdash; [[https://nipscern.com/projects/cgv][nipscern.com/projects/cgv]]
+   * Laboratory &nbsp; &mdash; [[https://nipscern.com][nipscern.com]]
+   * Source code &nbsp; &mdash; [[https://github.com/nipscern/cgv-web][github.com/nipscern/cgv-web]]
+
+---++ Credits
+
+Developed at NIPSCERN, Universidade Federal de Juiz de Fora, Brazil, in
+partnership with the ATLAS Experiment at CERN.
+
+   * Scientific advisor &mdash; Prof. Dr. Luciano Manh&atilde;es de Andrade Filho
+   * Lead developer &mdash; Chrysthofer Arthur Amaro Afonso (undergraduate research)
+   * JiveXML feed &mdash; ATHENA / ATLANTIS
+   * Event format &mdash; ATLAS =JiveXML= algorithm

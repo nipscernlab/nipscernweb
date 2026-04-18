@@ -684,6 +684,19 @@
     .tkey { font: 400 .58rem var(--font); color: var(--muted); text-transform: uppercase; letter-spacing: .09em; align-self: center; }
     .tval { font: 500 .69rem var(--mono); color: var(--bright); }
 
+    /* ── Collision info HUD (top-left corner) ────────────── */
+    #collision-hud {
+      position: fixed; top: 10px; left: 10px; z-index: 9998;
+      display: grid; grid-template-columns: auto 1fr; gap: 2px 8px;
+      font-family: monospace; font-size: 11px;
+      color: #66ccff; opacity: 0.45;
+      pointer-events: none; user-select: none;
+      line-height: 1.55;
+    }
+    #collision-hud[hidden] { display: none !important; }
+    #collision-hud .ch-key { color: #66ccff; opacity: 0.6; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
+    #collision-hud .ch-val { color: #66ccff; font-size: 11px; }
+
     /* ── Cinema mode ──────────────────────────────────────── */
     body.cinema #panel       { opacity: 0 !important; pointer-events: none; }
     body.cinema #toolbar     { opacity: 0 !important; pointer-events: none; }
