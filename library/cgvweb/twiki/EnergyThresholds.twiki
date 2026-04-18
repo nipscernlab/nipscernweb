@@ -1,0 +1,100 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Energy Thresholds
+
+%TOC%
+
+The right-side panel carries one slider tab per object class. A cell,
+cluster or track is drawn only when its energy (or =p_{T}=) falls inside
+the tab's =[min, max]= window. The sliders do not modify the
+underlying event &mdash; they are display-time filters. Switching
+events preserves your threshold settings; toggling a sub-detector off
+via the [[UserInterface#Detector_Layers_panel][Layers panel]] overrides
+its threshold (hidden = hidden).
+
+<img src="images/threshold-panel.png" alt="Threshold panel open over the canvas (full-screen context)" width="900" />
+
+---++ Tabs
+
+| *Tab*     | *Object*              | *Units* | *Default floor* | *Default ceiling*    |
+| TILE      | TileCal cell          | GeV     | 0               | auto (P97 of event)  |
+| LAr       | LAr EMB / EMEC cell   | GeV     | 0               | auto (P97)           |
+| FCAL      | LAr FCAL cell         | GeV     | 0               | auto (P97)           |
+| HEC       | LAr HEC cell          | GeV     | 0               | auto (P97)           |
+| Track     | Reconstructed track   | GeV     | 0.5             | &mdash;              |
+| Cluster   | Topological cluster   | GeV     | 0.5             | &mdash;              |
+
+The _Cluster_ tab exposes an extra =Cluster Threshold= on/off switch
+(=Shift+K=): when off, all clusters render regardless of =E_{T}=
+&mdash; useful when inspecting sub-GeV activity around a jet.
+
+---++ P97 auto-scaling
+
+By default the ceiling of every calorimeter tab is set to the 97th
+percentile of that sub-detector's cell energies in the current event.
+The palette therefore spans the bulk of the deposits rather than being
+compressed by a single high-energy outlier.
+
+The read-out above each slider shows the current ceiling (e.g.
+=2.00 GeV=). Double-click the slider to re-sample P97 if the event has
+just changed; type a numeric value in the text input to lock an
+absolute ceiling that survives event switches (useful when comparing
+two captures side-by-side).
+
+---++ Typed input
+
+Every tab exposes a text field below the slider. Accepted formats:
+
+<verbatim>
+200            -> 200 MeV  (default unit)
+200 MeV        -> 200 MeV
+1.5 GeV        -> 1 500 MeV
+2e3            -> 2 000 MeV
+0.1 TeV        -> 100 GeV
+</verbatim>
+
+Invalid input is silently ignored and the slider stays put; no error
+dialog interrupts the rendering loop.
+
+---++ Palette behaviour
+
+Each sub-detector has a per-tab cold-to-hot gradient (see
+[[Overview][Overview]] for the accent colours). Within =[min, max]=:
+
+   * A hit at =min= renders with the coldest colour of the sub-detector palette.
+   * A hit at =max= renders with the hottest colour.
+   * Hits below =min= are culled from the scene.
+   * Hits above =max= saturate at the hottest colour (clipping).
+
+---++ Interaction with _All cells_
+
+When the [[UserInterface#Show_all_cells][All cells]] toggle (=V=) is
+on, the threshold floor is bypassed for visibility: every cell of an
+enabled sub-detector is drawn, painting zero-energy cells with the
+coldest palette colour. The _max_ ceiling still scales the palette
+gradient for cells that _do_ carry a hit, so a low threshold ceiling
+still brightens mid-energy activity against the geometry backdrop.
+
+Turning _All cells_ off restores the strict =E &ge; min= visibility
+rule.
+
+---++ Recipes
+
+| *Goal*                                   | *Action*                                           |
+| Hide sub-MIP noise                       | Raise TILE / LAr floor to a few hundred MeV        |
+| Show only the shower core                | Raise floors on TILE and LAr simultaneously        |
+| Keep the scale fixed across events       | Lock each ceiling with a typed value               |
+| Isolate a single high-=p_{T}= track      | Raise _Track_ floor to the desired =p_{T}=         |
+| Compare two events in the same capture   | Same typed ceilings on both captures               |
+| Reveal the geometry of an empty corner   | Toggle _All cells_ (=V=), then scan with the orbit |
+
+---++ Interaction with geometry
+
+Thresholds never hide the geometry mesh itself &mdash; they hide the
+_energy colouring_ on cells that fail the filter. To remove a whole
+sub-detector from the scene, use the
+[[UserInterface#Detector_Layers_panel][Detector Layers panel]]. To
+carve a volume (independent of thresholds) use the
+[[UserInterface#Slicer_cylindrical_wedge][Slicer]].
+
+%BR% %BR%
+<em>Next: [[Geometry][Geometry &rarr;]]</em>

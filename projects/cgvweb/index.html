@@ -690,6 +690,16 @@
         <span class="shot-opt-sub"   data-i18n="shot-opt-sub">Save PNG with alpha channel (no scene background)</span>
       </span>
     </label>
+    <label class="shot-opt" for="shot-show-collision">
+      <input type="checkbox" id="shot-show-collision" checked>
+      <span class="shot-check" aria-hidden="true">
+        <svg viewBox="0 0 16 16"><polyline points="3.5,8.5 6.8,11.8 12.5,5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="shot-opt-text">
+        <span class="shot-opt-title" data-i18n="shot-collision-title">Collision info overlay</span>
+        <span class="shot-opt-sub"   data-i18n="shot-collision-sub">Composite event metadata (run, event, lumi block) onto the screenshot</span>
+      </span>
+    </label>
     <div id="shot-progress">
       <span class="shot-spinner"></span>
       <span id="shot-progress-txt"></span>
@@ -738,6 +748,8 @@
 <div id="btn-tip"></div>
 <!-- ── Multi-line hint (statusbar collision info) ────────── -->
 <div id="stat-hint"></div>
+<!-- ── Collision info HUD (top-left, shown when panel collapsed or cinema) -->
+<div id="collision-hud" hidden></div>
 
 <!-- ── Cell hover tooltip ────────────────────────────────── -->
 <div id="tip" hidden>

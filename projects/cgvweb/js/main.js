@@ -700,8 +700,33 @@ function parseEventInfo(doc) {
 }
 
 let _lastEventInfo = null;
+
+// ── Collision info HUD ────────────────────────────────────────────────────────
+const collisionHud = document.getElementById('collision-hud');
+function _buildCollisionHud() {
+  const info = _lastEventInfo;
+  if (!info) { collisionHud.innerHTML = ''; return; }
+  const fields = [
+    ['Date/Time',    info.dateTime],
+    ['Run',          info.runNumber],
+    ['Event',        info.eventNumber],
+    ['Lumi Block',   info.lumiBlock],
+    ['Version',      info.version],
+  ];
+  collisionHud.innerHTML = fields
+    .filter(([, v]) => v)
+    .map(([k, v]) => `<span class="ch-key">${esc(k)}</span><span class="ch-val">${esc(v)}</span>`)
+    .join('');
+}
+function updateCollisionHud() {
+  const visible = !panelPinned || cinemaMode;
+  collisionHud.hidden = !(visible && _lastEventInfo);
+  if (!collisionHud.hidden) _buildCollisionHud();
+}
+
 function showEventInfo(info) {
   _lastEventInfo = info;
+  updateCollisionHud();
   if (!info) { setStatus('<span class="muted">No event metadata</span>'); return; }
   const dt  = info.dateTime   || '—';
   const run = info.runNumber  || '—';
@@ -2317,6 +2342,7 @@ function enterCinema() {
   document.getElementById('btn-cinema').classList.add('on');
   clearOutline(); tooltip.hidden = true;
   _tourExiting = false;
+  updateCollisionHud();
   if (tourMode) {
     _startTour();
   } else {
@@ -2327,6 +2353,7 @@ function exitCinema() {
   const wasTour = cinemaMode && tourMode;
   cinemaMode = false; document.body.classList.remove('cinema');
   controls.autoRotate = false; document.getElementById('btn-cinema').classList.remove('on');
+  updateCollisionHud();
   if (wasTour) {
     _tourExiting = true;
     _tourExitT0  = performance.now();
@@ -2480,6 +2507,7 @@ function setPinned(v) {
   document.querySelector('#pin-icon use').setAttribute('href', v ? '#i-pin' : '#i-pin-off');
   document.getElementById('btn-pin').dataset.tip = t(v ? 'tip-pin' : 'tip-panel');
   document.getElementById('btn-panel').classList.toggle('on', v);
+  updateCollisionHud();
 }
 document.getElementById('btn-pin').addEventListener('click', () => setPinned(!panelPinned));
 // Hover from left edge — temporary show (only if auto-open enabled)
@@ -3210,6 +3238,47 @@ async function renderAndDownload(targetW, targetH) {
     ctx.textAlign = 'left';
 
     ctx.restore();
+  }
+
+  // ── 7b. Draw collision info HUD if enabled ───────────────────────────────
+  const showCollision = !!document.getElementById('shot-show-collision')?.checked;
+  if (showCollision && _lastEventInfo) {
+    const info = _lastEventInfo;
+    const scale = targetW / origW * origPR;
+    const fields = [
+      ['Date/Time',  info.dateTime],
+      ['Run',        info.runNumber],
+      ['Event',      info.eventNumber],
+      ['Lumi Block', info.lumiBlock],
+      ['Version',    info.version],
+    ].filter(([, v]) => v);
+
+    if (fields.length) {
+      const fs     = 13 * scale;
+      const lh     = 18 * scale;
+      const colGap = 8  * scale;
+      const margin = 10 * scale;
+
+      ctx.save();
+      ctx.fillStyle = '#66ccff';
+
+      ctx.font = `400 ${fs * 0.78}px monospace`;
+      const keyW = Math.max(...fields.map(([k]) => ctx.measureText(k.toUpperCase()).width));
+
+      let x = margin, y = margin;
+
+      for (const [k, v] of fields) {
+        ctx.font = `400 ${fs * 0.78}px monospace`;
+        ctx.globalAlpha = 0.25;
+        ctx.fillText(k.toUpperCase(), x, y + lh * 0.82);
+        ctx.font = `500 ${fs}px monospace`;
+        ctx.globalAlpha = 0.45;
+        ctx.fillText(v, x + keyW + colGap, y + lh * 0.82);
+        y += lh;
+      }
+
+      ctx.restore();
+    }
   }
 
   // ── 8. Restore original renderer state ──────────────────────────────────

@@ -1,0 +1,200 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Developers
+
+%TOC%
+
+This page is the on-ramp for anyone who wants to hack on CGV Web, run a
+private instance, regenerate the calorimeter geometry or rebuild the
+Rust-to-WASM ATLAS-ID parser. End-users should follow
+[[GettingStarted][Getting Started]] instead — the hosted viewer at
+[[https://nipscern.com/projects/cgvweb][nipscern.com/projects/cgvweb]]
+needs no install.
+
+---++ Just run the viewer
+
+The repository ships all compiled assets (=geometry_data/CaloGeometry.glb.gz=,
+=parser/pkg/*.wasm=), so a static HTTP server at the project root is
+enough to launch the full app:
+
+<verbatim>
+git clone https://github.com/nipscern/cgv-web.git
+cd cgv-web
+python -m http.server 8080
+</verbatim>
+
+Or, with Node:
+
+<verbatim>
+npx serve .
+</verbatim>
+
+Open =http://localhost:8080/= and the viewer behaves exactly like the
+hosted deployment.
+
+---++ Full build pipeline
+
+Rebuilding is only needed if you:
+
+   * regenerate =CaloGeometry.glb= from a new =.root= file, or
+   * touch the Rust parser and need to recompile the WASM.
+
+---+++ Required tools
+
+| *Tool*        | *Version* | *Purpose*                                   |
+| Node.js        | ≥ 18      | Runs the =.root= → =.glb= pipeline          |
+| npm            | bundled   | Installs JS dependencies                    |
+| Rust           | stable    | Compiles the ATLAS-ID parser                |
+| =wasm-pack=    | ≥ 0.12    | Builds the parser to WebAssembly            |
+
+Install Rust and wasm-pack:
+
+<verbatim>
+# Linux / macOS
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+cargo install wasm-pack
+
+# Windows
+# download rustup from https://www.rust-lang.org/tools/install
+cargo install wasm-pack
+</verbatim>
+
+---+++ Step-by-step (Linux / macOS)
+
+   1 Install Node dependencies from the project root:
+<verbatim>
+npm install --ignore-scripts
+</verbatim>
+   =--ignore-scripts= is required because =jsroot= ships postinstall hooks
+   that CGV Web does not need.
+   1 Patch the =jsroot= geometry modules (=geobase.mjs=, =csg.mjs=) so they
+   resolve outside the =jsroot= tree:
+<verbatim>
+cd setup
+node setup.mjs
+cd ..
+</verbatim>
+   1 Place the source geometry at =geometry_data/CaloGeometry.root= and
+   compile it to optimised glTF-binary:
+<verbatim>
+node setup/root2scene.mjs geometry_data/CaloGeometry.root --out geometry_data
+</verbatim>
+   1 Strip and quantise the GLB (removes unused UVs / tangents / materials):
+<verbatim>
+node setup/optimize_glb.mjs --quantize
+mv geometry_data/CaloGeometry_opt.glb geometry_data/CaloGeometry.glb
+</verbatim>
+   Typical reduction: ~330 MB → ~70 MB, visually identical. Bump
+   =GEO_CACHE_VER= in =index.html= to force client cache refresh.
+   1 Build the Rust ATLAS-ID parser to WASM:
+<verbatim>
+cd parser
+wasm-pack build --target web --release
+cd ..
+</verbatim>
+   Output: =parser/pkg/atlas_id_parser.js= and =atlas_id_parser_bg.wasm=,
+   loaded directly by =js/main.js=.
+
+---+++ One-shot Windows build — =build.bat=
+
+A =build.bat= at the project root chains every step above and is the
+recommended entry point on Windows. Double-click it, or run from a
+terminal:
+
+<verbatim>
+cd C:\path\to\cgv-web
+build.bat
+</verbatim>
+
+The script performs these stages:
+
+| *Step* | *Action*                                                                         |
+| 0      | Check for =node=, =npm=, =rustc=, =wasm-pack= (installs =wasm-pack= if missing)   |
+| 1      | =npm install --ignore-scripts=                                                   |
+| 2      | =node setup/setup.mjs= — patch =jsroot= geometry modules                         |
+| 3      | Delete any stale =geometry_data/CaloGeometry.glb= and =.glb.gz=                  |
+| 4      | Verify =geometry_data/CaloGeometry.root= exists                                  |
+| 5      | =node setup/root2scene.mjs= — compile =.root= → optimised =.glb=                 |
+| 6      | Compress the =.glb= to =.glb.gz= with PowerShell's =GZipStream=                  |
+| 7      | =wasm-pack build --target web --release= — build the Rust parser                 |
+
+On success the end state is:
+
+<verbatim>
+geometry_data\CaloGeometry.glb         (optimised + quantised)
+geometry_data\CaloGeometry.glb.gz      (gzip, shipped to clients)
+parser\pkg\atlas_id_parser.js
+parser\pkg\atlas_id_parser_bg.wasm
+</verbatim>
+
+Any step failing aborts the script with a non-zero exit code and a
+human-readable message. Run it from an elevated shell if =cargo install=
+needs administrative privileges to place =wasm-pack= on =PATH=.
+
+---++ Project layout
+
+<verbatim>
+cgv-web/
+├── index.html                  entry point (HTML only)
+├── css/style.css               all styles
+├── js/main.js                  viewer logic (Three.js, UI, i18n, networking)
+├── assets/                     icons, fonts, images (incl. cgvweb_icon.svg)
+├── const/                      CaloBuild.C, CaloGeoConst.h (ATLAS geometry constants)
+├── default_xml/                bundled JiveXML samples + index.json
+├── parser/                     Rust ATLAS-ID parser
+│   ├── src/lib.rs              Rust source
+│   ├── Cargo.toml
+│   └── pkg/                    wasm-pack output (committed)
+├── geometry_data/
+│   ├── CaloGeometry.root       source geometry (input)
+│   ├── CaloGeometry.glb        optimised glTF binary
+│   └── CaloGeometry.glb.gz     gzip-compressed GLB shipped to clients
+├── setup/                      build pipeline scripts
+│   ├── setup.mjs               patches jsroot modules
+│   ├── root2scene.mjs          .root → .glb compiler
+│   ├── optimize_glb.mjs        GLB stripper / quantiser
+│   └── lib/                    patched jsroot modules
+├── nipscern/                   lightweight standalone preview (pre-baked scene_data.bin)
+├── twiki/                      ATLAS TWiki user documentation (this folder)
+├── atlantis/                   bundled ATLANTIS archive
+├── live_atlas/                 optional live ATLANTIS bridge
+├── debug/                      debug scripts + dumps
+├── docs/                       design notes & PDFs
+└── build.bat                   one-shot Windows full-build pipeline
+</verbatim>
+
+---++ Code conventions
+
+   * No bundler — =index.html= loads =js/main.js= directly as a classic script, =twiki/app.js= as an ES module. Keep imports browser-native.
+   * =js/main.js= is a single file. Split only when a standalone concern emerges (WASM adapter, i18n table).
+   * The WASM parser is called off the main thread via dynamic =import()=; never block the render loop on decoding.
+   * Translations live in the =TRANSLATIONS= map at the top of =js/main.js=. Every UI string referenced by a =data-i18n= attribute must exist in all four locales (EN, FR, PT, NO).
+   * Screenshots must hide transient UI: the slicer bubble, hover outlines and the cursor crosshair are suppressed during capture (see =renderAndDownload= in =js/main.js=).
+
+---++ Previewing the TWiki locally
+
+The =twiki/= folder is a self-contained preview of the published ATLAS
+TWiki pages. From =twiki/=:
+
+<verbatim>
+python -m http.server 8080
+</verbatim>
+
+Open =http://localhost:8080/=. The local shell (=index.html=, =app.js=,
+=twiki-parser.js=, =style.css=) is a client-side Foswiki renderer styled
+to match the ATLAS Pattern skin. See =twiki/PUBLISHING.txt= for the
+procedure to copy each =.twiki= file into the CERN ATLAS TWiki.
+
+---++ Opening an issue / contributing
+
+   * Source — [[https://github.com/nipscern/cgv-web][github.com/nipscern/cgv-web]]
+   * Issues — [[https://github.com/nipscern/cgv-web/issues][github.com/nipscern/cgv-web/issues]]
+   * Extended dev notes — [[https://nipscern.com/projects/cgv][nipscern.com/projects/cgv]]
+
+Pull requests welcome. Follow the existing code style, keep build
+artefacts out of the diff (the repo already commits pre-built =pkg/= and
+=CaloGeometry.glb.gz=), and run =build.bat= (or its per-step
+equivalents) before opening the PR so reviewers see the regenerated
+artefacts in one commit.
+
+%BR% %BR%
+<em>Back to [[WebHome][Home]].</em>

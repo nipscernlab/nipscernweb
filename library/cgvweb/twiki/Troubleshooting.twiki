@@ -1,0 +1,79 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Troubleshooting
+
+%TOC%
+
+---++ The scene stays black or the loading card never clears
+
+   * Check the browser console for a CORS or 404 on =geometry_data/CaloGeometry.glb.gz=.
+   * WebGL2 must be available. Visit =chrome://gpu= (Chromium) or =about:support= (Firefox) and look for =WebGL 2 Enabled=.
+   * Some corporate proxies strip the =Content-Encoding: gzip= header; request an exemption for the deployment URL.
+   * Clear the service-worker cache (DevTools &rarr; Application &rarr; Clear storage) if a previous broken deploy is stuck in cache.
+
+---++ Live mode shows "waiting for events"
+
+   * Verify outbound HTTPS to =atlas-live.cern.ch= (proxy / VPN).
+   * Open DevTools &rarr; Network and look for a 401, 403 or a CORS preflight failure.
+   * Use the =⏸= / =▶= controls to reset the long-poll without reloading the page.
+   * Fall back to [[DataModes][Samples]] mode to confirm the rendering pipeline is healthy; if samples load and _Live_ does not, the network is the cause.
+
+---++ Cells look duplicated or flicker
+
+Usually two overlapping geometries. Open the
+[[UserInterface#ATLAS_Ghost_panel][ATLAS Ghost]] panel and turn off any
+envelope you do not need; the Tile barrel envelope and the Tile active
+cells share a boundary and can z-fight at very wide zoom levels. Moving
+the camera closer also resolves most flicker artefacts because the
+depth buffer gains precision.
+
+---++ Energy bars are all saturated red
+
+The palette ceiling is too low, or a stray high-energy cell compressed
+the dynamic range. Two fixes:
+
+   * Raise the sub-detector's =max= slider (or type a numeric value in the slider's text input).
+   * Double-click the slider to re-sample the 97th percentile of the current event.
+
+---++ A run's first event arrives and then nothing
+
+The ATLAS Live feed back-pressure is handled by ATLANTIS: if the feed
+is saturated, live mode buffers and then replays. Pause with =⏸= for a
+minute; resume with =▶=. During very busy runs, expect short gaps of
+5&ndash;30&nbsp;s.
+
+---++ Local mode rejects a file
+
+   * The file must be JiveXML &mdash; not an xAOD, D3PD or plain ROOT file. See [[DataModes][Data Modes]] for the accepted formats.
+   * A =.gz= file is auto-decoded; other compressions (=.zst=, =.bz2=) are not.
+   * For multi-event XMLs, the =<Event>= tags must each have =runNumber= and =eventNumber= attributes.
+   * If the =runNumber= / =eventNumber= attribute is missing, the event is still loaded but the collision footer and HUD will read =&mdash;= for that field.
+
+---++ Slicer does not carve anything
+
+   * The slicer is a _cylindrical wedge_ anchored at the origin with a fixed 5&nbsp;m radius. If the wedge angle =θ= is 0 (a freshly-enabled slicer), no volume is actually carved. Drag the handle up to sweep =θ= and see the cut open.
+   * Check that the slicer button is in its =on= state (filled background). Toggle with =Shift+S=.
+   * When combined with _All cells_ (=V=), the carved region should be empty; if you still see cells inside the bubble, right-drag the handle to confirm the cut volume is where you think it is.
+
+---++ The collision HUD (top-left) is blank
+
+   * It is only shown when an event has loaded _and_ when either the left panel is unpinned or cinema mode is active. Pin the sidebar and the HUD disappears by design.
+   * If the event metadata (=runNumber=, =eventNumber=, &hellip;) is absent from the JiveXML payload, the HUD will have nothing to show.
+
+---++ Screenshot is blank or shows only the UI
+
+   * Transparent-background mode returns a PNG with the scene geometry but no background; in an image viewer that renders alpha as black, the result looks "black". Open the file in a viewer that renders checkerboard alpha, or composite it over a background of your choice.
+   * If the captured PNG is completely blank, the GPU context may have been lost between the capture and the read-pixel step &mdash; reload the page and retry. A `WEBGL_lose_context` event in DevTools confirms this.
+
+---++ Opening an issue
+
+If none of the above applies, open an issue at
+[[https://github.com/nipscern/cgv-web/issues][github.com/nipscern/cgv-web/issues]]
+with:
+
+   * Browser name and version.
+   * The failing event (if small enough) or its run / event number.
+   * The full console log (right-click &rarr; =Save as…=).
+   * A screenshot of the error state &mdash; =P= while the overlay is up works.
+
+%BR% %BR%
+<em>Next: [[Glossary][Glossary &rarr;]]</em>

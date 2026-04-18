@@ -1,0 +1,91 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Geometry
+
+%TOC%
+
+The scene is a faithful reconstruction of the real ATLAS calorimeter
+geometry. Cell meshes come from the ATLAS GeoModel database, exported
+via a custom ROOT&rarr;glTF pipeline, repacked as a single
+=CaloGeometry.glb.gz= payload (~45 MB compressed) and preloaded by the
+page at first paint. Active cells and ATLAS-Ghost envelopes share the
+same glTF file and are toggled independently at runtime, so the wire-up
+cost is paid once.
+
+<img src="images/calorimeter-overview.png" alt="ATLAS calorimeter sub-detector overview" width="960" />
+
+---++ Active sub-detectors
+
+| *Sub-detector* | *Region*             | *η range*        | *Cells (approx.)* | *Panel group* |
+| TileCal LB     | Long barrel          | 0 &ndash; 1.0    | ~2 900            | TILE          |
+| TileCal EB&plusmn; | Extended barrel   | 0.8 &ndash; 1.7  | ~2 400            | TILE          |
+| LAr EMB        | EM barrel            | 0 &ndash; 1.475  | ~109 000          | LAr           |
+| LAr EMEC&plusmn; | EM end-cap         | 1.375 &ndash; 3.2 | ~63 000          | LAr           |
+| HEC            | Hadronic end-cap     | 1.5 &ndash; 3.2  | ~5 600            | HEC           |
+| FCAL 1 / 2 / 3 | Forward              | 3.1 &ndash; 4.9  | ~3 500            | FCAL          |
+
+Toggle the four groups from the
+[[UserInterface#Detector_Layers_panel][Layers panel]] or with the =T=
+(TILE), =L= / =A= (LAr), =H= (HEC), =F= (FCAL) hotkeys.
+
+<img src="images/geometry-active-cells.png" alt="Active cells of Tile, LAr, HEC and FCAL" width="960" />
+
+By default only cells with a hit (=E &ge; min_threshold=) are drawn.
+To visualise the bare geometry of a sub-detector even where the current
+event carries no deposit, enable
+[[UserInterface#Show_all_cells][All cells]] (=V=). Empty cells are
+then painted with the coldest colour of their sub-detector palette.
+
+---++ ATLAS Ghost envelopes
+
+"Ghosts" are the _inactive_ support, cryostat and structural volumes.
+CGV Web renders them as semi-transparent grey shells so that shifters
+can see where the beam axis and the sub-detector boundaries sit without
+occluding the event itself. All nine share a shared grey 15&nbsp;%-opacity
+material; the GeoModel materials are deliberately overridden to keep
+the visual budget small.
+
+<img src="images/ghost-envelopes.png" alt="ATLAS Ghost envelopes with phi segmentation overlay" width="960" />
+
+| *Mesh*            | *Default* | *Description*                                     |
+| =LBTile_0=        | off       | Tile long-barrel outer shell                      |
+| =LBTileLArg_0=    | off       | Tile / LAr barrel interface                       |
+| =LBLArg_0=        | off       | LAr barrel cryostat                               |
+| =EBTilep_0=       | off       | Extended-barrel Tile, =+z= side                   |
+| =EBTilen_0=       | off       | Extended-barrel Tile, =&minus;z= side             |
+| =EBTileHECp_0=    | off       | EB Tile / HEC interface, =+z=                     |
+| =EBTileHECn_0=    | off       | EB Tile / HEC interface, =&minus;z=               |
+| =EBHECp_0=        | off       | HEC cryostat, =+z=                                |
+| =EBHECn_0=        | off       | HEC cryostat, =&minus;z=                          |
+
+Quick controls in the panel: =All= turns every envelope on, =None= off.
+=G= on the keyboard opens or closes the panel.
+
+---++ φ-segmentation overlay
+
+When any ghost is visible, a dashed *φ-segmentation grid* is drawn on
+top of the Tile envelopes to mark module boundaries (64 modules per
+barrel &times; 11.25&deg; each). Turning all ghosts off removes the
+overlay. This is purely a navigation aid and has no effect on the
+underlying data.
+
+---++ Beam axis
+
+Toggle the beam-axis indicator with =B= or the _Beam axis_ toolbar
+button. Two cones at =&plusmn;z= mark the incoming proton beams; a
+small marker at the origin denotes the nominal interaction point. The
+indicator scales with the scene zoom so it stays legible at any camera
+distance.
+
+<img src="images/beam-axis.png" alt="Beam-axis cones with interaction-point marker" width="720" />
+
+---++ Carving the geometry &mdash; the slicer
+
+A cylindrical-wedge _slicer_ is available to carve a hole through the
+calorimeter volume without hiding a whole sub-detector. See
+[[UserInterface#Slicer_cylindrical_wedge][Slicer &mdash; cylindrical
+wedge]] in the User Interface topic for the drag-gestures and the cut
+semantics. The cut respects the current thresholds, the Ghost
+envelopes and the _All cells_ toggle.
+
+%BR% %BR%
+<em>Next: [[EventData][Event Data &rarr;]]</em>

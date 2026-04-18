@@ -1,0 +1,265 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ User Interface
+
+%TOC%
+
+The CGV Web interface is organised into three functional regions placed
+around the 3D canvas: a retractable left panel for data ingestion, a
+retractable right panel for energy threshold sliders, and a bottom
+toolbar for scene controls and output. Transient widgets &mdash; cell
+tooltip, collision HUD, dialogs and popovers &mdash; appear contextually
+on top of the canvas.
+
+<img src="images/ui-overview.png" alt="CGV Web — annotated interface" width="960" />
+
+Every control is keyboard-reachable: see [[KeyboardShortcuts][Keyboard
+Shortcuts]] for the full mapping. Most toolbar buttons expose their
+hotkey in the hover tooltip.
+
+---++ Left panel — data source
+
+The left panel has three exclusive modes at the top (_Live_, _Local_,
+_Samples_). Selecting a mode reveals the corresponding list or picker;
+switching modes stops the previous ingestion without discarding the
+scene.
+
+<img src="images/left-panel.png" alt="Left panel: mode bar, event list, status bar (full screen for context)" width="900" />
+
+   * =Live= &mdash; connects to the ATLAS Live long-poll served by ATLANTIS. A green pulsing dot indicates the feed is active. The =⏸= / =▶= buttons pause and resume polling without tearing down the connection.
+   * =Local= &mdash; parses JiveXML in the browser. =Select Folder= ingests an entire directory; =Upload XML= opens a single file. A carousel bar auto-advances through a multi-event folder.
+   * =Samples= &mdash; curated events bundled with the deployment (=default_xml/index.json=).
+   * _Status bar_ (bottom) &mdash; displays the current pipeline stage (request, recognise, download, acquire, load) and a session-wide request counter.
+   * _Collision footer_ &mdash; once an event is loaded, the bottom of the panel condenses run, event, luminosity block, timestamp and version into a compact strip. Hovering the strip promotes it to a full per-field tooltip.
+   * The panel is _pinnable_ via the pin icon at top-right. When unpinned it auto-opens on cursor hover near the left edge, provided the =Auto-open sidebar on hover= preference is enabled (see [[#Settings_panel][Settings panel]]).
+
+See [[DataModes][Data Modes]] for the full description of each mode and
+the accepted file formats.
+
+---++ Right panel — energy thresholds
+
+Stacked per-sub-detector tabs with a vertical slider each. The _Cluster_
+tab is pinned at the top as an always-visible fixed pane; _TILE_, _LAr_,
+_FCAL_, _HEC_ and _Track_ are sibling tabs below. Full semantics and
+palette behaviour are documented in
+[[EnergyThresholds][Energy Thresholds]].
+
+<img src="images/threshold-panel.png" alt="Right-side energy threshold panel (full screen for context)" width="900" />
+
+Each slider exposes:
+
+   * A vertical gradient track representing the palette from 0 to the current ceiling.
+   * A =max= read-out at the top, driven by the 97th-percentile of the current event unless overridden.
+   * A numeric text input below the slider for precise typed values (e.g. =200 MeV=, =1.5 GeV=, =2e3=).
+   * The _Cluster_ tab adds a =Cluster Threshold= on/off switch that bypasses the cluster filter when disengaged.
+
+---++ Bottom toolbar
+
+Every visible button and its associated keyboard shortcut. Buttons with
+a highlighted (=on=) state persist their state until toggled back.
+
+| *Button*        | *Action*                                                      | *Shortcut*   |
+| Sidebar         | Pin / unpin the left panel                                    | =M=          |
+| Energy          | Pin / unpin the right threshold panel                         | =E=          |
+| Layers          | Open the detector-layers popover (TILE, LAr, HEC, FCAL)       | &mdash;      |
+| Ghost           | Open the ATLAS Ghost envelopes popover                        | =G=          |
+| Tracks          | Show / hide reconstructed particle tracks                     | =J=          |
+| Clusters        | Show / hide topological cluster outlines                      | =K=          |
+| Cell info       | Toggle hover tooltip and cell outline                         | =I=          |
+| Beam axis       | Show / hide the =±z= beam cones and interaction point marker  | =B=          |
+| Background      | Open the scene-background colour picker                       | =Shift+B=    |
+| Slicer          | Activate the cylindrical-wedge carve gizmo                    | =Shift+S=    |
+| All cells       | Reveal every GLB cell, colouring non-active ones with =E_{min}= | =V=        |
+| Reset view      | Recentre the camera to the default isometric                  | =R=          |
+| Cinema          | Hide the UI, auto-rotate or run the guided tour               | =C=          |
+| Screenshot      | Open the resolution picker                                    | =P=          |
+| Settings        | Preferences, keyboard shortcuts, sponsors, _About_            | =S=          |
+| Language        | Cycle EN / FR / PT / NO                                       | &mdash;      |
+
+Toolbar button tooltips are suppressed while typing into a text input
+and while a modal overlay is open.
+
+---++ Detector Layers panel
+
+Independent on/off switches for the four active sub-detector groups,
+with =All= and =None= quick buttons. Each row shows the sub-detector
+accent dot and a short description (see [[Overview][Overview]] for the
+colour convention).
+
+<img src="images/layers-panel.png" alt="Detector layers popover (full-screen context)" width="900" />
+
+Turning a sub-detector off hides all of its active cells. Use the
+_energy threshold_ sliders (right panel) to fade out only low-energy
+hits without removing the sub-detector entirely.
+
+---++ ATLAS Ghost panel
+
+Per-envelope switches for the nine ghost meshes enumerated in
+[[Geometry][Geometry]]. Useful to reveal a single envelope (e.g. the
+Tile long-barrel shell) without the visual noise of the other eight.
+
+<img src="images/ghost-panel.png" alt="ATLAS Ghost popover (full-screen context)" width="900" />
+
+When at least one ghost is visible, a dashed φ-segmentation grid is
+overlaid on the Tile envelopes to mark the 64 × 11.25° module
+boundaries. The overlay disappears when all ghosts are turned off.
+
+---++ Cell tooltip
+
+Displayed on hover whenever _Cell info_ is enabled. The tooltip reports
+the compact ATLAS-ID =(sub-detector, side, sampling, η-bin, φ-bin)=, the
+cell's η/φ coordinates and the deposited energy. Units auto-scale
+between MeV and GeV so the read-out stays readable across four orders
+of magnitude.
+
+<img src="images/cell-tooltip.png" alt="Cell hover tooltip" width="560" />
+
+A thin outline is drawn around the hovered cell to make the selection
+unambiguous in dense regions. The tooltip and outline are suppressed
+during screenshot capture unless explicitly pinned.
+
+---++ Slicer &mdash; cylindrical wedge
+
+The slicer carves a Z-aligned cylindrical wedge out of the scene,
+hiding every cell whose centre falls inside the cut volume. Use it to
+peek at the shower core when the outer layers occlude it, or to
+isolate an embedded cluster during a detailed inspection.
+
+   * Activate with the =Slicer= toolbar button or =Shift+S=.
+   * The cut cylinder is axis-aligned along =z= and anchored by a small 3D handle. Two parameters are exposed through drag-gestures on the handle:
+      * _screen-Y_ drag &mdash; sweeps the wedge angle =θ= from 0 (no carve) to 2π (full cylinder). A half-drag carves half the detector.
+      * _screen-X_ drag &mdash; scales the cylinder height, symmetrically around the anchor. The default height is 3 m; the maximum is 20 m.
+   * _Right-click + drag_ on the handle translates the entire cut volume along the beam axis (=z=). This lets you park the carve around a particular sub-detector without touching its shape.
+   * The cylinder radius is fixed at 5 m, which is large enough to cover the full calorimeter envelope in =(r, φ)=.
+   * Culling interacts correctly with every other filter: sub-detector toggles, energy thresholds, cluster filters and _All cells_ are still honoured on the cells that remain visible.
+   * The gizmo is hidden automatically during screenshot capture so it never leaks into publication images.
+
+Deactivate with the same toolbar button (or =Shift+S=); the scene
+returns immediately to its threshold/cluster-filtered state.
+
+---++ Show all cells
+
+<blockquote>
+Fills every enabled sub-detector with its full GLB mesh, including
+cells that carry _no_ energy deposit in the current event. Cells absent
+from the XML are painted with the coldest colour of their sub-detector's
+palette. Useful for geometry inspection and for screenshots where an
+otherwise sparse event would look misleadingly empty.
+</blockquote>
+
+   * Toggle with the =All cells= toolbar button or the =V= hotkey.
+   * Bypasses the energy threshold, cluster filter and negative-energy gate for display purposes &mdash; the underlying data is untouched.
+   * Respects the _Detector Layers_ switches: turning TILE off still hides TILE even with _All cells_ on.
+   * Combines with the _Slicer_ and the _Ghost_ envelopes.
+   * Turning it off restores the regular event-driven rendering (only cells with a hit above threshold are drawn).
+
+---++ Collision info overlay
+
+Whenever the left panel is unpinned or cinema mode is active, a compact
+read-out of the current event's metadata is drawn in the top-left
+corner of the canvas, in the same style and accent colour as the FPS
+counter (monospace, =#66ccff=). Hidden automatically when the left
+panel is expanded.
+
+The overlay mirrors the _Collision footer_ of the left panel:
+
+   * =DATE/TIME= &mdash; event timestamp as reported by JiveXML.
+   * =RUN= &mdash; ATLAS run number.
+   * =EVENT= &mdash; event number within the run.
+   * =LUMI BLOCK= &mdash; luminosity block.
+   * =VERSION= &mdash; JiveXML producer version.
+
+The overlay is designed to be unobtrusive during orbital viewing and
+during cinema capture, while still preserving the provenance of the
+displayed event at a glance. It can be composited onto screenshots at
+render time &mdash; see [[#Screenshot_dialog][Screenshot dialog]] below.
+
+---++ Scene background
+
+Customise the scene background from a dedicated popover anchored to the
+toolbar. Useful to match slide-deck themes or to isolate a sub-detector
+against a neutral backdrop for paper figures.
+
+   * Open with the _Background_ toolbar button or =Shift+B=.
+   * A 2D saturation/value rectangle with a vertical hue strip sets any RGB.
+   * A hex field accepts typed =#rrggbb= values and copy-paste.
+   * ATLAS-palette presets and a =Reset to Default= button restore the shipped dark-navy =#020d1c=.
+
+---++ Screenshot dialog
+
+=P= or the camera toolbar button opens the resolution picker. The scene
+re-renders at the chosen resolution with the UI hidden (including the
+slicer gizmo and the beam-axis cones); if a tooltip was pinned at
+capture time, it is composited back into the output bitmap.
+
+<img src="images/screenshot-dialog.png" alt="Screenshot dialog open over the canvas (full-screen context)" width="900" />
+
+Available resolutions:
+
+| *Preset*    | *Dimensions*       | *Recommended for*                                   |
+| HD          | 1280 × 720         | Quick logbook thumbnails                            |
+| 1080p       | 1920 × 1080        | Default for slides                                  |
+| 2K          | 2560 × 1440        | Mobile / landscape tablet capture                   |
+| 4K          | 3840 × 2160        | High-resolution slide decks                         |
+| 8K          | 7680 × 4320        | Print-grade figures                                 |
+| 10K         | 10 240 × 5 760     | Wall-poster / banner renders (desktop only)         |
+
+Two compositing toggles sit below the grid:
+
+   * =Transparent background= &mdash; drops the scene background and saves the PNG with an alpha channel. Ideal for figures that must sit on a non-black background.
+   * =Collision info overlay= &mdash; on by default, composites the event metadata (timestamp, run, event, lumi block, version) into the top-left corner of the output using the same =#66ccff= accent as the on-screen HUD. Disable for clean geometry renders with no identifying metadata.
+
+The captured PNG is named =CGVWEB_{W}x{H}_{YYYY-MM-DDTHH-MM-SS}.png=.
+
+---++ Settings panel
+
+Opened with =S= or the gear icon. Three sections:
+
+<img src="images/settings-panel.png" alt="Settings panel open over the canvas (full-screen context)" width="900" />
+
+   * _Preferences_
+      * =Button hints= &mdash; show tooltips on every toolbar button.
+      * =Auto-open sidebar on hover= &mdash; auto-unfold the left / right panels when the cursor reaches the screen edge. Off by default; the pin icon overrides it once pinned.
+      * =Guided tour in cinema= &mdash; when enabled, cinema mode becomes a continuous on-rails fly-through of the detector instead of a simple auto-rotate. Exiting the tour keeps a short inertia so the camera drifts to a smooth stop.
+   * _Keyboard Shortcuts_ &mdash; full reference, mirrors [[KeyboardShortcuts][this page]].
+   * _Supported by_ &mdash; project sponsors (ATLAS, CERN, CNPq, CAPES, FAPEMIG, UFJF). Each logo links to the relevant institution.
+
+Preferences are persisted to =localStorage= under the =cgv-*= prefix.
+
+---++ Cinema and guided tour
+
+=C= (or the _Cinema_ toolbar button) hides all non-essential UI and
+rotates the camera slowly around the detector. Only the =Exit Cinema=
+pill at the bottom and the collision HUD at the top-left remain visible,
+so the frame is suitable for presentation capture.
+
+With =Guided tour in cinema= on, the simple auto-rotation is replaced
+by a scripted path:
+
+   1 Wide establishing shot from outside the calorimeter envelope.
+   1 Face-on approach to the =+z= FCAL along the beam axis.
+   1 Glide through the central bore; the camera pans across each inner wall before returning to aim at the geometric centre.
+   1 Face-on exit through the =−z= FCAL.
+   1 Outer arc with a close flyby past the =−x= wall, back to the start &mdash; all as a single continuous motion.
+
+The tour can be entered from any camera position; it blends into the
+scripted path smoothly (~0.8 s cross-fade). Leaving cinema mode
+preserves a ~1.4 s drift so the camera comes to rest gracefully.
+
+Any canvas click (without drag) exits cinema.
+
+---++ Language selector
+
+The globe button in the toolbar switches the UI language live, without
+reloading the scene or re-fetching the geometry:
+
+   * English (EN) &mdash; default.
+   * Français (FR).
+   * Português (PT).
+   * Norsk (NO).
+
+Every label, tooltip, placeholder, status message and settings
+description is translated; the choice persists in =localStorage= under
+=cgv-lang=. The first visit auto-detects the browser's =navigator.language=.
+
+%BR% %BR%
+<em>Next: [[DataModes][Data Modes &rarr;]]</em>

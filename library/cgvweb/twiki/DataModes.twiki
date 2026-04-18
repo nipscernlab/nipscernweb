@@ -1,0 +1,93 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Data Modes
+
+%TOC%
+
+Events enter CGV Web through three independent pathways, selected in
+the mode bar at the top of the left panel. Only one mode is active at
+a time; switching modes stops the previous ingestion without discarding
+the scene, so you can hop between _Live_ and a local file without
+losing the camera state or threshold configuration.
+
+<img src="images/mode-bar.png" alt="Left-panel mode bar: Live, Local, Samples" width="560" />
+
+---++ Live
+
+Live mode long-polls the ATLAS Live service hosted by the ATLANTIS
+project. It is the default mode in the Control Room deployment and
+typically delivers an event every few seconds during a run.
+
+<img src="images/atlas-live-landing.png" alt="ATLAS Live landing page served by ATLANTIS" width="900" />
+
+The CGV Web left panel mirrors exactly the event list served by
+=atlas-live.cern.ch=: the same run / event numbers, the same ordering
+and the same back-pressure behaviour during a busy run.
+
+<img src="images/live-mode.png" alt="Live mode — streaming events (full-screen context)" width="900" />
+
+   * _Status indicator_ &mdash; a green pulsing dot when the feed is live, amber if the last event is older than 60&nbsp;s, red if the endpoint is unreachable.
+   * _Event list_ &mdash; populates with events as they arrive. Each row shows run / event numbers and a timestamp.
+   * _Play / pause controls_ &mdash; =⏸= stops polling, =▶= resumes. =Space= toggles the same state from the keyboard.
+   * _Network_ &mdash; requires outbound HTTPS access to =atlas-live.cern.ch=. From the ATLAS Control Room this is whitelisted by default; off-site hosts may need VPN or proxy adjustments.
+
+See [[https://atlas-live.cern.ch/][atlas-live.cern.ch]] for the
+underlying ATLANTIS service and its event coverage.
+
+---++ Local
+
+Local mode parses JiveXML entirely in the browser. Files never leave
+the machine &mdash; no upload, no server round-trip, no telemetry.
+
+<img src="images/local-mode.png" alt="Local mode — folder picker and carousel (full-screen context)" width="900" />
+
+Two pickers:
+
+   * =Select Folder= &mdash; a directory is walked recursively; every =.xml= entry is added to the event list. Works with the File System Access API on Chromium and with the legacy =webkitdirectory= fallback on Firefox and Safari.
+   * =Upload XML= &mdash; a single file is opened straight into the viewer.
+
+Multi-event XMLs are expanded into their constituent events in the
+list. When a folder contains more than one event, a carousel bar
+appears at the bottom of the panel:
+
+   * =&#9654;= / =&#9632;= &mdash; play / stop auto-advance.
+   * Step buttons =2s / 5s / 10s / 30s= set the delay between advances.
+   * =&larr;= / =&rarr;= keys step through the list manually.
+
+Drag-and-drop of =.xml= (or gzipped =.xml.gz=) files directly onto
+the 3D canvas is equivalent to =Upload XML=.
+
+---++ Samples
+
+A curated set of events shipped in =default_xml/= is listed at
+start-up. Useful for demos, shifter training and for regression-testing
+a new build without touching production data.
+
+<img src="images/samples-mode.png" alt="Samples mode — bundled event list (full-screen context)" width="900" />
+
+Each row shows a short description and the run / event number;
+selecting one loads the event the same way _Local_ does. The list is
+populated from =default_xml/index.json=, which is bundled with the
+deployment.
+
+---++ Accepted file formats
+
+| *Format*           | *Source*                               | *Status*                                     |
+| JiveXML =.xml=     | ATHENA =JiveXML= algorithm / ATLANTIS  | supported                                    |
+| JiveXML =.xml.gz=  | gzipped JiveXML                        | supported (auto-decompressed)                |
+| =.root=            | xAOD / D3PD                            | not supported &mdash; convert via ATHENA first |
+| =.json=            | custom formats                         | not supported                                |
+| =.xml.zst=         | Zstandard-compressed JiveXML           | not supported                                |
+
+See [[EventData][Event Data]] for the JiveXML element layout and the
+compact ATLAS-ID decoding used by CGV Web.
+
+---++ Mode interaction cheat-sheet
+
+| *Current mode*  | *Action*                      | *Effect*                                     |
+| Live            | Click _Local_                 | Polling paused, local picker exposed         |
+| Local           | Click _Live_                  | Polling resumes from the latest event        |
+| Any             | Close tab / reload            | All state lost &mdash; collision history too |
+| Any             | Drop =.xml= on canvas         | Switch to _Local_ and load the file          |
+
+%BR% %BR%
+<em>Next: [[EnergyThresholds][Energy Thresholds &rarr;]]</em>

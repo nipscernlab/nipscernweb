@@ -1,0 +1,108 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Event Data
+
+%TOC%
+
+---++ JiveXML at a glance
+
+JiveXML is the ATLAS XML event-display interchange format. It is
+produced by ATHENA's =JiveXML= algorithm at reconstruction time and
+consumed by both the legacy Java ATLANTIS client and, now, CGV Web.
+A typical event carries the calorimeter cells, reconstructed
+inner-detector tracks and clusters, run and event numbers and a short
+summary block:
+
+<verbatim class="xml">
+<Event runNumber="431885" eventNumber="12345"
+       lumiBlock="42" dateTime="2026-04-17T14:32:10"
+       version="8.1.0">
+  <TILE count="184">
+    <id>...</id>
+    <energy>...</energy>
+    <eta>...</eta>
+    <phi>...</phi>
+  </TILE>
+  <LAr   count="4021">...</LAr>
+  <HEC   count="87">...</HEC>
+  <FCAL  count="24">...</FCAL>
+  <Track   count="12">...</Track>
+  <Cluster count="7">...</Cluster>
+</Event>
+</verbatim>
+
+Each sub-detector tag contains parallel arrays &mdash; the _i_-th
+=id= matches the _i_-th =energy=, =eta= and =phi=. Optional arrays
+(=time=, =quality=, =gain=) are ignored by CGV Web today but are kept
+in the payload for downstream tools.
+
+CGV Web is robust to the two common ATHENA dialect quirks: attribute
+ordering is free, and either =<id>= or =<cellId>= is accepted as the
+identifier tag. Numeric values in scientific notation (=1.2e3=) and
+unit suffixes are honoured by the parser.
+
+---++ Compact ATLAS-ID
+
+Calorimeter cells are referenced by a 32-bit compact identifier that
+packs the detector coordinates into a single integer:
+
+| *Field*    | *Bits* | *Meaning*                                                |
+| subDet     | 4      | 0 = Tile, 1 = LAr EM, 2 = HEC, 3 = FCAL                  |
+| side       | 1      | 0 = =&minus;z=, 1 = =+z=                                 |
+| sampling   | 3      | Depth layer inside the sub-detector                      |
+| η-bin      | 12     | Signed pseudorapidity index                              |
+| φ-bin      | 12     | Azimuthal module / cell index                            |
+
+CGV Web decodes the identifier on-the-fly with a Rust parser compiled
+to WebAssembly (=parser/pkg/atlas_id_parser_bg.wasm=). Typical cost is
+a couple of microseconds per cell, well under the GPU upload budget,
+and it runs off the main thread via =import()= so the render loop is
+never blocked.
+
+The decoded tuple is what populates the cell tooltip and the pinnable
+details card.
+
+<img src="images/cell-tooltip.png" alt="Cell tooltip showing decoded ID" width="560" />
+
+---++ Coordinate frame
+
+CGV Web uses the ATLAS right-handed coordinate frame translated into
+the Three.js convention:
+
+   * =z= &mdash; beam axis; =+z= points towards side A.
+   * =φ= &mdash; azimuth around =z=, 0 along =+x=.
+   * =η= &mdash; pseudorapidity, =η = &minus;ln tan(θ/2)= with =θ= the polar angle from =+z=.
+   * =r= &mdash; transverse distance from the beam axis.
+
+The default camera points along =&minus;z= towards the origin, so
+=+z= goes into the screen and the long-barrel Tile sits horizontally.
+The =1 / 2 / 3= hotkeys snap the view to top, side and isometric
+presets; =R= recentres on the full detector envelope.
+
+<img src="images/coordinate-frame.png" alt="ATLAS coordinate frame in CGV Web" width="720" />
+
+---++ Tracks and clusters
+
+_Tracks_ come from the ATLAS inner-detector reconstruction chain and
+are drawn as thin solid lines coloured by the Track accent =#ffea00=.
+The Track tab in the [[EnergyThresholds][threshold panel]] exposes a
+=p_{T}= floor.
+
+_Topological clusters_ come from the =CaloTopoCluster= algorithm and
+are drawn as dashed red outlines (=#ff4400=) around the cells that form
+the cluster. The Cluster right-panel tab exposes a min-=E_{T}= filter,
+and the =Shift+K= shortcut toggles the filter on/off entirely.
+
+---++ Provenance in the UI
+
+The event's provenance metadata (=dateTime=, =runNumber=, =eventNumber=,
+=lumiBlock=, =version=) is surfaced in three places:
+
+   1 _Collision footer_ &mdash; compact strip at the bottom of the left panel. Full per-field tooltip on hover.
+   1 _Collision HUD_ &mdash; top-left canvas overlay visible when the sidebar is unpinned or cinema mode is on (see [[UserInterface#Collision_info_overlay][User Interface]]).
+   1 _Screenshot composition_ &mdash; optionally composited into the PNG output by the [[UserInterface#Screenshot_dialog][screenshot dialog]].
+
+All three read from the same =<Event ...>= attributes; if a field is
+missing from the XML it is silently dropped from the display.
+
+%BR% %BR%
+<em>Next: [[KeyboardShortcuts][Keyboard Shortcuts &rarr;]]</em>

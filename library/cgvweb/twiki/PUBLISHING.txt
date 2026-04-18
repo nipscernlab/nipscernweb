@@ -1,0 +1,151 @@
+CGV Web TWiki — publishing guide
+================================
+
+This folder holds the CGV Web user documentation in the exact markup
+accepted by the CERN ATLAS TWiki (Foswiki / Pattern skin). You can:
+
+  1. Preview it locally, exactly as CERN will render it.
+  2. Copy each .twiki file as-is into the corresponding ATLAS TWiki topic.
+
+Last content review: 2026-04-18 — covers the cylindrical slicer, the
+"All cells" toggle (V), the top-left collision HUD and the updated
+screenshot dialog with the "Collision info overlay" composition toggle.
+
+
+-----------------------------------------------------------------------
+1. Preview locally
+-----------------------------------------------------------------------
+
+From this folder (the one that contains index.html):
+
+  python -m http.server 8080
+        (or)
+  npx serve .
+
+Then open http://localhost:8080/ in any modern browser.
+
+The local viewer (index.html + app.js + twiki-parser.js + style.css) is
+a client-side Foswiki renderer styled to match the public ATLAS TWiki
+(Pattern skin). What you see is a faithful preview of what the server
+will produce — minus macros that only exist server-side (%SEARCH%,
+%INCLUDE%, %USERINFO%, etc.). We do not use any of those.
+
+
+-----------------------------------------------------------------------
+2. Publish to the CERN ATLAS TWiki
+-----------------------------------------------------------------------
+
+The ATLAS TWiki lives at:
+
+  https://twiki.cern.ch/twiki/bin/view/Atlas/
+
+You need a CERN account with write permission to the target web
+(commonly the Atlas web or a project sub-web).
+
+For each .twiki file in this folder:
+
+  (a) In the target TWiki web, click "Create New Topic". Use the file
+      name without extension as the topic name (e.g. WebHome,
+      Overview, GettingStarted, ...).
+
+  (b) Choose the "Plain skin" edit view (usually the default).
+
+  (c) Open the .twiki file in a text editor, copy its ENTIRE content,
+      and paste it into the topic-body text area.
+
+  (d) Save.
+
+Parent topics: every file starts with
+
+    %META:TOPICPARENT{name="WebHome"}%
+
+so Foswiki will automatically wire up the breadcrumb. Edit the value
+if you publish under a different parent.
+
+Attachments (images):
+
+  (e) For each image in the images/ folder, go to the topic that
+      references it, click "Attach" and upload the file with the
+      exact file name. The <img src="images/foo.png"/> links in the
+      topic body will resolve automatically to the attached file.
+
+  (f) Before uploading, check images/README.txt for size warnings.
+      Any file above ~500 kB should be re-exported through tinypng
+      or `oxipng -strip all` — the CERN TWiki has strict attachment
+      budgets.
+
+Icons used in the local skin (assets/cgvweb_icon.svg,
+assets/icon_home_nipscern.svg, assets/github-octocat.svg,
+assets/atlas-logo.png, assets/cern.svg) are NOT needed on CERN — the
+TWiki server applies its own Pattern skin (ATLAS ribbon, sidebar,
+footer). They are only used by the local preview shell.
+
+
+-----------------------------------------------------------------------
+3. File inventory
+-----------------------------------------------------------------------
+
+  WebHome.twiki          Landing page + topic table + project links
+  Overview.twiki         What CGV Web is; sub-detectors & colour convention
+  GettingStarted.twiki   First launch / first event / collision HUD
+  UserInterface.twiki    Every toolbar button, panel, slicer, all-cells,
+                         collision HUD, screenshot dialog, cinema mode
+  DataModes.twiki        Live / Local / Samples ingestion
+  EnergyThresholds.twiki Min/max sliders per sub-detector + All-cells
+                         interaction + P97 auto-scaling
+  Geometry.twiki         Sub-detectors + 9 ghost envelopes + beam axis +
+                         slicer pointer
+  EventData.twiki        JiveXML + compact ATLAS-ID + provenance
+  KeyboardShortcuts.twiki All hotkeys + slicer gestures
+  Developers.twiki       Install, build.bat, project layout, contributing
+  Troubleshooting.twiki  Common issues incl. slicer / HUD / screenshot
+  Glossary.twiki         ATLAS / calo terms + CGV Web features
+  References.twiki       External links & publications
+
+Local preview only (do NOT paste into CERN):
+
+  index.html             ATLAS-styled shell
+  app.js                 Router + fetcher
+  twiki-parser.js        Client-side Foswiki renderer
+  style.css              ATLAS Pattern-skin-inspired CSS
+  assets/                Icons (project, lab, GitHub)
+  images/                Screenshots
+
+
+-----------------------------------------------------------------------
+4. Markup notes
+-----------------------------------------------------------------------
+
+Headings           ---+ H1, ---++ H2, ---+++ H3 ...     (---+!! = no TOC)
+Bold               *word*
+Italic             _word_
+Mono               =word=
+Bold-mono          ==word==
+Bullet             3 spaces + "* "
+Numbered           3 spaces + "1 "
+Link (wiki)        [[TopicName]]           [[TopicName][label]]
+Link (anchor)      [[TopicName#Anchor][label]]
+Link (url)         [[https://...][label]]
+Verbatim           <verbatim>...</verbatim>
+Tables             | *header* | *header* |    (asterisks = header row)
+                   | cell    | cell    |
+HTML entities      &plusmn; &rarr; &larr; &mdash; &minus; &asymp; etc.
+Macros we use      %TOC%   %BR%   %DATE%   %META:TOPICPARENT{...}%
+
+Anything more exotic than this list will NOT render in the local
+preview; test your change in the local viewer first.
+
+
+-----------------------------------------------------------------------
+5. Quick checklist for a new release
+-----------------------------------------------------------------------
+
+  [ ] Every new feature in js/main.js documented in UserInterface.twiki.
+  [ ] Every new hotkey added to KeyboardShortcuts.twiki AND the on-app
+      Settings > Keyboard Shortcuts grid (index.html).
+  [ ] Glossary.twiki has an entry for any new concept.
+  [ ] images/README.txt lists every new image and flags any file > 500 KB.
+  [ ] Ran local preview (python -m http.server 8080) and walked through
+      every topic + every image link with zero console errors.
+  [ ] All four languages (EN / FR / PT / NO) translate any new UI string
+      (see js/i18n/translations.js).
