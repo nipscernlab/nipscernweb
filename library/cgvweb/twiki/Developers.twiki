@@ -168,7 +168,7 @@ cgv-web/
    * =js/main.js= is a single file. Split only when a standalone concern emerges (WASM adapter, i18n table).
    * The WASM parser is called off the main thread via dynamic =import()=; never block the render loop on decoding.
    * Translations live in the =TRANSLATIONS= map at the top of =js/main.js=. Every UI string referenced by a =data-i18n= attribute must exist in all four locales (EN, FR, PT, NO).
-   * Screenshots must hide transient UI: the slicer bubble, hover outlines and the cursor crosshair are suppressed during capture (see =renderAndDownload= in =js/main.js=).
+   * Screenshots must hide transient UI: the slicer wedge gizmo, hover outlines and the cursor crosshair are suppressed during capture (see =renderAndDownload= in =js/main.js=).
 
 ---++ Previewing the TWiki locally
 
