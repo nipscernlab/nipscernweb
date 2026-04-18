@@ -2,6 +2,7 @@ import * as THREE         from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
 import wasmInit, { parse_atlas_ids_bulk } from '../parser/pkg/atlas_id_parser.js';
+import { initLanguage, setupLanguagePicker, t } from './i18n/index.js';
 
 // Subsystem codes returned by parse_atlas_ids_bulk (slot [0] of each 6-i32 record)
 const SUBSYS_TILE     = 1;
@@ -11,370 +12,23 @@ const SUBSYS_LAR_HEC  = 3;
 let LivePoller = null;
 try { ({ LivePoller } = await import('../live_atlas/live_cern/live_poller.js')); } catch (_) {}
 
-// ── i18n ─────────────────────────────────────────────────────────────────────
-const TRANSLATIONS = {
-  en: {
-    'logo-full': 'Calorimeter Geometry Viewer', 'logo-lab': 'NIPSCERN · ATLAS',
-    'btn-live': 'Live', 'btn-local': 'Local', 'btn-sample': 'Samples',
-    'sample-loading': 'Loading events…', 'sample-empty': 'No sample events found.',
-    'sample-error': 'Error loading event list.',
-    'live-starting': 'Starting…', 'live-polling': 'Polling…', 'live-same': 'Up to date',
-    'live-fetching': 'Fetching…', 'live-error': 'Error', 'live-stopped': 'Stopped',
-    'local-folder': 'Select Folder', 'local-or': 'or', 'local-upload': 'Upload XML',
-    'log-title': 'Session Log', 'status-init': 'Initializing…',
-    'status-ready': 'Ready — waiting for event…',
-    'cinema-exit': 'Exit Cinema',
-    'slbl-energy': 'Energy', 'slbl-threshold': 'Threshold', 'thr-placeholder': 'e.g. 200 MeV',
-    'about-title': 'Calorimeter Geometry Viewer', 'about-sub': 'ATLAS · NIPSCERN',
-    'about-p1': 'Interactive 3D visualization of the ATLAS calorimeter — real-time display of TileCal, LAr, HEC, FCAL cell energies, particle tracks and clusters from live or local JiveXML event data.',
-    'about-advisor-lbl': 'Scientific Advisor', 'about-advisor-name': 'Prof. Dr. Luciano Manhães de Andrade Filho',
-    'about-dev-lbl': 'Development', 'about-dev-name': 'Chrysthofer Arthur Amaro Afonso',
-    'about-dev-sub': 'Undergraduate Research · NIPSCERN Laboratory',
-    'about-lab1': 'NIPSCERN — Núcleo de Investigação em Física para o CERN',
-    'about-lab2': 'ATLAS Collaboration · CERN, Geneva',
-    'about-supported-by': 'Supported by',
-    'about-close': 'Close', 'tip-energy-key': 'Energy',
-    'tip-panel': 'Toggle the sidebar panel',
-    'tip-cinema': 'Cinema mode — auto-rotation, hide UI',
-    'tip-ghost': 'ATLAS ghost — toggle sub-detector outlines',
-    'tip-info': 'Cell info — show tooltip and outline on hover',
-    'tip-beam': 'Beam axis — show Z-axis N/S direction cones',
-    'tip-lang': 'Switch display language',
-    'tip-shot': 'Save screenshot — choose resolution',
-    'tip-reset': 'Reset camera to default position',
-    'tip-about': 'About this project', 'tip-pin': 'Pin panel open at all times',
-    'tip-poll-play': 'Resume live polling', 'tip-poll-stop': 'Pause live polling',
-    'shot-title': 'Save Screenshot',
-    'shot-sub': 'Select resolution. The scene renders at full quality — UI is hidden. The active tooltip is composited if visible.',
-    'shot-cancel': 'Cancel', 'shot-save': 'Save PNG',
-    'shot-rendering': 'Rendering {w}×{h}…',
-    'shot-done': 'PNG saved — download started',
-    'shot-error': 'Error: {msg}',
-    'just-now': 'just now', 's-ago': 's ago', 'm-ago': 'm ago', 'h-ago': 'h ago',
-    'log-glb-loaded': 'CaloGeometry.glb loaded',
-    'log-glb-notfound': 'CaloGeometry.glb not found',
-    'log-wasm-ready': 'WASM ID parser ready',
-    'log-wasm-error': 'WASM error: ',
-    'log-poller-init': 'Live poller initialized',
-    'log-poller-unavail': 'Live poller unavailable — local mode',
-    'log-poll-resumed': 'Polling resumed',
-    'log-poll-paused': 'Polling paused',
-    'log-poll-error': 'Polling error',
-    'log-no-xml': 'No XML files found in selected folder',
-    'log-folder-loaded': 'Folder loaded: {n} XML file(s)',
-    'log-loading': 'Loading: ',
-    'log-read-error': 'Read error: ',
-    'log-live-download': 'Downloading new event from live feed',
-    'log-new-event': 'New event: ',
-    'log-downloading': 'Downloading: ',
-    'log-event': 'Event: ',
-    'sett-preferences': 'Preferences',
-    'sett-hints-label': 'Button hints',
-    'sett-hints-sub': 'Show tooltips on toolbar buttons',
-    'sett-autopen-label': 'Auto-open sidebar on hover',
-    'sett-autopen-sub': 'Show panel when cursor reaches screen edge',
-    'sett-tour-label': 'Guided tour in cinema',
-    'sett-tour-sub': 'Cinema mode becomes a smooth camera tour through the detector',
-    'sett-shortcuts': 'Keyboard Shortcuts',
-    'sk-ghost': 'Toggle ghost frame', 'sk-beam': 'Toggle beam axis',
-    'sk-info': 'Toggle cell info', 'sk-reset': 'Reset camera',
-    'sk-cinema': 'Cinema mode', 'sk-menu': 'Menu (sidebar)',
-    'sk-energy': 'Energy panel', 'sk-shot': 'Screenshot',
-    'sk-settings': 'Settings', 'sk-tile': 'Toggle TILE',
-    'sk-lar': 'Toggle LAr', 'sk-hec': 'Toggle HEC',
-    'sk-tracks': 'Toggle particle tracks', 'sk-clusters': 'Toggle clusters',
-    'sk-bg': 'Pick background color', 'sk-slicer': 'Toggle slicer',
-    'sk-clthr': 'Toggle cluster threshold', 'sk-esc': 'Close / exit',
-    'bgcp-title': 'Scene Background', 'bgcp-presets': 'Presets',
-    'bgcp-reset': 'Reset to Default',
-    'shot-opt-title': 'Transparent background',
-    'shot-opt-sub': 'Save PNG with alpha channel (no scene background)',
-    'empty-live': 'No events yet — waiting for ATLAS Live data from ATLANTIS',
-  },
-  fr: {
-    'logo-full': 'Visionneur de Géométrie Calorimétrique', 'logo-lab': 'NIPSCERN · ATLAS',
-    'btn-live': 'Direct', 'btn-local': 'Local', 'btn-sample': 'Exemples',
-    'sample-loading': 'Chargement des événements…', 'sample-empty': 'Aucun événement exemple trouvé.',
-    'sample-error': 'Erreur lors du chargement de la liste.',
-    'live-starting': 'Démarrage…', 'live-polling': 'Interrogation…', 'live-same': 'À jour',
-    'live-fetching': 'Récupération…', 'live-error': 'Erreur', 'live-stopped': 'Arrêté',
-    'local-folder': 'Sélectionner un dossier', 'local-or': 'ou', 'local-upload': 'Charger XML',
-    'log-title': 'Journal de session', 'status-init': 'Initialisation…',
-    'status-ready': 'Prêt — en attente d\'événement…',
-    'cinema-exit': 'Quitter le cinéma',
-    'slbl-energy': 'Énergie', 'slbl-threshold': 'Seuil', 'thr-placeholder': 'ex. 200 MeV',
-    'about-title': 'Visionneur de Géométrie Calorimétrique', 'about-sub': 'ATLAS · NIPSCERN',
-    'about-p1': 'Visualisation 3D interactive du calorimètre ATLAS — affichage en temps réel des énergies des cellules TileCal, LAr, HEC, FCAL, ainsi que des traces et clusters depuis des données JiveXML en direct ou locales.',
-    'about-advisor-lbl': 'Conseiller scientifique', 'about-advisor-name': 'Prof. Dr. Luciano Manhães de Andrade Filho',
-    'about-dev-lbl': 'Développement', 'about-dev-name': 'Chrysthofer Arthur Amaro Afonso',
-    'about-dev-sub': 'Recherche de premier cycle · Laboratoire NIPSCERN',
-    'about-lab1': 'NIPSCERN — Núcleo de Investigação em Física para o CERN',
-    'about-lab2': 'Collaboration ATLAS · CERN, Genève',
-    'about-supported-by': 'Soutenu par',
-    'about-close': 'Fermer', 'tip-energy-key': 'Énergie',
-    'tip-panel': 'Afficher/masquer le panneau latéral',
-    'tip-cinema': 'Mode cinéma — rotation automatique, UI masquée',
-    'tip-ghost': 'Fantôme ATLAS — activer/désactiver les contours',
-    'tip-info': 'Info cellule — infobulle et contour au survol',
-    'tip-beam': 'Axe faisceau — indicateurs N/S sur l\'axe Z',
-    'tip-lang': 'Changer la langue d\'affichage',
-    'tip-shot': 'Enregistrer une capture d\'écran',
-    'tip-reset': 'Réinitialiser la caméra à la position par défaut',
-    'tip-about': 'À propos de ce projet', 'tip-pin': 'Épingler le panneau visible',
-    'tip-poll-play': 'Reprendre l\'interrogation en direct', 'tip-poll-stop': 'Suspendre l\'interrogation en direct',
-    'shot-title': 'Enregistrer une capture',
-    'shot-sub': 'Sélectionnez la résolution. La scène est rendue en pleine qualité — l\'interface est masquée. Le tooltip actif est composité si visible.',
-    'shot-cancel': 'Annuler', 'shot-save': 'Enregistrer PNG',
-    'shot-rendering': 'Rendu {w}×{h}…',
-    'shot-done': 'PNG enregistré — téléchargement lancé',
-    'shot-error': 'Erreur : {msg}',
-    'just-now': 'à l\'instant', 's-ago': 's', 'm-ago': ' min', 'h-ago': ' h',
-    'log-glb-loaded': 'CaloGeometry.glb chargé',
-    'log-glb-notfound': 'CaloGeometry.glb introuvable',
-    'log-wasm-ready': 'Parser WASM prêt',
-    'log-wasm-error': 'Erreur WASM : ',
-    'log-poller-init': 'Interrogateur en direct initialisé',
-    'log-poller-unavail': 'Interrogateur indisponible — mode local',
-    'log-poll-resumed': 'Interrogation reprise',
-    'log-poll-paused': 'Interrogation suspendue',
-    'log-poll-error': 'Erreur d\'interrogation',
-    'log-no-xml': 'Aucun fichier XML trouvé dans le dossier',
-    'log-folder-loaded': 'Dossier chargé : {n} fichier(s) XML',
-    'log-loading': 'Chargement : ',
-    'log-read-error': 'Erreur de lecture : ',
-    'log-live-download': 'Téléchargement du nouvel événement en direct',
-    'log-new-event': 'Nouvel événement : ',
-    'log-downloading': 'Téléchargement : ',
-    'log-event': 'Événement : ',
-    'sett-preferences': 'Préférences',
-    'sett-hints-label': 'Infobulles des boutons',
-    'sett-hints-sub': 'Afficher les infobulles sur la barre d\'outils',
-    'sett-autopen-label': 'Ouverture automatique au survol',
-    'sett-autopen-sub': 'Afficher le panneau au bord de l\'écran',
-    'sett-tour-label': 'Visite guidée en mode cinéma',
-    'sett-tour-sub': 'Le mode cinéma devient une visite fluide de la géométrie',
-    'sett-shortcuts': 'Raccourcis clavier',
-    'sk-ghost': 'Basculer le contour fantôme', 'sk-beam': 'Basculer l\'axe faisceau',
-    'sk-info': 'Basculer l\'info cellule', 'sk-reset': 'Réinitialiser la caméra',
-    'sk-cinema': 'Mode cinéma', 'sk-menu': 'Menu (panneau latéral)',
-    'sk-energy': 'Panneau énergie', 'sk-shot': 'Capture d\'écran',
-    'sk-settings': 'Paramètres', 'sk-tile': 'Basculer TILE',
-    'sk-lar': 'Basculer LAr', 'sk-hec': 'Basculer HEC',
-    'sk-tracks': 'Basculer les traces', 'sk-clusters': 'Basculer les clusters',
-    'sk-bg': 'Choisir la couleur d\'arrière-plan', 'sk-slicer': 'Basculer le découpeur',
-    'sk-clthr': 'Basculer le seuil de cluster', 'sk-esc': 'Fermer / Quitter',
-    'bgcp-title': 'Arrière-plan de la scène', 'bgcp-presets': 'Pré-réglages',
-    'bgcp-reset': 'Réinitialiser',
-    'shot-opt-title': 'Arrière-plan transparent',
-    'shot-opt-sub': 'Enregistrer PNG avec canal alpha (sans arrière-plan)',
-    'empty-live': 'Aucun événement — en attente des données ATLAS Live (ATLANTIS)',
-  },
-  no: {
-    'logo-full': 'Kalorimeter Geometri Visning', 'logo-lab': 'NIPSCERN · ATLAS',
-    'btn-live': 'Direkte', 'btn-local': 'Lokal', 'btn-sample': 'Eksempler',
-    'sample-loading': 'Laster hendelser…', 'sample-empty': 'Ingen eksempelhendelser funnet.',
-    'sample-error': 'Feil ved lasting av listen.',
-    'live-starting': 'Starter…', 'live-polling': 'Henter data…', 'live-same': 'Oppdatert',
-    'live-fetching': 'Laster ned…', 'live-error': 'Feil', 'live-stopped': 'Stoppet',
-    'local-folder': 'Velg mappe', 'local-or': 'eller', 'local-upload': 'Last opp XML',
-    'log-title': 'Øktlogg', 'status-init': 'Initialiserer…',
-    'status-ready': 'Klar — venter på hendelse…',
-    'cinema-exit': 'Avslutt kino',
-    'slbl-energy': 'Energi', 'slbl-threshold': 'Terskel', 'thr-placeholder': 'f.eks. 200 MeV',
-    'about-title': 'Kalorimeter Geometri Visning', 'about-sub': 'ATLAS · NIPSCERN',
-    'about-p1': 'Interaktiv 3D-visualisering av ATLAS-kalorimeteret — sanntidsvisning av TileCal-, LAr-, HEC- og FCAL-celleenergier, partikkelspor og klynger fra levende eller lokale JiveXML-hendelsesdata.',
-    'about-advisor-lbl': 'Vitenskapelig veileder', 'about-advisor-name': 'Prof. Dr. Luciano Manhães de Andrade Filho',
-    'about-dev-lbl': 'Utvikling', 'about-dev-name': 'Chrysthofer Arthur Amaro Afonso',
-    'about-dev-sub': 'Bachelorsforskning · NIPSCERN-laboratoriet',
-    'about-lab1': 'NIPSCERN — Núcleo de Investigação em Física para o CERN',
-    'about-lab2': 'ATLAS-samarbeidet · CERN, Genève',
-    'about-supported-by': 'Støttet av',
-    'about-close': 'Lukk', 'tip-energy-key': 'Energi',
-    'tip-panel': 'Vis/skjul sidepanelet',
-    'tip-cinema': 'Kinomodus — autorotasjon, skjul grensesnitt',
-    'tip-ghost': 'ATLAS-spøkelse — slå av/på underdetektoromriss',
-    'tip-info': 'Celleinformasjon — verktøytips og omriss ved hover',
-    'tip-beam': 'Stråleaksen — vis N/S-konuser på Z-aksen',
-    'tip-lang': 'Bytt visningsspråk',
-    'tip-shot': 'Lagre skjermbilde — velg oppløsning',
-    'tip-reset': 'Tilbakestill kamera til standardposisjon',
-    'tip-about': 'Om dette prosjektet', 'tip-pin': 'Fest panelet alltid synlig',
-    'tip-poll-play': 'Gjenoppta live-henting', 'tip-poll-stop': 'Sett live-henting på pause',
-    'shot-title': 'Lagre skjermbilde',
-    'shot-sub': 'Velg oppløsning. Scenen gjengis i full kvalitet — grensesnittet er skjult. Aktivt verktøytips legges over hvis synlig.',
-    'shot-cancel': 'Avbryt', 'shot-save': 'Lagre PNG',
-    'shot-rendering': 'Gjengir {w}×{h}…',
-    'shot-done': 'PNG lagret — nedlasting startet',
-    'shot-error': 'Feil: {msg}',
-    'just-now': 'akkurat nå', 's-ago': ' s siden', 'm-ago': ' min siden', 'h-ago': ' t siden',
-    'log-glb-loaded': 'CaloGeometry.glb lastet inn',
-    'log-glb-notfound': 'CaloGeometry.glb ikke funnet',
-    'log-wasm-ready': 'WASM ID-parser klar',
-    'log-wasm-error': 'WASM-feil: ',
-    'log-poller-init': 'Live-henter initialisert',
-    'log-poller-unavail': 'Live-henting utilgjengelig — lokal modus',
-    'log-poll-resumed': 'Henting gjenopptatt',
-    'log-poll-paused': 'Henting satt på pause',
-    'log-poll-error': 'Hentingsfeil',
-    'log-no-xml': 'Ingen XML-filer funnet i valgt mappe',
-    'log-folder-loaded': 'Mappe lastet: {n} XML-fil(er)',
-    'log-loading': 'Laster: ',
-    'log-read-error': 'Lesfeil: ',
-    'log-live-download': 'Laster ned ny hendelse fra live-strøm',
-    'log-new-event': 'Ny hendelse: ',
-    'log-downloading': 'Laster ned: ',
-    'log-event': 'Hendelse: ',
-    'sett-preferences': 'Preferanser',
-    'sett-hints-label': 'Knappetips',
-    'sett-hints-sub': 'Vis verktøytips på verktøylinjen',
-    'sett-autopen-label': 'Åpne sidepanelet ved hover',
-    'sett-autopen-sub': 'Vis panelet når markøren når skjermkanten',
-    'sett-tour-label': 'Omvisning i kinomodus',
-    'sett-tour-sub': 'Kinomodus blir en glatt kameratur gjennom detektoren',
-    'sett-shortcuts': 'Hurtigtaster',
-    'sk-ghost': 'Veksle spøkelsesramme', 'sk-beam': 'Veksle stråleaksen',
-    'sk-info': 'Veksle celleinformasjon', 'sk-reset': 'Tilbakestill kamera',
-    'sk-cinema': 'Kinomodus', 'sk-menu': 'Meny (sidepanel)',
-    'sk-energy': 'Energipanel', 'sk-shot': 'Skjermbilde',
-    'sk-settings': 'Innstillinger', 'sk-tile': 'Veksle TILE',
-    'sk-lar': 'Veksle LAr', 'sk-hec': 'Veksle HEC',
-    'sk-tracks': 'Veksle partikkelspor', 'sk-clusters': 'Veksle klynger',
-    'sk-bg': 'Velg bakgrunnsfarge', 'sk-slicer': 'Veksle kutteren',
-    'sk-clthr': 'Veksle klyngeterskel', 'sk-esc': 'Lukk / Avslutt',
-    'bgcp-title': 'Scenebakgrunn', 'bgcp-presets': 'Forhåndsinnstillinger',
-    'bgcp-reset': 'Tilbakestill',
-    'shot-opt-title': 'Gjennomsiktig bakgrunn',
-    'shot-opt-sub': 'Lagre PNG med alfakanal (ingen bakgrunn)',
-    'empty-live': 'Ingen hendelser — venter på ATLAS Live-data fra ATLANTIS',
-  },
-  pt: {
-    'logo-full': 'Visualizador de Geometria do Calorímetro', 'logo-lab': 'NIPSCERN · ATLAS',
-    'btn-live': 'Ao Vivo', 'btn-local': 'Local', 'btn-sample': 'Amostras',
-    'sample-loading': 'Carregando eventos…', 'sample-empty': 'Nenhum evento de amostra encontrado.',
-    'sample-error': 'Erro ao carregar a lista de eventos.',
-    'live-starting': 'Iniciando…', 'live-polling': 'Verificando…', 'live-same': 'Atualizado',
-    'live-fetching': 'Baixando…', 'live-error': 'Erro', 'live-stopped': 'Parado',
-    'local-folder': 'Selecionar Pasta', 'local-or': 'ou', 'local-upload': 'Enviar XML',
-    'log-title': 'Log de Sessão', 'status-init': 'Inicializando…',
-    'status-ready': 'Pronto — aguardando evento…',
-    'cinema-exit': 'Sair do Cinema',
-    'slbl-energy': 'Energia', 'slbl-threshold': 'Limiar', 'thr-placeholder': 'ex. 200 MeV',
-    'about-title': 'Visualizador de Geometria do Calorímetro', 'about-sub': 'ATLAS · NIPSCERN',
-    'about-p1': 'Visualização 3D interativa do calorímetro ATLAS — exibição em tempo real das energias das células TileCal, LAr, HEC e FCAL, além de trajetórias de partículas e clusters a partir de dados JiveXML ao vivo ou locais.',
-    'about-advisor-lbl': 'Orientador Científico', 'about-advisor-name': 'Prof. Dr. Luciano Manhães de Andrade Filho',
-    'about-dev-lbl': 'Desenvolvimento', 'about-dev-name': 'Chrysthofer Arthur Amaro Afonso',
-    'about-dev-sub': 'Iniciação Científica · Laboratório NIPSCERN',
-    'about-lab1': 'NIPSCERN — Núcleo de Investigação em Física para o CERN',
-    'about-lab2': 'Colaboração ATLAS · CERN, Genebra',
-    'about-supported-by': 'Apoio',
-    'about-close': 'Fechar', 'tip-energy-key': 'Energia',
-    'tip-panel': 'Mostrar/ocultar painel lateral',
-    'tip-cinema': 'Modo cinema — rotação automática, ocultar interface',
-    'tip-ghost': 'ATLAS fantasma — ativar/desativar contornos dos subdetectores',
-    'tip-info': 'Info da célula — tooltip e contorno ao passar o mouse',
-    'tip-beam': 'Eixo do feixe — cones N/S no eixo Z',
-    'tip-lang': 'Mudar idioma de exibição',
-    'tip-shot': 'Salvar captura de tela — escolher resolução',
-    'tip-reset': 'Redefinir câmera para posição padrão',
-    'tip-about': 'Sobre este projeto', 'tip-pin': 'Fixar painel sempre visível',
-    'tip-poll-play': 'Retomar monitoramento ao vivo', 'tip-poll-stop': 'Pausar monitoramento ao vivo',
-    'shot-title': 'Salvar Captura de Tela',
-    'shot-sub': 'Selecione a resolução. A cena é renderizada em qualidade máxima — a interface é ocultada. O tooltip ativo é composto se visível.',
-    'shot-cancel': 'Cancelar', 'shot-save': 'Salvar PNG',
-    'shot-rendering': 'Renderizando {w}×{h}…',
-    'shot-done': 'PNG salvo — download iniciado',
-    'shot-error': 'Erro: {msg}',
-    'just-now': 'agora mesmo', 's-ago': 's atrás', 'm-ago': ' min atrás', 'h-ago': ' h atrás',
-    'log-glb-loaded': 'CaloGeometry.glb carregado',
-    'log-glb-notfound': 'CaloGeometry.glb não encontrado',
-    'log-wasm-ready': 'Parser WASM pronto',
-    'log-wasm-error': 'Erro WASM: ',
-    'log-poller-init': 'Monitoramento ao vivo iniciado',
-    'log-poller-unavail': 'Monitoramento indisponível — modo local',
-    'log-poll-resumed': 'Monitoramento retomado',
-    'log-poll-paused': 'Monitoramento pausado',
-    'log-poll-error': 'Erro no monitoramento',
-    'log-no-xml': 'Nenhum arquivo XML encontrado na pasta',
-    'log-folder-loaded': 'Pasta carregada: {n} arquivo(s) XML',
-    'log-loading': 'Carregando: ',
-    'log-read-error': 'Erro de leitura: ',
-    'log-live-download': 'Baixando novo evento do feed ao vivo',
-    'log-new-event': 'Novo evento: ',
-    'log-downloading': 'Baixando: ',
-    'log-event': 'Evento: ',
-    'sett-preferences': 'Preferências',
-    'sett-hints-label': 'Dicas dos botões',
-    'sett-hints-sub': 'Exibir tooltips nos botões da barra de ferramentas',
-    'sett-autopen-label': 'Abrir painel ao passar o mouse',
-    'sett-autopen-sub': 'Mostrar painel ao aproximar o cursor da borda',
-    'sett-tour-label': 'Tour guiado no modo cinema',
-    'sett-tour-sub': 'O modo cinema vira um passeio suave pela geometria',
-    'sett-shortcuts': 'Atalhos do Teclado',
-    'sk-ghost': 'Alternar contorno fantasma', 'sk-beam': 'Alternar eixo do feixe',
-    'sk-info': 'Alternar info da célula', 'sk-reset': 'Resetar câmera',
-    'sk-cinema': 'Modo cinema', 'sk-menu': 'Menu (painel lateral)',
-    'sk-energy': 'Painel de energia', 'sk-shot': 'Captura de tela',
-    'sk-settings': 'Configurações', 'sk-tile': 'Alternar TILE',
-    'sk-lar': 'Alternar LAr', 'sk-hec': 'Alternar HEC',
-    'sk-tracks': 'Alternar trajetórias', 'sk-clusters': 'Alternar clusters',
-    'sk-bg': 'Escolher cor de fundo', 'sk-slicer': 'Alternar fatiador',
-    'sk-clthr': 'Alternar limiar de cluster', 'sk-esc': 'Fechar / Sair',
-    'bgcp-title': 'Fundo da cena', 'bgcp-presets': 'Predefinições',
-    'bgcp-reset': 'Restaurar padrão',
-    'shot-opt-title': 'Fundo transparente',
-    'shot-opt-sub': 'Salvar PNG com canal alfa (sem fundo de cena)',
-    'empty-live': 'Sem eventos — aguardando dados do ATLAS Live (ATLANTIS)',
-  },
-};
+// i18n
+initLanguage();
+setupLanguagePicker();
 
-let currentLang = 'en';
-function t(key) {
-  return (TRANSLATIONS[currentLang] ?? TRANSLATIONS.en)[key]
-      ?? TRANSLATIONS.en[key]
-      ?? key;
-}
 
-function applyLang(lang) {
-  currentLang = lang;
-  const htmlLang = { no: 'nb', pt: 'pt-BR' };
-  document.documentElement.lang = htmlLang[lang] ?? lang;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const v = t(el.dataset.i18n); if (v) el.textContent = v;
-  });
-  document.querySelectorAll('[data-i18n-tip]').forEach(el => {
-    const v = t(el.dataset.i18nTip); if (v) el.dataset.tip = v;
-  });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-    const v = t(el.dataset.i18nPh); if (v) el.placeholder = v;
-  });
-  document.querySelectorAll('.lang-opt').forEach(o =>
-    o.classList.toggle('on', o.dataset.lang === lang)
-  );
-  localStorage.setItem('cgv-lang', lang);
-}
-
-// Auto-detect language
-{
-  const saved   = localStorage.getItem('cgv-lang');
-  const browser = (navigator.language ?? 'en').split('-')[0].replace('nb','no').replace('nn','no');
-  const initial = saved ?? (['en','fr','no','pt'].includes(browser) ? browser : 'en');
-  applyLang(initial);
-}
-
-// ── Constants ─────────────────────────────────────────────────────────────────
-const PAL_N   = 256;
-const DEF_THR = 200;
-
-// ── State ─────────────────────────────────────────────────────────────────────
-const meshByName = new Map();   // string → Mesh  (non-hot-path: origMat restore, debug)
-const meshByKey  = new Map();   // int    → Mesh  (hot-path: event loop lookup)
-const origMat    = new Map();
-let   active     = new Map();   // Mesh → tooltip data  (keyed by object reference)
+// State
+const meshByKey  = new Map();   // int -> Mesh (hot-path: event loop lookup)
+// Every non-envelope cell mesh from the GLB, grouped by detector. Populated
+// once at load time so "show all cells" can reach meshes whose names don't
+// match the strict meshNameToKey regex (e.g. gap scintillators, ITC cells).
+const cellMeshesByDet = { TILE: [], LAR: [], HEC: [] };
+let   active     = new Map();   // Mesh -> tooltip data (keyed by object reference)
 let   rayTargets = [];
 
-// ── Integer key encoding — avoids string construction in the per-cell hot path ─
+// Integer key encoding: avoids string construction in the per-cell hot path.
 // Bits [1:0] = detector type tag: TILE=0b00, LAr EM=0b01, HEC=0b10 (no cross-type collision).
-// TILE:   x(5b<<2) | side(1b<<7) | k(4b<<8) | module(6b<<12)       — 18 bits total
+// TILE:   x(5b<<2) | side(1b<<7) | k(4b<<8) | module(6b<<12) - 18 bits total
 // LAr EM: (abs_be-1)(2b<<2) | samp(2b<<4) | R(3b<<6) | z_pos(1b<<9) | eta(9b<<10) | phi(8b<<19) | cell2(1b<<27)
 // HEC:    group(2b<<2) | region(1b<<4) | z_pos(1b<<5) | cum_eta(5b<<6) | phi(6b<<11)
 const _tileKey  = (x, s, k, mod) => (x<<2)|(s<<7)|(k<<8)|(mod<<12);
@@ -389,26 +43,41 @@ function meshNameToKey(name) {
   const c = name.indexOf(S, b+1); if (c < 0) return null;
   const l1 = name.slice(a+1, b), l2 = name.slice(b+1, c), l3 = name.slice(c+1);
   let m;
-  // TILE / MBTS — Tile{x}{y}_0 → Tile{x}{y}{k}_{k} → cell_{mod}
+  // TILE / MBTS: Tile{x}{y}_0 -> Tile{x}{y}{k}_{k} -> cell_{mod}
   if ((m = /^Tile(\d+)([pn])_0$/.exec(l1))) {
     const x = +m[1], s = m[2]==='p' ? 1 : 0;
     const m2 = /^Tile\d+[pn](\d+)_\d+$/.exec(l2); if (!m2) return null;
     const m3 = /^cell_(\d+)$/.exec(l3);            if (!m3) return null;
     return _tileKey(x, s, +m2[1], +m3[1]);
   }
-  // LAr EM — EM{X}_{samp}_{R}_{Z}_{W} → EM{X}_{samp}_{R}_{Z}_{eta}_{eta} → cell[2]_{phi}
+  // LAr EM: EM{X}_{samp}_{R}_{Z}_{W} -> EM{X}_{samp}_{R}_{Z}_{eta}_{eta} -> cell[2]_{phi}
   if ((m = /^EM(Barrel|EndCap)_(\d+)_(\d+)_([pn])_\d+$/.exec(l1))) {
     const ab = m[1]==='Barrel' ? 1 : +m[3], sa = +m[2], R = +m[3], z = m[4]==='p' ? 1 : 0;
     const m2 = /^EM(?:Barrel|EndCap)_\d+_\d+_[pn]_(\d+)_\d+$/.exec(l2); if (!m2) return null;
     const m3 = /^cell(2?)_(\d+)$/.exec(l3);                               if (!m3) return null;
     return _larEmKey(ab, sa, R, z, +m2[1], +m3[2], m3[1]==='2' ? 1 : 0);
   }
-  // HEC — HEC_{name}_{region}_{Z}_0 → HEC_{name}_{region}_{Z}_{cum}_{cum} → cell_{phi}
+  // HEC: HEC_{name}_{region}_{Z}_0 -> HEC_{name}_{region}_{Z}_{cum}_{cum} -> cell_{phi}
   if ((m = /^HEC_(\w+)_(\d+)_([pn])_0$/.exec(l1))) {
     const g = HEC_NAMES.indexOf(m[1]); if (g < 0) return null;
     const m2 = /^HEC_\w+_\d+_[pn]_(\d+)_\d+$/.exec(l2); if (!m2) return null;
     const m3 = /^cell_(\d+)$/.exec(l3);                   if (!m3) return null;
     return _hecKey(g, +m[2], m[3]==='p' ? 1 : 0, +m2[1], +m3[1]);
+  }
+  return null;
+}
+
+// Broader detector classifier for show-all-cells mode — matches every cell
+// mesh (leaves, not envelopes) regardless of whether meshNameToKey accepted it.
+// Envelopes are skipped via the ghost-envelope list.
+function classifyCellDet(name) {
+  if (ghostVisible.has(name)) return null;
+  const parts = name.split('\u2192');
+  if (parts.length < 3) return null;               // envelopes have 2 segments
+  for (const p of parts) {
+    if (p.startsWith('EMBarrel') || p.startsWith('EMEndCap')) return 'LAR';
+    if (p.startsWith('HEC_')) return 'HEC';
+    if (/^Tile/.test(p))      return 'TILE';
   }
   return null;
 }
@@ -448,13 +117,13 @@ let activeMbtsLabels      = null;  // null = no cluster filter; Set<string> = MB
 let clusterFilterEnabled  = true;
 let _readyFired  = false;
 
-// ── Loading screen helpers ─────────────────────────────────────────────────────
+// Loading screen helpers
 const _loadBar = document.getElementById('loading-bar');
 const _loadMsg = document.getElementById('loading-msg');
 
 // RAF loop: eases _barCurrent toward _barTarget, plus an asymptotic creep so
 // the bar is never truly frozen during the GLB parse phase.
-// Creep ceiling: 79% — success callback jumps to 100%.
+// Creep ceiling: 79% - success callback jumps to 100%.
 let _barTarget  = 0;
 let _barCurrent = 0;
 let _barRafId   = null;
@@ -484,31 +153,21 @@ function dismissLoadingScreen() {
   setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 750);
 }
 
-// ── Session log ───────────────────────────────────────────────────────────────
-const logListEl = document.getElementById('log-list');
-const reqBadge  = document.getElementById('req-badge');
-function addLog(msg, type = '') {
-  if (!logListEl) return;
-  const ts = new Date().toLocaleTimeString(document.documentElement.lang || 'en', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const el = document.createElement('div');
-  el.className = 'logrow' + (type ? ' ' + type : '');
-  el.textContent = `[${ts}] ${msg}`;
-  el.title = el.textContent;
-  logListEl.prepend(el);
-  while (logListEl.children.length > 60) logListEl.lastElementChild.remove();
-}
-function bumpReq(label = '') {
+const reqBadge = document.getElementById('req-badge');
+function bumpReq() {
   reqCount++;
   if (reqBadge) reqBadge.textContent = `${reqCount} req`;
-  if (label) addLog(label);
 }
 
-// ── Palette TILE: #ffff00 (min) → #800000 (max), linear ──────────────────────
+// Palette helpers
+const PAL_N = 256;
+
+// Palette TILE: #ffff00 (min) -> #800000 (max), linear
 function palColorTile(t) {
   t = Math.max(0, Math.min(1, t));
   return new THREE.Color(
-    1.000 + t * (0.502 - 1.000),       // R: 1.0 → 0.502
-    1.000 + t * (0.000 - 1.000),       // G: 1.0 → 0.0
+    1.000 + t * (0.502 - 1.000),       // R: 1.0 -> 0.502
+    1.000 + t * (0.000 - 1.000),       // G: 1.0 -> 0.0
     0.0                                 // B: always 0
   );
 }
@@ -523,13 +182,13 @@ function palMatTile(eMev) {
   return PAL_TILE[Math.round(tv * (PAL_N - 1))];
 }
 
-// ── Palette HEC: #66e0f6 (min) → #0c0368 (max), linear ─────────────────────
+// Palette HEC: #66e0f6 (min) -> #0c0368 (max), linear
 function palColorHec(t) {
   t = Math.max(0, Math.min(1, t));
   return new THREE.Color(
-    0.4000 + t * (0.0471 - 0.4000),   // R: 0.40 → 0.05
-    0.8784 + t * (0.0118 - 0.8784),   // G: 0.88 → 0.01
-    0.9647 + t * (0.4078 - 0.9647)    // B: 0.96 → 0.41
+    0.4000 + t * (0.0471 - 0.4000),   // R: 0.40 -> 0.05
+    0.8784 + t * (0.0118 - 0.8784),   // G: 0.88 -> 0.01
+    0.9647 + t * (0.4078 - 0.9647)    // B: 0.96 -> 0.41
   );
 }
 const PAL_HEC = Array.from({ length: PAL_N }, (_, i) => {
@@ -543,12 +202,12 @@ function palMatHec(eMev) {
   return PAL_HEC[Math.round(tv * (PAL_N - 1))];
 }
 
-// ── Palette LAr: #17cf42 (min) → #270042 (max), linear ──────────────────────
+// Palette LAr: #17cf42 (min) -> #270042 (max), linear
 function palColorLAr(t) {
   t = Math.max(0, Math.min(1, t));
   return new THREE.Color(
-    0.0902 + t * (0.1529 - 0.0902),   // R: 0.09 → 0.15
-    0.8118 + t * (0.0000 - 0.8118),   // G: 0.81 → 0
+    0.0902 + t * (0.1529 - 0.0902),   // R: 0.09 -> 0.15
+    0.8118 + t * (0.0000 - 0.8118),   // G: 0.81 -> 0
     0.2588                              // B: constant
   );
 }
@@ -557,15 +216,15 @@ const PAL_LAR = Array.from({ length: PAL_N }, (_, i) => {
   c.offsetHSL(0, 0.35, 0);
   return new THREE.MeshBasicMaterial({ color: c, side: THREE.FrontSide });
 });
-const LAR_SCALE = 1000; // MeV — fixed 0–1 GeV
+const LAR_SCALE = 1000; // MeV - fixed 0-1 GeV
 function palMatLAr(eMev) {
   const tv = Math.max(0, Math.min(1, eMev / LAR_SCALE));
   return PAL_LAR[Math.round(tv * (PAL_N - 1))];
 }
 
-// ── Palette FCAL: copper ramp (deep patina → molten copper → hot gold) ────────
+// Palette FCAL: copper ramp (deep patina -> molten copper -> hot gold)
 // Non-linear curve (gamma 0.55) keeps low energies dark and lets high values
-// pop visibly; stops: #1a0600 → #6b2310 → #c8642a → #ffb26a → #ffeabe
+// pop visibly; stops: #1a0600 -> #6b2310 -> #c8642a -> #ffb26a -> #ffeabe
 const FCAL_SCALE = 7000; // MeV slider range (7 GeV)
 const _FCAL_STOPS = [
   [0.102, 0.024, 0.000], // 0.00  deep patina
@@ -588,7 +247,7 @@ function palColorFcalRgb(t) {
   return _FCAL_STOPS[_FCAL_STOPS.length-1];
 }
 
-// ── Ghost — Calorimeter envelope meshes ──────────────────────────────────────
+// Ghost: calorimeter envelope meshes
 // All envelope meshes from the .glb share a single ghost material (same color,
 // same opacity) so they render as a visually unified outline regardless of any
 // material that might have been assigned by the exporter.
@@ -603,18 +262,6 @@ const GHOST_MESH_NAMES = [
   'Calorimeter→EBHECp_0',
   'Calorimeter→EBHECn_0',
 ];
-// Per-ghost UI metadata: short id used for DOM ids, label / sub-label in panel.
-const GHOST_META = {
-  'Calorimeter→LBTile_0':     { id:'LBTile',     label:'LB Tile',        sub:'Long barrel · Tile',      color:'#c87c18' },
-  'Calorimeter→LBTileLArg_0': { id:'LBTileLArg', label:'LB Tile·LAr',    sub:'Long barrel · Tile/LAr',  color:'#9b8a30' },
-  'Calorimeter→LBLArg_0':     { id:'LBLArg',     label:'LB LAr',         sub:'Long barrel · LAr',       color:'#27b568' },
-  'Calorimeter→EBTilep_0':    { id:'EBTilep',    label:'EB Tile +',      sub:'Extended barrel + · Tile',color:'#c87c18' },
-  'Calorimeter→EBTilen_0':    { id:'EBTilen',    label:'EB Tile −',      sub:'Extended barrel − · Tile',color:'#c87c18' },
-  'Calorimeter→EBTileHECp_0': { id:'EBTileHECp', label:'EB Tile·HEC +',  sub:'Ext. barrel + · Tile/HEC',color:'#a47042' },
-  'Calorimeter→EBTileHECn_0': { id:'EBTileHECn', label:'EB Tile·HEC −',  sub:'Ext. barrel − · Tile/HEC',color:'#a47042' },
-  'Calorimeter→EBHECp_0':     { id:'EBHECp',     label:'EB HEC +',       sub:'Extended barrel + · HEC', color:'#66e0f6' },
-  'Calorimeter→EBHECn_0':     { id:'EBHECn',     label:'EB HEC −',       sub:'Extended barrel − · HEC', color:'#66e0f6' },
-};
 // Ghosts enabled by default on startup (the TileCal envelopes).
 const GHOST_DEFAULT_ON = new Set([
   'Calorimeter→LBTile_0',
@@ -624,14 +271,13 @@ const GHOST_DEFAULT_ON = new Set([
   'Calorimeter→EBTileHECp_0',
   'Calorimeter→EBTileHECn_0',
 ]);
-// Per-ghost visibility state (name → bool); seeded from defaults at boot.
+// Per-ghost visibility state (name -> bool); seeded from defaults at boot.
 const ghostVisible = new Map();
 for (const n of GHOST_MESH_NAMES) ghostVisible.set(n, GHOST_DEFAULT_ON.has(n));
+const ghostMeshByName = new Map();
 
-// Mutable ghost colours / opacity (updated by UI controls)
-// RGB(92,95,102) = #5C5F66; 90% transparency = 10% opacity
+// Fixed ghost colors / opacity - RGB(92,95,102) = #5C5F66; 94% transparent = 6% opacity
 let ghostSolidColor = 0x5C5F66;
-let ghostPhiColor   = 0xFFFFFF;
 let ghostSolidOpacity = 0.01;  // 94% transparent
 
 const ghostSolidMat = new THREE.MeshBasicMaterial({
@@ -649,7 +295,6 @@ const ghostPhiMat = new THREE.LineBasicMaterial({
 // ── Phi-segmentation lines (TileCal) ─────────────────────────────────────────
 // 64 radial planes in φ, each as a rectangle: 4 edges at r_inner → r_outer,
 // spanning z_min → z_max of each TileCal barrel+ext-barrel envelope.
-// Geometry constants (mm) from the ATLAS TileCal geometry:
 //   LB  : r_in=2288  r_out=3835  z = ±2820
 //   EB p: r_in=2288  r_out=3835  z = [3600, 6050]
 //   EB n: r_in=2288  r_out=3835  z = [-6050, -3600]
@@ -691,14 +336,13 @@ function anyGhostOn() {
 
 // Apply a single ghost mesh's visibility + force the unified ghost material.
 function applyGhostMeshOne(name, visible) {
-  const mesh = meshByName.get(name);
+  const mesh = ghostMeshByName.get(name);
   if (!mesh) return;
   if (visible) {
     mesh.material    = ghostSolidMat;
     mesh.renderOrder = 5;
     mesh.visible     = true;
   } else {
-    mesh.material    = origMat.get(name) ?? mesh.material;
     mesh.renderOrder = 0;
     mesh.visible     = false;
   }
@@ -713,13 +357,6 @@ function applyAllGhostMeshes() {
 }
 
 function syncGhostToggles() {
-  for (const name of GHOST_MESH_NAMES) {
-    const el = document.getElementById('gtog-' + GHOST_META[name].id);
-    if (!el) continue;
-    const v = ghostVisible.get(name);
-    el.classList.toggle('on', v);
-    el.setAttribute('aria-checked', String(v));
-  }
   document.getElementById('btn-ghost').classList.toggle('on', anyGhostOn());
 }
 
@@ -768,34 +405,6 @@ function updateGhostColors() {
   dirty = true;
 }
 
-// ── Ghost UI controls ─────────────────────────────────────────────────────────
-document.getElementById('ghost-alpha-slider').addEventListener('input', e => {
-  const pct = parseInt(e.target.value);
-  document.getElementById('ghost-alpha-val').textContent = pct + '%';
-  ghostSolidOpacity = (100 - pct) / 100;  // pct = transparency%; 90% → 0.10 opacity
-  updateGhostColors();
-});
-
-function hexToInt(hex) { return parseInt(hex.replace('#',''), 16); }
-
-document.getElementById('ghost-solid-color').addEventListener('input', e => {
-  ghostSolidColor = hexToInt(e.target.value);
-  document.getElementById('ghost-solid-swatch').style.background = e.target.value;
-  updateGhostColors();
-});
-document.getElementById('ghost-solid-color').addEventListener('click', e => e.stopPropagation());
-document.getElementById('ghost-solid-swatch').closest('label').addEventListener('click', () => {
-  document.getElementById('ghost-solid-color').click();
-});
-
-document.getElementById('ghost-phi-color').addEventListener('input', e => {
-  ghostPhiColor = hexToInt(e.target.value);
-  document.getElementById('ghost-phi-swatch').style.background = e.target.value;
-  updateGhostColors();
-});
-document.getElementById('ghost-phi-swatch').closest('label').addEventListener('click', () => {
-  document.getElementById('ghost-phi-color').click();
-});
 
 // ── Renderer ──────────────────────────────────────────────────────────────────
 const canvas   = document.getElementById('c');
@@ -862,7 +471,6 @@ window.addEventListener('resize', () => {
 });
 
 // ── Status bar ────────────────────────────────────────────────────────────────
-const statusEl = document.getElementById('statusbar');
 const statusTxtEl = document.getElementById('status-txt');
 function setStatus(h) { statusTxtEl.innerHTML = h; }
 function checkReady() {
@@ -912,7 +520,6 @@ setLoadProgress(0, 'Downloading geometry…');
     ).arrayBuffer();
   } catch (e) {
     setStatus('<span class="warn">CaloGeometry.glb.gz not found.</span>');
-    addLog(t('log-glb-notfound'), 'warn');
     setLoadProgress(100, 'Geometry skipped');
     sceneOk = true; checkReady();
     return;
@@ -927,19 +534,18 @@ setLoadProgress(0, 'Downloading geometry…');
         o.matrixAutoUpdate = false;
         o.frustumCulled = false;  // all cells inside camera bounds always
         o.visible = false;
-        meshByName.set(o.name, o);
+        if (ghostVisible.has(o.name)) ghostMeshByName.set(o.name, o);
         const mkey = meshNameToKey(o.name);
         if (mkey !== null) meshByKey.set(mkey, o);
-        origMat.set(o.name, o.material);
+        const det = classifyCellDet(o.name);
+        if (det) cellMeshesByDet[det].push(o);
       });
       sceneOk = true; dirty = true;
       setLoadProgress(100, 'Geometry loaded');
-      addLog(t('log-glb-loaded'), 'ok');
       checkReady();
     },
     e => {
       setStatus(`<span class="warn">GLB parse error: ${esc(e.message)}</span>`);
-      addLog('GLB parse error: ' + e.message, 'err');
     }
   );
 })();
@@ -948,12 +554,10 @@ setLoadProgress(0, 'Downloading geometry…');
 wasmInit()
   .then(() => {
     wasmOk = true;
-    addLog(t('log-wasm-ready'), 'ok');
     checkReady();
   })
   .catch(e  => {
     setStatus(`<span class="err">WASM: ${esc(e.message)}</span>`);
-    addLog(t('log-wasm-error') + e.message, 'err');
   });
 
 // ── TileCal cell display label ────────────────────────────────────────────────
@@ -1480,23 +1084,30 @@ function _getFcalEdgeBase() {
 
 function _applyFcalDraw() {
   // While the slicer is active, also carve FCAL tubes whose centre sits inside
-  // the bubble. FCAL cells use (x,y,z,dz) in cm — convert to scene mm (×10).
-  const slicerOn = (typeof slicerActive !== 'undefined') && slicerActive;
-  const slR2     = slicerOn ? slicerRadius * slicerRadius : 0;
-  const slPx     = slicerOn ? slicerPos.x : 0;
-  const slPy     = slicerOn ? slicerPos.y : 0;
-  const slPz     = slicerOn ? slicerPos.z : 0;
+  // the Z-aligned cylindrical wedge anchored at the ATLAS origin. FCAL cells
+  // use (x,y,z,dz) in cm — convert to scene mm (×10).
+  const slicerOn   = (typeof slicerActive !== 'undefined') && slicerActive;
+  const slR2       = slicerOn ? SLICER_RADIUS * SLICER_RADIUS : 0;
+  const slZMax     = slicerOn ? slicerZOffset + slicerHalfHeight : 0;
+  const slZMin     = slicerOn ? slicerZOffset - slicerHalfHeight : 0;
+  const slThetaLen = slicerOn ? slicerThetaLength : 0;
+  const slFullTh   = slThetaLen >= 2 * Math.PI - 1e-6;
 
   const visible = fcalCellsData.filter(c => {
     if (!showFcal) return false;
-    // Hide cells with negative energy — they aren't physically meaningful for display.
-    if (c.energy < 0) return false;
-    if (c.energy * 1000 < thrFcalMev) return false;
-    if (activeClusterCellIds !== null && c.id && !activeClusterCellIds.has(c.id)) return false;
-    if (slicerOn) {
+    // Hide cells with negative energy — they aren't physically meaningful for
+    // display, unless show-all is on (user explicitly asked for every cell).
+    if (!showAllCells && c.energy < 0) return false;
+    if (!showAllCells && c.energy * 1000 < thrFcalMev) return false;
+    if (!showAllCells && activeClusterCellIds !== null && c.id && !activeClusterCellIds.has(c.id)) return false;
+    if (slicerOn && slThetaLen > 1e-6) {
       const cx = -c.x * 10, cy = -c.y * 10, cz = c.z * 10;
-      const dx = cx - slPx, dy = cy - slPy, dz = cz - slPz;
-      if (dx*dx + dy*dy + dz*dz < slR2) return false;
+      if (cx*cx + cy*cy < slR2 && cz > slZMin && cz < slZMax) {
+        if (slFullTh) return false;
+        let ang = Math.atan2(cy, cx);
+        if (ang < 0) ang += 2 * Math.PI;
+        if (ang < slThetaLen) return false;
+      }
     }
     return true;
   });
@@ -1637,9 +1248,17 @@ function drawClusters(clusters) {
 
 // ── Scene reset ───────────────────────────────────────────────────────────────
 function resetScene() {
-  for (const [name, mesh] of meshByName) {
-    mesh.visible = false; mesh.material = origMat.get(name) ?? mesh.material; mesh.renderOrder = 0;
+  for (const mesh of meshByKey.values()) {
+    mesh.visible = false;
+    mesh.renderOrder = 0;
   }
+  // meshByKey misses cells whose names bypassed the strict parser (ITC, gap
+  // scintillators, etc.) but they show up in show-all mode; reset them too.
+  for (const det of ['TILE', 'LAR', 'HEC'])
+    for (const mesh of cellMeshesByDet[det]) {
+      mesh.visible = false;
+      mesh.renderOrder = 0;
+    }
   // Re-apply ghost state: resetScene hides all meshes (including ghost envelopes),
   // which would desync the ghostVisible map and make the next ghost toggle
   // render only the phi lines without the solid envelopes.
@@ -1654,6 +1273,50 @@ function resetScene() {
   activeMbtsLabels     = null;
   tooltip.hidden = true; dirty = true;
 }
+// Sweep every mesh from the GLB that isn't part of the XML's `active` set and
+// decide its visibility for the "show all cells" mode. When showAllCells is off,
+// non-active meshes stay hidden (the normal flow). When on, each non-active
+// mesh is painted with the minimum-palette colour of its detector, and hidden
+// if the slicer wedge currently covers it.
+function _syncNonActiveShowAll() {
+  if (!showAllCells) return;         // non-active cells stay hidden by the normal flow
+  const slicerOn = slicerActive;
+  const r2       = slicerOn ? SLICER_RADIUS * SLICER_RADIUS : 0;
+  const zMax     = slicerOn ? slicerZOffset + slicerHalfHeight : 0;
+  const zMin     = slicerOn ? slicerZOffset - slicerHalfHeight : 0;
+  const thetaLen = slicerOn ? slicerThetaLength : 0;
+  const fullTh   = slicerOn && thetaLen >= 2 * Math.PI - 1e-6;
+  const emptyTh  = slicerOn && thetaLen <= 1e-6;
+  const sweep = (list, detOn, mat) => {
+    for (let i = 0; i < list.length; i++) {
+      const mesh = list[i];
+      if (active.has(mesh)) continue;   // active cells: normal flow handles them
+      if (!detOn) { mesh.visible = false; continue; }
+      let vis = true;
+      if (slicerOn && !emptyTh) {
+        const c = _cellCenter(mesh);
+        if (c.x*c.x + c.y*c.y < r2 && c.z > zMin && c.z < zMax) {
+          if (fullTh) vis = false;
+          else {
+            let ang = Math.atan2(c.y, c.x);
+            if (ang < 0) ang += 2 * Math.PI;
+            if (ang < thetaLen) vis = false;
+          }
+        }
+      }
+      if (vis) {
+        mesh.material    = mat;
+        mesh.renderOrder = 2;
+        rayTargets.push(mesh);          // include in outline build
+      }
+      mesh.visible = vis;
+    }
+  };
+  sweep(cellMeshesByDet.TILE, showTile, PAL_TILE[0]);
+  sweep(cellMeshesByDet.LAR,  showLAr,  PAL_LAR[0]);
+  sweep(cellMeshesByDet.HEC,  showHec,  PAL_HEC[0]);
+}
+
 function applyThreshold() {
   // When the slicer is active it owns cell visibility (its mask already
   // incorporates the thresholds / cluster filter). Delegate to it so we don't
@@ -1673,10 +1336,15 @@ function applyThreshold() {
     } else {
       inCluster = true;                                           // no ID and not MBTS → always pass
     }
-    // Hide cells with negative energy regardless of threshold.
-    const vis = detOn && energyMev >= 0 && (!isFinite(thr) || energyMev >= thr) && inCluster;
+    // Show-all bypasses every filter (threshold, cluster, negative energy) —
+    // the user wants literally every cell on an enabled detector visible.
+    const passThr = showAllCells || (!isFinite(thr) || energyMev >= thr);
+    const passCl  = showAllCells || inCluster;
+    const passNeg = showAllCells || energyMev >= 0;
+    const vis     = detOn && passNeg && passThr && passCl;
     mesh.visible = vis; if (vis) rayTargets.push(mesh);
   }
+  _syncNonActiveShowAll();
   rebuildAllOutlines();
   dirty = true;
 }
@@ -1690,7 +1358,7 @@ function processXml(xmlText) {
   // Parse XML once — all detectors share the same Document
   let doc, tileCells, larCells, hecCells, mbtsCells, fcalCells;
   try { doc = parseXmlDoc(xmlText); }
-  catch (e) { setStatus(`<span class="err">${esc(e.message)}</span>`); addLog(e.message, 'err'); return; }
+  catch (e) { setStatus(`<span class="err">${esc(e.message)}</span>`); return; }
   currentEventInfo = parseEventInfo(doc);
   try { tileCells = parseTile(doc); } catch { tileCells = []; }
   try { larCells  = parseLAr(doc);  } catch { larCells  = []; }
@@ -1699,7 +1367,7 @@ function processXml(xmlText) {
   try { fcalCells = parseFcal(doc); } catch { fcalCells = []; }
 
   const total = tileCells.length + larCells.length + hecCells.length + mbtsCells.length;
-  if (!total && !fcalCells.length) { setStatus('<span class="warn">No TILE, LAr, HEC, MBTS or FCAL cells found</span>'); addLog('No cells in XML', 'warn'); return; }
+  if (!total && !fcalCells.length) { setStatus('<span class="warn">No TILE, LAr, HEC, MBTS or FCAL cells found</span>'); return; }
 
   setStatus(`Decoding ${total} cells…`);
   resetScene();
@@ -1870,13 +1538,7 @@ function processXml(xmlText) {
 
   const nHit    = nTile + nMbts + nLAr + nHec;
   const allMiss = nMiss + nHecMiss + nMbtsMiss;
-  // Statusbar now shows event metadata instead of cell counts.
-  // Cell counts still go to the log for diagnostics.
   showEventInfo(currentEventInfo);
-  if (nHecMiss)  addLog(`HEC: ${nHec} mapped · ${nHecMiss} unmapped`, 'warn');
-  if (nMbtsMiss) addLog(`MBTS: ${nMbts} mapped · ${nMbtsMiss} unmapped`, 'warn');
-  if (fcalCells.length) addLog(`FCAL: ${fcalCells.length} lines`, 'ok');
-  addLog(`${nHit} cells${allMiss ? ` · ${allMiss} unmapped` : ''} (${dt}s)`, 'ok');
 }
 
 // ── Right panel (rpanel) toggle — mirrors left panel behavior ────────────────
@@ -1928,9 +1590,6 @@ function switchTab(det) {
     if (pane) pane.style.display = d === det ? 'flex' : 'none';
     if (tab)  tab.classList.toggle('on', d === det);
   });
-  // Keep ghost pane always hidden
-  const gp = document.getElementById('pane-ghost');
-  if (gp) gp.style.display = 'none';
 }
 TAB_IDS.forEach(d => document.getElementById('tab-' + d).addEventListener('click', () => switchTab(d)));
 document.getElementById('tab-cluster').addEventListener('click', () => switchTab('cluster'));
@@ -2041,6 +1700,8 @@ const fcalSlider = makeDetSlider('fcal-strak', 'fcal-sthumb', 'fcal-thr-input',
 const hecSlider  = makeDetSlider('hec-strak',  'hec-sthumb',  'hec-thr-input',
   () => thrHecMev,  v => { thrHecMev = v; },  HEC_SCALE,  'hec-sval-max');
 
+function fmtGev(v) { return v.toFixed(2) + ' GeV'; }
+
 // ── Track pT slider (dynamic range — updates each event) ─────────────────────
 function makeTrackPtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
   const trackEl  = document.getElementById(trackId);
@@ -2049,8 +1710,6 @@ function makeTrackPtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
   const maxLblEl = document.getElementById(maxLblId);
   const minLblEl = document.getElementById(minLblId);
   let drag = false;
-
-  function fmtGev(v) { return v.toFixed(2) + ' GeV'; }
 
   function updateUI() {
     const span = trackPtMaxGev - trackPtMinGev;
@@ -2115,7 +1774,6 @@ function makeClusterEtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
   const minLblEl = document.getElementById(minLblId);
   let drag = false;
 
-  function fmtGev(v) { return v.toFixed(2) + ' GeV'; }
 
   function updateUI() {
     const span = clusterEtMaxGev - clusterEtMinGev;
@@ -2350,8 +2008,12 @@ const raycast  = new THREE.Raycaster();
 raycast.firstHitOnly = true;  // stop after first intersection (much faster)
 raycast.params.Line = { threshold: 25 };  // 25 mm hit zone for track lines
 const mxy      = new THREE.Vector2();
-const tooltip  = document.getElementById('tip');
-let   lastRay  = 0;
+const tooltip    = document.getElementById('tip');
+const tipCellEl  = document.getElementById('tip-cell');
+const tipCoordEl = document.getElementById('tip-coords');
+const tipEEl     = document.getElementById('tip-e');
+const tipEKeyEl  = document.querySelector('#tip .tkey');
+let   lastRay    = 0;
 let   mousePos = { x: 0, y: 0 };
 document.addEventListener('mousemove', e => { mousePos.x = e.clientX; mousePos.y = e.clientY; });
 function doRaycast(clientX, clientY) {
@@ -2369,7 +2031,6 @@ function doRaycast(clientX, clientY) {
   mxy.set(((clientX-rect.left)/rect.width)*2-1, -((clientY-rect.top)/rect.height)*2+1);
   camera.updateMatrixWorld();
   raycast.setFromCamera(mxy, camera);
-  const tipEKeyEl = document.querySelector('#tip .tkey');
   // ── Cell + FCAL hit (same priority — pick closest) ────────────────────────
   {
     let cellHit = null, cellDist = Infinity;
@@ -2392,9 +2053,9 @@ function doRaycast(clientX, clientY) {
     if (cellHit && cellDist <= fcalDist) {
       const data = active.get(cellHit.object);
       showOutline(cellHit.object);
-      document.getElementById('tip-cell').textContent   = data.cellName;
-      document.getElementById('tip-coords').textContent = data.coords ?? '';
-      document.getElementById('tip-e').textContent      = `${data.energyGev.toFixed(4)} GeV`;
+      tipCellEl.textContent  = data.cellName;
+      tipCoordEl.textContent = data.coords ?? '';
+      tipEEl.textContent     = `${data.energyGev.toFixed(4)} GeV`;
       if (tipEKeyEl) tipEKeyEl.textContent = t('tip-energy-key');
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
@@ -2405,9 +2066,9 @@ function doRaycast(clientX, clientY) {
       const cell = fcalVisibleMap[iid];
       showFcalOutline(iid);
       const side = cell.eta >= 0 ? 'A' : 'C';
-      document.getElementById('tip-cell').textContent   = `FCAL${cell.module} (${side}-side)`;
-      document.getElementById('tip-coords').textContent = `η = ${cell.eta.toFixed(3)}   φ = ${cell.phi.toFixed(3)} rad`;
-      document.getElementById('tip-e').textContent      = `${cell.energy.toFixed(4)} GeV`;
+      tipCellEl.textContent  = `FCAL${cell.module} (${side}-side)`;
+      tipCoordEl.textContent = `η = ${cell.eta.toFixed(3)}   φ = ${cell.phi.toFixed(3)} rad`;
+      tipEEl.textContent     = `${cell.energy.toFixed(4)} GeV`;
       if (tipEKeyEl) tipEKeyEl.textContent = t('tip-energy-key');
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
@@ -2423,9 +2084,9 @@ function doRaycast(clientX, clientY) {
       const ptGev        = line.userData.ptGev        ?? 0;
       const storeGateKey = line.userData.storeGateKey ?? '';
       clearOutline();
-      document.getElementById('tip-cell').textContent   = 'Track';
-      document.getElementById('tip-coords').textContent = storeGateKey;
-      document.getElementById('tip-e').textContent      = `${ptGev.toFixed(3)} GeV`;
+      tipCellEl.textContent  = 'Track';
+      tipCoordEl.textContent = storeGateKey;
+      tipEEl.textContent     = `${ptGev.toFixed(3)} GeV`;
       if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
@@ -2438,13 +2099,12 @@ function doRaycast(clientX, clientY) {
     const clusterHits = raycast.intersectObjects(visibleClusters, false);
     if (clusterHits.length) {
       const line         = clusterHits[0].object;
-      console.log('[cluster hit] userData:', JSON.stringify(line.userData));
       const etGev        = line.userData.etGev        ?? 0;
       const storeGateKey = line.userData.storeGateKey ?? '';
       clearOutline();
-      document.getElementById('tip-cell').textContent   = 'Cluster';
-      document.getElementById('tip-coords').textContent = storeGateKey;
-      document.getElementById('tip-e').textContent      = `${etGev.toFixed(3)} GeV`;
+      tipCellEl.textContent  = 'Cluster';
+      tipCoordEl.textContent = storeGateKey;
+      tipEEl.textContent     = `${etGev.toFixed(3)} GeV`;
       if (tipEKeyEl) tipEKeyEl.innerHTML = 'E<sub>T</sub>';
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
@@ -2693,42 +2353,10 @@ document.getElementById('btn-info').addEventListener('click', () => {
   document.querySelector('#btn-info use').setAttribute('href', showInfo ? '#i-eye' : '#i-eye-off');
   if (!showInfo) { clearOutline(); tooltip.hidden = true; }
 });
-// Ghost panel: floating popover mirroring the Detector Layers panel.
-const ghostPanel = document.getElementById('ghost-panel');
-let ghostPanelOpen = false;
-function openGhostPanel() {
-  ghostPanelOpen = true;
-  ghostPanel.classList.add('open');
-  document.getElementById('btn-ghost').classList.add('on');
-  const br = document.getElementById('btn-ghost').getBoundingClientRect();
-  requestAnimationFrame(() => {
-    const pw = ghostPanel.offsetWidth  || 210;
-    const ph = ghostPanel.offsetHeight || 170;
-    let left = br.left + br.width / 2 - pw / 2;
-    let top  = br.top - ph - 10;
-    left = Math.max(6, Math.min(left, window.innerWidth  - pw - 6));
-    top  = Math.max(6, top);
-    ghostPanel.style.left = left + 'px';
-    ghostPanel.style.top  = top  + 'px';
-  });
-}
-function closeGhostPanel() {
-  ghostPanelOpen = false;
-  ghostPanel.classList.remove('open');
-  syncGhostToggles(); // keep btn-ghost lit state accurate
-}
 document.getElementById('btn-ghost').addEventListener('click', e => {
   e.stopPropagation();
   toggleAllGhosts();
 });
-for (const name of GHOST_MESH_NAMES) {
-  const el = document.getElementById('gtog-' + GHOST_META[name].id);
-  if (el) el.addEventListener('click', () => toggleGhostByName(name));
-}
-const _gbtnAll  = document.getElementById('gbtn-all');
-const _gbtnNone = document.getElementById('gbtn-none');
-if (_gbtnAll)  _gbtnAll .addEventListener('click', () => setAllGhosts(true));
-if (_gbtnNone) _gbtnNone.addEventListener('click', () => setAllGhosts(false));
 document.getElementById('btn-beam').addEventListener('click', toggleBeam);
 document.getElementById('btn-reset').addEventListener('click', resetCamera);
 
@@ -2879,32 +2507,6 @@ const aboutOverlay = document.getElementById('about-overlay');
 document.getElementById('btn-about-close').addEventListener('click', () => aboutOverlay.classList.remove('open'));
 aboutOverlay.addEventListener('click', e => { if (e.target===aboutOverlay) aboutOverlay.classList.remove('open'); });
 
-// ── Language picker ───────────────────────────────────────────────────────────
-const langMenu = document.getElementById('lang-menu');
-document.getElementById('btn-lang').addEventListener('click', e => {
-  e.stopPropagation();
-  const open = langMenu.classList.toggle('open');
-  if (open) {
-    const br = document.getElementById('btn-lang').getBoundingClientRect();
-    const mw = langMenu.offsetWidth || 140;
-    const mh = langMenu.offsetHeight || 110;
-    let left = br.left + br.width/2 - mw/2;
-    let top  = br.top - mh - 10;
-    left = Math.max(6, Math.min(left, window.innerWidth - mw - 6));
-    top  = Math.max(6, top);
-    langMenu.style.left = left + 'px';
-    langMenu.style.top  = top  + 'px';
-  }
-});
-document.addEventListener('click', () => langMenu.classList.remove('open'));
-document.querySelectorAll('.lang-opt').forEach(opt => {
-  opt.addEventListener('click', e => {
-    e.stopPropagation();
-    applyLang(opt.dataset.lang);
-    langMenu.classList.remove('open');
-  });
-});
-
 // ── Button hint tooltips ──────────────────────────────────────────────────────
 const btnTipEl = document.getElementById('btn-tip');
 function showBtnTip(anchor, text) {
@@ -3000,18 +2602,13 @@ if (LivePoller) poller = new LivePoller();
 function setLiveDot(state) {
   const dot   = document.getElementById('ldot');
   const txt   = document.getElementById('live-txt');
-  const brand = document.getElementById('log-brand');
   dot.className = 'ldot';
-  const isLiveActive = state === 'polling' || state === 'downloading' || state === 'same';
-  if (brand) brand.classList.toggle('live', isLiveActive);
   switch (state) {
     case 'polling':     dot.classList.add('ok','pulse'); txt.textContent = t('live-polling'); break;
     case 'same':        dot.classList.add('ok');         txt.textContent = t('live-same'); break;
-    case 'downloading': dot.classList.add('dl','pulse'); txt.textContent = t('live-fetching'); bumpReq(t('log-live-download'));
-      if (brand) { startProgress(); advanceProgress('download'); } break;
-    case 'error':       dot.classList.add('err');        txt.textContent = t('live-error'); addLog(t('log-poll-error'),'err'); break;
+    case 'downloading': dot.classList.add('dl','pulse'); txt.textContent = t('live-fetching'); bumpReq(); startProgress(); advanceProgress('download'); break;
+    case 'error':       dot.classList.add('err');        txt.textContent = t('live-error'); break;
     default:            txt.textContent = t('live-stopped');
-      if (brand) brand.classList.remove('live');
   }
 }
 function renderEvtList() {
@@ -3035,9 +2632,9 @@ function renderEvtList() {
       </div>
       <button class="edl"><svg class="ic" style="width:11px;height:11px"><use href="#i-dl"/></svg></button>`;
     row.querySelector('.einfo').addEventListener('click', () => {
-      curEvtId = entry.id; processXml(entry.text); renderEvtList(); addLog(t('log-event') + entry.name, 'info');
+      curEvtId = entry.id; processXml(entry.text); renderEvtList();
     });
-    row.querySelector('.edl').addEventListener('click', ev => { ev.stopPropagation(); poller.download(idx); addLog(t('log-downloading') + entry.name); });
+    row.querySelector('.edl').addEventListener('click', ev => { ev.stopPropagation(); poller.download(idx); });
     el.appendChild(row);
   });
 }
@@ -3047,62 +2644,36 @@ setInterval(() => {
 if (poller) {
   poller.addEventListener('newxml', ({ detail: { entry } }) => {
     startProgress(); advanceProgress('load');
-    curEvtId = entry.id; processXml(entry.text); renderEvtList(); bumpReq(t('log-new-event') + entry.name);
+    curEvtId = entry.id; processXml(entry.text); renderEvtList(); bumpReq();
     endProgress();
   });
   poller.addEventListener('listupdate', renderEvtList);
   poller.addEventListener('status', ({ detail: { state } }) => setLiveDot(state));
-  poller.addEventListener('error', ({ detail }) => { console.warn('[LivePoller]', detail.message); addLog('Poller: '+detail.message,'warn'); });
-  poller.init().then(() => { renderEvtList(); addLog(t('log-poller-init'),'ok'); }).catch(()=>{});
+  poller.addEventListener('error', ({ detail }) => { console.warn('[LivePoller]', detail.message); });
+  poller.init().then(() => { renderEvtList(); }).catch(()=>{});
 } else {
   document.getElementById('btn-local').click();
-  addLog(t('log-poller-unavail'),'warn');
 }
 document.getElementById('ibtn-play').addEventListener('click', () => {
   if (!poller) return; poller.start();
   document.getElementById('ibtn-play').hidden = true; document.getElementById('ibtn-stop').hidden = false;
-  addLog(t('log-poll-resumed'));
 });
 document.getElementById('ibtn-stop').addEventListener('click', () => {
   if (!poller) return; poller.stop();
   document.getElementById('ibtn-stop').hidden = true; document.getElementById('ibtn-play').hidden = false;
-  setLiveDot('stopped'); addLog(t('log-poll-paused'));
+  setLiveDot('stopped');
 });
 
 
-// ── Log collapse ──────────────────────────────────────────────────────────────
-document.getElementById('btn-log-min')?.addEventListener('click', () => {
-  const sec  = document.getElementById('log-sec');
-  const icon = document.getElementById('log-min-icon');
-  if (!sec) return;
-  const willCollapse = !sec.classList.contains('log-collapsed');
-  if (willCollapse) {
-    // Preserve any user-resized height so we can restore it on expand,
-    // then clear the inline styles so the .log-collapsed CSS rule can win.
-    sec.dataset.savedMaxH = sec.style.maxHeight || '';
-    sec.dataset.savedMinH = sec.style.minHeight || '';
-    sec.style.maxHeight = '';
-    sec.style.minHeight = '';
-    sec.classList.add('log-collapsed');
-  } else {
-    sec.classList.remove('log-collapsed');
-    if (sec.dataset.savedMaxH) sec.style.maxHeight = sec.dataset.savedMaxH;
-    if (sec.dataset.savedMinH) sec.style.minHeight = sec.dataset.savedMinH;
-  }
-  if (icon) icon.className = willCollapse ? 'ti ti-chevron-up' : 'ti ti-chevron-down';
-  const btn = document.getElementById('btn-log-min');
-  if (btn) btn.dataset.tip = willCollapse ? 'Expand session log' : 'Minimize session log';
-});
 
 // ── Local mode ────────────────────────────────────────────────────────────────
 let localFiles = [];
 document.getElementById('file-folder-in').addEventListener('change', async e => {
   const files = [...(e.target.files??[])].filter(f => f.name.toLowerCase().endsWith('.xml'));
   e.target.value = '';
-  if (!files.length) { addLog(t('log-no-xml'),'warn'); return; }
+  if (!files.length) return;
   localFiles = files.sort((a,b) => a.name.localeCompare(b.name));
   renderLocalList();
-  addLog(t('log-folder-loaded').replace('{n}', localFiles.length), 'ok');
 });
 
 // ── Carousel ──────────────────────────────────────────────────────────────────
@@ -3124,7 +2695,6 @@ document.getElementById('btn-carousel-play').addEventListener('click', () => {
   carouselActive = true;
   document.getElementById('btn-carousel-play').hidden = true;
   document.getElementById('btn-carousel-stop').hidden = false;
-  addLog('Carousel started — ' + localFiles.length + ' files', 'info');
   runCarouselStep();
 });
 document.getElementById('btn-carousel-stop').addEventListener('click', stopCarousel);
@@ -3134,7 +2704,6 @@ function stopCarousel() {
   clearTimeout(carouselTimer);
   document.getElementById('btn-carousel-stop').hidden = true;
   document.getElementById('btn-carousel-play').hidden = false;
-  addLog('Carousel stopped');
 }
 async function runCarouselStep() {
   if (!carouselActive || !localFiles.length) return;
@@ -3144,8 +2713,7 @@ async function runCarouselStep() {
   document.getElementById('carousel-status').textContent =
     `${carouselIdx + 1} / ${localFiles.length}`;
   const file = localFiles[carouselIdx];
-  addLog('Carousel: ' + file.name);
-  try { processXml(await file.text()); } catch(e) { addLog('Carousel error: ' + e.message, 'err'); }
+  try { processXml(await file.text()); } catch(e) { console.warn('Carousel error:', e.message); }
   carouselIdx++;
   carouselTimer = setTimeout(runCarouselStep, carouselDelaySec * 1000);
 }
@@ -3160,7 +2728,7 @@ function renderLocalList() {
     row.innerHTML = `<span class="lrow-name">${esc(file.name)}</span><span class="lrow-size">${fmtSize(file.size)}</span>`;
     row.addEventListener('click', async () => {
       document.querySelectorAll('#local-list .lrow.cur').forEach(r => r.classList.remove('cur'));
-      row.classList.add('cur'); addLog(t('log-loading') + file.name); setStatus('Reading file…');
+      row.classList.add('cur'); setStatus('Reading file…');
       startProgress('local'); advanceProgress('acquire');
       try {
         const text = await file.text();
@@ -3170,7 +2738,6 @@ function renderLocalList() {
       } catch (err) {
         endProgress();
         setStatus(`<span class="err">Read error: ${esc(err.message)}</span>`);
-        addLog(t('log-read-error') + err.message,'err');
       }
     });
     listEl.appendChild(row);
@@ -3179,7 +2746,7 @@ function renderLocalList() {
 document.getElementById('file-in').addEventListener('change', async e => {
   const f = e.target.files?.[0];
   if (f) {
-    addLog(t('log-loading') + f.name); setStatus('Parsing…');
+    setStatus('Parsing…');
     startProgress('local'); advanceProgress('acquire');
     try { processXml(await f.text()); advanceProgress('load'); endProgress(); }
     catch (err) { endProgress(); setStatus(`<span class="err">${esc(err.message)}</span>`); }
@@ -3204,17 +2771,16 @@ document.getElementById('file-in').addEventListener('change', async e => {
     sec.classList.remove('dragover');
     const items = e.dataTransfer?.files ? [...e.dataTransfer.files] : [];
     const xmls = items.filter(f => f.name.toLowerCase().endsWith('.xml'));
-    if (!xmls.length) { addLog('No .xml files in drop','warn'); return; }
+    if (!xmls.length) return;
     if (xmls.length === 1) {
       const f = xmls[0];
-      addLog(t('log-loading') + f.name); setStatus('Reading file…');
+      setStatus('Reading file…');
       startProgress('local'); advanceProgress('acquire');
       try { processXml(await f.text()); advanceProgress('load'); endProgress(); }
       catch (err) { endProgress(); setStatus(`<span class="err">${esc(err.message)}</span>`); }
     } else {
       localFiles = xmls.sort((a,b) => a.name.localeCompare(b.name));
       renderLocalList();
-      addLog(`Dropped ${localFiles.length} XML files`, 'ok');
     }
     // Switch to local tab
     document.getElementById('btn-local')?.click();
@@ -3243,7 +2809,7 @@ async function loadSampleIndex() {
       btn.addEventListener('click', async () => {
         document.querySelectorAll('.sample-item.cur').forEach(b => b.classList.remove('cur'));
         btn.classList.add('cur');
-        addLog(t('log-loading') + name); setStatus('Loading sample…');
+        setStatus('Loading sample…');
         startProgress(); advanceProgress('request');
         try {
           const xmlRes = await fetch(`./default_xml/${encodeURIComponent(name)}`);
@@ -3256,7 +2822,6 @@ async function loadSampleIndex() {
         } catch (err) {
           endProgress();
           setStatus(`<span class="err">Error: ${esc(err.message)}</span>`);
-          addLog(t('log-read-error') + err.message, 'err');
           btn.classList.remove('cur');
         }
       });
@@ -3266,7 +2831,6 @@ async function loadSampleIndex() {
   } catch (err) {
     msgEl.textContent = t('sample-error');
     msgEl.hidden = false;
-    addLog('Sample index error: ' + err.message, 'err');
   }
 }
 
@@ -3483,10 +3047,10 @@ const DEFAULT_BG_HEX = '#020d1c';
 
   presets.forEach(p => {
     p.style.background = p.dataset.c;
-    p.addEventListener('click', () => applyColor(p.dataset.c, { save: true, syncSliders: true }));
+    p.addEventListener('click', () => applyColor(p.dataset.c, { save: true, syncCursors: true }));
   });
 
-  resetBtn.addEventListener('click', () => applyColor(DEFAULT_BG_HEX, { save: true, syncSliders: true }));
+  resetBtn.addEventListener('click', () => applyColor(DEFAULT_BG_HEX, { save: true, syncCursors: true }));
 
   // ── Popover open/close/position ────────────────────────────────────
   function position() {
@@ -3527,7 +3091,7 @@ const DEFAULT_BG_HEX = '#020d1c';
   // ── Initial color ──────────────────────────────────────────────────
   const saved = localStorage.getItem('cgv-bg-color');
   const initial = (saved && /^#[0-9a-f]{6}$/i.test(saved)) ? saved : DEFAULT_BG_HEX;
-  applyColor(initial, { save: false, syncSliders: true });
+  applyColor(initial, { save: false, syncCursors: true });
 })();
 
 async function renderAndDownload(targetW, targetH) {
@@ -3542,8 +3106,8 @@ async function renderAndDownload(targetW, targetH) {
   let tipData = null;
   if (tipVisible) {
     tipData = {
-      cellName: document.getElementById('tip-cell').textContent,
-      energy:   document.getElementById('tip-e').textContent,
+      cellName: tipCellEl.textContent,
+      energy:   tipEEl.textContent,
       // Tooltip position as fraction of the current viewport
       xFrac: (parseFloat(tooltip.style.left) - canvas.getBoundingClientRect().left) / origW * origPR,
       yFrac: (parseFloat(tooltip.style.top)  - canvas.getBoundingClientRect().top)  / origH * origPR,
@@ -3689,31 +3253,6 @@ function relTime(ts) {
   return `${Math.floor(s/3600)}${t('h-ago')}`;
 }
 
-// ── Log section vertical resize ───────────────────────────────────────────────
-(function () {
-  const logSec    = document.getElementById('log-sec');
-  const logResize = document.getElementById('log-resize');
-  if (!logSec || !logResize) return;
-  let lrDrag = false, lrStartY = 0, lrStartH = 0;
-  logResize.addEventListener('pointerdown', e => {
-    lrDrag = true; lrStartY = e.clientY;
-    lrStartH = logSec.getBoundingClientRect().height;
-    logResize.setPointerCapture(e.pointerId);
-    logResize.classList.add('dragging');
-    e.preventDefault();
-  });
-  document.addEventListener('pointermove', e => {
-    if (!lrDrag) return;
-    const delta = lrStartY - e.clientY; // drag up → taller
-    const newH  = Math.max(50, Math.min(320, lrStartH + delta));
-    logSec.style.maxHeight = newH + 'px';
-    logSec.style.minHeight = newH + 'px';
-  });
-  document.addEventListener('pointerup', () => {
-    if (!lrDrag) return; lrDrag = false;
-    logResize.classList.remove('dragging');
-  });
-})();
 
 // ── Download progress bar ─────────────────────────────────────────────────────
 const DL_STAGES = ['request', 'recogn', 'download', 'acquire', 'load'];
@@ -3892,10 +3431,25 @@ document.getElementById('btn-about').addEventListener('click', () => {
 // cluster filters).
 let slicerGroup   = null;
 let slicerActive  = false;
-let slicerPos     = new THREE.Vector3(0, 0, 2000);  // initial cylinder point (z=2m)
-let slicerRadius  = 1500;   // bubble radius in mm (scroll-adjustable)
-const SLICER_R_MIN = 200;
-const SLICER_R_MAX = 8000;
+// Cut-volume is an invisible Z-aligned cylindrical wedge anchored at the origin.
+// The user controls two parameters by click-dragging the handle:
+//   · screen-Y drag → angular sweep (thetaLength, 0..2π)
+//   · screen-X drag → total height (mm, symmetric around origin)
+const SLICER_RADIUS       = 5000;            // cylinder radius, mm (fixed)
+const SLICER_HEIGHT_MIN   = 0;                // minimum total height, mm
+const SLICER_HEIGHT_MAX   = 20000;            // maximum total height, mm
+const SLICER_HEIGHT_INIT  = 3000;             // initial total height, mm (3 m)
+let   slicerHalfHeight    = SLICER_HEIGHT_INIT * 0.5;  // current half-height, mm
+let   slicerThetaLength   = 2 * Math.PI;      // wedge sweep, 0..2π
+const SLICER_THETA_DRAG_PX   = 300;           // px for a full 2π Y-drag
+const SLICER_HEIGHT_MM_PER_PX = 20;           // mm per px of X-drag (total height)
+// Right-click + drag translates the whole cut volume (handle + cylinder)
+// along the scene's Z axis. Independent of the left-drag behaviours above.
+let   slicerZOffset = 0;                      // world-Z translation of the cut volume, mm
+// Show-all-cells toggle: when true, every mesh from the GLB whose detector is
+// enabled is made visible. Cells absent from the current XML (not in `active`)
+// are painted with the minimum-palette colour for their detector.
+let   showAllCells  = false;
 // Cache of cell center world positions so we don't re-compute every frame.
 const _cellCenterCache = new Map();
 // Squared-distance helper (avoids sqrt in the hot loop)
@@ -3946,42 +3500,17 @@ function _buildSlicerGizmo() {
   g.add(sph);
   g.userData.handle = sph;
 
-  // Translucent bubble visualising the cut-volume radius.
-  const bubbleGeo = new THREE.SphereGeometry(1, 32, 24);
-  const bubbleMat = new THREE.MeshBasicMaterial({
-    color: 0x33bbff, transparent: true, opacity: 0.10,
-    depthWrite: false, side: THREE.DoubleSide,
-  });
-  const bubble = new THREE.Mesh(bubbleGeo, bubbleMat);
-  bubble.renderOrder = 19;
-  g.add(bubble);
-  g.userData.bubble = bubble;
-  // Wireframe edge for the bubble (subtle)
-  const bubbleEdgeGeo = new THREE.WireframeGeometry(bubbleGeo);
-  const bubbleEdgeMat = new THREE.LineBasicMaterial({
-    color: 0x33bbff, transparent: true, opacity: 0.35, depthTest: false,
-  });
-  const bubbleEdge = new THREE.LineSegments(bubbleEdgeGeo, bubbleEdgeMat);
-  bubbleEdge.renderOrder = 20;
-  g.add(bubbleEdge);
-  g.userData.bubbleEdge = bubbleEdge;
-
   return g;
 }
 
 function _updateSlicerBasis() {
   if (!slicerGroup) return;
-  slicerGroup.position.copy(slicerPos);
-  const phi = Math.atan2(slicerPos.y, slicerPos.x);
-  const rxy = Math.hypot(slicerPos.x, slicerPos.y);
+  // Handle sits at the slicer's current Z offset (0 unless translated by right-drag);
+  // arrows show fixed ATLAS axes.
+  slicerGroup.position.set(0, 0, slicerZOffset);
   slicerGroup.userData.arrowZ.setDirection(new THREE.Vector3(0, 0, 1));
-  slicerGroup.userData.arrowP.setDirection(new THREE.Vector3(-Math.sin(phi),  Math.cos(phi), 0));
-  const radial = rxy > 1e-6
-    ? new THREE.Vector3(slicerPos.x / rxy, slicerPos.y / rxy, 0)
-    : new THREE.Vector3(1, 0, 0);
-  slicerGroup.userData.arrowT.setDirection(radial);
-  if (slicerGroup.userData.bubble)     slicerGroup.userData.bubble.scale.setScalar(slicerRadius);
-  if (slicerGroup.userData.bubbleEdge) slicerGroup.userData.bubbleEdge.scale.setScalar(slicerRadius);
+  slicerGroup.userData.arrowP.setDirection(new THREE.Vector3(0, 1, 0));
+  slicerGroup.userData.arrowT.setDirection(new THREE.Vector3(1, 0, 0));
   slicerGroup.updateMatrix();
   _applySlicerMask();
 }
@@ -3991,8 +3520,13 @@ function _updateSlicerBasis() {
 function _applySlicerMask() {
   if (!slicerActive) return;
   rayTargets = [];
-  const r2 = slicerRadius * slicerRadius;
-  const px = slicerPos.x, py = slicerPos.y, pz = slicerPos.z;
+  // Cylindrical wedge, optionally translated along Z by right-click drag.
+  const r2       = SLICER_RADIUS * SLICER_RADIUS;
+  const zMax     = slicerZOffset + slicerHalfHeight;
+  const zMin     = slicerZOffset - slicerHalfHeight;
+  const thetaLen = slicerThetaLength;
+  const fullTh   = thetaLen >= 2 * Math.PI - 1e-6;
+  const emptyTh  = thetaLen <= 1e-6;
   for (const [mesh, { energyMev, det, cellId, mbtsLabel }] of active) {
     const thr    = det === 'LAR' ? thrLArMev  : det === 'HEC' ? thrHecMev : thrTileMev;
     const detOn  = det === 'LAR' ? showLAr    : det === 'HEC' ? showHec   : showTile;
@@ -4006,16 +3540,29 @@ function _applySlicerMask() {
     } else {
       inCluster = true;
     }
-    const passFilter = detOn && energyMev >= 0 && (!isFinite(thr) || energyMev >= thr) && inCluster;
+    const passThr    = showAllCells || (!isFinite(thr) || energyMev >= thr);
+    const passCl     = showAllCells || inCluster;
+    const passNeg    = showAllCells || energyMev >= 0;
+    const passFilter = detOn && passNeg && passThr && passCl;
     let vis = passFilter;
-    if (vis) {
+    if (vis && !emptyTh) {
       const c = _cellCenter(mesh);
-      const dx = c.x - px, dy = c.y - py, dz = c.z - pz;
-      if (dx*dx + dy*dy + dz*dz < r2) vis = false;   // inside bubble → hide
+      // Inside Z-aligned cylindrical wedge at origin: r² in XY, z within
+      // [zMin, zMax], and polar angle within [0, thetaLen).
+      if (c.x*c.x + c.y*c.y < r2 && c.z > zMin && c.z < zMax) {
+        if (fullTh) {
+          vis = false;
+        } else {
+          let ang = Math.atan2(c.y, c.x);
+          if (ang < 0) ang += 2 * Math.PI;
+          if (ang < thetaLen) vis = false;
+        }
+      }
     }
     mesh.visible = vis;
     if (vis) rayTargets.push(mesh);
   }
+  _syncNonActiveShowAll();
   rebuildAllOutlines();
   // FCAL tubes are drawn separately (instanced) — rebuild with current bubble.
   applyFcalThreshold();
@@ -4038,61 +3585,85 @@ function disableSlicer() {
   if (!slicerActive) return;
   slicerActive = false;
   if (slicerGroup) slicerGroup.visible = false;
-  // Re-apply user filters now that the bubble cut is gone.
+  // Re-apply user filters now that the cut is gone.
   applyThreshold();
   applyFcalThreshold();
   document.getElementById('btn-slicer').classList.remove('on');
 }
 function toggleSlicer() { slicerActive ? disableSlicer() : enableSlicer(); }
 
-// Drag interaction — click and drag the central sphere to reposition the gizmo.
-// We project mouse motion onto a plane through slicerPos perpendicular to the
-// camera view direction, then snap the result as the new cylindrical point.
+// Show-all-cells toggle — makes every GLB mesh visible for enabled detectors,
+// painting cells absent from the XML with the minimum palette colour of their
+// detector. Delegates to applyThreshold/_applySlicerMask for the actual sweep.
+function toggleShowAllCells() {
+  const wasOn = showAllCells;
+  showAllCells = !showAllCells;
+  document.getElementById('btn-showall').classList.toggle('on', showAllCells);
+  // When turning off, hide the non-active meshes we had shown so the normal
+  // flow (which skips non-active cells) leaves the scene clean.
+  if (wasOn) {
+    for (const det of ['TILE', 'LAR', 'HEC'])
+      for (const mesh of cellMeshesByDet[det])
+        if (!active.has(mesh)) mesh.visible = false;
+  }
+  applyThreshold();
+  applyFcalThreshold();
+}
+document.getElementById('btn-showall').addEventListener('click', toggleShowAllCells);
+
+// Drag interaction — click and drag the handle to reshape the cut volume.
+// The handle itself is pinned at the origin and never moves.
+//   · screen-Y  → angular sweep (thetaLength, 0..2π)
+//   · screen-X  → total cylinder height (mm, symmetric around origin)
 (function () {
   const btn = document.getElementById('btn-slicer');
   if (btn) btn.addEventListener('click', toggleSlicer);
 
-  const dragRay   = new THREE.Raycaster();
+  const dragRay = new THREE.Raycaster();
   dragRay.params.Line = { threshold: 25 };
-  const dragPlane = new THREE.Plane();
-  const dragHit   = new THREE.Vector3();
-  const _planeN   = new THREE.Vector3();
-  let   dragging  = false;
-  let   dragOffset = new THREE.Vector3();
+  let dragging        = false;
+  let dragStartX      = 0;
+  let dragStartY      = 0;
+  let dragStartTheta  = 0;
+  let dragStartHeight = 0;
 
   function _pointerXY(e) {
     const rect = canvas.getBoundingClientRect();
     return {
-      x: ((e.clientX - rect.left) / rect.width)  *  2 - 1,
+      x:  ((e.clientX - rect.left) / rect.width)  *  2 - 1,
       y: -((e.clientY - rect.top)  / rect.height) *  2 + 1,
     };
   }
 
   canvas.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;                 // left-button only; other buttons → new IIFE
     if (!slicerActive || !slicerGroup) return;
     const pt = _pointerXY(e);
     dragRay.setFromCamera(pt, camera);
     const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
     if (!hits.length) return;
-    dragging = true;
+    dragging         = true;
+    dragStartX       = e.clientX;
+    dragStartY       = e.clientY;
+    dragStartTheta   = slicerThetaLength;
+    dragStartHeight  = slicerHalfHeight * 2;
     controls.enabled = false;
     canvas.setPointerCapture(e.pointerId);
-    // Plane perpendicular to camera forward, through slicerPos
-    camera.getWorldDirection(_planeN);
-    dragPlane.setFromNormalAndCoplanarPoint(_planeN, slicerPos);
-    dragRay.ray.intersectPlane(dragPlane, dragHit);
-    dragOffset.copy(slicerPos).sub(dragHit);
     e.preventDefault();
     e.stopPropagation();
   }, /* capture: */ true);
   canvas.addEventListener('pointermove', e => {
     if (!dragging) return;
-    const pt = _pointerXY(e);
-    dragRay.setFromCamera(pt, camera);
-    if (dragRay.ray.intersectPlane(dragPlane, dragHit)) {
-      slicerPos.copy(dragHit).add(dragOffset);
-      _updateSlicerBasis();
-    }
+    // Drag upward (clientY decreases) → grows the sweep toward 2π.
+    const dy          = dragStartY - e.clientY;
+    const dTheta      = (dy / SLICER_THETA_DRAG_PX) * 2 * Math.PI;
+    slicerThetaLength = Math.max(0, Math.min(2 * Math.PI, dragStartTheta + dTheta));
+    // Drag rightward (clientX increases) → grows the total height.
+    const dx          = e.clientX - dragStartX;
+    const newHeight   = dragStartHeight + dx * SLICER_HEIGHT_MM_PER_PX;
+    const clampedH    = Math.max(SLICER_HEIGHT_MIN, Math.min(SLICER_HEIGHT_MAX, newHeight));
+    slicerHalfHeight  = clampedH * 0.5;
+    _updateSlicerBasis();
   });
   const endDrag = e => {
     if (!dragging) return;
@@ -4102,20 +3673,83 @@ function toggleSlicer() { slicerActive ? disableSlicer() : enableSlicer(); }
   };
   canvas.addEventListener('pointerup',     endDrag);
   canvas.addEventListener('pointercancel', endDrag);
+})();
 
-  // Wheel / +/- keys adjust the bubble radius while the slicer is active
-  // and the cursor is over the handle (or any key-press with slicer on).
-  canvas.addEventListener('wheel', e => {
+// Right-click + drag on the handle translates the whole cut volume (handle
+// gizmo + cylindrical wedge) along the scene's Z axis. The handle follows the
+// mouse cursor: we project each frame's pointer delta (in NDC) onto the
+// screen-space direction of +Z, so the motion matches visually regardless of
+// which side the camera is on. The left-button drag behaviours are untouched.
+(function () {
+  const dragRay = new THREE.Raycaster();
+  dragRay.params.Line = { threshold: 25 };
+  const _p0 = new THREE.Vector3();
+  const _p1 = new THREE.Vector3();
+  let zDragging = false;
+  let zPrevNdcX = 0;
+  let zPrevNdcY = 0;
+
+  function _pointerXY(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x:  ((e.clientX - rect.left) / rect.width)  *  2 - 1,
+      y: -((e.clientY - rect.top)  / rect.height) *  2 + 1,
+    };
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    if (e.button !== 2) return;                 // right-button only
     if (!slicerActive || !slicerGroup) return;
     const pt = _pointerXY(e);
     dragRay.setFromCamera(pt, camera);
     const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
     if (!hits.length) return;
+    zDragging        = true;
+    zPrevNdcX        = pt.x;
+    zPrevNdcY        = pt.y;
+    controls.enabled = false;
+    canvas.setPointerCapture(e.pointerId);
     e.preventDefault();
-    const step = slicerRadius * 0.1;
-    slicerRadius = Math.max(SLICER_R_MIN, Math.min(SLICER_R_MAX, slicerRadius + (e.deltaY < 0 ? step : -step)));
-    _updateSlicerBasis();
-  }, { passive: false });
+    e.stopPropagation();
+  }, /* capture: */ true);
+  canvas.addEventListener('pointermove', e => {
+    if (!zDragging) return;
+    const pt    = _pointerXY(e);
+    const dNdcX = pt.x - zPrevNdcX;
+    const dNdcY = pt.y - zPrevNdcY;
+    // Screen-space direction of +Z axis (1 mm step) at the handle's current Z.
+    _p0.set(0, 0, slicerZOffset).project(camera);
+    _p1.set(0, 0, slicerZOffset + 1).project(camera);
+    const zdx   = _p1.x - _p0.x;
+    const zdy   = _p1.y - _p0.y;
+    const len2  = zdx * zdx + zdy * zdy;
+    if (len2 > 1e-10) {
+      // Scalar projection of the mouse NDC delta onto (zdx, zdy) gives the
+      // millimetres of +Z that keep the handle under the cursor.
+      slicerZOffset += (dNdcX * zdx + dNdcY * zdy) / len2;
+      _updateSlicerBasis();
+    }
+    zPrevNdcX = pt.x;
+    zPrevNdcY = pt.y;
+  });
+  const endZDrag = e => {
+    if (!zDragging) return;
+    zDragging = false;
+    controls.enabled = true;
+    try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+  canvas.addEventListener('pointerup',     endZDrag);
+  canvas.addEventListener('pointercancel', endZDrag);
+
+  // Suppress the browser context menu when right-clicking on the handle so the
+  // drag isn't interrupted. Other right-clicks over the canvas are unaffected.
+  canvas.addEventListener('contextmenu', e => {
+    if (!slicerActive || !slicerGroup) return;
+    const pt = _pointerXY(e);
+    dragRay.setFromCamera(pt, camera);
+    const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
+    if (hits.length) e.preventDefault();
+  });
 })();
 
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
@@ -4196,6 +3830,9 @@ document.addEventListener('keydown', e => {
     case 'K':
       document.getElementById('btn-cluster').click();
       break;
+    case 'V':
+      toggleShowAllCells();
+      break;
     case 'ESCAPE':
       if (slicerActive)        { disableSlicer(); return; }
       if (cinemaMode)          { exitCinema(); return; }
@@ -4209,3 +3846,4 @@ document.addEventListener('keydown', e => {
       break;
   }
 });
+

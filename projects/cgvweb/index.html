@@ -127,13 +127,6 @@
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
     <circle cx="12" cy="13" r="4"/>
   </symbol>
-  <symbol id="i-palette" viewBox="0 0 24 24" fill="none">
-    <path d="M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z"/>
-    <circle cx="6.5" cy="11.5" r="1.5" fill="currentColor" stroke="none"/>
-    <circle cx="9.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/>
-    <circle cx="14.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/>
-    <circle cx="17.5" cy="11.5" r="1.5" fill="currentColor" stroke="none"/>
-  </symbol>
   <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
   </symbol>
@@ -288,40 +281,6 @@
     <div id="sample-list"></div>
   </div>
 
-  <!-- Session log / terminal — commented out; only request counter kept
-  <div id="log-sec">
-    <div id="log-resize" data-tip="Drag to resize log"></div>
-    <div id="log-head">
-      <div id="log-brand" data-tip="CGV · Session log">
-        <span class="lb-dot"></span><span data-i18n="log-title">Session Log</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:5px">
-        <span class="badge" id="req-badge" data-tip="Total requests this session">0 req</span>
-        <button class="icon-btn" id="btn-log-min"
-          data-tip="Minimize session log" style="width:22px;height:22px">
-          <i class="ti ti-chevron-down" id="log-min-icon" style="font-size:12px"></i>
-        </button>
-      </div>
-    </div>
-    <div id="log-body">
-      <div id="log-list"></div>
-      <div id="dl-progress" hidden>
-        <div class="dl-stages">
-          <div class="dl-stage" id="dlst-request"><div class="dl-dot"></div>Request</div>
-          <div class="dl-arrow">›</div>
-          <div class="dl-stage" id="dlst-recogn"><div class="dl-dot"></div>Recognize</div>
-          <div class="dl-arrow">›</div>
-          <div class="dl-stage" id="dlst-download"><div class="dl-dot"></div>Download</div>
-          <div class="dl-arrow">›</div>
-          <div class="dl-stage" id="dlst-acquire"><div class="dl-dot"></div>Acquire</div>
-          <div class="dl-arrow">›</div>
-          <div class="dl-stage" id="dlst-load"><div class="dl-dot"></div>Load</div>
-        </div>
-        <div id="dl-bar-track"><div id="dl-bar-fill"></div></div>
-      </div>
-    </div>
-  </div>
-  -->
   <!-- Download / load progress bar (only visible while loading) -->
   <div id="dl-progress" hidden>
     <div class="dl-stages">
@@ -474,15 +433,6 @@
       placeholder="e.g. 1.5 GeV">
   </div>
 
-  <!-- Hidden legacy ghost controls (still referenced by JS for colour/alpha). -->
-  <div id="pane-ghost" style="display:none" aria-hidden="true">
-    <input type="range" id="ghost-alpha-slider" min="0" max="100" value="94">
-    <label><input type="color" id="ghost-solid-color" value="#5C5F66">
-    <span id="ghost-solid-swatch" style="background:#5C5F66"></span></label>
-    <label><input type="color" id="ghost-phi-color" value="#FFFFFF">
-    <span id="ghost-phi-swatch" style="background:#FFFFFF"></span></label>
-    <span id="ghost-alpha-val">94%</span>
-  </div>
 </aside>
 
 
@@ -554,6 +504,12 @@
   <button class="tbtn" id="btn-slicer"
     data-tip="Slicer — drag the sphere to carve a bubble; scroll over the handle to resize (Shift+S)">
     <i class="ti ti-3d-cube-sphere" style="font-size:15px"></i>
+  </button>
+  <div class="tbtn-sep"></div>
+  <button class="tbtn" id="btn-showall"
+    data-tip="Show all cells — fill detectors absent from the XML with the minimum-palette colour (V)"
+    data-i18n-tip="tip-showall">
+    <i class="ti ti-grid-dots" style="font-size:15px"></i>
   </button>
   <div class="tbtn-sep"></div>
   <button class="tbtn" id="btn-settings"
@@ -641,97 +597,6 @@
   </div>
 </div>
 
-<!-- ── Ghost panel — per-envelope toggles (legacy, now hidden; ghost is a simple on/off toggle) ── -->
-<div id="ghost-panel" hidden aria-hidden="true">
-  <div class="layers-head">
-    <span class="layers-title">ATLAS Ghost</span>
-    <div class="layers-quick">
-      <button class="layers-qbtn" id="gbtn-all">All</button>
-      <button class="layers-qbtn" id="gbtn-none">None</button>
-    </div>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#c87c18"></span>
-    <div class="layer-info">
-      <div class="layer-name">LB Tile</div>
-      <div class="layer-sub">Long barrel · Tile</div>
-    </div>
-    <button class="gswitch" id="gtog-LBTile" role="switch" aria-checked="false"
-      style="--gswitch-col:#c87c18"></button>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#9b8a30"></span>
-    <div class="layer-info">
-      <div class="layer-name">LB Tile·LAr</div>
-      <div class="layer-sub">Long barrel · Tile/LAr</div>
-    </div>
-    <button class="gswitch" id="gtog-LBTileLArg" role="switch" aria-checked="false"
-      style="--gswitch-col:#9b8a30"></button>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#27b568"></span>
-    <div class="layer-info">
-      <div class="layer-name">LB LAr</div>
-      <div class="layer-sub">Long barrel · LAr</div>
-    </div>
-    <button class="gswitch" id="gtog-LBLArg" role="switch" aria-checked="false"
-      style="--gswitch-col:#27b568"></button>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#c87c18"></span>
-    <div class="layer-info">
-      <div class="layer-name">EB Tile +</div>
-      <div class="layer-sub">Extended barrel + · Tile</div>
-    </div>
-    <button class="gswitch" id="gtog-EBTilep" role="switch" aria-checked="false"
-      style="--gswitch-col:#c87c18"></button>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#c87c18"></span>
-    <div class="layer-info">
-      <div class="layer-name">EB Tile −</div>
-      <div class="layer-sub">Extended barrel − · Tile</div>
-    </div>
-    <button class="gswitch" id="gtog-EBTilen" role="switch" aria-checked="false"
-      style="--gswitch-col:#c87c18"></button>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#a47042"></span>
-    <div class="layer-info">
-      <div class="layer-name">EB Tile·HEC +</div>
-      <div class="layer-sub">Ext. barrel + · Tile/HEC</div>
-    </div>
-    <button class="gswitch" id="gtog-EBTileHECp" role="switch" aria-checked="false"
-      style="--gswitch-col:#a47042"></button>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#a47042"></span>
-    <div class="layer-info">
-      <div class="layer-name">EB Tile·HEC −</div>
-      <div class="layer-sub">Ext. barrel − · Tile/HEC</div>
-    </div>
-    <button class="gswitch" id="gtog-EBTileHECn" role="switch" aria-checked="false"
-      style="--gswitch-col:#a47042"></button>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#66e0f6"></span>
-    <div class="layer-info">
-      <div class="layer-name">EB HEC +</div>
-      <div class="layer-sub">Extended barrel + · HEC</div>
-    </div>
-    <button class="gswitch" id="gtog-EBHECp" role="switch" aria-checked="false"
-      style="--gswitch-col:#66e0f6"></button>
-  </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#66e0f6"></span>
-    <div class="layer-info">
-      <div class="layer-name">EB HEC −</div>
-      <div class="layer-sub">Extended barrel − · HEC</div>
-    </div>
-    <button class="gswitch" id="gtog-EBHECn" role="switch" aria-checked="false"
-      style="--gswitch-col:#66e0f6"></button>
-  </div>
-</div>
 
 <!-- ── Settings panel ─────────────────────────────────────── -->
 <div id="settings-panel">
@@ -781,12 +646,19 @@
       <span class="sk-key">H</span><span class="sk-desc" data-i18n="sk-hec">Toggle HEC</span>
       <span class="sk-key">J</span><span class="sk-desc" data-i18n="sk-tracks">Toggle particle tracks</span>
       <span class="sk-key">K</span><span class="sk-desc" data-i18n="sk-clusters">Toggle clusters</span>
+      <span class="sk-key">V</span><span class="sk-desc" data-i18n="sk-showall">Show all cells</span>
       <span class="sk-key">Shift+B</span><span class="sk-desc" data-i18n="sk-bg">Pick background color</span>
       <span class="sk-key">Shift+S</span><span class="sk-desc" data-i18n="sk-slicer">Toggle slicer</span>
       <span class="sk-key">Shift+K</span><span class="sk-desc" data-i18n="sk-clthr">Toggle cluster threshold</span>
       <span class="sk-key">Esc</span><span class="sk-desc" data-i18n="sk-esc">Close / exit</span>
     </div>
   </div>
+</div>
+
+<!-- ── Rotate-to-landscape hint (portrait phones only) ───── -->
+<div id="rotate-hint">
+  <div class="rotate-hint-gif" role="img" aria-label="rotate device"></div>
+  <div class="rotate-hint-text">Please rotate your device to landscape</div>
 </div>
 
 <!-- ── Mobile toolbar toggle ──────────────────────────────── -->
