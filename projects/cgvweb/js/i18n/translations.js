@@ -78,7 +78,7 @@ export const TRANSLATIONS = {
     'shot-opt-title': 'Transparent background',
     'shot-opt-sub': 'Save PNG with alpha channel (no scene background)',
     'shot-collision-title': 'Collision info overlay',
-    'shot-collision-sub': 'Composite event metadata (run, event, lumi block) onto the screenshot',
+    'shot-collision-sub': 'Overlay event metadata (run, event, lumi block) onto the screenshot',
     'empty-live': 'No events yet — waiting for ATLAS Live data from ATLANTIS',
   },
   fr: {
@@ -159,8 +159,8 @@ export const TRANSLATIONS = {
     'bgcp-reset': 'Réinitialiser',
     'shot-opt-title': 'Arrière-plan transparent',
     'shot-opt-sub': 'Enregistrer PNG avec canal alpha (sans arrière-plan)',
-    'shot-collision-title': 'Infos de collision',
-    'shot-collision-sub': 'Composer les métadonnées (run, événement, bloc de luminosité) sur la capture',
+    'shot-collision-title': 'Incrustation des infos de collision',
+    'shot-collision-sub': 'Superposer les métadonnées (run, event, lumi block) sur la capture',
     'empty-live': 'Aucun événement — en attente des données ATLAS Live (ATLANTIS)',
   },
   no: {
@@ -241,8 +241,8 @@ export const TRANSLATIONS = {
     'bgcp-reset': 'Tilbakestill',
     'shot-opt-title': 'Gjennomsiktig bakgrunn',
     'shot-opt-sub': 'Lagre PNG med alfakanal (ingen bakgrunn)',
-    'shot-collision-title': 'Kollisjonsinfo-overlay',
-    'shot-collision-sub': 'Legg hendelsesmetadata (kjøring, hendelse, lysblokkering) på skjermbildet',
+    'shot-collision-title': 'Kollisjonsinfo-overlegg',
+    'shot-collision-sub': 'Legg hendelsesmetadata (run, event, lumi block) over skjermbildet',
     'empty-live': 'Ingen hendelser — venter på ATLAS Live-data fra ATLANTIS',
   },
   pt: {
@@ -323,8 +323,8 @@ export const TRANSLATIONS = {
     'bgcp-reset': 'Restaurar padrão',
     'shot-opt-title': 'Fundo transparente',
     'shot-opt-sub': 'Salvar PNG com canal alfa (sem fundo de cena)',
-    'shot-collision-title': 'Overlay de info da colisão',
-    'shot-collision-sub': 'Compor metadados do evento (run, evento, bloco de luminosidade) na captura',
+    'shot-collision-title': 'Sobrepor info da colisão',
+    'shot-collision-sub': 'Inclui os metadados do evento (run, event, lumi block) na captura',
     'empty-live': 'Sem eventos — aguardando dados do ATLAS Live (ATLANTIS)',
   },
 };
