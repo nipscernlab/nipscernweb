@@ -10,7 +10,7 @@ toolbar for scene controls and output. Transient widgets &mdash; cell
 tooltip, collision HUD, dialogs and popovers &mdash; appear contextually
 on top of the canvas.
 
-<img src="images/ui-overview.png" alt="CGV Web — annotated interface" width="960" />
+<img src="images/ui-overview.png" alt="CGV Web — annotated interface" style="width:100%;max-width:960px;height:auto;display:block;" />
 
 Every control is keyboard-reachable: see [[KeyboardShortcuts][Keyboard
 Shortcuts]] for the full mapping. Most toolbar buttons expose their
@@ -23,7 +23,7 @@ _Samples_). Selecting a mode reveals the corresponding list or picker;
 switching modes stops the previous ingestion without discarding the
 scene.
 
-<img src="images/left-panel.png" alt="Left panel: mode bar, event list, status bar" width="380" />
+<img src="images/left-panel.png" alt="Left panel: mode bar, event list, status bar" style="width:100%;max-width:380px;height:auto;display:block;" />
 
    * =Live= &mdash; connects to the ATLAS Live long-poll served by ATLANTIS. A green pulsing dot indicates the feed is active. The =⏸= / =▶= buttons pause and resume polling without tearing down the connection.
    * =Local= &mdash; parses JiveXML in the browser. =Select Folder= ingests an entire directory; =Upload XML= opens a single file. A carousel bar auto-advances through a multi-event folder.
@@ -43,7 +43,7 @@ _FCAL_, _HEC_ and _Track_ are sibling tabs below. Full semantics and
 palette behaviour are documented in
 [[EnergyThresholds][Energy Thresholds]].
 
-<img src="images/threshold-panel.png" alt="Right-side energy threshold panel (full screen for context)" width="900" />
+<img src="images/threshold-panel.png" alt="Right-side energy threshold panel (full screen for context)" style="width:100%;max-width:900px;height:auto;display:block;" />
 
 Each slider exposes:
 
@@ -61,7 +61,7 @@ a highlighted (=on=) state persist their state until toggled back.
 | Sidebar         | Pin / unpin the left panel                                    | =M=          |
 | Energy          | Pin / unpin the right threshold panel                         | =E=          |
 | Layers          | Open the detector-layers popover (TILE, LAr, HEC, FCAL)       | &mdash;      |
-| Ghost           | Open the ATLAS Ghost envelopes popover                        | =G=          |
+| Ghost           | Toggle the ATLAS Ghost (TileCal outer shell) on / off         | =G=          |
 | Tracks          | Show / hide reconstructed particle tracks                     | =J=          |
 | Clusters        | Show / hide topological cluster outlines                      | =K=          |
 | Cell info       | Toggle hover tooltip and cell outline                         | =I=          |
@@ -85,23 +85,27 @@ with =All= and =None= quick buttons. Each row shows the sub-detector
 accent dot and a short description (see [[Overview][Overview]] for the
 colour convention).
 
-<img src="images/layers-panel.png" alt="Detector layers popover (full-screen context)" width="900" />
+<img src="images/layers-panel.png" alt="Detector layers popover (full-screen context)" style="width:100%;max-width:900px;height:auto;display:block;" />
 
 Turning a sub-detector off hides all of its active cells. Use the
 _energy threshold_ sliders (right panel) to fade out only low-energy
 hits without removing the sub-detector entirely.
 
----++ ATLAS Ghost panel
+---++ ATLAS Ghost toggle
 
-Per-envelope switches for the nine ghost meshes enumerated in
-[[Geometry][Geometry]]. Useful to reveal a single envelope (e.g. the
-Tile long-barrel shell) without the visual noise of the other eight.
+A single on/off control for the ATLAS Ghost envelope of the TileCal
+sub-detector &mdash; the semi-transparent grey outer shell that marks
+where the calorimeter sits without occluding the active cells. The
+current build does not expose per-envelope selection: toggling Ghost
+turns the full ATLAS Ghost (the TileCal-part envelope bundle) on or
+off as one unit.
 
-<img src="images/ghost-panel.png" alt="ATLAS Ghost popover (full-screen context)" width="900" />
+<img src="images/ghost-panel.png" alt="ATLAS Ghost toolbar button" style="width:100%;max-width:900px;height:auto;display:block;" />
 
-When at least one ghost is visible, a dashed φ-segmentation grid is
-overlaid on the Tile envelopes to mark the 64 × 11.25° module
-boundaries. The overlay disappears when all ghosts are turned off.
+Use the =Ghost= toolbar button or the =G= hotkey. When the Ghost is
+visible, a dashed φ-segmentation grid is overlaid on the Tile envelope
+to mark the 64 × 11.25° module boundaries; the overlay disappears
+together with the Ghost.
 
 ---++ Cell tooltip
 
@@ -111,7 +115,7 @@ cell's η/φ coordinates and the deposited energy. Units auto-scale
 between MeV and GeV so the read-out stays readable across four orders
 of magnitude.
 
-<img src="images/cell-tooltip.png" alt="Cell hover tooltip" width="820" />
+<img src="images/cell-tooltip.png" alt="Cell hover tooltip" style="width:100%;max-width:820px;height:auto;display:block;" />
 
 A thin outline is drawn around the hovered cell to make the selection
 unambiguous in dense regions. The tooltip and outline are suppressed
@@ -191,17 +195,19 @@ re-renders at the chosen resolution with the UI hidden (including the
 slicer gizmo and the beam-axis cones); if a tooltip was pinned at
 capture time, it is composited back into the output bitmap.
 
-<img src="images/screenshot-dialog.png" alt="Screenshot dialog open over the canvas (full-screen context)" width="900" />
+<img src="images/screenshot-dialog.png" alt="Screenshot dialog open over the canvas (full-screen context)" style="width:100%;max-width:900px;height:auto;display:block;" />
 
-Available resolutions:
+Available resolutions depend on the form factor: mobile devices and
+tablets expose presets up to *2K*; desktop and laptop browsers expose
+the full range up to *10K*.
 
-| *Preset*    | *Dimensions*       | *Recommended for*                                   |
-| HD          | 1280 × 720         | Quick logbook thumbnails                            |
-| 1080p       | 1920 × 1080        | Default for slides                                  |
-| 2K          | 2560 × 1440        | Mobile / landscape tablet capture                   |
-| 4K          | 3840 × 2160        | High-resolution slide decks                         |
-| 8K          | 7680 × 4320        | Print-grade figures                                 |
-| 10K         | 10 240 × 5 760     | Wall-poster / banner renders (desktop only)         |
+| *Preset*    | *Dimensions*       | *Recommended for*                                   | *Available on*   |
+| HD          | 1280 × 720         | Quick logbook thumbnails                            | All devices      |
+| 1080p       | 1920 × 1080        | Default for slides                                  | All devices      |
+| 2K          | 2560 × 1440        | Mobile / landscape tablet capture                   | All devices      |
+| 4K          | 3840 × 2160        | High-resolution slide decks                         | Desktop / laptop |
+| 8K          | 7680 × 4320        | Print-grade figures                                 | Desktop / laptop |
+| 10K         | 10 240 × 5 760     | Wall-poster / banner renders                        | Desktop / laptop |
 
 Two compositing toggles sit below the grid:
 
@@ -214,7 +220,7 @@ The captured PNG is named =CGVWEB_{W}x{H}_{YYYY-MM-DDTHH-MM-SS}.png=.
 
 Opened with =S= or the gear icon. Three sections:
 
-<img src="images/settings-panel.png" alt="Settings panel open over the canvas (full-screen context)" width="900" />
+<img src="images/settings-panel.png" alt="Settings panel open over the canvas (full-screen context)" style="width:100%;max-width:900px;height:auto;display:block;" />
 
    * _Preferences_
       * =Button hints= &mdash; show tooltips on every toolbar button.

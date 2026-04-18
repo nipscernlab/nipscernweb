@@ -17,35 +17,65 @@ documentation feedback, please contact
 
 <img src="assets/cgvweb_icon.svg" alt="CGV Web" style="float:right;width:120px;height:120px;margin:0 0 1em 1em;" />
 
-_CGV Web_ (Calorimeter Geometry Viewer) is a browser-based event
-display that renders the real ATLAS calorimeter geometry &mdash; Tile,
-LAr EM, HEC and FCAL &mdash; reconstructed cell-by-cell from the ATLAS
-GeoModel and shipped as a single glTF-binary payload. Over that
-geometry it overlays reconstructed tracks, topological clusters and
-per-cell energy deposits from [[EventData][JiveXML]] events supplied by
-ATHENA's =JiveXML= algorithm, and it can connect live to the ATLAS Live
-event feed served by ATLANTIS.
+[[https://nipscern.com/projects/cgvweb][_CGV Web_]] (Calorimeter
+Geometry Viewer) is a browser-based event display that renders the
+real ATLAS calorimeter geometry &mdash; Tile, LAr EM, HEC and FCAL
+&mdash; reconstructed cell-by-cell from the ATLAS GeoModel and shipped
+as a single glTF-binary payload. Over that geometry it overlays
+reconstructed tracks, topological clusters and per-cell energy deposits
+from [[EventData][JiveXML]] events supplied by ATHENA's =JiveXML=
+algorithm, and it can connect live to the ATLAS Live event feed served
+by ATLANTIS.
 
-<img src="images/ui-overview.png" alt="CGV Web main interface" width="960" />
+<img src="images/full-geometry-slicer.png" alt="CGV Web main interface" style="width:100%;max-width:960px;height:auto;display:block;" />
 
-The tool is optimised for the Run&nbsp;3 workflow of the ATLAS Control
-Room: open the page, see the most recent event rotating in, filter by
-sub-detector or energy threshold, and grab a publication-quality
-screenshot in one click. No install, no ROOT, no Athena &mdash; any
-modern browser with WebGL2 is enough.
+The tool works today on Run&nbsp;3 data and is optimised for the
+Run&nbsp;3 workflow of the ATLAS Control Room: open the page, see the
+most recent event rotating in, filter by sub-detector or energy
+threshold, and grab a publication-quality screenshot in one click. No
+install, no ROOT, no Athena &mdash; any modern browser with WebGL2 is
+enough.
+
+For Run&nbsp;4 (scheduled to start around 2030), CGV Web is planned to
+become the official CERN ATLAS calorimeter-geometry event-display tool,
+integrated directly into the ATLAS Control Room as the reference
+shifter-facing visualiser for calorimeter data.
+
+CGV Web is fully device-agnostic: the same code runs on phones,
+tablets, laptops and desktop workstations. Layout, input gestures and
+default resolutions adapt to the form factor (for example, mobile
+captures cap at 2K while desktops go up to 10K) without disabling
+any feature.
 
 This TWiki is the end-user manual. For developer documentation (build
 steps, geometry exporter, parser internals) see
 [[https://nipscern.com/projects/cgv][nipscern.com/projects/cgv]].
 
+---++ Lineage &mdash; from CGV to CGV Web
+
+CGV Web is the direct successor of the original _CGV_ (Calorimeter
+Geometry Viewer), developed by Prof. Dr. Luciano Manh&atilde;es de
+Andrade Filho as part of his doctoral thesis. The original CGV was
+built in =JSROOT=, ran on Linux in the ATLAS Control Room during the
+early days of the LHC in 2008 and served as the reference
+calorimeter-geometry event display for shifters of that era.
+
+In 2026 the project was rebuilt from scratch at NIPSCERN as a modern
+web application: a WebGL2 renderer, WASM-based JiveXML parser, live
+feed ingestion, an entirely new UI with cinema mode, slicer, guided
+tour and multi-language support &mdash; and many more capabilities
+beyond what the original tool offered. CGV Web inherits the spirit of
+the original CGV while targeting a browser-first, Run&nbsp;3/Run&nbsp;4
+workflow.
+
 ---++ Status and roadmap
 
 CGV Web is being prepared to serve as the official CERN event-display
-tool for the ATLAS experiment during Run&nbsp;4, succeeding the legacy
-ATLANTIS client. The current code base is the candidate build for that
-role: the geometry, parser, live-feed ingestion and UI are feature-ready
-and are being validated against Run&nbsp;3 Control Room operations
-ahead of the Run&nbsp;4 integration window.
+tool for the ATLAS experiment during Run&nbsp;4. The current code base
+is the candidate build for that role: the geometry, parser, live-feed
+ingestion and UI are feature-ready and are being validated against
+Run&nbsp;3 Control Room operations ahead of the Run&nbsp;4 integration
+window.
 
 ---++ Contents
 
@@ -55,7 +85,7 @@ ahead of the Run&nbsp;4 integration window.
 | [[UserInterface]]               | Every panel, toolbar button, tooltip and keyboard shortcut              |
 | [[DataModes]]                   | Live, Local folder / upload and bundled samples                         |
 | [[EnergyThresholds]]            | Per-sub-detector threshold sliders, P97 auto-scaling, cluster min =E_{T}= |
-| [[Geometry]]                    | Active sub-detectors, nine ATLAS-Ghost envelopes, GeoModel provenance   |
+| [[Geometry]]                    | Active sub-detectors, ATLAS-Ghost envelope, GeoModel provenance         |
 | [[EventData]]                   | JiveXML layout, compact ATLAS-ID, WASM decoder, coordinate frame        |
 | [[KeyboardShortcuts]]           | Full hotkey reference                                                   |
 | [[Developers]]                  | Clone, install, =build.bat=, geometry rebuild, parser WASM              |
@@ -68,7 +98,7 @@ ahead of the Run&nbsp;4 integration window.
    * Project site &nbsp; &mdash; [[https://nipscern.com/projects/cgvweb][nipscern.com/projects/cgvweb]]
    * Extended documentation &nbsp; &mdash; [[https://nipscern.com/projects/cgv][nipscern.com/projects/cgv]]
    * Laboratory &nbsp; &mdash; [[https://nipscern.com][nipscern.com]]
-   * Source code &nbsp; &mdash; [[https://github.com/nipscern/cgv-web][github.com/nipscern/cgv-web]]
+   * Source code &nbsp; &mdash; [[https://github.com/nipscernlab/cgv-web][github.com/nipscern/cgv-web]]
 
 ---++ Credits
 

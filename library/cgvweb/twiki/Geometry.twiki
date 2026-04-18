@@ -11,7 +11,11 @@ page at first paint. Active cells and ATLAS-Ghost envelopes share the
 same glTF file and are toggled independently at runtime, so the wire-up
 cost is paid once.
 
-<img src="images/calorimeter-overview.png" alt="ATLAS calorimeter sub-detector overview" width="960" />
+<img src="images/calorimeter-overview.png" alt="ATLAS calorimeter sub-detector overview" style="width:100%;max-width:960px;height:auto;display:block;" />
+<div style="font-size:11px;color:#5a6a80;margin:-6px 0 10px 2px;">
+Image credit: ATLAS Experiment &copy; CERN &mdash;
+[[https://cds.cern.ch/record/1095927][CDS record 1095927]].
+</div>
 
 ---++ Active sub-detectors
 
@@ -27,7 +31,7 @@ Toggle the four groups from the
 [[UserInterface#Detector_Layers_panel][Layers panel]] or with the =T=
 (TILE), =L= / =A= (LAr), =H= (HEC), =F= (FCAL) hotkeys.
 
-<img src="images/geometry-active-cells.png" alt="Active cells of Tile, LAr, HEC and FCAL" width="960" />
+<img src="images/geometry-active-cells.png" alt="Active cells of Tile, LAr, HEC and FCAL" style="width:100%;max-width:960px;height:auto;display:block;" />
 
 By default only cells with a hit (=E &ge; min_threshold=) are drawn.
 To visualise the bare geometry of a sub-detector even where the current
@@ -40,25 +44,16 @@ then painted with the coldest colour of their sub-detector palette.
 "Ghosts" are the _inactive_ support, cryostat and structural volumes.
 CGV Web renders them as semi-transparent grey shells so that shifters
 can see where the beam axis and the sub-detector boundaries sit without
-occluding the event itself. All nine share a shared grey 15&nbsp;%-opacity
-material; the GeoModel materials are deliberately overridden to keep
-the visual budget small.
+occluding the event itself. The ghost meshes share a common grey
+15&nbsp;%-opacity material; the GeoModel materials are deliberately
+overridden to keep the visual budget small.
 
-<img src="images/ghost-envelopes.png" alt="ATLAS Ghost envelopes with phi segmentation overlay" width="960" />
+<img src="images/ghost-envelopes.png" alt="ATLAS Ghost envelopes with phi segmentation overlay" style="width:100%;max-width:960px;height:auto;display:block;" />
 
-| *Mesh*            | *Default* | *Description*                                     |
-| =LBTile_0=        | off       | Tile long-barrel outer shell                      |
-| =LBTileLArg_0=    | off       | Tile / LAr barrel interface                       |
-| =LBLArg_0=        | off       | LAr barrel cryostat                               |
-| =EBTilep_0=       | off       | Extended-barrel Tile, =+z= side                   |
-| =EBTilen_0=       | off       | Extended-barrel Tile, =&minus;z= side             |
-| =EBTileHECp_0=    | off       | EB Tile / HEC interface, =+z=                     |
-| =EBTileHECn_0=    | off       | EB Tile / HEC interface, =&minus;z=               |
-| =EBHECp_0=        | off       | HEC cryostat, =+z=                                |
-| =EBHECn_0=        | off       | HEC cryostat, =&minus;z=                          |
-
-Quick controls in the panel: =All= turns every envelope on, =None= off.
-=G= on the keyboard opens or closes the panel.
+The current build exposes the Ghost as a single on/off control tied to
+the TileCal outer shell: the =Ghost= toolbar button (or =G=) toggles
+the whole ATLAS-Ghost envelope bundle as one unit. Per-envelope
+selection is not exposed in this version.
 
 ---++ φ-segmentation overlay
 
@@ -76,7 +71,7 @@ small marker at the origin denotes the nominal interaction point. The
 indicator scales with the scene zoom so it stays legible at any camera
 distance.
 
-<img src="images/beam-axis.png" alt="Beam-axis cones with interaction-point marker" width="720" />
+<img src="images/beam-axis.png" alt="Beam-axis cones with interaction-point marker" style="width:100%;max-width:720px;height:auto;display:block;" />
 
 ---++ Carving the geometry &mdash; the slicer
 
