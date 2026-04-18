@@ -8,7 +8,7 @@ const log = (...a) => { console.log(...a); logEl.textContent += a.join(' ') + '\
 
 const SUBSYS_TILE = 1, SUBSYS_LAR_EM = 2, SUBSYS_LAR_HEC = 3;
 const DEF_THR = 200;
-const thrTileMev = DEF_THR, thrLArMev = DEF_THR, thrHecMev = 1000;
+const thrTileMev = DEF_THR, thrLArMev = DEF_THR, thrHecMev = 1000, thrFcalMev = DEF_THR;
 
 const PAL_N = 256;
 function palColorTile(t){t=Math.max(0,Math.min(1,t));return new THREE.Color(1+t*(0.502-1),1+t*(0-1),0);}
@@ -22,6 +22,28 @@ const TILE_SCALE=2000, HEC_SCALE=5000, LAR_SCALE=1000;
 const colTile = eMev => PAL_TILE[Math.round(Math.max(0,Math.min(1,eMev/TILE_SCALE))*(PAL_N-1))];
 const colHec  = eMev => PAL_HEC [Math.round(Math.max(0,Math.min(1,eMev/HEC_SCALE ))*(PAL_N-1))];
 const colLAr  = eMev => PAL_LAR [Math.round(Math.max(0,Math.min(1,eMev/LAR_SCALE ))*(PAL_N-1))];
+
+// FCAL copper palette — mirrors js/main.js palColorFcalRgb with gamma 0.55.
+const FCAL_SCALE = 7000; // MeV
+const _FCAL_STOPS = [
+  [0.102, 0.024, 0.000], [0.420, 0.137, 0.063], [0.784, 0.392, 0.165],
+  [1.000, 0.698, 0.416], [1.000, 0.918, 0.745],
+];
+const _FCAL_STEPS = [0.0, 0.25, 0.55, 0.80, 1.0];
+function palColorFcal(eMev){
+  let t = Math.max(0, Math.min(1, eMev / FCAL_SCALE));
+  t = Math.pow(t, 0.55);
+  for (let i = 1; i < _FCAL_STEPS.length; i++){
+    if (t <= _FCAL_STEPS[i]){
+      const k = (t - _FCAL_STEPS[i-1]) / (_FCAL_STEPS[i] - _FCAL_STEPS[i-1]);
+      const a = _FCAL_STOPS[i-1], b = _FCAL_STOPS[i];
+      return new THREE.Color(a[0]+(b[0]-a[0])*k, a[1]+(b[1]-a[1])*k, a[2]+(b[2]-a[2])*k);
+    }
+  }
+  const s = _FCAL_STOPS[_FCAL_STOPS.length-1];
+  return new THREE.Color(s[0], s[1], s[2]);
+}
+const _FCAL_TWIST_RAD = (2 * Math.PI) / 16;
 
 const GHOST_TILE_NAMES = [
   'Calorimeter\u2192LBTile_0', 'Calorimeter\u2192LBTileLArg_0',
@@ -46,6 +68,33 @@ function extractCells(doc, tagName){
       const ens=eEl.textContent.trim().split(/\s+/).map(Number);
       const m=Math.min(ids.length,ens.length);
       for(let i=0;i<m;i++) if(ids[i]&&isFinite(ens[i])) cells.push({id:ids[i],energy:ens[i]});
+    }
+  }
+  return cells;
+}
+// FCAL cells: (x,y,z,dx,dy,dz) in cm, energy in GeV. Rendered as oriented cylinders.
+function extractFcal(doc){
+  const cells = [];
+  for (const el of doc.getElementsByTagName('FCAL')){
+    const xEl=el.querySelector('x'),  yEl=el.querySelector('y'),  zEl=el.querySelector('z');
+    const dxEl=el.querySelector('dx'),dyEl=el.querySelector('dy'),dzEl=el.querySelector('dz');
+    const eEl=el.querySelector('energy');
+    if(!xEl||!yEl||!zEl||!dxEl||!dyEl||!dzEl) continue;
+    const xs =xEl .textContent.trim().split(/\s+/).map(Number);
+    const ys =yEl .textContent.trim().split(/\s+/).map(Number);
+    const zs =zEl .textContent.trim().split(/\s+/).map(Number);
+    const dxs=dxEl.textContent.trim().split(/\s+/).map(Number);
+    const dys=dyEl.textContent.trim().split(/\s+/).map(Number);
+    const dzs=dzEl.textContent.trim().split(/\s+/).map(Number);
+    const ens=eEl ? eEl.textContent.trim().split(/\s+/).map(Number) : [];
+    const n = Math.min(xs.length, ys.length, zs.length, dxs.length, dys.length, dzs.length);
+    for (let i = 0; i < n; i++){
+      if (!isFinite(xs[i]) || !isFinite(ys[i]) || !isFinite(zs[i])) continue;
+      cells.push({
+        x: xs[i], y: ys[i], z: zs[i],
+        dx: dxs[i]||0, dy: dys[i]||0, dz: dzs[i]||0,
+        energy: isFinite(ens[i]) ? ens[i] : 0,
+      });
     }
   }
   return cells;
@@ -168,6 +217,38 @@ function bakeGeom(mesh){
   return { pos: posF32, idx, edge: edgeF32 };
 }
 
+// Bake one FCAL tube into world-space geometry. Mirrors js/main.js _applyFcalDraw:
+//   unit CylinderGeometry(1,1,1,8,1,false) → scale (rx, len, ry) → rotate (0,1,0)→(0,0,±1) → twist.
+const _fcalUpVec   = new THREE.Vector3(0, 1, 0);
+const _fcalTwistAx = new THREE.Vector3(0, 1, 0);
+function bakeFcalCell({x, y, z, dx, dy, dz}){
+  const rx  = Math.max(Math.abs(dx) * 5, 1e-3);
+  const ry  = Math.max(Math.abs(dy) * 5, 1e-3);
+  const len = Math.max(Math.abs(dz) * 2 * 10, 1e-3);   // cm → mm, full depth
+  const cx  = -x * 10,  cy = -y * 10,  cz = z * 10;
+  const dir = new THREE.Vector3(0, 0, dz >= 0 ? 1 : -1);
+  const q   = new THREE.Quaternion().setFromUnitVectors(_fcalUpVec, dir);
+  q.multiply(new THREE.Quaternion().setFromAxisAngle(_fcalTwistAx, _FCAL_TWIST_RAD));
+  const m   = new THREE.Matrix4().compose(
+    new THREE.Vector3(cx, cy, cz), q, new THREE.Vector3(rx, len, ry));
+  const geo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, false);
+  geo.applyMatrix4(m);
+  const pos = geo.getAttribute('position').array;
+  let idx = geo.index ? geo.index.array : null;
+  if(!idx){
+    idx = new Uint32Array(pos.length/3);
+    for(let i=0;i<idx.length;i++) idx[i]=i;
+  } else if(!(idx instanceof Uint32Array)){
+    idx = new Uint32Array(idx);
+  }
+  const edgeGeo = new THREE.EdgesGeometry(geo, 30);
+  const edge = edgeGeo.getAttribute('position').array;
+  const posF32  = pos  instanceof Float32Array ? pos  : new Float32Array(pos);
+  const edgeF32 = edge instanceof Float32Array ? edge : new Float32Array(edge);
+  geo.dispose(); edgeGeo.dispose();
+  return { pos: posF32, idx, edge: edgeF32 };
+}
+
 function bakeGhost(mesh){
   mesh.updateWorldMatrix(true, false);
   const g = mesh.geometry.clone();
@@ -210,7 +291,9 @@ async function main(){
   const larCells  = extractCells(doc, 'LAr');
   const hecCells  = extractCells(doc, 'HEC');
   const mbtsCells = extractMbts(doc);
-  log('  TILE', tileCells.length, 'LAr', larCells.length, 'HEC', hecCells.length, 'MBTS', mbtsCells.length);
+  const fcalCells = extractFcal(doc);
+  log('  TILE', tileCells.length, 'LAr', larCells.length, 'HEC', hecCells.length,
+      'MBTS', mbtsCells.length, 'FCAL', fcalCells.length);
 
   const tracks = parseTracks(doc);
   log('  tracks:', tracks.length);
@@ -268,6 +351,10 @@ async function main(){
   }
   log('  active cells (after threshold):', active.size);
 
+  // FCAL: energy ≥ threshold and ≥ 0 (mirrors live viewer filter).
+  const fcalActive = fcalCells.filter(c => c.energy >= 0 && c.energy * 1000 >= thrFcalMev);
+  log('  active FCAL cells (after threshold):', fcalActive.length);
+
   // Bake all active cells
   log('Baking cell geometries...');
   const cellHeaders = [];
@@ -289,6 +376,18 @@ async function main(){
     const col = det==='TILE' ? colTile(eMev) : det==='LAR' ? colLAr(eMev) : colHec(eMev);
     cellHeaders.push({
       det, rgb:[+col.r.toFixed(4), +col.g.toFixed(4), +col.b.toFixed(4)],
+      pos: pushChunk(pos),
+      idx: pushChunk(idx),
+      edge: pushChunk(edge),
+    });
+  }
+
+  // FCAL — bake each tube as its own cell entry (no GLB mesh, synthesized from JiveXML).
+  for (const c of fcalActive){
+    const {pos, idx, edge} = bakeFcalCell(c);
+    const col = palColorFcal(Math.abs(c.energy) * 1000);
+    cellHeaders.push({
+      det: 'FCAL', rgb:[+col.r.toFixed(4), +col.g.toFixed(4), +col.b.toFixed(4)],
       pos: pushChunk(pos),
       idx: pushChunk(idx),
       edge: pushChunk(edge),
