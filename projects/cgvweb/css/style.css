@@ -839,17 +839,30 @@
       #toolbar { gap: 1px; }
     }
 
+    /* Rotate-to-landscape hint — hidden by default, shown only on portrait phones */
+    #rotate-hint { display: none; }
+
     /* Portrait phone: show a rotate-to-landscape hint, minimal UI */
     @media (orientation: portrait) and (max-width: 700px) {
       #panel, #rpanel, #toolbar, #btn-toolbar-toggle, #statusbar,
       #layers-panel, #settings-panel { display: none !important; }
-      body::before {
-        content: 'Please rotate your device to landscape';
+      #rotate-hint {
         position: fixed; inset: 0; z-index: 3000;
-        display: flex; align-items: center; justify-content: center;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 22px;
         background: var(--bg); color: var(--text);
-        font: 500 .86rem var(--font); padding: 30px; text-align: center;
-        letter-spacing: .04em;
+        padding: 30px; text-align: center;
+      }
+      .rotate-hint-gif {
+        width: 140px; height: 140px;
+        background-color: var(--bright);
+        -webkit-mask: url('../assets/rotate_phone.gif') center / contain no-repeat;
+                mask: url('../assets/rotate_phone.gif') center / contain no-repeat;
+        filter: drop-shadow(0 4px 16px rgba(0,0,0,.4));
+      }
+      .rotate-hint-text {
+        font: 500 .86rem var(--font); letter-spacing: .04em;
+        max-width: 280px; line-height: 1.5;
       }
     }
 
