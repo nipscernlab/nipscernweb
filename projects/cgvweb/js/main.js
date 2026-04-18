@@ -25,13 +25,14 @@ const TRANSLATIONS = {
     'status-ready': 'Ready — waiting for event…',
     'cinema-exit': 'Exit Cinema',
     'slbl-energy': 'Energy', 'slbl-threshold': 'Threshold', 'thr-placeholder': 'e.g. 200 MeV',
-    'about-title': 'Calorimeter Geometry Viewer', 'about-sub': 'ATLAS · TileCal · NIPSCERN',
-    'about-p1': 'Interactive 3D visualization of the ATLAS calorimeter providing real-time display of TileCal cell energies from live or local JiveXML event data.',
+    'about-title': 'Calorimeter Geometry Viewer', 'about-sub': 'ATLAS · NIPSCERN',
+    'about-p1': 'Interactive 3D visualization of the ATLAS calorimeter — real-time display of TileCal, LAr, HEC, FCAL cell energies, particle tracks and clusters from live or local JiveXML event data.',
     'about-advisor-lbl': 'Scientific Advisor', 'about-advisor-name': 'Prof. Dr. Luciano Manhães de Andrade Filho',
     'about-dev-lbl': 'Development', 'about-dev-name': 'Chrysthofer Arthur Amaro Afonso',
     'about-dev-sub': 'Undergraduate Research · NIPSCERN Laboratory',
     'about-lab1': 'NIPSCERN — Núcleo de Investigação em Física para o CERN',
     'about-lab2': 'ATLAS Collaboration · CERN, Geneva',
+    'about-supported-by': 'Supported by',
     'about-close': 'Close', 'tip-energy-key': 'Energy',
     'tip-panel': 'Toggle the sidebar panel',
     'tip-cinema': 'Cinema mode — auto-rotation, hide UI',
@@ -67,6 +68,28 @@ const TRANSLATIONS = {
     'log-new-event': 'New event: ',
     'log-downloading': 'Downloading: ',
     'log-event': 'Event: ',
+    'sett-preferences': 'Preferences',
+    'sett-hints-label': 'Button hints',
+    'sett-hints-sub': 'Show tooltips on toolbar buttons',
+    'sett-autopen-label': 'Auto-open sidebar on hover',
+    'sett-autopen-sub': 'Show panel when cursor reaches screen edge',
+    'sett-tour-label': 'Guided tour in cinema',
+    'sett-tour-sub': 'Cinema mode becomes a smooth camera tour through the detector',
+    'sett-shortcuts': 'Keyboard Shortcuts',
+    'sk-ghost': 'Toggle ghost frame', 'sk-beam': 'Toggle beam axis',
+    'sk-info': 'Toggle cell info', 'sk-reset': 'Reset camera',
+    'sk-cinema': 'Cinema mode', 'sk-menu': 'Menu (sidebar)',
+    'sk-energy': 'Energy panel', 'sk-shot': 'Screenshot',
+    'sk-settings': 'Settings', 'sk-tile': 'Toggle TILE',
+    'sk-lar': 'Toggle LAr', 'sk-hec': 'Toggle HEC',
+    'sk-tracks': 'Toggle particle tracks', 'sk-clusters': 'Toggle clusters',
+    'sk-bg': 'Pick background color', 'sk-slicer': 'Toggle slicer',
+    'sk-clthr': 'Toggle cluster threshold', 'sk-esc': 'Close / exit',
+    'bgcp-title': 'Scene Background', 'bgcp-presets': 'Presets',
+    'bgcp-reset': 'Reset to Default',
+    'shot-opt-title': 'Transparent background',
+    'shot-opt-sub': 'Save PNG with alpha channel (no scene background)',
+    'empty-live': 'No events yet — waiting for ATLAS Live data from ATLANTIS',
   },
   fr: {
     'logo-full': 'Visionneur de Géométrie Calorimétrique', 'logo-lab': 'NIPSCERN · ATLAS',
@@ -80,13 +103,14 @@ const TRANSLATIONS = {
     'status-ready': 'Prêt — en attente d\'événement…',
     'cinema-exit': 'Quitter le cinéma',
     'slbl-energy': 'Énergie', 'slbl-threshold': 'Seuil', 'thr-placeholder': 'ex. 200 MeV',
-    'about-title': 'Visionneur de Géométrie Calorimétrique', 'about-sub': 'ATLAS · TileCal · NIPSCERN',
-    'about-p1': 'Visualisation 3D interactive du calorimètre ATLAS affichant en temps réel les énergies des cellules TileCal à partir de données JiveXML en direct ou locales.',
+    'about-title': 'Visionneur de Géométrie Calorimétrique', 'about-sub': 'ATLAS · NIPSCERN',
+    'about-p1': 'Visualisation 3D interactive du calorimètre ATLAS — affichage en temps réel des énergies des cellules TileCal, LAr, HEC, FCAL, ainsi que des traces et clusters depuis des données JiveXML en direct ou locales.',
     'about-advisor-lbl': 'Conseiller scientifique', 'about-advisor-name': 'Prof. Dr. Luciano Manhães de Andrade Filho',
     'about-dev-lbl': 'Développement', 'about-dev-name': 'Chrysthofer Arthur Amaro Afonso',
     'about-dev-sub': 'Recherche de premier cycle · Laboratoire NIPSCERN',
     'about-lab1': 'NIPSCERN — Núcleo de Investigação em Física para o CERN',
     'about-lab2': 'Collaboration ATLAS · CERN, Genève',
+    'about-supported-by': 'Soutenu par',
     'about-close': 'Fermer', 'tip-energy-key': 'Énergie',
     'tip-panel': 'Afficher/masquer le panneau latéral',
     'tip-cinema': 'Mode cinéma — rotation automatique, UI masquée',
@@ -122,6 +146,28 @@ const TRANSLATIONS = {
     'log-new-event': 'Nouvel événement : ',
     'log-downloading': 'Téléchargement : ',
     'log-event': 'Événement : ',
+    'sett-preferences': 'Préférences',
+    'sett-hints-label': 'Infobulles des boutons',
+    'sett-hints-sub': 'Afficher les infobulles sur la barre d\'outils',
+    'sett-autopen-label': 'Ouverture automatique au survol',
+    'sett-autopen-sub': 'Afficher le panneau au bord de l\'écran',
+    'sett-tour-label': 'Visite guidée en mode cinéma',
+    'sett-tour-sub': 'Le mode cinéma devient une visite fluide de la géométrie',
+    'sett-shortcuts': 'Raccourcis clavier',
+    'sk-ghost': 'Basculer le contour fantôme', 'sk-beam': 'Basculer l\'axe faisceau',
+    'sk-info': 'Basculer l\'info cellule', 'sk-reset': 'Réinitialiser la caméra',
+    'sk-cinema': 'Mode cinéma', 'sk-menu': 'Menu (panneau latéral)',
+    'sk-energy': 'Panneau énergie', 'sk-shot': 'Capture d\'écran',
+    'sk-settings': 'Paramètres', 'sk-tile': 'Basculer TILE',
+    'sk-lar': 'Basculer LAr', 'sk-hec': 'Basculer HEC',
+    'sk-tracks': 'Basculer les traces', 'sk-clusters': 'Basculer les clusters',
+    'sk-bg': 'Choisir la couleur d\'arrière-plan', 'sk-slicer': 'Basculer le découpeur',
+    'sk-clthr': 'Basculer le seuil de cluster', 'sk-esc': 'Fermer / Quitter',
+    'bgcp-title': 'Arrière-plan de la scène', 'bgcp-presets': 'Pré-réglages',
+    'bgcp-reset': 'Réinitialiser',
+    'shot-opt-title': 'Arrière-plan transparent',
+    'shot-opt-sub': 'Enregistrer PNG avec canal alpha (sans arrière-plan)',
+    'empty-live': 'Aucun événement — en attente des données ATLAS Live (ATLANTIS)',
   },
   no: {
     'logo-full': 'Kalorimeter Geometri Visning', 'logo-lab': 'NIPSCERN · ATLAS',
@@ -135,13 +181,14 @@ const TRANSLATIONS = {
     'status-ready': 'Klar — venter på hendelse…',
     'cinema-exit': 'Avslutt kino',
     'slbl-energy': 'Energi', 'slbl-threshold': 'Terskel', 'thr-placeholder': 'f.eks. 200 MeV',
-    'about-title': 'Kalorimeter Geometri Visning', 'about-sub': 'ATLAS · TileCal · NIPSCERN',
-    'about-p1': 'Interaktiv 3D-visualisering av ATLAS-kalorimeteret som viser TileCal-celleenergier i sanntid fra levende eller lokale JiveXML-hendelsesdata.',
+    'about-title': 'Kalorimeter Geometri Visning', 'about-sub': 'ATLAS · NIPSCERN',
+    'about-p1': 'Interaktiv 3D-visualisering av ATLAS-kalorimeteret — sanntidsvisning av TileCal-, LAr-, HEC- og FCAL-celleenergier, partikkelspor og klynger fra levende eller lokale JiveXML-hendelsesdata.',
     'about-advisor-lbl': 'Vitenskapelig veileder', 'about-advisor-name': 'Prof. Dr. Luciano Manhães de Andrade Filho',
     'about-dev-lbl': 'Utvikling', 'about-dev-name': 'Chrysthofer Arthur Amaro Afonso',
     'about-dev-sub': 'Bachelorsforskning · NIPSCERN-laboratoriet',
     'about-lab1': 'NIPSCERN — Núcleo de Investigação em Física para o CERN',
     'about-lab2': 'ATLAS-samarbeidet · CERN, Genève',
+    'about-supported-by': 'Støttet av',
     'about-close': 'Lukk', 'tip-energy-key': 'Energi',
     'tip-panel': 'Vis/skjul sidepanelet',
     'tip-cinema': 'Kinomodus — autorotasjon, skjul grensesnitt',
@@ -177,6 +224,28 @@ const TRANSLATIONS = {
     'log-new-event': 'Ny hendelse: ',
     'log-downloading': 'Laster ned: ',
     'log-event': 'Hendelse: ',
+    'sett-preferences': 'Preferanser',
+    'sett-hints-label': 'Knappetips',
+    'sett-hints-sub': 'Vis verktøytips på verktøylinjen',
+    'sett-autopen-label': 'Åpne sidepanelet ved hover',
+    'sett-autopen-sub': 'Vis panelet når markøren når skjermkanten',
+    'sett-tour-label': 'Omvisning i kinomodus',
+    'sett-tour-sub': 'Kinomodus blir en glatt kameratur gjennom detektoren',
+    'sett-shortcuts': 'Hurtigtaster',
+    'sk-ghost': 'Veksle spøkelsesramme', 'sk-beam': 'Veksle stråleaksen',
+    'sk-info': 'Veksle celleinformasjon', 'sk-reset': 'Tilbakestill kamera',
+    'sk-cinema': 'Kinomodus', 'sk-menu': 'Meny (sidepanel)',
+    'sk-energy': 'Energipanel', 'sk-shot': 'Skjermbilde',
+    'sk-settings': 'Innstillinger', 'sk-tile': 'Veksle TILE',
+    'sk-lar': 'Veksle LAr', 'sk-hec': 'Veksle HEC',
+    'sk-tracks': 'Veksle partikkelspor', 'sk-clusters': 'Veksle klynger',
+    'sk-bg': 'Velg bakgrunnsfarge', 'sk-slicer': 'Veksle kutteren',
+    'sk-clthr': 'Veksle klyngeterskel', 'sk-esc': 'Lukk / Avslutt',
+    'bgcp-title': 'Scenebakgrunn', 'bgcp-presets': 'Forhåndsinnstillinger',
+    'bgcp-reset': 'Tilbakestill',
+    'shot-opt-title': 'Gjennomsiktig bakgrunn',
+    'shot-opt-sub': 'Lagre PNG med alfakanal (ingen bakgrunn)',
+    'empty-live': 'Ingen hendelser — venter på ATLAS Live-data fra ATLANTIS',
   },
   pt: {
     'logo-full': 'Visualizador de Geometria do Calorímetro', 'logo-lab': 'NIPSCERN · ATLAS',
@@ -190,13 +259,14 @@ const TRANSLATIONS = {
     'status-ready': 'Pronto — aguardando evento…',
     'cinema-exit': 'Sair do Cinema',
     'slbl-energy': 'Energia', 'slbl-threshold': 'Limiar', 'thr-placeholder': 'ex. 200 MeV',
-    'about-title': 'Visualizador de Geometria do Calorímetro', 'about-sub': 'ATLAS · TileCal · NIPSCERN',
-    'about-p1': 'Visualização 3D interativa do calorímetro ATLAS com exibição em tempo real das energias das células TileCal a partir de dados JiveXML ao vivo ou locais.',
+    'about-title': 'Visualizador de Geometria do Calorímetro', 'about-sub': 'ATLAS · NIPSCERN',
+    'about-p1': 'Visualização 3D interativa do calorímetro ATLAS — exibição em tempo real das energias das células TileCal, LAr, HEC e FCAL, além de trajetórias de partículas e clusters a partir de dados JiveXML ao vivo ou locais.',
     'about-advisor-lbl': 'Orientador Científico', 'about-advisor-name': 'Prof. Dr. Luciano Manhães de Andrade Filho',
     'about-dev-lbl': 'Desenvolvimento', 'about-dev-name': 'Chrysthofer Arthur Amaro Afonso',
     'about-dev-sub': 'Iniciação Científica · Laboratório NIPSCERN',
     'about-lab1': 'NIPSCERN — Núcleo de Investigação em Física para o CERN',
     'about-lab2': 'Colaboração ATLAS · CERN, Genebra',
+    'about-supported-by': 'Apoio',
     'about-close': 'Fechar', 'tip-energy-key': 'Energia',
     'tip-panel': 'Mostrar/ocultar painel lateral',
     'tip-cinema': 'Modo cinema — rotação automática, ocultar interface',
@@ -232,6 +302,28 @@ const TRANSLATIONS = {
     'log-new-event': 'Novo evento: ',
     'log-downloading': 'Baixando: ',
     'log-event': 'Evento: ',
+    'sett-preferences': 'Preferências',
+    'sett-hints-label': 'Dicas dos botões',
+    'sett-hints-sub': 'Exibir tooltips nos botões da barra de ferramentas',
+    'sett-autopen-label': 'Abrir painel ao passar o mouse',
+    'sett-autopen-sub': 'Mostrar painel ao aproximar o cursor da borda',
+    'sett-tour-label': 'Tour guiado no modo cinema',
+    'sett-tour-sub': 'O modo cinema vira um passeio suave pela geometria',
+    'sett-shortcuts': 'Atalhos do Teclado',
+    'sk-ghost': 'Alternar contorno fantasma', 'sk-beam': 'Alternar eixo do feixe',
+    'sk-info': 'Alternar info da célula', 'sk-reset': 'Resetar câmera',
+    'sk-cinema': 'Modo cinema', 'sk-menu': 'Menu (painel lateral)',
+    'sk-energy': 'Painel de energia', 'sk-shot': 'Captura de tela',
+    'sk-settings': 'Configurações', 'sk-tile': 'Alternar TILE',
+    'sk-lar': 'Alternar LAr', 'sk-hec': 'Alternar HEC',
+    'sk-tracks': 'Alternar trajetórias', 'sk-clusters': 'Alternar clusters',
+    'sk-bg': 'Escolher cor de fundo', 'sk-slicer': 'Alternar fatiador',
+    'sk-clthr': 'Alternar limiar de cluster', 'sk-esc': 'Fechar / Sair',
+    'bgcp-title': 'Fundo da cena', 'bgcp-presets': 'Predefinições',
+    'bgcp-reset': 'Restaurar padrão',
+    'shot-opt-title': 'Fundo transparente',
+    'shot-opt-sub': 'Salvar PNG com canal alfa (sem fundo de cena)',
+    'empty-live': 'Sem eventos — aguardando dados do ATLAS Live (ATLANTIS)',
   },
 };
 
@@ -349,7 +441,6 @@ let trackGroup    = null;
 let clusterGroup  = null;
 let fcalGroup     = null;
 let fcalCellsData  = [];   // cached for threshold rebuilds
-let fcalMaxMev     = 1;    // actual data max, used for palette normalisation
 let fcalVisibleMap = [];   // [instanceId] → cell object for the current visible set
 let lastClusterData       = null;  // { collections: [{key, clusters: [{eta,phi,etGev,cells:{TILE,LAR_EM,HEC,OTHER}}]}] }
 let activeClusterCellIds  = null;  // null = no cluster filter; Set<string> = only these cell IDs are visible
@@ -472,17 +563,29 @@ function palMatLAr(eMev) {
   return PAL_LAR[Math.round(tv * (PAL_N - 1))];
 }
 
-// ── Palette FCAL: light copper (#e8a06a) → dark copper (#3d1000), linear ──────
-// Returns [r, g, b] in [0,1] for use with vertex colours on LineSegments.
-// Normalisation is against fcalMaxMev (actual per-event maximum).
-const FCAL_SCALE = 10000; // MeV slider range (10 GeV)
+// ── Palette FCAL: copper ramp (deep patina → molten copper → hot gold) ────────
+// Non-linear curve (gamma 0.55) keeps low energies dark and lets high values
+// pop visibly; stops: #1a0600 → #6b2310 → #c8642a → #ffb26a → #ffeabe
+const FCAL_SCALE = 7000; // MeV slider range (7 GeV)
+const _FCAL_STOPS = [
+  [0.102, 0.024, 0.000], // 0.00  deep patina
+  [0.420, 0.137, 0.063], // 0.25  oxidised copper
+  [0.784, 0.392, 0.165], // 0.55  molten copper
+  [1.000, 0.698, 0.416], // 0.80  bright copper
+  [1.000, 0.918, 0.745], // 1.00  hot highlight
+];
+const _FCAL_STEPS = [0.0, 0.25, 0.55, 0.80, 1.0];
 function palColorFcalRgb(t) {
   t = Math.max(0, Math.min(1, t));
-  return [
-    0.910 + t * (0.239 - 0.910),  // R: #e8 → #3d
-    0.627 + t * (0.063 - 0.627),  // G: #a0 → #10
-    0.416 + t * (0.000 - 0.416),  // B: #6a → #00
-  ];
+  t = Math.pow(t, 0.55);  // gamma boost so the upper range dominates
+  for (let i = 1; i < _FCAL_STEPS.length; i++) {
+    if (t <= _FCAL_STEPS[i]) {
+      const k = (t - _FCAL_STEPS[i-1]) / (_FCAL_STEPS[i] - _FCAL_STEPS[i-1]);
+      const a = _FCAL_STOPS[i-1], b = _FCAL_STOPS[i];
+      return [a[0]+(b[0]-a[0])*k, a[1]+(b[1]-a[1])*k, a[2]+(b[2]-a[2])*k];
+    }
+  }
+  return _FCAL_STOPS[_FCAL_STOPS.length-1];
 }
 
 // ── Ghost — Calorimeter envelope meshes ──────────────────────────────────────
@@ -696,7 +799,7 @@ document.getElementById('ghost-phi-swatch').closest('label').addEventListener('c
 
 // ── Renderer ──────────────────────────────────────────────────────────────────
 const canvas   = document.getElementById('c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', precision: 'mediump', preserveDrawingBuffer: true, stencil: false, depth: true });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance', precision: 'mediump', preserveDrawingBuffer: true, stencil: false, depth: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -744,6 +847,7 @@ let _fpsFrames = 0, _fpsLast = performance.now();
     fpsEl.textContent = ((_fpsFrames / (now - _fpsLast)) * 1000).toFixed(0) + ' FPS';
     _fpsFrames = 0; _fpsLast = now;
   }
+  if (cinemaMode || _tourExiting) _tourTick();
   controls.update();
   if (controls.autoRotate) dirty = true;
   if (!dirty) return;
@@ -991,7 +1095,9 @@ function parseEventInfo(doc) {
   };
 }
 
+let _lastEventInfo = null;
 function showEventInfo(info) {
+  _lastEventInfo = info;
   if (!info) { setStatus('<span class="muted">No event metadata</span>'); return; }
   const dt  = info.dateTime   || '—';
   const run = info.runNumber  || '—';
@@ -1284,7 +1390,7 @@ function drawTracks(tracks) {
 // Lines are drawn from the origin in the η/φ direction, 5 m = 5000 mm long.
 // Coordinate convention matches tracks: Three.js X = −ATLAS x, Y = −ATLAS y.
 const CLUSTER_MAT = new THREE.LineDashedMaterial({
-  color: 0xff4400, transparent: true, opacity: 0.38,
+  color: 0xff4400, transparent: true, opacity: 0.20,
   dashSize: 40, gapSize: 60, depthWrite: false,
 });
 // Inner cylinder (start): r = 1.4 m, h = 6.4 m
@@ -1333,9 +1439,6 @@ function drawFcal(cells) {
   clearFcal();
   fcalCellsData = cells;
   if (!cells.length) return;
-  let mx = 0;
-  for (const { energy } of cells) { const v = Math.abs(energy) * 1000; if (v > mx) mx = v; }
-  fcalMaxMev = mx || 1;
   _applyFcalDraw();
 }
 
@@ -1376,12 +1479,26 @@ function _getFcalEdgeBase() {
 }
 
 function _applyFcalDraw() {
+  // While the slicer is active, also carve FCAL tubes whose centre sits inside
+  // the bubble. FCAL cells use (x,y,z,dz) in cm — convert to scene mm (×10).
+  const slicerOn = (typeof slicerActive !== 'undefined') && slicerActive;
+  const slR2     = slicerOn ? slicerRadius * slicerRadius : 0;
+  const slPx     = slicerOn ? slicerPos.x : 0;
+  const slPy     = slicerOn ? slicerPos.y : 0;
+  const slPz     = slicerOn ? slicerPos.z : 0;
+
   const visible = fcalCellsData.filter(c => {
     if (!showFcal) return false;
-    if (Math.abs(c.energy) * 1000 < thrFcalMev) return false;
-    if (activeClusterCellIds === null) return true;
-    if (!c.id) return true;
-    return activeClusterCellIds.has(c.id);
+    // Hide cells with negative energy — they aren't physically meaningful for display.
+    if (c.energy < 0) return false;
+    if (c.energy * 1000 < thrFcalMev) return false;
+    if (activeClusterCellIds !== null && c.id && !activeClusterCellIds.has(c.id)) return false;
+    if (slicerOn) {
+      const cx = -c.x * 10, cy = -c.y * 10, cz = c.z * 10;
+      const dx = cx - slPx, dy = cy - slPy, dz = cz - slPz;
+      if (dx*dx + dy*dy + dz*dz < slR2) return false;
+    }
+    return true;
   });
   fcalVisibleMap = visible;   // instance index i → visible[i] for tooltip lookup
   if (!fcalGroup) {
@@ -1419,7 +1536,7 @@ function _applyFcalDraw() {
     _fcalDummy.updateMatrix();
     iMesh.setMatrixAt(i, _fcalDummy.matrix);
     // Per-instance colour from copper palette
-    const [r, g, b] = palColorFcalRgb(Math.abs(energy) * 1000 / fcalMaxMev);
+    const [r, g, b] = palColorFcalRgb(Math.abs(energy) * 1000 / FCAL_SCALE);
     _fcalCol.setRGB(r, g, b);
     iMesh.setColorAt(i, _fcalCol);
   }
@@ -1538,6 +1655,10 @@ function resetScene() {
   tooltip.hidden = true; dirty = true;
 }
 function applyThreshold() {
+  // When the slicer is active it owns cell visibility (its mask already
+  // incorporates the thresholds / cluster filter). Delegate to it so we don't
+  // un-hide cells that should be inside the bubble.
+  if (slicerActive) { _applySlicerMask(); return; }
   rayTargets = [];
   for (const [mesh, { energyMev, det, cellId, mbtsLabel }] of active) {
     const thr    = det === 'LAR' ? thrLArMev  : det === 'HEC' ? thrHecMev : thrTileMev;
@@ -1552,7 +1673,8 @@ function applyThreshold() {
     } else {
       inCluster = true;                                           // no ID and not MBTS → always pass
     }
-    const vis = detOn && (!isFinite(thr) || energyMev >= thr) && inCluster;
+    // Hide cells with negative energy regardless of threshold.
+    const vis = detOn && energyMev >= 0 && (!isFinite(thr) || energyMev >= thr) && inCluster;
     mesh.visible = vis; if (vis) rayTargets.push(mesh);
   }
   rebuildAllOutlines();
@@ -1615,17 +1737,25 @@ function processXml(xmlText) {
   // ── FCAL cells ───────────────────────────────────────────────────────────────
   try { drawFcal(fcalCells); } catch (e) { console.warn('FCAL draw error', e); }
 
-  // Per-detector energy ranges — single loop per detector, avoids spread stack overflow
+  // Per-detector energy ranges — min + 97th-percentile as max (top 3% above slider max)
   function minMax(cells) {
-    let mn = Infinity, mx = -Infinity;
-    for (const { energy } of cells) { const v = energy * 1000; if (isFinite(v) && v > 0) { if (v < mn) mn = v; if (v > mx) mx = v; } }
-    return mn === Infinity ? [0, 1] : [mn, mx];
+    const vals = [];
+    for (const { energy } of cells) { const v = energy * 1000; if (isFinite(v) && v > 0) vals.push(v); }
+    if (!vals.length) return [0, 1];
+    vals.sort((a, b) => a - b);
+    const p97 = vals[Math.floor(0.97 * vals.length)];
+    return [vals[0], p97 ?? vals[vals.length - 1]];
   }
   // MBTS shares the Tile palette — merge its range with Tile's
   const allTileCells = tileCells.concat(mbtsCells);
   [tileMinMev, tileMaxMev] = minMax(allTileCells);
   [larMinMev,  larMaxMev]  = minMax(larCells);
   [hecMinMev,  hecMaxMev]  = minMax(hecCells);
+  const fcalMaxMev = (() => { const [, mx] = minMax(fcalCells); return mx; })();
+  tileSlider.update(tileMaxMev);
+  larSlider.update(larMaxMev);
+  hecSlider.update(hecMaxMev);
+  fcalSlider.update(fcalMaxMev);
 
   let nTile = 0, nLAr = 0, nHec = 0, nMbts = 0, nMiss = 0, nSkip = 0;
   let nHecMiss = 0, nMbtsMiss = 0;
@@ -1660,7 +1790,8 @@ function processXml(xmlText) {
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
     const tEta = physTileEta(section, side, tower, sampling);
     const tPhi = physTilePhi(module);
-    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: cellLabel(x, k), coords: `η = ${tEta.toFixed(3)}   φ = ${tPhi.toFixed(3)} rad`, det: 'TILE', cellId: id });
+    const tilePrefix = `${section === 1 ? 'LB' : 'EB'}${side >= 0 ? 'A' : 'C'}${module + 1}`;
+    active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: `${tilePrefix} ${cellLabel(x, k)}`, coords: `η = ${tEta.toFixed(3)}   φ = ${tPhi.toFixed(3)} rad`, det: 'TILE', cellId: id });
     nTile++;
   }
 
@@ -1854,11 +1985,12 @@ function ratioFromPtr(e, trackEl) {
   return 1 - Math.max(0, Math.min(1, ((e.clientY ?? e.touches?.[0]?.clientY ?? 0) - rect.top) / rect.height));
 }
 
-// Generic vertical energy slider — fixed max in MeV
-function makeDetSlider(trackId, thumbId, inputId, getThr, setThr, maxMev) {
-  const track = document.getElementById(trackId);
-  const thumb = document.getElementById(thumbId);
-  const input = document.getElementById(inputId);
+// Generic vertical energy slider — max in MeV (dynamic, updated per event via .update())
+function makeDetSlider(trackId, thumbId, inputId, getThr, setThr, maxMev, maxLblId) {
+  const track  = document.getElementById(trackId);
+  const thumb  = document.getElementById(thumbId);
+  const input  = document.getElementById(inputId);
+  const maxLbl = maxLblId ? document.getElementById(maxLblId) : null;
   let drag = false;
 
   function updateUI(mev) {
@@ -1891,17 +2023,23 @@ function makeDetSlider(trackId, thumbId, inputId, getThr, setThr, maxMev) {
     updateUI(getThr());
   });
 
-  return { updateUI };
+  function update(newMaxMev) {
+    maxMev = newMaxMev;
+    if (maxLbl) maxLbl.textContent = fmtMev(newMaxMev);
+    updateUI(getThr());
+  }
+
+  return { updateUI, update };
 }
 
 const tileSlider = makeDetSlider('tile-strak', 'tile-sthumb', 'tile-thr-input',
-  () => thrTileMev, v => { thrTileMev = v; }, TILE_SCALE);
+  () => thrTileMev, v => { thrTileMev = v; }, TILE_SCALE, 'tile-sval-max');
 const larSlider  = makeDetSlider('lar-strak',  'lar-sthumb',  'lar-thr-input',
-  () => thrLArMev,  v => { thrLArMev = v; },  LAR_SCALE);
+  () => thrLArMev,  v => { thrLArMev = v; },  LAR_SCALE,  'lar-sval-max');
 const fcalSlider = makeDetSlider('fcal-strak', 'fcal-sthumb', 'fcal-thr-input',
-  () => thrFcalMev, v => { thrFcalMev = v; applyFcalThreshold(); }, FCAL_SCALE);
+  () => thrFcalMev, v => { thrFcalMev = v; applyFcalThreshold(); }, FCAL_SCALE, 'fcal-sval-max');
 const hecSlider  = makeDetSlider('hec-strak',  'hec-sthumb',  'hec-thr-input',
-  () => thrHecMev,  v => { thrHecMev = v; },  HEC_SCALE);
+  () => thrHecMev,  v => { thrHecMev = v; },  HEC_SCALE,  'hec-sval-max');
 
 // ── Track pT slider (dynamic range — updates each event) ─────────────────────
 function makeTrackPtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
@@ -2288,7 +2426,7 @@ function doRaycast(clientX, clientY) {
       document.getElementById('tip-cell').textContent   = 'Track';
       document.getElementById('tip-coords').textContent = storeGateKey;
       document.getElementById('tip-e').textContent      = `${ptGev.toFixed(3)} GeV`;
-      if (tipEKeyEl) tipEKeyEl.textContent = 'pT';
+      if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
       tooltip.hidden = false; dirty = true; return;
@@ -2323,15 +2461,217 @@ canvas.addEventListener('mouseleave', () => { clearOutline(); tooltip.hidden = t
 controls.addEventListener('end', () => { lastRay = 0; setTimeout(() => doRaycast(mousePos.x, mousePos.y), 50); });
 
 // ── Cinema ────────────────────────────────────────────────────────────────────
+let tourMode = localStorage.getItem('cgv-tour-mode') === '1';
+// Tour path — a single continuous Catmull-Rom spline, no segment-based ease so
+// the camera glides at near-uniform speed with no pauses at waypoints.
+// Scene units = mm. Beam axis is the z-axis (x=y=0). Inside the FCAL z-range
+// (|z| ~4700-6200 mm) the cells have a beam-pipe bore at r < ~70 mm, so we
+// keep the camera at r ≈ 10 mm throughout — always on the axis, never inside
+// any cell volume.
+// Narrative: wide establishing → swing down to the beam axis at +z → approach
+// face-on toward the +z FCAL → glide along the bore while panning the camera
+// to look at each inner wall then back to center → exit face-on through the
+// -z FCAL → arc around outside, see the detector from far → return to start.
+const _tourCamWaypoints = [
+  // Phase 1: wide establishing, swing onto beam axis
+  new THREE.Vector3(  8500,  3500,  12500),  // 1  wide oblique
+  new THREE.Vector3(  3000,  1200,  13000),  // 2  banking toward axis
+
+  // Phase 2: face-on approach to +z FCAL, zoom in
+  new THREE.Vector3(     0,    12,  11500),  // 3  on beam axis, distant
+  new THREE.Vector3(     0,    10,   8500),  // 4  zooming in on +z face
+  new THREE.Vector3(     0,    10,   7000),  // 5  close-up on +z FCAL face
+
+  // Phase 3: pass through FCAL bore, look at inner walls, return to center
+  new THREE.Vector3(     0,    10,   4500),  // 6  inside bore, swinging gaze to interior
+  new THREE.Vector3(     0,    10,   2500),  // 7  pan to +x wall
+  new THREE.Vector3(     0,    10,   1000),  // 8  pan upward diagonal
+  new THREE.Vector3(     0,    10,   -500),  // 9  pan to opposite wall
+  new THREE.Vector3(     0,    10,  -2000),  // 10 pan to -x wall
+  new THREE.Vector3(     0,    10,  -4000),  // 11 return gaze to center
+
+  // Phase 4: exit face-on through -z FCAL, zoom out
+  new THREE.Vector3(     0,    10,  -7000),  // 12 just past -z face, look back at it
+  new THREE.Vector3(     0,    12,  -8500),  // 13 pulling back, -z face still in view
+  new THREE.Vector3(     0,    15, -11500),  // 14 wide on -z axis
+
+  // Phase 5: arc around outside, pass near -x, climb back up and loop
+  new THREE.Vector3( -5500,  2500,  -9500),  // 15 banking out to -x side
+  new THREE.Vector3( -9000,  2000,      0),  // 16 wide pass along -x side
+  new THREE.Vector3( -5500,  3200,   8500),  // 17 arcing back toward +z
+  new THREE.Vector3(  1000,  4500,  12000),  // 18 closing the loop
+];
+const _tourTgtWaypoints = [
+  new THREE.Vector3(     0,     0,     0),  // 1
+  new THREE.Vector3(     0,     0,  3000),  // 2
+  new THREE.Vector3(     0,     0,  5800),  // 3  look at +z FCAL face
+  new THREE.Vector3(     0,     0,  5800),  // 4  hold on the face
+  new THREE.Vector3(     0,     0,  5500),  // 5  zoomed on the face
+  new THREE.Vector3(     0,     0,  1500),  // 6  swinging gaze into the barrel
+  new THREE.Vector3(  2800,   800,  1800),  // 7  +x wall slightly up
+  new THREE.Vector3(  1200,  2400,    400),  // 8  up-right diagonal (safe, 32° off +y)
+  new THREE.Vector3( -1200,  2400,   -400),  // 9  up-left diagonal
+  new THREE.Vector3( -2800,   800, -1800),  // 10 -x wall slightly up
+  new THREE.Vector3(     0,     0, -1500),  // 11 back to center of calorimeter
+  new THREE.Vector3(     0,     0, -5500),  // 12 look back at -z FCAL face
+  new THREE.Vector3(     0,     0, -5500),  // 13 hold on -z face
+  new THREE.Vector3(     0,     0,     0),  // 14 look back at ATLAS (whole thing)
+  new THREE.Vector3(     0,     0,     0),  // 15
+  new THREE.Vector3(     0,     0,     0),  // 16
+  new THREE.Vector3(     0,     0,     0),  // 17
+  new THREE.Vector3(     0,     0,     0),  // 18
+];
+const _tourPosCurve = new THREE.CatmullRomCurve3(_tourCamWaypoints, true, 'centripetal', 0.5);
+const _tourTgtCurve = new THREE.CatmullRomCurve3(_tourTgtWaypoints, true, 'centripetal', 0.5);
+const TOUR_TOTAL_DURATION = 105_000;  // full loop in ms
+const TOUR_BLEND_MS       = 2200;      // smooth entry from current pose
+
+// Exit inertia: track per-frame velocity of camera+target during the active
+// tour so we can keep drifting (with quadratic decay) after user leaves cinema.
+// `var` (not `let`) so the render-loop guard up-file can read it via hoisting.
+var _tourExiting = false;
+let _tourExitT0 = 0;
+const TOUR_EXIT_DURATION = 1400;
+const _tourPrevPos = new THREE.Vector3();
+const _tourPrevTgt = new THREE.Vector3();
+const _tourVelPos  = new THREE.Vector3();
+const _tourVelTgt  = new THREE.Vector3();
+let _tourPrevT = 0;
+
+// Continuous-motion state: `_tourU0` is the spline u-coordinate at time _tourT0
+// so the tour can resume mid-spline when re-entered.
+let _tourT0   = 0;
+let _tourU0   = 0;
+let _tourBlending   = false;
+let _tourBlendT0    = 0;
+const _tourBlendFromPos = new THREE.Vector3();
+const _tourBlendFromTgt = new THREE.Vector3();
+const _tourTmpPos = new THREE.Vector3();
+const _tourTmpTgt = new THREE.Vector3();
+
+function _tourEase(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2; }  // easeInOutQuad
+
+// Find the spline u-coordinate (0..1) whose point is closest to `v`.
+// Coarse sample then local refine — good enough for smooth resume.
+function _tourNearestU(v) {
+  const N = 240;
+  let bestU = 0, bestD = Infinity;
+  for (let i = 0; i < N; i++) {
+    const u = i / N;
+    _tourPosCurve.getPoint(u, _tourTmpPos);
+    const d = _tourTmpPos.distanceToSquared(v);
+    if (d < bestD) { bestD = d; bestU = u; }
+  }
+  return bestU;
+}
+
+function _tourSampleU(u) {
+  u = ((u % 1) + 1) % 1;
+  _tourPosCurve.getPoint(u, _tourTmpPos);
+  _tourTgtCurve.getPoint(u, _tourTmpTgt);
+}
+
+function _tourTick() {
+  const now = performance.now();
+
+  // Exit-inertia phase: cinema already off, but tour drift continues.
+  if (_tourExiting) {
+    const et = now - _tourExitT0;
+    if (et >= TOUR_EXIT_DURATION) { _tourExiting = false; return; }
+    const decay = Math.pow(1 - et / TOUR_EXIT_DURATION, 2);
+    const dtSec = Math.max(0.001, (now - _tourPrevT) / 1000);
+    camera.position.addScaledVector(_tourVelPos, decay * dtSec);
+    controls.target.addScaledVector(_tourVelTgt, decay * dtSec);
+    controls.update();
+    dirty = true;
+    _tourPrevT = now;
+    return;
+  }
+
+  if (!cinemaMode || !tourMode) return;
+
+  // Blend-in: 2.2 s easeInOut from whatever pose the camera had to the start
+  // of the spline, so entering the tour from anywhere is smooth.
+  if (_tourBlending) {
+    const bt = now - _tourBlendT0;
+    const k  = Math.min(1, bt / TOUR_BLEND_MS);
+    const e  = _tourEase(k);
+    _tourSampleU(_tourU0);
+    camera.position.lerpVectors(_tourBlendFromPos, _tourTmpPos, e);
+    controls.target.lerpVectors(_tourBlendFromTgt, _tourTmpTgt, e);
+    controls.update();
+    dirty = true;
+
+    const dtSec = Math.max(0.001, (now - _tourPrevT) / 1000);
+    _tourVelPos.subVectors(camera.position,  _tourPrevPos).divideScalar(dtSec);
+    _tourVelTgt.subVectors(controls.target, _tourPrevTgt).divideScalar(dtSec);
+    _tourPrevPos.copy(camera.position);
+    _tourPrevTgt.copy(controls.target);
+    _tourPrevT = now;
+
+    if (k >= 1) {
+      _tourBlending = false;
+      _tourT0 = now;  // spline-time clock starts now from u = _tourU0
+    }
+    return;
+  }
+
+  // Continuous spline traversal — no per-segment pauses.
+  const u = (_tourU0 + (now - _tourT0) / TOUR_TOTAL_DURATION) % 1;
+  _tourSampleU(u);
+  camera.position.copy(_tourTmpPos);
+  controls.target.copy(_tourTmpTgt);
+  controls.update();
+  dirty = true;
+
+  // Record per-frame velocity (scene-units / second) for exit inertia.
+  const dtSec = Math.max(0.001, (now - _tourPrevT) / 1000);
+  _tourVelPos.subVectors(camera.position,  _tourPrevPos).divideScalar(dtSec);
+  _tourVelTgt.subVectors(controls.target, _tourPrevTgt).divideScalar(dtSec);
+  _tourPrevPos.copy(camera.position);
+  _tourPrevTgt.copy(controls.target);
+  _tourPrevT = now;
+}
+
+function _startTour() {
+  // Resume from wherever the camera is: find the nearest u on the spline and
+  // blend in over TOUR_BLEND_MS. From u=_tourU0 the spline-time clock advances.
+  const now = performance.now();
+  _tourU0 = _tourNearestU(camera.position);
+  _tourBlending = true;
+  _tourBlendT0  = now;
+  _tourT0       = now;  // will be rebased when blend completes
+  _tourBlendFromPos.copy(camera.position);
+  _tourBlendFromTgt.copy(controls.target);
+  _tourPrevPos.copy(camera.position);
+  _tourPrevTgt.copy(controls.target);
+  _tourVelPos.set(0, 0, 0);
+  _tourVelTgt.set(0, 0, 0);
+  _tourPrevT = now;
+  _tourExiting = false;
+  controls.autoRotate = false;
+}
+
 function enterCinema() {
   cinemaMode = true; document.body.classList.add('cinema');
-  controls.autoRotate = true; controls.autoRotateSpeed = 0.38;
   document.getElementById('btn-cinema').classList.add('on');
   clearOutline(); tooltip.hidden = true;
+  _tourExiting = false;
+  if (tourMode) {
+    _startTour();
+  } else {
+    controls.autoRotate = true; controls.autoRotateSpeed = 0.38;
+  }
 }
 function exitCinema() {
+  const wasTour = cinemaMode && tourMode;
   cinemaMode = false; document.body.classList.remove('cinema');
   controls.autoRotate = false; document.getElementById('btn-cinema').classList.remove('on');
+  if (wasTour) {
+    _tourExiting = true;
+    _tourExitT0  = performance.now();
+    _tourPrevT   = _tourExitT0;
+  }
 }
 function resetCamera() {
   camera.position.set(0, 0, 12_000);
@@ -2379,20 +2719,16 @@ function closeGhostPanel() {
 }
 document.getElementById('btn-ghost').addEventListener('click', e => {
   e.stopPropagation();
-  ghostPanelOpen ? closeGhostPanel() : openGhostPanel();
+  toggleAllGhosts();
 });
 for (const name of GHOST_MESH_NAMES) {
   const el = document.getElementById('gtog-' + GHOST_META[name].id);
   if (el) el.addEventListener('click', () => toggleGhostByName(name));
 }
-document.getElementById('gbtn-all') .addEventListener('click', () => setAllGhosts(true));
-document.getElementById('gbtn-none').addEventListener('click', () => setAllGhosts(false));
-// Click outside closes the ghost panel
-document.addEventListener('click', e => {
-  if (!ghostPanelOpen) return;
-  if (ghostPanel.contains(e.target) || e.target.closest('#btn-ghost')) return;
-  closeGhostPanel();
-});
+const _gbtnAll  = document.getElementById('gbtn-all');
+const _gbtnNone = document.getElementById('gbtn-none');
+if (_gbtnAll)  _gbtnAll .addEventListener('click', () => setAllGhosts(true));
+if (_gbtnNone) _gbtnNone.addEventListener('click', () => setAllGhosts(false));
 document.getElementById('btn-beam').addEventListener('click', toggleBeam);
 document.getElementById('btn-reset').addEventListener('click', resetCamera);
 
@@ -2402,18 +2738,21 @@ function syncLayerToggles() {
   const tTile = document.getElementById('ltog-tile');
   const tLAr  = document.getElementById('ltog-lar');
   const tHec  = document.getElementById('ltog-hec');
+  const tFcal = document.getElementById('ltog-fcal');
   tTile.classList.toggle('on', showTile); tTile.setAttribute('aria-checked', showTile);
   tLAr .classList.toggle('on', showLAr);  tLAr .setAttribute('aria-checked', showLAr);
   tHec .classList.toggle('on', showHec);  tHec .setAttribute('aria-checked', showHec);
+  tFcal.classList.toggle('on', showFcal); tFcal.setAttribute('aria-checked', showFcal);
   // Layers button: dim when all off, lit otherwise
-  document.getElementById('btn-layers').classList.toggle('on', showTile || showLAr || showHec);
+  document.getElementById('btn-layers').classList.toggle('on', showTile || showLAr || showHec || showFcal);
 }
 
 document.getElementById('ltog-tile').addEventListener('click', () => { showTile = !showTile; syncLayerToggles(); applyThreshold(); });
 document.getElementById('ltog-lar') .addEventListener('click', () => { showLAr  = !showLAr;  syncLayerToggles(); applyThreshold(); });
 document.getElementById('ltog-hec') .addEventListener('click', () => { showHec  = !showHec;  syncLayerToggles(); applyThreshold(); });
-document.getElementById('lbtn-all') .addEventListener('click', () => { showTile = showLAr = showHec = true;  syncLayerToggles(); applyThreshold(); });
-document.getElementById('lbtn-none').addEventListener('click', () => { showTile = showLAr = showHec = false; syncLayerToggles(); applyThreshold(); });
+document.getElementById('ltog-fcal').addEventListener('click', () => { showFcal = !showFcal; syncLayerToggles(); applyFcalThreshold(); });
+document.getElementById('lbtn-all') .addEventListener('click', () => { showTile = showLAr = showHec = showFcal = true;  syncLayerToggles(); applyThreshold(); applyFcalThreshold(); });
+document.getElementById('lbtn-none').addEventListener('click', () => { showTile = showLAr = showHec = showFcal = false; syncLayerToggles(); applyThreshold(); applyFcalThreshold(); });
 document.getElementById('cluster-filter-toggle').addEventListener('click', () => {
   clusterFilterEnabled = !clusterFilterEnabled;
   syncClusterFilterToggle();
@@ -2444,7 +2783,7 @@ function closeLayersPanel() {
   layersPanelOpen = false;
   layersPanel.classList.remove('open');
   // Restore btn-layers state (lit if any layer on)
-  document.getElementById('btn-layers').classList.toggle('on', showTile || showLAr || showHec);
+  document.getElementById('btn-layers').classList.toggle('on', showTile || showLAr || showHec || showFcal);
 }
 document.getElementById('btn-layers').addEventListener('click', e => {
   e.stopPropagation();
@@ -2590,6 +2929,50 @@ document.querySelectorAll('[data-tip]').forEach(el => {
   el.addEventListener('click',      hideBtnTip);
 });
 
+// ── Statusbar hint: full collision info on hover ──────────────────────────────
+(function () {
+  const sb   = document.getElementById('statusbar');
+  const hint = document.getElementById('stat-hint');
+  if (!sb || !hint) return;
+  function labels() {
+    return {
+      'Date/Time':    'dateTime',
+      'Run Number':   'runNumber',
+      'Event Number': 'eventNumber',
+      'Lumi Block':   'lumiBlock',
+      'Version':      'version',
+    };
+  }
+  function build() {
+    const info = _lastEventInfo;
+    if (!info) { hint.innerHTML = `<span class="sh-key">Status</span><span class="sh-val">${esc(statusTxtEl.textContent)}</span>`; return; }
+    const map = labels();
+    let html = '';
+    for (const [k, prop] of Object.entries(map)) {
+      const v = info[prop];
+      if (!v) continue;
+      html += `<span class="sh-key">${esc(k)}</span><span class="sh-val">${esc(v)}</span>`;
+    }
+    hint.innerHTML = html || `<span class="sh-key">Event</span><span class="sh-val">no metadata</span>`;
+  }
+  function show() {
+    if (!hintsEnabled) return;
+    build();
+    hint.classList.add('show');
+    const sr = sb.getBoundingClientRect();
+    const hw = hint.offsetWidth, hh = hint.offsetHeight, gap = 8;
+    let left = sr.left;
+    let top  = sr.top - hh - gap;
+    left = Math.max(6, Math.min(left, window.innerWidth - hw - 6));
+    if (top < 6) top = sr.bottom + gap;
+    hint.style.left = left + 'px';
+    hint.style.top  = top  + 'px';
+  }
+  function hide() { hint.classList.remove('show'); }
+  sb.addEventListener('mouseenter', show);
+  sb.addEventListener('mouseleave', hide);
+})();
+
 // ── Mode toggle ───────────────────────────────────────────────────────────────
 function setMode(mode) {
   // mode: 'live' | 'local' | 'sample'
@@ -2644,9 +3027,10 @@ function renderEvtList() {
     const isCur = !marked && entry.id === curEvtId;
     if (isCur) marked = true;
     row.className = 'erow' + (isCur ? ' cur' : '');
+    const displayName = /\.xml$/i.test(entry.name) ? entry.name : entry.name + '.xml';
     row.innerHTML = `
       <div class="einfo">
-        <div class="ename">${esc(entry.name)}</div>
+        <div class="ename">${esc(displayName)}</div>
         <div class="etime" data-ts="${entry.timestamp}">${relTime(entry.timestamp)}</div>
       </div>
       <button class="edl"><svg class="ic" style="width:11px;height:11px"><use href="#i-dl"/></svg></button>`;
@@ -2893,6 +3277,27 @@ const shotProgress = document.getElementById('shot-progress');
 const shotProgTxt  = document.getElementById('shot-progress-txt');
 let   shotW = 0, shotH = 0;
 
+// Pick a sensible default resolution based on device capabilities.
+// Mobile (landscape small screens, touch/coarse pointer, low DPR) → 2K.
+// Desktop → 10K (maximum available).
+function _pickDefaultShotRes() {
+  const coarse  = window.matchMedia('(pointer: coarse)').matches;
+  const small   = window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches
+               || window.innerWidth < 900;
+  const isMob   = coarse || small;
+  return isMob ? { w: 2560, h: 1440 } : { w: 10240, h: 5760 };
+}
+
+function _applyDefaultShotRes() {
+  const { w, h } = _pickDefaultShotRes();
+  const target = document.querySelector(`.shot-res[data-w="${w}"][data-h="${h}"]`);
+  if (!target) return;
+  document.querySelectorAll('.shot-res').forEach(b => b.classList.remove('active'));
+  target.classList.add('active');
+  shotW = w; shotH = h;
+  shotSaveBtn.disabled = false;
+}
+
 // Resolution button selection
 document.querySelectorAll('.shot-res').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -2904,7 +3309,10 @@ document.querySelectorAll('.shot-res').forEach(btn => {
   });
 });
 
-function openShotDialog() { shotOverlay.classList.add('open'); }
+function openShotDialog() {
+  shotOverlay.classList.add('open');
+  _applyDefaultShotRes();
+}
 function closeShotDialog() {
   shotOverlay.classList.remove('open');
   document.querySelectorAll('.shot-res').forEach(b => b.classList.remove('active'));
@@ -2938,6 +3346,190 @@ shotSaveBtn.addEventListener('click', async () => {
   }
 });
 
+// ── Background color picker (2D SV rectangle + vertical hue strip) ────────────
+const DEFAULT_BG_HEX = '#020d1c';
+(function () {
+  const btn       = document.getElementById('btn-bgcolor');
+  const pop       = document.getElementById('bgcolor-popover');
+  const sv        = document.getElementById('bgcp-sv');
+  const svCursor  = document.getElementById('bgcp-sv-cursor');
+  const hueStrip  = document.getElementById('bgcp-hue-strip');
+  const hueCursor = document.getElementById('bgcp-hue-cursor');
+  const hexInput  = document.getElementById('bgcp-hex');
+  const swatch    = document.getElementById('bgcp-swatch');
+  const closeBtn  = document.getElementById('bgcp-close');
+  const resetBtn  = document.getElementById('bgcp-reset');
+  const presets   = Array.from(document.querySelectorAll('.bgcp-preset'));
+  if (!btn || !pop) return;
+
+  // ── Color math helpers ─────────────────────────────────────────────
+  function _clamp(n, a, b) { return n < a ? a : n > b ? b : n; }
+  function hexToRgb(hex) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(hex);
+    if (!m) return null;
+    const v = parseInt(m[1], 16);
+    return { r: (v>>16)&0xff, g: (v>>8)&0xff, b: v&0xff };
+  }
+  function rgbToHex(r, g, b) {
+    const h = n => _clamp(Math.round(n), 0, 255).toString(16).padStart(2, '0');
+    return '#' + h(r) + h(g) + h(b);
+  }
+  function rgbToHsv(r, g, b) {
+    r/=255; g/=255; b/=255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    const d = max - min;
+    let h = 0;
+    if (d !== 0) {
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)); break;
+        case g: h = ((b - r) / d + 2); break;
+        case b: h = ((r - g) / d + 4); break;
+      }
+      h *= 60;
+    }
+    const s = max === 0 ? 0 : d / max;
+    return { h, s: s*100, v: max*100 };
+  }
+  function hsvToRgb(h, s, v) {
+    h = ((h % 360) + 360) % 360; s /= 100; v /= 100;
+    const c = v * s;
+    const x = c * (1 - Math.abs(((h/60) % 2) - 1));
+    const m = v - c;
+    let r=0,g=0,b=0;
+    if      (h <  60) { r=c; g=x; }
+    else if (h < 120) { r=x; g=c; }
+    else if (h < 180) { g=c; b=x; }
+    else if (h < 240) { g=x; b=c; }
+    else if (h < 300) { r=x; b=c; }
+    else              { r=c; b=x; }
+    return { r: (r+m)*255, g: (g+m)*255, b: (b+m)*255 };
+  }
+
+  // ── State ──────────────────────────────────────────────────────────
+  let curH = 210, curS = 85, curV = 11;  // initial ≈ #020d1c
+  let open = false;
+
+  function applyColor(hex, { save = false, syncCursors = true } = {}) {
+    const rgb = hexToRgb(hex); if (!rgb) return;
+    scene.background = new THREE.Color(hex);
+    swatch.style.background = hex;
+    if (document.activeElement !== hexInput) hexInput.value = hex.toUpperCase();
+    if (syncCursors) {
+      const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+      curH = hsv.h; curS = hsv.s; curV = hsv.v;
+    }
+    _paintSvBackground();
+    _positionCursors();
+    _markActivePreset(hex);
+    if (save) localStorage.setItem('cgv-bg-color', hex);
+    dirty = true;
+  }
+
+  function _paintSvBackground() {
+    const pure = hsvToRgb(curH, 100, 100);
+    sv.style.background =
+      `linear-gradient(to top, #000 0%, rgba(0,0,0,0) 100%), ` +
+      `linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%), ` +
+      `rgb(${pure.r}, ${pure.g}, ${pure.b})`;
+  }
+  function _positionCursors() {
+    svCursor.style.left = curS + '%';
+    svCursor.style.top  = (100 - curV) + '%';
+    hueCursor.style.top = (curH / 360 * 100) + '%';
+  }
+  function _markActivePreset(hex) {
+    presets.forEach(p => p.classList.toggle('active', p.dataset.c.toLowerCase() === hex.toLowerCase()));
+  }
+  function _updateFromHsv() {
+    const rgb = hsvToRgb(curH, curS, curV);
+    applyColor(rgbToHex(rgb.r, rgb.g, rgb.b), { save: true, syncCursors: false });
+  }
+
+  // ── SV rectangle drag ──────────────────────────────────────────────
+  function _svFromEvent(e) {
+    const r = sv.getBoundingClientRect();
+    const x = _clamp(e.clientX - r.left, 0, r.width);
+    const y = _clamp(e.clientY - r.top,  0, r.height);
+    curS = (x / r.width) * 100;
+    curV = (1 - y / r.height) * 100;
+    _updateFromHsv();
+  }
+  let svDrag = false;
+  sv.addEventListener('pointerdown', e => {
+    svDrag = true; sv.setPointerCapture(e.pointerId); _svFromEvent(e);
+  });
+  sv.addEventListener('pointermove', e => { if (svDrag) _svFromEvent(e); });
+  sv.addEventListener('pointerup',   e => { svDrag = false; try { sv.releasePointerCapture(e.pointerId); } catch(_){} });
+
+  // ── Hue strip drag ─────────────────────────────────────────────────
+  function _hueFromEvent(e) {
+    const r = hueStrip.getBoundingClientRect();
+    const y = _clamp(e.clientY - r.top, 0, r.height);
+    curH = (y / r.height) * 360;
+    _updateFromHsv();
+  }
+  let hueDrag = false;
+  hueStrip.addEventListener('pointerdown', e => {
+    hueDrag = true; hueStrip.setPointerCapture(e.pointerId); _hueFromEvent(e);
+  });
+  hueStrip.addEventListener('pointermove', e => { if (hueDrag) _hueFromEvent(e); });
+  hueStrip.addEventListener('pointerup',   e => { hueDrag = false; try { hueStrip.releasePointerCapture(e.pointerId); } catch(_){} });
+
+  hexInput.addEventListener('input', () => {
+    let v = hexInput.value.trim();
+    if (!v.startsWith('#')) v = '#' + v;
+    if (/^#[0-9a-f]{6}$/i.test(v)) applyColor(v, { save: true, syncCursors: true });
+  });
+
+  presets.forEach(p => {
+    p.style.background = p.dataset.c;
+    p.addEventListener('click', () => applyColor(p.dataset.c, { save: true, syncSliders: true }));
+  });
+
+  resetBtn.addEventListener('click', () => applyColor(DEFAULT_BG_HEX, { save: true, syncSliders: true }));
+
+  // ── Popover open/close/position ────────────────────────────────────
+  function position() {
+    const r = btn.getBoundingClientRect();
+    const pw = pop.offsetWidth  || 260;
+    const ph = pop.offsetHeight || 340;
+    let left = r.left + r.width/2 - pw/2;
+    let top  = r.top - ph - 10;
+    left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+    if (top < 8) top = r.bottom + 10;
+    pop.style.left = left + 'px';
+    pop.style.top  = top + 'px';
+  }
+  function openPop() {
+    open = true;
+    position();
+    pop.classList.add('open');
+    btn.classList.add('on');
+    requestAnimationFrame(position);
+  }
+  function closePop() {
+    open = false;
+    pop.classList.remove('open');
+    btn.classList.remove('on');
+  }
+  btn.addEventListener('click', e => { e.stopPropagation(); open ? closePop() : openPop(); });
+  closeBtn.addEventListener('click', closePop);
+  document.addEventListener('click', e => {
+    if (!open) return;
+    if (pop.contains(e.target) || btn.contains(e.target)) return;
+    closePop();
+  });
+  window.addEventListener('resize', () => { if (open) position(); });
+
+  // Expose for the Shift+B keyboard shortcut.
+  window.__cgvToggleBgPicker = () => open ? closePop() : openPop();
+
+  // ── Initial color ──────────────────────────────────────────────────
+  const saved = localStorage.getItem('cgv-bg-color');
+  const initial = (saved && /^#[0-9a-f]{6}$/i.test(saved)) ? saved : DEFAULT_BG_HEX;
+  applyColor(initial, { save: false, syncSliders: true });
+})();
+
 async function renderAndDownload(targetW, targetH) {
   // ── 1. Save current renderer state ──────────────────────────────────────
   const origW  = renderer.domElement.width;
@@ -2965,7 +3557,19 @@ async function renderAndDownload(targetW, targetH) {
   camera.updateProjectionMatrix();
 
   // ── 4. Render one high-quality frame ─────────────────────────────────────
+  // If transparent-bg screenshot is requested, temporarily drop scene.background
+  // so the alpha channel is preserved when we read pixels.
+  const transparentBg = !!document.getElementById('shot-transparent')?.checked;
+  const savedBg = scene.background;
+  if (transparentBg) {
+    scene.background = null;
+    renderer.setClearColor(0x000000, 0);
+  }
+  // Hide slicer gizmo for the screenshot — the carve stays, the handle vanishes.
+  const slicerVisSaved = slicerGroup ? slicerGroup.visible : null;
+  if (slicerGroup) slicerGroup.visible = false;
   renderer.render(scene, camera);
+  if (slicerGroup && slicerVisSaved !== null) slicerGroup.visible = slicerVisSaved;
 
   // ── 5. Grab raw pixels from the WebGL canvas ─────────────────────────────
   const gl    = renderer.getContext();
@@ -3045,6 +3649,10 @@ async function renderAndDownload(targetW, targetH) {
   }
 
   // ── 8. Restore original renderer state ──────────────────────────────────
+  if (transparentBg) {
+    scene.background = savedBg;
+    renderer.setClearColor(0x000000, 1);
+  }
   renderer.setPixelRatio(origPR);
   renderer.setSize(origW / origPR, origH / origPR, false);
   camera.aspect = origAspect;
@@ -3202,6 +3810,31 @@ document.getElementById('stog-autopen').addEventListener('click', function() {
   rpanelEdge.style.pointerEvents   = autoOpenEnabled ? '' : 'none';
 });
 
+// Settings toggles — guided tour in cinema mode
+(function () {
+  const tog = document.getElementById('stog-tour');
+  if (!tog) return;
+  const sync = () => {
+    tog.classList.toggle('on', tourMode);
+    tog.setAttribute('aria-checked', tourMode ? 'true' : 'false');
+  };
+  sync();
+  tog.addEventListener('click', () => {
+    tourMode = !tourMode;
+    localStorage.setItem('cgv-tour-mode', tourMode ? '1' : '0');
+    sync();
+    if (cinemaMode) {
+      // Swap mode live: turning on → smooth entry from current pose;
+      // off → fall back to auto-rotate.
+      if (tourMode) { _startTour(); }
+      else {
+        _tourExiting = false; _tourBlending = false;
+        controls.autoRotate = true; controls.autoRotateSpeed = 0.38;
+      }
+    }
+  });
+})();
+
 // ── About button (panel head) ─────────────────────────────────────────────────
 document.getElementById('btn-about').addEventListener('click', () => {
   aboutOverlay.classList.add('open');
@@ -3251,6 +3884,240 @@ document.getElementById('btn-about').addEventListener('click', () => {
   });
 })();
 
+// ── Slicer gizmo ──────────────────────────────────────────────────────────────
+// A draggable 3D marker defining a cylindrical "bubble" at its current position.
+// While active, any cell whose centre is inside the bubble is hidden (both the
+// filled mesh AND its outline), so you can carve a hole through the detector.
+// Cells outside the bubble render normally (subject to the usual thresholds /
+// cluster filters).
+let slicerGroup   = null;
+let slicerActive  = false;
+let slicerPos     = new THREE.Vector3(0, 0, 2000);  // initial cylinder point (z=2m)
+let slicerRadius  = 1500;   // bubble radius in mm (scroll-adjustable)
+const SLICER_R_MIN = 200;
+const SLICER_R_MAX = 8000;
+// Cache of cell center world positions so we don't re-compute every frame.
+const _cellCenterCache = new Map();
+// Squared-distance helper (avoids sqrt in the hot loop)
+function _cellCenter(mesh) {
+  const cached = _cellCenterCache.get(mesh);
+  if (cached) return cached;
+  mesh.updateWorldMatrix(true, false);
+  const m = mesh.matrixWorld.elements;
+  const c = new THREE.Vector3(m[12], m[13], m[14]);
+  // For a few un-transformed meshes the translation is 0. Fall back to the
+  // geometry's bounding-sphere centre in that case so our "bubble" check isn't
+  // wrong for those cells.
+  if (c.lengthSq() < 1e-6 && mesh.geometry) {
+    if (!mesh.geometry.boundingSphere) mesh.geometry.computeBoundingSphere();
+    const bs = mesh.geometry.boundingSphere;
+    if (bs) c.copy(bs.center).applyMatrix4(mesh.matrixWorld);
+  }
+  _cellCenterCache.set(mesh, c);
+  return c;
+}
+
+function _buildSlicerGizmo() {
+  const g = new THREE.Group();
+  g.renderOrder = 20;
+  const L = 800;
+  const head = 120;
+  const rad  = 40;
+  const sphR = 60;
+
+  const mkArrow = (dir, color) => {
+    const a = new THREE.ArrowHelper(dir, new THREE.Vector3(0,0,0), L, color, head, rad);
+    a.line.material.linewidth = 3;
+    a.line.material.depthTest = false;
+    a.cone.material.depthTest = false;
+    a.renderOrder = 21;
+    return a;
+  };
+  g.userData.arrowZ = mkArrow(new THREE.Vector3(0,0,1), 0xff2a2a); g.add(g.userData.arrowZ);
+  g.userData.arrowP = mkArrow(new THREE.Vector3(0,1,0), 0x33dd55); g.add(g.userData.arrowP);
+  g.userData.arrowT = mkArrow(new THREE.Vector3(1,0,0), 0x3b8cff); g.add(g.userData.arrowT);
+
+  // Central draggable sphere
+  const sphGeo = new THREE.SphereGeometry(sphR, 16, 12);
+  const sphMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthTest: false });
+  const sph = new THREE.Mesh(sphGeo, sphMat);
+  sph.userData.slicerHandle = true;
+  sph.renderOrder = 22;
+  g.add(sph);
+  g.userData.handle = sph;
+
+  // Translucent bubble visualising the cut-volume radius.
+  const bubbleGeo = new THREE.SphereGeometry(1, 32, 24);
+  const bubbleMat = new THREE.MeshBasicMaterial({
+    color: 0x33bbff, transparent: true, opacity: 0.10,
+    depthWrite: false, side: THREE.DoubleSide,
+  });
+  const bubble = new THREE.Mesh(bubbleGeo, bubbleMat);
+  bubble.renderOrder = 19;
+  g.add(bubble);
+  g.userData.bubble = bubble;
+  // Wireframe edge for the bubble (subtle)
+  const bubbleEdgeGeo = new THREE.WireframeGeometry(bubbleGeo);
+  const bubbleEdgeMat = new THREE.LineBasicMaterial({
+    color: 0x33bbff, transparent: true, opacity: 0.35, depthTest: false,
+  });
+  const bubbleEdge = new THREE.LineSegments(bubbleEdgeGeo, bubbleEdgeMat);
+  bubbleEdge.renderOrder = 20;
+  g.add(bubbleEdge);
+  g.userData.bubbleEdge = bubbleEdge;
+
+  return g;
+}
+
+function _updateSlicerBasis() {
+  if (!slicerGroup) return;
+  slicerGroup.position.copy(slicerPos);
+  const phi = Math.atan2(slicerPos.y, slicerPos.x);
+  const rxy = Math.hypot(slicerPos.x, slicerPos.y);
+  slicerGroup.userData.arrowZ.setDirection(new THREE.Vector3(0, 0, 1));
+  slicerGroup.userData.arrowP.setDirection(new THREE.Vector3(-Math.sin(phi),  Math.cos(phi), 0));
+  const radial = rxy > 1e-6
+    ? new THREE.Vector3(slicerPos.x / rxy, slicerPos.y / rxy, 0)
+    : new THREE.Vector3(1, 0, 0);
+  slicerGroup.userData.arrowT.setDirection(radial);
+  if (slicerGroup.userData.bubble)     slicerGroup.userData.bubble.scale.setScalar(slicerRadius);
+  if (slicerGroup.userData.bubbleEdge) slicerGroup.userData.bubbleEdge.scale.setScalar(slicerRadius);
+  slicerGroup.updateMatrix();
+  _applySlicerMask();
+}
+
+// Apply the slicer cut — hide any active cell whose centre is inside the bubble,
+// then rebuild outlines so the outlined set matches what's visible.
+function _applySlicerMask() {
+  if (!slicerActive) return;
+  rayTargets = [];
+  const r2 = slicerRadius * slicerRadius;
+  const px = slicerPos.x, py = slicerPos.y, pz = slicerPos.z;
+  for (const [mesh, { energyMev, det, cellId, mbtsLabel }] of active) {
+    const thr    = det === 'LAR' ? thrLArMev  : det === 'HEC' ? thrHecMev : thrTileMev;
+    const detOn  = det === 'LAR' ? showLAr    : det === 'HEC' ? showHec   : showTile;
+    let inCluster;
+    if (activeClusterCellIds === null) {
+      inCluster = true;
+    } else if (mbtsLabel != null) {
+      inCluster = activeMbtsLabels !== null && activeMbtsLabels.has(mbtsLabel);
+    } else if (cellId != null) {
+      inCluster = activeClusterCellIds.has(cellId);
+    } else {
+      inCluster = true;
+    }
+    const passFilter = detOn && energyMev >= 0 && (!isFinite(thr) || energyMev >= thr) && inCluster;
+    let vis = passFilter;
+    if (vis) {
+      const c = _cellCenter(mesh);
+      const dx = c.x - px, dy = c.y - py, dz = c.z - pz;
+      if (dx*dx + dy*dy + dz*dz < r2) vis = false;   // inside bubble → hide
+    }
+    mesh.visible = vis;
+    if (vis) rayTargets.push(mesh);
+  }
+  rebuildAllOutlines();
+  // FCAL tubes are drawn separately (instanced) — rebuild with current bubble.
+  applyFcalThreshold();
+  dirty = true;
+}
+
+function enableSlicer() {
+  if (slicerActive) return;
+  slicerActive = true;
+  if (!slicerGroup) {
+    slicerGroup = _buildSlicerGizmo();
+    scene.add(slicerGroup);
+  }
+  slicerGroup.visible = true;
+  _updateSlicerBasis();
+  _applySlicerMask();
+  document.getElementById('btn-slicer').classList.add('on');
+}
+function disableSlicer() {
+  if (!slicerActive) return;
+  slicerActive = false;
+  if (slicerGroup) slicerGroup.visible = false;
+  // Re-apply user filters now that the bubble cut is gone.
+  applyThreshold();
+  applyFcalThreshold();
+  document.getElementById('btn-slicer').classList.remove('on');
+}
+function toggleSlicer() { slicerActive ? disableSlicer() : enableSlicer(); }
+
+// Drag interaction — click and drag the central sphere to reposition the gizmo.
+// We project mouse motion onto a plane through slicerPos perpendicular to the
+// camera view direction, then snap the result as the new cylindrical point.
+(function () {
+  const btn = document.getElementById('btn-slicer');
+  if (btn) btn.addEventListener('click', toggleSlicer);
+
+  const dragRay   = new THREE.Raycaster();
+  dragRay.params.Line = { threshold: 25 };
+  const dragPlane = new THREE.Plane();
+  const dragHit   = new THREE.Vector3();
+  const _planeN   = new THREE.Vector3();
+  let   dragging  = false;
+  let   dragOffset = new THREE.Vector3();
+
+  function _pointerXY(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: ((e.clientX - rect.left) / rect.width)  *  2 - 1,
+      y: -((e.clientY - rect.top)  / rect.height) *  2 + 1,
+    };
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    if (!slicerActive || !slicerGroup) return;
+    const pt = _pointerXY(e);
+    dragRay.setFromCamera(pt, camera);
+    const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
+    if (!hits.length) return;
+    dragging = true;
+    controls.enabled = false;
+    canvas.setPointerCapture(e.pointerId);
+    // Plane perpendicular to camera forward, through slicerPos
+    camera.getWorldDirection(_planeN);
+    dragPlane.setFromNormalAndCoplanarPoint(_planeN, slicerPos);
+    dragRay.ray.intersectPlane(dragPlane, dragHit);
+    dragOffset.copy(slicerPos).sub(dragHit);
+    e.preventDefault();
+    e.stopPropagation();
+  }, /* capture: */ true);
+  canvas.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const pt = _pointerXY(e);
+    dragRay.setFromCamera(pt, camera);
+    if (dragRay.ray.intersectPlane(dragPlane, dragHit)) {
+      slicerPos.copy(dragHit).add(dragOffset);
+      _updateSlicerBasis();
+    }
+  });
+  const endDrag = e => {
+    if (!dragging) return;
+    dragging = false;
+    controls.enabled = true;
+    try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+  canvas.addEventListener('pointerup',     endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+
+  // Wheel / +/- keys adjust the bubble radius while the slicer is active
+  // and the cursor is over the handle (or any key-press with slicer on).
+  canvas.addEventListener('wheel', e => {
+    if (!slicerActive || !slicerGroup) return;
+    const pt = _pointerXY(e);
+    dragRay.setFromCamera(pt, camera);
+    const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
+    if (!hits.length) return;
+    e.preventDefault();
+    const step = slicerRadius * 0.1;
+    slicerRadius = Math.max(SLICER_R_MIN, Math.min(SLICER_R_MAX, slicerRadius + (e.deltaY < 0 ? step : -step)));
+    _updateSlicerBasis();
+  }, { passive: false });
+})();
+
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
 // Viewer:   G ghost · B beam · R reset · I info · C cinema · P screenshot
 // Panels:   M menu sidebar · E energy · S settings
@@ -3259,8 +4126,27 @@ document.getElementById('btn-about').addEventListener('click', () => {
 document.addEventListener('keydown', e => {
   // Ignore when focus is inside a text input
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  // Ignore modifier combos (browser shortcuts)
+  // Ignore modifier combos (browser shortcuts) — except Shift, which we use
+  // for slicer/background-colour shortcuts.
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+  // Shift-modified shortcuts: handle first, then bail.
+  if (e.shiftKey) {
+    switch (e.key.toUpperCase()) {
+      case 'B':
+        window.__cgvToggleBgPicker?.();
+        return;
+      case 'S':
+        toggleSlicer();
+        return;
+      case 'K':
+        // Toggle the cluster-threshold slider on/off (mirrors the right-panel
+        // "Cluster Threshold" button).
+        document.getElementById('cluster-filter-toggle')?.click();
+        return;
+    }
+    return;
+  }
 
   switch (e.key.toUpperCase()) {
     case 'G':
@@ -3301,6 +4187,9 @@ document.addEventListener('keydown', e => {
     case 'H':
       document.getElementById('ltog-hec').click();
       break;
+    case 'F':
+      document.getElementById('ltog-fcal').click();
+      break;
     case 'J':
       document.getElementById('btn-tracks').click();
       break;
@@ -3308,6 +4197,7 @@ document.addEventListener('keydown', e => {
       document.getElementById('btn-cluster').click();
       break;
     case 'ESCAPE':
+      if (slicerActive)        { disableSlicer(); return; }
       if (cinemaMode)          { exitCinema(); return; }
       if (settingsPanelOpen)   { closeSettingsPanel(); return; }
       if (layersPanelOpen)     { closeLayersPanel(); return; }

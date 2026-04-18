@@ -161,39 +161,49 @@
 <!-- ── Left panel ─────────────────────────────────────────── -->
 <aside id="panel">
   <div id="panel-head">
-    <div class="logo-block">
+    <div class="panel-head-row panel-head-row-top">
       <div class="logo">CGV</div>
+      <div class="head-btns">
+        <button class="icon-btn" id="btn-about"
+          data-tip="About — project credits" data-i18n-tip="tip-about">
+          <svg class="ic"><use href="#i-info"/></svg>
+        </button>
+        <button class="icon-btn on" id="btn-pin"
+          data-tip="Pin panel open at all times" data-i18n-tip="tip-pin">
+          <svg class="ic" id="pin-icon"><use href="#i-panel-pin"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="logo-block">
       <div class="logo-full" data-i18n="logo-full">Calorimeter Geometry Viewer</div>
       <div class="logo-lab" data-i18n="logo-lab">NIPSCERN · ATLAS</div>
     </div>
-    <!-- External links strip — inline with CGV logo -->
+    <!-- External links strip — full-width row below the title -->
     <div id="ext-links-top">
       <a href="https://atlas-live.cern.ch" target="_blank" rel="noopener"
         data-tip="ATLAS Live — ATLANTIS project">
-        <i class="ti ti-radio"></i>
+        <i class="ti ti-broadcast"></i>
       </a>
       <a href="https://atlas.cern" target="_blank" rel="noopener"
         data-tip="ATLAS Experiment at CERN">
-        <i class="ti ti-atom-2"></i>
+        <i class="ti ti-atom"></i>
       </a>
       <a href="https://home.cern" target="_blank" rel="noopener"
         data-tip="CERN — European Organisation for Nuclear Research">
-        <i class="ti ti-building-arch"></i>
+        <i class="ti ti-building-bank"></i>
       </a>
       <a href="https://nipscern.com" target="_blank" rel="noopener"
         data-tip="NIPSCERN Laboratory — UFJF">
-        <i class="ti ti-microscope"></i>
+        <i class="ti ti-flask"></i>
       </a>
-    </div>
-    <div class="head-btns">
-      <button class="icon-btn" id="btn-about"
-        data-tip="About — project credits" data-i18n-tip="tip-about">
-        <svg class="ic"><use href="#i-info"/></svg>
-      </button>
-      <button class="icon-btn on" id="btn-pin"
-        data-tip="Pin panel open at all times" data-i18n-tip="tip-pin">
-        <svg class="ic" id="pin-icon"><use href="#i-panel-pin"/></svg>
-      </button>
+      <a class="docs" href="https://nipscern.com/library/cgvweb/twiki" target="_blank" rel="noopener"
+        data-tip="TWIKI — technical documentation">
+        <i class="ti ti-book-2"></i>
+      </a>
+      <a class="docs" href="https://nipscern.com/library/cgvweb" target="_blank" rel="noopener"
+        data-tip="Full documentation — nipscern.com/library/cgvweb">
+        <i class="ti ti-notebook"></i>
+      </a>
     </div>
   </div>
 
@@ -230,7 +240,7 @@
     </div>
     <div id="live-empty" hidden>
       <img src="./assets/undraw_server_9eix.svg" class="empty-illus" alt="">
-      <div class="empty-msg">No events yet — waiting for ATLAS Live data from ATLANTIS</div>
+      <div class="empty-msg" data-i18n="empty-live">No events yet — waiting for ATLAS Live data from ATLANTIS</div>
     </div>
     <div id="evt-list"></div>
   </div>
@@ -346,10 +356,6 @@
     <div class="det-tab on" style="--tab-col:#ff4400;pointer-events:none">Cluster</div>
   </div>
   <div class="det-pane" id="pane-cluster">
-    <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#ff4400"></span>
-      <span class="pane-det-name">Clusters</span>
-    </div>
     <div class="sval" id="cluster-sval-max">– GeV</div>
     <div class="strak" id="cluster-strak"
       style="background:linear-gradient(to top,#661a00 0%,#ff4400 100%)">
@@ -361,7 +367,7 @@
       autocomplete="off" spellcheck="false"
       placeholder="e.g. 1.5 GeV">
     <button class="cluster-filter-btn on" id="cluster-filter-toggle" type="button" role="switch" aria-checked="true">
-      Cluster Threshold
+      On
     </button>
   </div>
 </aside>
@@ -384,7 +390,7 @@
       <span class="pane-det-dot" style="background:#ff8c00"></span>
       <span class="pane-det-name">TileCal</span>
     </div>
-    <div class="sval">2.00 GeV</div>
+    <div class="sval" id="tile-sval-max">2.00 GeV</div>
     <div class="strak" id="tile-strak"
       style="background:linear-gradient(to top,#ffff00 0%,#800000 100%)">
       <div class="sthumb" id="tile-sthumb"></div>
@@ -402,7 +408,7 @@
       <span class="pane-det-dot" style="background:#00ff40"></span>
       <span class="pane-det-name">LAr EM</span>
     </div>
-    <div class="sval">1.00 GeV</div>
+    <div class="sval" id="lar-sval-max">1.00 GeV</div>
     <div class="strak" id="lar-strak"
       style="background:linear-gradient(to top,#17cf42 0%,#270042 100%)">
       <div class="sthumb" id="lar-sthumb"></div>
@@ -420,9 +426,9 @@
       <span class="pane-det-dot" style="background:#b87333"></span>
       <span class="pane-det-name">LAr FCAL</span>
     </div>
-    <div class="sval">10.00 GeV</div>
+    <div class="sval" id="fcal-sval-max">7.00 GeV</div>
     <div class="strak" id="fcal-strak"
-      style="background:linear-gradient(to top,#e8a06a 0%,#3d1000 100%)">
+      style="background:linear-gradient(to top,#1a0600 0%,#6b2310 25%,#c8642a 55%,#ffb26a 80%,#ffeabe 100%)">
       <div class="sthumb" id="fcal-sthumb"></div>
     </div>
     <div class="sval">0 GeV</div>
@@ -438,7 +444,7 @@
       <span class="pane-det-dot" style="background:#00e0ff"></span>
       <span class="pane-det-name">LAr HEC</span>
     </div>
-    <div class="sval">5.00 GeV</div>
+    <div class="sval" id="hec-sval-max">5.00 GeV</div>
     <div class="strak" id="hec-strak"
       style="background:linear-gradient(to top,#66e0f6 0%,#0c0368 100%)">
       <div class="sthumb" id="hec-sthumb"></div>
@@ -495,8 +501,8 @@
   </button>
   <div class="tbtn-sep"></div>
   <!-- Tabler ghost icon (proper library icon) -->
-  <button class="tbtn" id="btn-ghost"
-    data-tip="ATLAS ghost — show sub-detector outlines" data-i18n-tip="tip-ghost">
+  <button class="tbtn on" id="btn-ghost"
+    data-tip="ATLAS ghost — toggle sub-detector outlines (G)" data-i18n-tip="tip-ghost">
     <i class="ti ti-ghost"></i>
   </button>
   <div class="tbtn-sep"></div>
@@ -538,6 +544,16 @@
   <button class="tbtn" id="btn-shot"
     data-tip="Save screenshot" data-i18n-tip="tip-shot">
     <svg class="ic" style="width:14px;height:14px"><use href="#i-camera"/></svg>
+  </button>
+  <div class="tbtn-sep"></div>
+  <button class="tbtn" id="btn-bgcolor"
+    data-tip="Background color — pick scene background (Shift+B)">
+    <i class="ti ti-color-swatch" style="font-size:15px"></i>
+  </button>
+  <div class="tbtn-sep"></div>
+  <button class="tbtn" id="btn-slicer"
+    data-tip="Slicer — drag the sphere to carve a bubble; scroll over the handle to resize (Shift+S)">
+    <i class="ti ti-3d-cube-sphere" style="font-size:15px"></i>
   </button>
   <div class="tbtn-sep"></div>
   <button class="tbtn" id="btn-settings"
@@ -614,10 +630,19 @@
     <button class="gswitch on" id="ltog-hec" role="switch" aria-checked="true"
       style="--gswitch-col:#66e0f6"></button>
   </div>
+  <div class="layer-row">
+    <span class="layer-dot" style="background:#b87333"></span>
+    <div class="layer-info">
+      <div class="layer-name">FCAL</div>
+      <div class="layer-sub">Forward calorimeter</div>
+    </div>
+    <button class="gswitch on" id="ltog-fcal" role="switch" aria-checked="true"
+      style="--gswitch-col:#b87333"></button>
+  </div>
 </div>
 
-<!-- ── Ghost panel — per-envelope toggles ──────────────── -->
-<div id="ghost-panel">
+<!-- ── Ghost panel — per-envelope toggles (legacy, now hidden; ghost is a simple on/off toggle) ── -->
+<div id="ghost-panel" hidden aria-hidden="true">
   <div class="layers-head">
     <span class="layers-title">ATLAS Ghost</span>
     <div class="layers-quick">
@@ -712,64 +737,54 @@
 <div id="settings-panel">
   <!-- Preferences -->
   <div class="sett-section">
-    <div class="sett-hdr">Preferences</div>
+    <div class="sett-hdr" data-i18n="sett-preferences">Preferences</div>
     <div class="sett-row">
       <div class="sett-info">
-        <div class="sett-label">Button hints</div>
-        <div class="sett-sub">Show tooltips on toolbar buttons</div>
+        <div class="sett-label" data-i18n="sett-hints-label">Button hints</div>
+        <div class="sett-sub" data-i18n="sett-hints-sub">Show tooltips on toolbar buttons</div>
       </div>
       <button class="gswitch on" id="stog-hints" role="switch" aria-checked="true"
         style="--gswitch-col:#2467e0"></button>
     </div>
     <div class="sett-row">
       <div class="sett-info">
-        <div class="sett-label">Auto-open sidebar on hover</div>
-        <div class="sett-sub">Show panel when cursor reaches screen edge</div>
+        <div class="sett-label" data-i18n="sett-autopen-label">Auto-open sidebar on hover</div>
+        <div class="sett-sub" data-i18n="sett-autopen-sub">Show panel when cursor reaches screen edge</div>
       </div>
       <button class="gswitch on" id="stog-autopen" role="switch" aria-checked="true"
         style="--gswitch-col:#2467e0"></button>
     </div>
+    <div class="sett-row">
+      <div class="sett-info">
+        <div class="sett-label" data-i18n="sett-tour-label">Guided tour in cinema</div>
+        <div class="sett-sub" data-i18n="sett-tour-sub">Cinema mode becomes a smooth camera tour through the detector</div>
+      </div>
+      <button class="gswitch" id="stog-tour" role="switch" aria-checked="false"
+        style="--gswitch-col:#ff8a3c"></button>
+    </div>
   </div>
   <!-- Keyboard shortcuts -->
   <div class="sett-section">
-    <div class="sett-hdr">Keyboard Shortcuts</div>
+    <div class="sett-hdr" data-i18n="sett-shortcuts">Keyboard Shortcuts</div>
     <div class="sk-grid">
-      <span class="sk-key">G</span><span class="sk-desc">Toggle ghost frame</span>
-      <span class="sk-key">B</span><span class="sk-desc">Toggle beam axis</span>
-      <span class="sk-key">I</span><span class="sk-desc">Toggle cell info</span>
-      <span class="sk-key">R</span><span class="sk-desc">Reset camera</span>
-      <span class="sk-key">C</span><span class="sk-desc">Cinema mode</span>
-      <span class="sk-key">M</span><span class="sk-desc">Menu (sidebar)</span>
-      <span class="sk-key">E</span><span class="sk-desc">Energy panel</span>
-      <span class="sk-key">P</span><span class="sk-desc">Screenshot</span>
-      <span class="sk-key">S</span><span class="sk-desc">Settings</span>
-      <span class="sk-key">T</span><span class="sk-desc">Toggle TILE</span>
-      <span class="sk-key">L / A</span><span class="sk-desc">Toggle LAr</span>
-      <span class="sk-key">H</span><span class="sk-desc">Toggle HEC</span>
-      <span class="sk-key">J</span><span class="sk-desc">Toggle particle tracks</span>
-      <span class="sk-key">K</span><span class="sk-desc">Toggle clusters</span>
-      <span class="sk-key">Esc</span><span class="sk-desc">Close / exit</span>
-    </div>
-  </div>
-  <!-- Sponsors & credits -->
-  <div class="sett-section">
-    <div class="sett-hdr">Supported by</div>
-    <div class="sponsor-grid">
-      <img class="sponsor-img sponsor-atlas" src="./assets/ATLAS-Logo-Blue-transparent.png" alt="ATLAS" data-tip="ATLAS Experiment">
-      <img class="sponsor-img" src="./assets/sponsors/cern.svg"    alt="CERN"   data-tip="CERN">
-      <img class="sponsor-img" src="./assets/sponsors/cnpq.svg"    alt="CNPq"   data-tip="CNPq">
-      <img class="sponsor-img" src="./assets/sponsors/capes.png"   alt="CAPES"  data-tip="CAPES">
-      <img class="sponsor-img" src="./assets/sponsors/fapemig.png" alt="FAPEMIG" data-tip="FAPEMIG">
-      <img class="sponsor-img" src="./assets/sponsors/ufjf.png"    alt="UFJF"   data-tip="UFJF">
-    </div>
-  </div>
-  <!-- Credits -->
-  <div class="sett-section">
-    <div class="sett-hdr">About</div>
-    <div style="font:.58rem var(--font);color:var(--muted);line-height:1.7">
-      CGV Web · Calorimeter Geometry Viewer<br>
-      NIPSCERN · UFJF · Brazil<br>
-      Three.js + Rust/WASM · ATLAS TileCal
+      <span class="sk-key">G</span><span class="sk-desc" data-i18n="sk-ghost">Toggle ghost frame</span>
+      <span class="sk-key">B</span><span class="sk-desc" data-i18n="sk-beam">Toggle beam axis</span>
+      <span class="sk-key">I</span><span class="sk-desc" data-i18n="sk-info">Toggle cell info</span>
+      <span class="sk-key">R</span><span class="sk-desc" data-i18n="sk-reset">Reset camera</span>
+      <span class="sk-key">C</span><span class="sk-desc" data-i18n="sk-cinema">Cinema mode</span>
+      <span class="sk-key">M</span><span class="sk-desc" data-i18n="sk-menu">Menu (sidebar)</span>
+      <span class="sk-key">E</span><span class="sk-desc" data-i18n="sk-energy">Energy panel</span>
+      <span class="sk-key">P</span><span class="sk-desc" data-i18n="sk-shot">Screenshot</span>
+      <span class="sk-key">S</span><span class="sk-desc" data-i18n="sk-settings">Settings</span>
+      <span class="sk-key">T</span><span class="sk-desc" data-i18n="sk-tile">Toggle TILE</span>
+      <span class="sk-key">L / A</span><span class="sk-desc" data-i18n="sk-lar">Toggle LAr</span>
+      <span class="sk-key">H</span><span class="sk-desc" data-i18n="sk-hec">Toggle HEC</span>
+      <span class="sk-key">J</span><span class="sk-desc" data-i18n="sk-tracks">Toggle particle tracks</span>
+      <span class="sk-key">K</span><span class="sk-desc" data-i18n="sk-clusters">Toggle clusters</span>
+      <span class="sk-key">Shift+B</span><span class="sk-desc" data-i18n="sk-bg">Pick background color</span>
+      <span class="sk-key">Shift+S</span><span class="sk-desc" data-i18n="sk-slicer">Toggle slicer</span>
+      <span class="sk-key">Shift+K</span><span class="sk-desc" data-i18n="sk-clthr">Toggle cluster threshold</span>
+      <span class="sk-key">Esc</span><span class="sk-desc" data-i18n="sk-esc">Close / exit</span>
     </div>
   </div>
 </div>
@@ -793,6 +808,16 @@
       <button class="shot-res" data-w="7680"  data-h="4320">8K<br><span>7680 × 4320</span></button>
       <button class="shot-res" data-w="10240" data-h="5760">10K<br><span>10240 × 5760</span></button>
     </div>
+    <label class="shot-opt" for="shot-transparent">
+      <input type="checkbox" id="shot-transparent">
+      <span class="shot-check" aria-hidden="true">
+        <svg viewBox="0 0 16 16"><polyline points="3.5,8.5 6.8,11.8 12.5,5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="shot-opt-text">
+        <span class="shot-opt-title" data-i18n="shot-opt-title">Transparent background</span>
+        <span class="shot-opt-sub"   data-i18n="shot-opt-sub">Save PNG with alpha channel (no scene background)</span>
+      </span>
+    </label>
     <div id="shot-progress">
       <span class="shot-spinner"></span>
       <span id="shot-progress-txt"></span>
@@ -804,8 +829,43 @@
   </div>
 </div>
 
+<!-- ── Background color picker popover ───────────────────── -->
+<div id="bgcolor-popover">
+  <div class="bgcp-head">
+    <span class="bgcp-title" data-i18n="bgcp-title">Scene Background</span>
+    <button id="bgcp-close" class="bgcp-close" data-tip="Close">
+      <svg class="ic" style="width:10px;height:10px;stroke-width:2.5"><use href="#i-x"/></svg>
+    </button>
+  </div>
+  <div class="bgcp-canvas-row">
+    <div class="bgcp-sv" id="bgcp-sv">
+      <div class="bgcp-sv-cursor" id="bgcp-sv-cursor"></div>
+    </div>
+    <div class="bgcp-hue" id="bgcp-hue-strip">
+      <div class="bgcp-hue-cursor" id="bgcp-hue-cursor"></div>
+    </div>
+  </div>
+  <div class="bgcp-preview">
+    <div class="bgcp-swatch" id="bgcp-swatch"></div>
+    <input type="text" id="bgcp-hex" class="bgcp-hex" maxlength="7" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="bgcp-presets-hdr" data-i18n="bgcp-presets">Presets</div>
+  <div class="bgcp-presets">
+    <button class="bgcp-preset" data-c="#020d1c" data-tip="Default — Prussian Blue"></button>
+    <button class="bgcp-preset" data-c="#000000" data-tip="Black"></button>
+    <button class="bgcp-preset" data-c="#1a1a1a" data-tip="Charcoal"></button>
+    <button class="bgcp-preset" data-c="#0b1f3a" data-tip="Deep Navy"></button>
+    <button class="bgcp-preset" data-c="#101820" data-tip="Graphite"></button>
+    <button class="bgcp-preset" data-c="#1f2a44" data-tip="Slate"></button>
+    <button class="bgcp-preset" data-c="#ffffff" data-tip="White"></button>
+  </div>
+  <button id="bgcp-reset" class="bgcp-reset" data-i18n="bgcp-reset">Reset to Default</button>
+</div>
+
 <!-- ── Button hint tooltip ───────────────────────────────── -->
 <div id="btn-tip"></div>
+<!-- ── Multi-line hint (statusbar collision info) ────────── -->
+<div id="stat-hint"></div>
 
 <!-- ── Cell hover tooltip ────────────────────────────────── -->
 <div id="tip" hidden>
@@ -836,8 +896,16 @@
       </div>
       <div class="about-lab">
         <span data-i18n="about-lab1">NIPSCERN — Núcleo de Instrumentação e Processamento de Sinais for CERN</span><br>
-        <span data-i18n="about-lab2">UFJF — Universidade Federal de Juiz de Fora, Brazil</span><br>
-        <span data-i18n="about-lab3">In partnership with CERN · ATLAS Experiment · LHC</span>
+        <span data-i18n="about-lab2">UFJF — Universidade Federal de Juiz de Fora, Brazil</span>
+      </div>
+      <div class="about-sponsors-hdr" data-i18n="about-supported-by">Supported by</div>
+      <div class="sponsor-grid">
+        <img class="sponsor-img sponsor-atlas" src="./assets/ATLAS-Logo-Blue-transparent.png" alt="ATLAS" data-tip="ATLAS Experiment">
+        <img class="sponsor-img" src="./assets/sponsors/cern.svg"    alt="CERN"   data-tip="CERN">
+        <img class="sponsor-img" src="./assets/sponsors/cnpq.svg"    alt="CNPq"   data-tip="CNPq">
+        <img class="sponsor-img" src="./assets/sponsors/capes.png"   alt="CAPES"  data-tip="CAPES">
+        <img class="sponsor-img" src="./assets/sponsors/fapemig.png" alt="FAPEMIG" data-tip="FAPEMIG">
+        <img class="sponsor-img" src="./assets/sponsors/ufjf.png"    alt="UFJF"   data-tip="UFJF">
       </div>
     </div>
     <button class="about-close" id="btn-about-close">
@@ -852,6 +920,5 @@
 </div>
 
 <script type="module" src="./js/main.js"></script>
-  <script>(function(){var l=window.location,c=l.pathname.replace(/\/index\.html$/i,'/').replace(/\.html$/i,'');if(c!==l.pathname){try{history.replaceState(null,'',c+l.search+l.hash)}catch(e){}}window.goatcounter=window.goatcounter||{};window.goatcounter.path=function(p){return p.replace(/\/index\.html$/i,'/').replace(/\.html$/i,'')};var s=document.createElement('script');s.setAttribute('data-goatcounter','https://nipscern.goatcounter.com/count');s.async=true;s.src='https://gc.zgo.at/count.js';(document.head||document.documentElement).appendChild(s);})();</script>
 </body>
 </html>
