@@ -2346,7 +2346,8 @@ function enterCinema() {
   if (tourMode) {
     _startTour();
   } else {
-    controls.autoRotate = true; controls.autoRotateSpeed = 0.38;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.55;
   }
 }
 function exitCinema() {
@@ -3128,6 +3129,7 @@ async function renderAndDownload(targetW, targetH) {
   const origH  = renderer.domElement.height;
   const origPR = renderer.getPixelRatio();
   const origAspect = camera.aspect;
+  const origFov   = camera.fov;
 
   // ── 2. Snapshot tooltip content before any resize ────────────────────────
   const tipVisible  = !tooltip.hidden;
@@ -3143,9 +3145,19 @@ async function renderAndDownload(targetW, targetH) {
   }
 
   // ── 3. Resize renderer to target resolution ──────────────────────────────
+  // Adjust the vertical FOV so the screenshot frustum contains at least
+  // everything the user currently sees. If the target aspect is narrower
+  // (taller) than the window, widen the vertical FOV so the horizontal
+  // extent is preserved; if it's wider, keep fov_v and let the wider
+  // aspect reveal more sideways. Prevents edge/corner cropping.
+  const targetAspect = targetW / targetH;
+  const origTanHalf  = Math.tan((origFov * Math.PI / 180) / 2);
+  const newTanHalf   = origTanHalf * Math.max(1, origAspect / targetAspect);
+  const newFov       = 2 * Math.atan(newTanHalf) * 180 / Math.PI;
   renderer.setPixelRatio(1);
   renderer.setSize(targetW, targetH, false); // false = don't update CSS size
-  camera.aspect = targetW / targetH;
+  camera.aspect = targetAspect;
+  camera.fov    = newFov;
   camera.updateProjectionMatrix();
 
   // ── 4. Render one high-quality frame ─────────────────────────────────────
@@ -3289,6 +3301,7 @@ async function renderAndDownload(targetW, targetH) {
   renderer.setPixelRatio(origPR);
   renderer.setSize(origW / origPR, origH / origPR, false);
   camera.aspect = origAspect;
+  camera.fov    = origFov;
   camera.updateProjectionMatrix();
   dirty = true;
 
@@ -3433,11 +3446,12 @@ document.getElementById('stog-autopen').addEventListener('click', function() {
     sync();
     if (cinemaMode) {
       // Swap mode live: turning on → smooth entry from current pose;
-      // off → fall back to auto-rotate.
+      // off → fall back to auto-rotate with the cinema ramp restarted.
       if (tourMode) { _startTour(); }
       else {
         _tourExiting = false; _tourBlending = false;
-        controls.autoRotate = true; controls.autoRotateSpeed = 0.38;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.55;
       }
     }
   });

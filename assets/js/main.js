@@ -97,6 +97,9 @@ function buildNav() {
         <div class="lang-switcher" role="group" aria-label="Language selector">
           ${langBtns}
         </div>
+        <a href="https://nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-cgv-link" aria-label="CGVWEB Project" title="CGVWEB">
+          <img src="${ROOT}assets/icons/icon_cgv.svg" alt="CGVWEB" class="nav-cgv-icon">
+        </a>
         <button class="nav-hamburger" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
           <i class="ph ph-list" aria-hidden="true" style="font-size:20px"></i>
         </button>
@@ -117,6 +120,12 @@ function buildNav() {
       <nav class="nav-mobile-links">
         ${mobileLinksHtml}
       </nav>
+      <div class="nav-mobile-cgv" style="border-top:1px solid var(--border-subtle);padding-top:var(--sp-8)">
+        <a href="https://nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-mobile-cgv-link">
+          <img src="${ROOT}assets/icons/icon_cgv.svg" alt="CGVWEB" class="nav-cgv-icon">
+          <span>CGVWEB</span>
+        </a>
+      </div>
       <div class="nav-mobile-lang" style="border-top:1px solid var(--border-subtle);padding-top:var(--sp-8)">
         <div class="lang-switcher" style="justify-content:flex-start">
           ${langBtns}
