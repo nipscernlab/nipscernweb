@@ -413,6 +413,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.sortObjects = false;
+// renderer.info is only read by the FPS HUD (which uses its own frame counter),
+// so let Three.js skip the per-frame reset.
+renderer.info.autoReset = false;
 
 // ── Scene / Camera / Controls ─────────────────────────────────────────────────
 const scene = new THREE.Scene();
@@ -448,21 +451,37 @@ document.body.appendChild(fpsEl);
 let _fpsFrames = 0, _fpsLast = performance.now();
 
 // ── Render loop ───────────────────────────────────────────────────────────────
-(function loop() {
-  requestAnimationFrame(loop);
-  _fpsFrames++;
-  const now = performance.now();
-  if (now - _fpsLast >= 500) {
-    fpsEl.textContent = ((_fpsFrames / (now - _fpsLast)) * 1000).toFixed(0) + ' FPS';
-    _fpsFrames = 0; _fpsLast = now;
-  }
-  if (cinemaMode || _tourExiting) _tourTick();
-  controls.update();
-  if (controls.autoRotate) dirty = true;
-  if (!dirty) return;
-  renderer.render(scene, camera);
-  dirty = false;
-})();
+// Paused while the tab is hidden: browsers already throttle RAF on hidden tabs,
+// but stopping the loop entirely frees the main thread for other tabs. Resumed
+// on visibilitychange.
+let _loopRunning = false;
+function _startLoop() {
+  if (_loopRunning) return;
+  _loopRunning = true;
+  _fpsLast = performance.now(); _fpsFrames = 0;
+  dirty = true;
+  (function loop() {
+    if (!_loopRunning) return;
+    requestAnimationFrame(loop);
+    _fpsFrames++;
+    const now = performance.now();
+    if (now - _fpsLast >= 500) {
+      fpsEl.textContent = ((_fpsFrames / (now - _fpsLast)) * 1000).toFixed(0) + ' FPS';
+      _fpsFrames = 0; _fpsLast = now;
+    }
+    if (cinemaMode || _tourExiting) _tourTick();
+    controls.update();
+    if (controls.autoRotate) dirty = true;
+    if (!dirty) return;
+    renderer.render(scene, camera);
+    dirty = false;
+  })();
+}
+function _stopLoop() { _loopRunning = false; }
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) _stopLoop(); else _startLoop();
+});
+_startLoop();
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -492,38 +511,115 @@ function checkReady() {
   }
 }
 
-// ── GLB loader ────────────────────────────────────────────────────────────────
-// Fetches CaloGeometry.glb.gz, stream-decompresses via DecompressionStream (native
-// browser API, no extra library), then parses with GLTFLoader.parse().
-// Progress tracks the compressed download bytes → 0–40% of the loading bar.
-setLoadProgress(0, 'Downloading geometry…');
-(async () => {
-  let buffer;
+// ── GLB loader (with OPFS cache) ──────────────────────────────────────────────
+// Fetches CaloGeometry.glb.gz and stream-decompresses via DecompressionStream.
+// OPFS persists the gzipped bytes between sessions, keyed by the server's ETag
+// or Last-Modified — so repeat visits skip the network round trip entirely.
+// Cache is invalidated automatically when the file changes server-side.
+const _GLB_URL = './geometry_data/CaloGeometry.glb.gz';
+const _OPFS_DATA_NAME = 'CaloGeometry.glb.gz.bin';
+const _OPFS_META_NAME = 'CaloGeometry.glb.meta';
+
+async function _opfsRoot() {
+  if (!navigator.storage?.getDirectory) return null;
+  try { return await navigator.storage.getDirectory(); } catch { return null; }
+}
+async function _opfsLoadGz(version) {
+  const root = await _opfsRoot();
+  if (!root || !version) return null;
   try {
-    const res = await fetch('./geometry_data/CaloGeometry.glb.gz');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const total  = parseInt(res.headers.get('Content-Length') || '0', 10);
-    let   loaded = 0;
-    // TransformStream counts compressed bytes for the progress bar,
-    // then DecompressionStream inflates the gzip payload on the fly.
-    const counter = new TransformStream({ transform(chunk, ctrl) {
-      loaded += chunk.byteLength;
-      if (total) {
-        const pct = loaded / total;
+    const metaH = await root.getFileHandle(_OPFS_META_NAME, { create: false });
+    const meta  = JSON.parse(await (await metaH.getFile()).text());
+    if (meta.v !== version) return null;
+    const dataH = await root.getFileHandle(_OPFS_DATA_NAME, { create: false });
+    const file  = await dataH.getFile();
+    if (file.size !== meta.size) return null;
+    return await file.arrayBuffer();
+  } catch { return null; }
+}
+async function _opfsSaveGz(buffer, version) {
+  const root = await _opfsRoot();
+  if (!root || !version) return;
+  try {
+    const dataH = await root.getFileHandle(_OPFS_DATA_NAME, { create: true });
+    const wd    = await dataH.createWritable();
+    await wd.write(buffer);
+    await wd.close();
+    const metaH = await root.getFileHandle(_OPFS_META_NAME, { create: true });
+    const wm    = await metaH.createWritable();
+    await wm.write(JSON.stringify({ v: version, size: buffer.byteLength, t: Date.now() }));
+    await wm.close();
+  } catch { /* OPFS quota or transient error — cache is best-effort */ }
+}
+async function _glbVersion() {
+  // HEAD with no-cache forces a server round trip so we get the *current* validator.
+  // Without this, a stale browser-cache entry could mask a server update.
+  try {
+    const head = await fetch(_GLB_URL, { method: 'HEAD', cache: 'no-cache' });
+    if (!head.ok) return '';
+    return head.headers.get('etag') || head.headers.get('last-modified') || '';
+  } catch { return ''; }
+}
+// Stream-decompress a gzip stream into the raw GLB ArrayBuffer.
+async function _decompressGz(stream, totalBytes, onProgress) {
+  let loaded = 0;
+  const counter = new TransformStream({ transform(chunk, ctrl) {
+    loaded += chunk.byteLength;
+    if (totalBytes && onProgress) onProgress(loaded / totalBytes);
+    ctrl.enqueue(chunk);
+  }});
+  return await new Response(
+    stream.pipeThrough(counter).pipeThrough(new DecompressionStream('gzip'))
+  ).arrayBuffer();
+}
+
+setLoadProgress(0, 'Loading geometry…');
+(async () => {
+  let buffer = null;
+
+  // ── 1. OPFS hit path: validate cache against server, decompress locally ────
+  const version = await _glbVersion();
+  if (version) {
+    const cachedGz = await _opfsLoadGz(version);
+    if (cachedGz) {
+      try {
+        buffer = await _decompressGz(
+          new Blob([cachedGz]).stream(),
+          cachedGz.byteLength,
+          pct => setLoadProgress(pct * 40, `Loading cached geometry… ${Math.round(pct * 100)}%`)
+        );
+      } catch { buffer = null; /* poisoned cache — fall through to network */ }
+    }
+  }
+
+  // ── 2. Network path (also runs when version was empty / OPFS unavailable) ──
+  if (!buffer) {
+    try {
+      const res = await fetch(_GLB_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const total = parseInt(res.headers.get('Content-Length') || '0', 10);
+      // tee() lets us decompress AND collect raw bytes for OPFS save in parallel.
+      const [streamForDecode, streamForCache] = res.body.tee();
+      const decodePromise = _decompressGz(streamForDecode, total, pct => {
         setLoadProgress(pct * 40, `Downloading geometry… ${Math.round(pct * 100)}%`);
         setStatus(`Downloading geometry: ${Math.round(pct * 100)}%`);
+      });
+      if (version) {
+        new Response(streamForCache).arrayBuffer()
+          .then(gz => _opfsSaveGz(gz, version))
+          .catch(() => {});
+      } else {
+        streamForCache.cancel().catch(() => {});
       }
-      ctrl.enqueue(chunk);
-    }});
-    buffer = await new Response(
-      res.body.pipeThrough(counter).pipeThrough(new DecompressionStream('gzip'))
-    ).arrayBuffer();
-  } catch (e) {
-    setStatus('<span class="warn">CaloGeometry.glb.gz not found.</span>');
-    setLoadProgress(100, 'Geometry skipped');
-    sceneOk = true; checkReady();
-    return;
+      buffer = await decodePromise;
+    } catch (e) {
+      setStatus('<span class="warn">CaloGeometry.glb.gz not found.</span>');
+      setLoadProgress(100, 'Geometry skipped');
+      sceneOk = true; checkReady();
+      return;
+    }
   }
+
   new GLTFLoader().parse(
     buffer, './',
     ({ scene: g }) => {
@@ -1452,13 +1548,20 @@ function processXml(xmlText) {
 
   let nTile = 0, nLAr = 0, nHec = 0, nMbts = 0, nMiss = 0, nSkip = 0;
   let nHecMiss = 0, nMbtsMiss = 0;
+  // Sample misses instead of one console.warn per cell — full-resolution logging
+  // craters FPS when DevTools is open (each warn forces a synchronous flush).
+  // We keep the first 3 of each kind for diagnosis and aggregate the rest.
+  const _MISS_SAMPLE = 3;
+  const _missLog = { TILE: [], LAR: [], HEC: [], MBTS: [] };
+  const _logMiss = (kind, msg) => { if (_missLog[kind].length < _MISS_SAMPLE) _missLog[kind].push(msg); };
 
   // ── Bulk decode: one WASM call per detector replaces N individual FFI calls ──
-  // Build ID strings without intermediate array allocation
+  // Array.join avoids the O(n²) growth of repeated `s += ' ' + id` (V8 builds
+  // ropes but each branch still costs a heap allocation we can skip).
   function idsToStr(cells) {
-    let s = cells[0].id;
-    for (let i = 1; i < cells.length; i++) s += ' ' + cells[i].id;
-    return s;
+    const arr = new Array(cells.length);
+    for (let i = 0; i < cells.length; i++) arr[i] = cells[i].id;
+    return arr.join(' ');
   }
   const tilePacked = tileCells.length ? parse_atlas_ids_bulk(idsToStr(tileCells)) : null;
   const larPacked  = larCells.length  ? parse_atlas_ids_bulk(idsToStr(larCells))  : null;
@@ -1479,7 +1582,7 @@ function processXml(xmlText) {
     const eMev = energy * 1000;
     const s_bit = side < 0 ? 0 : 1;
     const mesh  = meshByKey.get(_tileKey(x, s_bit, k, module));
-    if (!mesh) { console.warn(`[TILE] id=${id} | Tile${x}${s_bit?'p':'n'} k=${k} mod=${module}`); nMiss++; continue; }
+    if (!mesh) { _logMiss('TILE', `id=${id} | Tile${x}${s_bit?'p':'n'} k=${k} mod=${module}`); nMiss++; continue; }
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
     const tEta = physTileEta(section, side, tower, sampling);
     const tPhi = physTilePhi(module);
@@ -1504,7 +1607,7 @@ function processXml(xmlText) {
     let mesh = meshByKey.get(_larEmKey(abs_be, sampling, R, z_pos, eta, phi, 0));
     if (!mesh) mesh = meshByKey.get(_larEmKey(abs_be, sampling, R, z_pos, eta, phi, 1));
     if (!mesh) {
-      console.warn(`[LAr EM] id=${id} | abs_be=${abs_be} samp=${sampling} R=${R} z=${z_pos} η=${eta} φ=${phi}`);
+      _logMiss('LAR', `id=${id} | abs_be=${abs_be} samp=${sampling} R=${R} z=${z_pos} η=${eta} φ=${phi}`);
       nMiss++; continue;
     }
     mesh.material = palMatLAr(eMev); mesh.visible = true; mesh.renderOrder = 2;
@@ -1529,7 +1632,7 @@ function processXml(xmlText) {
     const eMev = energy * 1000;
     const mesh = meshByKey.get(_hecKey(group, region, z_pos, cum_eta, phi));
     if (!mesh) {
-      console.warn(`[HEC] id=${id} | group=${group} region=${region} z=${z_pos} cumη=${cum_eta} φ=${phi}`);
+      _logMiss('HEC', `id=${id} | group=${group} region=${region} z=${z_pos} cumη=${cum_eta} φ=${phi}`);
       nHecMiss++; continue;
     }
     mesh.material = palMatHec(eMev); mesh.visible = true; mesh.renderOrder = 2;
@@ -1547,10 +1650,10 @@ function processXml(xmlText) {
     const { label, energy } = mbtsCells[i];
     const eMev = energy * 1000;
     const _m = /^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
-    if (!_m) { console.warn(`[MBTS] label=${label} | bad format`); nMbtsMiss++; continue; }
+    if (!_m) { _logMiss('MBTS', `label=${label} | bad format`); nMbtsMiss++; continue; }
     const tileNum = _m[2]==='0' ? 14 : 15, s_bit = _m[1]==='1' ? 1 : 0, mod = +_m[3];
     const mesh = meshByKey.get(_tileKey(tileNum, s_bit, 0, mod));
-    if (!mesh) { console.warn(`[MBTS] label=${label} | no mesh`); nMbtsMiss++; continue; }
+    if (!mesh) { _logMiss('MBTS', `label=${label} | no mesh`); nMbtsMiss++; continue; }
     mesh.material = palMatTile(eMev); mesh.visible = true; mesh.renderOrder = 2;
     const mbtsCoords = `η = ${((s_bit?1:-1)*(_m[2]==='0'?2.76:3.84)).toFixed(3)}   φ = ${_wrapPhi(2*Math.PI/16+mod*2*Math.PI/8).toFixed(3)} rad`;
     active.set(mesh, { energyGev: energy, energyMev: eMev, cellName: 'MBTS', coords: mbtsCoords, det: 'TILE', mbtsLabel: label });
@@ -1563,6 +1666,13 @@ function processXml(xmlText) {
 
   const nHit    = nTile + nMbts + nLAr + nHec;
   const allMiss = nMiss + nHecMiss + nMbtsMiss;
+  // Aggregated miss summary — one console line per detector kind, with samples.
+  if (allMiss) {
+    for (const kind of ['TILE', 'LAR', 'HEC', 'MBTS']) {
+      const samples = _missLog[kind];
+      if (samples.length) console.warn(`[${kind}] ${samples.length} sample miss(es):\n  ` + samples.join('\n  '));
+    }
+  }
   showEventInfo(currentEventInfo);
 }
 
@@ -2040,7 +2150,6 @@ const tipEEl     = document.getElementById('tip-e');
 const tipEKeyEl  = document.querySelector('#tip .tkey');
 let   lastRay    = 0;
 let   mousePos = { x: 0, y: 0 };
-document.addEventListener('mousemove', e => { mousePos.x = e.clientX; mousePos.y = e.clientY; });
 function doRaycast(clientX, clientY) {
   const hasTrackLines   = trackGroup   && trackGroup.visible   && trackGroup.children.length   > 0;
   const hasClusterLines = clusterGroup && clusterGroup.visible && clusterGroup.children.length > 0;
@@ -2139,6 +2248,7 @@ function doRaycast(clientX, clientY) {
   clearOutline(); tooltip.hidden = true;
 }
 document.addEventListener('mousemove', e => {
+  mousePos.x = e.clientX; mousePos.y = e.clientY;
   const now = Date.now(); if (now-lastRay < 50) return; lastRay = now;
   doRaycast(e.clientX, e.clientY);
 });
