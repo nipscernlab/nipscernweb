@@ -11,14 +11,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <!-- Preload critical geometry file (largest asset) -->
-  <link rel="preload" href="./geometry_data/CaloGeometry.glb.gz" as="fetch" crossorigin>
+  <link rel="preload" href="./geometry_data/CaloGeometry.glb.gz" as="fetch" crossorigin fetchpriority="high">
   <!-- Preload WASM parser -->
-  <link rel="preload" href="./parser/pkg/atlas_id_parser_bg.wasm" as="fetch" crossorigin type="application/wasm">
+  <link rel="preload" href="./parser/pkg/atlas_id_parser_bg.wasm" as="fetch" crossorigin type="application/wasm" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <!-- Tabler Icons webfont (for ghost icon) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
   <!-- flag-icons CSS (for language picker flags) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+  <!-- Importmap MUST appear before any modulepreload that imports a bare specifier
+       (Firefox tries to resolve "three" during preload — fails if importmap comes later). -->
   <script type="importmap">
   {
     "imports": {
@@ -27,6 +29,12 @@
     }
   }
   </script>
+  <!-- Module preload for the WASM JS shim only. We deliberately do NOT modulepreload
+       js/main.js: doing so causes some browsers (Firefox especially) to attempt to
+       resolve its bare "three" specifier before the importmap is consulted, even when
+       the importmap precedes it. The bottom-of-body <script type="module"> already
+       loads main.js with full importmap context. -->
+  <link rel="modulepreload" href="./parser/pkg/atlas_id_parser.js">
   <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
