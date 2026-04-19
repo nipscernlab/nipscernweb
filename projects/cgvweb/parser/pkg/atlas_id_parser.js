@@ -1,6 +1,39 @@
 /* @ts-self-types="./atlas_id_parser.d.ts" */
 
 /**
+ * Allocate (or grow) the shared input buffer for `n` u64 IDs and return the
+ * pointer to the first element. The pointer is valid until the next call to
+ * `bulk_alloc_ids`. The JS side wraps it as a BigUint64Array view.
+ * @param {number} n
+ * @returns {number}
+ */
+export function bulk_alloc_ids(n) {
+    const ret = wasm.bulk_alloc_ids(n);
+    return ret >>> 0;
+}
+
+/**
+ * Decode the first `n` IDs in the shared input buffer. Returns the total
+ * number of i32 slots written (= `n * 8`). 8 slots per ID, layout identical to
+ * `decode_id_compact`.
+ * @param {number} n
+ * @returns {number}
+ */
+export function bulk_decode_ids(n) {
+    const ret = wasm.bulk_decode_ids(n);
+    return ret >>> 0;
+}
+
+/**
+ * Pointer to the decoded result buffer. Valid after `bulk_decode_ids`.
+ * @returns {number}
+ */
+export function bulk_result_ptr() {
+    const ret = wasm.bulk_result_ptr();
+    return ret >>> 0;
+}
+
+/**
  * Return a JSON array of example IDs for the UI.
  * @returns {any}
  */
@@ -49,6 +82,21 @@ export function parse_atlas_ids_bulk(ids) {
     } finally {
         wasm.__wbindgen_add_to_stack_pointer(16);
     }
+}
+
+/**
+ * Parse a whitespace-separated decimal-ID string and write the decoded result
+ * into the shared buffer; returns the number of i32 slots. Companion to
+ * `bulk_result_ptr` — this path keeps the existing `&str` input API but avoids
+ * the `Vec<i32>` → `Int32Array` copy on the JS side.
+ * @param {string} ids
+ * @returns {number}
+ */
+export function parse_atlas_ids_bulk_zc(ids) {
+    const ptr0 = passStringToWasm0(ids, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.parse_atlas_ids_bulk_zc(ptr0, len0);
+    return ret >>> 0;
 }
 
 function __wbg_get_imports() {

@@ -35,6 +35,10 @@
        the importmap precedes it. The bottom-of-body <script type="module"> already
        loads main.js with full importmap context. -->
   <link rel="modulepreload" href="./parser/pkg/atlas_id_parser.js">
+  <!-- Preload the WASM Web Worker script — its module graph is tiny (WASM glue
+       + our worker) and preloading lets the browser kick off the fetch in
+       parallel with main.js module resolution, so the worker is ready sooner. -->
+  <link rel="modulepreload" href="./js/wasm_worker.js">
   <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
