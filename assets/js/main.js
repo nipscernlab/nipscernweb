@@ -219,7 +219,7 @@ function buildFooter() {
           <li><a href="https://github.com/nipscernlab" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a></li>
           <li><a href="https://nipscern.com" target="_blank" rel="noopener">nipscern.com</a></li>
           <li><a href="https://lattes.cnpq.br/5454168673866452" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px">
-            <img src="${ROOT}assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px;filter:brightness(0) saturate(100%) invert(61%) sepia(9%) saturate(764%) hue-rotate(184deg) brightness(93%) contrast(87%)" aria-hidden="true"> Luciano — Lattes
+            <img src="${ROOT}assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px" aria-hidden="true"> Luciano — Lattes
           </a></li>
           <li><a href="https://github.com/Chrysthofer" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-github-logo" aria-hidden="true"></i> Chrysthofer — GitHub</a></li>
         </ul>
