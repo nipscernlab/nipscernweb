@@ -338,9 +338,9 @@ const PAL_LAR_COLOR  = _mkPal(_rampLAr);
 // Shared cell materials — one per detector. Instance-color is applied by
 // InstancedMesh.setColorAt on top of the material's base white; the per-bin
 // ramp colors live in PAL_*_COLOR instead of per-Material instances.
-const matTile = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.FrontSide });
-const matHec  = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.FrontSide });
-const matLAr  = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.FrontSide });
+const matTile = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide, flatShading: true });
+const matHec  = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide, flatShading: true });
+const matLAr  = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide, flatShading: true });
 
 const TILE_SCALE = 2000;
 const HEC_SCALE  = 5000;
@@ -603,7 +603,17 @@ controls.addEventListener('change', () => {
   if (!cinemaMode && _ctrlActive) { tooltip.hidden = true; clearOutline(); }
 });
 
-// No lights needed — all cell materials are MeshBasicMaterial (unlit)
+// Lights are needed — all cell materials are MeshStandardMaterial (PBR lit)
+const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
+scene.add(ambientLight);
+
+// Directional light that follows the camera, always pointing at the origin.
+const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
+dirLight.position.copy(camera.position);
+scene.add(dirLight);
+controls.addEventListener('change', () => {
+  dirLight.position.copy(camera.position);
+});
 
 // ── FPS counter ──────────────────────────────────────────────────────────────
 const fpsEl = document.createElement('div');
@@ -1376,7 +1386,7 @@ function clearClusters() {
 // ── FCAL tube rendering ────────────────────────────────────────────────────────
 // Each cell is an InstancedMesh cylinder: centre at midpoint, aligned to (dx,dy,dz),
 // radius 25 mm (diameter 50 mm), colour from copper palette keyed on |energy|.
-// Uses MeshBasicMaterial (no lighting response) + per-instance colour via setColorAt,
+// Uses MeshStandardMaterial + per-instance colour via setColorAt,
 // matching the approach used for Tile/LAr/HEC cell materials.
 // Coordinate convention: ATLAS x→–X, y→–Y, z→Z ; cm × 10 = mm.
 
@@ -1474,8 +1484,8 @@ function _applyFcalDraw() {
   // Shared geometry: unit-height cylinder (height scaled per instance via matrix).
   // 6 radial segments keeps poly count low; openEnded:false adds caps.
   const cylGeo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, false);
-  // MeshBasicMaterial, colour 0xffffff so per-instance colour shows directly.
-  const cylMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.FrontSide });
+  // MeshStandardMaterial, colour 0xffffff so per-instance colour shows directly.
+  const cylMat = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide });
   const iMesh  = new THREE.InstancedMesh(cylGeo, cylMat, n);
   iMesh.matrixAutoUpdate = false;
 
