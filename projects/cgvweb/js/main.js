@@ -430,6 +430,149 @@ const ghostVisible = new Map();
 for (const n of GHOST_MESH_NAMES) ghostVisible.set(n, GHOST_DEFAULT_ON.has(n));
 const ghostMeshByName = new Map();
 
+// ── Atlas structural geometry (from atlas.root merged into GLB) ───────────────
+const atlasMat = new THREE.MeshBasicMaterial({
+  color: 0x4A90D9, transparent: true, opacity: 0.07,
+  depthWrite: false, side: THREE.DoubleSide,
+});
+let atlasRoot = null; // tree root node (built after GLB loads)
+
+// Build a tree from mesh name paths "atlas→A→B→...".
+// Each node: { name, parent, children: Map, meshes: Mesh[], allMeshes: Mesh[], cbEl: null }
+function _buildAtlasTree(meshes) {
+  const root = { name: 'atlas', parent: null, children: new Map(), meshes: [], allMeshes: [], cbEl: null };
+  for (const mesh of meshes) {
+    const parts = mesh.name.split('→');
+    let node = root;
+    for (let i = 1; i < parts.length; i++) {
+      if (!node.children.has(parts[i]))
+        node.children.set(parts[i], { name: parts[i], parent: node, children: new Map(), meshes: [], allMeshes: [], cbEl: null });
+      node = node.children.get(parts[i]);
+      if (i === parts.length - 1) node.meshes.push(mesh);
+    }
+  }
+  const propagate = n => {
+    n.allMeshes = [...n.meshes];
+    for (const c of n.children.values()) { propagate(c); n.allMeshes.push(...c.allMeshes); }
+  };
+  propagate(root);
+  return root;
+}
+
+// Render one tree node as DOM. Children are lazily rendered on first expand.
+function _renderAtlasNode(node, depth) {
+  const hasChildren = node.children.size > 0;
+  const wrap = document.createElement('div');
+  const row  = document.createElement('div');
+  row.className = 'atlas-row';
+  row.style.paddingLeft = (depth * 14 + 4) + 'px';
+
+  const chev = document.createElement('span');
+  chev.className = 'atlas-chev';
+  chev.textContent = hasChildren ? '▶' : '';
+
+  const cb = document.createElement('input');
+  cb.type = 'checkbox'; cb.className = 'atlas-cb';
+  const vis = node.allMeshes.filter(m => m.visible).length;
+  cb.checked       = node.allMeshes.length > 0 && vis === node.allMeshes.length;
+  cb.indeterminate = vis > 0 && vis < node.allMeshes.length;
+  node.cbEl = cb;
+
+  const lbl = document.createElement('span');
+  lbl.className = 'atlas-lbl';
+  lbl.textContent = node.name;
+
+  const cnt = document.createElement('span');
+  cnt.className = 'atlas-cnt';
+  cnt.textContent = node.allMeshes.length;
+
+  row.append(chev, cb, lbl, cnt);
+  wrap.appendChild(row);
+
+  if (hasChildren) {
+    const childWrap = document.createElement('div');
+    childWrap.className = 'atlas-children';
+    childWrap.hidden = true;
+    wrap.appendChild(childWrap);
+    let expanded = false;
+    const toggle = () => {
+      expanded = !expanded;
+      childWrap.hidden = !expanded;
+      chev.textContent = expanded ? '▼' : '▶';
+      if (expanded && !childWrap.firstChild)
+        for (const c of node.children.values())
+          childWrap.appendChild(_renderAtlasNode(c, depth + 1));
+    };
+    chev.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+    row.addEventListener('click',  e => { if (e.target !== cb) toggle(); });
+  }
+
+  cb.addEventListener('change', () => _setNodeVisible(node, cb.checked));
+  return wrap;
+}
+
+// Toggle visibility of all meshes in subtree; sync all checkboxes.
+function _setNodeVisible(node, on) {
+  for (const m of node.allMeshes) m.visible = on;
+  _syncSubtreeCb(node, on);
+  if (node.parent) _syncAncestorCb(node.parent);
+  syncAtlasBtn();
+  dirty = true;
+}
+// Push a definite on/off state down the rendered subtree.
+function _syncSubtreeCb(node, on) {
+  if (node.cbEl) { node.cbEl.checked = on; node.cbEl.indeterminate = false; }
+  for (const c of node.children.values()) _syncSubtreeCb(c, on);
+}
+// Walk up and recompute indeterminate/checked state from actual mesh count.
+function _syncAncestorCb(node) {
+  if (node.cbEl) {
+    const v = node.allMeshes.filter(m => m.visible).length;
+    node.cbEl.checked       = v === node.allMeshes.length;
+    node.cbEl.indeterminate = v > 0 && v < node.allMeshes.length;
+  }
+  if (node.parent) _syncAncestorCb(node.parent);
+}
+
+function anyAtlasOn() {
+  return atlasRoot ? atlasRoot.allMeshes.some(m => m.visible) : false;
+}
+function syncAtlasBtn() {
+  document.getElementById('btn-atlas').classList.toggle('on', anyAtlasOn());
+}
+
+// Atlas panel open / close
+const _atlasPanelEl = document.getElementById('atlas-panel');
+let atlasPanelOpen = false;
+function openAtlasPanel() {
+  atlasPanelOpen = true;
+  _atlasPanelEl.classList.add('open');
+  document.getElementById('btn-atlas').classList.add('on');
+  const br = document.getElementById('btn-atlas').getBoundingClientRect();
+  requestAnimationFrame(() => {
+    const pw = _atlasPanelEl.offsetWidth  || 260;
+    const ph = _atlasPanelEl.offsetHeight || 320;
+    let left = br.left + br.width / 2 - pw / 2;
+    let top  = br.top - ph - 10;
+    left = Math.max(6, Math.min(left, window.innerWidth - pw - 6));
+    top  = Math.max(6, top);
+    _atlasPanelEl.style.left = left + 'px';
+    _atlasPanelEl.style.top  = top  + 'px';
+  });
+}
+function closeAtlasPanel() {
+  atlasPanelOpen = false;
+  _atlasPanelEl.classList.remove('open');
+  syncAtlasBtn();
+}
+document.getElementById('btn-atlas').addEventListener('click', e => {
+  e.stopPropagation();
+  atlasPanelOpen ? closeAtlasPanel() : openAtlasPanel();
+});
+document.getElementById('atlas-all') .addEventListener('click', () => { if (atlasRoot) _setNodeVisible(atlasRoot, true);  });
+document.getElementById('atlas-none').addEventListener('click', () => { if (atlasRoot) _setNodeVisible(atlasRoot, false); });
+_atlasPanelEl.addEventListener('click', e => e.stopPropagation());
+
 // Fixed ghost colors / opacity - RGB(92,95,102) = #5C5F66; 94% transparent = 6% opacity
 let ghostSolidColor = 0x5C5F66;
 let ghostSolidOpacity = 0.01;  // 94% transparent
@@ -824,14 +967,17 @@ setLoadProgress(0, 'Loading geometry…');
       // InstancedMesh per (detector, geometry.uuid) — the GLB reuses geometry
       // heavily via shapeSignature, so this collapses tens of thousands of
       // cells into a handful of draw calls.
-      const ghosts    = [];
-      const groups    = new Map();  // key "DET::uuid" → { det, geo, items: [{matrix,name,key}] }
-      const loose     = [];         // non-cell, non-ghost meshes (rare/none) — kept as-is
+      const ghosts      = [];
+      const atlasMeshes = [];
+      const groups      = new Map();  // key "DET::uuid" → { det, geo, items: [{matrix,name,key}] }
+      const loose       = [];         // non-cell, non-ghost meshes (rare/none) — kept as-is
 
       g.updateMatrixWorld(true);
       g.traverse(o => {
         if (!o.isMesh) return;
         if (ghostVisible.has(o.name)) { ghosts.push(o); return; }
+        // Atlas structural meshes: name starts with "atlas→" (root name of atlas.root TGeoManager)
+        if (o.name.split('→')[0] === 'atlas') { atlasMeshes.push(o); return; }
         const det = classifyCellDet(o.name);
         if (!det) { loose.push(o); return; }
         const gk = `${det}::${o.geometry.uuid}`;
@@ -891,6 +1037,32 @@ setLoadProgress(0, 'Loading geometry…');
         o.frustumCulled = false;
         o.visible = false;
         scene.add(o);
+      }
+
+      // Atlas structural geometry — semi-transparent blue overlay, hidden by default.
+      // atlas.root uses cm; CaloGeometry.root uses mm → ×5 to align.
+      if (atlasMeshes.length > 0) {
+        // One scaled container; mesh visibility is controlled individually per tree node.
+        const atlasContainer = new THREE.Group();
+        atlasContainer.name = 'atlas-geo';
+        atlasContainer.scale.setScalar(10);
+        atlasContainer.updateMatrix();
+        atlasContainer.matrixAutoUpdate = false;
+        for (const o of atlasMeshes) {
+          o.material = atlasMat;
+          o.matrixAutoUpdate = false;
+          o.frustumCulled = false;
+          o.visible = false;
+          atlasContainer.add(o);
+        }
+        scene.add(atlasContainer);
+        // Build name-path hierarchy tree and render it into the panel.
+        atlasRoot = _buildAtlasTree(atlasMeshes);
+        const body = document.getElementById('atlas-panel-body');
+        body.innerHTML = '';
+        for (const child of atlasRoot.children.values())
+          body.appendChild(_renderAtlasNode(child, 0));
+        document.getElementById('btn-atlas').style.display = '';
       }
 
       sceneOk = true; dirty = true;
@@ -2897,7 +3069,10 @@ function toggleClusters() {
   dirty = true;
 }
 document.getElementById('btn-cluster').addEventListener('click', toggleClusters);
-document.addEventListener('click', () => { if (layersPanelOpen) closeLayersPanel(); });
+document.addEventListener('click', () => {
+  if (layersPanelOpen) closeLayersPanel();
+  if (atlasPanelOpen)  closeAtlasPanel();
+});
 layersPanel.addEventListener('click', e => e.stopPropagation());
 
 // ── Panel resize ──────────────────────────────────────────────────────────────

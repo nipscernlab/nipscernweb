@@ -858,7 +858,7 @@
     /* Portrait phone: show a rotate-to-landscape hint, minimal UI */
     @media (orientation: portrait) and (max-width: 700px) {
       #panel, #rpanel, #toolbar, #btn-toolbar-toggle, #statusbar,
-      #layers-panel, #settings-panel { display: none !important; }
+      #layers-panel, #atlas-panel, #settings-panel { display: none !important; }
       #rotate-hint {
         position: fixed; inset: 0; z-index: 3000;
         display: flex; flex-direction: column;
@@ -1068,8 +1068,8 @@
     .cdstep:hover { color: var(--text); border-color: rgba(36,103,224,.45); background: rgba(26,82,192,.10); }
     .cdstep.on { color: #7ab8ff; border-color: var(--accent); background: rgba(26,82,192,.18); }
 
-    /* ── Layers / Ghost (geometry toggle) floating panel ─────────── */
-    #layers-panel, #ghost-panel {
+    /* ── Layers / Ghost / Atlas (geometry toggle) floating panels ─── */
+    #layers-panel, #ghost-panel, #atlas-panel {
       position: fixed; z-index: 50;
       padding: 10px 12px 12px;
       background: rgba(2, 9, 24, 0.68);
@@ -1081,7 +1081,32 @@
       opacity: 0; transform: translateY(8px); pointer-events: none;
       transition: opacity 0.17s ease, transform 0.17s ease;
     }
-    #layers-panel.open, #ghost-panel.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #layers-panel.open, #ghost-panel.open, #atlas-panel.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    /* Atlas panel: fixed header + scrollable tree body */
+    #atlas-panel { display: flex; flex-direction: column; min-width: 240px; max-width: 340px; max-height: min(520px, calc(100vh - 80px)); overflow: hidden; }
+    #atlas-panel .layers-head { flex-shrink: 0; }
+    #atlas-panel-body { overflow-y: auto; flex: 1; min-height: 0; padding: 2px 0 4px; }
+    /* Tree nodes */
+    .atlas-row {
+      display: flex; align-items: center; gap: 5px;
+      padding: 3px 6px 3px 4px; border-radius: 5px;
+      cursor: pointer; user-select: none;
+      transition: background .12s;
+    }
+    .atlas-row:hover { background: rgba(74,144,217,.10); }
+    .atlas-chev {
+      font-size: 7px; width: 10px; flex-shrink: 0;
+      color: var(--muted); text-align: center; line-height: 1;
+    }
+    .atlas-cb { flex-shrink: 0; cursor: pointer; accent-color: #4A90D9; margin: 0; }
+    .atlas-lbl {
+      flex: 1; font: 500 .61rem var(--mono); color: var(--text);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .atlas-cnt {
+      font: 400 .53rem var(--font); color: var(--muted);
+      background: rgba(255,255,255,.06); border-radius: 3px; padding: 1px 4px; flex-shrink: 0;
+    }
     .layers-head {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 8px; padding-bottom: 8px;

@@ -468,6 +468,11 @@
     <i class="ti ti-ghost"></i>
   </button>
   <div class="tbtn-sep"></div>
+  <button class="tbtn" id="btn-atlas" style="display:none"
+    data-tip="ATLAS detector — toggle full structural geometry overlay">
+    <i class="ti ti-radar" style="font-size:15px"></i>
+  </button>
+  <div class="tbtn-sep"></div>
   <button class="tbtn on" id="btn-info"
     data-tip="Cell info — show tooltip and outline on hover" data-i18n-tip="tip-info">
     <svg class="ic" style="width:14px;height:14px"><use href="#i-eye"/></svg>
@@ -610,6 +615,18 @@
   </div>
 </div>
 
+
+<!-- ── Atlas geometry panel ────────────────────────────────── -->
+<div id="atlas-panel">
+  <div class="layers-head">
+    <span class="layers-title">ATLAS Geometry</span>
+    <div class="layers-quick">
+      <button class="layers-qbtn" id="atlas-all">All</button>
+      <button class="layers-qbtn" id="atlas-none">None</button>
+    </div>
+  </div>
+  <div id="atlas-panel-body"></div>
+</div>
 
 <!-- ── Settings panel ─────────────────────────────────────── -->
 <div id="settings-panel">
