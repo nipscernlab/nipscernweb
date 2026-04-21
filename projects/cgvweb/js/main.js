@@ -1957,6 +1957,9 @@ async function processXml(xmlText) {
   }
 
   // ── MBTS cells (direct label→key, no WASM needed) ────────────────────────
+  // EBA module numbers per mod index, inner (ch=0) and outer (ch=1)
+  const _mbtsEbaInner = [57, 58, 39, 40, 41, 42, 55, 56];
+  const _mbtsEbaOuter = [ 8,  8, 24, 24, 43, 43, 54, 54];
   for (let i = 0; i < mbtsCells.length; i++) {
     const { label, energy } = mbtsCells[i];
     const eMev = energy * 1000;
@@ -1968,7 +1971,12 @@ async function processXml(xmlText) {
     h.iMesh.setColorAt(h.instId, palColorTile(eMev));
     _markIMDirty(h.iMesh);
     const mbtsCoords = `η = ${((s_bit?1:-1)*(_m[2]==='0'?2.76:3.84)).toFixed(3)}   φ = ${_wrapPhi(2*Math.PI/16+mod*2*Math.PI/8).toFixed(3)} rad`;
-    active.set(h, { energyGev: energy, energyMev: eMev, cellName: 'MBTS', coords: mbtsCoords, det: 'TILE', mbtsLabel: label });
+    const _mbtsInner = _m[2] === '1';
+    const _mbtsSide  = s_bit ? 'A' : 'C';
+    const _mbtsEba   = (_mbtsInner ? _mbtsEbaInner : _mbtsEbaOuter)[mod];
+    const _mbtsIdx   = mod + (_mbtsInner ? 0 : 8);
+    const _mbtsCellName = `EB${_mbtsSide}${String(_mbtsEba).padStart(2,'0')} MBTS ${_mbtsSide}${String(_mbtsIdx).padStart(2,'0')}`;
+    active.set(h, { energyGev: energy, energyMev: eMev, cellName: _mbtsCellName, coords: mbtsCoords, det: 'TILE', mbtsLabel: label });
     nMbts++;
   }
 
