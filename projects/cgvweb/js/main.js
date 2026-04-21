@@ -114,7 +114,7 @@ const meshByKey  = new Map();   // int -> handle (hot-path: event loop lookup)
 // (gap scintillators, ITC cells).
 const cellMeshesByDet = { TILE: [], LAR: [], HEC: [] };
 let   active     = new Map();   // handle -> tooltip data (keyed by object reference)
-let   rayTargets = [];          // hover proxy Mesh[] for currently visible active cells
+let   rayTargets = [];          // InstancedMesh[] with ≥1 visible active instance
 
 // Shared constants for InstancedMesh bookkeeping.
 // Zero-determinant matrix: hides an instance (collapses its geometry to a
@@ -126,28 +126,32 @@ function _flushIMDirty() {
   for (const im of _dirtyIM) {
     im.instanceMatrix.needsUpdate = true;
     if (im.instanceColor) im.instanceColor.needsUpdate = true;
-    // InstancedMesh raycasting uses aggregate bounds; after moving instances
-    // between origMatrix and the hidden zero matrix, refresh them so picking
-    // still reaches the visible cells.
-    im.computeBoundingBox();
-    im.computeBoundingSphere();
+    // Recompute bounding sphere for raycasting, skipping hidden instances.
+    // Three.js's computeBoundingSphere() calls Sphere.applyMatrix4(_ZERO_MAT4)
+    // which evaluates w = 1/det = 1/0 = Infinity → NaN center, poisoning the
+    // sphere and making ray.intersectsSphere always return false (no tooltip).
+    // Fix: skip any instance where elements[15] == 0 (our zero-matrix sentinel).
+    if (!im.geometry.boundingSphere) im.geometry.computeBoundingSphere();
+    if (!im.boundingSphere) im.boundingSphere = new THREE.Sphere();
+    im.boundingSphere.makeEmpty();
+    for (let i = 0; i < im.count; i++) {
+      im.getMatrixAt(i, _bsMat);
+      if (_bsMat.elements[15] === 0) continue;
+      _bsSph.copy(im.geometry.boundingSphere).applyMatrix4(_bsMat);
+      im.boundingSphere.union(_bsSph);
+    }
+    if (im.boundingSphere.isEmpty()) im.boundingSphere.set(new THREE.Vector3(), 0);
   }
   _dirtyIM.clear();
 }
 // All cell InstancedMeshes (one per unique detector+geometry pair), for bulk
-// reset sweeps.
+// raycasting and reset sweeps.
 const _allCellIMeshes = [];
-// Stable hover path: keep InstancedMesh for rendering, but raycast against one
-// invisible proxy Mesh per visible cell. This preserves the rendering-speed
-// win while avoiding the broken instanceId-based picking path.
-const _hoverProxyMat = new THREE.MeshBasicMaterial({
-  color: 0xffffff,
-  side: THREE.FrontSide,
-  transparent: true,
-  opacity: 0,
-  depthWrite: false,
-});
-_hoverProxyMat.colorWrite = false;
+const _rayIMeshes = new Set();
+
+// Reusable temporaries for bounding-sphere computation (avoids per-frame GC).
+const _bsMat   = new THREE.Matrix4();
+const _bsSph   = new THREE.Sphere();
 
 // Integer key encoding: avoids string construction in the per-cell hot path.
 // Bits [1:0] = detector type tag: TILE=0b00, LAr EM=0b01, HEC=0b10 (no cross-type collision).
@@ -837,11 +841,8 @@ setLoadProgress(0, 'Loading geometry…');
       });
 
       const cellsGroup = new THREE.Group();
-      const hoverProxyGroup = new THREE.Group();
       cellsGroup.name = 'cells';
       cellsGroup.matrixAutoUpdate = false;
-      hoverProxyGroup.name = 'hover-proxies';
-      hoverProxyGroup.matrixAutoUpdate = false;
 
       for (const { det, geo, items } of groups.values()) {
         const mat = det === 'TILE' ? matTile : det === 'LAR' ? matLAr : matHec;
@@ -864,16 +865,6 @@ setLoadProgress(0, 'Loading geometry…');
             origMatrix: it.matrix,
             visible: false,
           };
-          const proxy = new THREE.Mesh(geo, _hoverProxyMat);
-          proxy.name = `hover_${it.name}`;
-          proxy.matrixAutoUpdate = false;
-          proxy.frustumCulled = false;
-          proxy.visible = false;
-          proxy.matrix.copy(it.matrix);
-          proxy.matrixWorld.copy(it.matrix);
-          proxy.userData.handle = h;
-          h.rayProxy = proxy;
-          hoverProxyGroup.add(proxy);
           handles[i] = h;
           if (it.key !== null) meshByKey.set(it.key, h);
           cellMeshesByDet[det].push(h);
@@ -885,7 +876,6 @@ setLoadProgress(0, 'Loading geometry…');
         _allCellIMeshes.push(iMesh);
       }
       scene.add(cellsGroup);
-      scene.add(hoverProxyGroup);
 
       // Ghosts keep their individual-mesh behavior (per-mesh material swap on toggle).
       for (const gh of ghosts) {
@@ -1645,11 +1635,12 @@ function _setHandleVisible(h, vis) {
   if (h.visible === vis) return;
   h.visible = vis;
   h.iMesh.setMatrixAt(h.instId, vis ? h.origMatrix : _ZERO_MAT4);
-  if (h.rayProxy) h.rayProxy.visible = vis;
   _markIMDirty(h.iMesh);
 }
 function _rebuildRayIMeshes() {
-  rayTargets = visHandles.map(h => h.rayProxy).filter(Boolean);
+  _rayIMeshes.clear();
+  for (const h of visHandles) _rayIMeshes.add(h.iMesh);
+  rayTargets = Array.from(_rayIMeshes);
 }
 
 function resetScene() {
@@ -1659,7 +1650,6 @@ function resetScene() {
       if (h.visible) {
         h.visible = false;
         h.iMesh.setMatrixAt(h.instId, _ZERO_MAT4);
-        if (h.rayProxy) h.rayProxy.visible = false;
         _markIMDirty(h.iMesh);
       }
     }
@@ -1669,7 +1659,7 @@ function resetScene() {
   // which would desync the ghostVisible map and make the next ghost toggle
   // render only the phi lines without the solid envelopes.
   applyAllGhostMeshes();
-  active.clear(); visHandles = []; rayTargets = [];
+  active.clear(); visHandles = []; rayTargets = []; _rayIMeshes.clear();
   clearOutline(); clearAllOutlines();
   clearTracks();
   clearClusters();
@@ -2460,7 +2450,7 @@ function _buildOutlinesNow() {
 
 // ── Hover tooltip — raycasting fix ───────────────────────────────────────────
 const raycast  = new THREE.Raycaster();
-raycast.firstHitOnly = true;  // proxy hover can use the first sorted hit
+raycast.firstHitOnly = true;  // stop after first intersection (much faster)
 raycast.params.Line = { threshold: 25 };  // 25 mm hit zone for track lines
 const mxy      = new THREE.Vector2();
 const tooltip    = document.getElementById('tip');
@@ -2490,13 +2480,14 @@ function doRaycast(clientX, clientY) {
     let cellHit = null, cellHandle = null, cellDist = Infinity;
     if (active.size && rayTargets.length) {
       const hits = raycast.intersectObjects(rayTargets, false);
-      if (hits.length) {
-        const h = hits[0].object.userData.handle;
-        if (h && active.has(h)) {
-          cellHit = hits[0];
-          cellHandle = h;
-          cellDist = hits[0].distance;
-        }
+      for (let i = 0; i < hits.length; i++) {
+        const hit = hits[i];
+        const iid = hit.instanceId;
+        if (iid == null) continue;
+        const h = hit.object.userData.handles?.[iid];
+        if (!h || !active.has(h)) continue;
+        cellHit = hit; cellHandle = h; cellDist = hit.distance;
+        break; // hits are sorted; first active match is closest
       }
     }
     let fcalHit = null, fcalDist = Infinity;
