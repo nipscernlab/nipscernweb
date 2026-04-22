@@ -87,6 +87,17 @@ class _WasmParserPool {
       hec:  hecStr  && f ? f(hecStr)  : null,
     });
   }
+  /** Parse XML text and bulk-decode ATLAS IDs entirely in the worker.
+   *  Returns the full parseXmlResult message, or null if no worker is available
+   *  (caller must fall back to inline parsing + parse()). */
+  parseXmlAndDecode(xmlText) {
+    if (!this._worker) return Promise.resolve(null);
+    const rid = ++this._rid;
+    return new Promise((resolve, reject) => {
+      this._pending.set(rid, { resolve, reject });
+      this._worker.postMessage({ type: 'parseXmlAndDecode', rid, xmlText });
+    });
+  }
 }
 const _wasmPool = new _WasmParserPool();
 
@@ -265,6 +276,7 @@ let reqCount     = 0;
 let allOutlinesMesh = null;
 let trackGroup    = null;
 let clusterGroup  = null;
+let photonGroup   = null;
 let fcalGroup     = null;
 let fcalCellsData  = [];   // cached for threshold rebuilds
 let fcalVisibleMap = [];   // [instanceId] → cell object for the current visible set
@@ -435,7 +447,218 @@ const atlasMat = new THREE.MeshBasicMaterial({
   color: 0x4A90D9, transparent: true, opacity: 0.07,
   depthWrite: false, side: THREE.DoubleSide,
 });
+const atlasTrackHitMat = new THREE.MeshBasicMaterial({
+  color: 0x4A90D9, transparent: true, opacity: 0.035,
+  depthWrite: false, side: THREE.DoubleSide,
+});
+const trackAtlasOutlineMat = new THREE.LineBasicMaterial({
+  color: 0x4A90D9, transparent: true, opacity: 0.15, depthWrite: false,
+});
 let atlasRoot = null; // tree root node (built after GLB loads)
+const TRACK_ATLAS_TARGET_NODE_NAMES = ['MUCH_1', 'MUC1_2'];
+let _trackAtlasNodes = null;
+let _trackAtlasMeshes = null;
+let _trackAtlasOutlineMeshes = null;
+let _trackAtlasMeshBoxes = null;
+const _trackAtlasRay = new THREE.Raycaster();
+const _trackAtlasSegA = new THREE.Vector3();
+const _trackAtlasSegB = new THREE.Vector3();
+const _trackAtlasDir  = new THREE.Vector3();
+const _trackAtlasEdgeGeoCache = new Map();
+
+function _findAtlasNodesByName(root, name, out = []) {
+  if (!root) return out;
+  if (root.name === name) out.push(root);
+  for (const child of root.children.values()) _findAtlasNodesByName(child, name, out);
+  return out;
+}
+
+function _maxAtlasSubtreeDepth(node) {
+  if (!node.children.size) return 0;
+  let maxDepth = 0;
+  for (const child of node.children.values())
+    maxDepth = Math.max(maxDepth, 1 + _maxAtlasSubtreeDepth(child));
+  return maxDepth;
+}
+
+function _collectAtlasNodesAtDepth(node, depth, out = []) {
+  if (depth === 0) {
+    out.push(node);
+    return out;
+  }
+  for (const child of node.children.values())
+    _collectAtlasNodesAtDepth(child, depth - 1, out);
+  return out;
+}
+
+function _ensureTrackAtlasOutline(mesh) {
+  mesh.material = atlasTrackHitMat;
+  if (mesh.userData.trackAtlasOutline) return mesh.userData.trackAtlasOutline;
+  const uid = mesh.geometry.uuid;
+  if (!_trackAtlasEdgeGeoCache.has(uid))
+    _trackAtlasEdgeGeoCache.set(uid, new THREE.EdgesGeometry(mesh.geometry, 30));
+  const outline = new THREE.LineSegments(_trackAtlasEdgeGeoCache.get(uid), trackAtlasOutlineMat);
+  outline.name = `${mesh.name}__track_outline`;
+  outline.matrixAutoUpdate = false;
+  outline.renderOrder = 8;
+  outline.visible = false;
+  mesh.add(outline);
+  mesh.userData.trackAtlasOutline = outline;
+  return outline;
+}
+
+function _resolveTrackAtlasTargets() {
+  if (!atlasRoot) return { nodes: [], meshes: [], outlineMeshes: [] };
+  if (_trackAtlasNodes && _trackAtlasMeshes && _trackAtlasOutlineMeshes)
+    return { nodes: _trackAtlasNodes, meshes: _trackAtlasMeshes, outlineMeshes: _trackAtlasOutlineMeshes };
+  const sourceNodes = [];
+  const seen        = new Set();
+  for (const name of TRACK_ATLAS_TARGET_NODE_NAMES) {
+    for (const node of _findAtlasNodesByName(atlasRoot, name)) {
+      if (seen.has(node)) continue;
+      seen.add(node);
+      sourceNodes.push(node);
+    }
+  }
+  const nodes = [];
+  const nodeSeen = new Set();
+  const outlineNodes = [];
+  const outlineNodeSeen = new Set();
+  for (const node of sourceNodes) {
+    const maxDepth = _maxAtlasSubtreeDepth(node);
+    for (const depth of [maxDepth - 1, maxDepth]) {
+      if (depth < 0) continue;
+      for (const match of _collectAtlasNodesAtDepth(node, depth)) {
+        if (nodeSeen.has(match)) continue;
+        nodeSeen.add(match);
+        nodes.push(match);
+      }
+    }
+    const outlineDepth = maxDepth - 1;
+    if (outlineDepth >= 0) {
+      for (const match of _collectAtlasNodesAtDepth(node, outlineDepth)) {
+        if (outlineNodeSeen.has(match)) continue;
+        outlineNodeSeen.add(match);
+        outlineNodes.push(match);
+      }
+    }
+  }
+  const meshes = [];
+  const meshSeen = new Set();
+  for (const node of nodes) {
+    for (const mesh of node.meshes) {
+      if (meshSeen.has(mesh)) continue;
+      meshSeen.add(mesh);
+      _ensureTrackAtlasOutline(mesh);
+      meshes.push(mesh);
+    }
+  }
+  const outlineMeshes = [];
+  const outlineMeshSeen = new Set();
+  for (const node of outlineNodes) {
+    for (const mesh of node.meshes) {
+      if (outlineMeshSeen.has(mesh)) continue;
+      outlineMeshSeen.add(mesh);
+      outlineMeshes.push(mesh);
+    }
+  }
+  _trackAtlasNodes  = nodes;
+  _trackAtlasMeshes = meshes;
+  _trackAtlasOutlineMeshes = outlineMeshes;
+  return { nodes, meshes, outlineMeshes };
+}
+
+function _refreshNodeCb(node) {
+  if (!node?.cbEl) return;
+  const v = node.allMeshes.filter(m => m.visible).length;
+  node.cbEl.checked       = node.allMeshes.length > 0 && v === node.allMeshes.length;
+  node.cbEl.indeterminate = v > 0 && v < node.allMeshes.length;
+}
+
+const _trackAtlasTrackBox = new THREE.Box3();
+
+function updateTrackAtlasIntersections() {
+  if (!atlasRoot) return;
+  const { nodes, meshes, outlineMeshes } = _resolveTrackAtlasTargets();
+  if (!meshes.length) return;
+
+  const visibleTracks = (trackGroup && trackGroup.visible)
+    ? trackGroup.children.filter(c => c.visible)
+    : [];
+  const hitMeshes = new Set();
+  const hitTracks = new Set();
+
+  if (visibleTracks.length) {
+    scene.updateMatrixWorld(true);
+
+    // Cache world-space AABBs for all target meshes once (static geometry).
+    if (!_trackAtlasMeshBoxes) {
+      _trackAtlasMeshBoxes = meshes.map(m => new THREE.Box3().setFromObject(m));
+    }
+
+    for (const line of visibleTracks) {
+      const pos = line.geometry?.getAttribute('position');
+      if (!pos || pos.count < 2) continue;
+
+      // Compute track world-space AABB to pre-filter candidate meshes.
+      _trackAtlasTrackBox.makeEmpty();
+      for (let i = 0; i < pos.count; i++) {
+        _trackAtlasSegA.fromBufferAttribute(pos, i).applyMatrix4(line.matrixWorld);
+        _trackAtlasTrackBox.expandByPoint(_trackAtlasSegA);
+      }
+
+      // Only test meshes whose AABB overlaps this track's AABB.
+      const nearMeshes = [];
+      for (let mi = 0; mi < meshes.length; mi++) {
+        if (_trackAtlasMeshBoxes[mi].intersectsBox(_trackAtlasTrackBox))
+          nearMeshes.push(meshes[mi]);
+      }
+      if (!nearMeshes.length) continue;
+
+      let lineHit = false;
+      for (let i = 0; i < pos.count - 1; i++) {
+        _trackAtlasSegA.fromBufferAttribute(pos, i).applyMatrix4(line.matrixWorld);
+        _trackAtlasSegB.fromBufferAttribute(pos, i + 1).applyMatrix4(line.matrixWorld);
+        _trackAtlasDir.subVectors(_trackAtlasSegB, _trackAtlasSegA);
+        const len = _trackAtlasDir.length();
+        if (len <= 1e-6) continue;
+        _trackAtlasDir.multiplyScalar(1 / len);
+        _trackAtlasRay.set(_trackAtlasSegA, _trackAtlasDir);
+        _trackAtlasRay.far = len;
+        for (const hit of _trackAtlasRay.intersectObjects(nearMeshes, false)) {
+          hitMeshes.add(hit.object);
+          lineHit = true;
+        }
+      }
+      if (lineHit) hitTracks.add(line);
+    }
+  }
+
+  let changed = false;
+  for (const mesh of meshes) {
+    const next = hitMeshes.has(mesh);
+    if (mesh.visible !== next) {
+      mesh.visible = next;
+      changed = true;
+    }
+  }
+  for (const mesh of meshes) {
+    if (mesh.userData.trackAtlasOutline)
+      mesh.userData.trackAtlasOutline.visible = hitMeshes.has(mesh) && outlineMeshes.includes(mesh);
+  }
+  if (trackGroup) {
+    for (const line of trackGroup.children)
+      line.material = hitTracks.has(line) ? TRACK_HIT_MAT : TRACK_MAT;
+  }
+  if (!changed) return;
+
+  for (const node of nodes) {
+    _refreshNodeCb(node);
+    if (node.parent) _syncAncestorCb(node.parent);
+  }
+  syncAtlasBtn();
+  dirty = true;
+}
 
 // Build a tree from mesh name paths "atlas→A→B→...".
 // Each node: { name, parent, children: Map, meshes: Mesh[], allMeshes: Mesh[], cbEl: null }
@@ -836,9 +1059,8 @@ function checkReady() {
   if (!_readyFired) {
     _readyFired = true;
     setLoadProgress(100, 'Ready');
-    // Enable the default TileCal ghost envelopes + beam axis on startup.
+    // Enable the default TileCal ghost envelopes on startup.
     enableDefaultGhosts();
-    toggleBeam();
     // Dismiss loading screen after a brief moment so 100% is visible
     setTimeout(dismissLoadingScreen, 280);
   }
@@ -1058,6 +1280,10 @@ setLoadProgress(0, 'Loading geometry…');
         scene.add(atlasContainer);
         // Build name-path hierarchy tree and render it into the panel.
         atlasRoot = _buildAtlasTree(atlasMeshes);
+        _trackAtlasNodes = null;
+        _trackAtlasMeshes = null;
+        _trackAtlasOutlineMeshes = null;
+        _trackAtlasMeshBoxes = null;
         const body = document.getElementById('atlas-panel-body');
         body.innerHTML = '';
         for (const child of atlasRoot.children.values())
@@ -1508,18 +1734,24 @@ let clusterEtMinGev   = 0;
 let clusterEtMaxGev   = 1;
 
 const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffea00, linewidth: 2 });
+const TRACK_HIT_MAT = new THREE.LineBasicMaterial({ color: 0x4A90D9, linewidth: 2 });
 
 function clearTracks() {
   if (!trackGroup) return;
   trackGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); });
   scene.remove(trackGroup);
   trackGroup = null;
+  updateTrackAtlasIntersections();
 }
 
 function applyTrackThreshold() {
-  if (!trackGroup) return;
-  for (const child of trackGroup.children)
-    child.visible = child.userData.ptGev >= thrTrackGev;
+  if (trackGroup)
+    for (const child of trackGroup.children)
+      child.visible = child.userData.ptGev >= thrTrackGev;
+  if (photonGroup)
+    for (const child of photonGroup.children)
+      child.visible = child.userData.ptGev >= thrTrackGev;
+  updateTrackAtlasIntersections();
   dirty = true;
 }
 
@@ -1541,6 +1773,7 @@ function drawTracks(tracks) {
   trackGroup.matrixAutoUpdate = false;
   scene.add(trackGroup);
   applyTrackThreshold();
+  updateTrackAtlasIntersections();
 }
 
 // ── Cluster line rendering ────────────────────────────────────────────────────
@@ -1550,6 +1783,15 @@ const CLUSTER_MAT = new THREE.LineDashedMaterial({
   color: 0xff4400, transparent: true, opacity: 0.20,
   dashSize: 40, gapSize: 60, depthWrite: false,
 });
+const PHOTON_MAT = new THREE.LineBasicMaterial({
+  color: 0xFFCC00, transparent: true, opacity: 0.85, depthWrite: false,
+});
+const PHOTON_START_OFFSET_MM  = 100;   // start the spring 10 cm away from the origin
+const PHOTON_SPRING_R         = 20;    // helix radius in mm
+const PHOTON_SPRING_TURNS_PER_MM = 0.014; // coils per mm of track length
+const PHOTON_SPRING_PTS       = 22;   // points sampled per coil (smoothness)
+const PHOTON_TRACK_DIR_DOT_MIN = 0.97;
+const PHOTON_TRACK_RADIAL_TOL_MM = 250;
 // Inner cylinder (start): r = 1.4 m, h = 6.4 m
 const CLUSTER_CYL_IN_R      = 1400;
 const CLUSTER_CYL_IN_HALF_H = 3200;
@@ -1573,6 +1815,133 @@ function clearClusters() {
   clusterGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); });
   scene.remove(clusterGroup);
   clusterGroup = null;
+}
+
+// ── Photon spring rendering ────────────────────────────────────────────────────
+// Photons are shown as a helix (spring) in the η/φ direction from the origin,
+// matching the conventional Feynman-diagram wavy-line symbol.
+
+function _makeSpringPoints(dx, dy, dz, totalLen, radius, nTurns, ptsPerTurn) {
+  const fwd = new THREE.Vector3(dx, dy, dz).normalize();
+  const ref = Math.abs(fwd.x) < 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+  const right = new THREE.Vector3().crossVectors(fwd, ref).normalize();
+  const up    = new THREE.Vector3().crossVectors(fwd, right).normalize();
+  const startOffset = Math.min(PHOTON_START_OFFSET_MM, Math.max(0, totalLen));
+  const visibleLen  = Math.max(0, totalLen - startOffset);
+  const nTotal = nTurns * ptsPerTurn + 1;
+  const pts = [];
+  for (let i = 0; i < nTotal; i++) {
+    const t     = i / (nTotal - 1);
+    const angle = t * nTurns * 2 * Math.PI;
+    const along = startOffset + t * visibleLen;
+    const cx    = Math.cos(angle) * radius;
+    const cy    = Math.sin(angle) * radius;
+    pts.push(new THREE.Vector3(
+      fwd.x * along + right.x * cx + up.x * cy,
+      fwd.y * along + right.y * cx + up.y * cy,
+      fwd.z * along + right.z * cx + up.z * cy,
+    ));
+  }
+  return pts;
+}
+
+function _photonDirection(eta, phi) {
+  const theta = 2 * Math.atan(Math.exp(-eta));
+  const sinT  = Math.sin(theta);
+  return new THREE.Vector3(
+    -sinT * Math.cos(phi),
+    -sinT * Math.sin(phi),
+     Math.cos(theta),
+  );
+}
+
+function _trackDuplicatesPhoton(track, photon) {
+  const pts = track.pts;
+  if (!pts || pts.length < 2) return false;
+  const dir = _photonDirection(photon.eta, photon.phi).normalize();
+  const seg = new THREE.Vector3().subVectors(pts[pts.length - 1], pts[0]);
+  if (seg.lengthSq() < 1e-6) return false;
+  seg.normalize();
+  if (Math.abs(seg.dot(dir)) < PHOTON_TRACK_DIR_DOT_MIN) return false;
+
+  const photonEnd = _cylIntersect(dir.x, dir.y, dir.z, CLUSTER_CYL_IN_R, CLUSTER_CYL_IN_HALF_H);
+  let matchedPts = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    const along = p.dot(dir);
+    if (along < PHOTON_START_OFFSET_MM || along > photonEnd + 50) continue;
+    const radial = Math.sqrt(Math.max(0, p.lengthSq() - along * along));
+    if (Math.abs(radial - PHOTON_SPRING_R) > PHOTON_TRACK_RADIAL_TOL_MM) return false;
+    matchedPts++;
+  }
+  return matchedPts >= 2;
+}
+
+function filterPhotonDuplicateTracks(tracks, photons) {
+  if (!tracks.length || !photons.length) return tracks;
+  return tracks.filter(track => {
+    for (let i = 0; i < photons.length; i++) {
+      if (_trackDuplicatesPhoton(track, photons[i])) return false;
+    }
+    return true;
+  });
+}
+
+function parsePhotons(doc) {
+  const result = [];
+  for (const el of doc.getElementsByTagName('Photon')) {
+    const etaEl    = el.querySelector('eta');
+    const phiEl    = el.querySelector('phi');
+    const energyEl = el.querySelector('energy');
+    const ptEl     = el.querySelector('pt');
+    if (!etaEl || !phiEl) continue;
+    const etas     = etaEl.textContent.trim().split(/\s+/).map(Number);
+    const phis     = phiEl.textContent.trim().split(/\s+/).map(Number);
+    const energies = energyEl ? energyEl.textContent.trim().split(/\s+/).map(Number) : [];
+    const pts      = ptEl     ? ptEl.textContent.trim().split(/\s+/).map(Number)     : [];
+    const m = Math.min(etas.length, phis.length);
+    for (let i = 0; i < m; i++) {
+      if (!isFinite(etas[i]) || !isFinite(phis[i])) continue;
+      result.push({
+        eta: etas[i], phi: phis[i],
+        energyGev: isFinite(energies[i]) ? energies[i] : 0,
+        ptGev:     isFinite(pts[i])      ? pts[i]      : 0,
+      });
+    }
+  }
+  return result;
+}
+
+function clearPhotons() {
+  if (!photonGroup) return;
+  photonGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+  scene.remove(photonGroup);
+  photonGroup = null;
+}
+
+function drawPhotons(photons) {
+  clearPhotons();
+  if (!photons.length) return;
+  photonGroup = new THREE.Group();
+  photonGroup.renderOrder = 7;
+  photonGroup.visible = (typeof tracksVisible === 'undefined') ? true : tracksVisible;
+  for (const { eta, phi, ptGev } of photons) {
+    const theta = 2 * Math.atan(Math.exp(-eta));
+    const sinT  = Math.sin(theta);
+    const dx = -sinT * Math.cos(phi);
+    const dy = -sinT * Math.sin(phi);
+    const dz =  Math.cos(theta);
+    const tEnd = _cylIntersect(dx, dy, dz, CLUSTER_CYL_IN_R, CLUSTER_CYL_IN_HALF_H);
+    const nTurns = Math.round(PHOTON_SPRING_TURNS_PER_MM * tEnd);
+    const pts  = _makeSpringPoints(dx, dy, dz, tEnd, PHOTON_SPRING_R, nTurns, PHOTON_SPRING_PTS);
+    const geo  = new THREE.BufferGeometry().setFromPoints(pts);
+    const line = new THREE.Line(geo, PHOTON_MAT);
+    line.userData.ptGev = ptGev;
+    line.visible = ptGev >= thrTrackGev;
+    photonGroup.add(line);
+  }
+  photonGroup.matrixAutoUpdate = false;
+  scene.add(photonGroup);
 }
 
 // ── FCAL tube rendering ────────────────────────────────────────────────────────
@@ -1835,6 +2204,7 @@ function resetScene() {
   clearOutline(); clearAllOutlines();
   clearTracks();
   clearClusters();
+  clearPhotons();
   clearFcal();
   lastClusterData      = null;
   activeClusterCellIds = null;
@@ -1936,38 +2306,78 @@ async function processXml(xmlText) {
   const rid = ++_procXmlRid;
   const t0 = performance.now();
 
-  // Parse XML once — all detectors share the same Document
-  let doc, tileCells, larCells, hecCells, mbtsCells, fcalCells;
-  try { doc = parseXmlDoc(xmlText); }
-  catch (e) { setStatus(`<span class="err">${esc(e.message)}</span>`); return; }
-  currentEventInfo = parseEventInfo(doc);
-  try { tileCells = parseTile(doc); } catch { tileCells = []; }
-  try { larCells  = parseLAr(doc);  } catch { larCells  = []; }
-  try { hecCells  = parseHec(doc);  } catch { hecCells  = []; }
-  try { mbtsCells = parseMBTS(doc); } catch { mbtsCells = []; }
-  try { fcalCells = parseFcal(doc); } catch { fcalCells = []; }
+  let doc = null;
+  let tileCells, larCells, hecCells, mbtsCells, fcalCells;
+  let tilePacked = null, larPacked = null, hecPacked = null;
+  let rawTracks = [], rawPhotons = [], rawClusters = [];
+  let _clusterCollections = null;
+
+  // ── Off-thread XML parse + WASM decode (worker path) ─────────────────────
+  // Both DOMParser and bulk ID decode run in the existing WASM worker so the
+  // main thread is never blocked, even on 47 MB events.
+  let workerResult;
+  try { workerResult = await _wasmPool.parseXmlAndDecode(xmlText); }
+  catch (e) { console.warn('[parseXmlAndDecode] worker error, falling back:', e && e.message); workerResult = null; }
+  // Drop stale replies — a newer event arrived while the worker was busy.
+  if (rid !== _procXmlRid) return;
+
+  if (workerResult) {
+    if (workerResult.error) { setStatus(`<span class="err">${esc(workerResult.error)}</span>`); return; }
+    currentEventInfo    = workerResult.eventInfo;
+    tileCells           = workerResult.tileCells;
+    larCells            = workerResult.larCells;
+    hecCells            = workerResult.hecCells;
+    mbtsCells           = workerResult.mbtsCells;
+    fcalCells           = workerResult.fcalCells;
+    tilePacked          = workerResult.tilePacked;
+    larPacked           = workerResult.larPacked;
+    hecPacked           = workerResult.hecPacked;
+    rawPhotons          = workerResult.photons;
+    rawClusters         = workerResult.clusters;
+    _clusterCollections = workerResult.clusterCollections;
+    // Worker returns plain {x,y,z} objects; reconstruct THREE.Vector3 here.
+    rawTracks = workerResult.tracks.map(t => ({
+      ...t, pts: t.pts.map(p => new THREE.Vector3(p.x, p.y, p.z)),
+    }));
+  } else {
+    // ── Fallback: synchronous parse on main thread ─────────────────────────
+    try { doc = parseXmlDoc(xmlText); }
+    catch (e) { setStatus(`<span class="err">${esc(e.message)}</span>`); return; }
+    currentEventInfo = parseEventInfo(doc);
+    try { tileCells = parseTile(doc); } catch { tileCells = []; }
+    try { larCells  = parseLAr(doc);  } catch { larCells  = []; }
+    try { hecCells  = parseHec(doc);  } catch { hecCells  = []; }
+    try { mbtsCells = parseMBTS(doc); } catch { mbtsCells = []; }
+    try { fcalCells = parseFcal(doc); } catch { fcalCells = []; }
+    try { rawTracks  = parseTracks(doc);  } catch (e) { console.warn('Track parse error', e); }
+    try { rawPhotons = parsePhotons(doc); } catch (e) { console.warn('Photon parse error', e); }
+    // parseClusters is called later (after resetScene) to preserve its
+    // lastClusterData side-effect in the correct order.
+  }
+  rawTracks = filterPhotonDuplicateTracks(rawTracks, rawPhotons);
 
   const total = tileCells.length + larCells.length + hecCells.length + mbtsCells.length;
   if (!total && !fcalCells.length) { setStatus('<span class="warn">No TILE, LAr, HEC, MBTS or FCAL cells found</span>'); return; }
 
   setStatus(`Decoding ${total} cells…`);
-  resetScene();
+  resetScene();  // clears lastClusterData
 
   // ── Particle tracks ─────────────────────────────────────────────────────────
-  try {
-    const raw = parseTracks(doc);
-    if (raw.length) {
-      trackPtMinGev = 0;
-      trackPtMaxGev = 5;
-      thrTrackGev   = 2;
-      trackPtSlider.update(0, 5);
-    }
-    drawTracks(raw);
-  } catch (e) { console.warn('Track parse error', e); }
+  if (rawTracks.length || rawPhotons.length) {
+    let ptMax = 5;
+    for (const { ptGev } of rawTracks)  if (isFinite(ptGev)  && ptGev  > ptMax) ptMax = ptGev;
+    for (const { ptGev } of rawPhotons) if (isFinite(ptGev)  && ptGev  > ptMax) ptMax = ptGev;
+    trackPtSlider.update(0, ptMax);
+  }
+  try { drawTracks(rawTracks);   } catch (e) { console.warn('Track draw error', e); }
+  try { drawPhotons(rawPhotons); } catch (e) { console.warn('Photon draw error', e); }
 
   // ── Cluster η/φ lines ────────────────────────────────────────────────────────
   try {
-    const rawClusters = parseClusters(doc);
+    // Fallback: parse clusters now (after resetScene) so lastClusterData is set.
+    // Worker path: restore lastClusterData from the pre-parsed collections.
+    if (!workerResult) rawClusters = parseClusters(doc);
+    else lastClusterData = { collections: _clusterCollections };
     if (rawClusters.length) {
       let etMin = Infinity, etMax = -Infinity;
       for (const { etGev } of rawClusters) {
@@ -2015,25 +2425,23 @@ async function processXml(xmlText) {
   const _missLog = { TILE: [], LAR: [], HEC: [], MBTS: [] };
   const _logMiss = (kind, msg) => { if (_missLog[kind].length < _MISS_SAMPLE) _missLog[kind].push(msg); };
 
-  // ── Bulk decode: one WASM call per detector replaces N individual FFI calls ──
-  // Array.join avoids the O(n²) growth of repeated `s += ' ' + id` (V8 builds
-  // ropes but each branch still costs a heap allocation we can skip).
-  function idsToStr(cells) {
-    const arr = new Array(cells.length);
-    for (let i = 0; i < cells.length; i++) arr[i] = cells[i].id;
-    return arr.join(' ');
+  // ── Bulk WASM decode (fallback path only — worker already did it above) ────
+  if (!workerResult) {
+    const idsToStr = (cells) => {
+      const arr = new Array(cells.length);
+      for (let i = 0; i < cells.length; i++) arr[i] = cells[i].id;
+      return arr.join(' ');
+    };
+    const _packs = await _wasmPool.parse(
+      tileCells.length ? idsToStr(tileCells) : null,
+      larCells.length  ? idsToStr(larCells)  : null,
+      hecCells.length  ? idsToStr(hecCells)  : null,
+    );
+    if (rid !== _procXmlRid) return;
+    tilePacked = _packs.tile;
+    larPacked  = _packs.lar;
+    hecPacked  = _packs.hec;
   }
-  const _packs = await _wasmPool.parse(
-    tileCells.length ? idsToStr(tileCells) : null,
-    larCells.length  ? idsToStr(larCells)  : null,
-    hecCells.length  ? idsToStr(hecCells)  : null,
-  );
-  // Another event may have started while the worker was busy — if so, drop
-  // this reply on the floor so we don't overwrite the fresher scene state.
-  if (rid !== _procXmlRid) return;
-  const tilePacked = _packs.tile;
-  const larPacked  = _packs.lar;
-  const hecPacked  = _packs.hec;
 
   // ── TileCal cells ─────────────────────────────────────────────────────────
   // The event loop paints colors via setColorAt; visibility is decided by
@@ -2634,9 +3042,10 @@ let   lastRay    = 0;
 let   mousePos = { x: 0, y: 0 };
 function doRaycast(clientX, clientY) {
   const hasTrackLines   = trackGroup   && trackGroup.visible   && trackGroup.children.length   > 0;
+  const hasPhotonLines  = photonGroup  && photonGroup.visible  && photonGroup.children.length  > 0;
   const hasClusterLines = clusterGroup && clusterGroup.visible && clusterGroup.children.length > 0;
   const hasFcalTubes    = fcalGroup && fcalGroup.children.some(c => c.isInstancedMesh) && fcalVisibleMap.length > 0;
-  if (!showInfo || cinemaMode || (!active.size && !hasTrackLines && !hasClusterLines && !hasFcalTubes)) { tooltip.hidden = true; clearOutline(); return; }
+  if (!showInfo || cinemaMode || (!active.size && !hasTrackLines && !hasPhotonLines && !hasClusterLines && !hasFcalTubes)) { tooltip.hidden = true; clearOutline(); return; }
   // Don't show cell info when the pointer is over any UI element (panels, toolbar, overlays)
   const topEl = document.elementFromPoint(clientX, clientY);
   if (topEl && topEl !== canvas) { tooltip.hidden = true; clearOutline(); return; }
@@ -2697,16 +3106,19 @@ function doRaycast(clientX, clientY) {
       tooltip.hidden = false; dirty = true; return;
     }
   }
-  // ── Track hit ─────────────────────────────────────────────────────────────
-  if (hasTrackLines) {
-    const visibleTracks = trackGroup.children.filter(c => c.visible);
-    const trackHits = raycast.intersectObjects(visibleTracks, false);
-    if (trackHits.length) {
-      const line         = trackHits[0].object;
+  // ── Track / Photon hit (pick closest) ────────────────────────────────────
+  if (hasTrackLines || hasPhotonLines) {
+    const candidates = [];
+    if (hasTrackLines)  candidates.push(...trackGroup.children.filter(c => c.visible));
+    if (hasPhotonLines) candidates.push(...photonGroup.children.filter(c => c.visible));
+    const hits = raycast.intersectObjects(candidates, false);
+    if (hits.length) {
+      const line         = hits[0].object;
       const ptGev        = line.userData.ptGev        ?? 0;
       const storeGateKey = line.userData.storeGateKey ?? '';
+      const isPhoton     = photonGroup && photonGroup.children.includes(line);
       clearOutline();
-      tipCellEl.textContent  = 'Track';
+      tipCellEl.textContent  = isPhoton ? 'Photon' : 'Track';
       tipCoordEl.textContent = storeGateKey;
       tipEEl.textContent     = `${ptGev.toFixed(3)} GeV`;
       if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';
@@ -3051,7 +3463,9 @@ function syncTracksBtn() {
 }
 function toggleTracks() {
   tracksVisible = !tracksVisible;
-  if (trackGroup) trackGroup.visible = tracksVisible;
+  if (trackGroup)  trackGroup.visible  = tracksVisible;
+  if (photonGroup) photonGroup.visible = tracksVisible;
+  updateTrackAtlasIntersections();
   syncTracksBtn();
   dirty = true;
 }
@@ -3069,6 +3483,8 @@ function toggleClusters() {
   dirty = true;
 }
 document.getElementById('btn-cluster').addEventListener('click', toggleClusters);
+
+
 document.addEventListener('click', () => {
   if (layersPanelOpen) closeLayersPanel();
   if (atlasPanelOpen)  closeAtlasPanel();
