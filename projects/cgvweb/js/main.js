@@ -1,250 +1,60 @@
 import * as THREE        from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
 import { initLanguage, setupLanguagePicker, t } from './i18n/index.js';
-
-// ── WASM parser: off-main-thread worker with synchronous fallback ────────────
-// The WASM ATLAS-ID parser runs in a dedicated Web Worker so that the per-event
-// bulk decode (tens of thousands of IDs) never blocks the render thread. The
-// main thread posts three whitespace-joined ID strings (TILE/LAR/HEC); the
-// worker returns three Int32Array packs via `postMessage`'s transferList for
-// zero-copy hand-off. If the Worker API is unavailable or the worker crashes at
-// init we fall back to importing the WASM module directly on the main thread.
-class _WasmParserPool {
-  constructor() {
-    this._worker = null;
-    this._ready = false;
-    this._rid = 0;
-    this._pending = new Map();
-    this._fallbackFn = null;
-    this._initPromise = null;
-  }
-  init() {
-    if (this._initPromise) return this._initPromise;
-    this._initPromise = (async () => {
-      if (typeof Worker !== 'undefined') {
-        try {
-          const w = new Worker(new URL('./wasm_worker.js', import.meta.url), { type: 'module' });
-          w.onmessage = (ev) => this._onMessage(ev);
-          w.onerror   = (e) => { console.warn('[wasm worker] runtime error', e && e.message); };
-          await new Promise((resolve, reject) => {
-            const to = setTimeout(() => reject(new Error('wasm worker init timeout')), 20000);
-            const onMsg = (ev) => {
-              if (ev.data && ev.data.type === 'ready') {
-                clearTimeout(to);
-                w.removeEventListener('message', onMsg);
-                resolve();
-              }
-            };
-            w.addEventListener('message', onMsg);
-            w.postMessage({ type: 'init' });
-          });
-          this._worker = w;
-          this._ready  = true;
-          return;
-        } catch (e) {
-          console.warn('[wasm worker] unavailable, falling back to main-thread WASM:', e && e.message);
-        }
-      }
-      await this._initFallback();
-    })();
-    return this._initPromise;
-  }
-  async _initFallback() {
-    const mod = await import('../parser/pkg/atlas_id_parser.js');
-    await mod.default();
-    this._fallbackFn = mod.parse_atlas_ids_bulk;
-    this._ready = true;
-  }
-  _onMessage(ev) {
-    const m = ev.data;
-    if (!m) return;
-    if (m.type === 'ready') return;
-    const pend = this._pending.get(m.rid);
-    if (!pend) return;
-    this._pending.delete(m.rid);
-    if (m.type === 'error') pend.reject(new Error(m.message || 'wasm worker error'));
-    else pend.resolve(m);
-  }
-  /** Parse three whitespace-joined ID strings; any may be empty/null.
-   *  Returns { tile, lar, hec } of Int32Array | null. */
-  parse(tileStr, larStr, hecStr) {
-    if (this._worker) {
-      const rid = ++this._rid;
-      return new Promise((resolve, reject) => {
-        this._pending.set(rid, { resolve, reject });
-        this._worker.postMessage({
-          type: 'parse', rid,
-          tile: tileStr || '', lar: larStr || '', hec: hecStr || '',
-        });
-      }).then(({ tile, lar, hec }) => ({ tile, lar, hec }));
-    }
-    // Fallback: main-thread sync WASM (already awaited in init())
-    const f = this._fallbackFn;
-    return Promise.resolve({
-      tile: tileStr && f ? f(tileStr) : null,
-      lar:  larStr  && f ? f(larStr)  : null,
-      hec:  hecStr  && f ? f(hecStr)  : null,
-    });
-  }
-  /** Parse XML text and bulk-decode ATLAS IDs entirely in the worker.
-   *  Returns the full parseXmlResult message, or null if no worker is available
-   *  (caller must fall back to inline parsing + parse()). */
-  parseXmlAndDecode(xmlText) {
-    if (!this._worker) return Promise.resolve(null);
-    const rid = ++this._rid;
-    return new Promise((resolve, reject) => {
-      this._pending.set(rid, { resolve, reject });
-      this._worker.postMessage({ type: 'parseXmlAndDecode', rid, xmlText });
-    });
-  }
-}
-const _wasmPool = new _WasmParserPool();
-
-// Subsystem codes returned by parse_atlas_ids_bulk (slot [0] of each 6-i32 record)
-const SUBSYS_TILE     = 1;
-const SUBSYS_LAR_EM   = 2;
-const SUBSYS_LAR_HEC  = 3;
+import { setupLiveMode } from './liveMode.js';
+import { setupSidebarControls } from './sidebarControls.js';
+import { createSlicerController } from './slicer.js';
+import { setupLocalMode } from './localMode.js';
+import { setupSampleMode } from './sampleMode.js';
+import { registerViewerShortcuts } from './viewerShortcuts.js';
+import {
+  _wasmPool, SUBSYS_TILE, SUBSYS_LAR_EM, SUBSYS_LAR_HEC,
+  meshByKey, cellMeshesByDet, active, rayTargets,
+  _ZERO_MAT4, _markIMDirty, _flushIMDirty,
+  _allCellIMeshes, _rayIMeshes,
+  _tileKey, _larEmKey, _hecKey,
+} from './state.js';
+import {
+  PAL_TILE_COLOR, PAL_HEC_COLOR, PAL_LAR_COLOR,
+  matTile, matHec, matLAr,
+  TILE_SCALE, HEC_SCALE, LAR_SCALE, FCAL_SCALE,
+  palColorTile, palColorHec, palColorLAr, palColorFcalRgb,
+} from './palette.js';
+import { setLoadProgress, dismissLoadingScreen, bumpReq } from './loading.js';
+import {
+  markDirty, isDirty, clearDirty,
+  canvas, renderer, scene, camera, controls, dirLight,
+} from './renderer.js';
+import {
+  GHOST_MESH_NAMES, ghostVisible, ghostMeshByName,
+  anyGhostOn, applyGhostMeshOne, applyAllGhostMeshes, syncGhostToggles,
+  toggleGhostByName, setAllGhosts, toggleAllGhosts,
+  enableDefaultGhosts, updateGhostColors,
+} from './ghost.js';
+import {
+  cellLabel, HEC_NAMES, HEC_INNER,
+  physLarEmEta, physLarEmPhi, physLarHecEta, physLarHecPhi,
+  physTileEta, physTilePhi, _wrapPhi,
+} from './coords.js';
+import { initScene } from './loader.js';
+import {
+  parseXmlDoc, parseEventInfo,
+  parseTile, parseLAr, parseHec, parseMBTS, parseFcal,
+  parseTracks, parsePhotons, parseClusters,
+} from './parser.js';
+import { setupColorPicker } from './colorpicker.js';
+import { setupCinemaControls } from './cinema.js';
+import { setupScreenshotControls } from './screenshot.js';
+import { setupDetectorPanels } from './detectorPanels.js';
+import { fmtSize, esc, makeRelTime } from './utils.js';
+import { createDownloadProgressController } from './progress.js';
 
 let LivePoller = null;
 try { ({ LivePoller } = await import('../live_atlas/live_cern/live_poller.js')); } catch (_) {}
 
-// i18n
 initLanguage();
 setupLanguagePicker();
 
-// State
-// Cell "handles" replace one-Mesh-per-cell. A handle is an opaque stable
-// object identifying one instance inside an InstancedMesh, with enough info
-// to toggle visibility (zero-scale the matrix), paint it (setColorAt), or
-// build its hover/outline geometry (origMatrix + shared cell geometry).
-//   handle = { iMesh, instId, det, name, origMatrix: Matrix4, visible: bool, _center?: Vector3 }
-const meshByKey  = new Map();   // int -> handle (hot-path: event loop lookup)
-// Every non-envelope cell handle, grouped by detector. Populated once at load
-// so "show all cells" can reach cells whose names bypass meshNameToKey
-// (gap scintillators, ITC cells).
-const cellMeshesByDet = { TILE: [], LAR: [], HEC: [] };
-let   active     = new Map();   // handle -> tooltip data (keyed by object reference)
-let   rayTargets = [];          // InstancedMesh[] with ≥1 visible active instance
-
-// Shared constants for InstancedMesh bookkeeping.
-// Zero-determinant matrix: hides an instance (collapses its geometry to a
-// point; degenerate triangles are rejected by the rasterizer AND the raycaster).
-const _ZERO_MAT4 = new THREE.Matrix4().set(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0);
-const _dirtyIM = new Set();
-function _markIMDirty(iMesh) { _dirtyIM.add(iMesh); }
-function _flushIMDirty() {
-  for (const im of _dirtyIM) {
-    im.instanceMatrix.needsUpdate = true;
-    if (im.instanceColor) im.instanceColor.needsUpdate = true;
-    // Recompute bounding sphere for raycasting, skipping hidden instances.
-    // Three.js's computeBoundingSphere() calls Sphere.applyMatrix4(_ZERO_MAT4)
-    // which evaluates w = 1/det = 1/0 = Infinity → NaN center, poisoning the
-    // sphere and making ray.intersectsSphere always return false (no tooltip).
-    // Fix: skip any instance where elements[15] == 0 (our zero-matrix sentinel).
-    if (!im.geometry.boundingSphere) im.geometry.computeBoundingSphere();
-    if (!im.boundingSphere) im.boundingSphere = new THREE.Sphere();
-    im.boundingSphere.makeEmpty();
-    for (let i = 0; i < im.count; i++) {
-      im.getMatrixAt(i, _bsMat);
-      if (_bsMat.elements[15] === 0) continue;
-      _bsSph.copy(im.geometry.boundingSphere).applyMatrix4(_bsMat);
-      im.boundingSphere.union(_bsSph);
-    }
-    if (im.boundingSphere.isEmpty()) im.boundingSphere.set(new THREE.Vector3(), 0);
-  }
-  _dirtyIM.clear();
-}
-// All cell InstancedMeshes (one per unique detector+geometry pair), for bulk
-// raycasting and reset sweeps.
-const _allCellIMeshes = [];
-const _rayIMeshes = new Set();
-
-// Reusable temporaries for bounding-sphere computation (avoids per-frame GC).
-const _bsMat   = new THREE.Matrix4();
-const _bsSph   = new THREE.Sphere();
-
-// Integer key encoding: avoids string construction in the per-cell hot path.
-// Bits [1:0] = detector type tag: TILE=0b00, LAr EM=0b01, HEC=0b10 (no cross-type collision).
-// TILE:   layer(5b<<2) | pn(1b<<7) | ieta(4b<<8) | module(6b<<12) - 18 bits total
-// LAr EM: (eb-1)(2b<<2) | sampling(2b<<4) | region(3b<<6) | pn(1b<<9) | eta(9b<<10) | phi(8b<<19)
-// HEC:    group(2b<<2) | region(1b<<4) | pn(1b<<5) | eta(5b<<6) | phi(6b<<11)
-const _tileKey  = (layer, pn, ieta, mod) => (layer<<2)|(pn<<7)|(ieta<<8)|(mod<<12);
-const _larEmKey = (eb, sampling, region, pn, eta, phi) => 1|((eb-1)<<2)|(sampling<<4)|(region<<6)|(pn<<9)|(eta<<10)|(phi<<19);
-const _hecKey   = (group, region, pn, eta, phi) => 2|(group<<2)|(region<<4)|(pn<<5)|(eta<<6)|(phi<<11);
-
-// Parse a GLB mesh name string into its integer key (called once per mesh at load time).
-function meshNameToKey(name) {
-  const S = '\u2192';
-  const a = name.indexOf(S); if (a < 0) return null;
-  const b = name.indexOf(S, a+1); if (b < 0) return null;
-  const c = name.indexOf(S, b+1);
-  const l1 = name.slice(a+1, b);
-  const l2 = c < 0 ? name.slice(b+1) : name.slice(b+1, c);
-  const l3 = c < 0 ? '' : name.slice(c+1);
-  let m;
-  // TILE / MBTS (legacy): Tile{x}{y}_0 -> Tile{x}{y}{k}_{k} -> cell_{mod}
-  if ((m = /^Tile(\d+)([pn])_0$/.exec(l1))) {
-    const layer = +m[1], pn = m[2]==='p' ? 1 : 0;
-    const m2 = /^Tile\d+[pn](\d+)_\d+$/.exec(l2); if (!m2) return null;
-    const m3 = /^cell_(\d+)$/.exec(l3);            if (!m3) return null;
-    return _tileKey(layer, pn, +m2[1], +m3[1]);
-  }
-  // TILE / MBTS (current): T{x}{y}{k}_{k} -> c_{mod}
-  if ((m = /^T(\d+)([pn])(\d+)_\d+$/.exec(l1))) {
-    const layer = +m[1], pn = m[2] === 'p' ? 1 : 0, ieta = +m[3];
-    const m2 = /^c_(\d+)$/.exec(l2); if (!m2) return null;
-    return _tileKey(layer, pn, ieta, +m2[1]);
-  }
-  // LAr EM (legacy): EM{X}_{samp}_{R}_{Z}_{W} -> EM{X}_{samp}_{R}_{Z}_{eta}_{eta} -> cell[2]_{phi}
-  if ((m = /^EM(Barrel|EndCap)_(\d+)_(\d+)_([pn])_\d+$/.exec(l1))) {
-    const eb = m[1]==='Barrel' ? 1 : +m[3], sampling = +m[2], region = +m[3], pn = m[4]==='p' ? 1 : 0;
-    const m2 = /^EM(?:Barrel|EndCap)_\d+_\d+_[pn]_(\d+)_\d+$/.exec(l2); if (!m2) return null;
-    const m3 = /^cell(2?)_(\d+)$/.exec(l3);                               if (!m3) return null;
-    return _larEmKey(eb, sampling, region, pn, +m2[1], +m3[2]);
-  }
-  // LAr EM (current barrel): EB_{samp}_{region}_{Z}_{eta}_{eta} -> c[2]_{phi}
-  if ((m = /^EB_(\d+)_(\d+)_([pn])_(\d+)_\d+$/.exec(l1))) {
-    const sampling = +m[1], region = +m[2], pn = m[3] === 'p' ? 1 : 0, eta = +m[4];
-    const m2 = /^c(2?)_(\d+)$/.exec(l2); if (!m2) return null;
-    return _larEmKey(1, sampling, region, pn, eta, +m2[2]);
-  }
-  // LAr EM (current endcap): EE_{samp}_{abs_be}_{Z}_{eta}_{eta} -> c[2]_{phi}
-  if ((m = /^EE_(\d+)_(\d+)_([pn])_(\d+)_\d+$/.exec(l1))) {
-    const sampling = +m[1], eb = +m[2], pn = m[3] === 'p' ? 1 : 0, eta = +m[4];
-    const m2 = /^c(2?)_(\d+)$/.exec(l2); if (!m2) return null;
-    return _larEmKey(eb, sampling, eb, pn, eta, +m2[2]);
-  }
-  // HEC (legacy): HEC_{name}_{region}_{Z}_0 -> HEC_{name}_{region}_{Z}_{cum}_{cum} -> cell_{phi}
-  if ((m = /^HEC_(\w+)_(\d+)_([pn])_0$/.exec(l1))) {
-    const group = HEC_NAMES.indexOf(m[1]); if (group < 0) return null;
-    const m2 = /^HEC_\w+_\d+_[pn]_(\d+)_\d+$/.exec(l2); if (!m2) return null;
-    const m3 = /^cell_(\d+)$/.exec(l3);                   if (!m3) return null;
-    return _hecKey(group, +m[2], m[3]==='p' ? 1 : 0, +m2[1], +m3[1]);
-  }
-  // HEC (current): H_{group}_{region}_{Z}_{cum}_{cum} -> c_{phi}
-  if ((m = /^H_(\d+)_(\d+)_([pn])_(\d+)_\d+$/.exec(l1))) {
-    const group = HEC_NAMES.indexOf(m[1]); if (group < 0) return null;
-    const m2 = /^c_(\d+)$/.exec(l2); if (!m2) return null;
-    return _hecKey(group, +m[2], m[3] === 'p' ? 1 : 0, +m[4], +m2[1]);
-  }
-  return null;
-}
-
-// Broader detector classifier for show-all-cells mode — matches every cell
-// mesh (leaves, not envelopes) regardless of whether meshNameToKey accepted it.
-// Envelopes are skipped via the ghost-envelope list.
-function classifyCellDet(name) {
-  if (ghostVisible.has(name)) return null;
-  const parts = name.split('\u2192');
-  if (parts.length < 3) return null;               // envelopes have 2 segments in both naming schemes
-  for (const p of parts) {
-    if (p.startsWith('EB_') || p.startsWith('EE_')) return 'LAR';
-    if (p.startsWith('H_'))                         return 'HEC';
-    if (/^T\d/.test(p))                             return 'TILE';
-  }
-  return null;
-}
 
 let tileMaxMev = 1, tileMinMev = 0;
 let larMaxMev  = 1, larMinMev  = 0;
@@ -261,19 +71,14 @@ let showFcal   = true;
 
 let wasmOk     = false;
 let sceneOk    = false;
-let dirty      = true;
-let curEvtId   = null;
 let isLive     = true;
 let showInfo   = true;
-let cinemaMode = false;
 
 // Ghost visibility is tracked per-mesh in `ghostVisible` (see GHOST_MESH_NAMES).
 let beamGroup  = null;
 let beamOn     = false;
-let panelPinned  = true;
-let panelHovered = false;
-let reqCount     = 0;
 let allOutlinesMesh = null;
+let sidebarControls = null;
 let trackGroup    = null;
 let clusterGroup  = null;
 let photonGroup   = null;
@@ -286,161 +91,7 @@ let activeMbtsLabels      = null;  // null = no cluster filter; Set<string> = MB
 let clusterFilterEnabled  = true;
 let _readyFired  = false;
 
-// Loading screen helpers
-const _loadBar = document.getElementById('loading-bar');
-const _loadMsg = document.getElementById('loading-msg');
 
-// RAF loop: eases _barCurrent toward _barTarget, plus an asymptotic creep so
-// the bar is never truly frozen during the GLB parse phase.
-// Creep ceiling: 79% - success callback jumps to 100%.
-let _barTarget  = 0;
-let _barCurrent = 0;
-let _barRafId   = null;
-function _barTick() {
-  // Asymptotic creep toward 79% (visible during parse phase, never freezes)
-  if (_barTarget < 79) {
-    _barTarget += (79 - _barTarget) * 0.003;
-  }
-  const gap = _barTarget - _barCurrent;
-  _barCurrent += gap > 0.05 ? gap * 0.1 : gap;
-  if (_loadBar) _loadBar.style.width = _barCurrent.toFixed(2) + '%';
-  _barRafId = requestAnimationFrame(_barTick);
-}
-_barRafId = requestAnimationFrame(_barTick);
-
-function setLoadProgress(pct, msg) {
-  _barTarget = Math.max(_barTarget, Math.min(100, pct));
-  if (_loadMsg && msg) _loadMsg.textContent = msg;
-}
-
-function dismissLoadingScreen() {
-  const overlay = document.getElementById('loading-overlay');
-  if (!overlay) return;
-  cancelAnimationFrame(_barRafId); _barRafId = null;
-  if (_loadBar) _loadBar.style.width = '100%';
-  overlay.classList.add('done');
-  setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 750);
-}
-
-const reqBadge = document.getElementById('req-badge');
-function bumpReq() {
-  reqCount++;
-  if (reqBadge) reqBadge.textContent = `${reqCount} req`;
-}
-
-// Palette helpers
-const PAL_N = 256;
-
-// Palette ramps (256 entries each). With InstancedMesh we no longer need one
-// Material per palette bin — one shared material per detector plus per-instance
-// colors via setColorAt gives identical visuals at a fraction of the GPU state.
-function _rampTile(t) {
-  t = Math.max(0, Math.min(1, t));
-  return new THREE.Color(
-    1.000 + t * (0.502 - 1.000),       // R: 1.0 -> 0.502
-    1.000 + t * (0.000 - 1.000),       // G: 1.0 -> 0.0
-    0.0                                 // B: always 0
-  );
-}
-function _rampHec(t) {
-  t = Math.max(0, Math.min(1, t));
-  return new THREE.Color(
-    0.4000 + t * (0.0471 - 0.4000),   // R: 0.40 -> 0.05
-    0.8784 + t * (0.0118 - 0.8784),   // G: 0.88 -> 0.01
-    0.9647 + t * (0.4078 - 0.9647)    // B: 0.96 -> 0.41
-  );
-}
-function _rampLAr(t) {
-  t = Math.max(0, Math.min(1, t));
-  return new THREE.Color(
-    0.0902 + t * (0.1529 - 0.0902),   // R: 0.09 -> 0.15
-    0.8118 + t * (0.0000 - 0.8118),   // G: 0.81 -> 0
-    0.2588                              // B: constant
-  );
-}
-const _mkPal = ramp => Array.from({ length: PAL_N }, (_, i) => {
-  const c = ramp(i / (PAL_N - 1));
-  c.offsetHSL(0, 0.35, 0);  // boost saturation, keep hue & lightness
-  return c;
-});
-const PAL_TILE_COLOR = _mkPal(_rampTile);
-const PAL_HEC_COLOR  = _mkPal(_rampHec);
-const PAL_LAR_COLOR  = _mkPal(_rampLAr);
-
-// Shared cell materials — one per detector. Instance-color is applied by
-// InstancedMesh.setColorAt on top of the material's base white; the per-bin
-// ramp colors live in PAL_*_COLOR instead of per-Material instances.
-const matTile = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide, flatShading: true });
-const matHec  = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide, flatShading: true });
-const matLAr  = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide, flatShading: true });
-
-const TILE_SCALE = 2000;
-const HEC_SCALE  = 5000;
-const LAR_SCALE  = 1000; // MeV - fixed 0-1 GeV
-const _palIdx = (v, s) => Math.round(Math.max(0, Math.min(1, v / s)) * (PAL_N - 1));
-function palColorTile(eMev) { return PAL_TILE_COLOR[_palIdx(eMev, TILE_SCALE)]; }
-function palColorHec (eMev) { return PAL_HEC_COLOR [_palIdx(eMev, HEC_SCALE)];  }
-function palColorLAr (eMev) { return PAL_LAR_COLOR [_palIdx(eMev, LAR_SCALE)];  }
-
-// Palette FCAL: copper ramp (deep patina -> molten copper -> hot gold)
-// Non-linear curve (gamma 0.55) keeps low energies dark and lets high values
-// pop visibly; stops: #1a0600 -> #6b2310 -> #c8642a -> #ffb26a -> #ffeabe
-const FCAL_SCALE = 7000; // MeV slider range (7 GeV)
-const _FCAL_STOPS = [
-  [0.102, 0.024, 0.000], // 0.00  deep patina
-  [0.420, 0.137, 0.063], // 0.25  oxidised copper
-  [0.784, 0.392, 0.165], // 0.55  molten copper
-  [1.000, 0.698, 0.416], // 0.80  bright copper
-  [1.000, 0.918, 0.745], // 1.00  hot highlight
-];
-const _FCAL_STEPS = [0.0, 0.25, 0.55, 0.80, 1.0];
-function palColorFcalRgb(t) {
-  t = Math.max(0, Math.min(1, t));
-  t = Math.pow(t, 0.55);  // gamma boost so the upper range dominates
-  for (let i = 1; i < _FCAL_STEPS.length; i++) {
-    if (t <= _FCAL_STEPS[i]) {
-      const k = (t - _FCAL_STEPS[i-1]) / (_FCAL_STEPS[i] - _FCAL_STEPS[i-1]);
-      const a = _FCAL_STOPS[i-1], b = _FCAL_STOPS[i];
-      return [a[0]+(b[0]-a[0])*k, a[1]+(b[1]-a[1])*k, a[2]+(b[2]-a[2])*k];
-    }
-  }
-  return _FCAL_STOPS[_FCAL_STOPS.length-1];
-}
-
-// Ghost: calorimeter envelope meshes
-// All envelope meshes from the .glb share a single ghost material (same color,
-// same opacity) so they render as a visually unified outline regardless of any
-// material that might have been assigned by the exporter.
-const GHOST_MESH_NAMES = [
-  'C→LBTile_0',
-  'C→EBTilep_0',
-  'C→EBTilen_0',
-  'Calorimeter→LBTile_0',
-  'Calorimeter→LBTileLArg_0',
-  'Calorimeter→LBLArg_0',
-  'Calorimeter→EBTilep_0',
-  'Calorimeter→EBTilen_0',
-  'Calorimeter→EBTileHECp_0',
-  'Calorimeter→EBTileHECn_0',
-  'Calorimeter→EBHECp_0',
-  'Calorimeter→EBHECn_0',
-];
-// Ghosts enabled by default on startup (the TileCal envelopes).
-const GHOST_DEFAULT_ON = new Set([
-  'C→LBTile_0',
-  'C→EBTilep_0',
-  'C→EBTilen_0',
-  'Calorimeter→LBTile_0',
-  'Calorimeter→LBTileLArg_0',
-  'Calorimeter→EBTilep_0',
-  'Calorimeter→EBTilen_0',
-  'Calorimeter→EBTileHECp_0',
-  'Calorimeter→EBTileHECn_0',
-]);
-// Per-ghost visibility state (name -> bool); seeded from defaults at boot.
-const ghostVisible = new Map();
-for (const n of GHOST_MESH_NAMES) ghostVisible.set(n, GHOST_DEFAULT_ON.has(n));
-const ghostMeshByName = new Map();
 
 // ── Atlas structural geometry (from atlas.root merged into GLB) ───────────────
 const atlasMat = new THREE.MeshBasicMaterial({
@@ -568,13 +219,6 @@ function _resolveTrackAtlasTargets() {
   return { nodes, meshes, outlineMeshes };
 }
 
-function _refreshNodeCb(node) {
-  if (!node?.cbEl) return;
-  const v = node.allMeshes.filter(m => m.visible).length;
-  node.cbEl.checked       = node.allMeshes.length > 0 && v === node.allMeshes.length;
-  node.cbEl.indeterminate = v > 0 && v < node.allMeshes.length;
-}
-
 const _trackAtlasTrackBox = new THREE.Box3();
 
 function updateTrackAtlasIntersections() {
@@ -651,354 +295,17 @@ function updateTrackAtlasIntersections() {
       line.material = hitTracks.has(line) ? TRACK_HIT_MAT : TRACK_MAT;
   }
   if (!changed) return;
-
-  for (const node of nodes) {
-    _refreshNodeCb(node);
-    if (node.parent) _syncAncestorCb(node.parent);
-  }
-  syncAtlasBtn();
-  dirty = true;
-}
-
-// Build a tree from mesh name paths "atlas→A→B→...".
-// Each node: { name, parent, children: Map, meshes: Mesh[], allMeshes: Mesh[], cbEl: null }
-function _buildAtlasTree(meshes) {
-  const root = { name: 'atlas', parent: null, children: new Map(), meshes: [], allMeshes: [], cbEl: null };
-  for (const mesh of meshes) {
-    const parts = mesh.name.split('→');
-    let node = root;
-    for (let i = 1; i < parts.length; i++) {
-      if (!node.children.has(parts[i]))
-        node.children.set(parts[i], { name: parts[i], parent: node, children: new Map(), meshes: [], allMeshes: [], cbEl: null });
-      node = node.children.get(parts[i]);
-      if (i === parts.length - 1) node.meshes.push(mesh);
-    }
-  }
-  const propagate = n => {
-    n.allMeshes = [...n.meshes];
-    for (const c of n.children.values()) { propagate(c); n.allMeshes.push(...c.allMeshes); }
-  };
-  propagate(root);
-  return root;
-}
-
-// Render one tree node as DOM. Children are lazily rendered on first expand.
-function _renderAtlasNode(node, depth) {
-  const hasChildren = node.children.size > 0;
-  const wrap = document.createElement('div');
-  const row  = document.createElement('div');
-  row.className = 'atlas-row';
-  row.style.paddingLeft = (depth * 14 + 4) + 'px';
-
-  const chev = document.createElement('span');
-  chev.className = 'atlas-chev';
-  chev.textContent = hasChildren ? '▶' : '';
-
-  const cb = document.createElement('input');
-  cb.type = 'checkbox'; cb.className = 'atlas-cb';
-  const vis = node.allMeshes.filter(m => m.visible).length;
-  cb.checked       = node.allMeshes.length > 0 && vis === node.allMeshes.length;
-  cb.indeterminate = vis > 0 && vis < node.allMeshes.length;
-  node.cbEl = cb;
-
-  const lbl = document.createElement('span');
-  lbl.className = 'atlas-lbl';
-  lbl.textContent = node.name;
-
-  const cnt = document.createElement('span');
-  cnt.className = 'atlas-cnt';
-  cnt.textContent = node.allMeshes.length;
-
-  row.append(chev, cb, lbl, cnt);
-  wrap.appendChild(row);
-
-  if (hasChildren) {
-    const childWrap = document.createElement('div');
-    childWrap.className = 'atlas-children';
-    childWrap.hidden = true;
-    wrap.appendChild(childWrap);
-    let expanded = false;
-    const toggle = () => {
-      expanded = !expanded;
-      childWrap.hidden = !expanded;
-      chev.textContent = expanded ? '▼' : '▶';
-      if (expanded && !childWrap.firstChild)
-        for (const c of node.children.values())
-          childWrap.appendChild(_renderAtlasNode(c, depth + 1));
-    };
-    chev.addEventListener('click', e => { e.stopPropagation(); toggle(); });
-    row.addEventListener('click',  e => { if (e.target !== cb) toggle(); });
-  }
-
-  cb.addEventListener('change', () => _setNodeVisible(node, cb.checked));
-  return wrap;
-}
-
-// Toggle visibility of all meshes in subtree; sync all checkboxes.
-function _setNodeVisible(node, on) {
-  for (const m of node.allMeshes) m.visible = on;
-  _syncSubtreeCb(node, on);
-  if (node.parent) _syncAncestorCb(node.parent);
-  syncAtlasBtn();
-  dirty = true;
-}
-// Push a definite on/off state down the rendered subtree.
-function _syncSubtreeCb(node, on) {
-  if (node.cbEl) { node.cbEl.checked = on; node.cbEl.indeterminate = false; }
-  for (const c of node.children.values()) _syncSubtreeCb(c, on);
-}
-// Walk up and recompute indeterminate/checked state from actual mesh count.
-function _syncAncestorCb(node) {
-  if (node.cbEl) {
-    const v = node.allMeshes.filter(m => m.visible).length;
-    node.cbEl.checked       = v === node.allMeshes.length;
-    node.cbEl.indeterminate = v > 0 && v < node.allMeshes.length;
-  }
-  if (node.parent) _syncAncestorCb(node.parent);
-}
-
-function anyAtlasOn() {
-  return atlasRoot ? atlasRoot.allMeshes.some(m => m.visible) : false;
-}
-function syncAtlasBtn() {
-  document.getElementById('btn-atlas').classList.toggle('on', anyAtlasOn());
-}
-
-// Atlas panel open / close
-const _atlasPanelEl = document.getElementById('atlas-panel');
-let atlasPanelOpen = false;
-function openAtlasPanel() {
-  atlasPanelOpen = true;
-  _atlasPanelEl.classList.add('open');
-  document.getElementById('btn-atlas').classList.add('on');
-  const br = document.getElementById('btn-atlas').getBoundingClientRect();
-  requestAnimationFrame(() => {
-    const pw = _atlasPanelEl.offsetWidth  || 260;
-    const ph = _atlasPanelEl.offsetHeight || 320;
-    let left = br.left + br.width / 2 - pw / 2;
-    let top  = br.top - ph - 10;
-    left = Math.max(6, Math.min(left, window.innerWidth - pw - 6));
-    top  = Math.max(6, top);
-    _atlasPanelEl.style.left = left + 'px';
-    _atlasPanelEl.style.top  = top  + 'px';
-  });
-}
-function closeAtlasPanel() {
-  atlasPanelOpen = false;
-  _atlasPanelEl.classList.remove('open');
-  syncAtlasBtn();
-}
-document.getElementById('btn-atlas').addEventListener('click', e => {
-  e.stopPropagation();
-  atlasPanelOpen ? closeAtlasPanel() : openAtlasPanel();
-});
-document.getElementById('atlas-all') .addEventListener('click', () => { if (atlasRoot) _setNodeVisible(atlasRoot, true);  });
-document.getElementById('atlas-none').addEventListener('click', () => { if (atlasRoot) _setNodeVisible(atlasRoot, false); });
-_atlasPanelEl.addEventListener('click', e => e.stopPropagation());
-
-// Fixed ghost colors / opacity - RGB(92,95,102) = #5C5F66; 94% transparent = 6% opacity
-let ghostSolidColor = 0x5C5F66;
-let ghostSolidOpacity = 0.01;  // 94% transparent
-
-const ghostSolidMat = new THREE.MeshBasicMaterial({
-  color: ghostSolidColor, transparent: true, opacity: ghostSolidOpacity,
-  depthWrite: false, side: THREE.DoubleSide,
-});
-// Phi lines: fixed white + high transparency (90%), independent of the alpha
-// slider which only affects the solid envelope. This keeps them as subtle
-// segmentation guides regardless of envelope opacity.
-const GHOST_PHI_FIXED_OPACITY = 0.06;
-const ghostPhiMat = new THREE.LineBasicMaterial({
-  color: 0xFFFFFF, transparent: true, opacity: GHOST_PHI_FIXED_OPACITY, depthWrite: false,
-});
-
-// ── Phi-segmentation lines (TileCal) ─────────────────────────────────────────
-// 64 radial planes in φ, each as a rectangle: 4 edges at r_inner → r_outer,
-// spanning z_min → z_max of each TileCal barrel+ext-barrel envelope.
-//   LB  : r_in=2288  r_out=3835  z = ±2820
-//   EB p: r_in=2288  r_out=3835  z = [3600, 6050]
-//   EB n: r_in=2288  r_out=3835  z = [-6050, -3600]
-const TILE_PHI_SEGS = [
-  { rIn: 2288, rOut: 3835, zMin: -2820, zMax:  2820 },  // LB
-  { rIn: 2288, rOut: 3835, zMin:  3600, zMax:  6050 },  // EB+
-  { rIn: 2288, rOut: 3835, zMin: -6050, zMax: -3600 },  // EB-
-];
-const N_PHI = 64;
-let ghostPhiGroup = null;
-
-function buildPhiLines() {
-  if (ghostPhiGroup) { scene.remove(ghostPhiGroup); ghostPhiGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
-  ghostPhiGroup = new THREE.Group();
-  ghostPhiGroup.renderOrder = 6;
-  ghostPhiGroup.visible = false;
-  for (let i = 0; i < N_PHI; i++) {
-    const phi = (i / N_PHI) * Math.PI * 2;
-    const cx = Math.cos(phi), cy = Math.sin(phi);
-    for (const { rIn, rOut, zMin, zMax } of TILE_PHI_SEGS) {
-      const pts = [
-        new THREE.Vector3(cx * rIn,  cy * rIn,  zMin),
-        new THREE.Vector3(cx * rIn,  cy * rIn,  zMax),
-        new THREE.Vector3(cx * rOut, cy * rOut, zMax),
-        new THREE.Vector3(cx * rOut, cy * rOut, zMin),
-        new THREE.Vector3(cx * rIn,  cy * rIn,  zMin),
-      ];
-      const geo = new THREE.BufferGeometry().setFromPoints(pts);
-      ghostPhiGroup.add(new THREE.Line(geo, ghostPhiMat));
-    }
-  }
-  scene.add(ghostPhiGroup);
-}
-
-function anyGhostOn() {
-  for (const v of ghostVisible.values()) if (v) return true;
-  return false;
-}
-
-// Apply a single ghost mesh's visibility + force the unified ghost material.
-function applyGhostMeshOne(name, visible) {
-  const mesh = ghostMeshByName.get(name);
-  if (!mesh) return;
-  if (visible) {
-    mesh.material    = ghostSolidMat;
-    mesh.renderOrder = 5;
-    mesh.visible     = true;
-  } else {
-    mesh.renderOrder = 0;
-    mesh.visible     = false;
-  }
-}
-
-// Re-apply every ghost's visibility from the ghostVisible map. Safe to call
-// after resetScene, which hides all meshes and restores original materials.
-function applyAllGhostMeshes() {
-  for (const [name, v] of ghostVisible) applyGhostMeshOne(name, v);
-  if (ghostPhiGroup) ghostPhiGroup.visible = anyGhostOn();
-  dirty = true;
-}
-
-function syncGhostToggles() {
-  document.getElementById('btn-ghost').classList.toggle('on', anyGhostOn());
-}
-
-function toggleGhostByName(name) {
-  if (!ghostVisible.has(name)) return;
-  const next = !ghostVisible.get(name);
-  ghostVisible.set(name, next);
-  if (next && !ghostPhiGroup) buildPhiLines();
-  applyGhostMeshOne(name, next);
-  if (ghostPhiGroup) ghostPhiGroup.visible = anyGhostOn();
-  syncGhostToggles();
-  dirty = true;
-}
-
-function setAllGhosts(on) {
-  for (const name of GHOST_MESH_NAMES) ghostVisible.set(name, on);
-  if (on && !ghostPhiGroup) buildPhiLines();
-  applyAllGhostMeshes();
-  syncGhostToggles();
-}
-
-// Keyboard shortcut (G): toggles combined ghost visibility — if any is on,
-// turn everything off; otherwise restore the default TileCal ghost set.
-function toggleAllGhosts() {
-  if (anyGhostOn()) { setAllGhosts(false); return; }
-  for (const name of GHOST_MESH_NAMES) ghostVisible.set(name, GHOST_DEFAULT_ON.has(name));
-  if (!ghostPhiGroup) buildPhiLines();
-  applyAllGhostMeshes();
-  syncGhostToggles();
-}
-
-// Startup: materialise the default ghost set (same path resetScene uses).
-function enableDefaultGhosts() {
-  buildPhiLines();
-  applyAllGhostMeshes();
-  syncGhostToggles();
-}
-
-function updateGhostColors() {
-  ghostSolidMat.color.set(ghostSolidColor);
-  ghostSolidMat.opacity = ghostSolidOpacity;
-  // Phi lines stay locked at white + high transparency — don't inherit from slider.
-  ghostPhiMat.opacity = GHOST_PHI_FIXED_OPACITY;
-  ghostPhiMat.color.set(0xFFFFFF);
-  if (ghostPhiGroup) ghostPhiGroup.traverse(o => { if (o.material) o.material.needsUpdate = true; });
-  dirty = true;
+  markDirty();
 }
 
 
-// ── Renderer ──────────────────────────────────────────────────────────────────
-// Default: Three.js WebGLRenderer — rock-solid and used for every feature.
-// Opt-in WebGPU path enabled via `?renderer=webgpu` (requires a WebGPU-capable
-// browser). WebGPU removes CPU overhead for draw-call dispatch and unlocks
-// compute shaders for future GPU-side geometry work. We fall back silently to
-// WebGL if the dynamic import or `init()` fails, so the URL flag is safe to
-// leave on even in browsers without WebGPU support.
-const canvas    = document.getElementById('c');
-const _rendererQuery = new URLSearchParams(location.search).get('renderer');
-const _wantWebGPU = _rendererQuery === 'webgpu' && typeof navigator !== 'undefined' && 'gpu' in navigator;
-
-let renderer = null;
-if (_wantWebGPU) {
-  try {
-    // Three.js ships WebGPURenderer under examples/jsm/renderers/webgpu/; the
-    // importmap resolves `three/addons/` to that directory.
-    const mod = await import('three/addons/renderers/webgpu/WebGPURenderer.js');
-    const WebGPURenderer = mod.default || mod.WebGPURenderer;
-    if (WebGPURenderer) {
-      renderer = new WebGPURenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-      await renderer.init();
-      console.info('[renderer] WebGPU active');
-    }
-  } catch (e) {
-    renderer = null;
-    console.warn('[renderer] WebGPU unavailable, falling back to WebGL:', e && e.message ? e.message : e);
-  }
-}
-if (!renderer) {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance', precision: 'mediump', preserveDrawingBuffer: true, stencil: false, depth: true });
-}
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-// WebGL-only knobs — WebGPURenderer does not expose these fields.
-if (renderer.isWebGLRenderer) {
-  renderer.sortObjects = false;
-  // renderer.info is only read by the FPS HUD (which uses its own frame counter),
-  // so let Three.js skip the per-frame reset.
-  renderer.info.autoReset = false;
-}
-
-// ── Scene / Camera / Controls ─────────────────────────────────────────────────
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x020d1c);
-scene.matrixAutoUpdate = false;  // we manage transforms manually
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 100_000);
-camera.position.set(0, 0, 12_000);
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
-controls.dampingFactor = 0.14;   // faster stop (~2.5× quicker than 0.055)
-controls.zoomSpeed     = 1.2;
-// Only clear tooltip while the user is *actively* dragging/panning/zooming.
-// During the damped deceleration phase (after release) we let the tooltip
-// appear normally so it can show as soon as the mouse enters a cell.
+// Tooltip + dirty on camera drag.
 let _ctrlActive = false;
 controls.addEventListener('start',  () => { _ctrlActive = true; });
 controls.addEventListener('end',    () => { _ctrlActive = false; });
 controls.addEventListener('change', () => {
-  dirty = true;
-  if (!cinemaMode && _ctrlActive) { tooltip.hidden = true; clearOutline(); }
-});
-
-// Lights are needed — all cell materials are MeshStandardMaterial (PBR lit)
-const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
-scene.add(ambientLight);
-
-// Directional light that follows the camera, always pointing at the origin.
-const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
-dirLight.position.copy(camera.position);
-scene.add(dirLight);
-controls.addEventListener('change', () => {
-  dirLight.position.copy(camera.position);
+  markDirty();
+  if (!cinema.isCinemaMode() && _ctrlActive) { tooltip.hidden = true; clearOutline(); }
 });
 
 // ── FPS counter ──────────────────────────────────────────────────────────────
@@ -1016,38 +323,84 @@ let _fpsFrames = 0, _fpsLast = performance.now();
 // but stopping the loop entirely frees the main thread for other tabs. Resumed
 // on visibilitychange.
 let _loopRunning = false;
+let _loopRafId = 0;
+let _resumeWarmFrames = 0;
+function _scheduleWarmFrames(count = 12) {
+  _resumeWarmFrames = Math.max(_resumeWarmFrames, count | 0);
+  markDirty();
+}
+function _restoreRendererAfterFocus() {
+  const pr = Math.min(window.devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(pr);
+  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  dirLight.position.copy(camera.position);
+  controls.update();
+  if (renderer.isWebGLRenderer) {
+    if (typeof renderer.resetState === 'function') renderer.resetState();
+    if (renderer.info && typeof renderer.info.reset === 'function') renderer.info.reset();
+  }
+  _scheduleWarmFrames(18);
+}
+function _loopTick() {
+  if (!_loopRunning) {
+    _loopRafId = 0;
+    return;
+  }
+  _loopRafId = requestAnimationFrame(_loopTick);
+  _fpsFrames++;
+  const now = performance.now();
+  if (now - _fpsLast >= 500) {
+    fpsEl.textContent = ((_fpsFrames / (now - _fpsLast)) * 1000).toFixed(0) + ' FPS';
+    _fpsFrames = 0; _fpsLast = now;
+  }
+  if (cinema.isAnimating()) cinema.tick();
+  controls.update();
+  if (_resumeWarmFrames > 0) {
+    _resumeWarmFrames--;
+    markDirty();
+  }
+  if (controls.autoRotate) markDirty();
+  if (!isDirty()) return;
+  renderer.render(scene, camera);
+  clearDirty();
+}
 function _startLoop() {
   if (_loopRunning) return;
   _loopRunning = true;
   _fpsLast = performance.now(); _fpsFrames = 0;
-  dirty = true;
-  (function loop() {
-    if (!_loopRunning) return;
-    requestAnimationFrame(loop);
-    _fpsFrames++;
-    const now = performance.now();
-    if (now - _fpsLast >= 500) {
-      fpsEl.textContent = ((_fpsFrames / (now - _fpsLast)) * 1000).toFixed(0) + ' FPS';
-      _fpsFrames = 0; _fpsLast = now;
-    }
-    if (cinemaMode || _tourExiting) _tourTick();
-    controls.update();
-    if (controls.autoRotate) dirty = true;
-    if (!dirty) return;
-    renderer.render(scene, camera);
-    dirty = false;
-  })();
+  markDirty();
+  if (!_loopRafId) _loopRafId = requestAnimationFrame(_loopTick);
 }
-function _stopLoop() { _loopRunning = false; }
+function _stopLoop() {
+  _loopRunning = false;
+  if (_loopRafId) {
+    cancelAnimationFrame(_loopRafId);
+    _loopRafId = 0;
+  }
+}
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) _stopLoop(); else _startLoop();
+  if (document.hidden) _stopLoop();
+  else {
+    _restoreRendererAfterFocus();
+    _startLoop();
+  }
 });
 _startLoop();
+window.addEventListener('focus', () => {
+  _restoreRendererAfterFocus();
+  _startLoop();
+});
+window.addEventListener('pageshow', () => {
+  _restoreRendererAfterFocus();
+  _startLoop();
+});
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  dirty = true;
+  markDirty();
 });
 
 // ── Status bar ────────────────────────────────────────────────────────────────
@@ -1066,392 +419,25 @@ function checkReady() {
   }
   if (isLive && poller) {
     poller.start();
-    const list = poller.getList();
-    if (list.length) { curEvtId = list[0].id; processXml(list[0].text); renderEvtList(); }
+    liveMode.loadFirstAvailableEvent();
   }
 }
 
 // ── GLB loader (with OPFS cache) ──────────────────────────────────────────────
-// Fetches CaloGeometry.glb.gz and stream-decompresses via DecompressionStream.
-// OPFS persists the gzipped bytes between sessions, keyed by the server's ETag
-// or Last-Modified — so repeat visits skip the network round trip entirely.
-// Cache is invalidated automatically when the file changes server-side.
-const _GLB_URL = './geometry_data/CaloGeometry.glb.gz';
-const _OPFS_DATA_NAME = 'CaloGeometry.glb.gz.bin';
-const _OPFS_META_NAME = 'CaloGeometry.glb.meta';
-
-async function _opfsRoot() {
-  if (!navigator.storage?.getDirectory) return null;
-  try { return await navigator.storage.getDirectory(); } catch { return null; }
-}
-async function _opfsLoadGz(version) {
-  const root = await _opfsRoot();
-  if (!root || !version) return null;
-  try {
-    const metaH = await root.getFileHandle(_OPFS_META_NAME, { create: false });
-    const meta  = JSON.parse(await (await metaH.getFile()).text());
-    if (meta.v !== version) return null;
-    const dataH = await root.getFileHandle(_OPFS_DATA_NAME, { create: false });
-    const file  = await dataH.getFile();
-    if (file.size !== meta.size) return null;
-    return await file.arrayBuffer();
-  } catch { return null; }
-}
-async function _opfsSaveGz(buffer, version) {
-  const root = await _opfsRoot();
-  if (!root || !version) return;
-  try {
-    const dataH = await root.getFileHandle(_OPFS_DATA_NAME, { create: true });
-    const wd    = await dataH.createWritable();
-    await wd.write(buffer);
-    await wd.close();
-    const metaH = await root.getFileHandle(_OPFS_META_NAME, { create: true });
-    const wm    = await metaH.createWritable();
-    await wm.write(JSON.stringify({ v: version, size: buffer.byteLength, t: Date.now() }));
-    await wm.close();
-  } catch { /* OPFS quota or transient error — cache is best-effort */ }
-}
-async function _glbVersion() {
-  // HEAD with no-cache forces a server round trip so we get the *current* validator.
-  // Without this, a stale browser-cache entry could mask a server update.
-  try {
-    const head = await fetch(_GLB_URL, { method: 'HEAD', cache: 'no-cache' });
-    if (!head.ok) return '';
-    return head.headers.get('etag') || head.headers.get('last-modified') || '';
-  } catch { return ''; }
-}
-// Stream-decompress a gzip stream into the raw GLB ArrayBuffer.
-async function _decompressGz(stream, totalBytes, onProgress) {
-  let loaded = 0;
-  const counter = new TransformStream({ transform(chunk, ctrl) {
-    loaded += chunk.byteLength;
-    if (totalBytes && onProgress) onProgress(loaded / totalBytes);
-    ctrl.enqueue(chunk);
-  }});
-  return await new Response(
-    stream.pipeThrough(counter).pipeThrough(new DecompressionStream('gzip'))
-  ).arrayBuffer();
-}
-
-setLoadProgress(0, 'Loading geometry…');
-(async () => {
-  let buffer = null;
-
-  // ── 1. OPFS hit path: validate cache against server, decompress locally ────
-  const version = await _glbVersion();
-  if (version) {
-    const cachedGz = await _opfsLoadGz(version);
-    if (cachedGz) {
-      try {
-        buffer = await _decompressGz(
-          new Blob([cachedGz]).stream(),
-          cachedGz.byteLength,
-          pct => setLoadProgress(pct * 40, `Loading cached geometry… ${Math.round(pct * 100)}%`)
-        );
-      } catch { buffer = null; /* poisoned cache — fall through to network */ }
-    }
-  }
-
-  // ── 2. Network path (also runs when version was empty / OPFS unavailable) ──
-  if (!buffer) {
-    try {
-      const res = await fetch(_GLB_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const total = parseInt(res.headers.get('Content-Length') || '0', 10);
-      // tee() lets us decompress AND collect raw bytes for OPFS save in parallel.
-      const [streamForDecode, streamForCache] = res.body.tee();
-      const decodePromise = _decompressGz(streamForDecode, total, pct => {
-        setLoadProgress(pct * 40, `Downloading geometry… ${Math.round(pct * 100)}%`);
-        setStatus(`Downloading geometry: ${Math.round(pct * 100)}%`);
-      });
-      if (version) {
-        new Response(streamForCache).arrayBuffer()
-          .then(gz => _opfsSaveGz(gz, version))
-          .catch(() => {});
-      } else {
-        streamForCache.cancel().catch(() => {});
-      }
-      buffer = await decodePromise;
-    } catch (e) {
-      setStatus('<span class="warn">CaloGeometry.glb.gz not found.</span>');
-      setLoadProgress(100, 'Geometry skipped');
-      sceneOk = true; checkReady();
-      return;
-    }
-  }
-
-  new GLTFLoader().parse(
-    buffer, './',
-    ({ scene: g }) => {
-      // Ghost envelopes (a few dozen non-cell meshes) stay as individual Meshes,
-      // since their toggling/render-order behavior differs from cells and the
-      // count is tiny. Every actual cell mesh is re-parented into a single
-      // InstancedMesh per (detector, geometry.uuid) — the GLB reuses geometry
-      // heavily via shapeSignature, so this collapses tens of thousands of
-      // cells into a handful of draw calls.
-      const ghosts      = [];
-      const atlasMeshes = [];
-      const groups      = new Map();  // key "DET::uuid" → { det, geo, items: [{matrix,name,key}] }
-      const loose       = [];         // non-cell, non-ghost meshes (rare/none) — kept as-is
-
-      g.updateMatrixWorld(true);
-      g.traverse(o => {
-        if (!o.isMesh) return;
-        if (ghostVisible.has(o.name)) { ghosts.push(o); return; }
-        // Atlas structural meshes: name starts with "atlas→" (root name of atlas.root TGeoManager)
-        if (o.name.split('→')[0] === 'atlas') { atlasMeshes.push(o); return; }
-        const det = classifyCellDet(o.name);
-        if (!det) { loose.push(o); return; }
-        const gk = `${det}::${o.geometry.uuid}`;
-        let bucket = groups.get(gk);
-        if (!bucket) { bucket = { det, geo: o.geometry, items: [] }; groups.set(gk, bucket); }
-        bucket.items.push({ matrix: o.matrixWorld.clone(), name: o.name, key: meshNameToKey(o.name) });
-      });
-
-      const cellsGroup = new THREE.Group();
-      cellsGroup.name = 'cells';
-      cellsGroup.matrixAutoUpdate = false;
-
-      for (const { det, geo, items } of groups.values()) {
-        const mat = det === 'TILE' ? matTile : det === 'LAR' ? matLAr : matHec;
-        const iMesh = new THREE.InstancedMesh(geo, mat, items.length);
-        iMesh.name = `cells_${det}_${geo.uuid.slice(0, 8)}`;
-        iMesh.matrixAutoUpdate = false;
-        iMesh.frustumCulled   = false;
-        iMesh.renderOrder     = 2;
-        iMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        // Allocate instanceColor up-front so setColorAt stays hot-path.
-        iMesh.setColorAt(0, new THREE.Color(1, 1, 1));
-        const handles = new Array(items.length);
-        for (let i = 0; i < items.length; i++) {
-          const it = items[i];
-          iMesh.setMatrixAt(i, _ZERO_MAT4);             // start hidden
-          iMesh.setColorAt(i, PAL_TILE_COLOR[0]);       // neutral fill; overwritten on event
-          const h = {
-            iMesh, instId: i, det,
-            name: it.name,
-            origMatrix: it.matrix,
-            visible: false,
-          };
-          handles[i] = h;
-          if (it.key !== null) meshByKey.set(it.key, h);
-          cellMeshesByDet[det].push(h);
-        }
-        iMesh.userData.handles = handles;
-        iMesh.instanceMatrix.needsUpdate = true;
-        iMesh.instanceColor.needsUpdate  = true;
-        cellsGroup.add(iMesh);
-        _allCellIMeshes.push(iMesh);
-      }
-      scene.add(cellsGroup);
-
-      // Ghosts keep their individual-mesh behavior (per-mesh material swap on toggle).
-      for (const gh of ghosts) {
-        gh.matrixAutoUpdate = false;
-        gh.frustumCulled = false;
-        gh.visible = false;
-        ghostMeshByName.set(gh.name, gh);
-        scene.add(gh);
-      }
-      // Any stragglers (shouldn't happen, but preserve existing behavior).
-      for (const o of loose) {
-        o.matrixAutoUpdate = false;
-        o.frustumCulled = false;
-        o.visible = false;
-        scene.add(o);
-      }
-
-      // Atlas structural geometry — semi-transparent blue overlay, hidden by default.
-      // atlas.root uses cm; CaloGeometry.root uses mm → ×5 to align.
-      if (atlasMeshes.length > 0) {
-        // One scaled container; mesh visibility is controlled individually per tree node.
-        const atlasContainer = new THREE.Group();
-        atlasContainer.name = 'atlas-geo';
-        atlasContainer.scale.setScalar(10);
-        atlasContainer.updateMatrix();
-        atlasContainer.matrixAutoUpdate = false;
-        for (const o of atlasMeshes) {
-          o.material = atlasMat;
-          o.matrixAutoUpdate = false;
-          o.frustumCulled = false;
-          o.visible = false;
-          atlasContainer.add(o);
-        }
-        scene.add(atlasContainer);
-        // Build name-path hierarchy tree and render it into the panel.
-        atlasRoot = _buildAtlasTree(atlasMeshes);
-        _trackAtlasNodes = null;
-        _trackAtlasMeshes = null;
-        _trackAtlasOutlineMeshes = null;
-        _trackAtlasMeshBoxes = null;
-        const body = document.getElementById('atlas-panel-body');
-        body.innerHTML = '';
-        for (const child of atlasRoot.children.values())
-          body.appendChild(_renderAtlasNode(child, 0));
-        document.getElementById('btn-atlas').style.display = '';
-      }
-
-      sceneOk = true; dirty = true;
-      setLoadProgress(100, 'Geometry loaded');
-      checkReady();
-    },
-    e => {
-      setStatus(`<span class="warn">GLB parse error: ${esc(e.message)}</span>`);
-    }
-  );
-})();
-
-// ── WASM ──────────────────────────────────────────────────────────────────────
-// Start the worker (or fallback) in parallel with the GLB download — both are
-// awaited by the `checkReady()` gate so the loading screen dismisses when the
-// slower of the two finishes.
+// ── Geometry + WASM initialisation ─────────────────────────────────────────
+initScene({
+  setStatus,
+  atlasMat,
+  onSceneReady() { sceneOk = true; markDirty(); checkReady(); },
+  onAtlasReady(tree) {
+    atlasRoot = tree;
+    _trackAtlasNodes = null; _trackAtlasMeshes = null;
+    _trackAtlasOutlineMeshes = null; _trackAtlasMeshBoxes = null;
+  },
+});
 _wasmPool.init()
-  .then(() => {
-    wasmOk = true;
-    checkReady();
-  })
-  .catch(e => {
-    setStatus(`<span class="err">WASM: ${esc(e && e.message || String(e))}</span>`);
-  });
-
-// ── TileCal cell display label ────────────────────────────────────────────────
-function cellLabel(x, k) {
-  switch (x) {
-    case  1: return `A${k+1}`;  case 23: return `BC${k+1}`;
-    case  4: return `D${k}`;    case  5: return `A${k+12}`;
-    case  6: return `B${k+11}`; case  7: return `D${k+5}`;
-    case  8: return 'D4';       case  9: return 'C10';
-    case 10: return 'E1';       case 11: return 'E2';
-    case 12: return 'E3';       case 13: return 'E4';
-    default: return '?';
-  }
-}
-
-// ── HEC group name/innerBins — used for physLarHecEta reconstruction ──────────
-const HEC_NAMES  = ['1', '23', '45', '67'];
-const HEC_INNER  = [10, 10, 9, 8];
-
-// ── Physical η / φ coordinate helpers ────────────────────────────────────────
-// Mirror the formulas from parser/src/lib.rs so the tooltip shows real values.
-
-function _larEmGlobalEtaOffset(absbe, sampling, region) {
-  if (absbe===1 && sampling===1 && region===1) return 448;
-  if (absbe===1 && sampling===2 && region===1) return 56;
-  if (absbe===2 && sampling===1 && region===1) return 1;
-  if (absbe===2 && sampling===1 && region===2) return 4;
-  if (absbe===2 && sampling===1 && region===3) return 100;
-  if (absbe===2 && sampling===1 && region===4) return 148;
-  if (absbe===2 && sampling===1 && region===5) return 212;
-  if (absbe===2 && sampling===2 && region===1) return 1;
-  if (absbe===3 && sampling===1 && region===0) return 216;
-  if (absbe===3 && sampling===2 && region===0) return 44;
-  return 0;
-}
-const _LAR_EM_ETA_TABLE = {
-  '1,0,0':[0.0,0.025],     '1,1,0':[0.003125,0.003125], '1,1,1':[1.4,0.025],
-  '1,2,0':[0.0,0.025],     '1,2,1':[1.4,0.075],         '1,3,0':[0.0,0.05],
-  '2,0,0':[1.5,0.025],     '2,1,0':[1.375,0.05],        '2,1,1':[1.425,0.025],
-  '2,1,2':[1.5,0.003125],  '2,1,3':[1.8,0.004167],      '2,1,4':[2.0,0.00625],
-  '2,1,5':[2.4,0.025],     '2,2,0':[1.375,0.05],        '2,2,1':[1.425,0.025],
-  '2,3,0':[1.5,0.05],      '3,1,0':[2.5,0.1],           '3,2,0':[2.5,0.1],
-};
-function physLarEmEta(be, sampling, region, globalEta) {
-  const absbe  = Math.abs(be);
-  const offset = _larEmGlobalEtaOffset(absbe, sampling, region);
-  const etaIdx = globalEta - offset;
-  const [eta0, deta] = _LAR_EM_ETA_TABLE[`${absbe},${sampling},${region}`] ?? [0.0, 0.1];
-  const absEta = eta0 + etaIdx * deta + deta / 2;
-  return be < 0 ? -absEta : absEta;
-}
-function physLarEmPhi(be, sampling, region, phiIdx) {
-  const absbe = Math.abs(be);
-  let nPhi = 64;
-  if (absbe===1 && region===1)              nPhi = 256;
-  else if (absbe===1 && (sampling===2 || sampling===3)) nPhi = 256;
-  else if (absbe===2 && (sampling===2 || sampling===3)) nPhi = 256;
-  return _wrapPhi((phiIdx + 0.5) * 2 * Math.PI / nPhi);
-}
-
-const _LAR_HEC_ETA_TABLE = {
-  '0,0':[1.5,0.1], '1,0':[1.5,0.1], '2,0':[1.6,0.1], '3,0':[1.7,0.1],
-  '0,1':[2.5,0.2], '1,1':[2.5,0.2], '2,1':[2.5,0.2], '3,1':[2.5,0.2],
-};
-function physLarHecEta(be, sampling, region, etaIdx) {
-  const [eta0, deta] = _LAR_HEC_ETA_TABLE[`${sampling},${region}`] ?? [1.5, 0.1];
-  const absEta = eta0 + etaIdx * deta + deta / 2;
-  return be < 0 ? -absEta : absEta;
-}
-function physLarHecPhi(region, phiIdx) {
-  const nPhi = region === 0 ? 64 : 32;
-  return _wrapPhi((phiIdx + 0.5) * 2 * Math.PI / nPhi);
-}
-
-function physTileEta(section, side, tower, sampling) {
-  let absEta;
-  if (section === 3) {
-    if      (tower === 8)  absEta = 0.8;
-    else if (tower === 9)  absEta = 1.05;
-    else if (tower === 10) absEta = 1.15;
-    else if (tower === 11) absEta = 1.25;
-    else if (tower === 13) absEta = 1.45;
-    else if (tower === 15) absEta = 1.65;
-    else absEta = 0.05 + 0.1 * tower;
-  } else if (sampling === 2) {
-    // D cells: Δη=0.2, each cell covers 2 towers → centre at k×0.2 where k=floor(tower/2)
-    absEta = Math.floor(tower / 2) * 0.2;
-  } else {
-    absEta = 0.05 + 0.1 * tower;
-  }
-  return side < 0 ? -absEta : absEta;
-}
-function _wrapPhi(phi) { return phi > Math.PI ? phi - 2 * Math.PI : phi; }
-function physTilePhi(module) { return _wrapPhi((module + 0.5) * 2 * Math.PI / 64); }
-
-// ── XML parsers ───────────────────────────────────────────────────────────────
-// ── Shared XML cell extractor (operates on a pre-parsed Document) ─────────────
-function extractCells(doc, tagName) {
-  const els = doc.getElementsByTagName(tagName);
-  const cells = [];
-  for (const el of els) {
-    let n = 0;
-    for (const ch of el.children) {
-      const id = ch.getAttribute('id') ?? ch.getAttribute('cellID');
-      const ev = ch.getAttribute('energy') ?? ch.getAttribute('e');
-      if (id && ev) { const e = parseFloat(ev); if (isFinite(e)) { cells.push({ id: id.trim(), energy: e }); n++; } }
-    }
-    if (n) continue;
-    const idEl = el.querySelector('id, cellID');
-    const eEl  = el.querySelector('energy, e');
-    if (idEl && eEl) {
-      const ids = idEl.textContent.trim().split(/\s+/);
-      const ens = eEl.textContent.trim().split(/\s+/).map(Number);
-      const m   = Math.min(ids.length, ens.length);
-      for (let i = 0; i < m; i++) if (ids[i] && isFinite(ens[i])) cells.push({ id: ids[i], energy: ens[i] });
-    }
-  }
-  return cells;
-}
-
-// ── Single-pass XML parse — returns one Document for all detectors ────────────
-function parseXmlDoc(xmlText) {
-  const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
-  const pe  = doc.querySelector('parsererror');
-  if (pe) throw new Error('XML parse error: ' + pe.textContent.slice(0, 120));
-  return doc;
-}
-
-// Extract top-level <Event> attributes (run/event/lumi/dateTime etc.)
-function parseEventInfo(doc) {
-  const ev = doc.querySelector('Event');
-  if (!ev) return null;
-  return {
-    runNumber:   ev.getAttribute('runNumber')   || '',
-    eventNumber: ev.getAttribute('eventNumber') || '',
-    lumiBlock:   ev.getAttribute('lumiBlock')   || '',
-    dateTime:    ev.getAttribute('dateTime')    || '',
-    version:     ev.getAttribute('version')     || '',
-  };
-}
+  .then(() => { wasmOk = true; checkReady(); })
+  .catch(e => { setStatus(`<span class="err">WASM: ${esc(e && e.message || String(e))}</span>`); });
 
 let _lastEventInfo = null;
 
@@ -1473,7 +459,7 @@ function _buildCollisionHud() {
     .join('');
 }
 function updateCollisionHud() {
-  const visible = !panelPinned || cinemaMode;
+  const visible = !(sidebarControls ? sidebarControls.getState().panelPinned : true) || cinema.isCinemaMode();
   collisionHud.hidden = !(visible && _lastEventInfo);
   if (!collisionHud.hidden) _buildCollisionHud();
 }
@@ -1497,231 +483,6 @@ function showEventInfo(info) {
   );
 }
 
-function parseTile(doc) {
-  const cells = extractCells(doc, 'TILE');
-  return cells; // empty array is fine — LAr may still exist
-}
-
-function parseLAr(doc) {
-  return extractCells(doc, 'LAr');
-}
-
-function parseHec(doc) {
-  return extractCells(doc, 'HEC');
-}
-
-// ── FCAL ID decoder ────────────────────────────────────────────────────────────
-// Bit layout (MSB-first, from IdDictLArCalorimeter; see pdf_geometrias.pdf §4):
-//   offset 64  3 b  subdet   = 4
-//   offset 61  3 b  part     = ±3 (LArFCAL)
-//   offset 58  1 b  be       — 0 → C-side (η<0), 1 → A-side (η>0)
-//   offset 57  2 b  module   — 0,1,2 → FCAL1,2,3
-//   offset 55  6 b  eta-fcal — 0–63
-//   offset 49  4 b  phi-fcal — 0–15
-// Physical coords: |η| = η₀ + eta_idx·Δη + Δη/2,  φ = (phi_idx+0.5)·2π/16
-const _FCAL_ETA_PARAMS = [[3.2, 0.025], [3.2, 0.05], [3.2, 0.1]]; // indexed by module_raw 0,1,2
-
-function decodeFcalId(idStr) {
-  const id     = BigInt(idStr);
-  const beSign = Number((id >> 57n) & 1n) ? 1 : -1;   // +1 = A-side, -1 = C-side
-  const modRaw = Number((id >> 55n) & 3n);              // 0,1,2 → FCAL1,2,3
-  const etaIdx = Number((id >> 49n) & 63n);
-  const phiIdx = Number((id >> 45n) & 15n);
-  const [eta0, deta] = _FCAL_ETA_PARAMS[modRaw] ?? [3.2, 0.025];
-  const eta = beSign * (eta0 + etaIdx * deta + deta / 2);
-  const phi = (phiIdx + 0.5) * (2 * Math.PI / 16);
-  return { module: modRaw + 1, etaIdx, phiIdx, eta, phi };  // module label 1,2,3
-}
-
-// ── FCAL parser ────────────────────────────────────────────────────────────────
-// JiveXML stores FCAL cell centres (x,y,z) and half-extents (dx,dy,dz) in cm.
-// energy is in GeV. <id> carries the 64-bit compact ID decoded above.
-function parseFcal(doc) {
-  const cells = [];
-  for (const el of doc.getElementsByTagName('FCAL')) {
-    const xEl  = el.querySelector('x');
-    const yEl  = el.querySelector('y');
-    const zEl  = el.querySelector('z');
-    const dxEl = el.querySelector('dx');
-    const dyEl = el.querySelector('dy');
-    const dzEl = el.querySelector('dz');
-    const eEl  = el.querySelector('energy');
-    const idEl = el.querySelector('id');
-    if (!xEl || !yEl || !zEl || !dxEl || !dyEl || !dzEl) continue;
-    const xs  = xEl.textContent.trim().split(/\s+/).map(Number);
-    const ys  = yEl.textContent.trim().split(/\s+/).map(Number);
-    const zs  = zEl.textContent.trim().split(/\s+/).map(Number);
-    const dxs = dxEl.textContent.trim().split(/\s+/).map(Number);
-    const dys = dyEl.textContent.trim().split(/\s+/).map(Number);
-    const dzs = dzEl.textContent.trim().split(/\s+/).map(Number);
-    const ens = eEl  ? eEl.textContent.trim().split(/\s+/).map(Number) : [];
-    const ids = idEl ? idEl.textContent.trim().split(/\s+/)            : [];
-    const n = Math.min(xs.length, ys.length, zs.length, dxs.length, dys.length, dzs.length);
-    for (let i = 0; i < n; i++) {
-      if (!isFinite(xs[i]) || !isFinite(ys[i]) || !isFinite(zs[i])) continue;
-      let module = 0, eta = 0, phi = 0, cellId = ids[i] ?? '';
-      if (cellId) {
-        try { const d = decodeFcalId(cellId); module = d.module; eta = d.eta; phi = d.phi; }
-        catch { /* leave defaults */ }
-      }
-      cells.push({
-        x: xs[i], y: ys[i], z: zs[i],
-        dx: dxs[i] || 0, dy: dys[i] || 0, dz: dzs[i] || 0,
-        energy: isFinite(ens[i]) ? ens[i] : 0,
-        id: cellId, module, eta, phi,
-      });
-    }
-  }
-  return cells;
-}
-
-function parseMBTS(doc) {
-  const cells = [];
-  const els = doc.getElementsByTagName('MBTS');
-  for (const el of els) {
-    let n = 0;
-    for (const ch of el.children) {
-      const label = ch.getAttribute('label');
-      const ev    = ch.getAttribute('energy') ?? ch.getAttribute('e');
-      if (label && ev) { const e = parseFloat(ev); if (isFinite(e)) { cells.push({ label: label.trim(), energy: e }); n++; } }
-    }
-    if (n) continue;
-    const lblEl = el.querySelector('label');
-    const eEl   = el.querySelector('energy, e');
-    if (lblEl && eEl) {
-      const labels = lblEl.textContent.trim().split(/\s+/);
-      const ens    = eEl.textContent.trim().split(/\s+/).map(Number);
-      const m      = Math.min(labels.length, ens.length);
-      for (let i = 0; i < m; i++) if (labels[i] && isFinite(ens[i])) cells.push({ label: labels[i], energy: ens[i] });
-    }
-  }
-  return cells;
-}
-
-// ── Track polylines ───────────────────────────────────────────────────────────
-// JiveXML stores polyline coordinates in cm; the Three.js scene uses mm → ×10.
-// numPolyline[i] = number of points for track i.
-// polylineX/Y/Z are the flattened point arrays (one segment per track).
-function parseTracks(doc) {
-  const tracks = [];
-  for (const el of doc.getElementsByTagName('Track')) {
-    const numPolyEl = el.querySelector('numPolyline');
-    const pxEl      = el.querySelector('polylineX');
-    const pyEl      = el.querySelector('polylineY');
-    const pzEl      = el.querySelector('polylineZ');
-    if (!numPolyEl || !pxEl || !pyEl || !pzEl) continue;
-    const numPoly = numPolyEl.textContent.trim().split(/\s+/).map(Number);
-    const xs      = pxEl.textContent.trim().split(/\s+/).map(Number);
-    const ys      = pyEl.textContent.trim().split(/\s+/).map(Number);
-    const zs      = pzEl.textContent.trim().split(/\s+/).map(Number);
-    const ptEl    = el.querySelector('pt');
-    const ptArr   = ptEl ? ptEl.textContent.trim().split(/\s+/).map(Number) : [];
-
-    // Hit IDs (subdet=2): numHits[i] hits belong to track i, flattened in <hits>
-    const numHitsEl  = el.querySelector('numHits');
-    const hitsEl     = el.querySelector('hits');
-    const numHitsArr = numHitsEl ? numHitsEl.textContent.trim().split(/\s+/).map(Number) : [];
-    const allHitStrs = hitsEl    ? hitsEl.textContent.trim().split(/\s+/)                : [];
-
-    const storeGateKey = el.getAttribute('storeGateKey') ?? '';
-    let offset = 0, hitOffset = 0;
-    for (let i = 0; i < numPoly.length; i++) {
-      const n  = numPoly[i];
-      const nh = numHitsArr[i] ?? 0;
-      const hitIds = allHitStrs.slice(hitOffset, hitOffset + nh);
-      hitOffset += nh;
-      if (n >= 2) {
-        const pts = [];
-        for (let j = 0; j < n; j++) {
-          const k = offset + j;
-          pts.push(new THREE.Vector3(-xs[k] * 10, -ys[k] * 10, zs[k] * 10));
-        }
-        const ptGev = i < ptArr.length ? Math.abs(ptArr[i]) : 0;
-        tracks.push({ pts, ptGev, hitIds, storeGateKey });
-      }
-      offset += n;
-    }
-  }
-  return tracks;
-}
-
-
-
-// ── Cell-ID subdetector decoder ───────────────────────────────────────────────
-// Uses BigInt to safely handle 64-bit IDs.
-// Bit layout (MSB-first, per ATLAS IdDict / lib.rs):
-//   bits 63-61 (3 bits): subdet index → maps to [2,4,5,7,10,11,12,13]
-//     4 = LArCalorimeter, 5 = TileCalorimeter
-//   bits 60-58 (3 bits, only when subdet=4): part index → maps to [-3,-2,-1,1,2,3,4,5]
-//     |part|=1 → LAr EM,  |part|=2 → LAr HEC
-const _CELL_SUBDET_MAP = [2, 4, 5, 7, 10, 11, 12, 13];
-const _CELL_PART_MAP   = [-3, -2, -1, 1, 2, 3, 4, 5];
-
-function decodeCellSubdet(idStr) {
-  const id     = BigInt(idStr);
-  const sdIdx  = Number((id >> 61n) & 7n);
-  const subdet = _CELL_SUBDET_MAP[sdIdx];
-  if (subdet === 5) return 'TILE';
-  if (subdet === 2) return 'TRACK';
-  if (subdet === 4) {
-    const ptIdx = Number((id >> 58n) & 7n);
-    const part  = _CELL_PART_MAP[ptIdx] ?? 0;
-    const absPart = Math.abs(part);
-    if (absPart === 1) return 'LAR_EM';
-    if (absPart === 2) return 'HEC';
-    if (absPart === 3) return 'FCAL';
-  }
-  return 'OTHER';
-}
-
-// ── Cluster (eta/phi) parser ──────────────────────────────────────────────────
-// Returns flat [{eta, phi, etGev, cells, storeGateKey}] where cells is:
-//   { TILE: string[], LAR_EM: string[], HEC: string[], FCAL: string[], OTHER: string[] }
-function parseClusters(doc) {
-  const flat        = [];
-  const collections = [];
-
-  for (const el of doc.getElementsByTagName('Cluster')) {
-    const key        = el.getAttribute('storeGateKey') ?? '';
-    const etaEl      = el.querySelector('eta');
-    const phiEl      = el.querySelector('phi');
-    const etEl       = el.querySelector('et');
-    const numCellsEl = el.querySelector('numCells');
-    const cellsEl    = el.querySelector('cells');
-    if (!etaEl || !phiEl) continue;
-
-    const etas        = etaEl.textContent.trim().split(/\s+/).map(Number);
-    const phis        = phiEl.textContent.trim().split(/\s+/).map(Number);
-    const ets         = etEl       ? etEl.textContent.trim().split(/\s+/).map(Number) : [];
-    const numCellsArr = numCellsEl ? numCellsEl.textContent.trim().split(/\s+/).map(Number) : [];
-    const allCellStrs = cellsEl    ? cellsEl.textContent.trim().split(/\s+/)            : [];
-
-    const m = Math.min(etas.length, phis.length);
-    const collClusters = [];
-    let offset = 0;
-    for (let i = 0; i < m; i++) {
-      const nc      = numCellsArr[i] ?? 0;
-      const rawIds  = allCellStrs.slice(offset, offset + nc);
-      offset += nc;
-      if (!isFinite(etas[i]) || !isFinite(phis[i])) continue;
-
-      // Group cell IDs by subdetector
-      const cells = { TILE: [], LAR_EM: [], HEC: [], FCAL: [], TRACK: [], OTHER: [] };
-      for (const idStr of rawIds) {
-        if (!idStr) continue;
-        cells[decodeCellSubdet(idStr)].push(idStr);
-      }
-
-      const entry = { eta: etas[i], phi: phis[i], etGev: isFinite(ets[i]) ? ets[i] : 0, cells };
-      collClusters.push(entry);
-      flat.push({ ...entry, storeGateKey: key });
-    }
-    if (collClusters.length) collections.push({ key, clusters: collClusters });
-  }
-
-  lastClusterData = { collections };
-  return flat;
-}
 
 // ── Track rendering ───────────────────────────────────────────────────────────
 let thrTrackGev   = 2;
@@ -1732,6 +493,15 @@ let trackPtMaxGev = 5;
 let thrClusterEtGev   = 0;
 let clusterEtMinGev   = 0;
 let clusterEtMaxGev   = 1;
+let tileSlider = null;
+let larSlider = null;
+let fcalSlider = null;
+let hecSlider = null;
+let trackPtSlider = null;
+let clusterEtSlider = null;
+let initDetPanel = null;
+const relTime = makeRelTime(t);
+const { startProgress, advanceProgress, endProgress } = createDownloadProgressController();
 
 const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffea00, linewidth: 2 });
 const TRACK_HIT_MAT = new THREE.LineBasicMaterial({ color: 0x4A90D9, linewidth: 2 });
@@ -1752,7 +522,7 @@ function applyTrackThreshold() {
     for (const child of photonGroup.children)
       child.visible = child.userData.ptGev >= thrTrackGev;
   updateTrackAtlasIntersections();
-  dirty = true;
+  markDirty();
 }
 
 function drawTracks(tracks) {
@@ -1786,15 +556,15 @@ const CLUSTER_MAT = new THREE.LineDashedMaterial({
 const PHOTON_MAT = new THREE.LineBasicMaterial({
   color: 0xFFCC00, transparent: true, opacity: 0.85, depthWrite: false,
 });
-const PHOTON_START_OFFSET_MM  = 100;   // start the spring 10 cm away from the origin
+const PHOTON_PRE_INNER_MM     = 800;   // start the spring 80 cm before the inner LAr cylinder
 const PHOTON_SPRING_R         = 20;    // helix radius in mm
 const PHOTON_SPRING_TURNS_PER_MM = 0.014; // coils per mm of track length
 const PHOTON_SPRING_PTS       = 22;   // points sampled per coil (smoothness)
 const PHOTON_TRACK_DIR_DOT_MIN = 0.97;
 const PHOTON_TRACK_RADIAL_TOL_MM = 250;
 // Inner cylinder (start): r = 1.4 m, h = 6.4 m
-const CLUSTER_CYL_IN_R      = 1400;
-const CLUSTER_CYL_IN_HALF_H = 3200;
+const CLUSTER_CYL_IN_R      = 1421.730;
+const CLUSTER_CYL_IN_HALF_H = 3680.75;
 // Outer cylinder (end):   r = 4.25 m, h = 12 m
 const CLUSTER_CYL_OUT_R      = 3820;
 const CLUSTER_CYL_OUT_HALF_H = 6000;
@@ -1826,7 +596,7 @@ function _makeSpringPoints(dx, dy, dz, totalLen, radius, nTurns, ptsPerTurn) {
   const ref = Math.abs(fwd.x) < 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
   const right = new THREE.Vector3().crossVectors(fwd, ref).normalize();
   const up    = new THREE.Vector3().crossVectors(fwd, right).normalize();
-  const startOffset = Math.min(PHOTON_START_OFFSET_MM, Math.max(0, totalLen));
+  const startOffset = Math.max(0, totalLen - PHOTON_PRE_INNER_MM);
   const visibleLen  = Math.max(0, totalLen - startOffset);
   const nTotal = nTurns * ptsPerTurn + 1;
   const pts = [];
@@ -1845,72 +615,6 @@ function _makeSpringPoints(dx, dy, dz, totalLen, radius, nTurns, ptsPerTurn) {
   return pts;
 }
 
-function _photonDirection(eta, phi) {
-  const theta = 2 * Math.atan(Math.exp(-eta));
-  const sinT  = Math.sin(theta);
-  return new THREE.Vector3(
-    -sinT * Math.cos(phi),
-    -sinT * Math.sin(phi),
-     Math.cos(theta),
-  );
-}
-
-function _trackDuplicatesPhoton(track, photon) {
-  const pts = track.pts;
-  if (!pts || pts.length < 2) return false;
-  const dir = _photonDirection(photon.eta, photon.phi).normalize();
-  const seg = new THREE.Vector3().subVectors(pts[pts.length - 1], pts[0]);
-  if (seg.lengthSq() < 1e-6) return false;
-  seg.normalize();
-  if (Math.abs(seg.dot(dir)) < PHOTON_TRACK_DIR_DOT_MIN) return false;
-
-  const photonEnd = _cylIntersect(dir.x, dir.y, dir.z, CLUSTER_CYL_IN_R, CLUSTER_CYL_IN_HALF_H);
-  let matchedPts = 0;
-  for (let i = 0; i < pts.length; i++) {
-    const p = pts[i];
-    const along = p.dot(dir);
-    if (along < PHOTON_START_OFFSET_MM || along > photonEnd + 50) continue;
-    const radial = Math.sqrt(Math.max(0, p.lengthSq() - along * along));
-    if (Math.abs(radial - PHOTON_SPRING_R) > PHOTON_TRACK_RADIAL_TOL_MM) return false;
-    matchedPts++;
-  }
-  return matchedPts >= 2;
-}
-
-function filterPhotonDuplicateTracks(tracks, photons) {
-  if (!tracks.length || !photons.length) return tracks;
-  return tracks.filter(track => {
-    for (let i = 0; i < photons.length; i++) {
-      if (_trackDuplicatesPhoton(track, photons[i])) return false;
-    }
-    return true;
-  });
-}
-
-function parsePhotons(doc) {
-  const result = [];
-  for (const el of doc.getElementsByTagName('Photon')) {
-    const etaEl    = el.querySelector('eta');
-    const phiEl    = el.querySelector('phi');
-    const energyEl = el.querySelector('energy');
-    const ptEl     = el.querySelector('pt');
-    if (!etaEl || !phiEl) continue;
-    const etas     = etaEl.textContent.trim().split(/\s+/).map(Number);
-    const phis     = phiEl.textContent.trim().split(/\s+/).map(Number);
-    const energies = energyEl ? energyEl.textContent.trim().split(/\s+/).map(Number) : [];
-    const pts      = ptEl     ? ptEl.textContent.trim().split(/\s+/).map(Number)     : [];
-    const m = Math.min(etas.length, phis.length);
-    for (let i = 0; i < m; i++) {
-      if (!isFinite(etas[i]) || !isFinite(phis[i])) continue;
-      result.push({
-        eta: etas[i], phi: phis[i],
-        energyGev: isFinite(energies[i]) ? energies[i] : 0,
-        ptGev:     isFinite(pts[i])      ? pts[i]      : 0,
-      });
-    }
-  }
-  return result;
-}
 
 function clearPhotons() {
   if (!photonGroup) return;
@@ -1932,7 +636,7 @@ function drawPhotons(photons) {
     const dy = -sinT * Math.sin(phi);
     const dz =  Math.cos(theta);
     const tEnd = _cylIntersect(dx, dy, dz, CLUSTER_CYL_IN_R, CLUSTER_CYL_IN_HALF_H);
-    const nTurns = Math.round(PHOTON_SPRING_TURNS_PER_MM * tEnd);
+    const nTurns = Math.round(PHOTON_SPRING_TURNS_PER_MM * Math.min(PHOTON_PRE_INNER_MM, tEnd));
     const pts  = _makeSpringPoints(dx, dy, dz, tEnd, PHOTON_SPRING_R, nTurns, PHOTON_SPRING_PTS);
     const geo  = new THREE.BufferGeometry().setFromPoints(pts);
     const line = new THREE.Line(geo, PHOTON_MAT);
@@ -2008,28 +712,18 @@ function _applyFcalDraw() {
   // While the slicer is active, also carve FCAL tubes whose centre sits inside
   // the Z-aligned cylindrical wedge anchored at the ATLAS origin. FCAL cells
   // use (x,y,z,dz) in cm — convert to scene mm (×10).
-  const slicerOn   = (typeof slicerActive !== 'undefined') && slicerActive;
-  const slR2       = slicerOn ? SLICER_RADIUS * SLICER_RADIUS : 0;
-  const slZMax     = slicerOn ? slicerZOffset + slicerHalfHeight : 0;
-  const slZMin     = slicerOn ? slicerZOffset - slicerHalfHeight : 0;
-  const slThetaLen = slicerOn ? slicerThetaLength : 0;
-  const slFullTh   = slThetaLen >= 2 * Math.PI - 1e-6;
+  const slicerMask = slicer.getMaskState();
 
   const visible = fcalCellsData.filter(c => {
     if (!showFcal) return false;
     // Hide cells with negative energy — they aren't physically meaningful for
     // display, unless show-all is on (user explicitly asked for every cell).
-    if (!showAllCells && c.energy < 0) return false;
-    if (!showAllCells && c.energy * 1000 < thrFcalMev) return false;
-    if (!showAllCells && activeClusterCellIds !== null && c.id && !activeClusterCellIds.has(c.id)) return false;
-    if (slicerOn && slThetaLen > 1e-6) {
+    if (!slicer.isShowAllCells() && c.energy < 0) return false;
+    if (!slicer.isShowAllCells() && c.energy * 1000 < thrFcalMev) return false;
+    if (!slicer.isShowAllCells() && activeClusterCellIds !== null && c.id && !activeClusterCellIds.has(c.id)) return false;
+    if (slicerMask.active) {
       const cx = -c.x * 10, cy = -c.y * 10, cz = c.z * 10;
-      if (cx*cx + cy*cy < slR2 && cz > slZMin && cz < slZMax) {
-        if (slFullTh) return false;
-        let ang = Math.atan2(cy, cx);
-        if (ang < 0) ang += 2 * Math.PI;
-        if (ang < slThetaLen) return false;
-      }
+      if (slicer.isPointInsideWedge(cx, cy, cz, slicerMask)) return false;
     }
     return true;
   });
@@ -2039,7 +733,7 @@ function _applyFcalDraw() {
     fcalGroup.matrixAutoUpdate = false;
     scene.add(fcalGroup);
   }
-  if (!visible.length) { dirty = true; return; }
+  if (!visible.length) { markDirty(); return; }
 
   const n      = visible.length;
   // Shared geometry: unit-height cylinder (height scaled per instance via matrix).
@@ -2101,7 +795,7 @@ function _applyFcalDraw() {
   outLines.renderOrder     = 3;
   fcalGroup.add(outLines);
 
-  dirty = true;
+  markDirty();
 }
 
 function rebuildActiveClusterCellIds() {
@@ -2181,7 +875,7 @@ function _setHandleVisible(h, vis) {
 function _rebuildRayIMeshes() {
   _rayIMeshes.clear();
   for (const h of visHandles) _rayIMeshes.add(h.iMesh);
-  rayTargets = Array.from(_rayIMeshes);
+  rayTargets.length = 0; _rayIMeshes.forEach(im => rayTargets.push(im));
 }
 
 function resetScene() {
@@ -2200,7 +894,7 @@ function resetScene() {
   // which would desync the ghostVisible map and make the next ghost toggle
   // render only the phi lines without the solid envelopes.
   applyAllGhostMeshes();
-  active.clear(); visHandles = []; rayTargets = []; _rayIMeshes.clear();
+  active.clear(); visHandles = []; rayTargets.length = 0; _rayIMeshes.clear();
   clearOutline(); clearAllOutlines();
   clearTracks();
   clearClusters();
@@ -2209,7 +903,7 @@ function resetScene() {
   lastClusterData      = null;
   activeClusterCellIds = null;
   activeMbtsLabels     = null;
-  tooltip.hidden = true; dirty = true;
+  tooltip.hidden = true; markDirty();
 }
 
 // Sweep every cell that isn't part of the XML's `active` set and decide its
@@ -2219,30 +913,17 @@ function resetScene() {
 // slicer wedge currently covers it. Non-active cells that become visible are
 // appended to visHandles so outlines+raycast include them.
 function _syncNonActiveShowAll() {
-  if (!showAllCells) return;
-  const slicerOn = slicerActive;
-  const r2       = slicerOn ? SLICER_RADIUS * SLICER_RADIUS : 0;
-  const zMax     = slicerOn ? slicerZOffset + slicerHalfHeight : 0;
-  const zMin     = slicerOn ? slicerZOffset - slicerHalfHeight : 0;
-  const thetaLen = slicerOn ? slicerThetaLength : 0;
-  const fullTh   = slicerOn && thetaLen >= 2 * Math.PI - 1e-6;
-  const emptyTh  = slicerOn && thetaLen <= 1e-6;
+  if (!slicer.isShowAllCells()) return;
+  const slicerMask = slicer.getMaskState();
   const sweep = (list, detOn, minColor) => {
     for (let i = 0; i < list.length; i++) {
       const h = list[i];
       if (active.has(h)) continue;      // active cells: normal flow handles them
       if (!detOn) { _setHandleVisible(h, false); continue; }
       let vis = true;
-      if (slicerOn && !emptyTh) {
+      if (slicerMask.active) {
         const c = _cellCenter(h);
-        if (c.x*c.x + c.y*c.y < r2 && c.z > zMin && c.z < zMax) {
-          if (fullTh) vis = false;
-          else {
-            let ang = Math.atan2(c.y, c.x);
-            if (ang < 0) ang += 2 * Math.PI;
-            if (ang < thetaLen) vis = false;
-          }
-        }
+        if (slicer.isPointInsideWedge(c.x, c.y, c.z, slicerMask)) vis = false;
       }
       if (vis) {
         h.iMesh.setColorAt(h.instId, minColor);
@@ -2261,7 +942,7 @@ function applyThreshold() {
   // When the slicer is active it owns cell visibility (its mask already
   // incorporates the thresholds / cluster filter). Delegate to it so we don't
   // un-hide cells that should be inside the bubble.
-  if (slicerActive) { _applySlicerMask(); return; }
+  if (slicer.isActive()) { _applySlicerMask(); return; }
   visHandles = [];
   for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
     const thr    = det === 'LAR' ? thrLArMev  : det === 'HEC' ? thrHecMev : thrTileMev;
@@ -2278,9 +959,9 @@ function applyThreshold() {
     }
     // Show-all bypasses every filter (threshold, cluster, negative energy) —
     // the user wants literally every cell on an enabled detector visible.
-    const passThr = showAllCells || (!isFinite(thr) || energyMev >= thr);
-    const passCl  = showAllCells || inCluster;
-    const passNeg = showAllCells || energyMev >= 0;
+    const passThr = slicer.isShowAllCells() || (!isFinite(thr) || energyMev >= thr);
+    const passCl  = slicer.isShowAllCells() || inCluster;
+    const passNeg = slicer.isShowAllCells() || energyMev >= 0;
     const vis     = detOn && passNeg && passThr && passCl;
     _setHandleVisible(h, vis);
     if (vis) visHandles.push(h);
@@ -2289,7 +970,7 @@ function applyThreshold() {
   _flushIMDirty();
   _rebuildRayIMeshes();
   rebuildAllOutlines();
-  dirty = true;
+  markDirty();
 }
 
 // ── Process XML ───────────────────────────────────────────────────────────────
@@ -2351,11 +1032,9 @@ async function processXml(xmlText) {
     try { fcalCells = parseFcal(doc); } catch { fcalCells = []; }
     try { rawTracks  = parseTracks(doc);  } catch (e) { console.warn('Track parse error', e); }
     try { rawPhotons = parsePhotons(doc); } catch (e) { console.warn('Photon parse error', e); }
-    // parseClusters is called later (after resetScene) to preserve its
-    // lastClusterData side-effect in the correct order.
+    // parseClusters is called later (after resetScene) so lastClusterData is set
+    // after the scene is cleared, keeping state consistent.
   }
-  rawTracks = filterPhotonDuplicateTracks(rawTracks, rawPhotons);
-
   const total = tileCells.length + larCells.length + hecCells.length + mbtsCells.length;
   if (!total && !fcalCells.length) { setStatus('<span class="warn">No TILE, LAr, HEC, MBTS or FCAL cells found</span>'); return; }
 
@@ -2376,8 +1055,11 @@ async function processXml(xmlText) {
   try {
     // Fallback: parse clusters now (after resetScene) so lastClusterData is set.
     // Worker path: restore lastClusterData from the pre-parsed collections.
-    if (!workerResult) rawClusters = parseClusters(doc);
-    else lastClusterData = { collections: _clusterCollections };
+    if (!workerResult) {
+      const r = parseClusters(doc);
+      rawClusters = r.flat;
+      lastClusterData = { collections: r.collections };
+    } else lastClusterData = { collections: _clusterCollections };
     if (rawClusters.length) {
       let etMin = Infinity, etMax = -Infinity;
       for (const { etGev } of rawClusters) {
@@ -2566,328 +1248,7 @@ async function processXml(xmlText) {
   showEventInfo(currentEventInfo);
 }
 
-// ── Right panel (rpanel) toggle — mirrors left panel behavior ────────────────
-const rpanelWrap = document.getElementById('rpanel-wrap');
-const btnRpanel  = document.getElementById('btn-rpanel');
-let rpanelPinned = true;
-let rpanelHovered = false;
-
-function syncRPanelUI() {
-  const open = rpanelPinned || rpanelHovered;
-  rpanelWrap.classList.toggle('collapsed', !open);
-  btnRpanel.classList.toggle('on', rpanelPinned);
-  document.body.classList.toggle('rpanel-unpinned', !rpanelPinned);
-}
-function setPinnedR(v) { rpanelPinned = v; if (v) rpanelHovered = false; syncRPanelUI(); }
-function closeRPanel() { setPinnedR(false); rpanelHovered = false; syncRPanelUI(); }
-function openRPanel()  { setPinnedR(true); }
-
-// Hover from right edge — temporary show (only when not pinned & auto-open on)
-const rpanelEdge = document.getElementById('rpanel-edge');
-rpanelEdge.addEventListener('mouseenter', () => {
-  if (!rpanelPinned && autoOpenEnabled) { rpanelHovered = true; syncRPanelUI(); }
-});
-rpanelWrap.addEventListener('mouseleave', () => {
-  if (!rpanelPinned && rpanelHovered) { rpanelHovered = false; syncRPanelUI(); }
-});
-// Canvas click closes the right panel if it was hovered (not pinned)
-canvas.addEventListener('click', () => {
-  if (!rpanelPinned && rpanelHovered) { rpanelHovered = false; syncRPanelUI(); }
-});
-// Toolbar button — toggle pinned state
-btnRpanel.addEventListener('click', e => {
-  e.stopPropagation();
-  setPinnedR(!rpanelPinned);
-});
-// Start collapsed
-setPinnedR(false);
-
-// ── Tab switching ─────────────────────────────────────────────────────────────
-const TAB_IDS = ['tile', 'lar', 'fcal', 'hec', 'track'];
-function switchTab(det) {
-  const tabs = [...TAB_IDS];
-  // Include 'cluster' only when its pane has been moved into #rpanel (mobile mode).
-  const pc = document.getElementById('pane-cluster');
-  if (pc && pc.parentElement && pc.parentElement.id === 'rpanel') tabs.push('cluster');
-  tabs.forEach(d => {
-    const pane = document.getElementById('pane-' + d);
-    const tab  = document.getElementById('tab-'  + d);
-    if (pane) pane.style.display = d === det ? 'flex' : 'none';
-    if (tab)  tab.classList.toggle('on', d === det);
-  });
-}
-TAB_IDS.forEach(d => document.getElementById('tab-' + d).addEventListener('click', () => switchTab(d)));
-document.getElementById('tab-cluster').addEventListener('click', () => switchTab('cluster'));
-// Initialize: TILE pane visible, others hidden
-switchTab('tile');
-
-// ── Mobile: edge-TAP zones to open side panels ────────────────────────────────
-// Dragging interferes with the ATLAS 3D orbit, so we use stationary taps
-// instead. Tapping the left/right edge strip opens the respective panel.
-const mobileMQ = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
-(function setupEdgeTaps() {
-  const panelEdgeEl  = document.getElementById('panel-edge');
-  const rpanelEdgeEl = document.getElementById('rpanel-edge');
-
-  // A "tap" means touch down + up at roughly the same point within 350ms.
-  function tapOpener(el, openFn) {
-    let sx = 0, sy = 0, st = 0, tracking = false;
-    el.addEventListener('touchstart', e => {
-      if (!mobileMQ.matches) return;
-      const t = e.touches[0];
-      sx = t.clientX; sy = t.clientY; st = Date.now();
-      tracking = true;
-    }, { passive: true });
-    el.addEventListener('touchend', e => {
-      if (!tracking) return;
-      tracking = false;
-      const t  = e.changedTouches[0];
-      const dx = Math.abs(t.clientX - sx);
-      const dy = Math.abs(t.clientY - sy);
-      const dt = Date.now() - st;
-      if (dt <= 350 && dx <= 12 && dy <= 12) {
-        openFn();
-        e.preventDefault();
-      }
-    });
-    el.addEventListener('click', () => { if (mobileMQ.matches) openFn(); });
-  }
-  tapOpener(panelEdgeEl,  () => setPinned(true));
-  tapOpener(rpanelEdgeEl, () => setPinnedR(true));
-})();
-
-// ── Slider helpers ────────────────────────────────────────────────────────────
-function parseMevInput(s) {
-  s = s.trim().toLowerCase();
-  if (!s || s === 'all') return -Infinity;
-  const g = s.match(/^([\d.]+)\s*gev$/i); if (g) return parseFloat(g[1]) * 1000;
-  const m = s.match(/^([\d.]+)\s*(mev)?$/i); if (m) return parseFloat(m[1]);
-  return null;
-}
-function ratioFromPtr(e, trackEl) {
-  const rect = trackEl.getBoundingClientRect();
-  return 1 - Math.max(0, Math.min(1, ((e.clientY ?? e.touches?.[0]?.clientY ?? 0) - rect.top) / rect.height));
-}
-
-// Generic vertical energy slider — max in MeV (dynamic, updated per event via .update())
-function makeDetSlider(trackId, thumbId, inputId, getThr, setThr, maxMev, maxLblId) {
-  const track  = document.getElementById(trackId);
-  const thumb  = document.getElementById(thumbId);
-  const input  = document.getElementById(inputId);
-  const maxLbl = maxLblId ? document.getElementById(maxLblId) : null;
-  let drag = false;
-
-  function updateUI(mev) {
-    const ratio = isFinite(mev) && mev > 0 ? Math.max(0, Math.min(1, mev / maxMev)) : 0;
-    thumb.style.top = ((1 - ratio) * 100) + '%';
-    if (document.activeElement !== input) input.value = isFinite(mev) && mev > 0 ? fmtMev(mev) : '';
-  }
-
-  track.addEventListener('pointerdown', e => {
-    drag = true; rpanelWrap.classList.add('dragging'); track.setPointerCapture(e.pointerId);
-    const r = ratioFromPtr(e, track); setThr(r <= 0 ? -Infinity : maxMev * r);
-    updateUI(getThr()); applyThreshold();
-  });
-  track.addEventListener('pointermove', e => {
-    if (!drag) return;
-    const r = ratioFromPtr(e, track); setThr(r <= 0 ? -Infinity : maxMev * r);
-    updateUI(getThr()); applyThreshold();
-  });
-  ['pointerup', 'pointercancel'].forEach(ev =>
-    track.addEventListener(ev, () => { drag = false; rpanelWrap.classList.remove('dragging'); })
-  );
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
-  input.addEventListener('blur', () => {
-    const v = parseMevInput(input.value);
-    if (v !== null) {
-      const clamped = v === -Infinity ? v : Math.max(0, Math.min(maxMev, v));
-      setThr(clamped);
-      applyThreshold();
-    }
-    updateUI(getThr());
-  });
-
-  function update(newMaxMev) {
-    maxMev = newMaxMev;
-    if (maxLbl) maxLbl.textContent = fmtMev(newMaxMev);
-    updateUI(getThr());
-  }
-
-  return { updateUI, update };
-}
-
-const tileSlider = makeDetSlider('tile-strak', 'tile-sthumb', 'tile-thr-input',
-  () => thrTileMev, v => { thrTileMev = v; }, TILE_SCALE, 'tile-sval-max');
-const larSlider  = makeDetSlider('lar-strak',  'lar-sthumb',  'lar-thr-input',
-  () => thrLArMev,  v => { thrLArMev = v; },  LAR_SCALE,  'lar-sval-max');
-const fcalSlider = makeDetSlider('fcal-strak', 'fcal-sthumb', 'fcal-thr-input',
-  () => thrFcalMev, v => { thrFcalMev = v; applyFcalThreshold(); }, FCAL_SCALE, 'fcal-sval-max');
-const hecSlider  = makeDetSlider('hec-strak',  'hec-sthumb',  'hec-thr-input',
-  () => thrHecMev,  v => { thrHecMev = v; },  HEC_SCALE,  'hec-sval-max');
-
-function fmtGev(v) { return v.toFixed(2) + ' GeV'; }
-
-// ── Track pT slider (dynamic range — updates each event) ─────────────────────
-function makeTrackPtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
-  const trackEl  = document.getElementById(trackId);
-  const thumbEl  = document.getElementById(thumbId);
-  const inputEl  = document.getElementById(inputId);
-  const maxLblEl = document.getElementById(maxLblId);
-  const minLblEl = document.getElementById(minLblId);
-  let drag = false;
-
-  function updateUI() {
-    const span = trackPtMaxGev - trackPtMinGev;
-    const r    = span > 0 ? Math.max(0, Math.min(1, (thrTrackGev - trackPtMinGev) / span)) : 0;
-    thumbEl.style.top = ((1 - r) * 100) + '%';
-    if (document.activeElement !== inputEl)
-      inputEl.value = thrTrackGev > trackPtMinGev + 1e-9 ? fmtGev(thrTrackGev) : '';
-  }
-
-  function setFromRatio(r) {
-    const span = trackPtMaxGev - trackPtMinGev;
-    thrTrackGev = r <= 0 ? trackPtMinGev : trackPtMinGev + span * r;
-    updateUI();
-    applyTrackThreshold();
-  }
-
-  trackEl.addEventListener('pointerdown', e => {
-    drag = true; rpanelWrap.classList.add('dragging'); trackEl.setPointerCapture(e.pointerId);
-    setFromRatio(ratioFromPtr(e, trackEl));
-  });
-  trackEl.addEventListener('pointermove', e => { if (drag) setFromRatio(ratioFromPtr(e, trackEl)); });
-  ['pointerup', 'pointercancel'].forEach(ev =>
-    trackEl.addEventListener(ev, () => { drag = false; rpanelWrap.classList.remove('dragging'); })
-  );
-  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') inputEl.blur(); });
-  inputEl.addEventListener('blur', () => {
-    const s = inputEl.value.trim().toLowerCase();
-    if (!s || s === 'all') {
-      thrTrackGev = trackPtMinGev;
-    } else {
-      const g = s.match(/^([\d.]+)\s*gev$/i);
-      const v = g ? parseFloat(g[1]) : parseFloat(s);
-      if (isFinite(v)) thrTrackGev = Math.max(trackPtMinGev, Math.min(trackPtMaxGev, v));
-    }
-    updateUI();
-    applyTrackThreshold();
-  });
-
-  function update(minGev, maxGev) {
-    trackPtMinGev = minGev;
-    trackPtMaxGev = maxGev;
-    thrTrackGev   = 2; // fixed initial threshold
-    if (maxLblEl) maxLblEl.textContent = fmtGev(maxGev);
-    if (minLblEl) minLblEl.textContent = fmtGev(minGev);
-    updateUI();
-  }
-
-  return { updateUI, update };
-}
-
-const trackPtSlider = makeTrackPtSlider(
-  'track-strak', 'track-sthumb', 'track-thr-input',
-  'track-sval-max', 'track-sval-min'
-);
-
-// ── Cluster Et slider (dynamic range — updates each event) ───────────────────
-function makeClusterEtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
-  const trackEl  = document.getElementById(trackId);
-  const thumbEl  = document.getElementById(thumbId);
-  const inputEl  = document.getElementById(inputId);
-  const maxLblEl = document.getElementById(maxLblId);
-  const minLblEl = document.getElementById(minLblId);
-  let drag = false;
-
-
-  function updateUI() {
-    const span = clusterEtMaxGev - clusterEtMinGev;
-    const r    = span > 0 ? Math.max(0, Math.min(1, (thrClusterEtGev - clusterEtMinGev) / span)) : 0;
-    thumbEl.style.top = ((1 - r) * 100) + '%';
-    if (document.activeElement !== inputEl)
-      inputEl.value = thrClusterEtGev > clusterEtMinGev + 1e-9 ? fmtGev(thrClusterEtGev) : '';
-  }
-
-  function setFromRatio(r) {
-    if (!clusterFilterEnabled) return;
-    const span = clusterEtMaxGev - clusterEtMinGev;
-    thrClusterEtGev = r <= 0 ? clusterEtMinGev : clusterEtMinGev + span * r;
-    updateUI();
-    applyClusterThreshold();
-  }
-
-  trackEl.addEventListener('pointerdown', e => {
-    drag = true; rpanelWrap.classList.add('dragging'); trackEl.setPointerCapture(e.pointerId);
-    setFromRatio(ratioFromPtr(e, trackEl));
-  });
-  trackEl.addEventListener('pointermove', e => { if (drag) setFromRatio(ratioFromPtr(e, trackEl)); });
-  ['pointerup', 'pointercancel'].forEach(ev =>
-    trackEl.addEventListener(ev, () => { drag = false; rpanelWrap.classList.remove('dragging'); })
-  );
-  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') inputEl.blur(); });
-  inputEl.addEventListener('blur', () => {
-    if (!clusterFilterEnabled) {
-      updateUI();
-      return;
-    }
-    const s = inputEl.value.trim().toLowerCase();
-    if (!s || s === 'all') {
-      thrClusterEtGev = clusterEtMinGev;
-    } else {
-      const g = s.match(/^([\d.]+)\s*gev$/i);
-      const v = g ? parseFloat(g[1]) : parseFloat(s);
-      if (isFinite(v)) thrClusterEtGev = Math.max(clusterEtMinGev, Math.min(clusterEtMaxGev, v));
-    }
-    updateUI();
-    applyClusterThreshold();
-  });
-
-  function update(minGev, maxGev) {
-    clusterEtMinGev   = minGev;
-    clusterEtMaxGev   = maxGev;
-    thrClusterEtGev   = Math.max(3, minGev); // default 3 GeV
-    if (maxLblEl) maxLblEl.textContent = fmtGev(maxGev);
-    if (minLblEl) minLblEl.textContent = fmtGev(minGev);
-    updateUI();
-  }
-
-  return { updateUI, update };
-}
-
-const clusterEtSlider = makeClusterEtSlider(
-  'cluster-strak', 'cluster-sthumb', 'cluster-thr-input',
-  'cluster-sval-max', 'cluster-sval-min'
-);
-
-function syncClusterFilterToggle() {
-  const btn  = document.getElementById('cluster-filter-toggle');
-  const pane = document.getElementById('pane-cluster');
-  const input = document.getElementById('cluster-thr-input');
-  if (!btn || !pane) return;
-  btn.classList.toggle('on', clusterFilterEnabled);
-  btn.setAttribute('aria-checked', clusterFilterEnabled ? 'true' : 'false');
-  btn.textContent = clusterFilterEnabled ? 'On' : 'Off';
-  pane.classList.toggle('cluster-filter-disabled', !clusterFilterEnabled);
-  if (input) input.disabled = !clusterFilterEnabled;
-}
-
-// Initialize thumb positions at default threshold
-tileSlider.updateUI(thrTileMev);
-larSlider.updateUI(thrLArMev);
-fcalSlider.updateUI(thrFcalMev);
-hecSlider.updateUI(thrHecMev);
-
-function initDetPanel(hasTile, hasLAr, hasHec, hasTracks, hasFcal) {
-  tileSlider.updateUI(thrTileMev);
-  larSlider.updateUI(thrLArMev);
-  fcalSlider.updateUI(thrFcalMev);
-  hecSlider.updateUI(thrHecMev);
-  clusterEtSlider.updateUI();
-  syncClusterFilterToggle();
-  openRPanel();
-  if (hasTile) switchTab('tile'); else if (hasLAr) switchTab('lar'); else if (hasFcal) switchTab('fcal');
-  else if (hasHec) switchTab('hec'); else if (hasTracks) switchTab('track');
-}
+// Detector tabs and threshold sliders live in js/detectorPanels.js.
 
 // (ghost functions defined above near GHOST_MESH_NAMES)
 
@@ -2911,7 +1272,7 @@ function toggleBeam() {
   buildBeamIndicator(); beamOn = !beamOn;
   beamGroup.visible = beamOn;
   document.getElementById('btn-beam').classList.toggle('on', beamOn);
-  dirty = true;
+  markDirty();
 }
 
 // ── EdgesGeometry outline (hover) ─────────────────────────────────────────────
@@ -2919,7 +1280,7 @@ const eGeoCache  = new Map();
 const outlineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
 let   outlineMesh = null;
 function clearOutline() {
-  if (!outlineMesh) return; scene.remove(outlineMesh); outlineMesh = null; dirty = true;
+  if (!outlineMesh) return; scene.remove(outlineMesh); outlineMesh = null; markDirty();
 }
 function showOutline(h) {
   if (outlineMesh?.userData.src === h.name) return;
@@ -2932,7 +1293,7 @@ function showOutline(h) {
   outlineMesh.matrix.copy(h.origMatrix);
   outlineMesh.matrixWorld.copy(h.origMatrix);
   outlineMesh.renderOrder = 999; outlineMesh.userData.src = h.name;
-  scene.add(outlineMesh); dirty = true;
+  scene.add(outlineMesh); markDirty();
 }
 
 // Show hover outline (white) for a specific FCAL InstancedMesh instance.
@@ -2959,7 +1320,7 @@ function showFcalOutline(instanceId) {
   outlineMesh.matrixAutoUpdate = false;
   outlineMesh.renderOrder = 999;
   outlineMesh.userData.src = src;
-  scene.add(outlineMesh); dirty = true;
+  scene.add(outlineMesh); markDirty();
 }
 
 // ── All-cells outline (optimised: cached world-space edges per mesh) ─────────
@@ -2992,7 +1353,7 @@ function clearAllOutlines() {
   scene.remove(allOutlinesMesh);
   allOutlinesMesh.geometry.dispose();
   allOutlinesMesh = null;
-  dirty = true;
+  markDirty();
 }
 
 function rebuildAllOutlines() {
@@ -3025,7 +1386,7 @@ function _buildOutlinesNow() {
   allOutlinesMesh.frustumCulled = false;
   allOutlinesMesh.renderOrder = 3;
   scene.add(allOutlinesMesh);
-  dirty = true;
+  markDirty();
 }
 
 // ── Hover tooltip — raycasting fix ───────────────────────────────────────────
@@ -3045,7 +1406,7 @@ function doRaycast(clientX, clientY) {
   const hasPhotonLines  = photonGroup  && photonGroup.visible  && photonGroup.children.length  > 0;
   const hasClusterLines = clusterGroup && clusterGroup.visible && clusterGroup.children.length > 0;
   const hasFcalTubes    = fcalGroup && fcalGroup.children.some(c => c.isInstancedMesh) && fcalVisibleMap.length > 0;
-  if (!showInfo || cinemaMode || (!active.size && !hasTrackLines && !hasPhotonLines && !hasClusterLines && !hasFcalTubes)) { tooltip.hidden = true; clearOutline(); return; }
+  if (!showInfo || cinema.isCinemaMode() || (!active.size && !hasTrackLines && !hasPhotonLines && !hasClusterLines && !hasFcalTubes)) { tooltip.hidden = true; clearOutline(); return; }
   // Don't show cell info when the pointer is over any UI element (panels, toolbar, overlays)
   const topEl = document.elementFromPoint(clientX, clientY);
   if (topEl && topEl !== canvas) { tooltip.hidden = true; clearOutline(); return; }
@@ -3090,7 +1451,7 @@ function doRaycast(clientX, clientY) {
       if (tipEKeyEl) tipEKeyEl.textContent = t('tip-energy-key');
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
-      tooltip.hidden = false; dirty = true; return;
+      tooltip.hidden = false; markDirty(); return;
     }
     if (fcalHit) {
       const iid  = fcalHit.instanceId;
@@ -3103,7 +1464,7 @@ function doRaycast(clientX, clientY) {
       if (tipEKeyEl) tipEKeyEl.textContent = t('tip-energy-key');
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
-      tooltip.hidden = false; dirty = true; return;
+      tooltip.hidden = false; markDirty(); return;
     }
   }
   // ── Track / Photon hit (pick closest) ────────────────────────────────────
@@ -3124,7 +1485,7 @@ function doRaycast(clientX, clientY) {
       if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
-      tooltip.hidden = false; dirty = true; return;
+      tooltip.hidden = false; markDirty(); return;
     }
   }
   // ── Cluster hit ───────────────────────────────────────────────────────────
@@ -3142,7 +1503,7 @@ function doRaycast(clientX, clientY) {
       if (tipEKeyEl) tipEKeyEl.innerHTML = 'E<sub>T</sub>';
       tooltip.style.left = Math.min(clientX+18, rect.right-210)+'px';
       tooltip.style.top  = Math.min(clientY+18, rect.bottom-90)+'px';
-      tooltip.hidden = false; dirty = true; return;
+      tooltip.hidden = false; markDirty(); return;
     }
   }
   clearOutline(); tooltip.hidden = true;
@@ -3155,234 +1516,18 @@ document.addEventListener('mousemove', e => {
 canvas.addEventListener('mouseleave', () => { clearOutline(); tooltip.hidden = true; });
 controls.addEventListener('end', () => { lastRay = 0; setTimeout(() => doRaycast(mousePos.x, mousePos.y), 50); });
 
-// ── Cinema ────────────────────────────────────────────────────────────────────
-let tourMode = localStorage.getItem('cgv-tour-mode') === '1';
-// Tour path — a single continuous Catmull-Rom spline, no segment-based ease so
-// the camera glides at near-uniform speed with no pauses at waypoints.
-// Scene units = mm. Beam axis is the z-axis (x=y=0). Inside the FCAL z-range
-// (|z| ~4700-6200 mm) the cells have a beam-pipe bore at r < ~70 mm, so we
-// keep the camera at r ≈ 10 mm throughout — always on the axis, never inside
-// any cell volume.
-// Narrative: wide establishing → swing down to the beam axis at +z → approach
-// face-on toward the +z FCAL → glide along the bore while panning the camera
-// to look at each inner wall then back to center → exit face-on through the
-// -z FCAL → arc around outside, see the detector from far → return to start.
-const _tourCamWaypoints = [
-  // Phase 1: wide establishing, swing onto beam axis
-  new THREE.Vector3(  8500,  3500,  12500),  // 1  wide oblique
-  new THREE.Vector3(  3000,  1200,  13000),  // 2  banking toward axis
-
-  // Phase 2: face-on approach to +z FCAL, zoom in
-  new THREE.Vector3(     0,    12,  11500),  // 3  on beam axis, distant
-  new THREE.Vector3(     0,    10,   8500),  // 4  zooming in on +z face
-  new THREE.Vector3(     0,    10,   7000),  // 5  close-up on +z FCAL face
-
-  // Phase 3: pass through FCAL bore, look at inner walls, return to center
-  new THREE.Vector3(     0,    10,   4500),  // 6  inside bore, swinging gaze to interior
-  new THREE.Vector3(     0,    10,   2500),  // 7  pan to +x wall
-  new THREE.Vector3(     0,    10,   1000),  // 8  pan upward diagonal
-  new THREE.Vector3(     0,    10,   -500),  // 9  pan to opposite wall
-  new THREE.Vector3(     0,    10,  -2000),  // 10 pan to -x wall
-  new THREE.Vector3(     0,    10,  -4000),  // 11 return gaze to center
-
-  // Phase 4: exit face-on through -z FCAL, zoom out
-  new THREE.Vector3(     0,    10,  -7000),  // 12 just past -z face, look back at it
-  new THREE.Vector3(     0,    12,  -8500),  // 13 pulling back, -z face still in view
-  new THREE.Vector3(     0,    15, -11500),  // 14 wide on -z axis
-
-  // Phase 5: arc around outside, pass near -x, climb back up and loop
-  new THREE.Vector3( -5500,  2500,  -9500),  // 15 banking out to -x side
-  new THREE.Vector3( -9000,  2000,      0),  // 16 wide pass along -x side
-  new THREE.Vector3( -5500,  3200,   8500),  // 17 arcing back toward +z
-  new THREE.Vector3(  1000,  4500,  12000),  // 18 closing the loop
-];
-const _tourTgtWaypoints = [
-  new THREE.Vector3(     0,     0,     0),  // 1
-  new THREE.Vector3(     0,     0,  3000),  // 2
-  new THREE.Vector3(     0,     0,  5800),  // 3  look at +z FCAL face
-  new THREE.Vector3(     0,     0,  5800),  // 4  hold on the face
-  new THREE.Vector3(     0,     0,  5500),  // 5  zoomed on the face
-  new THREE.Vector3(     0,     0,  1500),  // 6  swinging gaze into the barrel
-  new THREE.Vector3(  2800,   800,  1800),  // 7  +x wall slightly up
-  new THREE.Vector3(  1200,  2400,    400),  // 8  up-right diagonal (safe, 32° off +y)
-  new THREE.Vector3( -1200,  2400,   -400),  // 9  up-left diagonal
-  new THREE.Vector3( -2800,   800, -1800),  // 10 -x wall slightly up
-  new THREE.Vector3(     0,     0, -1500),  // 11 back to center of calorimeter
-  new THREE.Vector3(     0,     0, -5500),  // 12 look back at -z FCAL face
-  new THREE.Vector3(     0,     0, -5500),  // 13 hold on -z face
-  new THREE.Vector3(     0,     0,     0),  // 14 look back at ATLAS (whole thing)
-  new THREE.Vector3(     0,     0,     0),  // 15
-  new THREE.Vector3(     0,     0,     0),  // 16
-  new THREE.Vector3(     0,     0,     0),  // 17
-  new THREE.Vector3(     0,     0,     0),  // 18
-];
-const _tourPosCurve = new THREE.CatmullRomCurve3(_tourCamWaypoints, true, 'centripetal', 0.5);
-const _tourTgtCurve = new THREE.CatmullRomCurve3(_tourTgtWaypoints, true, 'centripetal', 0.5);
-const TOUR_TOTAL_DURATION = 105_000;  // full loop in ms
-const TOUR_BLEND_MS       = 2200;      // smooth entry from current pose
-
-// Exit inertia: track per-frame velocity of camera+target during the active
-// tour so we can keep drifting (with quadratic decay) after user leaves cinema.
-// `var` (not `let`) so the render-loop guard up-file can read it via hoisting.
-var _tourExiting = false;
-let _tourExitT0 = 0;
-const TOUR_EXIT_DURATION = 1400;
-const _tourPrevPos = new THREE.Vector3();
-const _tourPrevTgt = new THREE.Vector3();
-const _tourVelPos  = new THREE.Vector3();
-const _tourVelTgt  = new THREE.Vector3();
-let _tourPrevT = 0;
-
-// Continuous-motion state: `_tourU0` is the spline u-coordinate at time _tourT0
-// so the tour can resume mid-spline when re-entered.
-let _tourT0   = 0;
-let _tourU0   = 0;
-let _tourBlending   = false;
-let _tourBlendT0    = 0;
-const _tourBlendFromPos = new THREE.Vector3();
-const _tourBlendFromTgt = new THREE.Vector3();
-const _tourTmpPos = new THREE.Vector3();
-const _tourTmpTgt = new THREE.Vector3();
-
-function _tourEase(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2; }  // easeInOutQuad
-
-// Find the spline u-coordinate (0..1) whose point is closest to `v`.
-// Coarse sample then local refine — good enough for smooth resume.
-function _tourNearestU(v) {
-  const N = 240;
-  let bestU = 0, bestD = Infinity;
-  for (let i = 0; i < N; i++) {
-    const u = i / N;
-    _tourPosCurve.getPoint(u, _tourTmpPos);
-    const d = _tourTmpPos.distanceToSquared(v);
-    if (d < bestD) { bestD = d; bestU = u; }
-  }
-  return bestU;
-}
-
-function _tourSampleU(u) {
-  u = ((u % 1) + 1) % 1;
-  _tourPosCurve.getPoint(u, _tourTmpPos);
-  _tourTgtCurve.getPoint(u, _tourTmpTgt);
-}
-
-function _tourTick() {
-  const now = performance.now();
-
-  // Exit-inertia phase: cinema already off, but tour drift continues.
-  if (_tourExiting) {
-    const et = now - _tourExitT0;
-    if (et >= TOUR_EXIT_DURATION) { _tourExiting = false; return; }
-    const decay = Math.pow(1 - et / TOUR_EXIT_DURATION, 2);
-    const dtSec = Math.max(0.001, (now - _tourPrevT) / 1000);
-    camera.position.addScaledVector(_tourVelPos, decay * dtSec);
-    controls.target.addScaledVector(_tourVelTgt, decay * dtSec);
-    controls.update();
-    dirty = true;
-    _tourPrevT = now;
-    return;
-  }
-
-  if (!cinemaMode || !tourMode) return;
-
-  // Blend-in: 2.2 s easeInOut from whatever pose the camera had to the start
-  // of the spline, so entering the tour from anywhere is smooth.
-  if (_tourBlending) {
-    const bt = now - _tourBlendT0;
-    const k  = Math.min(1, bt / TOUR_BLEND_MS);
-    const e  = _tourEase(k);
-    _tourSampleU(_tourU0);
-    camera.position.lerpVectors(_tourBlendFromPos, _tourTmpPos, e);
-    controls.target.lerpVectors(_tourBlendFromTgt, _tourTmpTgt, e);
-    controls.update();
-    dirty = true;
-
-    const dtSec = Math.max(0.001, (now - _tourPrevT) / 1000);
-    _tourVelPos.subVectors(camera.position,  _tourPrevPos).divideScalar(dtSec);
-    _tourVelTgt.subVectors(controls.target, _tourPrevTgt).divideScalar(dtSec);
-    _tourPrevPos.copy(camera.position);
-    _tourPrevTgt.copy(controls.target);
-    _tourPrevT = now;
-
-    if (k >= 1) {
-      _tourBlending = false;
-      _tourT0 = now;  // spline-time clock starts now from u = _tourU0
-    }
-    return;
-  }
-
-  // Continuous spline traversal — no per-segment pauses.
-  const u = (_tourU0 + (now - _tourT0) / TOUR_TOTAL_DURATION) % 1;
-  _tourSampleU(u);
-  camera.position.copy(_tourTmpPos);
-  controls.target.copy(_tourTmpTgt);
-  controls.update();
-  dirty = true;
-
-  // Record per-frame velocity (scene-units / second) for exit inertia.
-  const dtSec = Math.max(0.001, (now - _tourPrevT) / 1000);
-  _tourVelPos.subVectors(camera.position,  _tourPrevPos).divideScalar(dtSec);
-  _tourVelTgt.subVectors(controls.target, _tourPrevTgt).divideScalar(dtSec);
-  _tourPrevPos.copy(camera.position);
-  _tourPrevTgt.copy(controls.target);
-  _tourPrevT = now;
-}
-
-function _startTour() {
-  // Resume from wherever the camera is: find the nearest u on the spline and
-  // blend in over TOUR_BLEND_MS. From u=_tourU0 the spline-time clock advances.
-  const now = performance.now();
-  _tourU0 = _tourNearestU(camera.position);
-  _tourBlending = true;
-  _tourBlendT0  = now;
-  _tourT0       = now;  // will be rebased when blend completes
-  _tourBlendFromPos.copy(camera.position);
-  _tourBlendFromTgt.copy(controls.target);
-  _tourPrevPos.copy(camera.position);
-  _tourPrevTgt.copy(controls.target);
-  _tourVelPos.set(0, 0, 0);
-  _tourVelTgt.set(0, 0, 0);
-  _tourPrevT = now;
-  _tourExiting = false;
-  controls.autoRotate = false;
-}
-
-function enterCinema() {
-  cinemaMode = true; document.body.classList.add('cinema');
-  document.getElementById('btn-cinema').classList.add('on');
-  clearOutline(); tooltip.hidden = true;
-  _tourExiting = false;
-  updateCollisionHud();
-  if (tourMode) {
-    _startTour();
-  } else {
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.55;
-  }
-}
-function exitCinema() {
-  const wasTour = cinemaMode && tourMode;
-  cinemaMode = false; document.body.classList.remove('cinema');
-  controls.autoRotate = false; document.getElementById('btn-cinema').classList.remove('on');
-  updateCollisionHud();
-  if (wasTour) {
-    _tourExiting = true;
-    _tourExitT0  = performance.now();
-    _tourPrevT   = _tourExitT0;
-  }
-}
-function resetCamera() {
-  camera.position.set(0, 0, 12_000);
-  controls.target.set(0, 0, 0);
-  controls.update();
-  dirty = true;
-}
-document.getElementById('btn-cinema').addEventListener('click', () => cinemaMode ? exitCinema() : enterCinema());
-document.getElementById('cinema-exit').addEventListener('click', exitCinema);
-let cDragged = false;
-canvas.addEventListener('mousedown', () => { cDragged = false; });
-canvas.addEventListener('mousemove', () => { cDragged = true; });
-canvas.addEventListener('mouseup',   () => { if (cinemaMode && !cDragged) exitCinema(); });
+const cinema = setupCinemaControls({
+  camera,
+  canvas,
+  controls,
+  markDirty,
+  clearOutline,
+  hideTooltip: () => { tooltip.hidden = true; },
+  updateCollisionHud,
+});
+const enterCinema = () => cinema.enterCinema();
+const exitCinema = () => cinema.exitCinema();
+const resetCamera = () => cinema.resetCamera();
 
 // ── Tooltip toggle ────────────────────────────────────────────────────────────
 document.getElementById('btn-info').addEventListener('click', () => {
@@ -3413,17 +1558,17 @@ function syncLayerToggles() {
   document.getElementById('btn-layers').classList.toggle('on', showTile || showLAr || showHec || showFcal);
 }
 
+function refreshSceneVisibility() {
+  applyThreshold();
+  applyFcalThreshold();
+}
+
 document.getElementById('ltog-tile').addEventListener('click', () => { showTile = !showTile; syncLayerToggles(); applyThreshold(); });
 document.getElementById('ltog-lar') .addEventListener('click', () => { showLAr  = !showLAr;  syncLayerToggles(); applyThreshold(); });
 document.getElementById('ltog-hec') .addEventListener('click', () => { showHec  = !showHec;  syncLayerToggles(); applyThreshold(); });
 document.getElementById('ltog-fcal').addEventListener('click', () => { showFcal = !showFcal; syncLayerToggles(); applyFcalThreshold(); });
-document.getElementById('lbtn-all') .addEventListener('click', () => { showTile = showLAr = showHec = showFcal = true;  syncLayerToggles(); applyThreshold(); applyFcalThreshold(); });
-document.getElementById('lbtn-none').addEventListener('click', () => { showTile = showLAr = showHec = showFcal = false; syncLayerToggles(); applyThreshold(); applyFcalThreshold(); });
-document.getElementById('cluster-filter-toggle').addEventListener('click', () => {
-  clusterFilterEnabled = !clusterFilterEnabled;
-  syncClusterFilterToggle();
-  applyClusterThreshold();
-});
+document.getElementById('lbtn-all') .addEventListener('click', () => { showTile = showLAr = showHec = showFcal = true;  syncLayerToggles(); refreshSceneVisibility(); });
+document.getElementById('lbtn-none').addEventListener('click', () => { showTile = showLAr = showHec = showFcal = false; syncLayerToggles(); refreshSceneVisibility(); });
 
 // Layers panel open / close
 const layersPanel = document.getElementById('layers-panel');
@@ -3467,7 +1612,7 @@ function toggleTracks() {
   if (photonGroup) photonGroup.visible = tracksVisible;
   updateTrackAtlasIntersections();
   syncTracksBtn();
-  dirty = true;
+  markDirty();
 }
 document.getElementById('btn-tracks').addEventListener('click', toggleTracks);
 
@@ -3480,14 +1625,13 @@ function toggleClusters() {
   clustersVisible = !clustersVisible;
   if (clusterGroup) clusterGroup.visible = clustersVisible;
   syncClustersBtn();
-  dirty = true;
+  markDirty();
 }
 document.getElementById('btn-cluster').addEventListener('click', toggleClusters);
 
 
 document.addEventListener('click', () => {
   if (layersPanelOpen) closeLayersPanel();
-  if (atlasPanelOpen)  closeAtlasPanel();
 });
 layersPanel.addEventListener('click', e => e.stopPropagation());
 
@@ -3495,6 +1639,7 @@ layersPanel.addEventListener('click', e => e.stopPropagation());
 const panelEl      = document.getElementById('panel');
 const panelEdge    = document.getElementById('panel-edge');
 const panelResizer = document.getElementById('panel-resizer');
+const rpanelWrap   = document.getElementById('rpanel-wrap');
 const savedPW = localStorage.getItem('cgv-panel-width');
 if (savedPW) document.documentElement.style.setProperty('--pw', savedPW + 'px');
 let prDrag = false, prStartX = 0, prStartW = 0;
@@ -3513,42 +1658,62 @@ document.addEventListener('pointerup', () => {
   localStorage.setItem('cgv-panel-width', w);
 });
 
-// ── Shared auto-open preference (set by Settings toggle) ─────────────────────
-let autoOpenEnabled = true;
-
-// ── Panel pin / unpin ─────────────────────────────────────────────────────────
-function setPinned(v) {
-  panelPinned = v;
-  document.body.classList.toggle('panel-unpinned', !v);
-  panelEl.classList.toggle('collapsed', !v);
-  document.getElementById('btn-pin').classList.toggle('on', v);
-  document.querySelector('#pin-icon use').setAttribute('href', v ? '#i-pin' : '#i-pin-off');
-  document.getElementById('btn-pin').dataset.tip = t(v ? 'tip-pin' : 'tip-panel');
-  document.getElementById('btn-panel').classList.toggle('on', v);
-  updateCollisionHud();
-}
-document.getElementById('btn-pin').addEventListener('click', () => setPinned(!panelPinned));
-// Hover from left edge — temporary show (only if auto-open enabled)
-panelEdge.addEventListener('mouseenter', () => {
-  if (!panelPinned && autoOpenEnabled) { panelEl.classList.remove('collapsed'); panelHovered = true; }
-});
-panelEl.addEventListener('mouseleave', () => {
-  if (!panelPinned && panelHovered) { panelEl.classList.add('collapsed'); panelHovered = false; }
-});
-canvas.addEventListener('click', () => {
-  if (!panelPinned && panelHovered) { panelEl.classList.add('collapsed'); panelHovered = false; }
-});
-if (window.innerWidth < 640 || mobileMQ.matches) setPinned(false);
-
-// ── Panel toggle button in toolbar (L key) — pin/unpin ───────────────────────
-document.getElementById('btn-panel').addEventListener('click', () => {
-  // If hovered (temporary): pin it so it stays
-  if (!panelPinned && panelHovered) { panelHovered = false; setPinned(true); return; }
-  // Otherwise toggle pin
-  setPinned(!panelPinned);
-});
 
 // ── About overlay ─────────────────────────────────────────────────────────────
+sidebarControls = setupSidebarControls({
+  canvas,
+  getCinemaMode: () => cinema.isCinemaMode(),
+  getTourMode: () => cinema.isTourMode(),
+  onDisableTourMode: () => cinema.disableTourMode(),
+  onEnableTourMode: () => cinema.enableTourMode(),
+  t,
+  updateCollisionHud,
+});
+
+({
+  tileSlider,
+  larSlider,
+  fcalSlider,
+  hecSlider,
+  trackPtSlider,
+  clusterEtSlider,
+  initDetPanel,
+} = setupDetectorPanels({
+  TILE_SCALE,
+  LAR_SCALE,
+  FCAL_SCALE,
+  HEC_SCALE,
+  applyThreshold,
+  applyFcalThreshold,
+  applyTrackThreshold,
+  applyClusterThreshold,
+  sidebarControls,
+  state: {
+    getThrTileMev: () => thrTileMev,
+    setThrTileMev: v => { thrTileMev = v; },
+    getThrLArMev: () => thrLArMev,
+    setThrLArMev: v => { thrLArMev = v; },
+    getThrFcalMev: () => thrFcalMev,
+    setThrFcalMev: v => { thrFcalMev = v; },
+    getThrHecMev: () => thrHecMev,
+    setThrHecMev: v => { thrHecMev = v; },
+    getThrTrackGev: () => thrTrackGev,
+    setThrTrackGev: v => { thrTrackGev = v; },
+    getTrackPtMinGev: () => trackPtMinGev,
+    setTrackPtMinGev: v => { trackPtMinGev = v; },
+    getTrackPtMaxGev: () => trackPtMaxGev,
+    setTrackPtMaxGev: v => { trackPtMaxGev = v; },
+    getThrClusterEtGev: () => thrClusterEtGev,
+    setThrClusterEtGev: v => { thrClusterEtGev = v; },
+    getClusterEtMinGev: () => clusterEtMinGev,
+    setClusterEtMinGev: v => { clusterEtMinGev = v; },
+    getClusterEtMaxGev: () => clusterEtMaxGev,
+    setClusterEtMaxGev: v => { clusterEtMaxGev = v; },
+    getClusterFilterEnabled: () => clusterFilterEnabled,
+    setClusterFilterEnabled: v => { clusterFilterEnabled = v; },
+  },
+}));
+
 const aboutOverlay = document.getElementById('about-overlay');
 document.getElementById('btn-about-close').addEventListener('click', () => aboutOverlay.classList.remove('open'));
 aboutOverlay.addEventListener('click', e => { if (e.target===aboutOverlay) aboutOverlay.classList.remove('open'); });
@@ -3604,7 +1769,7 @@ document.querySelectorAll('[data-tip]').forEach(el => {
     hint.innerHTML = html || `<span class="sh-key">Event</span><span class="sh-val">no metadata</span>`;
   }
   function show() {
-    if (!hintsEnabled) return;
+    if (!sidebarControls.isHintsEnabled()) return;
     build();
     hint.classList.add('show');
     const sr = sb.getBoundingClientRect();
@@ -3622,6 +1787,16 @@ document.querySelectorAll('[data-tip]').forEach(el => {
 })();
 
 // ── Mode toggle ───────────────────────────────────────────────────────────────
+const sampleMode = setupSampleMode({
+  advanceProgress,
+  endProgress,
+  esc,
+  processXml,
+  setStatus,
+  startProgress,
+  t,
+});
+
 function setMode(mode) {
   // mode: 'live' | 'local' | 'sample'
   isLive = (mode === 'live');
@@ -3634,511 +1809,45 @@ function setMode(mode) {
   if (mode === 'live') {
     if (poller && wasmOk && sceneOk) poller.start();
   } else {
-    if (poller) { poller.stop(); setLiveDot('stopped'); }
-    if (mode === 'sample') loadSampleIndex();
+    if (poller) poller.stop();
+    if (mode === 'sample') sampleMode.loadSampleIndex();
   }
 }
 document.getElementById('btn-live').addEventListener('click',   () => { if (!isLive) setMode('live'); });
 document.getElementById('btn-local').addEventListener('click',  () => { if (document.getElementById('local-sec').hidden) setMode('local'); });
 document.getElementById('btn-sample').addEventListener('click', () => { if (document.getElementById('sample-sec').hidden) setMode('sample'); });
 
-// ── LivePoller ────────────────────────────────────────────────────────────────
-let poller = null;
-if (LivePoller) poller = new LivePoller();
-function setLiveDot(state) {
-  const dot   = document.getElementById('ldot');
-  const txt   = document.getElementById('live-txt');
-  dot.className = 'ldot';
-  switch (state) {
-    case 'polling':     dot.classList.add('ok','pulse'); txt.textContent = t('live-polling'); break;
-    case 'same':        dot.classList.add('ok');         txt.textContent = t('live-same'); break;
-    case 'downloading': dot.classList.add('dl','pulse'); txt.textContent = t('live-fetching'); bumpReq(); startProgress(); advanceProgress('download'); break;
-    case 'error':       dot.classList.add('err');        txt.textContent = t('live-error'); break;
-    default:            txt.textContent = t('live-stopped');
-  }
-}
-function renderEvtList() {
-  const list = poller ? poller.getList() : [];
-  const el   = document.getElementById('evt-list');
-  const empty = document.getElementById('live-empty');
-  el.innerHTML = '';
-  // Show empty state when no events available
-  if (empty) empty.hidden = list.length > 0;
-  let marked = false;
-  list.slice(0, 10).forEach((entry, idx) => {
-    const row = document.createElement('div');
-    const isCur = !marked && entry.id === curEvtId;
-    if (isCur) marked = true;
-    row.className = 'erow' + (isCur ? ' cur' : '');
-    const displayName = /\.xml$/i.test(entry.name) ? entry.name : entry.name + '.xml';
-    row.innerHTML = `
-      <div class="einfo">
-        <div class="ename">${esc(displayName)}</div>
-        <div class="etime" data-ts="${entry.timestamp}">${relTime(entry.timestamp)}</div>
-      </div>
-      <button class="edl"><svg class="ic" style="width:11px;height:11px"><use href="#i-dl"/></svg></button>`;
-    row.querySelector('.einfo').addEventListener('click', () => {
-      curEvtId = entry.id; processXml(entry.text); renderEvtList();
-    });
-    row.querySelector('.edl').addEventListener('click', ev => { ev.stopPropagation(); poller.download(idx); });
-    el.appendChild(row);
-  });
-}
-setInterval(() => {
-  for (const el of document.querySelectorAll('.etime[data-ts]')) el.textContent = relTime(+el.dataset.ts);
-}, 30_000);
-if (poller) {
-  poller.addEventListener('newxml', ({ detail: { entry } }) => {
-    startProgress(); advanceProgress('load');
-    curEvtId = entry.id; processXml(entry.text); renderEvtList(); bumpReq();
-    endProgress();
-  });
-  poller.addEventListener('listupdate', renderEvtList);
-  poller.addEventListener('status', ({ detail: { state } }) => setLiveDot(state));
-  poller.addEventListener('error', ({ detail }) => { console.warn('[LivePoller]', detail.message); });
-  poller.init().then(() => { renderEvtList(); }).catch(()=>{});
-} else {
-  document.getElementById('btn-local').click();
-}
-document.getElementById('ibtn-play').addEventListener('click', () => {
-  if (!poller) return; poller.start();
-  document.getElementById('ibtn-play').hidden = true; document.getElementById('ibtn-stop').hidden = false;
+const liveMode = setupLiveMode({
+  LivePoller,
+  advanceProgress,
+  bumpReq,
+  endProgress,
+  esc,
+  onFallbackToLocal: () => document.getElementById('btn-local').click(),
+  processXml,
+  relTime,
+  startProgress,
+  t,
 });
-document.getElementById('ibtn-stop').addEventListener('click', () => {
-  if (!poller) return; poller.stop();
-  document.getElementById('ibtn-stop').hidden = true; document.getElementById('ibtn-play').hidden = false;
-  setLiveDot('stopped');
+const poller = liveMode.hasPoller() ? { start: () => liveMode.start(), stop: () => liveMode.stop() } : null;
+
+setupLocalMode({
+  advanceProgress,
+  endProgress,
+  esc,
+  fmtSize,
+  processXml,
+  setStatus,
+  startProgress,
+  activateLocalTab: () => document.getElementById('btn-local')?.click(),
 });
-
-
-
-// ── Local mode ────────────────────────────────────────────────────────────────
-let localFiles = [];
-document.getElementById('file-folder-in').addEventListener('change', async e => {
-  const files = [...(e.target.files??[])].filter(f => f.name.toLowerCase().endsWith('.xml'));
-  e.target.value = '';
-  if (!files.length) return;
-  localFiles = files.sort((a,b) => a.name.localeCompare(b.name));
-  renderLocalList();
-});
-
-// ── Carousel ──────────────────────────────────────────────────────────────────
-let carouselActive = false;
-let carouselTimer  = null;
-let carouselIdx    = 0;
-
-// Carousel delay step buttons
-let carouselDelaySec = 5;
-document.querySelectorAll('.cdstep').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.cdstep').forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-    carouselDelaySec = parseInt(btn.dataset.s);
-  });
-});
-document.getElementById('btn-carousel-play').addEventListener('click', () => {
-  if (!localFiles.length) return;
-  carouselActive = true;
-  document.getElementById('btn-carousel-play').hidden = true;
-  document.getElementById('btn-carousel-stop').hidden = false;
-  runCarouselStep();
-});
-document.getElementById('btn-carousel-stop').addEventListener('click', stopCarousel);
-
-function stopCarousel() {
-  carouselActive = false;
-  clearTimeout(carouselTimer);
-  document.getElementById('btn-carousel-stop').hidden = true;
-  document.getElementById('btn-carousel-play').hidden = false;
-}
-async function runCarouselStep() {
-  if (!carouselActive || !localFiles.length) return;
-  carouselIdx = carouselIdx % localFiles.length;
-  document.querySelectorAll('#local-list .lrow').forEach((r, i) =>
-    r.classList.toggle('cur', i === carouselIdx));
-  document.getElementById('carousel-status').textContent =
-    `${carouselIdx + 1} / ${localFiles.length}`;
-  const file = localFiles[carouselIdx];
-  try { processXml(await file.text()); } catch(e) { console.warn('Carousel error:', e.message); }
-  carouselIdx++;
-  carouselTimer = setTimeout(runCarouselStep, carouselDelaySec * 1000);
-}
-function renderLocalList() {
-  const listEl = document.getElementById('local-list');
-  const carBar = document.getElementById('carousel-bar');
-  listEl.hidden = !localFiles.length; listEl.innerHTML = '';
-  if (carBar) { carBar.hidden = localFiles.length < 2; }
-  carouselIdx = 0; stopCarousel();
-  localFiles.forEach(file => {
-    const row = document.createElement('div'); row.className = 'lrow';
-    row.innerHTML = `<span class="lrow-name">${esc(file.name)}</span><span class="lrow-size">${fmtSize(file.size)}</span>`;
-    row.addEventListener('click', async () => {
-      document.querySelectorAll('#local-list .lrow.cur').forEach(r => r.classList.remove('cur'));
-      row.classList.add('cur'); setStatus('Reading file…');
-      startProgress('local'); advanceProgress('acquire');
-      try {
-        const text = await file.text();
-        advanceProgress('load');
-        processXml(text);
-        endProgress();
-      } catch (err) {
-        endProgress();
-        setStatus(`<span class="err">Read error: ${esc(err.message)}</span>`);
-      }
-    });
-    listEl.appendChild(row);
-  });
-}
-document.getElementById('file-in').addEventListener('change', async e => {
-  const f = e.target.files?.[0];
-  if (f) {
-    setStatus('Parsing…');
-    startProgress('local'); advanceProgress('acquire');
-    try { processXml(await f.text()); advanceProgress('load'); endProgress(); }
-    catch (err) { endProgress(); setStatus(`<span class="err">${esc(err.message)}</span>`); }
-  }
-  e.target.value = '';
-});
-
-// ── Drag & drop XML onto Local tab ────────────────────────────────────────────
-(function initLocalDnD() {
-  const sec = document.getElementById('local-sec');
-  if (!sec) return;
-  ['dragenter','dragover'].forEach(ev => sec.addEventListener(ev, e => {
-    e.preventDefault(); e.stopPropagation();
-    sec.classList.add('dragover');
-    e.dataTransfer.dropEffect = 'copy';
-  }));
-  ['dragleave','dragend'].forEach(ev => sec.addEventListener(ev, e => {
-    if (e.target === sec) sec.classList.remove('dragover');
-  }));
-  sec.addEventListener('drop', async e => {
-    e.preventDefault(); e.stopPropagation();
-    sec.classList.remove('dragover');
-    const items = e.dataTransfer?.files ? [...e.dataTransfer.files] : [];
-    const xmls = items.filter(f => f.name.toLowerCase().endsWith('.xml'));
-    if (!xmls.length) return;
-    if (xmls.length === 1) {
-      const f = xmls[0];
-      setStatus('Reading file…');
-      startProgress('local'); advanceProgress('acquire');
-      try { processXml(await f.text()); advanceProgress('load'); endProgress(); }
-      catch (err) { endProgress(); setStatus(`<span class="err">${esc(err.message)}</span>`); }
-    } else {
-      localFiles = xmls.sort((a,b) => a.name.localeCompare(b.name));
-      renderLocalList();
-    }
-    // Switch to local tab
-    document.getElementById('btn-local')?.click();
-  });
-})();
-
-// ── Sample events mode ────────────────────────────────────────────────────────
-let _sampleLoaded = false;
-async function loadSampleIndex() {
-  if (_sampleLoaded) return;
-  const msgEl  = document.getElementById('sample-list-msg');
-  const listEl = document.getElementById('sample-list');
-  msgEl.textContent = t('sample-loading');
-  msgEl.hidden = false;
-  listEl.innerHTML = '';
-  try {
-    const res = await fetch('./default_xml/index.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const names = await res.json();
-    msgEl.hidden = true;
-    if (!names.length) { msgEl.textContent = t('sample-empty'); msgEl.hidden = false; return; }
-    names.forEach(name => {
-      const btn = document.createElement('button');
-      btn.className = 'sample-item';
-      btn.innerHTML = `<svg class="ic sample-item-icon" style="width:11px;height:11px"><use href="#i-star"/></svg><span class="sample-item-name">${esc(name)}</span>`;
-      btn.addEventListener('click', async () => {
-        document.querySelectorAll('.sample-item.cur').forEach(b => b.classList.remove('cur'));
-        btn.classList.add('cur');
-        setStatus('Loading sample…');
-        startProgress(); advanceProgress('request');
-        try {
-          const xmlRes = await fetch(`./default_xml/${encodeURIComponent(name)}`);
-          advanceProgress('download');
-          if (!xmlRes.ok) throw new Error(`HTTP ${xmlRes.status}`);
-          const xmlText = await xmlRes.text();
-          advanceProgress('load');
-          processXml(xmlText);
-          endProgress();
-        } catch (err) {
-          endProgress();
-          setStatus(`<span class="err">Error: ${esc(err.message)}</span>`);
-          btn.classList.remove('cur');
-        }
-      });
-      listEl.appendChild(btn);
-    });
-    _sampleLoaded = true;
-  } catch (err) {
-    msgEl.textContent = t('sample-error');
-    msgEl.hidden = false;
-  }
-}
 
 // ── Screenshot ────────────────────────────────────────────────────────────────
-const shotOverlay  = document.getElementById('shot-overlay');
-const shotSaveBtn  = document.getElementById('btn-shot-save');
-const shotProgress = document.getElementById('shot-progress');
-const shotProgTxt  = document.getElementById('shot-progress-txt');
-let   shotW = 0, shotH = 0;
 
 // Pick a sensible default resolution based on device capabilities.
 // Mobile (landscape small screens, touch/coarse pointer, low DPR) → 2K.
 // Desktop → 10K (maximum available).
-function _pickDefaultShotRes() {
-  const coarse  = window.matchMedia('(pointer: coarse)').matches;
-  const small   = window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches
-               || window.innerWidth < 900;
-  const isMob   = coarse || small;
-  return isMob ? { w: 2560, h: 1440 } : { w: 10240, h: 5760 };
-}
-
-function _applyDefaultShotRes() {
-  const { w, h } = _pickDefaultShotRes();
-  const target = document.querySelector(`.shot-res[data-w="${w}"][data-h="${h}"]`);
-  if (!target) return;
-  document.querySelectorAll('.shot-res').forEach(b => b.classList.remove('active'));
-  target.classList.add('active');
-  shotW = w; shotH = h;
-  shotSaveBtn.disabled = false;
-}
-
-// Resolution button selection
-document.querySelectorAll('.shot-res').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.shot-res').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    shotW = parseInt(btn.dataset.w, 10);
-    shotH = parseInt(btn.dataset.h, 10);
-    shotSaveBtn.disabled = false;
-  });
-});
-
-function openShotDialog() {
-  shotOverlay.classList.add('open');
-  _applyDefaultShotRes();
-}
-function closeShotDialog() {
-  shotOverlay.classList.remove('open');
-  document.querySelectorAll('.shot-res').forEach(b => b.classList.remove('active'));
-  shotSaveBtn.disabled = true;
-  shotProgress.classList.remove('running');
-  shotProgTxt.textContent = '';
-  shotW = 0; shotH = 0;
-}
-
-document.getElementById('btn-shot').addEventListener('click', openShotDialog);
-document.getElementById('btn-shot-cancel').addEventListener('click', closeShotDialog);
-shotOverlay.addEventListener('click', e => { if (e.target === shotOverlay) closeShotDialog(); });
-
-shotSaveBtn.addEventListener('click', async () => {
-  if (!shotW || !shotH) return;
-  shotSaveBtn.disabled = true;
-  shotProgTxt.textContent = t('shot-rendering').replace('{w}', shotW).replace('{h}', shotH);
-  shotProgress.classList.add('running');
-
-  // Let the DOM update (spinner + text visible) before the blocking render
-  await new Promise(r => setTimeout(r, 80));
-
-  try {
-    await renderAndDownload(shotW, shotH);
-    shotProgTxt.textContent = t('shot-done');
-    await new Promise(r => setTimeout(r, 900));
-    closeShotDialog();
-  } catch (err) {
-    shotProgTxt.textContent = t('shot-error').replace('{msg}', err.message);
-    shotSaveBtn.disabled = false;
-  }
-});
-
-// ── Background color picker (2D SV rectangle + vertical hue strip) ────────────
-const DEFAULT_BG_HEX = '#020d1c';
-(function () {
-  const btn       = document.getElementById('btn-bgcolor');
-  const pop       = document.getElementById('bgcolor-popover');
-  const sv        = document.getElementById('bgcp-sv');
-  const svCursor  = document.getElementById('bgcp-sv-cursor');
-  const hueStrip  = document.getElementById('bgcp-hue-strip');
-  const hueCursor = document.getElementById('bgcp-hue-cursor');
-  const hexInput  = document.getElementById('bgcp-hex');
-  const swatch    = document.getElementById('bgcp-swatch');
-  const closeBtn  = document.getElementById('bgcp-close');
-  const resetBtn  = document.getElementById('bgcp-reset');
-  const presets   = Array.from(document.querySelectorAll('.bgcp-preset'));
-  if (!btn || !pop) return;
-
-  // ── Color math helpers ─────────────────────────────────────────────
-  function _clamp(n, a, b) { return n < a ? a : n > b ? b : n; }
-  function hexToRgb(hex) {
-    const m = /^#?([0-9a-f]{6})$/i.exec(hex);
-    if (!m) return null;
-    const v = parseInt(m[1], 16);
-    return { r: (v>>16)&0xff, g: (v>>8)&0xff, b: v&0xff };
-  }
-  function rgbToHex(r, g, b) {
-    const h = n => _clamp(Math.round(n), 0, 255).toString(16).padStart(2, '0');
-    return '#' + h(r) + h(g) + h(b);
-  }
-  function rgbToHsv(r, g, b) {
-    r/=255; g/=255; b/=255;
-    const max = Math.max(r,g,b), min = Math.min(r,g,b);
-    const d = max - min;
-    let h = 0;
-    if (d !== 0) {
-      switch (max) {
-        case r: h = ((g - b) / d + (g < b ? 6 : 0)); break;
-        case g: h = ((b - r) / d + 2); break;
-        case b: h = ((r - g) / d + 4); break;
-      }
-      h *= 60;
-    }
-    const s = max === 0 ? 0 : d / max;
-    return { h, s: s*100, v: max*100 };
-  }
-  function hsvToRgb(h, s, v) {
-    h = ((h % 360) + 360) % 360; s /= 100; v /= 100;
-    const c = v * s;
-    const x = c * (1 - Math.abs(((h/60) % 2) - 1));
-    const m = v - c;
-    let r=0,g=0,b=0;
-    if      (h <  60) { r=c; g=x; }
-    else if (h < 120) { r=x; g=c; }
-    else if (h < 180) { g=c; b=x; }
-    else if (h < 240) { g=x; b=c; }
-    else if (h < 300) { r=x; b=c; }
-    else              { r=c; b=x; }
-    return { r: (r+m)*255, g: (g+m)*255, b: (b+m)*255 };
-  }
-
-  // ── State ──────────────────────────────────────────────────────────
-  let curH = 210, curS = 85, curV = 11;  // initial ≈ #020d1c
-  let open = false;
-
-  function applyColor(hex, { save = false, syncCursors = true } = {}) {
-    const rgb = hexToRgb(hex); if (!rgb) return;
-    scene.background = new THREE.Color(hex);
-    swatch.style.background = hex;
-    if (document.activeElement !== hexInput) hexInput.value = hex.toUpperCase();
-    if (syncCursors) {
-      const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-      curH = hsv.h; curS = hsv.s; curV = hsv.v;
-    }
-    _paintSvBackground();
-    _positionCursors();
-    _markActivePreset(hex);
-    if (save) localStorage.setItem('cgv-bg-color', hex);
-    dirty = true;
-  }
-
-  function _paintSvBackground() {
-    const pure = hsvToRgb(curH, 100, 100);
-    sv.style.background =
-      `linear-gradient(to top, #000 0%, rgba(0,0,0,0) 100%), ` +
-      `linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%), ` +
-      `rgb(${pure.r}, ${pure.g}, ${pure.b})`;
-  }
-  function _positionCursors() {
-    svCursor.style.left = curS + '%';
-    svCursor.style.top  = (100 - curV) + '%';
-    hueCursor.style.top = (curH / 360 * 100) + '%';
-  }
-  function _markActivePreset(hex) {
-    presets.forEach(p => p.classList.toggle('active', p.dataset.c.toLowerCase() === hex.toLowerCase()));
-  }
-  function _updateFromHsv() {
-    const rgb = hsvToRgb(curH, curS, curV);
-    applyColor(rgbToHex(rgb.r, rgb.g, rgb.b), { save: true, syncCursors: false });
-  }
-
-  // ── SV rectangle drag ──────────────────────────────────────────────
-  function _svFromEvent(e) {
-    const r = sv.getBoundingClientRect();
-    const x = _clamp(e.clientX - r.left, 0, r.width);
-    const y = _clamp(e.clientY - r.top,  0, r.height);
-    curS = (x / r.width) * 100;
-    curV = (1 - y / r.height) * 100;
-    _updateFromHsv();
-  }
-  let svDrag = false;
-  sv.addEventListener('pointerdown', e => {
-    svDrag = true; sv.setPointerCapture(e.pointerId); _svFromEvent(e);
-  });
-  sv.addEventListener('pointermove', e => { if (svDrag) _svFromEvent(e); });
-  sv.addEventListener('pointerup',   e => { svDrag = false; try { sv.releasePointerCapture(e.pointerId); } catch(_){} });
-
-  // ── Hue strip drag ─────────────────────────────────────────────────
-  function _hueFromEvent(e) {
-    const r = hueStrip.getBoundingClientRect();
-    const y = _clamp(e.clientY - r.top, 0, r.height);
-    curH = (y / r.height) * 360;
-    _updateFromHsv();
-  }
-  let hueDrag = false;
-  hueStrip.addEventListener('pointerdown', e => {
-    hueDrag = true; hueStrip.setPointerCapture(e.pointerId); _hueFromEvent(e);
-  });
-  hueStrip.addEventListener('pointermove', e => { if (hueDrag) _hueFromEvent(e); });
-  hueStrip.addEventListener('pointerup',   e => { hueDrag = false; try { hueStrip.releasePointerCapture(e.pointerId); } catch(_){} });
-
-  hexInput.addEventListener('input', () => {
-    let v = hexInput.value.trim();
-    if (!v.startsWith('#')) v = '#' + v;
-    if (/^#[0-9a-f]{6}$/i.test(v)) applyColor(v, { save: true, syncCursors: true });
-  });
-
-  presets.forEach(p => {
-    p.style.background = p.dataset.c;
-    p.addEventListener('click', () => applyColor(p.dataset.c, { save: true, syncCursors: true }));
-  });
-
-  resetBtn.addEventListener('click', () => applyColor(DEFAULT_BG_HEX, { save: true, syncCursors: true }));
-
-  // ── Popover open/close/position ────────────────────────────────────
-  function position() {
-    const r = btn.getBoundingClientRect();
-    const pw = pop.offsetWidth  || 260;
-    const ph = pop.offsetHeight || 340;
-    let left = r.left + r.width/2 - pw/2;
-    let top  = r.top - ph - 10;
-    left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
-    if (top < 8) top = r.bottom + 10;
-    pop.style.left = left + 'px';
-    pop.style.top  = top + 'px';
-  }
-  function openPop() {
-    open = true;
-    position();
-    pop.classList.add('open');
-    btn.classList.add('on');
-    requestAnimationFrame(position);
-  }
-  function closePop() {
-    open = false;
-    pop.classList.remove('open');
-    btn.classList.remove('on');
-  }
-  btn.addEventListener('click', e => { e.stopPropagation(); open ? closePop() : openPop(); });
-  closeBtn.addEventListener('click', closePop);
-  document.addEventListener('click', e => {
-    if (!open) return;
-    if (pop.contains(e.target) || btn.contains(e.target)) return;
-    closePop();
-  });
-  window.addEventListener('resize', () => { if (open) position(); });
-
-  // Expose for the Shift+B keyboard shortcut.
-  window.__cgvToggleBgPicker = () => open ? closePop() : openPop();
-
-  // ── Initial color ──────────────────────────────────────────────────
-  const saved = localStorage.getItem('cgv-bg-color');
-  const initial = (saved && /^#[0-9a-f]{6}$/i.test(saved)) ? saved : DEFAULT_BG_HEX;
-  applyColor(initial, { save: false, syncCursors: true });
-})();
+setupColorPicker();
 
 async function renderAndDownload(targetW, targetH) {
   // ── 1. Save current renderer state ──────────────────────────────────────
@@ -4187,6 +1896,7 @@ async function renderAndDownload(targetW, targetH) {
     renderer.setClearColor(0x000000, 0);
   }
   // Hide slicer gizmo for the screenshot — the carve stays, the handle vanishes.
+  const slicerGroup = slicer.getGroup();
   const slicerVisSaved = slicerGroup ? slicerGroup.visible : null;
   if (slicerGroup) slicerGroup.visible = false;
   renderer.render(scene, camera);
@@ -4320,7 +2030,7 @@ async function renderAndDownload(targetW, targetH) {
   camera.aspect = origAspect;
   camera.fov    = origFov;
   camera.updateProjectionMatrix();
-  dirty = true;
+  markDirty();
 
   // ── 9. Download ─────────────────────────────────────────────────────────
   const ts   = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
@@ -4338,141 +2048,11 @@ function fmtMev(v) {
   if (a>=1)    return `${v.toFixed(1)} MeV`;
   return `${v.toFixed(3)} MeV`;
 }
-function fmtSize(b) {
-  if (b<1024) return `${b} B`;
-  if (b<1048576) return `${(b/1024).toFixed(1)} KB`;
-  return `${(b/1048576).toFixed(1)} MB`;
-}
-function esc(s) { return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function relTime(ts) {
-  const s = (Date.now()-ts)/1000;
-  if (s<10)   return t('just-now');
-  if (s<60)   return `${Math.floor(s)}${t('s-ago')}`;
-  if (s<3600) return `${Math.floor(s/60)}${t('m-ago')}`;
-  return `${Math.floor(s/3600)}${t('h-ago')}`;
-}
 
 
 // ── Download progress bar ─────────────────────────────────────────────────────
-const DL_STAGES = ['request', 'recogn', 'download', 'acquire', 'load'];
-const DL_PCTS   = { request: 10, recogn: 28, download: 58, acquire: 78, load: 95 };
-let _dlTimer = null;
-function startProgress(kind = 'live') {
-  const pEl = document.getElementById('dl-progress');
-  if (!pEl) return;
-  pEl.classList.toggle('local', kind === 'local');
-  pEl.classList.toggle('live',  kind !== 'local');
-  pEl.hidden = false;
-  DL_STAGES.forEach(s => {
-    const el = document.getElementById('dlst-' + s);
-    if (el) el.classList.remove('active','done');
-  });
-  const bar = document.getElementById('dl-bar-fill');
-  if (bar) bar.style.width = '0%';
-  advanceProgress('request');
-}
-function advanceProgress(stage) {
-  if (_dlTimer) clearTimeout(_dlTimer);
-  const pEl = document.getElementById('dl-progress');
-  if (!pEl) return;
-  const idx = DL_STAGES.indexOf(stage);
-  DL_STAGES.forEach((s, i) => {
-    const el = document.getElementById('dlst-' + s);
-    if (!el) return;
-    el.classList.toggle('done',   i < idx);
-    el.classList.toggle('active', i === idx);
-  });
-  const bar = document.getElementById('dl-bar-fill');
-  if (bar) bar.style.width = (DL_PCTS[stage] || 0) + '%';
-}
-function endProgress() {
-  const bar = document.getElementById('dl-bar-fill');
-  if (!bar) return;
-  bar.style.width = '100%';
-  DL_STAGES.forEach(s => {
-    const el = document.getElementById('dlst-' + s);
-    if (el) { el.classList.remove('active'); el.classList.add('done'); }
-  });
-  _dlTimer = setTimeout(() => {
-    const p = document.getElementById('dl-progress');
-    if (p) p.hidden = true;
-    bar.style.width = '0%';
-  }, 900);
-}
 
 // ── Settings panel ────────────────────────────────────────────────────────────
-const settingsPanel = document.getElementById('settings-panel');
-let settingsPanelOpen = false;
-function openSettingsPanel() {
-  settingsPanelOpen = true;
-  settingsPanel.classList.add('open');
-  document.getElementById('btn-settings').classList.add('on');
-  const br = document.getElementById('btn-settings').getBoundingClientRect();
-  requestAnimationFrame(() => {
-    const pw = settingsPanel.offsetWidth  || 290;
-    const ph = settingsPanel.offsetHeight || 320;
-    let left = br.left + br.width / 2 - pw / 2;
-    let top  = br.top - ph - 10;
-    left = Math.max(6, Math.min(left, window.innerWidth - pw - 6));
-    top  = Math.max(6, top);
-    settingsPanel.style.left = left + 'px';
-    settingsPanel.style.top  = top  + 'px';
-  });
-}
-function closeSettingsPanel() {
-  settingsPanelOpen = false;
-  settingsPanel.classList.remove('open');
-  document.getElementById('btn-settings').classList.remove('on');
-}
-document.getElementById('btn-settings').addEventListener('click', e => {
-  e.stopPropagation();
-  settingsPanelOpen ? closeSettingsPanel() : openSettingsPanel();
-});
-document.addEventListener('click', () => { if (settingsPanelOpen) closeSettingsPanel(); });
-settingsPanel.addEventListener('click', e => e.stopPropagation());
-
-// Settings toggles — hints
-let hintsEnabled = true;
-document.getElementById('stog-hints').addEventListener('click', function() {
-  hintsEnabled = !hintsEnabled;
-  this.classList.toggle('on', hintsEnabled);
-  this.setAttribute('aria-checked', hintsEnabled);
-  document.getElementById('btn-tip').style.display = hintsEnabled ? '' : 'none';
-});
-
-// Settings toggles — auto-open sidebar on hover
-document.getElementById('stog-autopen').addEventListener('click', function() {
-  autoOpenEnabled = this.classList.toggle('on');
-  this.setAttribute('aria-checked', autoOpenEnabled);
-  panelEdge.style.pointerEvents    = autoOpenEnabled ? '' : 'none';
-  rpanelEdge.style.pointerEvents   = autoOpenEnabled ? '' : 'none';
-});
-
-// Settings toggles — guided tour in cinema mode
-(function () {
-  const tog = document.getElementById('stog-tour');
-  if (!tog) return;
-  const sync = () => {
-    tog.classList.toggle('on', tourMode);
-    tog.setAttribute('aria-checked', tourMode ? 'true' : 'false');
-  };
-  sync();
-  tog.addEventListener('click', () => {
-    tourMode = !tourMode;
-    localStorage.setItem('cgv-tour-mode', tourMode ? '1' : '0');
-    sync();
-    if (cinemaMode) {
-      // Swap mode live: turning on → smooth entry from current pose;
-      // off → fall back to auto-rotate with the cinema ramp restarted.
-      if (tourMode) { _startTour(); }
-      else {
-        _tourExiting = false; _tourBlending = false;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.55;
-      }
-    }
-  });
-})();
 
 // ── About button (panel head) ─────────────────────────────────────────────────
 document.getElementById('btn-about').addEventListener('click', () => {
@@ -4529,27 +2109,15 @@ document.getElementById('btn-about').addEventListener('click', () => {
 // filled mesh AND its outline), so you can carve a hole through the detector.
 // Cells outside the bubble render normally (subject to the usual thresholds /
 // cluster filters).
-let slicerGroup   = null;
-let slicerActive  = false;
 // Cut-volume is an invisible Z-aligned cylindrical wedge anchored at the origin.
 // The user controls two parameters by click-dragging the handle:
 //   · screen-Y drag → angular sweep (thetaLength, 0..2π)
 //   · screen-X drag → total height (mm, symmetric around origin)
-const SLICER_RADIUS       = 5000;            // cylinder radius, mm (fixed)
-const SLICER_HEIGHT_MIN   = 0;                // minimum total height, mm
-const SLICER_HEIGHT_MAX   = 20000;            // maximum total height, mm
-const SLICER_HEIGHT_INIT  = 3000;             // initial total height, mm (3 m)
-let   slicerHalfHeight    = SLICER_HEIGHT_INIT * 0.5;  // current half-height, mm
-let   slicerThetaLength   = 2 * Math.PI;      // wedge sweep, 0..2π
-const SLICER_THETA_DRAG_PX   = 300;           // px for a full 2π Y-drag
-const SLICER_HEIGHT_MM_PER_PX = 20;           // mm per px of X-drag (total height)
 // Right-click + drag translates the whole cut volume (handle + cylinder)
 // along the scene's Z axis. Independent of the left-drag behaviours above.
-let   slicerZOffset = 0;                      // world-Z translation of the cut volume, mm
 // Show-all-cells toggle: when true, every mesh from the GLB whose detector is
 // enabled is made visible. Cells absent from the current XML (not in `active`)
 // are painted with the minimum-palette colour for their detector.
-let   showAllCells  = false;
 // Cell center world positions are cached on the handle itself (stable identity,
 // no extra Map lookup). The center is computed from origMatrix + geometry
 // bounding sphere, identical to the pre-refactor semantics.
@@ -4569,62 +2137,12 @@ function _cellCenter(h) {
   return c;
 }
 
-function _buildSlicerGizmo() {
-  const g = new THREE.Group();
-  g.renderOrder = 20;
-  const L = 800;
-  const head = 120;
-  const rad  = 40;
-  const sphR = 60;
-
-  const mkArrow = (dir, color) => {
-    const a = new THREE.ArrowHelper(dir, new THREE.Vector3(0,0,0), L, color, head, rad);
-    a.line.material.linewidth = 3;
-    a.line.material.depthTest = false;
-    a.cone.material.depthTest = false;
-    a.renderOrder = 21;
-    return a;
-  };
-  g.userData.arrowZ = mkArrow(new THREE.Vector3(0,0,1), 0xff2a2a); g.add(g.userData.arrowZ);
-  g.userData.arrowP = mkArrow(new THREE.Vector3(0,1,0), 0x33dd55); g.add(g.userData.arrowP);
-  g.userData.arrowT = mkArrow(new THREE.Vector3(1,0,0), 0x3b8cff); g.add(g.userData.arrowT);
-
-  // Central draggable sphere
-  const sphGeo = new THREE.SphereGeometry(sphR, 16, 12);
-  const sphMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthTest: false });
-  const sph = new THREE.Mesh(sphGeo, sphMat);
-  sph.userData.slicerHandle = true;
-  sph.renderOrder = 22;
-  g.add(sph);
-  g.userData.handle = sph;
-
-  return g;
-}
-
-function _updateSlicerBasis() {
-  if (!slicerGroup) return;
-  // Handle sits at the slicer's current Z offset (0 unless translated by right-drag);
-  // arrows show fixed ATLAS axes.
-  slicerGroup.position.set(0, 0, slicerZOffset);
-  slicerGroup.userData.arrowZ.setDirection(new THREE.Vector3(0, 0, 1));
-  slicerGroup.userData.arrowP.setDirection(new THREE.Vector3(0, 1, 0));
-  slicerGroup.userData.arrowT.setDirection(new THREE.Vector3(1, 0, 0));
-  slicerGroup.updateMatrix();
-  _applySlicerMask();
-}
-
 // Apply the slicer cut — hide any active cell whose centre is inside the bubble,
 // then rebuild outlines so the outlined set matches what's visible.
 function _applySlicerMask() {
-  if (!slicerActive) return;
+  if (!slicer.isActive()) return;
   visHandles = [];
-  // Cylindrical wedge, optionally translated along Z by right-click drag.
-  const r2       = SLICER_RADIUS * SLICER_RADIUS;
-  const zMax     = slicerZOffset + slicerHalfHeight;
-  const zMin     = slicerZOffset - slicerHalfHeight;
-  const thetaLen = slicerThetaLength;
-  const fullTh   = thetaLen >= 2 * Math.PI - 1e-6;
-  const emptyTh  = thetaLen <= 1e-6;
+  const slicerMask = slicer.getMaskState();
   for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
     const thr    = det === 'LAR' ? thrLArMev  : det === 'HEC' ? thrHecMev : thrTileMev;
     const detOn  = det === 'LAR' ? showLAr    : det === 'HEC' ? showHec   : showTile;
@@ -4638,24 +2156,16 @@ function _applySlicerMask() {
     } else {
       inCluster = true;
     }
-    const passThr    = showAllCells || (!isFinite(thr) || energyMev >= thr);
-    const passCl     = showAllCells || inCluster;
-    const passNeg    = showAllCells || energyMev >= 0;
+    const passThr    = slicer.isShowAllCells() || (!isFinite(thr) || energyMev >= thr);
+    const passCl     = slicer.isShowAllCells() || inCluster;
+    const passNeg    = slicer.isShowAllCells() || energyMev >= 0;
     const passFilter = detOn && passNeg && passThr && passCl;
     let vis = passFilter;
-    if (vis && !emptyTh) {
+    if (vis) {
       const c = _cellCenter(h);
       // Inside Z-aligned cylindrical wedge at origin: r² in XY, z within
       // [zMin, zMax], and polar angle within [0, thetaLen).
-      if (c.x*c.x + c.y*c.y < r2 && c.z > zMin && c.z < zMax) {
-        if (fullTh) {
-          vis = false;
-        } else {
-          let ang = Math.atan2(c.y, c.x);
-          if (ang < 0) ang += 2 * Math.PI;
-          if (ang < thetaLen) vis = false;
-        }
-      }
+      if (slicer.isPointInsideWedge(c.x, c.y, c.z, slicerMask)) vis = false;
     }
     _setHandleVisible(h, vis);
     if (vis) visHandles.push(h);
@@ -4666,284 +2176,66 @@ function _applySlicerMask() {
   rebuildAllOutlines();
   // FCAL tubes are drawn separately (instanced) — rebuild with current bubble.
   applyFcalThreshold();
-  dirty = true;
+  markDirty();
 }
 
-function enableSlicer() {
-  if (slicerActive) return;
-  slicerActive = true;
-  if (!slicerGroup) {
-    slicerGroup = _buildSlicerGizmo();
-    scene.add(slicerGroup);
-  }
-  slicerGroup.visible = true;
-  _updateSlicerBasis();
-  _applySlicerMask();
-  document.getElementById('btn-slicer').classList.add('on');
-}
-function disableSlicer() {
-  if (!slicerActive) return;
-  slicerActive = false;
-  if (slicerGroup) slicerGroup.visible = false;
-  // Re-apply user filters now that the cut is gone.
-  applyThreshold();
-  applyFcalThreshold();
-  document.getElementById('btn-slicer').classList.remove('on');
-}
-function toggleSlicer() { slicerActive ? disableSlicer() : enableSlicer(); }
-
-// Show-all-cells toggle — makes every GLB mesh visible for enabled detectors,
-// painting cells absent from the XML with the minimum palette colour of their
-// detector. Delegates to applyThreshold/_applySlicerMask for the actual sweep.
-function toggleShowAllCells() {
-  const wasOn = showAllCells;
-  showAllCells = !showAllCells;
-  document.getElementById('btn-showall').classList.toggle('on', showAllCells);
-  // When turning off, hide the non-active handles we had shown so the normal
-  // flow (which skips non-active cells) leaves the scene clean.
-  if (wasOn) {
-    for (const det of ['TILE', 'LAR', 'HEC'])
-      for (const h of cellMeshesByDet[det])
+const slicer = createSlicerController({
+  THREE,
+  camera,
+  canvas,
+  controls,
+  scene,
+  slicerButton: document.getElementById('btn-slicer'),
+  showAllButton: document.getElementById('btn-showall'),
+  onMaskChange: () => {
+    if (slicer.isActive()) _applySlicerMask();
+    else refreshSceneVisibility();
+  },
+  onDisable: refreshSceneVisibility,
+  onHideNonActiveShowAll: () => {
+    for (const det of ['TILE', 'LAR', 'HEC']) {
+      for (const h of cellMeshesByDet[det]) {
         if (!active.has(h)) _setHandleVisible(h, false);
+      }
+    }
     _flushIMDirty();
-  }
-  applyThreshold();
-  applyFcalThreshold();
-}
-document.getElementById('btn-showall').addEventListener('click', toggleShowAllCells);
-
-// Drag interaction — click and drag the handle to reshape the cut volume.
-// The handle itself is pinned at the origin and never moves.
-//   · screen-Y  → angular sweep (thetaLength, 0..2π)
-//   · screen-X  → total cylinder height (mm, symmetric around origin)
-(function () {
-  const btn = document.getElementById('btn-slicer');
-  if (btn) btn.addEventListener('click', toggleSlicer);
-
-  const dragRay = new THREE.Raycaster();
-  dragRay.params.Line = { threshold: 25 };
-  let dragging        = false;
-  let dragStartX      = 0;
-  let dragStartY      = 0;
-  let dragStartTheta  = 0;
-  let dragStartHeight = 0;
-
-  function _pointerXY(e) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x:  ((e.clientX - rect.left) / rect.width)  *  2 - 1,
-      y: -((e.clientY - rect.top)  / rect.height) *  2 + 1,
-    };
-  }
-
-  canvas.addEventListener('pointerdown', e => {
-    if (e.button !== 0) return;                 // left-button only; other buttons → new IIFE
-    if (!slicerActive || !slicerGroup) return;
-    const pt = _pointerXY(e);
-    dragRay.setFromCamera(pt, camera);
-    const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
-    if (!hits.length) return;
-    dragging         = true;
-    dragStartX       = e.clientX;
-    dragStartY       = e.clientY;
-    dragStartTheta   = slicerThetaLength;
-    dragStartHeight  = slicerHalfHeight * 2;
-    controls.enabled = false;
-    canvas.setPointerCapture(e.pointerId);
-    e.preventDefault();
-    e.stopPropagation();
-  }, /* capture: */ true);
-  canvas.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    // Drag upward (clientY decreases) → grows the sweep toward 2π.
-    const dy          = dragStartY - e.clientY;
-    const dTheta      = (dy / SLICER_THETA_DRAG_PX) * 2 * Math.PI;
-    slicerThetaLength = Math.max(0, Math.min(2 * Math.PI, dragStartTheta + dTheta));
-    // Drag rightward (clientX increases) → grows the total height.
-    const dx          = e.clientX - dragStartX;
-    const newHeight   = dragStartHeight + dx * SLICER_HEIGHT_MM_PER_PX;
-    const clampedH    = Math.max(SLICER_HEIGHT_MIN, Math.min(SLICER_HEIGHT_MAX, newHeight));
-    slicerHalfHeight  = clampedH * 0.5;
-    _updateSlicerBasis();
-  });
-  const endDrag = e => {
-    if (!dragging) return;
-    dragging = false;
-    controls.enabled = true;
-    try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
-  };
-  canvas.addEventListener('pointerup',     endDrag);
-  canvas.addEventListener('pointercancel', endDrag);
-})();
-
-// Right-click + drag on the handle translates the whole cut volume (handle
-// gizmo + cylindrical wedge) along the scene's Z axis. The handle follows the
-// mouse cursor: we project each frame's pointer delta (in NDC) onto the
-// screen-space direction of +Z, so the motion matches visually regardless of
-// which side the camera is on. The left-button drag behaviours are untouched.
-(function () {
-  const dragRay = new THREE.Raycaster();
-  dragRay.params.Line = { threshold: 25 };
-  const _p0 = new THREE.Vector3();
-  const _p1 = new THREE.Vector3();
-  let zDragging = false;
-  let zPrevNdcX = 0;
-  let zPrevNdcY = 0;
-
-  function _pointerXY(e) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x:  ((e.clientX - rect.left) / rect.width)  *  2 - 1,
-      y: -((e.clientY - rect.top)  / rect.height) *  2 + 1,
-    };
-  }
-
-  canvas.addEventListener('pointerdown', e => {
-    if (e.button !== 2) return;                 // right-button only
-    if (!slicerActive || !slicerGroup) return;
-    const pt = _pointerXY(e);
-    dragRay.setFromCamera(pt, camera);
-    const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
-    if (!hits.length) return;
-    zDragging        = true;
-    zPrevNdcX        = pt.x;
-    zPrevNdcY        = pt.y;
-    controls.enabled = false;
-    canvas.setPointerCapture(e.pointerId);
-    e.preventDefault();
-    e.stopPropagation();
-  }, /* capture: */ true);
-  canvas.addEventListener('pointermove', e => {
-    if (!zDragging) return;
-    const pt    = _pointerXY(e);
-    const dNdcX = pt.x - zPrevNdcX;
-    const dNdcY = pt.y - zPrevNdcY;
-    // Screen-space direction of +Z axis (1 mm step) at the handle's current Z.
-    _p0.set(0, 0, slicerZOffset).project(camera);
-    _p1.set(0, 0, slicerZOffset + 1).project(camera);
-    const zdx   = _p1.x - _p0.x;
-    const zdy   = _p1.y - _p0.y;
-    const len2  = zdx * zdx + zdy * zdy;
-    if (len2 > 1e-10) {
-      // Scalar projection of the mouse NDC delta onto (zdx, zdy) gives the
-      // millimetres of +Z that keep the handle under the cursor.
-      slicerZOffset += (dNdcX * zdx + dNdcY * zdy) / len2;
-      _updateSlicerBasis();
-    }
-    zPrevNdcX = pt.x;
-    zPrevNdcY = pt.y;
-  });
-  const endZDrag = e => {
-    if (!zDragging) return;
-    zDragging = false;
-    controls.enabled = true;
-    try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
-  };
-  canvas.addEventListener('pointerup',     endZDrag);
-  canvas.addEventListener('pointercancel', endZDrag);
-
-  // Suppress the browser context menu when right-clicking on the handle so the
-  // drag isn't interrupted. Other right-clicks over the canvas are unaffected.
-  canvas.addEventListener('contextmenu', e => {
-    if (!slicerActive || !slicerGroup) return;
-    const pt = _pointerXY(e);
-    dragRay.setFromCamera(pt, camera);
-    const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
-    if (hits.length) e.preventDefault();
-  });
-})();
-
-// ── Keyboard shortcuts ────────────────────────────────────────────────────────
-// Viewer:   G ghost · B beam · R reset · I info · C cinema · P screenshot
-// Panels:   M menu sidebar · E energy · S settings
-// Layers:   T TILE · A LAr · H HEC (toggle each detector visibility)
-// Escape:   close topmost overlay / menu
-document.addEventListener('keydown', e => {
-  // Ignore when focus is inside a text input
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  // Ignore modifier combos (browser shortcuts) — except Shift, which we use
-  // for slicer/background-colour shortcuts.
-  if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-  // Shift-modified shortcuts: handle first, then bail.
-  if (e.shiftKey) {
-    switch (e.key.toUpperCase()) {
-      case 'B':
-        window.__cgvToggleBgPicker?.();
-        return;
-      case 'S':
-        toggleSlicer();
-        return;
-      case 'K':
-        // Toggle the cluster-threshold slider on/off (mirrors the right-panel
-        // "Cluster Threshold" button).
-        document.getElementById('cluster-filter-toggle')?.click();
-        return;
-    }
-    return;
-  }
-
-  switch (e.key.toUpperCase()) {
-    case 'G':
-      toggleAllGhosts();
-      break;
-    case 'B':
-      toggleBeam();
-      break;
-    case 'R':
-      resetCamera();
-      break;
-    case 'I':
-      document.getElementById('btn-info').click();
-      break;
-    case 'C':
-      cinemaMode ? exitCinema() : enterCinema();
-      break;
-    case 'M':
-      document.getElementById('btn-panel').click();
-      break;
-    case 'E':
-      setPinnedR(!rpanelPinned);
-      break;
-    case 'P':
-      document.getElementById('btn-shot').click();
-      break;
-    case 'S':
-      settingsPanelOpen ? closeSettingsPanel() : openSettingsPanel();
-      break;
-    // Detector layer toggles (item 8)
-    case 'T':
-      document.getElementById('ltog-tile').click();
-      break;
-    case 'L':
-    case 'A':
-      document.getElementById('ltog-lar').click();
-      break;
-    case 'H':
-      document.getElementById('ltog-hec').click();
-      break;
-    case 'F':
-      document.getElementById('ltog-fcal').click();
-      break;
-    case 'J':
-      document.getElementById('btn-tracks').click();
-      break;
-    case 'K':
-      document.getElementById('btn-cluster').click();
-      break;
-    case 'V':
-      toggleShowAllCells();
-      break;
-    case 'ESCAPE':
-      if (slicerActive)        { disableSlicer(); return; }
-      if (cinemaMode)          { exitCinema(); return; }
-      if (settingsPanelOpen)   { closeSettingsPanel(); return; }
-      if (layersPanelOpen)     { closeLayersPanel(); return; }
-      if (rpanelPinned)        { setPinnedR(false); return; }
-      if (document.getElementById('shot-overlay').classList.contains('open'))
-        { document.getElementById('btn-shot-cancel').click(); return; }
-      if (panelPinned)         { setPinned(false); return; }
-      aboutOverlay.classList.remove('open');
-      break;
-  }
+  },
 });
+
+setupScreenshotControls({
+  camera,
+  canvas,
+  markDirty,
+  renderer,
+  scene,
+  slicer,
+  t,
+  getLastEventInfo: () => _lastEventInfo,
+  tooltip,
+  tipCellEl,
+  tipEEl,
+});
+
+registerViewerShortcuts({
+  aboutOverlay,
+  closeLayersPanel,
+  closeSettingsPanel: sidebarControls.closeSettingsPanel,
+  enterCinema,
+  exitCinema,
+  getState: () => ({
+    cinemaMode: cinema.isCinemaMode(),
+    layersPanelOpen,
+    panelPinned: sidebarControls.getState().panelPinned,
+    rpanelPinned: sidebarControls.getState().rpanelPinned,
+    settingsPanelOpen: sidebarControls.getState().settingsPanelOpen,
+  }),
+  openSettingsPanel: sidebarControls.openSettingsPanel,
+  resetCamera,
+  setPinned: sidebarControls.setPinned,
+  setPinnedR: sidebarControls.setPinnedR,
+  slicer,
+  toggleAllGhosts,
+  toggleBeam,
+});
+
+

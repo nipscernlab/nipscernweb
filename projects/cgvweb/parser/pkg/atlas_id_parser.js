@@ -99,6 +99,23 @@ export function parse_atlas_ids_bulk_zc(ids) {
     return ret >>> 0;
 }
 
+/**
+ * Parse a full JiveXML event string.
+ * Returns a JS object with all detector data and pre-decoded ATLAS ID packs.
+ * The return value mirrors the protocol used by `parseXmlAndDecode` in the worker:
+ *   { eventInfo, tileCells, larCells, hecCells, mbtsCells, fcalCells,
+ *     tracks, photons, clusters, clusterCollections,
+ *     tilePacked, larPacked, hecPacked }
+ * @param {string} xml_text
+ * @returns {any}
+ */
+export function parse_jivexml(xml_text) {
+    const ptr0 = passStringToWasm0(xml_text, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.parse_jivexml(ptr0, len0);
+    return takeObject(ret);
+}
+
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,

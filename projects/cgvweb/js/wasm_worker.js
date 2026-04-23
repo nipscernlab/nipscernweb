@@ -18,7 +18,7 @@
 //         tilePacked/larPacked/hecPacked: Int32Array (transferred zero-copy) | null
 //         tracks[i].pts: [{x,y,z}] plain objects (no THREE.Vector3)
 
-import wasmInit, { parse_atlas_ids_bulk } from '../parser/pkg/atlas_id_parser.js';
+import wasmInit, { parse_atlas_ids_bulk, parse_jivexml } from '../parser/pkg/atlas_id_parser.js';
 
 let _ready = false;
 let _readyPromise = null;
@@ -320,44 +320,9 @@ self.onmessage = async (ev) => {
     if (msg.type === 'parseXmlAndDecode') {
       await ensureReady();
       const { rid, xmlText } = msg;
-
-      const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
-      const pe  = doc.querySelector('parsererror');
-      if (pe) {
-        self.postMessage({ type: 'parseXmlResult', rid, error: 'XML parse error: ' + pe.textContent.slice(0, 120) });
-        return;
-      }
-
-      const eventInfo = parseEventInfo(doc);
-      let tileCells, larCells, hecCells, mbtsCells, fcalCells, tracks, photons;
-      let clusters, clusterCollections;
-      try { tileCells = extractCells(doc, 'TILE'); } catch { tileCells = []; }
-      try { larCells  = extractCells(doc, 'LAr');  } catch { larCells  = []; }
-      try { hecCells  = extractCells(doc, 'HEC');  } catch { hecCells  = []; }
-      try { mbtsCells = parseMBTS(doc);   } catch { mbtsCells = []; }
-      try { fcalCells = parseFcal(doc);   } catch { fcalCells = []; }
-      try { tracks    = parseTracks(doc); } catch { tracks    = []; }
-      try { photons   = parsePhotons(doc);} catch { photons   = []; }
-      try {
-        const r = parseClusters(doc);
-        clusters = r.flat; clusterCollections = r.collections;
-      } catch { clusters = []; clusterCollections = []; }
-
-      const tilePk = runBulk(tileCells.length ? idsToStr(tileCells) : null);
-      const larPk  = runBulk(larCells.length  ? idsToStr(larCells)  : null);
-      const hecPk  = runBulk(hecCells.length  ? idsToStr(hecCells)  : null);
-
-      const transfer = [];
-      if (tilePk && tilePk.buffer) transfer.push(tilePk.buffer);
-      if (larPk  && larPk.buffer)  transfer.push(larPk.buffer);
-      if (hecPk  && hecPk.buffer)  transfer.push(hecPk.buffer);
-
-      self.postMessage({
-        type: 'parseXmlResult', rid,
-        eventInfo, tileCells, larCells, hecCells, mbtsCells, fcalCells,
-        tracks, photons, clusters, clusterCollections,
-        tilePacked: tilePk, larPacked: larPk, hecPacked: hecPk,
-      }, transfer);
+      // Delegate entirely to the Rust WASM parser — no DOMParser, no JS iteration.
+      const result = parse_jivexml(xmlText);
+      self.postMessage({ type: 'parseXmlResult', rid, ...result });
       return;
     }
   } catch (e) {
