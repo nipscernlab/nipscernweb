@@ -14,7 +14,7 @@ const WORKER_URL = 'https://atlas-cors-prox.nipscernlab.workers.dev/';  // e.g. 
 const LATEST_URL = 'https://atlas-live.cern.ch/latest';
 const BASE_URL   = 'https://atlas-live.cern.ch';
 const CACHE_NAME = 'atlas-live-xml-v2';
-const MAX_CACHED = 10;
+const MAX_CACHED = 100;
 const POLL_MS    = 5_000;
 
 /**

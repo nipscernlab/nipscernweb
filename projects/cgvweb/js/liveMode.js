@@ -50,7 +50,7 @@ export function setupLiveMode({
     if (emptyEl) emptyEl.hidden = list.length > 0;
 
     let marked = false;
-    list.slice(0, 10).forEach((entry, idx) => {
+    list.slice(0, 100).forEach((entry, idx) => {
       const row = document.createElement('div');
       const isCurrent = !marked && entry.id === currentEventId;
       if (isCurrent) marked = true;

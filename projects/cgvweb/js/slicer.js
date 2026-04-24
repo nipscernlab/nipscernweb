@@ -5,7 +5,6 @@ export function createSlicerController({
   controls,
   scene,
   slicerButton,
-  showAllButton,
   onMaskChange,
   onDisable,
   onHideNonActiveShowAll,
@@ -18,22 +17,23 @@ export function createSlicerController({
   const SLICER_EPS = 1e-6;
   const SLICER_THETA_DRAG_PX = 300;
   const SLICER_HEIGHT_MM_PER_PX = 20;
+  const TWO_PI = 2 * Math.PI;
 
   let slicerGroup = null;
   let slicerActive = false;
-  let showAllCells = false;
   let slicerHalfHeight = SLICER_HEIGHT_INIT * 0.5;
-  let slicerThetaLength = 2 * Math.PI;
+  let slicerThetaLength = TWO_PI;
+  let slicerYOffset = 0;
   let slicerZOffset = 0;
 
   function syncButtons() {
     slicerButton?.classList.toggle('on', slicerActive);
-    showAllButton?.classList.toggle('on', showAllCells);
   }
 
   function resetState() {
     slicerHalfHeight = SLICER_HEIGHT_INIT * 0.5;
     slicerThetaLength = SLICER_THETA_INIT;
+    slicerYOffset = 0;
     slicerZOffset = 0;
   }
 
@@ -42,21 +42,23 @@ export function createSlicerController({
     return {
       active: slicerActive,
       r2: SLICER_RADIUS * SLICER_RADIUS,
+      yOff: slicerYOffset,
       zMin: slicerZOffset - slicerHalfHeight,
       zMax: slicerZOffset + slicerHalfHeight,
       thetaLen,
-      fullTh: thetaLen >= 2 * Math.PI - SLICER_EPS,
+      fullTh: thetaLen >= TWO_PI - SLICER_EPS,
       emptyTh: thetaLen <= SLICER_EPS,
     };
   }
 
   function isPointInsideWedge(x, y, z, slicer = getMaskState()) {
     if (!slicer.active || slicer.emptyTh) return false;
-    if (x * x + y * y >= slicer.r2) return false;
+    const dy = y - slicer.yOff;
+    if (x * x + dy * dy >= slicer.r2) return false;
     if (z <= slicer.zMin || z >= slicer.zMax) return false;
     if (slicer.fullTh) return true;
-    let ang = Math.atan2(y, x);
-    if (ang < 0) ang += 2 * Math.PI;
+    let ang = Math.atan2(dy, x);
+    if (ang < 0) ang += TWO_PI;
     return ang < slicer.thetaLen;
   }
 
@@ -94,7 +96,7 @@ export function createSlicerController({
 
   function updateBasis() {
     if (!slicerGroup) return;
-    slicerGroup.position.set(0, 0, slicerZOffset);
+    slicerGroup.position.set(0, slicerYOffset, slicerZOffset);
     slicerGroup.userData.arrowZ.setDirection(new THREE.Vector3(0, 0, 1));
     slicerGroup.userData.arrowP.setDirection(new THREE.Vector3(0, 1, 0));
     slicerGroup.userData.arrowT.setDirection(new THREE.Vector3(1, 0, 0));
@@ -120,23 +122,12 @@ export function createSlicerController({
     slicerActive = false;
     if (slicerGroup) slicerGroup.visible = false;
     syncButtons();
+    onHideNonActiveShowAll?.();
     onDisable?.();
   }
 
   function toggle() {
     slicerActive ? disable() : enable();
-  }
-
-  function setShowAllCells(next) {
-    const prev = showAllCells;
-    showAllCells = !!next;
-    syncButtons();
-    if (prev && !showAllCells) onHideNonActiveShowAll?.();
-    onMaskChange?.();
-  }
-
-  function toggleShowAllCells() {
-    setShowAllCells(!showAllCells);
   }
 
   function pointerXY(e) {
@@ -177,8 +168,9 @@ export function createSlicerController({
     canvas.addEventListener('pointermove', e => {
       if (!dragging) return;
       const dy = dragStartY - e.clientY;
-      const dTheta = (dy / SLICER_THETA_DRAG_PX) * 2 * Math.PI;
-      slicerThetaLength = Math.max(0, Math.min(2 * Math.PI, dragStartTheta + dTheta));
+      const dTheta = (dy / SLICER_THETA_DRAG_PX) * TWO_PI;
+      const raw = dragStartTheta + dTheta;
+      slicerThetaLength = ((raw % TWO_PI) + TWO_PI) % TWO_PI;
 
       const dx = e.clientX - dragStartX;
       const newHeight = dragStartHeight + dx * SLICER_HEIGHT_MM_PER_PX;
@@ -197,14 +189,15 @@ export function createSlicerController({
     canvas.addEventListener('pointercancel', endDrag);
   })();
 
-  (function installZDrag() {
+  (function installTranslateDrag() {
     const dragRay = new THREE.Raycaster();
     dragRay.params.Line = { threshold: 25 };
     const p0 = new THREE.Vector3();
-    const p1 = new THREE.Vector3();
-    let zDragging = false;
-    let zPrevNdcX = 0;
-    let zPrevNdcY = 0;
+    const pZ = new THREE.Vector3();
+    const pY = new THREE.Vector3();
+    let tDragging = false;
+    let prevNdcX = 0;
+    let prevNdcY = 0;
 
     canvas.addEventListener('pointerdown', e => {
       if (e.button !== 2) return;
@@ -213,9 +206,9 @@ export function createSlicerController({
       dragRay.setFromCamera(pt, camera);
       const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
       if (!hits.length) return;
-      zDragging = true;
-      zPrevNdcX = pt.x;
-      zPrevNdcY = pt.y;
+      tDragging = true;
+      prevNdcX = pt.x;
+      prevNdcY = pt.y;
       controls.enabled = false;
       canvas.setPointerCapture(e.pointerId);
       e.preventDefault();
@@ -223,31 +216,49 @@ export function createSlicerController({
     }, true);
 
     canvas.addEventListener('pointermove', e => {
-      if (!zDragging) return;
+      if (!tDragging) return;
       const pt = pointerXY(e);
-      const dNdcX = pt.x - zPrevNdcX;
-      const dNdcY = pt.y - zPrevNdcY;
-      p0.set(0, 0, slicerZOffset).project(camera);
-      p1.set(0, 0, slicerZOffset + 1).project(camera);
-      const zdx = p1.x - p0.x;
-      const zdy = p1.y - p0.y;
-      const len2 = zdx * zdx + zdy * zdy;
-      if (len2 > 1e-10) {
-        slicerZOffset += (dNdcX * zdx + dNdcY * zdy) / len2;
+      const dNdcX = pt.x - prevNdcX;
+      const dNdcY = pt.y - prevNdcY;
+
+      // Origin of the gizmo in NDC.
+      p0.set(0, slicerYOffset, slicerZOffset).project(camera);
+      // Tip of +Z and +Y unit vectors, also in NDC.
+      pZ.set(0, slicerYOffset, slicerZOffset + 1).project(camera);
+      pY.set(0, slicerYOffset + 1, slicerZOffset).project(camera);
+
+      const zdx = pZ.x - p0.x, zdy = pZ.y - p0.y;
+      const ydx = pY.x - p0.x, ydy = pY.y - p0.y;
+
+      // Solve a 2x2 system: [zdx ydx; zdy ydy] · [dz, dy] = [dNdcX, dNdcY].
+      // This decomposes the cursor delta into independent contributions
+      // along +Z and +Y of the world frame.
+      const det = zdx * ydy - ydx * zdy;
+      if (Math.abs(det) > 1e-10) {
+        slicerZOffset += ( ydy * dNdcX - ydx * dNdcY) / det;
+        slicerYOffset += (-zdy * dNdcX + zdx * dNdcY) / det;
         updateBasis();
+      } else {
+        // Degenerate (camera looking down the axis we're trying to move) —
+        // fall back to a straight Z projection so the gizmo still responds.
+        const len2 = zdx * zdx + zdy * zdy;
+        if (len2 > 1e-10) {
+          slicerZOffset += (dNdcX * zdx + dNdcY * zdy) / len2;
+          updateBasis();
+        }
       }
-      zPrevNdcX = pt.x;
-      zPrevNdcY = pt.y;
+      prevNdcX = pt.x;
+      prevNdcY = pt.y;
     });
 
-    const endZDrag = e => {
-      if (!zDragging) return;
-      zDragging = false;
+    const endTDrag = e => {
+      if (!tDragging) return;
+      tDragging = false;
       controls.enabled = true;
       try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
     };
-    canvas.addEventListener('pointerup', endZDrag);
-    canvas.addEventListener('pointercancel', endZDrag);
+    canvas.addEventListener('pointerup', endTDrag);
+    canvas.addEventListener('pointercancel', endTDrag);
 
     canvas.addEventListener('contextmenu', e => {
       if (!slicerActive || !slicerGroup) return;
@@ -259,7 +270,6 @@ export function createSlicerController({
   })();
 
   slicerButton?.addEventListener('click', toggle);
-  showAllButton?.addEventListener('click', toggleShowAllCells);
   syncButtons();
 
   return {
@@ -269,8 +279,7 @@ export function createSlicerController({
     getMaskState,
     isActive: () => slicerActive,
     isPointInsideWedge,
-    isShowAllCells: () => showAllCells,
+    isShowAllCells: () => slicerActive,
     toggle,
-    toggleShowAllCells,
   };
 }

@@ -63,24 +63,28 @@ at 15&nbsp;% opacity so they never compete with the active data.
 
 ---++ Offline analysis
 
-The same page accepts local JiveXML files (folder picker or
-drag-and-drop) and bundled sample events. Multi-event XML is supported
-with a carousel that auto-advances between files &mdash; useful during a
-shift debrief or for building a quick training deck from a list of
-flagged events.
+The same page also reads JiveXML straight from a local folder
+(=Live / SERVER=, refreshes every 5&nbsp;s and auto-loads the newest
+event) or from a one-off file picker / drag-and-drop in the
+=Samples= panel. The folder-watch path doubles as the in-Control-Room
+mode: at Point-1 the dedicated =/atlas/EventDisplayEvents= NetApp area
+is mounted read-only on the host VM and used as the data source,
+removing the round-trip through =atlas-live.cern.ch=.
 
-<img src="images/local-mode.png" alt="Local mode with the carousel bar" style="width:100%;max-width:900px;height:auto;display:block;" />
+<img src="images/live-sub-modes.png" alt="Live mode with WEB / SERVER sub-tabs" style="width:100%;max-width:900px;height:auto;display:block;" />
 
 ---++ Relationship to ATLANTIS
 
 CGV Web is not a replacement for ATLANTIS; it is a lightweight,
 modern complement. It consumes the same JiveXML payload produced by
-ATHENA's =JiveXML= algorithm and, in _Live_ mode, subscribes to the
-same long-poll endpoint as the Java ATLANTIS client
-(=atlas-live.cern.ch=). Shifters who need the full reconstruction
-inspection capabilities of ATLANTIS can run both side-by-side; CGV Web
-focuses on fast, publication-ready calorimeter visualisation with no
-local install.
+ATHENA's =JiveXML= algorithm and, in =Live / WEB= mode, subscribes to
+the same long-poll endpoint as the Java ATLANTIS client
+(=atlas-live.cern.ch=). In =Live / SERVER= mode it reads the same
+events directly from the FileServer area where they are written at
+Point-1, with no HTTP intermediary. Shifters who need the full
+reconstruction inspection capabilities of ATLANTIS can run both
+side-by-side; CGV Web focuses on fast, publication-ready calorimeter
+visualisation with no local install.
 
 %BR% %BR%
 <em>Next: [[GettingStarted][Getting Started &rarr;]]</em>

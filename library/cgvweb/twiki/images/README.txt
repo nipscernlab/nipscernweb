@@ -55,20 +55,21 @@ convert to JPEG q=88 for photographic captures).
                               Sponsors visible.
                               Used in: UserInterface.
 
-   mode-bar.png               Close-up of the Live / Local / Samples
-                              tri-button.
+   mode-bar.png               Close-up of the Live / Samples bi-button at
+                              the top of the left panel.
                               Used in: DataModes.
 
-   live-mode.png              Live mode — green pulsing dot, events
-                              streaming.
+   live-mode.png              Live / WEB sub-mode — green pulsing dot,
+                              events streaming from atlas-live.cern.ch.
                               Used in: DataModes.
 
-   local-mode.png             Local mode after folder selection, carousel
-                              bar visible.
-                              Used in: DataModes, Overview.
+   local-mode.png             (Legacy) Local mode capture from before the
+                              Live / SERVER refactor. No longer referenced
+                              by any topic; kept for archival only.
 
    samples-mode.png           Samples list populated from
-                              default_xml/index.json.
+                              default_xml/index.json plus user-added
+                              local files.
                               Used in: DataModes.
 
    calorimeter-overview.png   High-level diagram of the ATLAS calorimeter
@@ -101,6 +102,14 @@ convert to JPEG q=88 for photographic captures).
 
 2. Missing images for the new features (please capture and drop here)
 ---------------------------------------------------------------------
+
+   live-sub-modes.png         Left panel with Live mode selected, showing
+                              the WEB / SERVER sub-tab bar and the SERVER
+                              picker (Select Folder button + spinner /
+                              pause button) populated with a few rows.
+                              Capture width: 1920 px, render at 560 px,
+                              ≤ 250 kB.
+                              Will be added to: DataModes, Overview.
 
    slicer-cylinder.png        The slicer gizmo active. Capture the FULL
                               CGV Web window — toolbar, panels and canvas

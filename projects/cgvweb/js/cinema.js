@@ -10,7 +10,7 @@ export function setupCinemaControls({
   updateCollisionHud,
 }) {
   let cinemaMode = false;
-  let tourMode = localStorage.getItem('cgv-tour-mode') === '1';
+  let tourMode = localStorage.getItem('cgv-tour-mode') !== '0';
 
   const tourCamWaypoints = [
     new THREE.Vector3(8500, 3500, 12500),
