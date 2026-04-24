@@ -80,9 +80,6 @@ export function registerViewerShortcuts({
       case 'K':
         document.getElementById('btn-cluster').click();
         break;
-      case 'V':
-        slicer.toggleShowAllCells();
-        break;
       case 'ESCAPE':
         if (slicer.isActive()) { slicer.disable(); return; }
         if (state.cinemaMode) { exitCinema(); return; }

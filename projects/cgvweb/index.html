@@ -217,10 +217,6 @@
       <svg class="ic" style="width:12px;height:12px"><use href="#i-wifi"/></svg>
       <span data-i18n="btn-live">Live</span>
     </button>
-    <button id="btn-local" class="mbtn">
-      <svg class="ic" style="width:12px;height:12px"><use href="#i-folder"/></svg>
-      <span data-i18n="btn-local">Local</span>
-    </button>
     <button id="btn-sample" class="mbtn">
       <i class="ti ti-atom" style="font-size:13px;line-height:1"></i>
       <span data-i18n="btn-sample">Samples</span>
@@ -229,66 +225,75 @@
 
   <!-- Live mode -->
   <div id="live-sec">
-    <div id="live-bar">
-      <span class="ldot pulse" id="ldot"></span>
-      <span id="live-txt" data-i18n="live-starting">Starting…</span>
-      <div id="live-ctrl">
-        <button class="ctrl-btn" id="ibtn-play" hidden
-          data-tip="Resume live polling" data-i18n-tip="tip-poll-play">
-          <svg class="ic" style="width:9px;height:9px"><use href="#i-play"/></svg>
-        </button>
-        <button class="ctrl-btn" id="ibtn-stop"
-          data-tip="Pause live polling" data-i18n-tip="tip-poll-stop">
-          <svg class="ic" style="width:9px;height:9px"><use href="#i-stop"/></svg>
-        </button>
-      </div>
+    <div id="live-sub-bar">
+      <button id="btn-live-web" class="sbtn on">
+        <i class="ti ti-world" style="font-size:11px;line-height:1"></i>
+        <span data-i18n="sub-live-web">WEB</span>
+      </button>
+      <button id="btn-live-server" class="sbtn">
+        <i class="ti ti-server" style="font-size:11px;line-height:1"></i>
+        <span data-i18n="sub-live-server">SERVER</span>
+      </button>
     </div>
-    <div id="live-empty" hidden>
-      <img src="./assets/undraw_server_9eix.svg" class="empty-illus" alt="">
-      <div class="empty-msg" data-i18n="empty-live">No events yet — waiting for ATLAS Live data from ATLANTIS</div>
-    </div>
-    <div id="evt-list"></div>
-  </div>
 
-  <!-- Local mode -->
-  <div id="local-sec" hidden>
-    <label class="file-pick-btn" for="file-folder-in">
-      <svg class="ic"><use href="#i-folder"/></svg>
-      <span data-i18n="local-folder">Select Folder</span>
-    </label>
-    <input id="file-folder-in" type="file" accept=".xml" multiple webkitdirectory>
-    <div class="or-divider"><span data-i18n="local-or">or</span></div>
-    <label class="file-pick-btn alt" for="file-in">
-      <svg class="ic"><use href="#i-up"/></svg>
-      <span data-i18n="local-upload">Upload XML</span>
-    </label>
-    <input id="file-in" type="file" accept=".xml">
-    <div id="local-list" hidden></div>
-    <div id="carousel-bar" hidden>
-      <div class="carousel-row">
-        <button class="icon-btn" id="btn-carousel-play"
-          data-tip="Start carousel — auto-load files in sequence"
-          style="width:24px;height:24px;flex-shrink:0">
-          <i class="ti ti-player-play" style="font-size:12px"></i>
-        </button>
-        <button class="icon-btn" id="btn-carousel-stop"
-          data-tip="Stop carousel playback"
-          style="width:24px;height:24px;flex-shrink:0" hidden>
-          <i class="ti ti-player-stop-filled" style="font-size:12px;color:var(--warn)"></i>
-        </button>
-        <span id="carousel-status">–</span>
-        <div class="carousel-delay-steps">
-          <button class="cdstep" data-s="2">2s</button>
-          <button class="cdstep on" data-s="5">5s</button>
-          <button class="cdstep" data-s="10">10s</button>
-          <button class="cdstep" data-s="30">30s</button>
+    <!-- WEB: ATLAS live polling -->
+    <div id="live-web-sec" class="live-sub">
+      <div id="live-bar">
+        <span class="ldot pulse" id="ldot"></span>
+        <span id="live-txt" data-i18n="live-starting">Starting…</span>
+        <div id="live-ctrl">
+          <button class="ctrl-btn" id="ibtn-play" hidden
+            data-tip="Resume live polling" data-i18n-tip="tip-poll-play">
+            <svg class="ic" style="width:9px;height:9px"><use href="#i-play"/></svg>
+          </button>
+          <button class="ctrl-btn" id="ibtn-stop"
+            data-tip="Pause live polling" data-i18n-tip="tip-poll-stop">
+            <svg class="ic" style="width:9px;height:9px"><use href="#i-stop"/></svg>
+          </button>
         </div>
       </div>
+      <div id="live-empty" hidden>
+        <img src="./assets/undraw_server_9eix.svg" class="empty-illus" alt="">
+        <div class="empty-msg" data-i18n="empty-live">No events yet — waiting for ATLAS Live data from ATLANTIS</div>
+      </div>
+      <div id="evt-list"></div>
+    </div>
+
+    <!-- SERVER: folder on user machine, auto-refresh -->
+    <div id="live-server-sec" class="live-sub" hidden>
+      <div id="server-top">
+        <button id="btn-server-pick" class="file-pick-btn sm">
+          <svg class="ic" style="width:11px;height:11px"><use href="#i-folder"/></svg>
+          <span data-i18n="server-folder">Select Folder</span>
+        </button>
+        <input id="server-folder-in" type="file" accept=".xml" multiple webkitdirectory>
+        <button id="server-refresh-btn" class="server-refresh-btn"
+          data-tip="Pause folder polling" data-i18n-tip="tip-poll-stop" hidden>
+          <i class="ti ti-rotate-clockwise refresh-ic"></i>
+          <svg class="ic pause-ic" style="width:9px;height:9px"><use href="#i-stop"/></svg>
+          <svg class="ic play-ic"  style="width:9px;height:9px"><use href="#i-play"/></svg>
+        </button>
+      </div>
+      <div id="server-empty" data-i18n="server-empty">
+        Pick a folder with JiveXML files. The 100 most recent are shown and refresh every 5s.
+      </div>
+      <div id="server-list" hidden></div>
     </div>
   </div>
 
   <!-- Sample events mode -->
   <div id="sample-sec" hidden>
+    <div id="sample-top">
+      <button id="btn-sample-add" class="file-pick-btn sm">
+        <svg class="ic" style="width:11px;height:11px"><use href="#i-up"/></svg>
+        <span data-i18n="sample-upload">Add XML</span>
+      </button>
+      <input id="sample-file-in" type="file" accept=".xml">
+      <button id="btn-sample-clear" class="sm-icon-btn"
+        data-tip="Remove all XMLs from the list" data-i18n-tip="tip-sample-clear">
+        <i class="ti ti-trash"></i>
+      </button>
+    </div>
     <div id="sample-list-msg" data-i18n="sample-loading">Loading events…</div>
     <div id="sample-list"></div>
   </div>
@@ -514,15 +519,9 @@
   </button>
   <div class="tbtn-sep"></div>
   <button class="tbtn" id="btn-slicer"
-    data-tip="Slicer — drag the handle to sweep the cylindrical-wedge carve (Y: angle, X: height); right-drag to slide along the beam axis (Shift+S)"
+    data-tip="Slicer — drag the handle to sweep the cylindrical-wedge carve (Y: angle wraps continuously, X: height); right-drag to slide along the Y/Z plane. Also fills the geometry with empty cells (Shift+S)"
     data-i18n-tip="tip-slicer">
     <i class="ti ti-3d-cube-sphere" style="font-size:15px"></i>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-showall"
-    data-tip="Show all cells — fill detectors absent from the XML with the minimum-palette colour (V)"
-    data-i18n-tip="tip-showall">
-    <i class="ti ti-grid-dots" style="font-size:15px"></i>
   </button>
   <div class="tbtn-sep"></div>
   <button class="tbtn" id="btn-settings"
@@ -661,7 +660,6 @@
       <span class="sk-key">H</span><span class="sk-desc" data-i18n="sk-hec">Toggle HEC</span>
       <span class="sk-key">J</span><span class="sk-desc" data-i18n="sk-tracks">Toggle particle tracks</span>
       <span class="sk-key">K</span><span class="sk-desc" data-i18n="sk-clusters">Toggle clusters</span>
-      <span class="sk-key">V</span><span class="sk-desc" data-i18n="sk-showall">Show all cells</span>
       <span class="sk-key">Shift+B</span><span class="sk-desc" data-i18n="sk-bg">Pick background color</span>
       <span class="sk-key">Shift+S</span><span class="sk-desc" data-i18n="sk-slicer">Toggle slicer</span>
       <span class="sk-key">Shift+K</span><span class="sk-desc" data-i18n="sk-clthr">Toggle cluster threshold</span>

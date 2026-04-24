@@ -41,12 +41,19 @@ is saturated, live mode buffers and then replays. Pause with =⏸= for a
 minute; resume with =▶=. During very busy runs, expect short gaps of
 5&ndash;30&nbsp;s.
 
----++ Local mode rejects a file
+---++ Samples or SERVER mode rejects a file
 
    * The file must be JiveXML &mdash; not an xAOD, D3PD or plain ROOT file. See [[DataModes][Data Modes]] for the accepted formats.
    * A =.gz= file is auto-decoded; other compressions (=.zst=, =.bz2=) are not.
    * For multi-event XMLs, the =<Event>= tags must each have =runNumber= and =eventNumber= attributes.
    * If the =runNumber= / =eventNumber= attribute is missing, the event is still loaded but the collision footer and HUD will read =&mdash;= for that field.
+   * In =Live / SERVER=, if the new top file is corrupt or empty the auto-load still runs and the status bar reports =No TILE, LAr, HEC, MBTS or FCAL cells found= &mdash; the next valid event at the top of the list will be picked up on a subsequent refresh.
+
+---++ SERVER mode does not refresh on its own
+
+   * Auto-refresh requires the File System Access API. It is available on Chromium-based browsers (Chrome, Edge) on desktop and Android. Firefox, Safari and iOS fall back to a one-shot snapshot picker, so the list is frozen at the time of selection. The status bar shows a subtle warning when this happens.
+   * The work-around in fallback browsers is to click =Select Folder= again whenever you want to see new files.
+   * Even in supported browsers, if you paused the refresh with the spinner-button, click it again to resume; a refresh runs immediately on resume.
 
 ---++ Slicer does not carve anything
 

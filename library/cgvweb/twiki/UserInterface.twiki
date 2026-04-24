@@ -18,16 +18,17 @@ hotkey in the hover tooltip.
 
 ---++ Left panel — data source
 
-The left panel has three exclusive modes at the top (_Live_, _Local_,
+The left panel has two exclusive modes at the top (_Live_ and
 _Samples_). Selecting a mode reveals the corresponding list or picker;
 switching modes stops the previous ingestion without discarding the
-scene.
+scene. _Live_ further splits into two sub-modes (_WEB_ and _SERVER_)
+chosen with the second-row tab bar.
 
 <img src="images/left-panel.png" alt="Left panel: mode bar, event list, status bar" style="width:100%;max-width:380px;height:auto;display:block;" />
 
-   * =Live= &mdash; connects to the ATLAS Live long-poll served by ATLANTIS. A green pulsing dot indicates the feed is active. The =⏸= / =▶= buttons pause and resume polling without tearing down the connection.
-   * =Local= &mdash; parses JiveXML in the browser. =Select Folder= ingests an entire directory; =Upload XML= opens a single file. A carousel bar auto-advances through a multi-event folder.
-   * =Samples= &mdash; curated events bundled with the deployment (=default_xml/index.json=).
+   * =Live / WEB= &mdash; long-polls the ATLAS Live HTTP service at =atlas-live.cern.ch= (served by ATLANTIS). A green pulsing dot indicates the feed is active. =⏸= / =▶= pause and resume polling.
+   * =Live / SERVER= &mdash; reads JiveXML directly from a local folder (or from the read-only mount on the host VM in P1). =Select Folder= picks the directory; the list refreshes every 5&nbsp;s and the newest event is auto-loaded.
+   * =Samples= &mdash; curated events bundled with the deployment (=default_xml/index.json=) plus any local =.xml= the user adds via =Add XML= or drag-and-drop.
    * _Status bar_ (bottom) &mdash; displays the current pipeline stage (request, recognise, download, acquire, load) and a session-wide request counter.
    * _Collision footer_ &mdash; once an event is loaded, the bottom of the panel condenses run, event, luminosity block, timestamp and version into a compact strip. Hovering the strip promotes it to a full per-field tooltip.
    * The panel is _pinnable_ via the pin icon at top-right. When unpinned it auto-opens on cursor hover near the left edge, provided the =Auto-open sidebar on hover= preference is enabled (see [[#Settings_panel][Settings panel]]).

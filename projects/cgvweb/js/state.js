@@ -1,53 +1,40 @@
 import * as THREE from 'three';
 
-// ── WASM parser: off-main-thread worker with synchronous fallback ────────────
-// Runs in a dedicated Web Worker so bulk ID decodes never block the render
-// thread. Falls back to main-thread WASM if Worker is unavailable or crashes.
+// ── WASM parser pool: runs entirely in a dedicated Web Worker ────────────────
+// XML parse + bulk ID decode happen off-thread so the UI stays at 60 fps even
+// on 47 MB events. If Web Workers are unavailable, init() rejects — there is
+// no main-thread fallback.
 class _WasmParserPool {
   constructor() {
     this._worker      = null;
     this._ready       = false;
     this._rid         = 0;
     this._pending     = new Map();
-    this._fallbackFn  = null;
     this._initPromise = null;
   }
   init() {
     if (this._initPromise) return this._initPromise;
     this._initPromise = (async () => {
-      if (typeof Worker !== 'undefined') {
-        try {
-          const w = new Worker(new URL('./wasm_worker.js', import.meta.url), { type: 'module' });
-          w.onmessage = (ev) => this._onMessage(ev);
-          w.onerror   = (e) => { console.warn('[wasm worker] runtime error', e && e.message); };
-          await new Promise((resolve, reject) => {
-            const to = setTimeout(() => reject(new Error('wasm worker init timeout')), 20000);
-            const onMsg = (ev) => {
-              if (ev.data && ev.data.type === 'ready') {
-                clearTimeout(to);
-                w.removeEventListener('message', onMsg);
-                resolve();
-              }
-            };
-            w.addEventListener('message', onMsg);
-            w.postMessage({ type: 'init' });
-          });
-          this._worker = w;
-          this._ready  = true;
-          return;
-        } catch (e) {
-          console.warn('[wasm worker] unavailable, falling back to main-thread WASM:', e && e.message);
-        }
-      }
-      await this._initFallback();
+      if (typeof Worker === 'undefined') throw new Error('Web Workers not supported');
+      const w = new Worker(new URL('./wasm_worker.js', import.meta.url), { type: 'module' });
+      w.onmessage = (ev) => this._onMessage(ev);
+      w.onerror   = (e) => { console.warn('[wasm worker] runtime error', e && e.message); };
+      await new Promise((resolve, reject) => {
+        const to = setTimeout(() => reject(new Error('wasm worker init timeout')), 20000);
+        const onMsg = (ev) => {
+          if (ev.data && ev.data.type === 'ready') {
+            clearTimeout(to);
+            w.removeEventListener('message', onMsg);
+            resolve();
+          }
+        };
+        w.addEventListener('message', onMsg);
+        w.postMessage({ type: 'init' });
+      });
+      this._worker = w;
+      this._ready  = true;
     })();
     return this._initPromise;
-  }
-  async _initFallback() {
-    const mod = await import('../parser/pkg/atlas_id_parser.js');
-    await mod.default();
-    this._fallbackFn = mod.parse_atlas_ids_bulk;
-    this._ready = true;
   }
   _onMessage(ev) {
     const m = ev.data;
@@ -59,30 +46,8 @@ class _WasmParserPool {
     if (m.type === 'error') pend.reject(new Error(m.message || 'wasm worker error'));
     else pend.resolve(m);
   }
-  /** Parse three whitespace-joined ID strings; any may be empty/null.
-   *  Returns { tile, lar, hec } of Int32Array | null. */
-  parse(tileStr, larStr, hecStr) {
-    if (this._worker) {
-      const rid = ++this._rid;
-      return new Promise((resolve, reject) => {
-        this._pending.set(rid, { resolve, reject });
-        this._worker.postMessage({
-          type: 'parse', rid,
-          tile: tileStr || '', lar: larStr || '', hec: hecStr || '',
-        });
-      }).then(({ tile, lar, hec }) => ({ tile, lar, hec }));
-    }
-    const f = this._fallbackFn;
-    return Promise.resolve({
-      tile: tileStr && f ? f(tileStr) : null,
-      lar:  larStr  && f ? f(larStr)  : null,
-      hec:  hecStr  && f ? f(hecStr)  : null,
-    });
-  }
-  /** Parse XML + bulk-decode ATLAS IDs entirely in the worker.
-   *  Returns the full parseXmlResult, or null if no worker (caller must fall back). */
+  /** Parse XML + bulk-decode ATLAS IDs entirely in the worker. */
   parseXmlAndDecode(xmlText) {
-    if (!this._worker) return Promise.resolve(null);
     const rid = ++this._rid;
     return new Promise((resolve, reject) => {
       this._pending.set(rid, { resolve, reject });
