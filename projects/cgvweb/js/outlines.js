@@ -1,13 +1,19 @@
 import * as THREE from 'three';
 import { scene, markDirty } from './renderer.js';
-import {
-  fcalGroup, fcalEdgeMat4, getFcalEdgeBase, visHandles,
-} from './visibility.js';
+import { fcalGroup, fcalEdgeMat4, getFcalEdgeBase, visHandles } from './visibility.js';
 
 // ── EdgesGeometry outline (hover) ─────────────────────────────────────────────
-const eGeoCache  = new Map();
-const outlineMat = new THREE.LineBasicMaterial({ color: 0xffffff });
-let   outlineMesh = null;
+// `transparent: true` (at opacity 1.0) moves the hover into Three.js's
+// transparent pass so it draws AFTER the permanent 50%-black outline (which
+// is itself transparent); otherwise opaque→transparent ordering makes the
+// permanent outline paint over the hover.
+const eGeoCache = new Map();
+const outlineMat = new THREE.LineBasicMaterial({
+  color: 0xffffff,
+  transparent: true,
+  opacity: 1.0,
+});
+let outlineMesh = null;
 
 export function clearOutline() {
   if (!outlineMesh) return;
@@ -38,17 +44,19 @@ export function showFcalOutline(instanceId) {
   const src = 'fcal_' + instanceId;
   if (outlineMesh?.userData.src === src) return;
   clearOutline();
-  const iMesh = fcalGroup?.children.find(c => c.isInstancedMesh);
+  const iMesh = fcalGroup?.children.find((c) => c.isInstancedMesh);
   if (!iMesh) return;
   iMesh.getMatrixAt(instanceId, fcalEdgeMat4);
-  const eb  = getFcalEdgeBase();
+  const eb = getFcalEdgeBase();
   const buf = new Float32Array(eb.length);
-  const m   = fcalEdgeMat4.elements;
+  const m = fcalEdgeMat4.elements;
   for (let j = 0; j < eb.length; j += 3) {
-    const lx = eb[j], ly = eb[j + 1], lz = eb[j + 2];
-    buf[j]     = m[0]*lx + m[4]*ly + m[8]*lz  + m[12];
-    buf[j + 1] = m[1]*lx + m[5]*ly + m[9]*lz  + m[13];
-    buf[j + 2] = m[2]*lx + m[6]*ly + m[10]*lz + m[14];
+    const lx = eb[j],
+      ly = eb[j + 1],
+      lz = eb[j + 2];
+    buf[j] = m[0] * lx + m[4] * ly + m[8] * lz + m[12];
+    buf[j + 1] = m[1] * lx + m[5] * ly + m[9] * lz + m[13];
+    buf[j + 2] = m[2] * lx + m[6] * ly + m[10] * lz + m[14];
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(buf, 3));
@@ -61,8 +69,13 @@ export function showFcalOutline(instanceId) {
 }
 
 // ── All-cells outline (optimised: cached world-space edges per mesh) ─────────
-const outlineAllMat = new THREE.LineBasicMaterial({ color: 0x000000 });
-const _edgeWorldCache = new Map();  // handle.name → Float32Array (world-space positions)
+const outlineAllMat = new THREE.LineBasicMaterial({
+  color: 0x000000,
+  transparent: true,
+  opacity: 0.5,
+  depthWrite: false,
+});
+const _edgeWorldCache = new Map(); // handle.name → Float32Array (world-space positions)
 let allOutlinesMesh = null;
 
 function _getWorldEdges(h) {
@@ -75,9 +88,11 @@ function _getWorldEdges(h) {
   const m = h.origMatrix.elements;
   const out = new Float32Array(src.length);
   for (let i = 0; i < src.length; i += 3) {
-    const x = src[i], y = src[i + 1], z = src[i + 2];
-    out[i]     = m[0] * x + m[4] * y + m[8]  * z + m[12];
-    out[i + 1] = m[1] * x + m[5] * y + m[9]  * z + m[13];
+    const x = src[i],
+      y = src[i + 1],
+      z = src[i + 2];
+    out[i] = m[0] * x + m[4] * y + m[8] * z + m[12];
+    out[i + 1] = m[1] * x + m[5] * y + m[9] * z + m[13];
     out[i + 2] = m[2] * x + m[6] * y + m[10] * z + m[14];
   }
   _edgeWorldCache.set(h.name, out);

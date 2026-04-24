@@ -10,7 +10,7 @@ export function createDownloadProgressController() {
     pEl.classList.toggle('local', kind === 'local');
     pEl.classList.toggle('live', kind !== 'local');
     pEl.hidden = false;
-    DL_STAGES.forEach(stage => {
+    DL_STAGES.forEach((stage) => {
       const el = document.getElementById('dlst-' + stage);
       if (el) el.classList.remove('active', 'done');
     });
@@ -38,7 +38,7 @@ export function createDownloadProgressController() {
     const bar = document.getElementById('dl-bar-fill');
     if (!bar) return;
     bar.style.width = '100%';
-    DL_STAGES.forEach(stage => {
+    DL_STAGES.forEach((stage) => {
       const el = document.getElementById('dlst-' + stage);
       if (el) {
         el.classList.remove('active');

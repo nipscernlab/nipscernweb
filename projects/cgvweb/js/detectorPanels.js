@@ -16,7 +16,10 @@ function parseMevInput(s) {
 
 function ratioFromPtr(e, trackEl) {
   const rect = trackEl.getBoundingClientRect();
-  return 1 - Math.max(0, Math.min(1, ((e.clientY ?? e.touches?.[0]?.clientY ?? 0) - rect.top) / rect.height));
+  return (
+    1 -
+    Math.max(0, Math.min(1, ((e.clientY ?? e.touches?.[0]?.clientY ?? 0) - rect.top) / rect.height))
+  );
 }
 
 export function setupDetectorPanels({
@@ -38,7 +41,7 @@ export function setupDetectorPanels({
     const tabs = [...TAB_IDS];
     const pc = document.getElementById('pane-cluster');
     if (pc && pc.parentElement && pc.parentElement.id === 'rpanel') tabs.push('cluster');
-    tabs.forEach(id => {
+    tabs.forEach((id) => {
       const pane = document.getElementById('pane-' + id);
       const tab = document.getElementById('tab-' + id);
       if (pane) pane.style.display = id === det ? 'flex' : 'none';
@@ -46,57 +49,78 @@ export function setupDetectorPanels({
     });
   }
 
-  function makeDetSlider(trackId, thumbId, inputId, getThr, setThr, maxMev, maxLblId, onApply = applyThreshold) {
+  function makeDetSlider(
+    trackId,
+    thumbId,
+    inputId,
+    getThr,
+    setThr,
+    maxMev,
+    maxLblId,
+    minLblId,
+    onApply = applyThreshold,
+  ) {
     const track = document.getElementById(trackId);
     const thumb = document.getElementById(thumbId);
     const input = document.getElementById(inputId);
     const maxLbl = maxLblId ? document.getElementById(maxLblId) : null;
+    const minLbl = minLblId ? document.getElementById(minLblId) : null;
+    let minMev = 0;
     let drag = false;
 
+    // Slider semantics: bottom (ratio=0) snaps to -Infinity = "show all";
+    // anywhere above the bottom maps linearly to [minMev, maxMev].
+    const fromRatio = (r) => (r <= 0 ? -Infinity : minMev + (maxMev - minMev) * r);
+
     function updateUI(mev) {
-      const ratio = isFinite(mev) && mev > 0 ? Math.max(0, Math.min(1, mev / maxMev)) : 0;
-      thumb.style.top = ((1 - ratio) * 100) + '%';
-      if (document.activeElement !== input) input.value = isFinite(mev) && mev > 0 ? fmtMev(mev) : '';
+      const span = maxMev - minMev;
+      const ratio =
+        isFinite(mev) && span > 0 && mev > minMev
+          ? Math.max(0, Math.min(1, (mev - minMev) / span))
+          : 0;
+      thumb.style.top = (1 - ratio) * 100 + '%';
+      if (document.activeElement !== input)
+        input.value = isFinite(mev) && mev > minMev ? fmtMev(mev) : '';
     }
 
-    track.addEventListener('pointerdown', e => {
+    track.addEventListener('pointerdown', (e) => {
       drag = true;
       rpanelWrap.classList.add('dragging');
       track.setPointerCapture(e.pointerId);
-      const ratio = ratioFromPtr(e, track);
-      setThr(ratio <= 0 ? -Infinity : maxMev * ratio);
+      setThr(fromRatio(ratioFromPtr(e, track)));
       updateUI(getThr());
       onApply();
     });
-    track.addEventListener('pointermove', e => {
+    track.addEventListener('pointermove', (e) => {
       if (!drag) return;
-      const ratio = ratioFromPtr(e, track);
-      setThr(ratio <= 0 ? -Infinity : maxMev * ratio);
+      setThr(fromRatio(ratioFromPtr(e, track)));
       updateUI(getThr());
       onApply();
     });
-    ['pointerup', 'pointercancel'].forEach(eventName => {
+    ['pointerup', 'pointercancel'].forEach((eventName) => {
       track.addEventListener(eventName, () => {
         drag = false;
         rpanelWrap.classList.remove('dragging');
       });
     });
-    input.addEventListener('keydown', e => {
+    input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') input.blur();
     });
     input.addEventListener('blur', () => {
       const value = parseMevInput(input.value);
       if (value !== null) {
-        const clamped = value === -Infinity ? value : Math.max(0, Math.min(maxMev, value));
+        const clamped = value === -Infinity ? value : Math.max(minMev, Math.min(maxMev, value));
         setThr(clamped);
         onApply();
       }
       updateUI(getThr());
     });
 
-    function update(newMaxMev) {
+    function update(newMinMev, newMaxMev) {
+      minMev = newMinMev;
       maxMev = newMaxMev;
       if (maxLbl) maxLbl.textContent = fmtMev(newMaxMev);
+      if (minLbl) minLbl.textContent = fmtMev(newMinMev);
       updateUI(getThr());
     }
 
@@ -113,40 +137,44 @@ export function setupDetectorPanels({
 
     function updateUI() {
       const span = state.getTrackPtMaxGev() - state.getTrackPtMinGev();
-      const ratio = span > 0
-        ? Math.max(0, Math.min(1, (state.getThrTrackGev() - state.getTrackPtMinGev()) / span))
-        : 0;
-      thumbEl.style.top = ((1 - ratio) * 100) + '%';
+      const ratio =
+        span > 0
+          ? Math.max(0, Math.min(1, (state.getThrTrackGev() - state.getTrackPtMinGev()) / span))
+          : 0;
+      thumbEl.style.top = (1 - ratio) * 100 + '%';
       if (document.activeElement !== inputEl) {
-        inputEl.value = state.getThrTrackGev() > state.getTrackPtMinGev() + 1e-9
-          ? fmtGev(state.getThrTrackGev())
-          : '';
+        inputEl.value =
+          state.getThrTrackGev() > state.getTrackPtMinGev() + 1e-9
+            ? fmtGev(state.getThrTrackGev())
+            : '';
       }
     }
 
     function setFromRatio(ratio) {
       const span = state.getTrackPtMaxGev() - state.getTrackPtMinGev();
-      state.setThrTrackGev(ratio <= 0 ? state.getTrackPtMinGev() : state.getTrackPtMinGev() + span * ratio);
+      state.setThrTrackGev(
+        ratio <= 0 ? state.getTrackPtMinGev() : state.getTrackPtMinGev() + span * ratio,
+      );
       updateUI();
       applyTrackThreshold();
     }
 
-    trackEl.addEventListener('pointerdown', e => {
+    trackEl.addEventListener('pointerdown', (e) => {
       drag = true;
       rpanelWrap.classList.add('dragging');
       trackEl.setPointerCapture(e.pointerId);
       setFromRatio(ratioFromPtr(e, trackEl));
     });
-    trackEl.addEventListener('pointermove', e => {
+    trackEl.addEventListener('pointermove', (e) => {
       if (drag) setFromRatio(ratioFromPtr(e, trackEl));
     });
-    ['pointerup', 'pointercancel'].forEach(eventName => {
+    ['pointerup', 'pointercancel'].forEach((eventName) => {
       trackEl.addEventListener(eventName, () => {
         drag = false;
         rpanelWrap.classList.remove('dragging');
       });
     });
-    inputEl.addEventListener('keydown', e => {
+    inputEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') inputEl.blur();
     });
     inputEl.addEventListener('blur', () => {
@@ -157,7 +185,9 @@ export function setupDetectorPanels({
         const gev = value.match(/^([\d.]+)\s*gev$/i);
         const parsed = gev ? parseFloat(gev[1]) : parseFloat(value);
         if (isFinite(parsed)) {
-          state.setThrTrackGev(Math.max(state.getTrackPtMinGev(), Math.min(state.getTrackPtMaxGev(), parsed)));
+          state.setThrTrackGev(
+            Math.max(state.getTrackPtMinGev(), Math.min(state.getTrackPtMaxGev(), parsed)),
+          );
         }
       }
       updateUI();
@@ -186,41 +216,48 @@ export function setupDetectorPanels({
 
     function updateUI() {
       const span = state.getClusterEtMaxGev() - state.getClusterEtMinGev();
-      const ratio = span > 0
-        ? Math.max(0, Math.min(1, (state.getThrClusterEtGev() - state.getClusterEtMinGev()) / span))
-        : 0;
-      thumbEl.style.top = ((1 - ratio) * 100) + '%';
+      const ratio =
+        span > 0
+          ? Math.max(
+              0,
+              Math.min(1, (state.getThrClusterEtGev() - state.getClusterEtMinGev()) / span),
+            )
+          : 0;
+      thumbEl.style.top = (1 - ratio) * 100 + '%';
       if (document.activeElement !== inputEl) {
-        inputEl.value = state.getThrClusterEtGev() > state.getClusterEtMinGev() + 1e-9
-          ? fmtGev(state.getThrClusterEtGev())
-          : '';
+        inputEl.value =
+          state.getThrClusterEtGev() > state.getClusterEtMinGev() + 1e-9
+            ? fmtGev(state.getThrClusterEtGev())
+            : '';
       }
     }
 
     function setFromRatio(ratio) {
       if (!state.getClusterFilterEnabled()) return;
       const span = state.getClusterEtMaxGev() - state.getClusterEtMinGev();
-      state.setThrClusterEtGev(ratio <= 0 ? state.getClusterEtMinGev() : state.getClusterEtMinGev() + span * ratio);
+      state.setThrClusterEtGev(
+        ratio <= 0 ? state.getClusterEtMinGev() : state.getClusterEtMinGev() + span * ratio,
+      );
       updateUI();
       applyClusterThreshold();
     }
 
-    trackEl.addEventListener('pointerdown', e => {
+    trackEl.addEventListener('pointerdown', (e) => {
       drag = true;
       rpanelWrap.classList.add('dragging');
       trackEl.setPointerCapture(e.pointerId);
       setFromRatio(ratioFromPtr(e, trackEl));
     });
-    trackEl.addEventListener('pointermove', e => {
+    trackEl.addEventListener('pointermove', (e) => {
       if (drag) setFromRatio(ratioFromPtr(e, trackEl));
     });
-    ['pointerup', 'pointercancel'].forEach(eventName => {
+    ['pointerup', 'pointercancel'].forEach((eventName) => {
       trackEl.addEventListener(eventName, () => {
         drag = false;
         rpanelWrap.classList.remove('dragging');
       });
     });
-    inputEl.addEventListener('keydown', e => {
+    inputEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') inputEl.blur();
     });
     inputEl.addEventListener('blur', () => {
@@ -235,7 +272,9 @@ export function setupDetectorPanels({
         const gev = value.match(/^([\d.]+)\s*gev$/i);
         const parsed = gev ? parseFloat(gev[1]) : parseFloat(value);
         if (isFinite(parsed)) {
-          state.setThrClusterEtGev(Math.max(state.getClusterEtMinGev(), Math.min(state.getClusterEtMaxGev(), parsed)));
+          state.setThrClusterEtGev(
+            Math.max(state.getClusterEtMinGev(), Math.min(state.getClusterEtMaxGev(), parsed)),
+          );
         }
       }
       updateUI();
@@ -267,26 +306,59 @@ export function setupDetectorPanels({
   }
 
   const tileSlider = makeDetSlider(
-    'tile-strak', 'tile-sthumb', 'tile-thr-input',
-    state.getThrTileMev, state.setThrTileMev, TILE_SCALE, 'tile-sval-max'
+    'tile-strak',
+    'tile-sthumb',
+    'tile-thr-input',
+    state.getThrTileMev,
+    state.setThrTileMev,
+    TILE_SCALE,
+    'tile-sval-max',
+    'tile-sval-min',
   );
   const larSlider = makeDetSlider(
-    'lar-strak', 'lar-sthumb', 'lar-thr-input',
-    state.getThrLArMev, state.setThrLArMev, LAR_SCALE, 'lar-sval-max'
+    'lar-strak',
+    'lar-sthumb',
+    'lar-thr-input',
+    state.getThrLArMev,
+    state.setThrLArMev,
+    LAR_SCALE,
+    'lar-sval-max',
+    'lar-sval-min',
   );
   const fcalSlider = makeDetSlider(
-    'fcal-strak', 'fcal-sthumb', 'fcal-thr-input',
-    state.getThrFcalMev, state.setThrFcalMev, FCAL_SCALE, 'fcal-sval-max', applyFcalThreshold
+    'fcal-strak',
+    'fcal-sthumb',
+    'fcal-thr-input',
+    state.getThrFcalMev,
+    state.setThrFcalMev,
+    FCAL_SCALE,
+    'fcal-sval-max',
+    'fcal-sval-min',
+    applyFcalThreshold,
   );
   const hecSlider = makeDetSlider(
-    'hec-strak', 'hec-sthumb', 'hec-thr-input',
-    state.getThrHecMev, state.setThrHecMev, HEC_SCALE, 'hec-sval-max'
+    'hec-strak',
+    'hec-sthumb',
+    'hec-thr-input',
+    state.getThrHecMev,
+    state.setThrHecMev,
+    HEC_SCALE,
+    'hec-sval-max',
+    'hec-sval-min',
   );
   const trackPtSlider = makeTrackPtSlider(
-    'track-strak', 'track-sthumb', 'track-thr-input', 'track-sval-max', 'track-sval-min'
+    'track-strak',
+    'track-sthumb',
+    'track-thr-input',
+    'track-sval-max',
+    'track-sval-min',
   );
   const clusterEtSlider = makeClusterEtSlider(
-    'cluster-strak', 'cluster-sthumb', 'cluster-thr-input', 'cluster-sval-max', 'cluster-sval-min'
+    'cluster-strak',
+    'cluster-sthumb',
+    'cluster-thr-input',
+    'cluster-sval-max',
+    'cluster-sval-min',
   );
 
   function initDetPanel(hasTile, hasLAr, hasHec, hasTracks, hasFcal) {
@@ -304,7 +376,7 @@ export function setupDetectorPanels({
     else if (hasTracks) switchTab('track');
   }
 
-  TAB_IDS.forEach(id => {
+  TAB_IDS.forEach((id) => {
     document.getElementById('tab-' + id).addEventListener('click', () => switchTab(id));
   });
   document.getElementById('tab-cluster').addEventListener('click', () => switchTab('cluster'));

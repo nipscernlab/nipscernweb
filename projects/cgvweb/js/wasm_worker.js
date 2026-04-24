@@ -22,7 +22,10 @@ let _readyPromise = null;
 
 async function ensureReady() {
   if (_ready) return;
-  if (!_readyPromise) _readyPromise = wasmInit().then(() => { _ready = true; });
+  if (!_readyPromise)
+    _readyPromise = wasmInit().then(() => {
+      _ready = true;
+    });
   await _readyPromise;
 }
 

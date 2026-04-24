@@ -130,13 +130,14 @@ peek at the shower core when the outer layers occlude it, or to
 isolate an embedded cluster during a detailed inspection.
 
    * Activate with the =Slicer= toolbar button or =Shift+S=.
-   * The cut cylinder is axis-aligned along =z= and anchored by a small 3D handle. Two parameters are exposed through drag-gestures on the handle:
-      * _screen-Y_ drag &mdash; sweeps the wedge angle =θ= from 0 (no carve) to 2π (full cylinder). A half-drag carves half the detector.
-      * _screen-X_ drag &mdash; scales the cylinder height, symmetrically around the anchor. The default height is 3 m; the maximum is 20 m.
-   * _Right-click + drag_ on the handle translates the entire cut volume along the beam axis (=z=). This lets you park the carve around a particular sub-detector without touching its shape.
-   * The cylinder radius is fixed at 5 m, which is large enough to cover the full calorimeter envelope in =(r, φ)=.
-   * Culling interacts correctly with every other filter: sub-detector toggles, energy thresholds, cluster filters and _All cells_ are still honoured on the cells that remain visible.
-   * The gizmo is hidden automatically during screenshot capture so it never leaks into publication images.
+   * On activation the gizmo appears at the world origin: a white sphere (the drag handle) with three colour-coded arrows — red (+Z), green (+Y) and blue (+X) — marking the world axes.
+   * The cut cylinder is axis-aligned along =z=, centred on the handle position. Two shape parameters are exposed through drag-gestures on the white sphere:
+      * _screen-Y_ drag (up/down) &mdash; sweeps the wedge angle =θ= continuously from 0 to 2π. Dragging 300 px upward completes one full revolution. The initial carve on activation is 90° (π/2). Dragging past 360° wraps back smoothly.
+      * _screen-X_ drag (left/right) &mdash; scales the cylinder height symmetrically around the anchor at a rate of 20 mm per pixel. The default height on activation is 5 m; the maximum is 20 m; the minimum is 0 (flat disc).
+   * _Right-click + drag_ on the white sphere translates the entire cut volume in the world Y/Z plane — simultaneously controlling both vertical (=y=) and beam-axis (=z=) position. The decomposition uses a 2×2 NDC-projection solve so the motion always follows the screen-space direction regardless of camera angle. Use this to park the carve at a specific sub-detector depth without changing the wedge shape.
+   * The cylinder radius is fixed at 5 m, large enough to cover the full calorimeter envelope in =(r, φ)=.
+   * Culling interacts correctly with every other filter: sub-detector toggles, energy thresholds, cluster filters and _All cells_ are all still honoured on the cells that remain visible.
+   * The gizmo is hidden automatically during screenshot capture so it never appears in publication images.
 
 Deactivate with the same toolbar button (or =Shift+S=); the scene
 returns immediately to its threshold/cluster-filtered state.
