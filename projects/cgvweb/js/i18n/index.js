@@ -2,40 +2,34 @@ import { TRANSLATIONS } from './translations.js';
 
 let currentLang = 'en';
 
-export function getCurrentLang() {
-  return currentLang;
-}
-
 export function t(key) {
-  return (TRANSLATIONS[currentLang] ?? TRANSLATIONS.en)[key]
-      ?? TRANSLATIONS.en[key]
-      ?? key;
+  return (TRANSLATIONS[currentLang] ?? TRANSLATIONS.en)[key] ?? TRANSLATIONS.en[key] ?? key;
 }
 
-export function applyLang(lang) {
+function applyLang(lang) {
   currentLang = lang;
 
   const htmlLang = { no: 'nb', pt: 'pt-BR' };
   document.documentElement.lang = htmlLang[lang] ?? lang;
 
-  document.querySelectorAll('[data-i18n]').forEach(el => {
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
     const v = t(el.dataset.i18n);
     if (v) el.textContent = v;
   });
 
-  document.querySelectorAll('[data-i18n-tip]').forEach(el => {
+  document.querySelectorAll('[data-i18n-tip]').forEach((el) => {
     const v = t(el.dataset.i18nTip);
     if (v) el.dataset.tip = v;
   });
 
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+  document.querySelectorAll('[data-i18n-ph]').forEach((el) => {
     const v = t(el.dataset.i18nPh);
     if (v) el.placeholder = v;
   });
 
-  document.querySelectorAll('.lang-opt').forEach(o =>
-    o.classList.toggle('on', o.dataset.lang === lang)
-  );
+  document
+    .querySelectorAll('.lang-opt')
+    .forEach((o) => o.classList.toggle('on', o.dataset.lang === lang));
 
   localStorage.setItem('cgv-lang', lang);
 }
@@ -56,7 +50,7 @@ export function setupLanguagePicker() {
   const langButton = document.getElementById('btn-lang');
   if (!langMenu || !langButton) return;
 
-  langButton.addEventListener('click', e => {
+  langButton.addEventListener('click', (e) => {
     e.stopPropagation();
 
     const open = langMenu.classList.toggle('open');
@@ -77,8 +71,8 @@ export function setupLanguagePicker() {
 
   document.addEventListener('click', () => langMenu.classList.remove('open'));
 
-  document.querySelectorAll('.lang-opt').forEach(opt => {
-    opt.addEventListener('click', e => {
+  document.querySelectorAll('.lang-opt').forEach((opt) => {
+    opt.addEventListener('click', (e) => {
       e.stopPropagation();
       applyLang(opt.dataset.lang);
       langMenu.classList.remove('open');

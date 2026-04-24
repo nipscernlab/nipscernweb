@@ -13,7 +13,7 @@ export function registerViewerShortcuts({
   toggleAllGhosts,
   toggleBeam,
 }) {
-  document.addEventListener('keydown', e => {
+  document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
 
@@ -81,16 +81,34 @@ export function registerViewerShortcuts({
         document.getElementById('btn-cluster').click();
         break;
       case 'ESCAPE':
-        if (slicer.isActive()) { slicer.disable(); return; }
-        if (state.cinemaMode) { exitCinema(); return; }
-        if (state.settingsPanelOpen) { closeSettingsPanel(); return; }
-        if (state.layersPanelOpen) { closeLayersPanel(); return; }
-        if (state.rpanelPinned) { setPinnedR(false); return; }
+        if (slicer.isActive()) {
+          slicer.disable();
+          return;
+        }
+        if (state.cinemaMode) {
+          exitCinema();
+          return;
+        }
+        if (state.settingsPanelOpen) {
+          closeSettingsPanel();
+          return;
+        }
+        if (state.layersPanelOpen) {
+          closeLayersPanel();
+          return;
+        }
+        if (state.rpanelPinned) {
+          setPinnedR(false);
+          return;
+        }
         if (document.getElementById('shot-overlay').classList.contains('open')) {
           document.getElementById('btn-shot-cancel').click();
           return;
         }
-        if (state.panelPinned) { setPinned(false); return; }
+        if (state.panelPinned) {
+          setPinned(false);
+          return;
+        }
         aboutOverlay.classList.remove('open');
         break;
     }

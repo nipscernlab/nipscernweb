@@ -237,8 +237,12 @@ export function setupCinemaControls({
   document.getElementById('cinema-exit').addEventListener('click', exitCinema);
 
   let dragged = false;
-  canvas.addEventListener('mousedown', () => { dragged = false; });
-  canvas.addEventListener('mousemove', () => { dragged = true; });
+  canvas.addEventListener('mousedown', () => {
+    dragged = false;
+  });
+  canvas.addEventListener('mousemove', () => {
+    dragged = true;
+  });
   canvas.addEventListener('mouseup', () => {
     if (cinemaMode && !dragged) exitCinema();
   });

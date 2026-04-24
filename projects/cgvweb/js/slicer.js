@@ -79,12 +79,20 @@ export function createSlicerController({
       return a;
     };
 
-    g.userData.arrowZ = mkArrow(new THREE.Vector3(0, 0, 1), 0xff2a2a); g.add(g.userData.arrowZ);
-    g.userData.arrowP = mkArrow(new THREE.Vector3(0, 1, 0), 0x33dd55); g.add(g.userData.arrowP);
-    g.userData.arrowT = mkArrow(new THREE.Vector3(1, 0, 0), 0x3b8cff); g.add(g.userData.arrowT);
+    g.userData.arrowZ = mkArrow(new THREE.Vector3(0, 0, 1), 0xff2a2a);
+    g.add(g.userData.arrowZ);
+    g.userData.arrowP = mkArrow(new THREE.Vector3(0, 1, 0), 0x33dd55);
+    g.add(g.userData.arrowP);
+    g.userData.arrowT = mkArrow(new THREE.Vector3(1, 0, 0), 0x3b8cff);
+    g.add(g.userData.arrowT);
 
     const sphGeo = new THREE.SphereGeometry(sphR, 16, 12);
-    const sphMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthTest: false });
+    const sphMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.85,
+      depthTest: false,
+    });
     const sph = new THREE.Mesh(sphGeo, sphMat);
     sph.userData.slicerHandle = true;
     sph.renderOrder = 22;
@@ -147,25 +155,29 @@ export function createSlicerController({
     let dragStartTheta = 0;
     let dragStartHeight = 0;
 
-    canvas.addEventListener('pointerdown', e => {
-      if (e.button !== 0) return;
-      if (!slicerActive || !slicerGroup) return;
-      const pt = pointerXY(e);
-      dragRay.setFromCamera(pt, camera);
-      const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
-      if (!hits.length) return;
-      dragging = true;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-      dragStartTheta = slicerThetaLength;
-      dragStartHeight = slicerHalfHeight * 2;
-      controls.enabled = false;
-      canvas.setPointerCapture(e.pointerId);
-      e.preventDefault();
-      e.stopPropagation();
-    }, true);
+    canvas.addEventListener(
+      'pointerdown',
+      (e) => {
+        if (e.button !== 0) return;
+        if (!slicerActive || !slicerGroup) return;
+        const pt = pointerXY(e);
+        dragRay.setFromCamera(pt, camera);
+        const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
+        if (!hits.length) return;
+        dragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        dragStartTheta = slicerThetaLength;
+        dragStartHeight = slicerHalfHeight * 2;
+        controls.enabled = false;
+        canvas.setPointerCapture(e.pointerId);
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      true,
+    );
 
-    canvas.addEventListener('pointermove', e => {
+    canvas.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       const dy = dragStartY - e.clientY;
       const dTheta = (dy / SLICER_THETA_DRAG_PX) * TWO_PI;
@@ -179,11 +191,13 @@ export function createSlicerController({
       updateBasis();
     });
 
-    const endDrag = e => {
+    const endDrag = (e) => {
       if (!dragging) return;
       dragging = false;
       controls.enabled = true;
-      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+      try {
+        canvas.releasePointerCapture(e.pointerId);
+      } catch (_) {}
     };
     canvas.addEventListener('pointerup', endDrag);
     canvas.addEventListener('pointercancel', endDrag);
@@ -199,23 +213,27 @@ export function createSlicerController({
     let prevNdcX = 0;
     let prevNdcY = 0;
 
-    canvas.addEventListener('pointerdown', e => {
-      if (e.button !== 2) return;
-      if (!slicerActive || !slicerGroup) return;
-      const pt = pointerXY(e);
-      dragRay.setFromCamera(pt, camera);
-      const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
-      if (!hits.length) return;
-      tDragging = true;
-      prevNdcX = pt.x;
-      prevNdcY = pt.y;
-      controls.enabled = false;
-      canvas.setPointerCapture(e.pointerId);
-      e.preventDefault();
-      e.stopPropagation();
-    }, true);
+    canvas.addEventListener(
+      'pointerdown',
+      (e) => {
+        if (e.button !== 2) return;
+        if (!slicerActive || !slicerGroup) return;
+        const pt = pointerXY(e);
+        dragRay.setFromCamera(pt, camera);
+        const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
+        if (!hits.length) return;
+        tDragging = true;
+        prevNdcX = pt.x;
+        prevNdcY = pt.y;
+        controls.enabled = false;
+        canvas.setPointerCapture(e.pointerId);
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      true,
+    );
 
-    canvas.addEventListener('pointermove', e => {
+    canvas.addEventListener('pointermove', (e) => {
       if (!tDragging) return;
       const pt = pointerXY(e);
       const dNdcX = pt.x - prevNdcX;
@@ -227,15 +245,17 @@ export function createSlicerController({
       pZ.set(0, slicerYOffset, slicerZOffset + 1).project(camera);
       pY.set(0, slicerYOffset + 1, slicerZOffset).project(camera);
 
-      const zdx = pZ.x - p0.x, zdy = pZ.y - p0.y;
-      const ydx = pY.x - p0.x, ydy = pY.y - p0.y;
+      const zdx = pZ.x - p0.x,
+        zdy = pZ.y - p0.y;
+      const ydx = pY.x - p0.x,
+        ydy = pY.y - p0.y;
 
       // Solve a 2x2 system: [zdx ydx; zdy ydy] · [dz, dy] = [dNdcX, dNdcY].
       // This decomposes the cursor delta into independent contributions
       // along +Z and +Y of the world frame.
       const det = zdx * ydy - ydx * zdy;
       if (Math.abs(det) > 1e-10) {
-        slicerZOffset += ( ydy * dNdcX - ydx * dNdcY) / det;
+        slicerZOffset += (ydy * dNdcX - ydx * dNdcY) / det;
         slicerYOffset += (-zdy * dNdcX + zdx * dNdcY) / det;
         updateBasis();
       } else {
@@ -251,16 +271,18 @@ export function createSlicerController({
       prevNdcY = pt.y;
     });
 
-    const endTDrag = e => {
+    const endTDrag = (e) => {
       if (!tDragging) return;
       tDragging = false;
       controls.enabled = true;
-      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+      try {
+        canvas.releasePointerCapture(e.pointerId);
+      } catch (_) {}
     };
     canvas.addEventListener('pointerup', endTDrag);
     canvas.addEventListener('pointercancel', endTDrag);
 
-    canvas.addEventListener('contextmenu', e => {
+    canvas.addEventListener('contextmenu', (e) => {
       if (!slicerActive || !slicerGroup) return;
       const pt = pointerXY(e);
       dragRay.setFromCamera(pt, camera);

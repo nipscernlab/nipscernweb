@@ -14,8 +14,8 @@ export function setupSampleMode({
   let seq = 0;
 
   const listEl = document.getElementById('sample-list');
-  const msgEl  = document.getElementById('sample-list-msg');
-  const sec    = document.getElementById('sample-sec');
+  const msgEl = document.getElementById('sample-list-msg');
+  const sec = document.getElementById('sample-sec');
   const addBtn = document.getElementById('btn-sample-add');
   const clearBtn = document.getElementById('btn-sample-clear');
   const fileInput = document.getElementById('sample-file-in');
@@ -27,12 +27,13 @@ export function setupSampleMode({
 
   function renderList() {
     listEl.innerHTML = '';
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       const btn = document.createElement('div');
       btn.className = 'sample-item' + (entry.key === currentKey ? ' cur' : '');
-      const iconHtml = entry.kind === 'test'
-        ? `<svg class="ic sample-item-icon" style="width:11px;height:11px"><use href="#i-star"/></svg>`
-        : `<i class="ti ti-file-code sample-item-icon" style="font-size:11px"></i>`;
+      const iconHtml =
+        entry.kind === 'test'
+          ? `<svg class="ic sample-item-icon" style="width:11px;height:11px"><use href="#i-star"/></svg>`
+          : `<i class="ti ti-file-code sample-item-icon" style="font-size:11px"></i>`;
       const subKey = entry.kind === 'test' ? 'sample-sub-test' : 'sample-sub-user';
       btn.innerHTML = `
         ${iconHtml}
@@ -43,11 +44,11 @@ export function setupSampleMode({
         <button class="sample-item-x" data-tip="Remove from list" data-i18n-tip="tip-sample-remove">
           <svg class="ic" style="width:9px;height:9px;stroke-width:2.2"><use href="#i-x"/></svg>
         </button>`;
-      btn.addEventListener('click', ev => {
+      btn.addEventListener('click', (ev) => {
         if (ev.target.closest('.sample-item-x')) return;
         load(entry, btn);
       });
-      btn.querySelector('.sample-item-x').addEventListener('click', ev => {
+      btn.querySelector('.sample-item-x').addEventListener('click', (ev) => {
         ev.stopPropagation();
         removeEntry(entry.key);
       });
@@ -57,7 +58,7 @@ export function setupSampleMode({
   }
 
   async function load(entry, rowEl) {
-    document.querySelectorAll('.sample-item.cur').forEach(b => b.classList.remove('cur'));
+    document.querySelectorAll('.sample-item.cur').forEach((b) => b.classList.remove('cur'));
     rowEl.classList.add('cur');
     currentKey = entry.key;
     setStatus('Loading sample…');
@@ -85,7 +86,7 @@ export function setupSampleMode({
   }
 
   function removeEntry(key) {
-    entries = entries.filter(e => e.key !== key);
+    entries = entries.filter((e) => e.key !== key);
     if (currentKey === key) currentKey = null;
     renderList();
   }
@@ -123,13 +124,13 @@ export function setupSampleMode({
         msgEl.hidden = false;
         return;
       }
-      const testEntries = names.map(name => ({
+      const testEntries = names.map((name) => ({
         display: `test_${name}`,
         kind: 'test',
         source: { url: `./default_xml/${encodeURIComponent(name)}` },
         key: `t:${name}`,
       }));
-      entries = testEntries.concat(entries.filter(e => e.kind === 'user'));
+      entries = testEntries.concat(entries.filter((e) => e.kind === 'user'));
       renderList();
       sampleLoaded = true;
     } catch (_) {
@@ -139,27 +140,33 @@ export function setupSampleMode({
   }
 
   addBtn.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => {
+  fileInput.addEventListener('change', (e) => {
     const f = e.target.files?.[0];
     e.target.value = '';
     if (f) addUserFile(f);
   });
   clearBtn.addEventListener('click', clearAll);
 
-  ['dragenter', 'dragover'].forEach(ev => sec.addEventListener(ev, e => {
-    e.preventDefault();
-    e.stopPropagation();
-    sec.classList.add('dragover');
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-  }));
-  ['dragleave', 'dragend'].forEach(ev => sec.addEventListener(ev, e => {
-    if (e.target === sec) sec.classList.remove('dragover');
-  }));
-  sec.addEventListener('drop', e => {
+  ['dragenter', 'dragover'].forEach((ev) =>
+    sec.addEventListener(ev, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sec.classList.add('dragover');
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    }),
+  );
+  ['dragleave', 'dragend'].forEach((ev) =>
+    sec.addEventListener(ev, (e) => {
+      if (e.target === sec) sec.classList.remove('dragover');
+    }),
+  );
+  sec.addEventListener('drop', (e) => {
     e.preventDefault();
     e.stopPropagation();
     sec.classList.remove('dragover');
-    const files = [...(e.dataTransfer?.files ?? [])].filter(f => f.name.toLowerCase().endsWith('.xml'));
+    const files = [...(e.dataTransfer?.files ?? [])].filter((f) =>
+      f.name.toLowerCase().endsWith('.xml'),
+    );
     files.forEach(addUserFile);
   });
 

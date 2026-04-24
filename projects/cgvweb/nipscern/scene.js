@@ -50,7 +50,7 @@ function buildBeam(){
   scene.add(g);
 }
 
-// ── Phi ghost lines (procedural — no data needed) ────────────────────────────
+// ── Phi ghost lines (procedural) ─────────────────────────────────────────────
 const TILE_PHI_SEGS = [
   { rIn:2288, rOut:3835, zMin:-2820, zMax:2820 },
   { rIn:2288, rOut:3835, zMin:3600,  zMax:6050 },
@@ -77,12 +77,13 @@ function buildPhiLines(){
   scene.add(group);
 }
 
-// ── Materials / runtime state ────────────────────────────────────────────────
-const ghostSolidMat = new THREE.MeshBasicMaterial({color:0x5C5F66, transparent:true, opacity:0.04, depthWrite:false, side:THREE.DoubleSide});
-const outlineAllMat = new THREE.LineBasicMaterial({color:0x000000});
-const outlineHoverMat = new THREE.LineBasicMaterial({color:0xffffff});
-const trackMat = new THREE.LineBasicMaterial({color:0xffea00});
-const clusterMat = new THREE.LineDashedMaterial({
+// ── Materials ─────────────────────────────────────────────────────────────────
+const ghostSolidMat  = new THREE.MeshBasicMaterial({color:0x5C5F66, transparent:true, opacity:0.04, depthWrite:false, side:THREE.DoubleSide});
+const outlineAllMat  = new THREE.LineBasicMaterial({color:0x000000});
+const outlineHoverMat= new THREE.LineBasicMaterial({color:0xffffff});
+const trackMat       = new THREE.LineBasicMaterial({color:0xffea00});
+const photonMat      = new THREE.LineBasicMaterial({color:0xffcc00, transparent:true, opacity:0.85, depthWrite:false});
+const clusterMat     = new THREE.LineDashedMaterial({
   color:0xff4400, transparent:true, opacity:0.55,
   dashSize:40, gapSize:60, depthWrite:false,
 });
@@ -98,10 +99,10 @@ function matForRgb(r, g, b){
   return m;
 }
 
+// ── Hover outline ─────────────────────────────────────────────────────────────
 const rayTargets = [];
-const cellEdgeBufByName = new Map(); // name -> Float32Array (baked edge positions)
+const cellEdgeBufByName = new Map();
 
-// ── Hover white outline ──────────────────────────────────────────────────────
 let hoverMesh = null;
 function clearHover(){
   if(!hoverMesh) return;
@@ -126,7 +127,7 @@ function showHover(mesh){
   dirty = true;
 }
 
-// ── Raycast hover ────────────────────────────────────────────────────────────
+// ── Raycast hover ─────────────────────────────────────────────────────────────
 const raycast = new THREE.Raycaster();
 raycast.firstHitOnly = true;
 const mxy = new THREE.Vector2();
@@ -149,7 +150,7 @@ document.addEventListener('mousemove', e => {
 });
 canvas.addEventListener('mouseleave', clearHover);
 
-// ── Load scene_data.bin ──────────────────────────────────────────────────────
+// ── Load scene_data.bin ───────────────────────────────────────────────────────
 async function loadSceneData(){
   const buf = await (await fetch('./scene_data.bin')).arrayBuffer();
   const headerLen = new DataView(buf).getUint32(0, true);
@@ -167,7 +168,7 @@ async function main(){
 
   const { header, f32, u32 } = await loadSceneData();
 
-  // Cells
+  // ── Cells ────────────────────────────────────────────────────────────────────
   let totalEdgeFloats = 0;
   for(const c of header.cells) totalEdgeFloats += c.edge[1]/4;
   const allEdges = new Float32Array(totalEdgeFloats);
@@ -196,7 +197,6 @@ async function main(){
     edgeCursor += edge.length;
   }
 
-  // Single big LineSegments for black outline
   if(totalEdgeFloats){
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(allEdges, 3));
@@ -207,7 +207,7 @@ async function main(){
     scene.add(m);
   }
 
-  // Ghosts
+  // ── Ghosts ───────────────────────────────────────────────────────────────────
   for(const g of header.ghosts){
     const pos = f32(g.pos[0], g.pos[1]);
     const idx = u32(g.idx[0], g.idx[1]);
@@ -221,7 +221,7 @@ async function main(){
     scene.add(mesh);
   }
 
-  // Tracks
+  // ── Tracks ───────────────────────────────────────────────────────────────────
   if(header.tracks && header.tracks.length){
     const group = new THREE.Group();
     group.renderOrder = 5;
@@ -234,7 +234,7 @@ async function main(){
     scene.add(group);
   }
 
-  // Clusters
+  // ── Clusters ─────────────────────────────────────────────────────────────────
   if(header.clusters && header.clusters.length){
     const group = new THREE.Group();
     group.renderOrder = 6;
@@ -245,6 +245,19 @@ async function main(){
       const line = new THREE.Line(geo, clusterMat);
       line.computeLineDistances();
       group.add(line);
+    }
+    scene.add(group);
+  }
+
+  // ── Photons (wavy helix lines) ────────────────────────────────────────────────
+  if(header.photons && header.photons.length){
+    const group = new THREE.Group();
+    group.renderOrder = 7;
+    for(const [off, byteLen] of header.photons){
+      const pts = f32(off, byteLen);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+      group.add(new THREE.Line(geo, photonMat));
     }
     scene.add(group);
   }

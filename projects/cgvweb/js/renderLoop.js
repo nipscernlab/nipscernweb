@@ -1,14 +1,27 @@
 import {
-  renderer, scene, camera, controls, dirLight,
-  markDirty, isDirty, clearDirty,
+  renderer,
+  scene,
+  camera,
+  controls,
+  dirLight,
+  markDirty,
+  isDirty,
+  clearDirty,
 } from './renderer.js';
 
 // ── FPS counter ──────────────────────────────────────────────────────────────
 const fpsEl = document.createElement('div');
 Object.assign(fpsEl.style, {
-  position: 'fixed', bottom: '8px', right: '10px', zIndex: '9999',
-  fontFamily: 'monospace', fontSize: '13px', color: '#66ccff',
-  opacity: '0.45', pointerEvents: 'none', userSelect: 'none',
+  position: 'fixed',
+  bottom: '8px',
+  right: '10px',
+  zIndex: '9999',
+  fontFamily: 'monospace',
+  fontSize: '13px',
+  color: '#66ccff',
+  opacity: '0.45',
+  pointerEvents: 'none',
+  userSelect: 'none',
 });
 document.body.appendChild(fpsEl);
 
@@ -16,7 +29,8 @@ document.body.appendChild(fpsEl);
 // Paused while the tab is hidden: browsers already throttle RAF on hidden tabs,
 // but stopping the loop entirely frees the main thread for other tabs. Resumed
 // on visibilitychange.
-let _fpsFrames = 0, _fpsLast = performance.now();
+let _fpsFrames = 0,
+  _fpsLast = performance.now();
 let _loopRunning = false;
 let _loopRafId = 0;
 let _resumeWarmFrames = 0;
@@ -52,7 +66,8 @@ function _loopTick() {
   const now = performance.now();
   if (now - _fpsLast >= 500) {
     fpsEl.textContent = ((_fpsFrames / (now - _fpsLast)) * 1000).toFixed(0) + ' FPS';
-    _fpsFrames = 0; _fpsLast = now;
+    _fpsFrames = 0;
+    _fpsLast = now;
   }
   _onFrameStart();
   controls.update();
@@ -69,7 +84,8 @@ function _loopTick() {
 function _startLoop() {
   if (_loopRunning) return;
   _loopRunning = true;
-  _fpsLast = performance.now(); _fpsFrames = 0;
+  _fpsLast = performance.now();
+  _fpsFrames = 0;
   markDirty();
   if (!_loopRafId) _loopRafId = requestAnimationFrame(_loopTick);
 }

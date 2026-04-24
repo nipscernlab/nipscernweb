@@ -1,9 +1,9 @@
 export function setupSidebarControls({
   canvas,
-  getCinemaMode,
   getTourMode,
   onDisableTourMode,
   onEnableTourMode,
+  onToggleCollisionHud,
   t,
   updateCollisionHud,
 }) {
@@ -19,6 +19,7 @@ export function setupSidebarControls({
   const hintsToggle = document.getElementById('stog-hints');
   const autoOpenToggle = document.getElementById('stog-autopen');
   const tourToggle = document.getElementById('stog-tour');
+  const collisionToggle = document.getElementById('stog-collision-hud');
   const btnTip = document.getElementById('btn-tip');
   const mobileMQ = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
 
@@ -34,7 +35,9 @@ export function setupSidebarControls({
     document.body.classList.toggle('panel-unpinned', !panelPinned);
     panelEl.classList.toggle('collapsed', !panelPinned);
     btnPin.classList.toggle('on', panelPinned);
-    document.querySelector('#pin-icon use').setAttribute('href', panelPinned ? '#i-pin' : '#i-pin-off');
+    document
+      .querySelector('#pin-icon use')
+      .setAttribute('href', panelPinned ? '#i-pin' : '#i-pin-off');
     btnPin.dataset.tip = t(panelPinned ? 'tip-pin' : 'tip-panel');
     btnPanel.classList.toggle('on', panelPinned);
     updateCollisionHud();
@@ -145,7 +148,7 @@ export function setupSidebarControls({
       syncRightPanel();
     }
   });
-  btnRpanel.addEventListener('click', e => {
+  btnRpanel.addEventListener('click', (e) => {
     e.stopPropagation();
     setPinnedR(!rpanelPinned);
   });
@@ -156,15 +159,19 @@ export function setupSidebarControls({
       let sy = 0;
       let st = 0;
       let tracking = false;
-      el.addEventListener('touchstart', e => {
-        if (!mobileMQ.matches) return;
-        const touch = e.touches[0];
-        sx = touch.clientX;
-        sy = touch.clientY;
-        st = Date.now();
-        tracking = true;
-      }, { passive: true });
-      el.addEventListener('touchend', e => {
+      el.addEventListener(
+        'touchstart',
+        (e) => {
+          if (!mobileMQ.matches) return;
+          const touch = e.touches[0];
+          sx = touch.clientX;
+          sy = touch.clientY;
+          st = Date.now();
+          tracking = true;
+        },
+        { passive: true },
+      );
+      el.addEventListener('touchend', (e) => {
         if (!tracking) return;
         tracking = false;
         const touch = e.changedTouches[0];
@@ -184,14 +191,14 @@ export function setupSidebarControls({
     tapOpener(rpanelEdge, () => setPinnedR(true));
   })();
 
-  btnSettings.addEventListener('click', e => {
+  btnSettings.addEventListener('click', (e) => {
     e.stopPropagation();
     settingsPanelOpen ? closeSettingsPanel() : openSettingsPanel();
   });
   document.addEventListener('click', () => {
     if (settingsPanelOpen) closeSettingsPanel();
   });
-  settingsPanel.addEventListener('click', e => e.stopPropagation());
+  settingsPanel.addEventListener('click', (e) => e.stopPropagation());
 
   hintsToggle.addEventListener('click', () => {
     hintsEnabled = !hintsEnabled;
@@ -214,6 +221,31 @@ export function setupSidebarControls({
     });
   }
 
+  // Collision-info overlay toggle (top-left HUD with run/event/LB/timestamp).
+  // Persists in localStorage; defaults to ON.
+  let collisionHudEnabled = true;
+  function syncCollisionUi() {
+    if (!collisionToggle) return;
+    collisionToggle.classList.toggle('on', collisionHudEnabled);
+    collisionToggle.setAttribute('aria-checked', collisionHudEnabled ? 'true' : 'false');
+  }
+  if (collisionToggle) {
+    try {
+      const saved = localStorage.getItem('cgv-collision-hud');
+      if (saved !== null) collisionHudEnabled = saved === '1';
+    } catch (_) {}
+    if (onToggleCollisionHud) onToggleCollisionHud(collisionHudEnabled);
+    syncCollisionUi();
+    collisionToggle.addEventListener('click', () => {
+      collisionHudEnabled = !collisionHudEnabled;
+      try {
+        localStorage.setItem('cgv-collision-hud', collisionHudEnabled ? '1' : '0');
+      } catch (_) {}
+      if (onToggleCollisionHud) onToggleCollisionHud(collisionHudEnabled);
+      syncCollisionUi();
+    });
+  }
+
   setPinnedR(false);
   if (window.innerWidth < 640 || mobileMQ.matches) setPinned(false);
   syncHintsUi();
@@ -223,12 +255,16 @@ export function setupSidebarControls({
     closeSettingsPanel,
     getState() {
       return {
+        collisionHudEnabled,
         hintsEnabled,
         mobileMQ,
         panelPinned,
         rpanelPinned,
         settingsPanelOpen,
       };
+    },
+    isCollisionHudEnabled() {
+      return collisionHudEnabled;
     },
     isHintsEnabled() {
       return hintsEnabled;

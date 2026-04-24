@@ -2,22 +2,28 @@ import * as THREE from 'three';
 import { scene, markDirty } from './renderer.js';
 
 // Track line materials — shared with drawTracks() so hit/miss restyling stays consistent.
-export const TRACK_MAT     = new THREE.LineBasicMaterial({ color: 0xffea00, linewidth: 2 });
-export const TRACK_HIT_MAT = new THREE.LineBasicMaterial({ color: 0x4A90D9, linewidth: 2 });
+export const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffea00, linewidth: 2 });
+const TRACK_HIT_MAT = new THREE.LineBasicMaterial({ color: 0x4a90d9, linewidth: 2 });
 
 const atlasTrackHitMat = new THREE.MeshBasicMaterial({
-  color: 0x4A90D9, transparent: true, opacity: 0.035,
-  depthWrite: false, side: THREE.DoubleSide,
+  color: 0x4a90d9,
+  transparent: true,
+  opacity: 0.035,
+  depthWrite: false,
+  side: THREE.DoubleSide,
 });
 const trackAtlasOutlineMat = new THREE.LineBasicMaterial({
-  color: 0x4A90D9, transparent: true, opacity: 0.15, depthWrite: false,
+  color: 0x4a90d9,
+  transparent: true,
+  opacity: 0.15,
+  depthWrite: false,
 });
 
 const TRACK_ATLAS_TARGET_NODE_NAMES = ['MUCH_1', 'MUC1_2'];
-const _trackAtlasRay  = new THREE.Raycaster();
+const _trackAtlasRay = new THREE.Raycaster();
 const _trackAtlasSegA = new THREE.Vector3();
 const _trackAtlasSegB = new THREE.Vector3();
-const _trackAtlasDir  = new THREE.Vector3();
+const _trackAtlasDir = new THREE.Vector3();
 const _trackAtlasTrackBox = new THREE.Box3();
 const _trackAtlasEdgeGeoCache = new Map();
 
@@ -61,8 +67,7 @@ function _collectAtlasNodesAtDepth(node, depth, out = []) {
     out.push(node);
     return out;
   }
-  for (const child of node.children.values())
-    _collectAtlasNodesAtDepth(child, depth - 1, out);
+  for (const child of node.children.values()) _collectAtlasNodesAtDepth(child, depth - 1, out);
   return out;
 }
 
@@ -85,9 +90,13 @@ function _ensureTrackAtlasOutline(mesh) {
 function _resolveTrackAtlasTargets() {
   if (!atlasRoot) return { nodes: [], meshes: [], outlineMeshes: [] };
   if (_trackAtlasNodes && _trackAtlasMeshes && _trackAtlasOutlineMeshes)
-    return { nodes: _trackAtlasNodes, meshes: _trackAtlasMeshes, outlineMeshes: _trackAtlasOutlineMeshes };
+    return {
+      nodes: _trackAtlasNodes,
+      meshes: _trackAtlasMeshes,
+      outlineMeshes: _trackAtlasOutlineMeshes,
+    };
   const sourceNodes = [];
-  const seen        = new Set();
+  const seen = new Set();
   for (const name of TRACK_ATLAS_TARGET_NODE_NAMES) {
     for (const node of _findAtlasNodesByName(atlasRoot, name)) {
       if (seen.has(node)) continue;
@@ -137,7 +146,7 @@ function _resolveTrackAtlasTargets() {
       outlineMeshes.push(mesh);
     }
   }
-  _trackAtlasNodes  = nodes;
+  _trackAtlasNodes = nodes;
   _trackAtlasMeshes = meshes;
   _trackAtlasOutlineMeshes = outlineMeshes;
   return { nodes, meshes, outlineMeshes };
@@ -149,9 +158,8 @@ export function updateTrackAtlasIntersections() {
   if (!meshes.length) return;
 
   const trackGroup = _getTrackGroup();
-  const visibleTracks = (trackGroup && trackGroup.visible)
-    ? trackGroup.children.filter(c => c.visible)
-    : [];
+  const visibleTracks =
+    trackGroup && trackGroup.visible ? trackGroup.children.filter((c) => c.visible) : [];
   const hitMeshes = new Set();
   const hitTracks = new Set();
 
@@ -160,7 +168,7 @@ export function updateTrackAtlasIntersections() {
 
     // Cache world-space AABBs for all target meshes once (static geometry).
     if (!_trackAtlasMeshBoxes) {
-      _trackAtlasMeshBoxes = meshes.map(m => new THREE.Box3().setFromObject(m));
+      _trackAtlasMeshBoxes = meshes.map((m) => new THREE.Box3().setFromObject(m));
     }
 
     for (const line of visibleTracks) {

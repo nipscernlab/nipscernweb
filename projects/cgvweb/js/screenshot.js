@@ -20,16 +20,17 @@ export function setupScreenshotControls({
 
   function pickDefaultShotRes() {
     const coarse = window.matchMedia('(pointer: coarse)').matches;
-    const small = window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches
-      || window.innerWidth < 900;
-    return (coarse || small) ? { w: 2560, h: 1440 } : { w: 10240, h: 5760 };
+    const small =
+      window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches ||
+      window.innerWidth < 900;
+    return coarse || small ? { w: 2560, h: 1440 } : { w: 10240, h: 5760 };
   }
 
   function applyDefaultShotRes() {
     const { w, h } = pickDefaultShotRes();
     const target = document.querySelector(`.shot-res[data-w="${w}"][data-h="${h}"]`);
     if (!target) return;
-    document.querySelectorAll('.shot-res').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.shot-res').forEach((btn) => btn.classList.remove('active'));
     target.classList.add('active');
     shotW = w;
     shotH = h;
@@ -43,7 +44,7 @@ export function setupScreenshotControls({
 
   function closeShotDialog() {
     shotOverlay.classList.remove('open');
-    document.querySelectorAll('.shot-res').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.shot-res').forEach((btn) => btn.classList.remove('active'));
     shotSaveBtn.disabled = true;
     shotProgress.classList.remove('running');
     shotProgTxt.textContent = '';
@@ -64,15 +65,17 @@ export function setupScreenshotControls({
       tipData = {
         cellName: tipCellEl.textContent,
         energy: tipEEl.textContent,
-        xFrac: (parseFloat(tooltip.style.left) - canvas.getBoundingClientRect().left) / origW * origPR,
-        yFrac: (parseFloat(tooltip.style.top) - canvas.getBoundingClientRect().top) / origH * origPR,
+        xFrac:
+          ((parseFloat(tooltip.style.left) - canvas.getBoundingClientRect().left) / origW) * origPR,
+        yFrac:
+          ((parseFloat(tooltip.style.top) - canvas.getBoundingClientRect().top) / origH) * origPR,
       };
     }
 
     const targetAspect = targetW / targetH;
-    const origTanHalf = Math.tan((origFov * Math.PI / 180) / 2);
+    const origTanHalf = Math.tan((origFov * Math.PI) / 180 / 2);
     const newTanHalf = origTanHalf * Math.max(1, origAspect / targetAspect);
-    const newFov = 2 * Math.atan(newTanHalf) * 180 / Math.PI;
+    const newFov = (2 * Math.atan(newTanHalf) * 180) / Math.PI;
     renderer.setPixelRatio(1);
     renderer.setSize(targetW, targetH, false);
     camera.aspect = targetAspect;
@@ -108,7 +111,7 @@ export function setupScreenshotControls({
     ctx.putImageData(imgData, 0, 0);
 
     if (tipData) {
-      const scale = targetW / origW * origPR;
+      const scale = (targetW / origW) * origPR;
       const tx = tipData.xFrac * targetW;
       const ty = tipData.yFrac * targetH;
       const pad = 14 * scale;
@@ -172,7 +175,7 @@ export function setupScreenshotControls({
       ].filter(([, value]) => value);
 
       if (fields.length) {
-        const scale = targetW / origW * origPR;
+        const scale = (targetW / origW) * origPR;
         const fs = 13 * scale;
         const lh = 18 * scale;
         const colGap = 8 * scale;
@@ -216,9 +219,9 @@ export function setupScreenshotControls({
     link.click();
   }
 
-  document.querySelectorAll('.shot-res').forEach(btn => {
+  document.querySelectorAll('.shot-res').forEach((btn) => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.shot-res').forEach(node => node.classList.remove('active'));
+      document.querySelectorAll('.shot-res').forEach((node) => node.classList.remove('active'));
       btn.classList.add('active');
       shotW = parseInt(btn.dataset.w, 10);
       shotH = parseInt(btn.dataset.h, 10);
@@ -228,7 +231,7 @@ export function setupScreenshotControls({
 
   document.getElementById('btn-shot').addEventListener('click', openShotDialog);
   document.getElementById('btn-shot-cancel').addEventListener('click', closeShotDialog);
-  shotOverlay.addEventListener('click', e => {
+  shotOverlay.addEventListener('click', (e) => {
     if (e.target === shotOverlay) closeShotDialog();
   });
 
@@ -237,12 +240,12 @@ export function setupScreenshotControls({
     shotSaveBtn.disabled = true;
     shotProgTxt.textContent = t('shot-rendering').replace('{w}', shotW).replace('{h}', shotH);
     shotProgress.classList.add('running');
-    await new Promise(resolve => setTimeout(resolve, 80));
+    await new Promise((resolve) => setTimeout(resolve, 80));
 
     try {
       await renderAndDownload(shotW, shotH);
       shotProgTxt.textContent = t('shot-done');
-      await new Promise(resolve => setTimeout(resolve, 900));
+      await new Promise((resolve) => setTimeout(resolve, 900));
       closeShotDialog();
     } catch (err) {
       shotProgTxt.textContent = t('shot-error').replace('{msg}', err.message);

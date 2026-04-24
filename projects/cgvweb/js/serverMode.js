@@ -1,10 +1,14 @@
+import { dateGroup } from './utils.js';
+
 const MAX_ENTRIES = 100;
 const REFRESH_MS = 5000;
+const REMOTE_API = '/api/xml';
+const HAS_FSA = typeof window !== 'undefined' && 'showDirectoryPicker' in window;
 
 function fmtTime(ts) {
   if (!Number.isFinite(ts)) return '';
   const d = new Date(ts);
-  const pad = n => n.toString().padStart(2, '0');
+  const pad = (n) => n.toString().padStart(2, '0');
   return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
@@ -25,7 +29,7 @@ async function walkDirectoryHandle(dirHandle, out, prefix = '') {
 async function walkDataTransferEntry(entry, out, prefix = '') {
   if (!entry) return;
   if (entry.isFile) {
-    const f = await new Promise(res => entry.file(res, () => res(null)));
+    const f = await new Promise((res) => entry.file(res, () => res(null)));
     if (f && f.name.toLowerCase().endsWith('.xml')) {
       out.push({ file: f, rel: prefix + f.name });
     }
@@ -33,7 +37,7 @@ async function walkDataTransferEntry(entry, out, prefix = '') {
     const reader = entry.createReader();
     let batch;
     do {
-      batch = await new Promise(res => reader.readEntries(res, () => res([])));
+      batch = await new Promise((res) => reader.readEntries(res, () => res([])));
       for (const child of batch) {
         await walkDataTransferEntry(child, out, prefix + entry.name + '/');
       }
@@ -59,6 +63,8 @@ export function setupServerMode({
   let isActive = false;
   let isPaused = false;
   let canPoll = false;
+  let remoteMode = false;
+  let remoteFolderPath = null;
 
   const sec = document.getElementById('live-server-sec');
   const listEl = document.getElementById('server-list');
@@ -66,6 +72,14 @@ export function setupServerMode({
   const refreshBtn = document.getElementById('server-refresh-btn');
   const pickBtn = document.getElementById('btn-server-pick');
   const folderInput = document.getElementById('server-folder-in');
+  const remoteBar = document.getElementById('server-remote-bar');
+  const remoteFolderBtn = document.getElementById('server-folder-cur');
+  const remoteFolderText = document.getElementById('server-folder-cur-text');
+  const remoteEditRow = document.getElementById('server-folder-edit');
+  const remoteEditInput = document.getElementById('server-folder-input');
+  const remoteApplyBtn = document.getElementById('server-folder-apply');
+  const remoteCancelBtn = document.getElementById('server-folder-cancel');
+  const remoteErrorEl = document.getElementById('server-folder-error');
 
   function keyFor(f, rel) {
     return `${rel || f.name}|${f.size}|${f.lastModified}`;
@@ -105,7 +119,16 @@ export function setupServerMode({
     emptyEl.hidden = entries.length > 0;
     listEl.hidden = entries.length === 0;
     listEl.innerHTML = '';
+    let lastGroupKey = null;
     entries.forEach((e, idx) => {
+      const group = dateGroup(e.file.lastModified, t);
+      if (group.key !== lastGroupKey) {
+        lastGroupKey = group.key;
+        const sep = document.createElement('div');
+        sep.className = 'date-sep';
+        sep.textContent = group.label;
+        listEl.appendChild(sep);
+      }
       const row = document.createElement('div');
       row.className = 'srow' + (e.key === currentKey ? ' cur' : '');
       const shortName = e.rel.split('/').pop();
@@ -119,11 +142,11 @@ export function setupServerMode({
         </button>`;
       row.querySelector('.srow-info').addEventListener('click', async () => {
         currentKey = e.key;
-        listEl.querySelectorAll('.srow.cur').forEach(r => r.classList.remove('cur'));
+        listEl.querySelectorAll('.srow.cur').forEach((r) => r.classList.remove('cur'));
         row.classList.add('cur');
         await readAndProcess(e.file);
       });
-      row.querySelector('.srow-dl').addEventListener('click', ev => {
+      row.querySelector('.srow-dl').addEventListener('click', (ev) => {
         ev.stopPropagation();
         downloadFile(e.file, shortName);
       });
@@ -149,8 +172,10 @@ export function setupServerMode({
   function downloadFile(file, name) {
     const url = URL.createObjectURL(file);
     const a = Object.assign(document.createElement('a'), { href: url, download: name });
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   function updateEntries(rawItems) {
@@ -164,7 +189,7 @@ export function setupServerMode({
         return (a.rel || '').localeCompare(b.rel || '');
       })
       .slice(0, MAX_ENTRIES)
-      .map(it => ({ ...it, key: keyFor(it.file, it.rel) }));
+      .map((it) => ({ ...it, key: keyFor(it.file, it.rel) }));
     const sameLen = sorted.length === entries.length;
     const sameKeys = sameLen && sorted.every((e, i) => e.key === entries[i].key);
     if (!sameKeys) {
@@ -180,7 +205,7 @@ export function setupServerMode({
     if (top.key === lastAutoLoadedKey) return;
     lastAutoLoadedKey = top.key;
     currentKey = top.key;
-    listEl.querySelectorAll('.srow.cur').forEach(r => r.classList.remove('cur'));
+    listEl.querySelectorAll('.srow.cur').forEach((r) => r.classList.remove('cur'));
     const firstRow = listEl.querySelector('.srow');
     if (firstRow) firstRow.classList.add('cur');
     readAndProcess(top.file);
@@ -208,17 +233,50 @@ export function setupServerMode({
     updateEntries(out);
   }
 
+  function makeRemoteFile(meta) {
+    const url = `${REMOTE_API}/file/${encodeURIComponent(meta.name)}`;
+    return {
+      name: meta.name,
+      size: meta.size,
+      lastModified: meta.mtime,
+      async text() {
+        const r = await fetch(url, { cache: 'no-store' });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.text();
+      },
+    };
+  }
+
+  async function reloadFromRemote() {
+    try {
+      const r = await fetch(`${REMOTE_API}/list`, { cache: 'no-store' });
+      if (!r.ok) {
+        if (r.status === 503) {
+          entries = [];
+          renderList();
+        }
+        return;
+      }
+      const list = await r.json();
+      const out = list.map((it) => ({ file: makeRemoteFile(it), rel: it.name }));
+      updateEntries(out);
+    } catch (err) {
+      console.warn('[serverMode] remote reload failed:', err);
+    }
+  }
+
   async function refreshTick() {
     if (!isActive || isPaused) return;
     flashRefresh();
-    if (folderHandle) await reloadFromHandle();
+    if (remoteMode) await reloadFromRemote();
+    else if (folderHandle) await reloadFromHandle();
     scheduleRefresh();
   }
 
   function scheduleRefresh() {
     clearTimeout(refreshTimer);
     if (!isActive || isPaused) return;
-    if (!folderHandle) return;
+    if (!remoteMode && !folderHandle) return;
     refreshTimer = setTimeout(refreshTick, REFRESH_MS);
   }
 
@@ -228,7 +286,9 @@ export function setupServerMode({
   }
 
   function showFallbackWarning() {
-    setStatus(`<span class="warn">${esc(t('server-no-watch'))}</span>`);
+    const main = esc(t('server-no-watch'));
+    const tip = HAS_FSA ? '' : ` <span class="warn-tip">${esc(t('server-try-chromium'))}</span>`;
+    setStatus(`<span class="warn">${main}${tip}</span>`);
   }
 
   async function pickFolder() {
@@ -256,7 +316,7 @@ export function setupServerMode({
 
   pickBtn.addEventListener('click', pickFolder);
 
-  folderInput.addEventListener('change', e => {
+  folderInput.addEventListener('change', (e) => {
     const files = [...(e.target.files ?? [])];
     e.target.value = '';
     if (!files.length) return;
@@ -284,16 +344,20 @@ export function setupServerMode({
     }
   });
 
-  ['dragenter', 'dragover'].forEach(ev => sec.addEventListener(ev, e => {
-    e.preventDefault();
-    e.stopPropagation();
-    sec.classList.add('dragover');
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-  }));
-  ['dragleave', 'dragend'].forEach(ev => sec.addEventListener(ev, e => {
-    if (e.target === sec) sec.classList.remove('dragover');
-  }));
-  sec.addEventListener('drop', async e => {
+  ['dragenter', 'dragover'].forEach((ev) =>
+    sec.addEventListener(ev, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sec.classList.add('dragover');
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    }),
+  );
+  ['dragleave', 'dragend'].forEach((ev) =>
+    sec.addEventListener(ev, (e) => {
+      if (e.target === sec) sec.classList.remove('dragover');
+    }),
+  );
+  sec.addEventListener('drop', async (e) => {
     e.preventDefault();
     e.stopPropagation();
     sec.classList.remove('dragover');
@@ -301,8 +365,8 @@ export function setupServerMode({
     const out = [];
 
     const entriesList = items
-      .filter(it => it.kind === 'file')
-      .map(it => (it.webkitGetAsEntry ? it.webkitGetAsEntry() : null))
+      .filter((it) => it.kind === 'file')
+      .map((it) => (it.webkitGetAsEntry ? it.webkitGetAsEntry() : null))
       .filter(Boolean);
 
     if (entriesList.length) {
@@ -317,7 +381,7 @@ export function setupServerMode({
 
     if (!out.length) return;
     folderHandle = null;
-    inputFiles = out.map(o => o.file);
+    inputFiles = out.map((o) => o.file);
     canPoll = false;
     isPaused = false;
     lastAutoLoadedKey = null;
@@ -336,7 +400,109 @@ export function setupServerMode({
     }
   }
 
+  // ── Remote mode (server-side folder via /api/xml/*) ───────────────────
+  function updateRemoteFolderDisplay() {
+    if (!remoteFolderText) return;
+    remoteFolderText.textContent = remoteFolderPath || t('server-folder-not-set');
+    if (remoteFolderBtn) remoteFolderBtn.title = remoteFolderPath || '';
+  }
+
+  function showRemoteError(msg) {
+    if (!remoteErrorEl) return;
+    if (!msg) {
+      remoteErrorEl.hidden = true;
+      remoteErrorEl.textContent = '';
+      return;
+    }
+    remoteErrorEl.hidden = false;
+    remoteErrorEl.textContent = msg;
+  }
+
+  function openFolderEdit() {
+    if (!remoteEditRow) return;
+    showRemoteError('');
+    remoteEditInput.value = remoteFolderPath || '';
+    remoteEditRow.hidden = false;
+    if (remoteBar) remoteBar.hidden = true;
+    setTimeout(() => remoteEditInput.focus(), 0);
+  }
+
+  function closeFolderEdit() {
+    if (!remoteEditRow) return;
+    remoteEditRow.hidden = true;
+    if (remoteBar) remoteBar.hidden = false;
+    showRemoteError('');
+  }
+
+  async function applyFolderEdit() {
+    const path = (remoteEditInput?.value || '').trim();
+    if (!path) return;
+    try {
+      const r = await fetch(`${REMOTE_API}/set-folder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+      remoteFolderPath = data.path || path;
+      updateRemoteFolderDisplay();
+      lastAutoLoadedKey = null;
+      currentKey = null;
+      closeFolderEdit();
+      await reloadFromRemote();
+    } catch (err) {
+      showRemoteError(err.message || String(err));
+    }
+  }
+
+  async function tryEnterRemoteMode() {
+    try {
+      const r = await fetch(`${REMOTE_API}/folder`, {
+        cache: 'no-store',
+        headers: { Accept: 'application/json' },
+      });
+      if (!r.ok) return false;
+      // Guard against static hosts (Cloudflare Pages, etc.) that return a 200
+      // HTML 404 page on unknown routes — only accept a JSON body with `path`.
+      const ct = r.headers.get('content-type') || '';
+      if (!ct.toLowerCase().includes('json')) return false;
+      const data = await r.json();
+      if (!data || typeof data !== 'object' || !('path' in data)) return false;
+      remoteMode = true;
+      remoteFolderPath = data.path || null;
+      // Hide the local picker; show the remote bar.
+      if (pickBtn) pickBtn.hidden = true;
+      if (remoteBar) remoteBar.hidden = false;
+      updateRemoteFolderDisplay();
+      canPoll = true;
+      isPaused = false;
+      syncRefreshBtn();
+      await reloadFromRemote();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  if (remoteFolderBtn) remoteFolderBtn.addEventListener('click', openFolderEdit);
+  if (remoteApplyBtn) remoteApplyBtn.addEventListener('click', applyFolderEdit);
+  if (remoteCancelBtn) remoteCancelBtn.addEventListener('click', closeFolderEdit);
+  if (remoteEditInput) {
+    remoteEditInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyFolderEdit();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeFolderEdit();
+      }
+    });
+  }
+
   syncRefreshBtn();
+  tryEnterRemoteMode();
 
   return {
     setActive,

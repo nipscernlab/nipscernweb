@@ -10,8 +10,9 @@ const SUBSYS_TILE = 1, SUBSYS_LAR_EM = 2, SUBSYS_LAR_HEC = 3;
 const DEF_THR = 200;
 const thrTileMev = DEF_THR, thrLArMev = DEF_THR, thrHecMev = 1000, thrFcalMev = DEF_THR;
 
+// ── Palettes (mirrored from js/palette.js) ───────────────────────────────────
 const PAL_N = 256;
-function palColorTile(t){t=Math.max(0,Math.min(1,t));return new THREE.Color(1+t*(0.502-1),1+t*(0-1),0);}
+function palColorTile(t){t=Math.max(0,Math.min(1,t));return new THREE.Color(1+t*(0.3-1),1+t*(0-1),0);}
 function palColorHec(t){t=Math.max(0,Math.min(1,t));return new THREE.Color(0.4+t*(0.0471-0.4),0.8784+t*(0.0118-0.8784),0.9647+t*(0.4078-0.9647));}
 function palColorLAr(t){t=Math.max(0,Math.min(1,t));return new THREE.Color(0.0902+t*(0.1529-0.0902),0.8118+t*(0-0.8118),0.2588);}
 function makePal(fn){return Array.from({length:PAL_N},(_,i)=>{const c=fn(i/(PAL_N-1));c.offsetHSL(0,0.35,0);return c;});}
@@ -23,8 +24,8 @@ const colTile = eMev => PAL_TILE[Math.round(Math.max(0,Math.min(1,eMev/TILE_SCAL
 const colHec  = eMev => PAL_HEC [Math.round(Math.max(0,Math.min(1,eMev/HEC_SCALE ))*(PAL_N-1))];
 const colLAr  = eMev => PAL_LAR [Math.round(Math.max(0,Math.min(1,eMev/LAR_SCALE ))*(PAL_N-1))];
 
-// FCAL copper palette — mirrors js/main.js palColorFcalRgb with gamma 0.55.
-const FCAL_SCALE = 7000; // MeV
+// FCAL copper palette — mirrors js/palette.js palColorFcalRgb with gamma 0.55.
+const FCAL_SCALE = 7000;
 const _FCAL_STOPS = [
   [0.102, 0.024, 0.000], [0.420, 0.137, 0.063], [0.784, 0.392, 0.165],
   [1.000, 0.698, 0.416], [1.000, 0.918, 0.745],
@@ -45,13 +46,13 @@ function palColorFcal(eMev){
 }
 const _FCAL_TWIST_RAD = (2 * Math.PI) / 16;
 
+// ── Ghost names ──────────────────────────────────────────────────────────────
 const GHOST_TILE_NAMES = [
-  'Calorimeter\u2192LBTile_0', 'Calorimeter\u2192LBTileLArg_0',
-  'Calorimeter\u2192EBTilep_0', 'Calorimeter\u2192EBTilen_0',
-  'Calorimeter\u2192EBTileHECp_0', 'Calorimeter\u2192EBTileHECn_0',
+  'C→LBTile_0', 'C→EBTilep_0', 'C→EBTilen_0',
 ];
 const HEC_NAMES = ['1','23','45','67'];
 
+// ── XML extraction ────────────────────────────────────────────────────────────
 function extractCells(doc, tagName){
   const els = doc.getElementsByTagName(tagName); const cells=[];
   for(const el of els){
@@ -72,7 +73,7 @@ function extractCells(doc, tagName){
   }
   return cells;
 }
-// FCAL cells: (x,y,z,dx,dy,dz) in cm, energy in GeV. Rendered as oriented cylinders.
+
 function extractFcal(doc){
   const cells = [];
   for (const el of doc.getElementsByTagName('FCAL')){
@@ -99,6 +100,7 @@ function extractFcal(doc){
   }
   return cells;
 }
+
 function extractMbts(doc){
   const cells=[];
   for(const el of doc.getElementsByTagName('MBTS')){
@@ -118,8 +120,11 @@ function extractMbts(doc){
   }
   return cells;
 }
+
+// ── Clusters ──────────────────────────────────────────────────────────────────
 const CLUSTER_THR_GEV = 3;
-const CLUSTER_CYL_IN_R = 1400, CLUSTER_CYL_IN_HALF_H = 3200;
+// Mirrors particles.js cylinder constants exactly
+const CLUSTER_CYL_IN_R = 1421.73, CLUSTER_CYL_IN_HALF_H = 3680.75;
 const CLUSTER_CYL_OUT_R = 3820, CLUSTER_CYL_OUT_HALF_H = 6000;
 function _cylIntersect(dx, dy, dz, r, halfH){
   const rT = Math.sqrt(dx*dx + dy*dy);
@@ -159,6 +164,8 @@ function parseClusters(doc){
   }
   return out;
 }
+
+// ── Tracks ────────────────────────────────────────────────────────────────────
 function parseTracks(doc){
   const out=[];
   for(const el of doc.getElementsByTagName('Track')){
@@ -187,16 +194,77 @@ function parseTracks(doc){
   }
   return out;
 }
+
+// ── Photons (wavy helix from origin to inner calorimeter surface) ─────────────
+// Mirrors js/particles.js _makeSpringPoints logic
+const PHOTON_PRE_INNER_MM = 400;
+const PHOTON_SPRING_R = 20;
+const PHOTON_SPRING_TURNS_PER_MM = 0.014;
+const PHOTON_SPRING_PTS = 22;
+
+function _makeSpringPoints(dx, dy, dz, totalLen){
+  const fwd = new THREE.Vector3(dx, dy, dz).normalize();
+  const ref = Math.abs(fwd.x) < 0.9 ? new THREE.Vector3(1,0,0) : new THREE.Vector3(0,1,0);
+  const right = new THREE.Vector3().crossVectors(fwd, ref).normalize();
+  const up    = new THREE.Vector3().crossVectors(fwd, right).normalize();
+  const startOffset = Math.max(0, totalLen - PHOTON_PRE_INNER_MM);
+  const visibleLen  = Math.max(0, totalLen - startOffset);
+  const nTurns  = Math.round(PHOTON_SPRING_TURNS_PER_MM * Math.min(PHOTON_PRE_INNER_MM, totalLen));
+  const nTotal  = nTurns * PHOTON_SPRING_PTS + 1;
+  if(nTotal < 2) return null;
+  const arr = new Float32Array(nTotal * 3);
+  for(let i=0;i<nTotal;i++){
+    const t = i/(nTotal-1);
+    const angle = t * nTurns * 2 * Math.PI;
+    const along = startOffset + t * visibleLen;
+    const cx = Math.cos(angle) * PHOTON_SPRING_R;
+    const cy = Math.sin(angle) * PHOTON_SPRING_R;
+    arr[i*3  ] = fwd.x*along + right.x*cx + up.x*cy;
+    arr[i*3+1] = fwd.y*along + right.y*cx + up.y*cy;
+    arr[i*3+2] = fwd.z*along + right.z*cx + up.z*cy;
+  }
+  return arr;
+}
+
+function parsePhotons(doc){
+  const out = [];
+  // JiveXML photon collections: <PhotonCollection> with <pt>, <eta>, <phi> children
+  for(const el of doc.querySelectorAll('PhotonCollection, Photon')){
+    const ptEl  = el.querySelector('pt, et');
+    const etaEl = el.querySelector('eta');
+    const phiEl = el.querySelector('phi');
+    if(!etaEl || !phiEl) continue;
+    const etas = etaEl.textContent.trim().split(/\s+/).map(Number);
+    const phis = phiEl.textContent.trim().split(/\s+/).map(Number);
+    const pts  = ptEl ? ptEl.textContent.trim().split(/\s+/).map(Number) : [];
+    const m = Math.min(etas.length, phis.length);
+    for(let i=0;i<m;i++){
+      if(!isFinite(etas[i]) || !isFinite(phis[i])) continue;
+      const theta = 2 * Math.atan(Math.exp(-etas[i]));
+      const sinT = Math.sin(theta);
+      const dx = -sinT * Math.cos(phis[i]);
+      const dy = -sinT * Math.sin(phis[i]);
+      const dz =  Math.cos(theta);
+      const tEnd = _cylIntersect(dx, dy, dz, CLUSTER_CYL_IN_R, CLUSTER_CYL_IN_HALF_H);
+      const arr = _makeSpringPoints(dx, dy, dz, tEnd);
+      if(arr) out.push(arr);
+    }
+  }
+  return out;
+}
+
+// ── MBTS path resolution ─────────────────────────────────────────────────────
 function mbtsMeshPath(label, meshByName){
   const m=/^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
   if(!m) return null;
   const side=m[1]==='1'?'p':'n';
   const tileNum=m[2]==='0'?14:15;
   const mod=m[3];
-  const path=`Calorimeter\u2192Tile${tileNum}${side}_0\u2192Tile${tileNum}${side}0_0\u2192cell_${mod}`;
+  const path=`Calorimeter→Tile${tileNum}${side}_0→Tile${tileNum}${side}0_0→cell_${mod}`;
   return meshByName.has(path)?path:null;
 }
 
+// ── Geometry baking ────────────────────────────────────────────────────────────
 function bakeGeom(mesh){
   mesh.updateWorldMatrix(true, false);
   const g = mesh.geometry.clone();
@@ -217,22 +285,20 @@ function bakeGeom(mesh){
   return { pos: posF32, idx, edge: edgeF32 };
 }
 
-// Bake one FCAL tube into world-space geometry. Mirrors js/main.js _applyFcalDraw:
-//   unit CylinderGeometry(1,1,1,8,1,false) → scale (rx, len, ry) → rotate (0,1,0)→(0,0,±1) → twist.
 const _fcalUpVec   = new THREE.Vector3(0, 1, 0);
 const _fcalTwistAx = new THREE.Vector3(0, 1, 0);
 function bakeFcalCell({x, y, z, dx, dy, dz}){
   const rx  = Math.max(Math.abs(dx) * 5, 1e-3);
   const ry  = Math.max(Math.abs(dy) * 5, 1e-3);
-  const len = Math.max(Math.abs(dz) * 2 * 10, 1e-3);   // cm → mm, full depth
+  const len = Math.max(Math.abs(dz) * 2 * 10, 1e-3);
   const cx  = -x * 10,  cy = -y * 10,  cz = z * 10;
   const dir = new THREE.Vector3(0, 0, dz >= 0 ? 1 : -1);
   const q   = new THREE.Quaternion().setFromUnitVectors(_fcalUpVec, dir);
   q.multiply(new THREE.Quaternion().setFromAxisAngle(_fcalTwistAx, _FCAL_TWIST_RAD));
-  const m   = new THREE.Matrix4().compose(
+  const mat = new THREE.Matrix4().compose(
     new THREE.Vector3(cx, cy, cz), q, new THREE.Vector3(rx, len, ry));
   const geo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, false);
-  geo.applyMatrix4(m);
+  geo.applyMatrix4(mat);
   const pos = geo.getAttribute('position').array;
   let idx = geo.index ? geo.index.array : null;
   if(!idx){
@@ -266,6 +332,7 @@ function bakeGhost(mesh){
   return { pos: posF32, idx };
 }
 
+// ── Main bake routine ──────────────────────────────────────────────────────────
 async function main(){
   btn.disabled = true;
   log('Initializing WASM...');
@@ -295,25 +362,24 @@ async function main(){
   log('  TILE', tileCells.length, 'LAr', larCells.length, 'HEC', hecCells.length,
       'MBTS', mbtsCells.length, 'FCAL', fcalCells.length);
 
-  const tracks = parseTracks(doc);
-  log('  tracks:', tracks.length);
+  const tracks   = parseTracks(doc);
   const clusters = parseClusters(doc);
-  log('  clusters (Et >= '+CLUSTER_THR_GEV+' GeV):', clusters.length);
+  const photons  = parsePhotons(doc);
+  log('  tracks:', tracks.length, '  clusters:', clusters.length, '  photons:', photons.length);
 
-  // Resolve to (meshName, energyMev, det)
   const idsToStr = cs => cs.map(c=>c.id).join(' ');
   const tilePacked = tileCells.length ? parse_atlas_ids_bulk(idsToStr(tileCells)) : null;
   const larPacked  = larCells.length  ? parse_atlas_ids_bulk(idsToStr(larCells))  : null;
   const hecPacked  = hecCells.length  ? parse_atlas_ids_bulk(idsToStr(hecCells))  : null;
 
-  const active = new Map(); // name -> { det, eMev }
+  const active = new Map();
 
   for(let i=0;i<tileCells.length;i++){
     const b=i*8; if(tilePacked[b]!==SUBSYS_TILE) continue;
     const x=tilePacked[b+1], k=tilePacked[b+2], side=tilePacked[b+3], mod=tilePacked[b+4];
     const eMev=tileCells[i].energy*1000;
     const y=side<0?'n':'p';
-    const path=`Calorimeter\u2192Tile${x}${y}_0\u2192Tile${x}${y}${k}_${k}\u2192cell_${mod}`;
+    const path=`Calorimeter→Tile${x}${y}_0→Tile${x}${y}${k}_${k}→cell_${mod}`;
     if(!meshByName.has(path)) continue;
     if(eMev < thrTileMev) continue;
     active.set(path, {det:'TILE', eMev});
@@ -324,7 +390,7 @@ async function main(){
           R=larPacked[b+5], eta=larPacked[b+6], phi=larPacked[b+7];
     const eMev=larCells[i].energy*1000;
     const X=abs_be===1?'Barrel':'EndCap'; const W=abs_be===1?0:1; const Z=z_pos?'p':'n';
-    const prefix=`Calorimeter\u2192EM${X}_${sampling}_${R}_${Z}_${W}\u2192EM${X}_${sampling}_${R}_${Z}_${eta}_${eta}\u2192`;
+    const prefix=`Calorimeter→EM${X}_${sampling}_${R}_${Z}_${W}→EM${X}_${sampling}_${R}_${Z}_${eta}_${eta}→`;
     const path = meshByName.has(prefix+`cell_${phi}`)  ? prefix+`cell_${phi}`  :
                  meshByName.has(prefix+`cell2_${phi}`) ? prefix+`cell2_${phi}` : null;
     if(!path) continue;
@@ -337,7 +403,7 @@ async function main(){
           cum_eta=hecPacked[b+4], phi=hecPacked[b+5];
     const eMev=hecCells[i].energy*1000;
     const Z=z_pos?'p':'n'; const name=HEC_NAMES[group];
-    const path=`Calorimeter\u2192HEC_${name}_${region}_${Z}_0\u2192HEC_${name}_${region}_${Z}_${cum_eta}_${cum_eta}\u2192cell_${phi}`;
+    const path=`Calorimeter→HEC_${name}_${region}_${Z}_0→HEC_${name}_${region}_${Z}_${cum_eta}_${cum_eta}→cell_${phi}`;
     if(!meshByName.has(path)) continue;
     if(eMev < thrHecMev) continue;
     active.set(path, {det:'HEC', eMev});
@@ -351,17 +417,14 @@ async function main(){
   }
   log('  active cells (after threshold):', active.size);
 
-  // FCAL: energy ≥ threshold and ≥ 0 (mirrors live viewer filter).
   const fcalActive = fcalCells.filter(c => c.energy >= 0 && c.energy * 1000 >= thrFcalMev);
   log('  active FCAL cells (after threshold):', fcalActive.length);
 
-  // Bake all active cells
   log('Baking cell geometries...');
   const cellHeaders = [];
-  const chunks = []; // array of {arr, align}  (we'll emit Float32/Uint32)
+  const chunks = [];
   let byteCursor = 0;
   function pushChunk(arr){
-    // align to 4 bytes
     const align = 4;
     if(byteCursor % align) byteCursor += align - (byteCursor % align);
     const off = byteCursor;
@@ -382,7 +445,6 @@ async function main(){
     });
   }
 
-  // FCAL — bake each tube as its own cell entry (no GLB mesh, synthesized from JiveXML).
   for (const c of fcalActive){
     const {pos, idx, edge} = bakeFcalCell(c);
     const col = palColorFcal(Math.abs(c.energy) * 1000);
@@ -400,25 +462,21 @@ async function main(){
     const mesh = meshByName.get(name);
     if(!mesh) continue;
     const {pos, idx} = bakeGhost(mesh);
-    ghostHeaders.push({
-      pos: pushChunk(pos),
-      idx: pushChunk(idx),
-    });
+    ghostHeaders.push({ pos: pushChunk(pos), idx: pushChunk(idx) });
   }
 
   log('Packing tracks...');
   const trackHeaders = [];
-  for(const arr of tracks){
-    trackHeaders.push(pushChunk(arr));
-  }
+  for(const arr of tracks) trackHeaders.push(pushChunk(arr));
 
   log('Packing clusters...');
   const clusterHeaders = [];
-  for(const arr of clusters){
-    clusterHeaders.push(pushChunk(arr));
-  }
+  for(const arr of clusters) clusterHeaders.push(pushChunk(arr));
 
-  // Assemble body buffer
+  log('Packing photons...');
+  const photonHeaders = [];
+  for(const arr of photons) photonHeaders.push(pushChunk(arr));
+
   const body = new ArrayBuffer(byteCursor);
   const bodyU8 = new Uint8Array(body);
   for(const {arr, off} of chunks){
@@ -426,18 +484,17 @@ async function main(){
   }
 
   const header = {
-    v: 2,
+    v: 3,
     cells: cellHeaders,
     ghosts: ghostHeaders,
     tracks: trackHeaders,
     clusters: clusterHeaders,
+    photons: photonHeaders,
   };
   let headerJson = JSON.stringify(header);
-  // Pad header so (4 + headerLen) is 4-aligned for typed-array views into body
   while(((4 + headerJson.length) & 3) !== 0) headerJson += ' ';
   const headerBytes = new TextEncoder().encode(headerJson);
 
-  // Final file: [u32 LE: headerLen][header][body]
   const out = new ArrayBuffer(4 + headerBytes.byteLength + body.byteLength);
   new DataView(out).setUint32(0, headerBytes.byteLength, true);
   new Uint8Array(out, 4, headerBytes.byteLength).set(headerBytes);
@@ -446,15 +503,17 @@ async function main(){
   log('Total size:', (out.byteLength/1024/1024).toFixed(2), 'MB');
   log('  header JSON:', (headerBytes.byteLength/1024).toFixed(1), 'KB');
   log('  body       :', (body.byteLength/1024/1024).toFixed(2), 'MB');
+  log('  cells:', cellHeaders.length, ' ghosts:', ghostHeaders.length,
+      ' tracks:', trackHeaders.length, ' clusters:', clusterHeaders.length,
+      ' photons:', photonHeaders.length);
 
-  // Download
   const blob = new Blob([out], {type:'application/octet-stream'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = 'scene_data.bin';
   a.click();
   URL.revokeObjectURL(url);
-  log('Downloaded scene_data.bin');
+  log('Downloaded scene_data.bin — replace the file in nipscern/ and re-bake is done.');
   btn.disabled = false;
 }
 
