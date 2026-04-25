@@ -1,0 +1,304 @@
+/* ── Layers floating panel ─── */
+#layers-panel {
+  position: fixed;
+  z-index: 50;
+  padding: 10px 12px 12px;
+  background: rgba(2, 9, 24, 0.68);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
+  min-width: 200px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity 0.17s ease,
+    transform 0.17s ease;
+}
+#layers-panel.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.layers-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.layers-title {
+  font: 600 0.63rem var(--font);
+  color: var(--text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.layers-quick {
+  display: flex;
+  gap: 4px;
+}
+.layers-qbtn {
+  padding: 2px 8px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font: 500 0.58rem var(--font);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.layers-qbtn:hover {
+  color: var(--bright);
+  border-color: rgba(36, 103, 224, 0.45);
+  background: rgba(26, 82, 192, 0.12);
+}
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  transition: background 0.12s;
+  cursor: default;
+}
+.layer-row:hover {
+  background: rgba(36, 103, 224, 0.07);
+  border-color: rgba(36, 103, 224, 0.14);
+}
+.layer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.layer-info {
+  flex: 1;
+  min-width: 0;
+}
+.layer-name {
+  font: 600 0.65rem var(--mono);
+  color: var(--bright);
+  letter-spacing: 0.04em;
+}
+.layer-sub {
+  font: 400 0.58rem var(--font);
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+/* ── Background color picker popover ─────────────────── */
+#bgcolor-popover {
+  position: fixed;
+  z-index: 60;
+  width: 260px;
+  padding: 14px 14px 12px;
+  background: rgba(2, 9, 24, 0.98);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  pointer-events: none;
+  transition:
+    opacity 0.17s ease,
+    transform 0.17s ease;
+}
+#bgcolor-popover.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.bgcp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.bgcp-title {
+  font: 600 0.62rem var(--font);
+  color: var(--text);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.bgcp-close {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.14s;
+}
+.bgcp-close:hover {
+  color: var(--bright);
+  background: rgba(255, 255, 255, 0.08);
+}
+/* SV rectangle + vertical hue strip */
+.bgcp-canvas-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  height: 150px;
+}
+.bgcp-sv {
+  flex: 1;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: crosshair;
+  touch-action: none;
+  background: #ff0000;
+  background-image:
+    linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0) 100%),
+    linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 100%);
+}
+.bgcp-sv-cursor {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  left: 50%;
+  top: 50%;
+}
+.bgcp-hue {
+  width: 16px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: ns-resize;
+  touch-action: none;
+  background: linear-gradient(
+    to bottom,
+    #ff0000 0%,
+    #ffff00 17%,
+    #00ff00 33%,
+    #00ffff 50%,
+    #0000ff 67%,
+    #ff00ff 83%,
+    #ff0000 100%
+  );
+}
+.bgcp-hue-cursor {
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  transform: translateY(-50%);
+  pointer-events: none;
+  top: 0;
+}
+.bgcp-preview {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.bgcp-swatch {
+  width: 40px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+  background: #020d1c;
+}
+.bgcp-hex {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: rgba(26, 82, 192, 0.08);
+  border: 1px solid var(--border);
+  font: 500 0.72rem var(--mono);
+  color: var(--bright);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition:
+    border-color 0.14s,
+    background 0.14s;
+}
+.bgcp-hex:focus {
+  border-color: var(--accent2);
+  background: rgba(26, 82, 192, 0.14);
+}
+.bgcp-presets-hdr {
+  margin-top: 10px;
+  margin-bottom: 6px;
+  font: 600 0.54rem var(--font);
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.bgcp-presets {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.bgcp-preset {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition:
+    transform 0.12s,
+    border-color 0.14s,
+    box-shadow 0.14s;
+  position: relative;
+}
+.bgcp-preset:hover {
+  transform: scale(1.08);
+  border-color: var(--accent2);
+  box-shadow: 0 2px 8px rgba(36, 103, 224, 0.35);
+}
+.bgcp-preset.active {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 2px rgba(36, 103, 224, 0.45);
+}
+.bgcp-reset {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(26, 82, 192, 0.14);
+  border: 1px solid var(--accent);
+  color: #7ab8ff;
+  font: 600 0.62rem var(--font);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.bgcp-reset:hover {
+  background: rgba(26, 82, 192, 0.28);
+  color: var(--bright);
+  border-color: var(--accent2);
+}
