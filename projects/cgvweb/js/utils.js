@@ -69,6 +69,7 @@ export function dateGroup(ts, t) {
   if (!Number.isFinite(ts)) return { key: 'unknown', label: t('date-group-earlier') };
   const now = new Date();
   const item = new Date(ts);
+  /** @type {(d: Date) => number} */
   const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const today = startOfDay(now);
   const itemDay = startOfDay(item);
@@ -78,6 +79,7 @@ export function dateGroup(ts, t) {
   if (daysAgo <= 0) return { key: 'today', label: t('date-group-today') };
   if (daysAgo === 1) return { key: 'yesterday', label: t('date-group-yesterday') };
   if (daysAgo < 7) return { key: 'this-week', label: t('date-group-this-week') };
+  /** @type {(n: number) => string} */
   const pad = (n) => String(n).padStart(2, '0');
   const iso = `${item.getFullYear()}-${pad(item.getMonth() + 1)}-${pad(item.getDate())}`;
   return { key: iso, label: iso };

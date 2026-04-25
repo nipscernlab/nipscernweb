@@ -1,0 +1,154 @@
+/* ── Bottom-center toolbar ────────────────────────────── */
+#toolbar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 10px;
+  background: var(--panel);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  opacity: 0.22;
+  transition: opacity 0.36s ease;
+}
+#toolbar:hover {
+  opacity: 1;
+}
+.tbtn {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.16s;
+}
+.tbtn:hover {
+  color: var(--bright);
+  border-color: rgba(36, 103, 224, 0.38);
+  background: rgba(26, 82, 192, 0.1);
+}
+.tbtn.on {
+  color: #7ab8ff;
+  border-color: rgba(26, 82, 192, 0.48);
+  background: rgba(26, 82, 192, 0.16);
+}
+.tbtn-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+/* Tabler icon size inside buttons */
+.tbtn .ti {
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* ── Language dropdown ────────────────────────────────── */
+#lang-menu {
+  position: fixed;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: rgba(2, 9, 24, 0.68);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+#lang-menu.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.lang-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  color: var(--muted);
+  font: 400 0.68rem var(--font);
+  transition: all 0.13s;
+  white-space: nowrap;
+}
+.lang-opt:hover {
+  color: var(--bright);
+  background: rgba(36, 103, 224, 0.12);
+}
+.lang-opt.on {
+  color: #7ab8ff;
+  background: rgba(26, 82, 192, 0.16);
+}
+.fi {
+  width: 18px;
+  height: 14px;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+/* ── Button hint tooltip ─────────────────────────────── */
+#btn-tip {
+  position: fixed;
+  z-index: 200;
+  pointer-events: none;
+  padding: 5px 11px;
+  background: rgba(2, 9, 22, 0.97);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  font: 400 0.61rem var(--font);
+  color: var(--bright);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.13s ease,
+    transform 0.13s ease;
+}
+#btn-tip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+#btn-tip .tip-kbd {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 2px;
+  align-items: center;
+}
+#btn-tip kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom-color: rgba(255, 255, 255, 0.28);
+  border-radius: 3px;
+  color: #d4e4ff;
+  font: 600 0.58rem/1 var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+  vertical-align: baseline;
+}

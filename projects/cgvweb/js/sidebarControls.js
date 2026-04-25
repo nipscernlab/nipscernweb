@@ -4,6 +4,7 @@ export function setupSidebarControls({
   onDisableTourMode,
   onEnableTourMode,
   onToggleCollisionHud,
+  onToggleMinimap,
   t,
   updateCollisionHud,
 }) {
@@ -20,6 +21,7 @@ export function setupSidebarControls({
   const autoOpenToggle = document.getElementById('stog-autopen');
   const tourToggle = document.getElementById('stog-tour');
   const collisionToggle = document.getElementById('stog-collision-hud');
+  const minimapToggle = document.getElementById('stog-minimap');
   const btnTip = document.getElementById('btn-tip');
   const mobileMQ = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
 
@@ -243,6 +245,29 @@ export function setupSidebarControls({
       } catch (_) {}
       if (onToggleCollisionHud) onToggleCollisionHud(collisionHudEnabled);
       syncCollisionUi();
+    });
+  }
+
+  let minimapEnabled = false;
+  function syncMinimapUi() {
+    if (!minimapToggle) return;
+    minimapToggle.classList.toggle('on', minimapEnabled);
+    minimapToggle.setAttribute('aria-checked', minimapEnabled ? 'true' : 'false');
+  }
+  if (minimapToggle) {
+    try {
+      const saved = localStorage.getItem('cgv-minimap');
+      if (saved !== null) minimapEnabled = saved === '1';
+    } catch (_) {}
+    if (onToggleMinimap) onToggleMinimap(minimapEnabled);
+    syncMinimapUi();
+    minimapToggle.addEventListener('click', () => {
+      minimapEnabled = !minimapEnabled;
+      try {
+        localStorage.setItem('cgv-minimap', minimapEnabled ? '1' : '0');
+      } catch (_) {}
+      if (onToggleMinimap) onToggleMinimap(minimapEnabled);
+      syncMinimapUi();
     });
   }
 

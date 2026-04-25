@@ -37,7 +37,20 @@
        + our worker) and preloading lets the browser kick off the fetch in
        parallel with main.js module resolution, so the worker is ready sooner. -->
   <link rel="modulepreload" href="./js/wasm_worker.js">
-  <link rel="stylesheet" href="./css/style.css">
+  <!-- Stylesheets are split by component; load order matches CSS cascade
+       (mobile.css overrides earlier rules via media queries; cinema.css overrides
+       panel/toolbar opacity in cinema mode). -->
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/panel-left.css">
+  <link rel="stylesheet" href="./css/panel-right.css">
+  <link rel="stylesheet" href="./css/modes.css">
+  <link rel="stylesheet" href="./css/hud.css">
+  <link rel="stylesheet" href="./css/toolbar.css">
+  <link rel="stylesheet" href="./css/dialogs.css">
+  <link rel="stylesheet" href="./css/loading.css">
+  <link rel="stylesheet" href="./css/floating.css">
+  <link rel="stylesheet" href="./css/cinema.css">
+  <link rel="stylesheet" href="./css/mobile.css">
 </head>
 <body>
 
@@ -541,7 +554,7 @@
   </button>
   <div class="tbtn-sep"></div>
   <button class="tbtn" id="btn-slicer"
-    data-tip="Slicer — drag the handle to sweep the cylindrical-wedge carve (Y: angle wraps continuously, X: height); right-drag to slide along the Y/Z plane. Also fills the geometry with empty cells (Shift+S)"
+    data-tip="Slicer — cylindrical-wedge carve (Shift+S)"
     data-i18n-tip="tip-slicer">
     <i class="ti ti-3d-cube-sphere" style="font-size:15px"></i>
   </button>
@@ -671,6 +684,14 @@
       <button class="gswitch on" id="stog-collision-hud" role="switch" aria-checked="true"
         style="--gswitch-col:#66ccff"></button>
     </div>
+    <div class="sett-row">
+      <div class="sett-info">
+        <div class="sett-label" data-i18n="sett-minimap-label">η × φ radar minimap</div>
+        <div class="sett-sub" data-i18n="sett-minimap-sub">Top-right 2D map of active cells, clusters &amp; FCAL hits</div>
+      </div>
+      <button class="gswitch" id="stog-minimap" role="switch" aria-checked="false"
+        style="--gswitch-col:#ffa040"></button>
+    </div>
   </div>
   <!-- Keyboard shortcuts -->
   <div class="sett-section">
@@ -789,9 +810,7 @@
 
 <!-- ── Button hint tooltip ───────────────────────────────── -->
 <div id="btn-tip"></div>
-<!-- ── Multi-line hint (statusbar collision info) ────────── -->
-<div id="stat-hint"></div>
-<!-- ── Collision info HUD (top-left, shown when panel collapsed or cinema) -->
+<!-- ── Collision info HUD (top-left; toggleable in Settings) ── -->
 <div id="collision-hud" hidden></div>
 
 <!-- ── Cell hover tooltip ────────────────────────────────── -->

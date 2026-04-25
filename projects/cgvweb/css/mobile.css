@@ -1,0 +1,365 @@
+/* ── Mobile-only helpers ─────────────────────────────── */
+/* Elements marked .mobile-only are hidden on desktop; shown on mobile
+       landscape (handled inside the mobile media query below). */
+.mobile-only {
+  display: none !important;
+}
+
+/* ── Mobile (landscape-only optimization) ─────────────── */
+/* Target landscape phones/small tablets. Portrait is NOT optimized;
+       user is expected to rotate to landscape. */
+@media (orientation: landscape) and (max-height: 520px) {
+  :root {
+    --pw: 220px;
+    --rpw: 130px;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  /* ─── Left panel ─────────────────────────────────── */
+  /* Shortened so the statusbar + dl-progress at the bottom sit above the
+         toolbar/toggle-pill (which float at bottom: 8-10px, ~52px tall). */
+  #panel {
+    top: 0;
+    left: 0;
+    height: calc(100vh - 58px);
+    border-radius: 0 12px 12px 0;
+    box-shadow: 6px 0 30px rgba(0, 0, 0, 0.65);
+  }
+  #panel.collapsed {
+    transform: translateX(calc(-1 * var(--pw)));
+  }
+  #panel-resizer {
+    display: none;
+  }
+
+  /* Compact header: keep only the logo mark + ext-links + head-btns on one row.
+         Hide the long subtitles (Calorimeter Geometry Viewer / NIPSCERN · ATLAS). */
+  #panel-head {
+    padding: 6px 8px;
+    gap: 4px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+  .panel-head-row {
+    display: contents;
+  }
+  .logo-full,
+  .logo-lab {
+    display: none;
+  }
+  .logo-block {
+    display: none;
+  }
+  .logo {
+    font-size: 0.82rem;
+  }
+  #ext-links-top {
+    flex: 1;
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+    border: 0;
+    padding: 0;
+  }
+  #ext-links-top a {
+    width: 22px;
+    height: 22px;
+    border: 0;
+    font-size: 13px;
+  }
+  #ext-links-top a .ti {
+    font-size: 13px;
+  }
+  .head-btns {
+    gap: 2px;
+  }
+
+  /* Mode bar: tighter */
+  #mode-bar {
+    padding: 5px 6px;
+    gap: 3px;
+  }
+  .mbtn {
+    padding: 6px 3px;
+    font-size: 0.6rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* Statusbar: compact, badge stays inline at the right */
+  #statusbar {
+    padding: 5px 9px;
+    font-size: 0.55rem;
+    min-height: 24px;
+    gap: 6px;
+  }
+  #statusbar #req-badge {
+    font-size: 0.55rem;
+    padding: 0 6px;
+  }
+
+  /* Touch targets */
+  .tbtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+  .tbtn .ti {
+    font-size: 14px;
+  }
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .ctrl-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .edl {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* ─── Toolbar ───────────────────────────────────── */
+  #toolbar {
+    bottom: 8px;
+    padding: 4px 8px;
+    gap: 2px;
+    max-width: calc(100vw - 24px);
+    border-radius: 20px;
+    transform: translateX(-50%) translateY(calc(100% + 60px));
+    opacity: 0;
+    pointer-events: none;
+  }
+  #toolbar.tb-visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #btn-toolbar-close,
+  #toolbar-close-sep {
+    display: none !important;
+  }
+
+  /* ─── Right panel: cluster on top, detectors below, stacked ────── */
+  /* Both panels visible simultaneously. If total content exceeds the
+         viewport height, the wrap itself scrolls so the user can reach both. */
+  #rpanel-wrap {
+    top: 8px;
+    right: 8px;
+    gap: 8px;
+    max-height: calc(100vh - 74px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  #rpanel-wrap::-webkit-scrollbar {
+    width: 3px;
+  }
+  #rpanel-wrap::-webkit-scrollbar-thumb {
+    background: rgba(36, 103, 224, 0.22);
+    border-radius: 2px;
+  }
+  #rpanel-wrap.collapsed {
+    transform: translateX(calc(var(--rpw) + 12px));
+  }
+
+  #rpanel,
+  #rpanel2 {
+    max-height: none;
+    flex-shrink: 0;
+    border-radius: 12px;
+    width: var(--rpw);
+  }
+  /* Cluster tab stays desktop-only (cluster lives in its own panel here). */
+  #tab-cluster {
+    display: none !important;
+  }
+
+  /* Right-panel pane contents — keep vertical sliders compact */
+  .strak {
+    height: 110px;
+  }
+  .pane-det-name {
+    font-size: 0.58rem;
+  }
+  .slbl {
+    font-size: 0.58rem;
+  }
+  .sval {
+    font-size: 0.57rem;
+  }
+  .thr-input {
+    width: 72px;
+    font-size: 0.58rem;
+  }
+  .cluster-filter-btn {
+    width: 86px;
+    font-size: 0.58rem;
+  }
+
+  /* ─── Misc ──────────────────────────────────────── */
+  /* Hide very-large screenshot options */
+  .shot-res[data-w='3840'],
+  .shot-res[data-w='7680'],
+  .shot-res[data-w='10240'] {
+    display: none;
+  }
+
+  #cinema-exit {
+    bottom: 56px;
+  }
+
+  /* Bigger edge-tap zones on mobile (opens left/right panels). Always
+         visible when the corresponding panel is collapsed. */
+  #panel-edge,
+  #rpanel-edge {
+    width: 32px;
+    display: block !important;
+    touch-action: manipulation;
+  }
+  /* When a panel is pinned (open), hide its edge strip so it doesn't
+         block touches on the panel's own interactive controls. */
+  body:not(.panel-unpinned) #panel-edge {
+    display: none !important;
+  }
+  body:not(.rpanel-unpinned) #rpanel-edge {
+    display: none !important;
+  }
+}
+
+/* Extremely narrow landscape — drop separators */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 720px) {
+  .tbtn-sep {
+    display: none;
+  }
+  #toolbar {
+    gap: 1px;
+  }
+}
+
+/* Rotate-to-landscape hint — hidden by default, shown only on portrait phones */
+#rotate-hint {
+  display: none;
+}
+
+/* Portrait phone: show a rotate-to-landscape hint, minimal UI */
+@media (orientation: portrait) and (max-width: 700px) {
+  #panel,
+  #rpanel,
+  #toolbar,
+  #btn-toolbar-toggle,
+  #statusbar,
+  #layers-panel,
+  #settings-panel {
+    display: none !important;
+  }
+  #rotate-hint {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    background: var(--bg);
+    color: var(--text);
+    padding: 30px;
+    text-align: center;
+  }
+  .rotate-hint-gif {
+    width: 140px;
+    height: 140px;
+    background-color: var(--bright);
+    -webkit-mask: url('../assets/rotate_phone.gif') center / contain no-repeat;
+    mask: url('../assets/rotate_phone.gif') center / contain no-repeat;
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4));
+  }
+  .rotate-hint-text {
+    font: 500 0.86rem var(--font);
+    letter-spacing: 0.04em;
+    max-width: 280px;
+    line-height: 1.5;
+  }
+}
+
+/* Touch-friendly: bigger hit area for slider on touch */
+@media (pointer: coarse) {
+  .strak {
+    width: 18px;
+    border-radius: 9px;
+  }
+  .sthumb {
+    left: -12px;
+    right: -12px;
+    height: 3px;
+  }
+  .ctrl-btn,
+  .edl {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+/* ── Mobile toolbar toggle (landscape only) ───────────── */
+#btn-toolbar-toggle {
+  display: none;
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  z-index: 46;
+  background: rgba(2, 9, 24, 0.94);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 6px 16px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text);
+  font: 500 0.62rem var(--font);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
+  transition:
+    background 0.15s,
+    bottom 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#btn-toolbar-toggle i {
+  font-size: 13px;
+}
+#btn-toolbar-toggle:hover {
+  background: rgba(26, 82, 192, 0.18);
+}
+/* When toolbar is open the toggle slides up above it (acts as close) */
+#btn-toolbar-toggle.tb-open {
+  bottom: 58px;
+}
+#btn-toolbar-toggle.tb-open i.ti-layout-navbar {
+  transform: rotate(180deg);
+}
+#btn-toolbar-toggle i.ti-layout-navbar {
+  transition: transform 0.28s ease;
+}
+/* Toolbar transition on mobile */
+#toolbar {
+  transition:
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.28s ease;
+}
+/* Default: hide the in-toolbar close button (only shown in mobile landscape) */
+#btn-toolbar-close,
+#toolbar-close-sep {
+  display: none;
+}
+/* Show toggle only in landscape small screens */
+@media (orientation: landscape) and (max-height: 520px) {
+  #btn-toolbar-toggle {
+    display: flex;
+  }
+}

@@ -1,0 +1,175 @@
+/* ── Loading overlay ──────────────────────────────────── */
+#loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#loading-overlay.done {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  user-select: none;
+}
+.loading-logo {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 20px;
+}
+.loading-title {
+  font: 700 2.2rem var(--font);
+  color: var(--bright);
+  letter-spacing: 0.18em;
+  margin-bottom: 4px;
+}
+.loading-sub {
+  font: 400 0.68rem var(--font);
+  color: var(--text);
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+.loading-lab {
+  font: 500 0.54rem var(--font);
+  color: var(--muted);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 36px;
+}
+.loading-bar-track {
+  width: 220px;
+  height: 2px;
+  background: var(--dim);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.loading-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent) 0%, #4a9eff 100%);
+  box-shadow: 0 0 8px rgba(36, 103, 224, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+.loading-bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 100%
+  );
+  animation: bar-shimmer 1.6s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+@keyframes bar-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+.loading-msg {
+  font: 400 0.6rem var(--mono);
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  min-height: 1.4em;
+  transition: opacity 0.2s;
+}
+
+/* ── Download progress (Live & Local) ─────────────────── */
+#dl-progress {
+  flex-shrink: 0;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  background: rgba(2, 9, 24, 0.55);
+}
+#dl-progress[hidden] {
+  display: none;
+}
+.dl-stages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  overflow: hidden;
+  font: 500 0.54rem var(--font);
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.dl-stage {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font: 500 0.6rem var(--mono);
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.dl-stage.active {
+  color: var(--accent2);
+}
+.dl-stage.done {
+  color: var(--ok);
+}
+.dl-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.dl-stage.active .dl-dot {
+  background: var(--accent2);
+  box-shadow: 0 0 6px var(--accent2);
+  animation: pulse 0.9s ease-in-out infinite;
+}
+.dl-stage.done .dl-dot {
+  background: var(--ok);
+  animation: none;
+}
+.dl-arrow {
+  color: var(--dim);
+  font-size: 0.6rem;
+}
+#dl-bar-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+#dl-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 1px;
+  transition: width 0.25s ease;
+}
+/* Local-mode tint for distinguishing source */
+#dl-progress.local #dl-bar-fill {
+  background: linear-gradient(90deg, #5a8c2a, #8fd64a);
+}
+#dl-progress.local .dl-stage.active {
+  color: #8fd64a;
+}
+#dl-progress.local .dl-stage.active .dl-dot {
+  background: #8fd64a;
+  box-shadow: 0 0 6px #8fd64a;
+}
