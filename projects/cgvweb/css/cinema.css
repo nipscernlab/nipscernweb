@@ -1,0 +1,64 @@
+/* ── Cinema mode ──────────────────────────────────────── */
+body.cinema #panel {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+body.cinema #toolbar,
+body.cinema #btn-toolbar-toggle {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+body.cinema #rpanel-wrap {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+body.cinema #tip {
+  display: none;
+}
+#cinema-exit {
+  position: fixed;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 18px;
+  background: rgba(2, 9, 24, 0.62);
+  backdrop-filter: var(--blur);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  color: rgba(185, 215, 255, 0.4);
+  font: 400 0.6rem var(--font);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.38s ease,
+    color 0.2s,
+    border-color 0.2s;
+}
+body.cinema #cinema-exit {
+  opacity: 0.45;
+  pointer-events: auto;
+}
+#cinema-exit:hover {
+  opacity: 1 !important;
+  color: #d8eeff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* ── Cinema mode: smooth right panel fade-out ────────── */
+body.cinema #rpanel-wrap {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateX(calc(var(--rpw) + 40px));
+}
+body.cinema #panel {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateX(calc(-1 * (var(--pw) + 40px)));
+}

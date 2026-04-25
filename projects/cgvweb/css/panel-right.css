@@ -1,0 +1,223 @@
+/* ── Right retractable panel — floating slim card ───── */
+/* No `transform`/`will-change` here at rest: those would create a
+       stacking context on the wrapper and prevent the children's
+       backdrop-filter from sampling the page behind. The .collapsed rule
+       still uses transform — that's fine, the panel is animating out. */
+#rpanel-wrap {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 30;
+  opacity: 1;
+  transition:
+    transform var(--pt) cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.38s ease;
+}
+#rpanel-wrap.collapsed {
+  transform: translateX(calc(var(--rpw) + 18px));
+}
+#rpanel,
+#rpanel2 {
+  width: var(--rpw);
+  background: var(--panel);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 4px 4px 32px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+}
+#rpanel {
+  max-height: calc(100vh - 28px);
+}
+#rpanel2 {
+  max-height: calc(100vh - 28px);
+}
+
+/* ── Detector tab bar ────────────────────────────────── */
+#det-tab-bar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.det-tab {
+  flex: none;
+  padding: 5px 8px;
+  font: 600 0.62rem var(--mono);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border: none;
+  text-align: center;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition:
+    color 0.14s,
+    border-color 0.14s,
+    background 0.14s;
+}
+.det-tab:hover {
+  color: var(--text);
+}
+.det-tab.on {
+  color: var(--bright);
+  border-left-color: var(--tab-col, var(--accent2));
+  background: rgba(36, 103, 224, 0.06);
+}
+
+/* ── Detector pane — slim compact layout ───���─────────── */
+.det-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 0 8px;
+}
+.pane-det-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 1px;
+}
+.pane-det-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pane-det-name {
+  font: 500 0.62rem var(--font);
+  color: var(--text);
+  letter-spacing: 0.03em;
+}
+.slbl {
+  font: 400 0.6rem var(--font);
+  letter-spacing: 0.13em;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: center;
+}
+.sval {
+  font: 400 0.62rem var(--mono);
+  color: var(--muted);
+  text-align: center;
+}
+.strak {
+  position: relative;
+  width: 12px;
+  height: 160px;
+  border-radius: 6px;
+  cursor: ns-resize;
+  user-select: none;
+  touch-action: none;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: inset 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+.sthumb {
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.9),
+    0 0 4px rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  top: 50%;
+}
+.thr-input {
+  width: 68px;
+  padding: 3px 4px;
+  background: rgba(2, 11, 28, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font: 400 0.62rem var(--mono);
+  text-align: center;
+  transition: border-color 0.15s;
+}
+.thr-input:focus {
+  border-color: var(--accent2);
+  color: var(--bright);
+}
+.thr-input::placeholder {
+  color: var(--dim);
+}
+.cluster-filter-btn {
+  width: 78px;
+  padding: 4px 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--muted);
+  font: 600 0.58rem var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s,
+    opacity 0.15s;
+}
+.cluster-filter-btn:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.cluster-filter-btn.on {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+#pane-cluster.cluster-filter-disabled .sval,
+#pane-cluster.cluster-filter-disabled .slbl,
+#pane-cluster.cluster-filter-disabled .thr-input,
+#pane-cluster.cluster-filter-disabled .strak {
+  opacity: 0.38;
+}
+#pane-cluster.cluster-filter-disabled .strak {
+  cursor: default;
+}
+
+/* ── Ghost switches (CSS-only toggle pill, no text inside) ─── */
+.gswitch {
+  position: relative;
+  width: 28px;
+  height: 15px;
+  flex-shrink: 0;
+  background: var(--dim);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.gswitch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition:
+    transform 0.18s,
+    background 0.18s;
+}
+.gswitch.on {
+  background: var(--gswitch-col, var(--accent2));
+  border-color: transparent;
+}
+.gswitch.on::after {
+  transform: translateX(13px);
+  background: #fff;
+}

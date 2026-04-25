@@ -197,7 +197,6 @@ export function setupDetectorPanels({
     function update(minGev, maxGev) {
       state.setTrackPtMinGev(minGev);
       state.setTrackPtMaxGev(maxGev);
-      state.setThrTrackGev(2);
       if (maxLblEl) maxLblEl.textContent = fmtGev(maxGev);
       if (minLblEl) minLblEl.textContent = fmtGev(minGev);
       updateUI();
@@ -284,7 +283,6 @@ export function setupDetectorPanels({
     function update(minGev, maxGev) {
       state.setClusterEtMinGev(minGev);
       state.setClusterEtMaxGev(maxGev);
-      state.setThrClusterEtGev(Math.max(3, minGev));
       if (maxLblEl) maxLblEl.textContent = fmtGev(maxGev);
       if (minLblEl) minLblEl.textContent = fmtGev(minGev);
       updateUI();

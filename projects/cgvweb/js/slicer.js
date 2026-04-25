@@ -16,8 +16,15 @@ export function createSlicerController({
   const SLICER_THETA_INIT = 0.5 * Math.PI;
   const SLICER_EPS = 1e-6;
   const SLICER_THETA_DRAG_PX = 300;
+  const SLICER_PHI_DRAG_PX = 300;
   const SLICER_HEIGHT_MM_PER_PX = 20;
   const TWO_PI = 2 * Math.PI;
+  // Touch-only: hold the gizmo without moving for this long to enter the
+  // rotate-around-Z mode (mirrors what right-click does on desktop).
+  const SLICER_LONGPRESS_MS = 400;
+  // If the finger drifts more than this before the timer fires, treat the
+  // gesture as a regular shape drag.
+  const SLICER_LONGPRESS_MOVE_PX = 10;
 
   let slicerGroup = null;
   let slicerActive = false;
@@ -25,6 +32,7 @@ export function createSlicerController({
   let slicerThetaLength = TWO_PI;
   let slicerYOffset = 0;
   let slicerZOffset = 0;
+  let slicerPhi = 0;
 
   function syncButtons() {
     slicerButton?.classList.toggle('on', slicerActive);
@@ -35,6 +43,7 @@ export function createSlicerController({
     slicerThetaLength = SLICER_THETA_INIT;
     slicerYOffset = 0;
     slicerZOffset = 0;
+    slicerPhi = 0;
   }
 
   function getMaskState() {
@@ -46,6 +55,7 @@ export function createSlicerController({
       zMin: slicerZOffset - slicerHalfHeight,
       zMax: slicerZOffset + slicerHalfHeight,
       thetaLen,
+      phi: slicerPhi,
       fullTh: thetaLen >= TWO_PI - SLICER_EPS,
       emptyTh: thetaLen <= SLICER_EPS,
     };
@@ -57,8 +67,8 @@ export function createSlicerController({
     if (x * x + dy * dy >= slicer.r2) return false;
     if (z <= slicer.zMin || z >= slicer.zMax) return false;
     if (slicer.fullTh) return true;
-    let ang = Math.atan2(dy, x);
-    if (ang < 0) ang += TWO_PI;
+    let ang = Math.atan2(dy, x) - slicer.phi;
+    ang = ((ang % TWO_PI) + TWO_PI) % TWO_PI;
     return ang < slicer.thetaLen;
   }
 
@@ -97,9 +107,31 @@ export function createSlicerController({
     sph.userData.slicerHandle = true;
     sph.renderOrder = 22;
     g.add(sph);
-    g.userData.handle = sph;
+    g.userData.handleMouse = sph;
+
+    // Invisible larger hit-area so touch input on mobile (where the visual
+    // sphere is only a few pixels wide) doesn't have to land on the dot exactly.
+    const hitR = 500;
+    const hitGeo = new THREE.SphereGeometry(hitR, 12, 8);
+    const hitMat = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: 0,
+      depthTest: false,
+      depthWrite: false,
+    });
+    const hit = new THREE.Mesh(hitGeo, hitMat);
+    hit.userData.slicerHandle = true;
+    hit.renderOrder = 22;
+    g.add(hit);
+    g.userData.handleTouch = hit;
 
     return g;
+  }
+
+  function pickHandle(e) {
+    return e.pointerType === 'touch'
+      ? slicerGroup.userData.handleTouch
+      : slicerGroup.userData.handleMouse;
   }
 
   function updateBasis() {
@@ -149,11 +181,49 @@ export function createSlicerController({
   (function installShapeDrag() {
     const dragRay = new THREE.Raycaster();
     dragRay.params.Line = { threshold: 25 };
+    const p0 = new THREE.Vector3();
+    const pZ = new THREE.Vector3();
     let dragging = false;
+    let mode = 'shape'; // 'shape' | 'rotate' (touch long-press)
     let dragStartX = 0;
     let dragStartY = 0;
     let dragStartTheta = 0;
     let dragStartHeight = 0;
+    // Rotate-mode anchors, set when long-press fires (not at pointerdown).
+    let dragStartClientY_rot = 0;
+    let dragStartPhi_rot = 0;
+    let prevNdcX_rot = 0;
+    // Last cursor position; needed by the long-press timer because the
+    // setTimeout callback has no fresh PointerEvent of its own.
+    let lastClientX = 0;
+    let lastClientY = 0;
+    let longPressTimer = null;
+
+    function clearLongPress() {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    }
+
+    function setHandleHighlight(on) {
+      if (!slicerGroup) return;
+      const sph = slicerGroup.userData.handleMouse;
+      sph.material.color.setHex(on ? 0xffaa33 : 0xffffff);
+    }
+
+    function enterRotateMode() {
+      if (!dragging) return;
+      mode = 'rotate';
+      dragStartClientY_rot = lastClientY;
+      dragStartPhi_rot = slicerPhi;
+      const rect = canvas.getBoundingClientRect();
+      prevNdcX_rot = ((lastClientX - rect.left) / rect.width) * 2 - 1;
+      setHandleHighlight(true);
+      try {
+        navigator.vibrate?.(15);
+      } catch (_) {}
+    }
 
     canvas.addEventListener(
       'pointerdown',
@@ -162,15 +232,21 @@ export function createSlicerController({
         if (!slicerActive || !slicerGroup) return;
         const pt = pointerXY(e);
         dragRay.setFromCamera(pt, camera);
-        const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
+        const hits = dragRay.intersectObject(pickHandle(e), false);
         if (!hits.length) return;
         dragging = true;
+        mode = 'shape';
         dragStartX = e.clientX;
         dragStartY = e.clientY;
         dragStartTheta = slicerThetaLength;
         dragStartHeight = slicerHalfHeight * 2;
+        lastClientX = e.clientX;
+        lastClientY = e.clientY;
         controls.enabled = false;
         canvas.setPointerCapture(e.pointerId);
+        if (e.pointerType === 'touch') {
+          longPressTimer = setTimeout(enterRotateMode, SLICER_LONGPRESS_MS);
+        }
         e.preventDefault();
         e.stopPropagation();
       },
@@ -179,21 +255,55 @@ export function createSlicerController({
 
     canvas.addEventListener('pointermove', (e) => {
       if (!dragging) return;
-      const dy = dragStartY - e.clientY;
-      const dTheta = (dy / SLICER_THETA_DRAG_PX) * TWO_PI;
-      const raw = dragStartTheta + dTheta;
-      slicerThetaLength = ((raw % TWO_PI) + TWO_PI) % TWO_PI;
+      lastClientX = e.clientX;
+      lastClientY = e.clientY;
 
-      const dx = e.clientX - dragStartX;
-      const newHeight = dragStartHeight + dx * SLICER_HEIGHT_MM_PER_PX;
-      const clampedH = Math.max(SLICER_HEIGHT_MIN, Math.min(SLICER_HEIGHT_MAX, newHeight));
-      slicerHalfHeight = clampedH * 0.5;
-      updateBasis();
+      // Cancel pending long-press if the finger drifts before it fires.
+      if (longPressTimer) {
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        if (dx * dx + dy * dy > SLICER_LONGPRESS_MOVE_PX * SLICER_LONGPRESS_MOVE_PX) {
+          clearLongPress();
+        }
+      }
+
+      if (mode === 'shape') {
+        const dy = dragStartY - e.clientY;
+        const dTheta = (dy / SLICER_THETA_DRAG_PX) * TWO_PI;
+        const raw = dragStartTheta + dTheta;
+        slicerThetaLength = ((raw % TWO_PI) + TWO_PI) % TWO_PI;
+
+        const dx = e.clientX - dragStartX;
+        const newHeight = dragStartHeight + dx * SLICER_HEIGHT_MM_PER_PX;
+        const clampedH = Math.max(SLICER_HEIGHT_MIN, Math.min(SLICER_HEIGHT_MAX, newHeight));
+        slicerHalfHeight = clampedH * 0.5;
+        updateBasis();
+      } else {
+        // Rotate mode: vertical → phi, horizontal → Z translation.
+        const dyClient = e.clientY - dragStartClientY_rot;
+        slicerPhi = dragStartPhi_rot + (dyClient / SLICER_PHI_DRAG_PX) * TWO_PI;
+
+        const ndcX = pointerXY(e).x;
+        const dNdcX = ndcX - prevNdcX_rot;
+        p0.set(0, slicerYOffset, slicerZOffset).project(camera);
+        pZ.set(0, slicerYOffset, slicerZOffset + 1).project(camera);
+        const zdx = pZ.x - p0.x,
+          zdy = pZ.y - p0.y;
+        const len2 = zdx * zdx + zdy * zdy;
+        if (len2 > 1e-10) {
+          slicerZOffset += (dNdcX * zdx) / len2;
+        }
+        prevNdcX_rot = ndcX;
+        updateBasis();
+      }
     });
 
     const endDrag = (e) => {
       if (!dragging) return;
       dragging = false;
+      clearLongPress();
+      if (mode === 'rotate') setHandleHighlight(false);
+      mode = 'shape';
       controls.enabled = true;
       try {
         canvas.releasePointerCapture(e.pointerId);
@@ -208,10 +318,10 @@ export function createSlicerController({
     dragRay.params.Line = { threshold: 25 };
     const p0 = new THREE.Vector3();
     const pZ = new THREE.Vector3();
-    const pY = new THREE.Vector3();
     let tDragging = false;
     let prevNdcX = 0;
-    let prevNdcY = 0;
+    let dragStartClientY = 0;
+    let dragStartPhi = 0;
 
     canvas.addEventListener(
       'pointerdown',
@@ -220,11 +330,12 @@ export function createSlicerController({
         if (!slicerActive || !slicerGroup) return;
         const pt = pointerXY(e);
         dragRay.setFromCamera(pt, camera);
-        const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
+        const hits = dragRay.intersectObject(pickHandle(e), false);
         if (!hits.length) return;
         tDragging = true;
         prevNdcX = pt.x;
-        prevNdcY = pt.y;
+        dragStartClientY = e.clientY;
+        dragStartPhi = slicerPhi;
         controls.enabled = false;
         canvas.setPointerCapture(e.pointerId);
         e.preventDefault();
@@ -237,38 +348,25 @@ export function createSlicerController({
       if (!tDragging) return;
       const pt = pointerXY(e);
       const dNdcX = pt.x - prevNdcX;
-      const dNdcY = pt.y - prevNdcY;
 
-      // Origin of the gizmo in NDC.
+      // Vertical drag → rotate the wedge around the Z (beam) axis.
+      const dyClient = e.clientY - dragStartClientY;
+      slicerPhi = dragStartPhi + (dyClient / SLICER_PHI_DRAG_PX) * TWO_PI;
+
+      // Horizontal drag → translate along world +Z. Project the unit +Z
+      // vector to NDC so the cursor "follows" the gizmo at any camera angle;
+      // we only consume the horizontal component of the cursor delta.
       p0.set(0, slicerYOffset, slicerZOffset).project(camera);
-      // Tip of +Z and +Y unit vectors, also in NDC.
       pZ.set(0, slicerYOffset, slicerZOffset + 1).project(camera);
-      pY.set(0, slicerYOffset + 1, slicerZOffset).project(camera);
-
       const zdx = pZ.x - p0.x,
         zdy = pZ.y - p0.y;
-      const ydx = pY.x - p0.x,
-        ydy = pY.y - p0.y;
-
-      // Solve a 2x2 system: [zdx ydx; zdy ydy] · [dz, dy] = [dNdcX, dNdcY].
-      // This decomposes the cursor delta into independent contributions
-      // along +Z and +Y of the world frame.
-      const det = zdx * ydy - ydx * zdy;
-      if (Math.abs(det) > 1e-10) {
-        slicerZOffset += (ydy * dNdcX - ydx * dNdcY) / det;
-        slicerYOffset += (-zdy * dNdcX + zdx * dNdcY) / det;
-        updateBasis();
-      } else {
-        // Degenerate (camera looking down the axis we're trying to move) —
-        // fall back to a straight Z projection so the gizmo still responds.
-        const len2 = zdx * zdx + zdy * zdy;
-        if (len2 > 1e-10) {
-          slicerZOffset += (dNdcX * zdx + dNdcY * zdy) / len2;
-          updateBasis();
-        }
+      const len2 = zdx * zdx + zdy * zdy;
+      if (len2 > 1e-10) {
+        slicerZOffset += (dNdcX * zdx) / len2;
       }
+
+      updateBasis();
       prevNdcX = pt.x;
-      prevNdcY = pt.y;
     });
 
     const endTDrag = (e) => {
@@ -286,7 +384,7 @@ export function createSlicerController({
       if (!slicerActive || !slicerGroup) return;
       const pt = pointerXY(e);
       dragRay.setFromCamera(pt, camera);
-      const hits = dragRay.intersectObject(slicerGroup.userData.handle, false);
+      const hits = dragRay.intersectObject(slicerGroup.userData.handleMouse, false);
       if (hits.length) e.preventDefault();
     });
   })();

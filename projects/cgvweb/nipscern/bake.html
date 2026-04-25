@@ -20,12 +20,16 @@
 </head>
 <body>
   <h1>Bake scene_data.bin</h1>
-  <p>Este utilitário roda uma vez no navegador. Ele carrega <code>CaloGeometry.glb</code>,
-     <code>JiveXML_*.xml</code> e o WASM parser, aplica os thresholds,
-     assa (<i>bake</i>) os mesh/edges/ghosts/tracks em um único binário compacto e
-     faz download de <code>scene_data.bin</code>.</p>
-  <p>Depois disso, coloque <code>scene_data.bin</code> na pasta <code>nipscern/</code> e você
-     pode excluir com segurança: <code>CaloGeometry.glb</code>, o XML, <code>atlas_id_parser.js</code> e <code>atlas_id_parser_bg.wasm</code>.</p>
+  <p>Este utilitário roda uma vez no navegador. Ele carrega
+     <code>../geometry_data/CaloGeometry.glb</code>,
+     <code>../default_xml/JiveXML_*.xml</code> e o WASM parser em
+     <code>../parser/pkg/</code>, aplica os thresholds, assa (<i>bake</i>) os
+     mesh/edges/ghosts/tracks em um único binário compacto e faz download de
+     <code>scene_data.bin</code>.</p>
+  <p>Pré-requisitos antes de rodar: <code>npm run fetch:geometry:source</code>
+     e <code>npm run fetch:samples</code> (popula os arquivos fonte fora do
+     repositório). Depois do bake, coloque <code>scene_data.bin</code> na pasta
+     <code>nipscern/</code>.</p>
   <button id="go">Start bake</button>
   <pre id="log"></pre>
   <script type="module" src="bake.js"></script>
