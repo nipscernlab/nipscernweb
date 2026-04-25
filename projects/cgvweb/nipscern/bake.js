@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import wasmInit, { parse_atlas_ids_bulk } from './atlas_id_parser.js';
+import wasmInit, { parse_atlas_ids_bulk } from '../parser/pkg/atlas_id_parser.js';
 
 const logEl = document.getElementById('log');
 const btn = document.getElementById('go');
@@ -341,7 +341,7 @@ async function main(){
   log('Loading GLB...');
   const meshByName = new Map();
   await new Promise((res, rej)=>{
-    new GLTFLoader().load('./CaloGeometry.glb', ({scene:g}) => {
+    new GLTFLoader().load('../geometry_data/CaloGeometry.glb', ({scene:g}) => {
       g.traverse(o => { if(o.isMesh) meshByName.set(o.name, o); });
       res();
     }, undefined, rej);
@@ -349,7 +349,7 @@ async function main(){
   log('  meshes:', meshByName.size);
 
   log('Fetching XML...');
-  const xmlText = await (await fetch('./JiveXML_518084_14173642443.xml')).text();
+  const xmlText = await (await fetch('../default_xml/JiveXML_518084_14173642443.xml')).text();
   const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
   const pe = doc.querySelector('parsererror');
   if(pe) throw new Error('XML parse error: '+pe.textContent.slice(0,120));

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { canvas, camera, controls, markDirty } from './renderer.js';
 import { active, rayTargets } from './state.js';
 import { fcalGroup, fcalVisibleMap } from './visibility.js';
-import { getTrackGroup, getPhotonGroup, getClusterGroup } from './visibility.js';
+import { getTrackGroup, getPhotonGroup, getElectronGroup, getClusterGroup } from './visibility.js';
 import { showOutline, showFcalOutline, clearOutline } from './outlines.js';
 
 export const tooltip = document.getElementById('tip');
@@ -53,16 +53,24 @@ export function initHoverTooltip({ getShowInfo, getCinemaMode, t }) {
 function doRaycast(clientX, clientY) {
   const trackGroup = getTrackGroup();
   const photonGroup = getPhotonGroup();
+  const electronGroup = getElectronGroup();
   const clusterGroup = getClusterGroup();
   const hasTrackLines = trackGroup && trackGroup.visible && trackGroup.children.length > 0;
   const hasPhotonLines = photonGroup && photonGroup.visible && photonGroup.children.length > 0;
+  const hasElectronLines =
+    electronGroup && electronGroup.visible && electronGroup.children.length > 0;
   const hasClusterLines = clusterGroup && clusterGroup.visible && clusterGroup.children.length > 0;
   const hasFcalTubes =
     fcalGroup && fcalGroup.children.some((c) => c.isInstancedMesh) && fcalVisibleMap.length > 0;
   if (
     !_getShowInfo() ||
     _getCinemaMode() ||
-    (!active.size && !hasTrackLines && !hasPhotonLines && !hasClusterLines && !hasFcalTubes)
+    (!active.size &&
+      !hasTrackLines &&
+      !hasPhotonLines &&
+      !hasElectronLines &&
+      !hasClusterLines &&
+      !hasFcalTubes)
   ) {
     hideTooltip();
     clearOutline();
@@ -147,19 +155,26 @@ function doRaycast(clientX, clientY) {
       return;
     }
   }
-  // ── Track / Photon hit (pick closest) ────────────────────────────────────
-  if (hasTrackLines || hasPhotonLines) {
+  // ── Track / Photon / Electron hit (pick closest) ─────────────────────────
+  if (hasTrackLines || hasPhotonLines || hasElectronLines) {
     const candidates = [];
     if (hasTrackLines) candidates.push(...trackGroup.children.filter((c) => c.visible));
     if (hasPhotonLines) candidates.push(...photonGroup.children.filter((c) => c.visible));
+    if (hasElectronLines)
+      candidates.push(...electronGroup.children.filter((c) => c.visible && c.isMesh));
     const hits = raycast.intersectObjects(candidates, false);
     if (hits.length) {
       const line = hits[0].object;
       const ptGev = line.userData.ptGev ?? 0;
       const storeGateKey = line.userData.storeGateKey ?? '';
       const isPhoton = photonGroup && photonGroup.children.includes(line);
+      const isElectron = electronGroup && electronGroup.children.includes(line);
+      let label;
+      if (isElectron) label = line.userData.pdgId < 0 ? 'Electron' : 'Positron';
+      else if (isPhoton) label = 'Photon';
+      else label = 'Track';
       clearOutline();
-      tipCellEl.textContent = isPhoton ? 'Photon' : 'Track';
+      tipCellEl.textContent = label;
       tipCoordEl.textContent = storeGateKey;
       tipEEl.textContent = `${ptGev.toFixed(3)} GeV`;
       if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';

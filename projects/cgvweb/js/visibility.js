@@ -22,9 +22,10 @@ export function initVisibility({ slicer, rebuildAllOutlines, updateTrackAtlasInt
   _updateTrackAtlasIntersections = updateTrackAtlasIntersections;
 }
 
-// ── Track / Photon / Cluster groups (created by particles.js, lifecycle owned here) ──
+// ── Track / Photon / Electron / Cluster groups (created by particles.js, lifecycle owned here) ──
 let _trackGroup = null;
 let _photonGroup = null;
+let _electronGroup = null;
 let _clusterGroup = null;
 
 let _tracksVisible = true;
@@ -32,6 +33,7 @@ let _clustersVisible = true;
 
 export const getTrackGroup = () => _trackGroup;
 export const getPhotonGroup = () => _photonGroup;
+export const getElectronGroup = () => _electronGroup;
 export const getClusterGroup = () => _clusterGroup;
 
 export const getTracksVisible = () => _tracksVisible;
@@ -45,6 +47,10 @@ export function setPhotonGroup(g) {
   _photonGroup = g;
   if (g) g.visible = _tracksVisible;
 }
+export function setElectronGroup(g) {
+  _electronGroup = g;
+  if (g) g.visible = _tracksVisible;
+}
 export function setClusterGroup(g) {
   _clusterGroup = g;
   if (g) g.visible = _clustersVisible;
@@ -54,6 +60,7 @@ export function setTracksVisible(v) {
   _tracksVisible = v;
   if (_trackGroup) _trackGroup.visible = v;
   if (_photonGroup) _photonGroup.visible = v;
+  if (_electronGroup) _electronGroup.visible = v;
 }
 export function setClustersVisible(v) {
   _clustersVisible = v;
@@ -114,7 +121,7 @@ export function setTrackPtMaxGev(v) {
 }
 
 // ── Cluster threshold state ───────────────────────────────────────────────────
-export let thrClusterEtGev = 0;
+export let thrClusterEtGev = 3;
 export let clusterEtMinGev = 0;
 export let clusterEtMaxGev = 1;
 export let clusterFilterEnabled = true;
@@ -377,6 +384,9 @@ export function applyTrackThreshold() {
     for (const child of _trackGroup.children) child.visible = child.userData.ptGev >= thrTrackGev;
   if (_photonGroup)
     for (const child of _photonGroup.children) child.visible = child.userData.ptGev >= thrTrackGev;
+  if (_electronGroup)
+    for (const child of _electronGroup.children)
+      child.visible = child.userData.ptGev >= thrTrackGev;
   _updateTrackAtlasIntersections?.();
   markDirty();
 }

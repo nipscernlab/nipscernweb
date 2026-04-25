@@ -53,16 +53,19 @@ import {
 import {
   drawTracks,
   drawPhotons,
+  drawElectrons,
   drawClusters,
   clearTracks,
   clearClusters,
   clearPhotons,
+  clearElectrons,
 } from './particles.js';
 import { clearOutline, clearAllOutlines } from './outlines.js';
 import { setStatus, showEventInfo } from './statusHud.js';
 import { markDirty } from './renderer.js';
 import { hideTooltip } from './hoverTooltip.js';
 import { esc } from './utils.js';
+import { updateMinimap } from './minimap.js';
 
 // Sliders + detector-panel init are assigned by setupDetectorPanels(), which
 // runs after this module loads. Main wires them via setProcessXmlDeps().
@@ -106,6 +109,7 @@ function resetScene() {
   clearTracks();
   clearClusters();
   clearPhotons();
+  clearElectrons();
   clearFcal();
   hideTooltip();
   markDirty();
@@ -149,6 +153,7 @@ export async function processXml(xmlText) {
   const larPacked = workerResult.larPacked;
   const hecPacked = workerResult.hecPacked;
   const rawPhotons = workerResult.photons;
+  const rawElectrons = workerResult.electrons ?? [];
   const rawClusters = workerResult.clusters;
   const _clusterCollections = workerResult.clusterCollections;
   // Worker returns plain {x,y,z} objects; reconstruct THREE.Vector3 here.
@@ -167,14 +172,16 @@ export async function processXml(xmlText) {
   resetScene(); // clears lastClusterData
 
   // ── Particle tracks ─────────────────────────────────────────────────────────
-  if (rawTracks.length || rawPhotons.length) {
+  if (rawTracks.length || rawPhotons.length || rawElectrons.length) {
     let ptMax = 5;
     for (const { ptGev } of rawTracks) if (isFinite(ptGev) && ptGev > ptMax) ptMax = ptGev;
     for (const { ptGev } of rawPhotons) if (isFinite(ptGev) && ptGev > ptMax) ptMax = ptGev;
+    for (const { ptGev } of rawElectrons) if (isFinite(ptGev) && ptGev > ptMax) ptMax = ptGev;
     _deps.trackPtSlider.update(0, ptMax);
   }
   drawTracks(rawTracks);
   drawPhotons(rawPhotons);
+  drawElectrons(rawElectrons);
 
   // ── Cluster η/φ lines ────────────────────────────────────────────────────────
   setLastClusterData({ collections: _clusterCollections });
@@ -265,6 +272,8 @@ export async function processXml(xmlText) {
       energyMev: eMev,
       cellName: `${tilePrefix} ${cellLabel(x, k)}`,
       coords: `η = ${tEta.toFixed(3)}   φ = ${tPhi.toFixed(3)} rad`,
+      eta: tEta,
+      phi: tPhi,
       det: 'TILE',
       cellId: id,
     });
@@ -302,6 +311,8 @@ export async function processXml(xmlText) {
       energyMev: eMev,
       cellName: rName,
       coords: `η = ${lEta.toFixed(3)}   φ = ${lPhi.toFixed(3)} rad`,
+      eta: lEta,
+      phi: lPhi,
       det: 'LAR',
       cellId: id,
     });
@@ -333,6 +344,8 @@ export async function processXml(xmlText) {
       energyMev: eMev,
       cellName: hLabel,
       coords: `η = ${hEta.toFixed(3)}   φ = ${hPhi.toFixed(3)} rad`,
+      eta: hEta,
+      phi: hPhi,
       det: 'HEC',
       cellId: id,
     });
@@ -355,7 +368,9 @@ export async function processXml(xmlText) {
     if (!h) continue;
     h.iMesh.setColorAt(h.instId, palColorTile(eMev));
     _markIMDirty(h.iMesh);
-    const mbtsCoords = `η = ${((s_bit ? 1 : -1) * (_m[2] === '0' ? 2.76 : 3.84)).toFixed(3)}   φ = ${_wrapPhi((2 * Math.PI) / 16 + (mod * 2 * Math.PI) / 8).toFixed(3)} rad`;
+    const mbtsEta = (s_bit ? 1 : -1) * (_m[2] === '0' ? 2.76 : 3.84);
+    const mbtsPhi = _wrapPhi((2 * Math.PI) / 16 + (mod * 2 * Math.PI) / 8);
+    const mbtsCoords = `η = ${mbtsEta.toFixed(3)}   φ = ${mbtsPhi.toFixed(3)} rad`;
     const _mbtsInner = _m[2] === '1';
     const _mbtsSide = s_bit ? 'A' : 'C';
     const _mbtsEba = (_mbtsInner ? _mbtsEbaInner : _mbtsEbaOuter)[mod];
@@ -366,6 +381,8 @@ export async function processXml(xmlText) {
       energyMev: eMev,
       cellName: _mbtsCellName,
       coords: mbtsCoords,
+      eta: mbtsEta,
+      phi: mbtsPhi,
       det: 'TILE',
       mbtsLabel: label,
     });
@@ -381,4 +398,5 @@ export async function processXml(xmlText) {
   );
   applyThreshold();
   showEventInfo(currentEventInfo);
+  updateMinimap({ active, fcalCells, clusters: rawClusters });
 }
