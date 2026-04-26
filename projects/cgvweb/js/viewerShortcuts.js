@@ -11,7 +11,6 @@ export function registerViewerShortcuts({
   setPinnedR,
   slicer,
   toggleAllGhosts,
-  toggleBeam,
 }) {
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -25,9 +24,6 @@ export function registerViewerShortcuts({
         case 'S':
           slicer.toggle();
           return;
-        case 'K':
-          document.getElementById('cluster-filter-toggle')?.click();
-          return;
       }
       return;
     }
@@ -36,9 +32,6 @@ export function registerViewerShortcuts({
     switch (e.key.toUpperCase()) {
       case 'G':
         toggleAllGhosts();
-        break;
-      case 'B':
-        toggleBeam();
         break;
       case 'R':
         resetCamera();

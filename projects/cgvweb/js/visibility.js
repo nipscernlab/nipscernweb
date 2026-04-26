@@ -10,6 +10,15 @@ import {
 } from './state.js';
 import { PAL_TILE_COLOR, PAL_LAR_COLOR, PAL_HEC_COLOR, palColorFcal } from './palette.js';
 import { scene, markDirty } from './renderer.js';
+import { getViewLevel, onViewLevelChange } from './viewLevel.js';
+import { getActiveJetCollection } from './jets.js';
+import { recomputeJetTrackMatch } from './trackAtlasIntersections.js';
+import {
+  getLastElectrons,
+  syncElectronTrackMatch,
+  getLastTaus,
+  syncTauTrackMatch,
+} from './particles.js';
 
 // ── Late-injected dependencies (set via initVisibility after slicer is ready) ─
 let _slicer = null;
@@ -22,22 +31,33 @@ export function initVisibility({ slicer, rebuildAllOutlines, updateTrackAtlasInt
   _updateTrackAtlasIntersections = updateTrackAtlasIntersections;
 }
 
-// ── Track / Photon / Electron / Cluster groups (created by particles.js, lifecycle owned here) ──
+// ── Track / Photon / Electron / Cluster / Jet / Tau / MET / Vertex groups ──
 let _trackGroup = null;
 let _photonGroup = null;
 let _electronGroup = null;
 let _clusterGroup = null;
+let _jetGroup = null;
+let _tauGroup = null;
+let _metGroup = null;
+let _vertexGroup = null;
 
 let _tracksVisible = true;
 let _clustersVisible = true;
+let _jetsVisible = true;
+let _tausVisible = true;
 
 export const getTrackGroup = () => _trackGroup;
 export const getPhotonGroup = () => _photonGroup;
 export const getElectronGroup = () => _electronGroup;
 export const getClusterGroup = () => _clusterGroup;
+export const getJetGroup = () => _jetGroup;
+export const getTauGroup = () => _tauGroup;
+export const getMetGroup = () => _metGroup;
+export const getVertexGroup = () => _vertexGroup;
 
 export const getTracksVisible = () => _tracksVisible;
 export const getClustersVisible = () => _clustersVisible;
+export const getJetsVisible = () => _jetsVisible;
 
 export function setTrackGroup(g) {
   _trackGroup = g;
@@ -45,27 +65,82 @@ export function setTrackGroup(g) {
 }
 export function setPhotonGroup(g) {
   _photonGroup = g;
-  if (g) g.visible = _tracksVisible;
+  if (g) g.visible = getViewLevel() === 3;
 }
 export function setElectronGroup(g) {
   _electronGroup = g;
-  if (g) g.visible = _tracksVisible;
+  if (g) g.visible = getViewLevel() === 3;
 }
 export function setClusterGroup(g) {
   _clusterGroup = g;
-  if (g) g.visible = _clustersVisible;
+  if (g) g.visible = _clustersVisible && getViewLevel() === 2;
+}
+export function setJetGroup(g) {
+  _jetGroup = g;
+  if (g) g.visible = _jetsVisible && getViewLevel() === 3;
+}
+export function setTauGroup(g) {
+  _tauGroup = g;
+  if (g) g.visible = _tausVisible && getViewLevel() === 3;
+}
+export function setMetGroup(g) {
+  _metGroup = g;
+  if (g) g.visible = getViewLevel() === 3;
+}
+// Vertices are event-level summary info — relevant at every view level, so
+// no gate. Always visible while the marker group exists.
+export function setVertexGroup(g) {
+  _vertexGroup = g;
 }
 
+// Tracks toggle (J button): controls only the track lines now. Photons and
+// electrons are no longer linked to this flag — their visibility comes from
+// the view level (level 3 shows them).
 export function setTracksVisible(v) {
   _tracksVisible = v;
   if (_trackGroup) _trackGroup.visible = v;
-  if (_photonGroup) _photonGroup.visible = v;
-  if (_electronGroup) _electronGroup.visible = v;
 }
+// User intent for the cluster toggle (K button at level 2). The cluster group
+// is only actually shown when level === 2 AND the user has clusters enabled.
 export function setClustersVisible(v) {
   _clustersVisible = v;
-  if (_clusterGroup) _clusterGroup.visible = v;
+  if (_clusterGroup) _clusterGroup.visible = v && getViewLevel() === 2;
 }
+// User intent for the jet toggle (K button at level 3). Same idea, gated to L3.
+export function setJetsVisible(v) {
+  _jetsVisible = v;
+  if (_jetGroup) _jetGroup.visible = v && getViewLevel() === 3;
+}
+
+// Re-applies cluster / photon / electron visibility AND the cell cluster-filter
+// when the view level changes. Tracks are unaffected (they show at every level,
+// gated only by setTracksVisible).
+function _applyViewLevelGate() {
+  const lvl = getViewLevel();
+  if (_clusterGroup) _clusterGroup.visible = _clustersVisible && lvl === 2;
+  if (_photonGroup) _photonGroup.visible = lvl === 3;
+  if (_electronGroup) _electronGroup.visible = lvl === 3;
+  if (_jetGroup) _jetGroup.visible = _jetsVisible && lvl === 3;
+  if (_tauGroup) _tauGroup.visible = _tausVisible && lvl === 3;
+  if (_metGroup) _metGroup.visible = lvl === 3;
+  // Refresh cell visibility: rebuildActiveClusterCellIds reads getViewLevel()
+  // and disables the cluster-membership filter outside level 2; applyThreshold
+  // then re-evaluates per-cell visibility.
+  rebuildActiveClusterCellIds();
+  applyThreshold();
+  applyFcalThreshold();
+  // Track jet-match highlight is only meaningful on level 3; passing null
+  // (off levels) makes recompute clear all isJetMatched flags.
+  recomputeJetTrackMatch(lvl === 3 ? getActiveJetCollection() : null, thrJetEtGev);
+  // Same gate for the electron→track ΔR match — outside L3 we don't want the
+  // red/green colours bleeding into the simpler views. syncElectronTrackMatch
+  // re-marks tracks AND rebuilds the floating "e±" label sprites.
+  syncElectronTrackMatch(lvl === 3 ? getLastElectrons() : null);
+  // τ→track colour mirrors the same L3-only gate.
+  syncTauTrackMatch(lvl === 3 ? getLastTaus() : null);
+  markDirty();
+}
+onViewLevelChange(_applyViewLevelGate);
 
 // ── Energy threshold state ────────────────────────────────────────────────────
 export let thrTileMev = 50;
@@ -124,7 +199,6 @@ export function setTrackPtMaxGev(v) {
 export let thrClusterEtGev = 3;
 export let clusterEtMinGev = 0;
 export let clusterEtMaxGev = 1;
-export let clusterFilterEnabled = true;
 
 export function setThrClusterEtGev(v) {
   thrClusterEtGev = v;
@@ -135,8 +209,22 @@ export function setClusterEtMinGev(v) {
 export function setClusterEtMaxGev(v) {
   clusterEtMaxGev = v;
 }
-export function setClusterFilterEnabled(v) {
-  clusterFilterEnabled = v;
+
+// ── Jet threshold state ───────────────────────────────────────────────────────
+// Independent from cluster — the slider in #rpanel2 reads/writes one or the
+// other based on the current view level (level 2 = cluster, level 3 = jet).
+export let thrJetEtGev = 20;
+export let jetEtMinGev = 0;
+export let jetEtMaxGev = 1;
+
+export function setThrJetEtGev(v) {
+  thrJetEtGev = v;
+}
+export function setJetEtMinGev(v) {
+  jetEtMinGev = v;
+}
+export function setJetEtMaxGev(v) {
+  jetEtMaxGev = v;
 }
 
 // ── Cluster filter sets (computed from cluster data) ─────────────────────────
@@ -349,33 +437,56 @@ export function hideNonActiveCells() {
   _flushIMDirty();
 }
 
-// ── Cluster filter ────────────────────────────────────────────────────────────
+// ── Cell-membership filter (cluster at L2, jet at L3) ─────────────────────────
+// Builds the set of cell IDs that pass the current overlay's filter.
+//   Level 1: filter off (null = pass all).
+//   Level 2: cells belonging to any cluster passing thrClusterEtGev.
+//   Level 3: cells belonging to any jet (in the active collection) passing
+//            thrJetEtGev. Collections without a <cells> field (EMPFlow,
+//            UFOCSSK) yield an empty set, which hides every cell — matches
+//            the strict cluster behaviour the user asked for.
+// activeMbtsLabels is only populated for clusters; jets don't expose MBTS.
 export function rebuildActiveClusterCellIds() {
-  if (!clusterFilterEnabled || !lastClusterData) {
-    activeClusterCellIds = null;
+  const lvl = getViewLevel();
+  if (lvl === 2 && lastClusterData) {
+    const ids = new Set();
+    const mbts = new Set();
+    for (const { clusters } of lastClusterData.collections) {
+      for (const { eta, phi: rawPhi, etGev, cells } of clusters) {
+        if (etGev < thrClusterEtGev) continue;
+        for (const k of ['TILE', 'LAR_EM', 'HEC', 'FCAL', 'TRACK', 'OTHER'])
+          for (const id of cells[k]) ids.add(id);
+        const absEta = Math.abs(eta);
+        let ch;
+        if (absEta >= 2.78 && absEta <= 3.86) ch = 1;
+        else if (absEta >= 2.08 && absEta < 2.78) ch = 0;
+        else continue;
+        const type = eta >= 0 ? 1 : -1;
+        const phiPos = rawPhi < 0 ? rawPhi + 2 * Math.PI : rawPhi;
+        const mod = Math.floor(phiPos / ((2 * Math.PI) / 8)) % 8;
+        mbts.add(`type_${type}_ch_${ch}_mod_${mod}`);
+      }
+    }
+    activeClusterCellIds = ids;
+    activeMbtsLabels = mbts;
+    return;
+  }
+  if (lvl === 3) {
+    const c = getActiveJetCollection();
+    const ids = new Set();
+    if (c) {
+      for (const j of c.jets) {
+        if (j.etGev < thrJetEtGev) continue;
+        for (const id of j.cells) ids.add(id);
+      }
+    }
+    activeClusterCellIds = ids;
     activeMbtsLabels = null;
     return;
   }
-  const ids = new Set();
-  const mbts = new Set();
-  for (const { clusters } of lastClusterData.collections) {
-    for (const { eta, phi: rawPhi, etGev, cells } of clusters) {
-      if (etGev < thrClusterEtGev) continue;
-      for (const k of ['TILE', 'LAR_EM', 'HEC', 'FCAL', 'TRACK', 'OTHER'])
-        for (const id of cells[k]) ids.add(id);
-      const absEta = Math.abs(eta);
-      let ch;
-      if (absEta >= 2.78 && absEta <= 3.86) ch = 1;
-      else if (absEta >= 2.08 && absEta < 2.78) ch = 0;
-      else continue;
-      const type = eta >= 0 ? 1 : -1;
-      const phiPos = rawPhi < 0 ? rawPhi + 2 * Math.PI : rawPhi;
-      const mod = Math.floor(phiPos / ((2 * Math.PI) / 8)) % 8;
-      mbts.add(`type_${type}_ch_${ch}_mod_${mod}`);
-    }
-  }
-  activeClusterCellIds = ids;
-  activeMbtsLabels = mbts;
+  // Level 1 (or no data): filter off entirely.
+  activeClusterCellIds = null;
+  activeMbtsLabels = null;
 }
 
 // ── Track threshold ───────────────────────────────────────────────────────────
@@ -388,6 +499,12 @@ export function applyTrackThreshold() {
     for (const child of _electronGroup.children)
       child.visible = child.userData.ptGev >= thrTrackGev;
   _updateTrackAtlasIntersections?.();
+  // Track visibility just changed — soft tracks getting hidden could free up
+  // the closest-track slot for an electron, or vice-versa. Re-run the ΔR match
+  // and rebuild "e±" labels (gated to L3 — at other levels it's a no-op).
+  if (getViewLevel() === 3) {
+    syncElectronTrackMatch(getLastElectrons());
+  }
   markDirty();
 }
 
@@ -395,11 +512,28 @@ export function applyTrackThreshold() {
 export function applyClusterThreshold() {
   if (_clusterGroup)
     for (const child of _clusterGroup.children)
-      child.visible = clusterFilterEnabled && child.userData.etGev >= thrClusterEtGev;
+      child.visible = child.userData.etGev >= thrClusterEtGev;
   rebuildActiveClusterCellIds();
   applyThreshold();
   applyFcalThreshold();
   applyTrackThreshold();
+}
+
+// ── Jet threshold ─────────────────────────────────────────────────────────────
+// Mirrors applyClusterThreshold: hides jet lines below thrJetEtGev AND rebuilds
+// the cell-membership filter so cells outside the passing jets disappear at
+// level 3 (same behaviour as the cluster view at level 2). Also refreshes the
+// jet→track highlight (orange) for tracks belonging to passing jets.
+export function applyJetThreshold() {
+  if (_jetGroup)
+    for (const child of _jetGroup.children) child.visible = child.userData.etGev >= thrJetEtGev;
+  rebuildActiveClusterCellIds();
+  applyThreshold();
+  applyFcalThreshold();
+  applyTrackThreshold();
+  // Highlight tracks of passing jets (orange) — only meaningful on level 3.
+  const lvl = getViewLevel();
+  recomputeJetTrackMatch(lvl === 3 ? getActiveJetCollection() : null, thrJetEtGev);
 }
 
 // ── Non-active cells in show-all mode ────────────────────────────────────────

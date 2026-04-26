@@ -45,7 +45,6 @@ import {
   clearVisibilityState,
   clearFcal,
   drawFcal,
-  rebuildActiveClusterCellIds,
   setLastClusterData,
   applyThreshold,
   getTrackGroup,
@@ -55,17 +54,42 @@ import {
   drawPhotons,
   drawElectrons,
   drawClusters,
+  drawJets,
+  drawTaus,
   clearTracks,
   clearClusters,
   clearPhotons,
   clearElectrons,
+  clearJets,
+  clearTaus,
 } from './particles.js';
+import { parseJets } from './jetParser.js';
+import {
+  setJetCollections,
+  clearJetState,
+  getActiveJetCollection,
+  onJetStateChange,
+} from './jets.js';
+import { parseHits } from './hitsParser.js';
+import { setHitPositions, clearHitsState } from './hitsOverlay.js';
+import { parseMet, pickPreferredMet } from './metParser.js';
+import { drawMet, clearMet } from './metOverlay.js';
+import { parseVertices } from './vertexParser.js';
+import { drawVertices, clearVertices } from './vertexOverlay.js';
+import { parseTaus } from './tauParser.js';
 import { clearOutline, clearAllOutlines } from './outlines.js';
 import { setStatus, showEventInfo } from './statusHud.js';
 import { markDirty } from './renderer.js';
 import { hideTooltip } from './hoverTooltip.js';
 import { esc } from './utils.js';
 import { updateMinimap } from './minimap.js';
+
+// Single subscription that re-draws jets whenever jet state changes — fires on
+// fresh events (setJetCollections) and on user-driven collection switches
+// (setActiveJetKey). drawJets(null) on clearJetState removes the group.
+onJetStateChange(() => {
+  drawJets(getActiveJetCollection());
+});
 
 // Sliders + detector-panel init are assigned by setupDetectorPanels(), which
 // runs after this module loads. Main wires them via setProcessXmlDeps().
@@ -110,6 +134,12 @@ function resetScene() {
   clearClusters();
   clearPhotons();
   clearElectrons();
+  clearJets();
+  clearJetState();
+  clearTaus();
+  clearHitsState();
+  clearMet();
+  clearVertices();
   clearFcal();
   hideTooltip();
   markDirty();
@@ -197,8 +227,40 @@ export async function processXml(xmlText) {
       etMax === -Infinity ? 1 : etMax,
     );
   }
+  // drawClusters → applyClusterThreshold internally rebuilds the cluster
+  // cell-id set and refreshes thresholds; no extra rebuildActiveClusterCellIds
+  // call is needed here.
   drawClusters(rawClusters);
-  rebuildActiveClusterCellIds();
+
+  // ── Jets ────────────────────────────────────────────────────────────────────
+  // The Rust WASM parser doesn't extract jets yet — do a light JS pass over
+  // the same xmlText (regex-based, jets are a tiny fraction of the file).
+  // setJetCollections triggers onJetStateChange (installed at module load
+  // below); the listener handles the redraw, both for fresh events and when
+  // the user later picks a different collection.
+  setJetCollections(parseJets(xmlText));
+
+  // ── Inner-detector + muon-spectrometer hits ───────────────────────────────
+  // Cache hit-id → position lookup (with TRT/muon-chamber subtleties handled
+  // inside the overlay) so the hover tooltip can render markers along the
+  // track under the cursor. No rendering happens here.
+  setHitPositions(parseHits(xmlText));
+
+  // ── Missing transverse energy (MET) ─────────────────────────────────────────
+  // JiveXML publishes several MET variants (EMPFlow / EMTopo / Calo / ...).
+  // We render only the preferred one (EMPFlow when present, first otherwise).
+  drawMet(pickPreferredMet(parseMet(xmlText)));
+
+  // ── Vertices (primary, pile-up, b-tag secondary) ──────────────────────────
+  // Small markers showing where the actual collisions happened — the PV is
+  // typically at z ~ ±50 mm from origin (within the BeamSpot), useful context
+  // when zooming in to the inner detector.
+  drawVertices(parseVertices(xmlText));
+
+  // ── Hadronic τ candidates (TauJets_xAOD) ──────────────────────────────────
+  // 6-9 per event typical. drawTaus also re-runs the τ→track colour sync so
+  // tracks attached to a τ pick up the purple material.
+  drawTaus(parseTaus(xmlText));
 
   // Per-detector energy range: symmetric percentiles on each tail so a single
   // extreme cell (e.g. FCAL down to -31 GeV) can't blow out the scale. Real
