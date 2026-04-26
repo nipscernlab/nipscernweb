@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { scene, markDirty } from './renderer.js';
 import { getMetGroup, setMetGroup } from './visibility.js';
+import { makeLabelSprite } from './labelSprite.js';
 
 // Hot pink — distinct from every other rendered colour (track yellow, jet
 // orange, cluster red-orange, electron red/green, photon yellow, muon blue).
@@ -24,6 +25,13 @@ const MET_MAX_LEN_MM = 6000;
 // height); 0.5 reads as a chunky arrowhead, smaller values are sharper.
 const MET_HEAD_PX = 10;
 const MET_HEAD_W_RATIO = 0.5;
+// ν label sits past the cone, along the arrow direction. MET arrows in
+// JiveXML mark where the missing momentum points — physically interpreted
+// as the direction the (undetected) neutrino(s) escaped, hence the ν.
+// Offset is in mm world units, picked so the label clears the cone at any
+// reasonable zoom without drifting too far from the arrow visually.
+const MET_LABEL_OFFSET_MM = 250;
+const MET_LABEL_COLOR = MET_COLOR;
 // Material singletons — one shaft material, one cone material per arrow is
 // wasteful, but materials with depthTest:false need to be shared cleanly.
 const _SHAFT_MAT = new THREE.LineBasicMaterial({
@@ -89,7 +97,6 @@ export function drawMet(metInfo) {
   // Cone at the tip, oriented along the arrow direction. Per-frame
   // onBeforeRender resizes it to MET_HEAD_PX pixels tall on screen.
   const cone = new THREE.Mesh(_CONE_GEO, _CONE_MAT);
-  cone.matrixAutoUpdate = false;
   cone.renderOrder = 9;
   const tipDir = new THREE.Vector3(dx, dy, 0);
   const tipQuat = new THREE.Quaternion().setFromUnitVectors(_Y_AXIS, tipDir);
@@ -126,10 +133,20 @@ export function drawMet(metInfo) {
   cone.userData.magnitude = magnitude;
   cone.userData.sumEt = metInfo.sumEt;
 
+  // ν label past the cone, along the arrow direction. Sprite handles its
+  // own per-frame screen-size sizing (labelSprite.js); we just pin its
+  // position once. MET physically tags the inferred neutrino direction
+  // (undetected, escapes the apparatus) — a single ν reads cleanly even
+  // when the actual escape is several neutrinos summed vectorially.
+  const nuLabel = makeLabelSprite('ν', MET_LABEL_COLOR);
+  nuLabel.position.set(dx * (len + MET_LABEL_OFFSET_MM), dy * (len + MET_LABEL_OFFSET_MM), 0);
+  nuLabel.renderOrder = 9;
+
   const g = new THREE.Group();
   g.renderOrder = 9;
   g.add(shaft);
   g.add(cone);
+  g.add(nuLabel);
   scene.add(g);
   setMetGroup(g);
   markDirty();

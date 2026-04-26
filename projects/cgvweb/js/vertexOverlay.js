@@ -100,8 +100,6 @@ export function drawVertices(vertices) {
     const style = VERTEX_STYLES[v.kind];
     const m = new THREE.Mesh(_GEO, _MATS[v.kind]);
     m.position.copy(v.position);
-    m.matrixAutoUpdate = false;
-    m.updateMatrix();
     m.onBeforeRender = _makeOnBeforeRender(style.sizePx);
     m.userData.vertexKind = v.kind;
     m.userData.numTracks = v.numTracks;

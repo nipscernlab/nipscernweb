@@ -29,9 +29,11 @@ export function showOutline(h) {
   const uid = geo.uuid;
   if (!eGeoCache.has(uid)) eGeoCache.set(uid, new THREE.EdgesGeometry(geo, 30));
   outlineMesh = new THREE.LineSegments(eGeoCache.get(uid), outlineMat);
-  outlineMesh.matrixAutoUpdate = false;
-  outlineMesh.matrix.copy(h.origMatrix);
-  outlineMesh.matrixWorld.copy(h.origMatrix);
+  // Decompose the cell's origMatrix into the outline's position/quaternion/
+  // scale so matrixAutoUpdate=true (default) reproduces it correctly each
+  // frame — and so a rotated scene's matrixWorld propagates to the outline
+  // without any per-add fix-ups.
+  outlineMesh.applyMatrix4(h.origMatrix);
   outlineMesh.renderOrder = 999;
   outlineMesh.userData.src = h.name;
   scene.add(outlineMesh);
@@ -61,7 +63,6 @@ export function showFcalOutline(instanceId) {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(buf, 3));
   outlineMesh = new THREE.LineSegments(geo, outlineMat);
-  outlineMesh.matrixAutoUpdate = false;
   outlineMesh.renderOrder = 999;
   outlineMesh.userData.src = src;
   scene.add(outlineMesh);
@@ -128,7 +129,6 @@ export function rebuildAllOutlines() {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(buf, 3));
   allOutlinesMesh = new THREE.LineSegments(geo, outlineAllMat);
-  allOutlinesMesh.matrixAutoUpdate = false;
   allOutlinesMesh.frustumCulled = false;
   allOutlinesMesh.renderOrder = 3;
   scene.add(allOutlinesMesh);

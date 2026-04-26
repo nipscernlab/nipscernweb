@@ -18,6 +18,8 @@ import {
   syncElectronTrackMatch,
   getLastTaus,
   syncTauTrackMatch,
+  getLastMuons,
+  syncMuonTrackMatch,
 } from './particles.js';
 
 // ── Late-injected dependencies (set via initVisibility after slicer is ready) ─
@@ -31,10 +33,11 @@ export function initVisibility({ slicer, rebuildAllOutlines, updateTrackAtlasInt
   _updateTrackAtlasIntersections = updateTrackAtlasIntersections;
 }
 
-// ── Track / Photon / Electron / Cluster / Jet / Tau / MET / Vertex groups ──
+// ── Track / Photon / Electron / Muon / Cluster / Jet / Tau / MET / Vertex groups ──
 let _trackGroup = null;
 let _photonGroup = null;
 let _electronGroup = null;
+let _muonGroup = null;
 let _clusterGroup = null;
 let _jetGroup = null;
 let _tauGroup = null;
@@ -49,6 +52,7 @@ let _tausVisible = true;
 export const getTrackGroup = () => _trackGroup;
 export const getPhotonGroup = () => _photonGroup;
 export const getElectronGroup = () => _electronGroup;
+export const getMuonGroup = () => _muonGroup;
 export const getClusterGroup = () => _clusterGroup;
 export const getJetGroup = () => _jetGroup;
 export const getTauGroup = () => _tauGroup;
@@ -69,6 +73,10 @@ export function setPhotonGroup(g) {
 }
 export function setElectronGroup(g) {
   _electronGroup = g;
+  if (g) g.visible = getViewLevel() === 3;
+}
+export function setMuonGroup(g) {
+  _muonGroup = g;
   if (g) g.visible = getViewLevel() === 3;
 }
 export function setClusterGroup(g) {
@@ -120,6 +128,7 @@ function _applyViewLevelGate() {
   if (_clusterGroup) _clusterGroup.visible = _clustersVisible && lvl === 2;
   if (_photonGroup) _photonGroup.visible = lvl === 3;
   if (_electronGroup) _electronGroup.visible = lvl === 3;
+  if (_muonGroup) _muonGroup.visible = lvl === 3;
   if (_jetGroup) _jetGroup.visible = _jetsVisible && lvl === 3;
   if (_tauGroup) _tauGroup.visible = _tausVisible && lvl === 3;
   if (_metGroup) _metGroup.visible = lvl === 3;
@@ -138,6 +147,8 @@ function _applyViewLevelGate() {
   syncElectronTrackMatch(lvl === 3 ? getLastElectrons() : null);
   // τ→track colour mirrors the same L3-only gate.
   syncTauTrackMatch(lvl === 3 ? getLastTaus() : null);
+  // μ→track sprite labels — same L3-only gate.
+  syncMuonTrackMatch(lvl === 3 ? getLastMuons() : null);
   markDirty();
 }
 onViewLevelChange(_applyViewLevelGate);
@@ -325,7 +336,6 @@ function _applyFcalDraw() {
   fcalVisibleMap = visible;
   if (!fcalGroup) {
     fcalGroup = new THREE.Group();
-    fcalGroup.matrixAutoUpdate = false;
     scene.add(fcalGroup);
   }
   if (!visible.length) {
@@ -337,7 +347,6 @@ function _applyFcalDraw() {
   const cylGeo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, false);
   const cylMat = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide });
   const iMesh = new THREE.InstancedMesh(cylGeo, cylMat, n);
-  iMesh.matrixAutoUpdate = false;
 
   for (let i = 0; i < n; i++) {
     const { x, y, z, dx, dy, dz, energy } = visible[i];
@@ -389,7 +398,6 @@ function _applyFcalDraw() {
       depthWrite: false,
     }),
   );
-  outLines.matrixAutoUpdate = false;
   outLines.frustumCulled = false;
   outLines.renderOrder = 3;
   fcalGroup.add(outLines);
@@ -502,8 +510,10 @@ export function applyTrackThreshold() {
   // Track visibility just changed — soft tracks getting hidden could free up
   // the closest-track slot for an electron, or vice-versa. Re-run the ΔR match
   // and rebuild "e±" labels (gated to L3 — at other levels it's a no-op).
+  // Same goes for "μ±" labels.
   if (getViewLevel() === 3) {
     syncElectronTrackMatch(getLastElectrons());
+    syncMuonTrackMatch(getLastMuons());
   }
   markDirty();
 }
@@ -527,6 +537,12 @@ export function applyClusterThreshold() {
 export function applyJetThreshold() {
   if (_jetGroup)
     for (const child of _jetGroup.children) child.visible = child.userData.etGev >= thrJetEtGev;
+  // τ lines share the same L3 ET slider — hadronic τs *are* narrow jets, so
+  // letting them pass while real jets are cut would visually dominate the
+  // L3 view. <TauJet> publishes pT (not ET); for the cone of objects we're
+  // dealing with the two are close enough to compare against a single
+  // threshold.
+  applyTauPtThreshold();
   rebuildActiveClusterCellIds();
   applyThreshold();
   applyFcalThreshold();
@@ -534,6 +550,15 @@ export function applyJetThreshold() {
   // Highlight tracks of passing jets (orange) — only meaningful on level 3.
   const lvl = getViewLevel();
   recomputeJetTrackMatch(lvl === 3 ? getActiveJetCollection() : null, thrJetEtGev);
+}
+
+// Hides τ lines whose pT falls below the L3 ET slider. Called from
+// applyJetThreshold when the slider moves and from drawTaus on fresh load.
+// Standalone (not folded into applyJetThreshold) so drawTaus can reuse it
+// without dragging the cell-filter / track-recolour passes along.
+export function applyTauPtThreshold() {
+  if (!_tauGroup) return;
+  for (const child of _tauGroup.children) child.visible = child.userData.ptGev >= thrJetEtGev;
 }
 
 // ── Non-active cells in show-all mode ────────────────────────────────────────

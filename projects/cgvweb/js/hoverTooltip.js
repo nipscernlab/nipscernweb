@@ -290,11 +290,20 @@ function doRaycast(clientX, clientY) {
       if (isPhoton) label = 'Photon';
       else {
         // Track label mirrors the colour priority chain in
-        // _applyTrackMaterials: electron > τ > jet > muon-hit > default.
+        // _applyTrackMaterials: electron > muon > jet > τ > muon-hit >
+        // default. Lepton IDs (electron / muon) are official ΔR matches to
+        // <Electron> / <Muon> objects, so they win first. Jet beats τ
+        // because every τ in this XML carries withoutQuality — they are τ
+        // algorithm INPUT, not τ-ID output. When the muon's pdgId is
+        // unknown we keep a charge-less "Track → Muon".
         const ePdg = line.userData.matchedElectronPdgId;
         if (ePdg != null) label = ePdg < 0 ? 'Track → Electron' : 'Track → Positron';
+        else if (line.userData.isMuonMatched) {
+          const muPdg = line.userData.matchedMuonPdgId;
+          if (muPdg == null) label = 'Track → Muon';
+          else label = muPdg < 0 ? 'Track → Muon' : 'Track → Anti-muon';
+        } else if (line.userData.isJetMatched) label = 'Track → Jet';
         else if (line.userData.isTauMatched) label = 'Track → Tau';
-        else if (line.userData.isJetMatched) label = 'Track → Jet';
         else label = 'Track';
       }
       // Show pixel-hit markers for the hovered track; clear them for photons.
@@ -346,7 +355,6 @@ function doRaycast(clientX, clientY) {
       const line = tauHits[0].object;
       const ptGev = line.userData.ptGev ?? 0;
       const storeGateKey = line.userData.storeGateKey ?? '';
-      const isTau = line.userData.isTau ?? '';
       const numTracks = line.userData.numTracks ?? 0;
       clearOutline();
       hideTrackHits();
@@ -354,13 +362,8 @@ function doRaycast(clientX, clientY) {
       tipCoordEl.textContent = storeGateKey;
       tipEEl.textContent = `${ptGev.toFixed(3)} GeV`;
       if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';
-      // ID quality token from <isTauString> ("Loose" / "Medium" / "Tight" /
-      // "none") and prong count (1 or 3 for hadronic τ). Both are essential
-      // for reading whether this candidate is a real τ vs. a jet fake.
-      const idLabel = isTau && isTau !== 'none' ? isTau : '—';
       _setExtras([
         [_ETA_LABEL, _fmtEta(line.userData.eta)],
-        ['ID', idLabel],
         ['tracks', `${numTracks}`],
       ]);
       tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';

@@ -67,7 +67,6 @@ if (renderer.isWebGLRenderer) {
 // ── Scene / Camera ────────────────────────────────────────────────────────────
 export const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020d1c);
-scene.matrixAutoUpdate = false;
 
 export const camera = new THREE.PerspectiveCamera(
   45,

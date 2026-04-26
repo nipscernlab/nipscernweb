@@ -306,13 +306,11 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
       // Build one InstancedMesh per (detector, geometry) pair.
       const cellsGroup = new THREE.Group();
       cellsGroup.name = 'cells';
-      cellsGroup.matrixAutoUpdate = false;
 
       for (const { det, geo, items } of groups.values()) {
         const mat = det === 'TILE' ? matTile : det === 'LAR' ? matLAr : matHec;
         const iMesh = new THREE.InstancedMesh(geo, mat, items.length);
         iMesh.name = `cells_${det}_${geo.uuid.slice(0, 8)}`;
-        iMesh.matrixAutoUpdate = false;
         iMesh.frustumCulled = false;
         iMesh.renderOrder = 2;
         iMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -337,14 +335,12 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
 
       // Envelope ghosts keep their individual-mesh behaviour.
       for (const gh of ghosts) {
-        gh.matrixAutoUpdate = false;
         gh.frustumCulled = false;
         gh.visible = false;
         ghostMeshByName.set(gh.name, gh);
         scene.add(gh);
       }
       for (const o of loose) {
-        o.matrixAutoUpdate = false;
         o.frustumCulled = false;
         o.visible = false;
         scene.add(o);
@@ -355,11 +351,8 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
         const atlasContainer = new THREE.Group();
         atlasContainer.name = 'atlas-geo';
         atlasContainer.scale.setScalar(10);
-        atlasContainer.updateMatrix();
-        atlasContainer.matrixAutoUpdate = false;
         for (const o of atlasMeshes) {
           o.material = atlasMat;
-          o.matrixAutoUpdate = false;
           o.frustumCulled = false;
           o.visible = false;
           atlasContainer.add(o);
