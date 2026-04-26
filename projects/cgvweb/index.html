@@ -140,12 +140,6 @@
     <line x1="2" y1="12" x2="22" y2="12"/>
     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
   </symbol>
-  <symbol id="i-beam" viewBox="0 0 24 24">
-    <line x1="12" y1="3" x2="12" y2="21"/>
-    <polyline points="9,7 12,3 15,7"/>
-    <polyline points="9,17 12,21 15,17"/>
-    <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
-  </symbol>
   <symbol id="i-camera" viewBox="0 0 24 24">
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
     <circle cx="12" cy="13" r="4"/>
@@ -364,8 +358,9 @@
 <!-- ── Cluster panel (top) ─────────────────────────────────── -->
 <aside id="rpanel2">
   <div id="det-tab-bar-cluster" style="border-bottom:1px solid var(--border);flex-shrink:0">
-    <div class="det-tab on" style="--tab-col:#ff4400;pointer-events:none">Cluster</div>
+    <div class="det-tab on" id="cluster-tab-label" style="--tab-col:#ff4400;pointer-events:none">Cluster</div>
   </div>
+  <select id="jet-collection-select" class="jet-coll-select" style="display:none"></select>
   <div class="det-pane" id="pane-cluster">
     <div class="sval" id="cluster-sval-max">– GeV</div>
     <div class="strak" id="cluster-strak"
@@ -377,9 +372,6 @@
     <input id="cluster-thr-input" class="thr-input" type="text"
       autocomplete="off" spellcheck="false"
       data-i18n-ph="thr-placeholder-gev" placeholder="e.g. 1.5 GeV">
-    <button class="cluster-filter-btn on" id="cluster-filter-toggle" type="button" role="switch" aria-checked="true">
-      On
-    </button>
   </div>
 </aside>
 
@@ -513,15 +505,22 @@
     <svg class="ic" style="width:14px;height:14px"><use href="#i-eye"/></svg>
   </button>
   <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-beam"
-    data-tip="Beam axis — show Z-axis N/S direction cones (B)" data-i18n-tip="tip-beam">
-    <svg class="ic" style="width:14px;height:14px"><use href="#i-beam"/></svg>
-  </button>
-  <div class="tbtn-sep"></div>
   <button class="tbtn on" id="btn-layers"
     data-tip="Detector layers — toggle geometry visibility" data-i18n-tip="tip-layers">
     <i class="ti ti-layers-subtract" style="font-size:15px"></i>
   </button>
+  <div class="tbtn-sep"></div>
+  <div class="tseg" id="view-level">
+    <button class="tseg-btn" data-level="1"
+      data-tip="Level 1 — Hits: raw cells and tracks"
+      data-i18n-tip="tip-view-level-1">1</button>
+    <button class="tseg-btn" data-level="2"
+      data-tip="Level 2 — Clusters: adds η/φ cluster lines"
+      data-i18n-tip="tip-view-level-2">2</button>
+    <button class="tseg-btn on" data-level="3"
+      data-tip="Level 3 — Particles: jets, photons, electrons and muons"
+      data-i18n-tip="tip-view-level-3">3</button>
+  </div>
   <div class="tbtn-sep"></div>
   <button class="tbtn on" id="btn-tracks"
     data-tip="Particle tracks — toggle collision path/tracer (J)" data-i18n-tip="tip-tracks">
@@ -529,7 +528,8 @@
   </button>
   <div class="tbtn-sep"></div>
   <button class="tbtn on" id="btn-cluster"
-    data-tip="Clusters — toggle η/φ cluster lines (K)" data-i18n-tip="tip-cluster">
+    data-tip="Toggle η/φ overlay — cluster lines at level 2, jet lines at level 3 (K)"
+    data-i18n-tip="tip-cluster">
     <i class="ti ti-focus-2" style="font-size:15px"></i>
   </button>
   <div class="tbtn-sep"></div>
@@ -822,6 +822,7 @@
     <span class="tkey" data-i18n="tip-energy-key">Energy</span>
     <span class="tval" id="tip-e">—</span>
   </div>
+  <div id="tip-extra"></div>
 </div>
 
 <!-- ── About overlay ─────────────────────────────────────── -->

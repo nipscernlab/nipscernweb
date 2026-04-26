@@ -44,6 +44,11 @@
   border-color: rgba(26, 82, 192, 0.48);
   background: rgba(26, 82, 192, 0.16);
 }
+.tbtn.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 .tbtn-sep {
   width: 1px;
   height: 18px;
@@ -51,6 +56,37 @@
   margin: 0 2px;
   flex-shrink: 0;
 }
+
+/* Segmented 1/2/3 control — view-level selector */
+.tseg {
+  display: inline-flex;
+  align-items: stretch;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tseg-btn {
+  width: 22px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font: 600 11px/1 inherit;
+  padding: 0;
+  transition: all 0.16s;
+}
+.tseg-btn:hover {
+  color: var(--bright);
+}
+.tseg-btn.on {
+  color: #7ab8ff;
+  background: rgba(26, 82, 192, 0.16);
+}
+.tseg-btn + .tseg-btn {
+  border-left: 1px solid var(--border);
+}
+
 /* Tabler icon size inside buttons */
 .tbtn .ti {
   font-size: 15px;

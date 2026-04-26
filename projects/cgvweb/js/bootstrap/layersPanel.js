@@ -18,11 +18,14 @@ import {
   refreshSceneVisibility,
   getTracksVisible,
   getClustersVisible,
+  getJetsVisible,
   setTracksVisible,
   setClustersVisible,
+  setJetsVisible,
 } from '../visibility.js';
 import { updateTrackAtlasIntersections } from '../trackAtlasIntersections.js';
 import { markDirty } from '../renderer.js';
+import { getViewLevel, onViewLevelChange } from '../viewLevel.js';
 
 export function setupLayersPanel() {
   // ── Detector layer toggles ─────────────────────────────────────────────────
@@ -130,14 +133,30 @@ export function setupLayersPanel() {
     markDirty();
   });
 
+  // K button is level-aware: at L2 it toggles cluster lines, at L3 it toggles
+  // jet lines, and at L1 it's disabled (no cluster/jet to show).
+  const btnCluster = document.getElementById('btn-cluster');
   function syncClustersBtn() {
-    document.getElementById('btn-cluster').classList.toggle('on', getClustersVisible());
+    const lvl = getViewLevel();
+    if (lvl === 1) {
+      btnCluster.classList.add('disabled');
+      btnCluster.classList.remove('on');
+    } else {
+      btnCluster.classList.remove('disabled');
+      const flag = lvl === 3 ? getJetsVisible() : getClustersVisible();
+      btnCluster.classList.toggle('on', flag);
+    }
   }
-  document.getElementById('btn-cluster').addEventListener('click', () => {
-    setClustersVisible(!getClustersVisible());
+  btnCluster.addEventListener('click', () => {
+    const lvl = getViewLevel();
+    if (lvl === 1) return;
+    if (lvl === 3) setJetsVisible(!getJetsVisible());
+    else setClustersVisible(!getClustersVisible());
     syncClustersBtn();
     markDirty();
   });
+  onViewLevelChange(syncClustersBtn);
+  syncClustersBtn();
 
   return {
     closeLayersPanel,

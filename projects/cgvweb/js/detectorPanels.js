@@ -1,4 +1,6 @@
 import { fmtMev } from './utils.js';
+import { getViewLevel, onViewLevelChange } from './viewLevel.js';
+import { getActiveJetCollection, onJetStateChange } from './jets.js';
 
 function fmtGev(v) {
   return v.toFixed(2) + ' GeV';
@@ -31,6 +33,7 @@ export function setupDetectorPanels({
   applyFcalThreshold,
   applyTrackThreshold,
   applyClusterThreshold,
+  applyJetThreshold,
   sidebarControls,
   state,
 }) {
@@ -213,32 +216,48 @@ export function setupDetectorPanels({
     const minLblEl = document.getElementById(minLblId);
     let drag = false;
 
+    // Polymorphic ops bundle: cluster mode at level 2, jet mode at level 3.
+    // Returns the same shape so updateUI / setFromRatio / blur logic works
+    // unchanged. Outside levels 2 and 3 the slider is hidden anyway.
+    const CLUSTER_OPS = {
+      getMin: () => state.getClusterEtMinGev(),
+      getMax: () => state.getClusterEtMaxGev(),
+      getThr: () => state.getThrClusterEtGev(),
+      setThr: (v) => state.setThrClusterEtGev(v),
+      apply: applyClusterThreshold,
+    };
+    const JET_OPS = {
+      getMin: () => state.getJetEtMinGev(),
+      getMax: () => state.getJetEtMaxGev(),
+      getThr: () => state.getThrJetEtGev(),
+      setThr: (v) => state.setThrJetEtGev(v),
+      apply: applyJetThreshold,
+    };
+    function currentOps() {
+      return getViewLevel() === 3 ? JET_OPS : CLUSTER_OPS;
+    }
+
     function updateUI() {
-      const span = state.getClusterEtMaxGev() - state.getClusterEtMinGev();
-      const ratio =
-        span > 0
-          ? Math.max(
-              0,
-              Math.min(1, (state.getThrClusterEtGev() - state.getClusterEtMinGev()) / span),
-            )
-          : 0;
+      const ops = currentOps();
+      const min = ops.getMin();
+      const max = ops.getMax();
+      const span = max - min;
+      const ratio = span > 0 ? Math.max(0, Math.min(1, (ops.getThr() - min) / span)) : 0;
       thumbEl.style.top = (1 - ratio) * 100 + '%';
       if (document.activeElement !== inputEl) {
-        inputEl.value =
-          state.getThrClusterEtGev() > state.getClusterEtMinGev() + 1e-9
-            ? fmtGev(state.getThrClusterEtGev())
-            : '';
+        inputEl.value = ops.getThr() > min + 1e-9 ? fmtGev(ops.getThr()) : '';
       }
+      if (maxLblEl) maxLblEl.textContent = fmtGev(max);
+      if (minLblEl) minLblEl.textContent = fmtGev(min);
     }
 
     function setFromRatio(ratio) {
-      if (!state.getClusterFilterEnabled()) return;
-      const span = state.getClusterEtMaxGev() - state.getClusterEtMinGev();
-      state.setThrClusterEtGev(
-        ratio <= 0 ? state.getClusterEtMinGev() : state.getClusterEtMinGev() + span * ratio,
-      );
+      const ops = currentOps();
+      const min = ops.getMin();
+      const span = ops.getMax() - min;
+      ops.setThr(ratio <= 0 ? min : min + span * ratio);
       updateUI();
-      applyClusterThreshold();
+      ops.apply();
     }
 
     trackEl.addEventListener('pointerdown', (e) => {
@@ -260,47 +279,54 @@ export function setupDetectorPanels({
       if (e.key === 'Enter') inputEl.blur();
     });
     inputEl.addEventListener('blur', () => {
-      if (!state.getClusterFilterEnabled()) {
-        updateUI();
-        return;
-      }
+      const ops = currentOps();
       const value = inputEl.value.trim().toLowerCase();
       if (!value || value === 'all') {
-        state.setThrClusterEtGev(state.getClusterEtMinGev());
+        ops.setThr(ops.getMin());
       } else {
         const gev = value.match(/^([\d.]+)\s*gev$/i);
         const parsed = gev ? parseFloat(gev[1]) : parseFloat(value);
         if (isFinite(parsed)) {
-          state.setThrClusterEtGev(
-            Math.max(state.getClusterEtMinGev(), Math.min(state.getClusterEtMaxGev(), parsed)),
-          );
+          ops.setThr(Math.max(ops.getMin(), Math.min(ops.getMax(), parsed)));
         }
       }
       updateUI();
-      applyClusterThreshold();
+      ops.apply();
     });
 
+    // Level switch: redraw the slider against the new mode's bounds + value.
+    onViewLevelChange(updateUI);
+    // Active jet collection changed (new event or user picked another from the
+    // dropdown): recompute jet ET min/max from the active list, then refresh.
+    onJetStateChange(() => {
+      const c = getActiveJetCollection();
+      let min = Infinity;
+      let max = -Infinity;
+      if (c) {
+        for (const j of c.jets) {
+          if (j.etGev < min) min = j.etGev;
+          if (j.etGev > max) max = j.etGev;
+        }
+      }
+      if (!isFinite(min)) {
+        min = 0;
+        max = 1;
+      }
+      state.setJetEtMinGev(Math.max(0, min));
+      state.setJetEtMaxGev(max);
+      if (getViewLevel() === 3) updateUI();
+    });
+
+    // Cluster-only update path kept for processXml.js (which only knows about
+    // cluster ET ranges). Jet bounds flow through the onJetStateChange hook
+    // above. Both paths converge on updateUI for the active mode.
     function update(minGev, maxGev) {
       state.setClusterEtMinGev(minGev);
       state.setClusterEtMaxGev(maxGev);
-      if (maxLblEl) maxLblEl.textContent = fmtGev(maxGev);
-      if (minLblEl) minLblEl.textContent = fmtGev(minGev);
-      updateUI();
+      if (getViewLevel() !== 3) updateUI();
     }
 
     return { updateUI, update };
-  }
-
-  function syncClusterFilterToggle() {
-    const btn = document.getElementById('cluster-filter-toggle');
-    const pane = document.getElementById('pane-cluster');
-    const input = document.getElementById('cluster-thr-input');
-    if (!btn || !pane) return;
-    btn.classList.toggle('on', state.getClusterFilterEnabled());
-    btn.setAttribute('aria-checked', state.getClusterFilterEnabled() ? 'true' : 'false');
-    btn.textContent = state.getClusterFilterEnabled() ? 'On' : 'Off';
-    pane.classList.toggle('cluster-filter-disabled', !state.getClusterFilterEnabled());
-    if (input) input.disabled = !state.getClusterFilterEnabled();
   }
 
   const tileSlider = makeDetSlider(
@@ -365,7 +391,6 @@ export function setupDetectorPanels({
     fcalSlider.updateUI(state.getThrFcalMev());
     hecSlider.updateUI(state.getThrHecMev());
     clusterEtSlider.updateUI();
-    syncClusterFilterToggle();
     sidebarControls.setPinnedR(true);
     if (hasTile) switchTab('tile');
     else if (hasLAr) switchTab('lar');
@@ -378,11 +403,6 @@ export function setupDetectorPanels({
     document.getElementById('tab-' + id).addEventListener('click', () => switchTab(id));
   });
   document.getElementById('tab-cluster').addEventListener('click', () => switchTab('cluster'));
-  document.getElementById('cluster-filter-toggle').addEventListener('click', () => {
-    state.setClusterFilterEnabled(!state.getClusterFilterEnabled());
-    syncClusterFilterToggle();
-    applyClusterThreshold();
-  });
 
   switchTab('tile');
   tileSlider.updateUI(state.getThrTileMev());
@@ -393,7 +413,6 @@ export function setupDetectorPanels({
   return {
     switchTab,
     initDetPanel,
-    syncClusterFilterToggle,
     tileSlider,
     larSlider,
     fcalSlider,

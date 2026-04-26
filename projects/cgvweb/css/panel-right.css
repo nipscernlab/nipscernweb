@@ -150,42 +150,24 @@
 .thr-input::placeholder {
   color: var(--dim);
 }
-.cluster-filter-btn {
-  width: 78px;
+/* ── Jet collection dropdown (rpanel2 at level 3) ───────── */
+.jet-coll-select {
+  margin: 6px 8px 0;
   padding: 4px 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
   border-radius: 6px;
-  color: var(--muted);
-  font: 600 0.58rem var(--mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s,
-    box-shadow 0.15s,
-    opacity 0.15s;
-}
-.cluster-filter-btn:hover {
   color: var(--text);
+  font: 500 0.62rem var(--mono);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.jet-coll-select:hover {
   border-color: rgba(255, 255, 255, 0.18);
 }
-.cluster-filter-btn.on {
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: none;
-}
-#pane-cluster.cluster-filter-disabled .sval,
-#pane-cluster.cluster-filter-disabled .slbl,
-#pane-cluster.cluster-filter-disabled .thr-input,
-#pane-cluster.cluster-filter-disabled .strak {
-  opacity: 0.38;
-}
-#pane-cluster.cluster-filter-disabled .strak {
-  cursor: default;
+.jet-coll-select:focus {
+  outline: none;
+  border-color: var(--accent2);
 }
 
 /* ── Ghost switches (CSS-only toggle pill, no text inside) ─── */

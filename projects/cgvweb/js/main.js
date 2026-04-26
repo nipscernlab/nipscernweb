@@ -22,7 +22,9 @@ import {
   thrClusterEtGev,
   clusterEtMinGev,
   clusterEtMaxGev,
-  clusterFilterEnabled,
+  thrJetEtGev,
+  jetEtMinGev,
+  jetEtMaxGev,
   setThrTileMev,
   setThrLArMev,
   setThrHecMev,
@@ -33,12 +35,15 @@ import {
   setThrClusterEtGev,
   setClusterEtMinGev,
   setClusterEtMaxGev,
-  setClusterFilterEnabled,
+  setThrJetEtGev,
+  setJetEtMinGev,
+  setJetEtMaxGev,
   hideNonActiveCells,
   applyThreshold,
   applyFcalThreshold,
   applyTrackThreshold,
   applyClusterThreshold,
+  applyJetThreshold,
   refreshSceneVisibility,
   getTrackGroup,
 } from './visibility.js';
@@ -50,7 +55,6 @@ import {
 import { clearOutline, rebuildAllOutlines } from './outlines.js';
 import { initHoverTooltip, hideTooltip, tooltip, tipCellEl, tipEEl } from './hoverTooltip.js';
 import { initRenderLoop } from './renderLoop.js';
-import { toggleBeam } from './beamIndicator.js';
 import { setupPanelResize } from './panelResize.js';
 import { setupButtonTooltips } from './buttonTooltips.js';
 import { setupMobileToolbar } from './mobileToolbar.js';
@@ -132,7 +136,6 @@ const topToolbar = setupTopToolbar({
   clearOutline,
   hideTooltip,
   toggleAllGhosts,
-  toggleBeam,
 });
 
 initHoverTooltip({
@@ -173,6 +176,7 @@ initStatusHud({
     applyFcalThreshold,
     applyTrackThreshold,
     applyClusterThreshold,
+    applyJetThreshold,
     sidebarControls,
     state: {
       getThrTileMev: () => thrTileMev,
@@ -195,8 +199,12 @@ initStatusHud({
       setClusterEtMinGev,
       getClusterEtMaxGev: () => clusterEtMaxGev,
       setClusterEtMaxGev,
-      getClusterFilterEnabled: () => clusterFilterEnabled,
-      setClusterFilterEnabled,
+      getThrJetEtGev: () => thrJetEtGev,
+      setThrJetEtGev,
+      getJetEtMinGev: () => jetEtMinGev,
+      setJetEtMinGev,
+      getJetEtMaxGev: () => jetEtMaxGev,
+      setJetEtMaxGev,
     },
   }));
 
@@ -282,5 +290,4 @@ registerViewerShortcuts({
   setPinnedR: sidebarControls.setPinnedR,
   slicer,
   toggleAllGhosts,
-  toggleBeam,
 });
