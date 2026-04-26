@@ -8,11 +8,22 @@ export function createSlicerController({
   onMaskChange,
   onDisable,
   onHideNonActiveShowAll,
+  markDirty,
+  // Optional: returns the active jet collection (or null). When present, the
+  // slicer's initial wedge is sized to put its two cut walls at the φ of the
+  // two leading-ET jets — the cross-section faces then frame the event's
+  // most energetic deposits, which is the prettiest way to "open" the calo.
+  getActiveJetCollection,
 }) {
   const SLICER_RADIUS = 5000;
   const SLICER_HEIGHT_MIN = 0;
-  const SLICER_HEIGHT_MAX = 20000;
-  const SLICER_HEIGHT_INIT = 5000;
+  // Calorimeter outer cylinder spans 12 m total (CLUSTER_CYL_OUT_HALF_H =
+  // 6000 mm in particles.js). Initial wedge matches that exactly so the cut
+  // covers the whole calo on first activation, and the max equals the init —
+  // dragging the height larger than the cylinder would just expose empty
+  // space outside the calo, which is never useful.
+  const SLICER_HEIGHT_INIT = 12000;
+  const SLICER_HEIGHT_MAX = 12000;
   const SLICER_THETA_INIT = 0.5 * Math.PI;
   const SLICER_EPS = 1e-6;
   const SLICER_THETA_DRAG_PX = 300;
@@ -44,6 +55,41 @@ export function createSlicerController({
     slicerYOffset = 0;
     slicerZOffset = 0;
     slicerPhi = 0;
+  }
+
+  // Tries to override (slicerPhi, slicerThetaLength) with values that put the
+  // wedge's two walls at the φ of the two highest-ET jets in the active
+  // collection. Hides the smaller arc between them so the larger half (which
+  // contains both jets, with the walls passing through their cores) stays
+  // visible — the cut faces show the longitudinal cross-section *through*
+  // the leading jets, exposing the most energetic calo cells on the walls.
+  //
+  // ATLAS-φ → scene-φ conversion: scene x = -ATLAS x and scene y = -ATLAS y,
+  // so atan2 in scene coords is offset by π from atan2 in ATLAS coords.
+  //
+  // Returns false (and leaves the default wedge alone) when there aren't two
+  // usable jets or the two φ values would produce a degenerate (zero-length)
+  // wedge.
+  function _configureFromLeadingJets() {
+    const c = getActiveJetCollection?.();
+    if (!c || !Array.isArray(c.jets) || c.jets.length < 2) return false;
+    const usable = c.jets.filter((j) => Number.isFinite(j.phi) && Number.isFinite(j.etGev));
+    if (usable.length < 2) return false;
+    usable.sort((a, b) => b.etGev - a.etGev);
+    const norm = (a) => ((a % TWO_PI) + TWO_PI) % TWO_PI;
+    const phi1 = norm(usable[0].phi + Math.PI);
+    const phi2 = norm(usable[1].phi + Math.PI);
+    const fwd = norm(phi2 - phi1);
+    const bwd = TWO_PI - fwd;
+    if (fwd < SLICER_EPS || bwd < SLICER_EPS) return false;
+    if (fwd <= bwd) {
+      slicerPhi = phi1;
+      slicerThetaLength = fwd;
+    } else {
+      slicerPhi = phi2;
+      slicerThetaLength = bwd;
+    }
+    return true;
   }
 
   function getMaskState() {
@@ -144,23 +190,82 @@ export function createSlicerController({
     onMaskChange?.();
   }
 
+  // Camera to project default (renderer.js initial state).
+  function _resetCameraToDefault() {
+    if (!camera || !controls) return;
+    camera.up.set(0, 1, 0);
+    camera.position.set(0, 0, 12000);
+    controls.target.set(0, 0, 0);
+    controls.update();
+    controls.saveState();
+  }
+
+  // Camera at world +X looking back at the origin — the wedge opening sits
+  // at +X after _alignSceneToWedge, so this view stares straight into the
+  // cut. Distance is preserved from the user's current orbit so zoom is
+  // kept across reframes.
+  function _resetCameraToWedgeFrontView() {
+    if (!camera || !controls) return;
+    const dist = Math.max(100, camera.position.distanceTo(controls.target));
+    camera.up.set(0, 1, 0);
+    camera.position.set(dist, 0, 0);
+    controls.target.set(0, 0, 0);
+    controls.update();
+    controls.saveState();
+  }
+
+  // Rotates the entire scene around its Z axis so the wedge bisector
+  // lands at world +X. Camera then sits at +X looking back at origin to
+  // see the cut from the front. Relies on every overlay using
+  // matrixAutoUpdate=true so per-frame matrix recomputation picks up
+  // the scene rotation correctly even for objects added after the
+  // rotation was set.
+  function _alignSceneToWedge() {
+    if (!scene) return;
+    const phi = slicerPhi + slicerThetaLength / 2;
+    scene.rotation.z = -phi;
+    scene.updateMatrix();
+    markDirty?.();
+  }
+
+  function _restoreSceneRotation() {
+    if (!scene) return;
+    scene.rotation.z = 0;
+    scene.updateMatrix();
+    markDirty?.();
+  }
+
+  // Shared post-configuration sequence: refreshes the gizmo basis, rotates
+  // the scene so the wedge bisector lands at world +X, and snaps the camera
+  // to the +X front view. Used by enable / resetCamera / refreshFromActiveJets.
+  function _frameWedgeView() {
+    updateBasis();
+    _alignSceneToWedge();
+    _resetCameraToWedgeFrontView();
+  }
+
   function enable() {
     if (slicerActive) return;
     slicerActive = true;
     resetState();
+    // Replace the default π/2 wedge with one whose walls align with the two
+    // leading jets, when those exist. Falls through silently otherwise.
+    _configureFromLeadingJets();
     if (!slicerGroup) {
       slicerGroup = buildGizmo();
       scene.add(slicerGroup);
     }
     slicerGroup.visible = true;
     syncButtons();
-    updateBasis();
+    _frameWedgeView();
   }
 
   function disable() {
     if (!slicerActive) return;
     slicerActive = false;
     if (slicerGroup) slicerGroup.visible = false;
+    _restoreSceneRotation();
+    _resetCameraToDefault();
     syncButtons();
     onHideNonActiveShowAll?.();
     onDisable?.();
@@ -168,6 +273,17 @@ export function createSlicerController({
 
   function toggle() {
     slicerActive ? disable() : enable();
+  }
+
+  // Re-aligns the wedge walls with the current event's two leading jets,
+  // and re-frames the camera onto the new wedge. Called from outside
+  // (main.js) on jet-state changes — typically when a new event lands or
+  // the user picks a different jet collection. No-op if the slicer isn't
+  // active or the new state has fewer than two usable jets; the existing
+  // wedge and camera are left alone.
+  function refreshFromActiveJets() {
+    if (!slicerActive) return;
+    if (_configureFromLeadingJets()) _frameWedgeView();
   }
 
   function pointerXY(e) {
@@ -392,6 +508,17 @@ export function createSlicerController({
   slicerButton?.addEventListener('click', toggle);
   syncButtons();
 
+  // Public re-snap of the slicer view: redoes the full first-activation
+  // sequence (wedge state reset, leading-jet alignment, scene rotation,
+  // camera framing). Intended to back the global "reset camera" button
+  // while slicer is active.
+  function resetCamera() {
+    if (!slicerActive) return;
+    resetState();
+    _configureFromLeadingJets();
+    _frameWedgeView();
+  }
+
   return {
     disable,
     enable,
@@ -400,6 +527,8 @@ export function createSlicerController({
     isActive: () => slicerActive,
     isPointInsideWedge,
     isShowAllCells: () => slicerActive,
+    refreshFromActiveJets,
+    resetCamera,
     toggle,
   };
 }

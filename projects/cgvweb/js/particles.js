@@ -4,26 +4,31 @@ import {
   getTrackGroup,
   getPhotonGroup,
   getElectronGroup,
+  getMuonGroup,
   getClusterGroup,
   getJetGroup,
   getTauGroup,
   setTrackGroup,
   setPhotonGroup,
   setElectronGroup,
+  setMuonGroup,
   setClusterGroup,
   setJetGroup,
   setTauGroup,
   applyTrackThreshold,
   applyClusterThreshold,
   applyJetThreshold,
+  applyTauPtThreshold,
 } from './visibility.js';
 import {
   TRACK_MAT,
   updateTrackAtlasIntersections,
   recomputeElectronTrackMatch,
   recomputeTauTrackMatch,
+  recomputeMuonTrackMatch,
 } from './trackAtlasIntersections.js';
 import { getViewLevel } from './viewLevel.js';
+import { makeLabelSprite } from './labelSprite.js';
 
 // ── Cluster line rendering ────────────────────────────────────────────────────
 // Lines are drawn from the origin in the η/φ direction, 5 m = 5000 mm long.
@@ -53,18 +58,14 @@ const PHOTON_SPRING_PTS = 22; // points sampled per coil (smoothness)
 // stands in for the old red/green arrow that pointed into the inner cylinder.
 const ELECTRON_NEG_COLOR = 0xff3030;
 const ELECTRON_POS_COLOR = 0x33dd55;
-// Sprite label sizing:
-//   - far away (camera outside the detector): use a fixed world-units height
-//     so the labels grow naturally on the screen as the user zooms in.
-//   - close in (camera inside the outer cylinder): cap the on-screen height
-//     so the labels stop dominating the view.
-// The crossover happens automatically via min(worldH, screenH).
-const ELECTRON_LABEL_WORLD_H_MM = 150;
-const ELECTRON_LABEL_MAX_PX = 20;
 // Push the sprite slightly outward (radially in the xy plane) so it doesn't
 // sit directly on top of the line at the calorimeter face.
 const ELECTRON_LABEL_RADIAL_OFFSET_MM = 120;
-const _tmpVec2 = new THREE.Vector2();
+// Muon labels: blue, matching the TRACK_HIT_MAT colour painted on muon tracks
+// by the muon-chamber-hit raycast. Charge is read from the label text
+// (μ- / μ+), so a single colour is enough — splitting like the e± red/green
+// would just add visual noise on top of an already-blue line.
+const MUON_LABEL_COLOR = 0x4a90d9;
 
 // Inner cylinder (start): r = 1.4 m, h = 6.4 m
 const CLUSTER_CYL_IN_R = 1421.73;
@@ -154,10 +155,8 @@ export function drawTracks(tracks) {
         line.userData.phi = Math.atan2(-p.y, -p.x);
       }
     }
-    line.matrixAutoUpdate = false;
     g.add(line);
   }
-  g.matrixAutoUpdate = false;
   scene.add(g);
   setTrackGroup(g); // stores ref + applies _tracksVisible
   applyTrackThreshold();
@@ -222,7 +221,6 @@ export function drawPhotons(photons) {
     line.userData.phi = phi;
     g.add(line);
   }
-  g.matrixAutoUpdate = false;
   scene.add(g);
   setPhotonGroup(g);
   applyTrackThreshold();
@@ -235,47 +233,8 @@ export function drawPhotons(photons) {
 // track's outermost point and pushed slightly outward so it doesn't sit on
 // top of the line.
 
-// Billboarded text sprite ("e-" or "e+") in the colour of the e±.
-// onBeforeRender keeps a constant on-screen pixel height regardless of zoom.
-function _makeLabelSprite(text, hexColor) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 64;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = `#${hexColor.toString(16).padStart(6, '0')}`;
-  ctx.font = 'bold 56px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  const mat = new THREE.SpriteMaterial({
-    map: tex,
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
-  });
-  const sprite = new THREE.Sprite(mat);
-  sprite.scale.set(1, 0.5, 1); // overwritten in onBeforeRender
-  sprite.onBeforeRender = function (renderer, _scene, camera) {
-    renderer.getSize(_tmpVec2);
-    const viewportH = _tmpVec2.y || 1;
-    let worldHPerPx;
-    if (camera.isPerspectiveCamera) {
-      const dist = Math.max(0.001, camera.position.distanceTo(this.position));
-      worldHPerPx = (2 * Math.tan((camera.fov * Math.PI) / 360) * dist) / viewportH;
-    } else {
-      const visH = Math.max(0.001, (camera.top - camera.bottom) / (camera.zoom || 1));
-      worldHPerPx = visH / viewportH;
-    }
-    const screenCappedH = ELECTRON_LABEL_MAX_PX * worldHPerPx;
-    const h = Math.min(ELECTRON_LABEL_WORLD_H_MM, screenCappedH);
-    this.scale.set(h * 2, h, 1);
-  };
-  return sprite;
-}
+// Sprite-creation helper lives in labelSprite.js — shared with metOverlay's
+// ν label. Default world-h / screen-px values match the old electron tuning.
 
 // Full electron reset: drops the cached parser list and removes the label
 // group. Called by resetScene before a new XML loads.
@@ -328,7 +287,7 @@ function _rebuildElectronLabels() {
       const y = pos.getY(idx);
       const z = pos.getZ(idx);
       const isElectron = pdg < 0;
-      const label = _makeLabelSprite(
+      const label = makeLabelSprite(
         isElectron ? 'e-' : 'e+',
         isElectron ? ELECTRON_NEG_COLOR : ELECTRON_POS_COLOR,
       );
@@ -346,7 +305,6 @@ function _rebuildElectronLabels() {
     }
   }
   if (!added) return;
-  g.matrixAutoUpdate = false;
   scene.add(g);
   setElectronGroup(g);
 }
@@ -359,6 +317,88 @@ export function syncElectronTrackMatch(electrons) {
   recomputeElectronTrackMatch(electrons);
   _clearElectronGroupOnly();
   if (electrons && electrons.length) _rebuildElectronLabels();
+}
+
+// ── Muons / Anti-muons ────────────────────────────────────────────────────────
+// Mirrors the electron pipeline: the matched track is already coloured blue
+// by the muon-chamber-hit raycast (TRACK_HIT_MAT), so we don't repaint it —
+// we just add a "μ-" / "μ+" sprite floating beside it. Sprite is anchored on
+// the OUTER end of the CombinedMuonTrack polyline (~9-10 m), where the muon
+// exits the spectrometer and the line is most distinctly visible.
+
+let _lastMuons = [];
+export function getLastMuons() {
+  return _lastMuons;
+}
+
+export function clearMuons() {
+  _lastMuons = [];
+  _clearMuonGroupOnly();
+}
+
+function _clearMuonGroupOnly() {
+  const g = getMuonGroup();
+  if (!g) return;
+  g.traverse((o) => {
+    if (o.isSprite && o.material?.map) o.material.map.dispose();
+  });
+  scene.remove(g);
+  setMuonGroup(null);
+}
+
+export function drawMuons(muons) {
+  clearMuons();
+  _lastMuons = Array.isArray(muons) ? muons : [];
+  syncMuonTrackMatch(getViewLevel() === 3 ? muons : null);
+}
+
+function _rebuildMuonLabels() {
+  const trackGroup = getTrackGroup();
+  const g = new THREE.Group();
+  g.renderOrder = 7;
+  let added = false;
+  if (trackGroup) {
+    for (const line of trackGroup.children) {
+      if (!line.userData.isMuonMatched) continue;
+      const pos = line.geometry?.getAttribute('position');
+      if (!pos || pos.count < 1) continue;
+      // Last polyline point — sits at the muon-chamber edge (~9-10 m radius),
+      // outside every other detector envelope. Putting the sprite there keeps
+      // it readable from any zoom and makes the "this blue line is a muon"
+      // mapping immediate.
+      const idx = pos.count - 1;
+      const x = pos.getX(idx);
+      const y = pos.getY(idx);
+      const z = pos.getZ(idx);
+      // Sign convention follows the existing electron code: pdgId < 0 maps
+      // to the negatively-charged lepton. When pdgId is null (parser couldn't
+      // determine the sign) we drop the ± and render a plain "μ" — better
+      // than guessing.
+      const pdg = line.userData.matchedMuonPdgId;
+      const text = pdg == null ? 'μ' : pdg < 0 ? 'μ-' : 'μ+';
+      const label = makeLabelSprite(text, MUON_LABEL_COLOR);
+      const rLen = Math.hypot(x, y);
+      const radX = rLen > 1e-6 ? x / rLen : 1;
+      const radY = rLen > 1e-6 ? y / rLen : 0;
+      label.position.set(
+        x + radX * ELECTRON_LABEL_RADIAL_OFFSET_MM,
+        y + radY * ELECTRON_LABEL_RADIAL_OFFSET_MM,
+        z,
+      );
+      label.userData.pdgId = pdg;
+      g.add(label);
+      added = true;
+    }
+  }
+  if (!added) return;
+  scene.add(g);
+  setMuonGroup(g);
+}
+
+export function syncMuonTrackMatch(muons) {
+  recomputeMuonTrackMatch(muons);
+  _clearMuonGroupOnly();
+  if (muons && muons.length) _rebuildMuonLabels();
 }
 
 // ── Clusters (η/φ lines between inner and outer cylinders) ───────────────────
@@ -394,10 +434,8 @@ export function drawClusters(clusters) {
     line.userData.eta = eta;
     line.userData.phi = phi;
     line.userData.storeGateKey = storeGateKey ?? '';
-    line.matrixAutoUpdate = false;
     g.add(line);
   }
-  g.matrixAutoUpdate = false;
   scene.add(g);
   setClusterGroup(g);
   applyClusterThreshold();
@@ -461,10 +499,8 @@ export function drawJets(collection) {
     line.userData.eta = eta;
     line.userData.phi = phi;
     line.userData.storeGateKey = sgk;
-    line.matrixAutoUpdate = false;
     g.add(line);
   }
-  g.matrixAutoUpdate = false;
   scene.add(g);
   setJetGroup(g);
   applyJetThreshold();
@@ -537,12 +573,13 @@ export function drawTaus(taus) {
     line.userData.isTau = t.isTau;
     line.userData.numTracks = t.numTracks;
     line.userData.storeGateKey = t.key;
-    line.matrixAutoUpdate = false;
     g.add(line);
   }
-  g.matrixAutoUpdate = false;
   scene.add(g);
   setTauGroup(g);
+  // Honour the L3 ET slider on first draw — without this, every τ would
+  // render until the user nudges the slider.
+  applyTauPtThreshold();
   syncTauTrackMatch(getViewLevel() === 3 ? _lastTaus : null);
 }
 

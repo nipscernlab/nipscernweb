@@ -53,6 +53,7 @@ import {
   drawTracks,
   drawPhotons,
   drawElectrons,
+  drawMuons,
   drawClusters,
   drawJets,
   drawTaus,
@@ -60,6 +61,7 @@ import {
   clearClusters,
   clearPhotons,
   clearElectrons,
+  clearMuons,
   clearJets,
   clearTaus,
 } from './particles.js';
@@ -77,6 +79,7 @@ import { drawMet, clearMet } from './metOverlay.js';
 import { parseVertices } from './vertexParser.js';
 import { drawVertices, clearVertices } from './vertexOverlay.js';
 import { parseTaus } from './tauParser.js';
+import { parseMuons } from './muonParser.js';
 import { clearOutline, clearAllOutlines } from './outlines.js';
 import { setStatus, showEventInfo } from './statusHud.js';
 import { markDirty } from './renderer.js';
@@ -134,6 +137,7 @@ function resetScene() {
   clearClusters();
   clearPhotons();
   clearElectrons();
+  clearMuons();
   clearJets();
   clearJetState();
   clearTaus();
@@ -202,16 +206,31 @@ export async function processXml(xmlText) {
   resetScene(); // clears lastClusterData
 
   // ── Particle tracks ─────────────────────────────────────────────────────────
+  // Slider max uses the 99th percentile across tracks ∪ photons ∪ electrons,
+  // not the raw maximum. Without the percentile cap, a single high-pT object
+  // (W/Z lepton, ~30-50 GeV) pushes the slider top way past where most
+  // tracks live and the user has to drag the thumb almost all the way down
+  // to reach the bulk. Floor at 5 GeV keeps the slider usable in events
+  // with mostly soft tracks.
   if (rawTracks.length || rawPhotons.length || rawElectrons.length) {
+    const allPts = [];
+    for (const { ptGev } of rawTracks) if (isFinite(ptGev)) allPts.push(ptGev);
+    for (const { ptGev } of rawPhotons) if (isFinite(ptGev)) allPts.push(ptGev);
+    for (const { ptGev } of rawElectrons) if (isFinite(ptGev)) allPts.push(ptGev);
     let ptMax = 5;
-    for (const { ptGev } of rawTracks) if (isFinite(ptGev) && ptGev > ptMax) ptMax = ptGev;
-    for (const { ptGev } of rawPhotons) if (isFinite(ptGev) && ptGev > ptMax) ptMax = ptGev;
-    for (const { ptGev } of rawElectrons) if (isFinite(ptGev) && ptGev > ptMax) ptMax = ptGev;
+    if (allPts.length) {
+      allPts.sort((a, b) => a - b);
+      const idx = Math.floor(0.99 * allPts.length);
+      ptMax = Math.max(ptMax, allPts[Math.min(idx, allPts.length - 1)]);
+    }
     _deps.trackPtSlider.update(0, ptMax);
   }
   drawTracks(rawTracks);
   drawPhotons(rawPhotons);
   drawElectrons(rawElectrons);
+  // Muons parsed JS-side (the WASM worker doesn't extract them yet). The
+  // <Muon> regex pass over xmlText is cheap — typically 0-3 muons per event.
+  drawMuons(parseMuons(xmlText));
 
   // ── Cluster η/φ lines ────────────────────────────────────────────────────────
   setLastClusterData({ collections: _clusterCollections });
@@ -231,6 +250,14 @@ export async function processXml(xmlText) {
   // cell-id set and refreshes thresholds; no extra rebuildActiveClusterCellIds
   // call is needed here.
   drawClusters(rawClusters);
+
+  // ── Hadronic τ candidates (TauJets_xAOD) ──────────────────────────────────
+  // 6-9 per event typical. drawTaus also re-runs the τ→track colour sync so
+  // tracks attached to a τ pick up the purple material. Drawn BEFORE
+  // setJetCollections so the L3 ET-slider listener (in detectorPanels.js)
+  // can pick up τ pT values via getLastTaus when it recomputes the range —
+  // τs share the same slider as jets.
+  drawTaus(parseTaus(xmlText));
 
   // ── Jets ────────────────────────────────────────────────────────────────────
   // The Rust WASM parser doesn't extract jets yet — do a light JS pass over
@@ -256,11 +283,6 @@ export async function processXml(xmlText) {
   // typically at z ~ ±50 mm from origin (within the BeamSpot), useful context
   // when zooming in to the inner detector.
   drawVertices(parseVertices(xmlText));
-
-  // ── Hadronic τ candidates (TauJets_xAOD) ──────────────────────────────────
-  // 6-9 per event typical. drawTaus also re-runs the τ→track colour sync so
-  // tracks attached to a τ pick up the purple material.
-  drawTaus(parseTaus(xmlText));
 
   // Per-detector energy range: symmetric percentiles on each tail so a single
   // extreme cell (e.g. FCAL down to -31 GeV) can't blow out the scale. Real

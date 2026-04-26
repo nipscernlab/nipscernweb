@@ -100,7 +100,6 @@ function _ensureTrackAtlasOutline(mesh) {
     _trackAtlasEdgeGeoCache.set(uid, new THREE.EdgesGeometry(mesh.geometry, 30));
   const outline = new THREE.LineSegments(_trackAtlasEdgeGeoCache.get(uid), trackAtlasOutlineMat);
   outline.name = `${mesh.name}__track_outline`;
-  outline.matrixAutoUpdate = false;
   outline.renderOrder = 8;
   outline.visible = false;
   mesh.add(outline);
@@ -256,23 +255,39 @@ export function updateTrackAtlasIntersections() {
 }
 
 // Applies the priority chain to every track line:
-//   electron / positron match (red / green) > τ-match (purple) >
-//   jet-match (orange) > muon-chamber hit (blue) > default (yellow).
-// Each source flag lives on userData; this loop is the single place that knows
-// about the priority ordering. Electron beats τ because e± identification is
-// the most specific. τ beats jet because hadronic τs *are* narrow jets — the
-// τ ID is a stricter classification of the same object, and the explicit
-// (key, index) link from <TauJet> is more authoritative than the jet's track
-// list, which can include the same tracks via overlap.
+//   electron / positron match (red / green) > muon match (blue) >
+//   jet-match (orange) > τ-match (purple) > muon-chamber hit (blue) >
+//   default (yellow).
+//
+// Rationale (top-down):
+//   1. Electron and Muon win first — both are official lepton-ID matches
+//      (ΔR against the reconstructed <Electron> / <Muon> objects). Most
+//      specific identification a track can carry.
+//   2. Jet beats τ: in this JiveXML's data every <TauJet> carries
+//      isTauString = "xAOD_tauJet_withoutQuality", i.e. they are the τ
+//      algorithm's INPUT list, not τs that passed any ID. Jet is the more
+//      reliable established object; if both claim the same track, paint it
+//      as a jet's. (If a future XML exposes τ-with-quality we can promote
+//      τ above jet again.)
+//   3. Muon-chamber hit (geometric, the track passes through MUC1/MUCH)
+//      sits last because it doesn't claim ownership — it just notes that
+//      the track reaches the chambers. Painted blue, the same as a real
+//      muon match: muon-hit tracks are virtually always real muons that
+//      happen to lack an explicit <Muon> object reference.
+//
+// Each source flag lives on userData; this loop is the single place that
+// knows about the priority ordering.
 function _applyTrackMaterials(trackGroup) {
   for (const line of trackGroup.children) {
     const ePdg = line.userData.matchedElectronPdgId;
     if (ePdg != null) {
       line.material = ePdg < 0 ? TRACK_ELECTRON_NEG_MAT : TRACK_ELECTRON_POS_MAT;
-    } else if (line.userData.isTauMatched) {
-      line.material = TRACK_TAU_MAT;
+    } else if (line.userData.isMuonMatched) {
+      line.material = TRACK_HIT_MAT;
     } else if (line.userData.isJetMatched) {
       line.material = TRACK_JET_MAT;
+    } else if (line.userData.isTauMatched) {
+      line.material = TRACK_TAU_MAT;
     } else if (line.userData.isHitTrack) {
       line.material = TRACK_HIT_MAT;
     } else {
@@ -393,6 +408,72 @@ export function recomputeElectronTrackMatch(electrons) {
       if (best) best.userData.matchedElectronPdgId = e.pdgId;
     }
   }
+  _applyTrackMaterials(trackGroup);
+  markDirty();
+}
+
+// Heuristic ΔR matching from each <Muon> object to its closest CombinedMuon
+// track. JiveXML doesn't publish a Muon → track link, so we approximate with
+// η/φ proximity — analogous to the electron matcher but tuned for muons:
+//   • Match against CombinedMuonTracks only: those polylines run all the way
+//     through the toroid to the muon chambers (~10 m), which is the trajectory
+//     that physically belongs to a Muon object. ID-only tracks would also be
+//     close in η/φ for a high-pT muon, but anchoring the μ± sprite there
+//     would put the label inside the inner detector instead of out on the
+//     blue line that uniquely identifies the muon.
+//   • Wider ΔR cap (0.10) than electrons (0.05): the toroid bends the muon
+//     significantly between the IP and the chambers, so the track endpoint
+//     direction can drift from the muon's IP-pointing (eta, phi) by ~0.05.
+//   • No pT pre-cut: the Muon collection is small (typically 0-3 per event)
+//     and already curated; even a few-GeV muon is interesting to label.
+// `muons` may be null (clears all matches).
+const _MUON_TRACK_DR_MAX = 0.1;
+const _MUON_TRACK_COLLECTION = 'CombinedMuonTracks';
+export function recomputeMuonTrackMatch(muons) {
+  const trackGroup = _getTrackGroup();
+  if (!trackGroup) return;
+  // Two flags: `isMuonMatched` is the binary "this track has a Muon attached"
+  // signal, `matchedMuonPdgId` carries the sign when known. Splitting them
+  // lets the renderer distinguish "no match" from "matched but charge-less"
+  // (parser returns pdgId=null when the XML field is missing or zero).
+  for (const line of trackGroup.children) {
+    line.userData.isMuonMatched = false;
+    line.userData.matchedMuonPdgId = null;
+  }
+
+  if (muons && muons.length) {
+    for (const mu of muons) {
+      if (!Number.isFinite(mu.eta) || !Number.isFinite(mu.phi)) continue;
+      let best = null;
+      let bestDR = _MUON_TRACK_DR_MAX;
+      for (const line of trackGroup.children) {
+        if (line.userData.storeGateKey !== _MUON_TRACK_COLLECTION) continue;
+        if (!line.visible) continue;
+        const tEta = line.userData.eta;
+        const tPhi = line.userData.phi;
+        if (!Number.isFinite(tEta) || !Number.isFinite(tPhi)) continue;
+        if (line.userData.isMuonMatched) continue;
+        const dEta = mu.eta - tEta;
+        let dPhi = mu.phi - tPhi;
+        if (dPhi > Math.PI) dPhi -= 2 * Math.PI;
+        else if (dPhi < -Math.PI) dPhi += 2 * Math.PI;
+        const dR = Math.sqrt(dEta * dEta + dPhi * dPhi);
+        if (dR < bestDR) {
+          bestDR = dR;
+          best = line;
+        }
+      }
+      if (best) {
+        best.userData.isMuonMatched = true;
+        best.userData.matchedMuonPdgId = mu.pdgId;
+      }
+    }
+  }
+  // Re-apply materials: muon match now sits in the priority chain *above*
+  // jet and τ (a track that's both a muon and in a jet should read as a
+  // muon, not a jet). The colour is still the same blue as TRACK_HIT_MAT —
+  // muon tracks virtually always also pass through the chambers — but the
+  // priority guarantees it wins over orange / purple when both apply.
   _applyTrackMaterials(trackGroup);
   markDirty();
 }

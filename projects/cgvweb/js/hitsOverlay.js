@@ -49,13 +49,12 @@ function _hitOnBeforeRender(renderer, _scene, camera) {
   }
   const targetWorldRadius = HIT_TARGET_PX * worldUnitsPerPx;
   this.scale.setScalar(targetWorldRadius / HIT_BASE_RADIUS_MM);
-  // matrixAutoUpdate is off, so push the new scale into the local matrix.
+  // scene.updateMatrixWorld() already ran for this frame against the
+  // previous scale — push the new scale into matrix and re-derive
+  // matrixWorld so the upcoming draw call picks up the new size on the
+  // SAME frame instead of the next. Without this, the first hover frame
+  // pops in at the geometry's natural 8 mm and resizes on the next tick.
   this.updateMatrix();
-  // scene.updateMatrixWorld() already ran for this frame using the previous
-  // scale — re-derive matrixWorld here so the actual draw call (which reads
-  // matrixWorld, not matrix) picks up the size we just set, instead of one
-  // frame later. Without this, the first hover frame pops in at the geometry's
-  // natural 8 mm and then resizes on the next tick.
   if (this.parent) {
     this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix);
   } else {
@@ -210,8 +209,6 @@ export function showTrackHits(trackLine) {
     if (!p) continue;
     const m = new THREE.Mesh(_HIT_GEO, _HIT_MAT);
     m.position.copy(p);
-    m.matrixAutoUpdate = false;
-    m.updateMatrix();
     m.onBeforeRender = _hitOnBeforeRender;
     g.add(m);
     added++;

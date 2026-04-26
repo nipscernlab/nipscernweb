@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { initLanguage, setupLanguagePicker, t } from './i18n/index.js';
 import { setupSidebarControls } from './sidebarControls.js';
 import { createSlicerController } from './slicer.js';
+import { getActiveJetCollection, onJetStateChange } from './jets.js';
 import { registerViewerShortcuts } from './viewerShortcuts.js';
 import { TILE_SCALE, HEC_SCALE, LAR_SCALE, FCAL_SCALE } from './palette.js';
 import { markDirty, canvas, renderer, scene, camera, controls } from './renderer.js';
@@ -129,7 +130,15 @@ const cinema = setupCinemaControls({
 });
 const enterCinema = () => cinema.enterCinema();
 const exitCinema = () => cinema.exitCinema();
-const resetCamera = () => cinema.resetCamera();
+// Reset-camera button: when the slicer is active, re-snap to the slicer's
+// own wedge-front view (with scene rotation and +X camera placement) rather
+// than the project-default top-down view. The slicer instance is created
+// further below; the closure looks it up at click time, never at module
+// init, so the const-before-let ordering is fine.
+const resetCamera = () => {
+  if (slicer?.isActive?.()) slicer.resetCamera();
+  else cinema.resetCamera();
+};
 
 const topToolbar = setupTopToolbar({
   resetCamera,
@@ -253,7 +262,14 @@ const slicer = createSlicerController({
   onMaskChange: refreshSceneVisibility,
   onDisable: refreshSceneVisibility,
   onHideNonActiveShowAll: hideNonActiveCells,
+  markDirty,
+  getActiveJetCollection,
 });
+
+// New event lands or user picks a different jet collection — if the slicer
+// is active, snap its walls to the new top-2 jets. No-op when slicer is
+// inactive or fewer than 2 usable jets are present.
+onJetStateChange(() => slicer.refreshFromActiveJets());
 
 initVisibility({ slicer, rebuildAllOutlines, updateTrackAtlasIntersections });
 

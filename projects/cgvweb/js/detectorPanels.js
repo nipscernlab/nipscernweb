@@ -1,6 +1,7 @@
 import { fmtMev } from './utils.js';
 import { getViewLevel, onViewLevelChange } from './viewLevel.js';
 import { getActiveJetCollection, onJetStateChange } from './jets.js';
+import { getLastTaus } from './particles.js';
 
 function fmtGev(v) {
   return v.toFixed(2) + ' GeV';
@@ -297,7 +298,10 @@ export function setupDetectorPanels({
     // Level switch: redraw the slider against the new mode's bounds + value.
     onViewLevelChange(updateUI);
     // Active jet collection changed (new event or user picked another from the
-    // dropdown): recompute jet ET min/max from the active list, then refresh.
+    // dropdown): recompute jet ET min/max from the active list AND from τ
+    // candidates (they share this slider — see applyTauPtThreshold), then
+    // refresh. processXml.js draws τs *before* setJetCollections so that
+    // getLastTaus is already populated by the time this listener fires.
     onJetStateChange(() => {
       const c = getActiveJetCollection();
       let min = Infinity;
@@ -307,6 +311,11 @@ export function setupDetectorPanels({
           if (j.etGev < min) min = j.etGev;
           if (j.etGev > max) max = j.etGev;
         }
+      }
+      for (const t of getLastTaus()) {
+        if (!Number.isFinite(t.ptGev)) continue;
+        if (t.ptGev < min) min = t.ptGev;
+        if (t.ptGev > max) max = t.ptGev;
       }
       if (!isFinite(min)) {
         min = 0;

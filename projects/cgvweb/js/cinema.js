@@ -27,9 +27,9 @@ export function setupCinemaControls({
     new THREE.Vector3(0, 10, -7000),
     new THREE.Vector3(0, 12, -8500),
     new THREE.Vector3(0, 15, -11500),
-    new THREE.Vector3(-5500, 2500, -9500),
-    new THREE.Vector3(-9000, 2000, 0),
-    new THREE.Vector3(-5500, 3200, 8500),
+    new THREE.Vector3(5500, 2500, -9500),
+    new THREE.Vector3(9000, 2000, 0),
+    new THREE.Vector3(5500, 3200, 8500),
     new THREE.Vector3(1000, 4500, 12000),
   ];
   const tourTgtWaypoints = [
@@ -101,6 +101,65 @@ export function setupCinemaControls({
     tourTgtCurve.getPoint(u, tourTmpTgt);
   }
 
+  // Two blends drive the inner-detector camera overrides:
+  //
+  // 1. TARGET blend (x/y based): the on-axis corridor in xy where the
+  //    camera's curve target gets replaced by a far ±Z point so the look
+  //    direction is forced parallel to the beam axis. Sign flips abruptly
+  //    at z=0, in/out fades smoothly so the entry/exit of the corridor
+  //    doesn't itself jump.
+  //
+  // 2. ROLL blend (z based): the screen rolls 90° around the beam axis
+  //    while the camera is INSIDE the cylinder. We tie this to the z
+  //    position relative to the calo outer envelope (half-length 6 m,
+  //    matching CLUSTER_CYL_OUT_HALF_H in particles.js). Roll starts at
+  //    the cylinder edge and finishes 1.5 m further in — same on the way
+  //    out — so the rotation feels gradual instead of snapping to fully
+  //    rolled the moment the camera enters the on-axis corridor.
+  const TRAVERSAL_X_FULL = 100;
+  const TRAVERSAL_X_OFF = 800;
+  const TRAVERSAL_Y_FULL = 50;
+  const TRAVERSAL_Y_OFF = 400;
+  const TRAVERSAL_TARGET_FAR = 10000;
+  const ROLL_CYL_HALF_LEN_MM = 6000;
+  const ROLL_RAMP_MM = 1500;
+  const _tourOverrideTgt = new THREE.Vector3();
+  const _UP_OUTSIDE = new THREE.Vector3(0, 1, 0);
+  const _UP_INSIDE = new THREE.Vector3(1, 0, 0);
+  function _smoothBlend01(v, fullBelow, offAbove) {
+    if (v <= fullBelow) return 1;
+    if (v >= offAbove) return 0;
+    const t = (v - fullBelow) / (offAbove - fullBelow);
+    return 1 - t * t * (3 - 2 * t);
+  }
+  function _zRollBlend(z) {
+    const az = Math.abs(z);
+    if (az >= ROLL_CYL_HALF_LEN_MM) return 0;
+    if (az <= ROLL_CYL_HALF_LEN_MM - ROLL_RAMP_MM) return 1;
+    const t = (ROLL_CYL_HALF_LEN_MM - az) / ROLL_RAMP_MM;
+    return t * t * (3 - 2 * t); // smoothstep 0 → 1 over the ramp
+  }
+  function _maybeOverrideTraversalTarget() {
+    // On-axis gate (xy): both target override and roll are only meaningful
+    // while the camera is in the on-axis corridor. Outside waypoints can
+    // also cross z=0 — without this gate the roll would fire there too.
+    const xBlend = _smoothBlend01(Math.abs(tourTmpPos.x), TRAVERSAL_X_FULL, TRAVERSAL_X_OFF);
+    const yBlend = _smoothBlend01(tourTmpPos.y, TRAVERSAL_Y_FULL, TRAVERSAL_Y_OFF);
+    const onAxisBlend = xBlend * yBlend;
+
+    // Up vector: gated by on-axis AND ramped on z so the 90° roll fades
+    // over the first 1.5 m inside the cylinder (and unwinds on the way
+    // out). Outside the corridor → up stays at world +Y.
+    const rollBlend = _zRollBlend(tourTmpPos.z) * onAxisBlend;
+    camera.up.lerpVectors(_UP_OUTSIDE, _UP_INSIDE, rollBlend).normalize();
+
+    // Target override: same gate, no z ramp.
+    if (onAxisBlend <= 0) return;
+    const sign = tourTmpPos.z >= 0 ? -1 : 1;
+    _tourOverrideTgt.set(0, 0, sign * TRAVERSAL_TARGET_FAR);
+    tourTmpTgt.lerp(_tourOverrideTgt, onAxisBlend);
+  }
+
   function tick() {
     const now = performance.now();
 
@@ -127,6 +186,7 @@ export function setupCinemaControls({
       const k = Math.min(1, bt / TOUR_BLEND_MS);
       const eased = tourEase(k);
       tourSampleU(tourU0);
+      _maybeOverrideTraversalTarget();
       camera.position.lerpVectors(tourBlendFromPos, tourTmpPos, eased);
       controls.target.lerpVectors(tourBlendFromTgt, tourTmpTgt, eased);
       controls.update();
@@ -148,6 +208,7 @@ export function setupCinemaControls({
 
     const u = (tourU0 + (now - tourT0) / TOUR_TOTAL_DURATION) % 1;
     tourSampleU(u);
+    _maybeOverrideTraversalTarget();
     camera.position.copy(tourTmpPos);
     controls.target.copy(tourTmpTgt);
     controls.update();
@@ -201,6 +262,10 @@ export function setupCinemaControls({
     controls.autoRotate = false;
     document.getElementById('btn-cinema').classList.remove('on');
     updateCollisionHud();
+    // The traversal override may have rolled camera.up around the beam
+    // axis; restore the project-default world-up so post-cinema navigation
+    // doesn't carry the roll over.
+    camera.up.set(0, 1, 0);
     if (wasTour) {
       tourExiting = true;
       tourExitT0 = performance.now();
@@ -220,6 +285,7 @@ export function setupCinemaControls({
     if (cinemaMode) {
       tourExiting = false;
       tourBlending = false;
+      camera.up.set(0, 1, 0);
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.55;
     }
