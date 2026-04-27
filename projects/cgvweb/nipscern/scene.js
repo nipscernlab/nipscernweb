@@ -141,65 +141,6 @@ function buildPhiLines(){
   scene.add(group);
 }
 
-// ── Muon spectrometer ghost ───────────────────────────────────────────────────
-function buildMuonDetector(){
-  const g = new THREE.Group();
-  g.renderOrder = 1;
-  const mat = new THREE.LineBasicMaterial({color:0x1a4080, transparent:true, opacity:0.20, depthWrite:false});
-  const N = 64;
-  // Barrel muon system: r ~ 5 m (inner) and r ~ 10 m (outer), |z| ≤ 11.5 m
-  const RB1 = 5000, RB2 = 8000, RB3 = 10000;
-  const ZB  = 11500;
-  // Endcap muon system: r up to 10 m, z ~ ±13.5 m – ±22 m
-  const ZE1 = 13500, ZE2 = 17000, ZE3 = 21500;
-  const RE_IN = 1500;
-
-  function ring(r, z){
-    const pts = [];
-    for(let i=0;i<=N;i++){const phi=(i/N)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(phi)*r, Math.sin(phi)*r, z));}
-    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat));
-  }
-  function stave(r, z0, z1, nStaves){
-    for(let i=0;i<nStaves;i++){
-      const phi=(i/nStaves)*Math.PI*2; const cx=Math.cos(phi)*r, cy=Math.sin(phi)*r;
-      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(cx,cy,z0), new THREE.Vector3(cx,cy,z1)]), mat));
-    }
-  }
-  function spoke(rIn, rOut, z, n){
-    for(let i=0;i<n;i++){
-      const phi=(i/n)*Math.PI*2;
-      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(Math.cos(phi)*rIn,  Math.sin(phi)*rIn,  z),
-        new THREE.Vector3(Math.cos(phi)*rOut, Math.sin(phi)*rOut, z),
-      ]), mat));
-    }
-  }
-
-  // Barrel rings at three radii × several z slices
-  for(const r of [RB1, RB2, RB3]){
-    for(const z of [-ZB, -ZB*0.5, 0, ZB*0.5, ZB]) ring(r, z);
-    stave(r, -ZB, ZB, 16);
-  }
-  // Endcap disks: inner + outer rings + spokes at three z stations per side
-  for(const sign of [-1, 1]){
-    for(const ze of [ZE1, ZE2, ZE3]){
-      const z = sign * ze;
-      ring(RE_IN, z);
-      ring(RB3,   z);
-      spoke(RE_IN, RB3, z, 16);
-    }
-    // Barrel → endcap connector lines
-    for(let i=0;i<16;i++){
-      const phi=(i/16)*Math.PI*2;
-      const cx=Math.cos(phi)*RB3, cy=Math.sin(phi)*RB3;
-      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(cx, cy, sign*ZB),
-        new THREE.Vector3(cx, cy, sign*ZE1),
-      ]), mat));
-    }
-  }
-  scene.add(g);
-}
 
 // ── Hover outline ─────────────────────────────────────────────────────────────
 const rayTargets = [];
@@ -267,7 +208,6 @@ async function loadSceneData(){
 async function main(){
   buildBeam();
   buildPhiLines();
-  buildMuonDetector();
 
   const { header, f32, u32 } = await loadSceneData();
 
