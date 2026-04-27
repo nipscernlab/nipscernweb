@@ -5,12 +5,20 @@
 // keyboard-shortcut module can close the popover and inspect its state.
 
 import {
-  showTile,
-  showLAr,
+  showTileBarrel,
+  showTileExt,
+  showTileItc,
+  showMbts,
+  showLArBarrel,
+  showLArEc,
   showHec,
   showFcal,
-  setShowTile,
-  setShowLAr,
+  setShowTileBarrel,
+  setShowTileExt,
+  setShowTileItc,
+  setShowMbts,
+  setShowLArBarrel,
+  setShowLArEc,
   setShowHec,
   setShowFcal,
   applyThreshold,
@@ -29,31 +37,91 @@ import { getViewLevel, onViewLevelChange } from '../viewLevel.js';
 
 export function setupLayersPanel() {
   // ── Detector layer toggles ─────────────────────────────────────────────────
-  function syncLayerToggles() {
-    const tTile = document.getElementById('ltog-tile');
-    const tLAr = document.getElementById('ltog-lar');
-    const tHec = document.getElementById('ltog-hec');
-    const tFcal = document.getElementById('ltog-fcal');
-    tTile.classList.toggle('on', showTile);
-    tTile.setAttribute('aria-checked', showTile);
-    tLAr.classList.toggle('on', showLAr);
-    tLAr.setAttribute('aria-checked', showLAr);
-    tHec.classList.toggle('on', showHec);
-    tHec.setAttribute('aria-checked', showHec);
-    tFcal.classList.toggle('on', showFcal);
-    tFcal.setAttribute('aria-checked', showFcal);
-    document
-      .getElementById('btn-layers')
-      .classList.toggle('on', showTile || showLAr || showHec || showFcal);
+  // Tile and LAr have a parent toggle that mirrors the OR of their children:
+  // clicking the parent flips all children to the same target state. The MBTS
+  // toggle is a peer of the parents (not a Tile child) because the user wants
+  // it controlled separately.
+  const anyTileOn = () => showTileBarrel || showTileExt || showTileItc;
+  const anyLArOn = () => showLArBarrel || showLArEc;
+  const anyOn = () => anyTileOn() || showMbts || anyLArOn() || showHec || showFcal;
+
+  function setAllTile(v) {
+    setShowTileBarrel(v);
+    setShowTileExt(v);
+    setShowTileItc(v);
+  }
+  function setAllLAr(v) {
+    setShowLArBarrel(v);
+    setShowLArEc(v);
   }
 
+  function syncOne(id, on) {
+    const el = document.getElementById(id);
+    el.classList.toggle('on', on);
+    el.setAttribute('aria-checked', on);
+  }
+
+  function syncLayerToggles() {
+    syncOne('ltog-tile', anyTileOn());
+    syncOne('ltog-tile-barrel', showTileBarrel);
+    syncOne('ltog-tile-ext', showTileExt);
+    syncOne('ltog-tile-itc', showTileItc);
+    syncOne('ltog-mbts', showMbts);
+    syncOne('ltog-lar', anyLArOn());
+    syncOne('ltog-lar-barrel', showLArBarrel);
+    syncOne('ltog-lar-ec', showLArEc);
+    syncOne('ltog-hec', showHec);
+    syncOne('ltog-fcal', showFcal);
+    document.getElementById('btn-layers').classList.toggle('on', anyOn());
+  }
+
+  // Expand/collapse the Tile and LAr sub-trees. Click anywhere on the parent
+  // row toggles `.expanded` on the group; clicks on the gswitch are ignored
+  // here so the visibility-toggle handler fires alone.
+  document.querySelectorAll('#layers-panel .layer-row-parent').forEach((row) => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.gswitch')) return;
+      row.parentElement.classList.toggle('expanded');
+    });
+  });
+
   document.getElementById('ltog-tile').addEventListener('click', () => {
-    setShowTile(!showTile);
+    setAllTile(!anyTileOn());
+    syncLayerToggles();
+    applyThreshold();
+  });
+  document.getElementById('ltog-tile-barrel').addEventListener('click', () => {
+    setShowTileBarrel(!showTileBarrel);
+    syncLayerToggles();
+    applyThreshold();
+  });
+  document.getElementById('ltog-tile-ext').addEventListener('click', () => {
+    setShowTileExt(!showTileExt);
+    syncLayerToggles();
+    applyThreshold();
+  });
+  document.getElementById('ltog-tile-itc').addEventListener('click', () => {
+    setShowTileItc(!showTileItc);
+    syncLayerToggles();
+    applyThreshold();
+  });
+  document.getElementById('ltog-mbts').addEventListener('click', () => {
+    setShowMbts(!showMbts);
     syncLayerToggles();
     applyThreshold();
   });
   document.getElementById('ltog-lar').addEventListener('click', () => {
-    setShowLAr(!showLAr);
+    setAllLAr(!anyLArOn());
+    syncLayerToggles();
+    applyThreshold();
+  });
+  document.getElementById('ltog-lar-barrel').addEventListener('click', () => {
+    setShowLArBarrel(!showLArBarrel);
+    syncLayerToggles();
+    applyThreshold();
+  });
+  document.getElementById('ltog-lar-ec').addEventListener('click', () => {
+    setShowLArEc(!showLArEc);
     syncLayerToggles();
     applyThreshold();
   });
@@ -68,16 +136,18 @@ export function setupLayersPanel() {
     applyFcalThreshold();
   });
   document.getElementById('lbtn-all').addEventListener('click', () => {
-    setShowTile(true);
-    setShowLAr(true);
+    setAllTile(true);
+    setShowMbts(true);
+    setAllLAr(true);
     setShowHec(true);
     setShowFcal(true);
     syncLayerToggles();
     refreshSceneVisibility();
   });
   document.getElementById('lbtn-none').addEventListener('click', () => {
-    setShowTile(false);
-    setShowLAr(false);
+    setAllTile(false);
+    setShowMbts(false);
+    setAllLAr(false);
     setShowHec(false);
     setShowFcal(false);
     syncLayerToggles();
@@ -108,9 +178,7 @@ export function setupLayersPanel() {
   function closeLayersPanel() {
     layersPanelOpen = false;
     layersPanel.classList.remove('open');
-    document
-      .getElementById('btn-layers')
-      .classList.toggle('on', showTile || showLAr || showHec || showFcal);
+    document.getElementById('btn-layers').classList.toggle('on', anyOn());
   }
 
   document.getElementById('btn-layers').addEventListener('click', (e) => {

@@ -12,8 +12,8 @@ renderer.sortObjects = false;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x05070f);
 scene.matrixAutoUpdate = false;
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 10, 100_000);
-camera.position.set(0, 0, 12_000);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 10, 200_000);
+camera.position.set(0, 0, 22_000);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true; controls.dampingFactor = 0.14; controls.zoomSpeed = 1.2;
 
@@ -34,6 +34,70 @@ window.addEventListener('resize', () => {
   dirty = true;
 });
 
+// ── Materials ─────────────────────────────────────────────────────────────────
+const ghostSolidMat  = new THREE.MeshBasicMaterial({color:0x5C5F66, transparent:true, opacity:0.04, depthWrite:false, side:THREE.DoubleSide});
+const outlineAllMat  = new THREE.LineBasicMaterial({color:0x000000});
+const outlineHoverMat= new THREE.LineBasicMaterial({color:0xffffff});
+const trackMat       = new THREE.LineBasicMaterial({color:0xffea00});
+const photonMat      = new THREE.LineBasicMaterial({color:0xffcc00, transparent:true, opacity:0.85, depthWrite:false});
+const electronNegMat = new THREE.LineBasicMaterial({color:0xff3030, transparent:true, opacity:0.9,  depthWrite:false});
+const electronPosMat = new THREE.LineBasicMaterial({color:0x33dd55, transparent:true, opacity:0.9,  depthWrite:false});
+const muonMat        = new THREE.LineBasicMaterial({color:0x4a90d9, transparent:true, opacity:0.9,  depthWrite:false});
+const clusterMat     = new THREE.LineDashedMaterial({
+  color:0xff4400, transparent:true, opacity:0.55,
+  dashSize:40, gapSize:60, depthWrite:false,
+});
+
+const matCache = new Map();
+function matForRgb(r, g, b){
+  const key = (Math.round(r*255)<<16) | (Math.round(g*255)<<8) | Math.round(b*255);
+  let m = matCache.get(key);
+  if(!m){
+    m = new THREE.MeshBasicMaterial({color: new THREE.Color(r,g,b), side:THREE.FrontSide});
+    matCache.set(key, m);
+  }
+  return m;
+}
+
+// ── Cylinder intersection helper ──────────────────────────────────────────────
+function _cylIntersect(dx, dy, dz, r, halfH){
+  const rT = Math.sqrt(dx*dx + dy*dy);
+  if(rT > 1e-9){
+    const tB = r / rT;
+    if(Math.abs(dz * tB) <= halfH) return tB;
+  }
+  return halfH / Math.abs(dz);
+}
+
+// ── Billboard label sprite ────────────────────────────────────────────────────
+const _labelVec2 = new THREE.Vector2();
+function makeLabelSprite(text, hexColor){
+  const canvas2 = document.createElement('canvas');
+  canvas2.width = 128; canvas2.height = 64;
+  const ctx = canvas2.getContext('2d');
+  ctx.clearRect(0, 0, 128, 64);
+  ctx.fillStyle = '#' + hexColor.toString(16).padStart(6,'0');
+  ctx.font = 'bold 52px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 64, 32);
+  const tex = new THREE.CanvasTexture(canvas2);
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  const mat = new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false});
+  const sprite = new THREE.Sprite(mat);
+  sprite.renderOrder = 10;
+  sprite.onBeforeRender = function(rdr, _s, cam){
+    rdr.getSize(_labelVec2);
+    const dist = Math.max(1, cam.position.distanceTo(this.position));
+    const wpx = (2 * Math.tan(cam.fov * Math.PI / 360) * dist) / (_labelVec2.y || 1);
+    const h = Math.min(180, 22 * wpx);
+    this.scale.set(h * 2, h, 1);
+    dirty = true;
+  };
+  return sprite;
+}
+
 // ── Beam indicator ───────────────────────────────────────────────────────────
 function buildBeam(){
   const g = new THREE.Group();
@@ -50,7 +114,7 @@ function buildBeam(){
   scene.add(g);
 }
 
-// ── Phi ghost lines (procedural) ─────────────────────────────────────────────
+// ── Phi ghost lines (TileCal) ─────────────────────────────────────────────────
 const TILE_PHI_SEGS = [
   { rIn:2288, rOut:3835, zMin:-2820, zMax:2820 },
   { rIn:2288, rOut:3835, zMin:3600,  zMax:6050 },
@@ -77,26 +141,64 @@ function buildPhiLines(){
   scene.add(group);
 }
 
-// ── Materials ─────────────────────────────────────────────────────────────────
-const ghostSolidMat  = new THREE.MeshBasicMaterial({color:0x5C5F66, transparent:true, opacity:0.04, depthWrite:false, side:THREE.DoubleSide});
-const outlineAllMat  = new THREE.LineBasicMaterial({color:0x000000});
-const outlineHoverMat= new THREE.LineBasicMaterial({color:0xffffff});
-const trackMat       = new THREE.LineBasicMaterial({color:0xffea00});
-const photonMat      = new THREE.LineBasicMaterial({color:0xffcc00, transparent:true, opacity:0.85, depthWrite:false});
-const clusterMat     = new THREE.LineDashedMaterial({
-  color:0xff4400, transparent:true, opacity:0.55,
-  dashSize:40, gapSize:60, depthWrite:false,
-});
+// ── Muon spectrometer ghost ───────────────────────────────────────────────────
+function buildMuonDetector(){
+  const g = new THREE.Group();
+  g.renderOrder = 1;
+  const mat = new THREE.LineBasicMaterial({color:0x1a4080, transparent:true, opacity:0.20, depthWrite:false});
+  const N = 64;
+  // Barrel muon system: r ~ 5 m (inner) and r ~ 10 m (outer), |z| ≤ 11.5 m
+  const RB1 = 5000, RB2 = 8000, RB3 = 10000;
+  const ZB  = 11500;
+  // Endcap muon system: r up to 10 m, z ~ ±13.5 m – ±22 m
+  const ZE1 = 13500, ZE2 = 17000, ZE3 = 21500;
+  const RE_IN = 1500;
 
-const matCache = new Map();
-function matForRgb(r, g, b){
-  const key = (Math.round(r*255)<<16) | (Math.round(g*255)<<8) | Math.round(b*255);
-  let m = matCache.get(key);
-  if(!m){
-    m = new THREE.MeshBasicMaterial({color: new THREE.Color(r,g,b), side:THREE.FrontSide});
-    matCache.set(key, m);
+  function ring(r, z){
+    const pts = [];
+    for(let i=0;i<=N;i++){const phi=(i/N)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(phi)*r, Math.sin(phi)*r, z));}
+    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat));
   }
-  return m;
+  function stave(r, z0, z1, nStaves){
+    for(let i=0;i<nStaves;i++){
+      const phi=(i/nStaves)*Math.PI*2; const cx=Math.cos(phi)*r, cy=Math.sin(phi)*r;
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(cx,cy,z0), new THREE.Vector3(cx,cy,z1)]), mat));
+    }
+  }
+  function spoke(rIn, rOut, z, n){
+    for(let i=0;i<n;i++){
+      const phi=(i/n)*Math.PI*2;
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(Math.cos(phi)*rIn,  Math.sin(phi)*rIn,  z),
+        new THREE.Vector3(Math.cos(phi)*rOut, Math.sin(phi)*rOut, z),
+      ]), mat));
+    }
+  }
+
+  // Barrel rings at three radii × several z slices
+  for(const r of [RB1, RB2, RB3]){
+    for(const z of [-ZB, -ZB*0.5, 0, ZB*0.5, ZB]) ring(r, z);
+    stave(r, -ZB, ZB, 16);
+  }
+  // Endcap disks: inner + outer rings + spokes at three z stations per side
+  for(const sign of [-1, 1]){
+    for(const ze of [ZE1, ZE2, ZE3]){
+      const z = sign * ze;
+      ring(RE_IN, z);
+      ring(RB3,   z);
+      spoke(RE_IN, RB3, z, 16);
+    }
+    // Barrel → endcap connector lines
+    for(let i=0;i<16;i++){
+      const phi=(i/16)*Math.PI*2;
+      const cx=Math.cos(phi)*RB3, cy=Math.sin(phi)*RB3;
+      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(cx, cy, sign*ZB),
+        new THREE.Vector3(cx, cy, sign*ZE1),
+      ]), mat));
+    }
+  }
+  scene.add(g);
 }
 
 // ── Hover outline ─────────────────────────────────────────────────────────────
@@ -165,6 +267,7 @@ async function loadSceneData(){
 async function main(){
   buildBeam();
   buildPhiLines();
+  buildMuonDetector();
 
   const { header, f32, u32 } = await loadSceneData();
 
@@ -249,7 +352,7 @@ async function main(){
     scene.add(group);
   }
 
-  // ── Photons (wavy helix lines) ────────────────────────────────────────────────
+  // ── Photons (wavy helix) ──────────────────────────────────────────────────────
   if(header.photons && header.photons.length){
     const group = new THREE.Group();
     group.renderOrder = 7;
@@ -261,6 +364,91 @@ async function main(){
     }
     scene.add(group);
   }
+
+  // ── Electrons / Positrons ─────────────────────────────────────────────────────
+  if(header.electrons && header.electrons.length){
+    const group = new THREE.Group();
+    group.renderOrder = 7;
+    for(let i=0;i<header.electrons.length;i++){
+      const entry = header.electrons[i];
+      if(!entry) continue;
+      const [off, byteLen] = entry;
+      const pts = f32(off, byteLen);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+      const info = header.electronList && header.electronList[i];
+      // Convention mirrors main app: pdgId < 0 → e- (red), pdgId > 0 → e+ (green)
+      const isNeg = info && info.pdgId != null ? info.pdgId < 0 : true;
+      group.add(new THREE.Line(geo, isNeg ? electronNegMat : electronPosMat));
+    }
+    scene.add(group);
+  }
+
+  // ── Muons ─────────────────────────────────────────────────────────────────────
+  if(header.muons && header.muons.length){
+    const group = new THREE.Group();
+    group.renderOrder = 7;
+    for(const [off, byteLen] of header.muons){
+      const pts = f32(off, byteLen);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+      group.add(new THREE.Line(geo, muonMat));
+    }
+    scene.add(group);
+  }
+
+  // ── Particle labels ───────────────────────────────────────────────────────────
+  const labelGroup = new THREE.Group();
+  labelGroup.renderOrder = 10;
+  const CALO_IN_R = 1421.73, CALO_IN_Z = 3680.75;
+  const MUON_R = 10000, MUON_Z = 22000;
+  const LABEL_OFFSET = 180; // mm, radial push so label clears the line
+
+  function labelPos(eta, phi, r, halfH, offset){
+    const theta = 2 * Math.atan(Math.exp(-eta));
+    const sinT = Math.sin(theta);
+    const dx = -sinT * Math.cos(phi);
+    const dy = -sinT * Math.sin(phi);
+    const dz =  Math.cos(theta);
+    const t = _cylIntersect(dx, dy, dz, r, halfH);
+    const px = dx*t, py = dy*t, pz = dz*t;
+    const rxy = Math.hypot(px, py);
+    const nx = rxy > 1e-6 ? px/rxy : 1;
+    const ny = rxy > 1e-6 ? py/rxy : 0;
+    return new THREE.Vector3(px + nx*offset, py + ny*offset, pz);
+  }
+
+  // Photon labels — γ at the inner calo face
+  if(header.photonList){
+    for(const {eta, phi} of header.photonList){
+      const sprite = makeLabelSprite('γ', 0xffcc00);
+      sprite.position.copy(labelPos(eta, phi, CALO_IN_R, CALO_IN_Z, LABEL_OFFSET));
+      labelGroup.add(sprite);
+    }
+  }
+
+  // Electron / positron labels — e-/e+ at inner calo face
+  if(header.electronList){
+    for(const {eta, phi, pdgId} of header.electronList){
+      const isNeg = pdgId != null ? pdgId < 0 : true;
+      const sprite = makeLabelSprite(isNeg ? 'e-' : 'e+', isNeg ? 0xff3030 : 0x33dd55);
+      sprite.position.copy(labelPos(eta, phi, CALO_IN_R, CALO_IN_Z, LABEL_OFFSET));
+      labelGroup.add(sprite);
+    }
+  }
+
+  // Muon labels — μ-/μ+ at muon spectrometer outer wall
+  if(header.muonList){
+    for(const {eta, phi, pdgId} of header.muonList){
+      const isNeg = pdgId != null ? pdgId < 0 : null;
+      const text = isNeg === null ? 'μ' : isNeg ? 'μ-' : 'μ+';
+      const sprite = makeLabelSprite(text, 0x4a90d9);
+      sprite.position.copy(labelPos(eta, phi, MUON_R, MUON_Z, LABEL_OFFSET));
+      labelGroup.add(sprite);
+    }
+  }
+
+  if(labelGroup.children.length) scene.add(labelGroup);
 
   dirty = true;
 }

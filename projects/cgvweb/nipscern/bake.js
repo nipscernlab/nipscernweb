@@ -24,7 +24,7 @@ const colTile = eMev => PAL_TILE[Math.round(Math.max(0,Math.min(1,eMev/TILE_SCAL
 const colHec  = eMev => PAL_HEC [Math.round(Math.max(0,Math.min(1,eMev/HEC_SCALE ))*(PAL_N-1))];
 const colLAr  = eMev => PAL_LAR [Math.round(Math.max(0,Math.min(1,eMev/LAR_SCALE ))*(PAL_N-1))];
 
-// FCAL copper palette — mirrors js/palette.js palColorFcalRgb with gamma 0.55.
+// FCAL copper palette
 const FCAL_SCALE = 7000;
 const _FCAL_STOPS = [
   [0.102, 0.024, 0.000], [0.420, 0.137, 0.063], [0.784, 0.392, 0.165],
@@ -51,6 +51,79 @@ const GHOST_TILE_NAMES = [
   'C→LBTile_0', 'C→EBTilep_0', 'C→EBTilen_0',
 ];
 const HEC_NAMES = ['1','23','45','67'];
+
+// ── Integer key encoding (mirrors js/state.js) ────────────────────────────────
+const _tileKey = (layer, pn, ieta, mod) =>
+  (layer << 2) | (pn << 7) | (ieta << 8) | (mod << 12);
+const _larEmKey = (eb, sampling, region, pn, eta, phi) =>
+  1 | ((eb - 1) << 2) | (sampling << 4) | (region << 6) | (pn << 9) | (eta << 10) | (phi << 19);
+const _hecKey = (group, region, pn, eta, phi) =>
+  2 | (group << 2) | (region << 4) | (pn << 5) | (eta << 6) | (phi << 11);
+
+// ── Mesh name → integer key (mirrors js/loader.js meshNameToKey) ──────────────
+function meshNameToKey(name) {
+  const S = '→';
+  const a = name.indexOf(S);
+  if (a < 0) return null;
+  const b = name.indexOf(S, a + 1);
+  if (b < 0) return null;
+  const c = name.indexOf(S, b + 1);
+  const l1 = name.slice(a + 1, b);
+  const l2 = c < 0 ? name.slice(b + 1) : name.slice(b + 1, c);
+  const l3 = c < 0 ? '' : name.slice(c + 1);
+  let m;
+  if ((m = /^Tile(\d+)([pn])_0$/.exec(l1))) {
+    const layer = +m[1], pn = m[2] === 'p' ? 1 : 0;
+    const m2 = /^Tile\d+[pn](\d+)_\d+$/.exec(l2);
+    if (!m2) return null;
+    const m3 = /^cell_(\d+)$/.exec(l3);
+    if (!m3) return null;
+    return _tileKey(layer, pn, +m2[1], +m3[1]);
+  }
+  if ((m = /^T(\d+)([pn])(\d+)_\d+$/.exec(l1))) {
+    const layer = +m[1], pn = m[2] === 'p' ? 1 : 0, ieta = +m[3];
+    const m2 = /^c_(\d+)$/.exec(l2);
+    if (!m2) return null;
+    return _tileKey(layer, pn, ieta, +m2[1]);
+  }
+  if ((m = /^EM(Barrel|EndCap)_(\d+)_(\d+)_([pn])_\d+$/.exec(l1))) {
+    const eb = m[1] === 'Barrel' ? 1 : +m[3], sampling = +m[2], region = +m[3], pn = m[4] === 'p' ? 1 : 0;
+    const m2 = /^EM(?:Barrel|EndCap)_\d+_\d+_[pn]_(\d+)_\d+$/.exec(l2);
+    if (!m2) return null;
+    const m3 = /^cell(2?)_(\d+)$/.exec(l3);
+    if (!m3) return null;
+    return _larEmKey(eb, sampling, region, pn, +m2[1], +m3[2]);
+  }
+  if ((m = /^EB_(\d+)_(\d+)_([pn])_(\d+)_\d+$/.exec(l1))) {
+    const sampling = +m[1], region = +m[2], pn = m[3] === 'p' ? 1 : 0, eta = +m[4];
+    const m2 = /^c(2?)_(\d+)$/.exec(l2);
+    if (!m2) return null;
+    return _larEmKey(1, sampling, region, pn, eta, +m2[2]);
+  }
+  if ((m = /^EE_(\d+)_(\d+)_([pn])_(\d+)_\d+$/.exec(l1))) {
+    const sampling = +m[1], eb = +m[2], pn = m[3] === 'p' ? 1 : 0, eta = +m[4];
+    const m2 = /^c(2?)_(\d+)$/.exec(l2);
+    if (!m2) return null;
+    return _larEmKey(eb, sampling, eb, pn, eta, +m2[2]);
+  }
+  if ((m = /^HEC_(\w+)_(\d+)_([pn])_0$/.exec(l1))) {
+    const group = HEC_NAMES.indexOf(m[1]);
+    if (group < 0) return null;
+    const m2 = /^HEC_\w+_\d+_[pn]_(\d+)_\d+$/.exec(l2);
+    if (!m2) return null;
+    const m3 = /^cell_(\d+)$/.exec(l3);
+    if (!m3) return null;
+    return _hecKey(group, +m[2], m[3] === 'p' ? 1 : 0, +m2[1], +m3[1]);
+  }
+  if ((m = /^H_(\w+)_(\d+)_([pn])_(\d+)_\d+$/.exec(l1))) {
+    const group = HEC_NAMES.indexOf(m[1]);
+    if (group < 0) return null;
+    const m2 = /^c_(\d+)$/.exec(l2);
+    if (!m2) return null;
+    return _hecKey(group, +m[2], m[3] === 'p' ? 1 : 0, +m[4], +m2[1]);
+  }
+  return null;
+}
 
 // ── XML extraction ────────────────────────────────────────────────────────────
 function extractCells(doc, tagName){
@@ -121,11 +194,56 @@ function extractMbts(doc){
   return cells;
 }
 
+// ── Particle parsers ──────────────────────────────────────────────────────────
+function _readTextNums(el, tag){
+  const child = el.querySelector(tag);
+  if(!child) return [];
+  return child.textContent.trim().split(/\s+/).map(Number).filter(isFinite);
+}
+
+function parseElectrons(doc){
+  const out = [];
+  for(const el of doc.getElementsByTagName('Electron')){
+    const etas = _readTextNums(el, 'eta');
+    const phis = _readTextNums(el, 'phi');
+    const pts  = _readTextNums(el, 'pt');
+    const pdgs = _readTextNums(el, 'pdgId');
+    const n = Math.min(etas.length, phis.length);
+    for(let i=0;i<n;i++){
+      if(!isFinite(etas[i])||!isFinite(phis[i])) continue;
+      const raw = pdgs[i];
+      const pdgId = Number.isFinite(raw) && raw !== 0 ? raw|0 : null;
+      out.push({eta:etas[i], phi:phis[i], ptGev:isFinite(pts[i])?pts[i]:0, pdgId});
+    }
+  }
+  return out;
+}
+
+function parseMuons(doc){
+  const out = [];
+  for(const el of doc.getElementsByTagName('Muon')){
+    const etas = _readTextNums(el, 'eta');
+    const phis = _readTextNums(el, 'phi');
+    const pts  = _readTextNums(el, 'pt');
+    const pdgs = _readTextNums(el, 'pdgId');
+    const n = Math.min(etas.length, phis.length);
+    for(let i=0;i<n;i++){
+      if(!isFinite(etas[i])||!isFinite(phis[i])) continue;
+      const raw = pdgs[i];
+      const pdgId = Number.isFinite(raw) && raw !== 0 ? raw|0 : null;
+      out.push({eta:etas[i], phi:phis[i], ptGev:isFinite(pts[i])?pts[i]:0, pdgId});
+    }
+  }
+  return out;
+}
+
 // ── Clusters ──────────────────────────────────────────────────────────────────
 const CLUSTER_THR_GEV = 3;
-// Mirrors particles.js cylinder constants exactly
 const CLUSTER_CYL_IN_R = 1421.73, CLUSTER_CYL_IN_HALF_H = 3680.75;
 const CLUSTER_CYL_OUT_R = 3820, CLUSTER_CYL_OUT_HALF_H = 6000;
+// Muon spectrometer outer boundary (barrel r=10 m, endcap z=±22 m)
+const MUON_R = 10000, MUON_Z = 22000;
+
 function _cylIntersect(dx, dy, dz, r, halfH){
   const rT = Math.sqrt(dx*dx + dy*dy);
   if(rT > 1e-9){
@@ -134,6 +252,7 @@ function _cylIntersect(dx, dy, dz, r, halfH){
   }
   return halfH / Math.abs(dz);
 }
+
 function parseClusters(doc){
   const out = [];
   for(const el of doc.getElementsByTagName('Cluster')){
@@ -195,8 +314,7 @@ function parseTracks(doc){
   return out;
 }
 
-// ── Photons (wavy helix from origin to inner calorimeter surface) ─────────────
-// Mirrors js/particles.js _makeSpringPoints logic
+// ── Photons (wavy helix) ──────────────────────────────────────────────────────
 const PHOTON_PRE_INNER_MM = 400;
 const PHOTON_SPRING_R = 20;
 const PHOTON_SPRING_TURNS_PER_MM = 0.014;
@@ -228,7 +346,6 @@ function _makeSpringPoints(dx, dy, dz, totalLen){
 
 function parsePhotons(doc){
   const out = [];
-  // JiveXML photon collections: <PhotonCollection> with <pt>, <eta>, <phi> children
   for(const el of doc.querySelectorAll('PhotonCollection, Photon')){
     const ptEl  = el.querySelector('pt, et');
     const etaEl = el.querySelector('eta');
@@ -240,28 +357,61 @@ function parsePhotons(doc){
     const m = Math.min(etas.length, phis.length);
     for(let i=0;i<m;i++){
       if(!isFinite(etas[i]) || !isFinite(phis[i])) continue;
-      const theta = 2 * Math.atan(Math.exp(-etas[i]));
-      const sinT = Math.sin(theta);
-      const dx = -sinT * Math.cos(phis[i]);
-      const dy = -sinT * Math.sin(phis[i]);
-      const dz =  Math.cos(theta);
-      const tEnd = _cylIntersect(dx, dy, dz, CLUSTER_CYL_IN_R, CLUSTER_CYL_IN_HALF_H);
-      const arr = _makeSpringPoints(dx, dy, dz, tEnd);
-      if(arr) out.push(arr);
+      out.push({eta:etas[i], phi:phis[i], ptGev:isFinite(pts[i])?pts[i]:0});
     }
   }
   return out;
 }
 
-// ── MBTS path resolution ─────────────────────────────────────────────────────
-function mbtsMeshPath(label, meshByName){
+// ── Electron helix (same waveguide as photon, shorter spring) ─────────────────
+const ELECTRON_SPRING_R = 14;
+const ELECTRON_SPRING_TURNS_PER_MM = 0.025;
+const ELECTRON_SPRING_PTS = 22;
+const ELECTRON_PRE_INNER_MM = 300;
+
+function _makeElectronSpring(dx, dy, dz, totalLen){
+  const fwd = new THREE.Vector3(dx, dy, dz).normalize();
+  const ref = Math.abs(fwd.x) < 0.9 ? new THREE.Vector3(1,0,0) : new THREE.Vector3(0,1,0);
+  const right = new THREE.Vector3().crossVectors(fwd, ref).normalize();
+  const up    = new THREE.Vector3().crossVectors(fwd, right).normalize();
+  const startOffset = Math.max(0, totalLen - ELECTRON_PRE_INNER_MM);
+  const visibleLen  = Math.max(0, totalLen - startOffset);
+  const nTurns  = Math.round(ELECTRON_SPRING_TURNS_PER_MM * Math.min(ELECTRON_PRE_INNER_MM, totalLen));
+  const nTotal  = nTurns * ELECTRON_SPRING_PTS + 1;
+  if(nTotal < 2) return null;
+  const arr = new Float32Array(nTotal * 3);
+  for(let i=0;i<nTotal;i++){
+    const t = i/(nTotal-1);
+    const angle = t * nTurns * 2 * Math.PI;
+    const along = startOffset + t * visibleLen;
+    const cx = Math.cos(angle) * ELECTRON_SPRING_R;
+    const cy = Math.sin(angle) * ELECTRON_SPRING_R;
+    arr[i*3  ] = fwd.x*along + right.x*cx + up.x*cy;
+    arr[i*3+1] = fwd.y*along + right.y*cx + up.y*cy;
+    arr[i*3+2] = fwd.z*along + right.z*cx + up.z*cy;
+  }
+  return arr;
+}
+
+// ── Muon straight line (origin → muon spectrometer outer wall) ────────────────
+function _makeMuonLine(eta, phi){
+  const theta = 2 * Math.atan(Math.exp(-eta));
+  const sinT = Math.sin(theta);
+  const dx = -sinT * Math.cos(phi);
+  const dy = -sinT * Math.sin(phi);
+  const dz =  Math.cos(theta);
+  const t = _cylIntersect(dx, dy, dz, MUON_R, MUON_Z);
+  const arr = new Float32Array(6);
+  arr[0]=0; arr[1]=0; arr[2]=0;
+  arr[3]=dx*t; arr[4]=dy*t; arr[5]=dz*t;
+  return arr;
+}
+
+// ── MBTS key lookup ───────────────────────────────────────────────────────────
+function mbtsMeshKey(label){
   const m=/^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
   if(!m) return null;
-  const side=m[1]==='1'?'p':'n';
-  const tileNum=m[2]==='0'?14:15;
-  const mod=m[3];
-  const path=`Calorimeter→Tile${tileNum}${side}_0→Tile${tileNum}${side}0_0→cell_${mod}`;
-  return meshByName.has(path)?path:null;
+  return _tileKey(m[2]==='0'?14:15, m[1]==='1'?1:0, 0, +m[3]);
 }
 
 // ── Geometry baking ────────────────────────────────────────────────────────────
@@ -279,8 +429,8 @@ function bakeGeom(mesh){
   }
   const edgeGeo = new THREE.EdgesGeometry(g, 30);
   const edge = edgeGeo.getAttribute('position').array;
-  const posF32   = pos   instanceof Float32Array ? pos   : new Float32Array(pos);
-  const edgeF32  = edge  instanceof Float32Array ? edge  : new Float32Array(edge);
+  const posF32  = pos  instanceof Float32Array ? pos  : new Float32Array(pos);
+  const edgeF32 = edge instanceof Float32Array ? edge : new Float32Array(edge);
   g.dispose(); edgeGeo.dispose();
   return { pos: posF32, idx, edge: edgeF32 };
 }
@@ -339,14 +489,21 @@ async function main(){
   await wasmInit();
 
   log('Loading GLB...');
+  const meshByKey  = new Map();
   const meshByName = new Map();
   await new Promise((res, rej)=>{
     new GLTFLoader().load('../geometry_data/CaloGeometry.glb', ({scene:g}) => {
-      g.traverse(o => { if(o.isMesh) meshByName.set(o.name, o); });
+      g.updateMatrixWorld(true);
+      g.traverse(o => {
+        if(!o.isMesh) return;
+        meshByName.set(o.name, o);
+        const key = meshNameToKey(o.name);
+        if(key !== null) meshByKey.set(key, o);
+      });
       res();
     }, undefined, rej);
   });
-  log('  meshes:', meshByName.size);
+  log('  meshes:', meshByName.size, '  keyed:', meshByKey.size);
 
   log('Fetching XML...');
   const xmlText = await (await fetch('../default_xml/JiveXML_518084_14173642443.xml')).text();
@@ -364,8 +521,13 @@ async function main(){
 
   const tracks   = parseTracks(doc);
   const clusters = parseClusters(doc);
-  const photons  = parsePhotons(doc);
-  log('  tracks:', tracks.length, '  clusters:', clusters.length, '  photons:', photons.length);
+  const photonParticles   = parsePhotons(doc);
+  const electronParticles = parseElectrons(doc);
+  const muonParticles     = parseMuons(doc);
+  log('  tracks:', tracks.length, '  clusters:', clusters.length,
+      '  photons:', photonParticles.length,
+      '  electrons:', electronParticles.length,
+      '  muons:', muonParticles.length);
 
   const idsToStr = cs => cs.map(c=>c.id).join(' ');
   const tilePacked = tileCells.length ? parse_atlas_ids_bulk(idsToStr(tileCells)) : null;
@@ -378,42 +540,39 @@ async function main(){
     const b=i*8; if(tilePacked[b]!==SUBSYS_TILE) continue;
     const x=tilePacked[b+1], k=tilePacked[b+2], side=tilePacked[b+3], mod=tilePacked[b+4];
     const eMev=tileCells[i].energy*1000;
-    const y=side<0?'n':'p';
-    const path=`Calorimeter→Tile${x}${y}_0→Tile${x}${y}${k}_${k}→cell_${mod}`;
-    if(!meshByName.has(path)) continue;
     if(eMev < thrTileMev) continue;
-    active.set(path, {det:'TILE', eMev});
+    const mesh = meshByKey.get(_tileKey(x, side<0?0:1, k, mod));
+    if(!mesh) continue;
+    active.set(mesh.name, {det:'TILE', eMev, mesh});
   }
   for(let i=0;i<larCells.length;i++){
     const b=i*8; if(larPacked[b]!==SUBSYS_LAR_EM) continue;
     const abs_be=larPacked[b+1], sampling=larPacked[b+2], z_pos=larPacked[b+4],
           R=larPacked[b+5], eta=larPacked[b+6], phi=larPacked[b+7];
     const eMev=larCells[i].energy*1000;
-    const X=abs_be===1?'Barrel':'EndCap'; const W=abs_be===1?0:1; const Z=z_pos?'p':'n';
-    const prefix=`Calorimeter→EM${X}_${sampling}_${R}_${Z}_${W}→EM${X}_${sampling}_${R}_${Z}_${eta}_${eta}→`;
-    const path = meshByName.has(prefix+`cell_${phi}`)  ? prefix+`cell_${phi}`  :
-                 meshByName.has(prefix+`cell2_${phi}`) ? prefix+`cell2_${phi}` : null;
-    if(!path) continue;
     if(eMev < thrLArMev) continue;
-    active.set(path, {det:'LAR', eMev});
+    const mesh = meshByKey.get(_larEmKey(abs_be, sampling, R, z_pos, eta, phi));
+    if(!mesh) continue;
+    active.set(mesh.name, {det:'LAR', eMev, mesh});
   }
   for(let i=0;i<hecCells.length;i++){
     const b=i*8; if(hecPacked[b]!==SUBSYS_LAR_HEC) continue;
     const group=hecPacked[b+1], region=hecPacked[b+2], z_pos=hecPacked[b+3],
           cum_eta=hecPacked[b+4], phi=hecPacked[b+5];
     const eMev=hecCells[i].energy*1000;
-    const Z=z_pos?'p':'n'; const name=HEC_NAMES[group];
-    const path=`Calorimeter→HEC_${name}_${region}_${Z}_0→HEC_${name}_${region}_${Z}_${cum_eta}_${cum_eta}→cell_${phi}`;
-    if(!meshByName.has(path)) continue;
     if(eMev < thrHecMev) continue;
-    active.set(path, {det:'HEC', eMev});
+    const mesh = meshByKey.get(_hecKey(group, region, z_pos, cum_eta, phi));
+    if(!mesh) continue;
+    active.set(mesh.name, {det:'HEC', eMev, mesh});
   }
   for(const {label, energy} of mbtsCells){
     const eMev = energy*1000;
-    const path = mbtsMeshPath(label, meshByName);
-    if(!path) continue;
     if(eMev < thrTileMev) continue;
-    active.set(path, {det:'TILE', eMev});
+    const key = mbtsMeshKey(label);
+    if(key === null) continue;
+    const mesh = meshByKey.get(key);
+    if(!mesh) continue;
+    active.set(mesh.name, {det:'TILE', eMev, mesh});
   }
   log('  active cells (after threshold):', active.size);
 
@@ -433,8 +592,7 @@ async function main(){
     return [off, arr.byteLength];
   }
 
-  for(const [name, {det, eMev}] of active){
-    const mesh = meshByName.get(name);
+  for(const [, {det, eMev, mesh}] of active){
     const {pos, idx, edge} = bakeGeom(mesh);
     const col = det==='TILE' ? colTile(eMev) : det==='LAR' ? colLAr(eMev) : colHec(eMev);
     cellHeaders.push({
@@ -475,7 +633,36 @@ async function main(){
 
   log('Packing photons...');
   const photonHeaders = [];
-  for(const arr of photons) photonHeaders.push(pushChunk(arr));
+  for(const {eta, phi} of photonParticles){
+    const theta = 2 * Math.atan(Math.exp(-eta));
+    const sinT = Math.sin(theta);
+    const dx = -sinT * Math.cos(phi);
+    const dy = -sinT * Math.sin(phi);
+    const dz =  Math.cos(theta);
+    const tEnd = _cylIntersect(dx, dy, dz, CLUSTER_CYL_IN_R, CLUSTER_CYL_IN_HALF_H);
+    const arr = _makeSpringPoints(dx, dy, dz, tEnd);
+    if(arr) photonHeaders.push(pushChunk(arr));
+  }
+
+  log('Packing electrons...');
+  const electronHeaders = [];
+  for(const {eta, phi} of electronParticles){
+    const theta = 2 * Math.atan(Math.exp(-eta));
+    const sinT = Math.sin(theta);
+    const dx = -sinT * Math.cos(phi);
+    const dy = -sinT * Math.sin(phi);
+    const dz =  Math.cos(theta);
+    const tEnd = _cylIntersect(dx, dy, dz, CLUSTER_CYL_IN_R, CLUSTER_CYL_IN_HALF_H);
+    const arr = _makeElectronSpring(dx, dy, dz, tEnd);
+    if(arr) electronHeaders.push(pushChunk(arr));
+    else    electronHeaders.push(null);
+  }
+
+  log('Packing muons...');
+  const muonHeaders = [];
+  for(const {eta, phi} of muonParticles){
+    muonHeaders.push(pushChunk(_makeMuonLine(eta, phi)));
+  }
 
   const body = new ArrayBuffer(byteCursor);
   const bodyU8 = new Uint8Array(body);
@@ -484,12 +671,18 @@ async function main(){
   }
 
   const header = {
-    v: 3,
-    cells: cellHeaders,
-    ghosts: ghostHeaders,
-    tracks: trackHeaders,
-    clusters: clusterHeaders,
+    v: 4,
+    cells:   cellHeaders,
+    ghosts:  ghostHeaders,
+    tracks:  trackHeaders,
+    clusters:clusterHeaders,
     photons: photonHeaders,
+    electrons: electronHeaders,
+    muons:   muonHeaders,
+    // Particle lists for label sprites (eta/phi/pdgId stored in JSON header)
+    photonList:   photonParticles.map(({eta,phi,ptGev})=>({eta,phi,ptGev})),
+    electronList: electronParticles.map(({eta,phi,pdgId,ptGev})=>({eta,phi,pdgId,ptGev})),
+    muonList:     muonParticles.map(({eta,phi,pdgId,ptGev})=>({eta,phi,pdgId,ptGev})),
   };
   let headerJson = JSON.stringify(header);
   while(((4 + headerJson.length) & 3) !== 0) headerJson += ' ';
@@ -505,7 +698,9 @@ async function main(){
   log('  body       :', (body.byteLength/1024/1024).toFixed(2), 'MB');
   log('  cells:', cellHeaders.length, ' ghosts:', ghostHeaders.length,
       ' tracks:', trackHeaders.length, ' clusters:', clusterHeaders.length,
-      ' photons:', photonHeaders.length);
+      ' photons:', photonHeaders.length,
+      ' electrons:', electronHeaders.filter(Boolean).length,
+      ' muons:', muonHeaders.length);
 
   const blob = new Blob([out], {type:'application/octet-stream'});
   const url = URL.createObjectURL(blob);
