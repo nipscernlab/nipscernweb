@@ -145,6 +145,9 @@ Divination through hexagrams. Cosmology and change.
 **Tanakh (selections)** — Hebrew Bible
 Read as literature: Genesis, Job, Psalms, Ecclesiastes.
 
+**Sinuhe the Egyptian (Story of Sinuhe)** — Anonymous (Egypt, ~1875 BCE)
+One of the finest works of ancient Egyptian literature. Exile, identity, nostalgia, and return.
+
 ### Poetry
 
 **Dreamtime Songlines** — Aboriginal Australia
@@ -201,6 +204,7 @@ Aztec philosopher-king. Impermanence and beauty.
 - **三星堆 (Sanxingdui Bronze Masks)** — Ancient Shu (China)
 - **Nok Terracotta** — West Africa (~1000 BCE)
 - **San Rock Paintings (Drakensberg)** — Southern Africa
+- **Lapita Pottery** — Pacific Islands (~1600–500 BCE) *(ceramic art tracing Austronesian migration across Oceania)*
 - **Oseberg Ship & Viking Funerary Art** — Norway (9th c.)
 
 ---
