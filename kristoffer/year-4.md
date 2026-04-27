@@ -1,5 +1,5 @@
 # THE ARCHITECT: Year IV (2029)
-### Paraconsistency, Modernity & The Broken Mirror
+### Computation, Modernity & The Broken Mirror
 
 **Study Parameters:** Polymath intensity — unrestricted
 
@@ -101,6 +101,9 @@ Africa's collision with colonialism.
 **Wide Sargasso Sea** — Jean Rhys
 Caribbean postcolonial voice.
 
+**The Sound and the Fury · Absalom, Absalom!** — William Faulkner (1929 · 1936)
+Stream of consciousness and the Southern Gothic. Time fractured, memory unhinged.
+
 ### Poetry
 
 **The Waste Land** — T.S. Eliot
@@ -121,6 +124,9 @@ Stalin's terror remembered in verse.
 **Todesfuge** — Paul Celan
 Death Fugue. The Holocaust's central poem.
 
+**Марина Цветаева — избранные стихи (Selected Poems)** — Marina Tsvetaeva
+Russian Silver Age. Passionate, syntactically fractured verse — lyric intensity at its most extreme.
+
 ### Theater
 
 **Mutter Courage und ihre Kinder · Galileo** — Bertolt Brecht
@@ -131,6 +137,12 @@ Swedish naturalist tragedy.
 
 **Sei personaggi in cerca d'autore** — Luigi Pirandello
 Six Characters in Search of an Author. Meta-theatre is born.
+
+**Long Day's Journey Into Night** — Eugene O'Neill (written 1941–42)
+American tragedy at its rawest. A family dismantling itself over one day.
+
+**La Cantatrice chauve · Rhinocéros** — Eugène Ionesco (1950 · 1959)
+Theater of the Absurd. Language collapses; conformism spreads like a virus.
 
 ---
 
@@ -149,6 +161,11 @@ Six Characters in Search of an Author. Meta-theatre is born.
 - **Metamorfosis de Narciso** — Salvador Dalí
 - **Le Penseur · La Porte de l'Enfer** — Auguste Rodin
 - **The Decisive Moment** — Henri Cartier-Bresson
+- **Moi et le village** — Marc Chagall (1911) *(Cubism + Jewish-Russian folklore in dreamlike color)*
+- **Nu couché** — Amedeo Modigliani (1917–18) *(elongated form and raw sensuality)*
+- **Straße, Berlin** — Ernst Ludwig Kirchner (1913) *(German Expressionism; urban alienation at its most anxious)*
+- **Der Krieg (War Triptych)** — Otto Dix (1929–32) *(the most unflinching painting of WWI; Dix as new Grünewald)*
+- **Documentary Photography** — Eugène Atget · Walker Evans · Dorothea Lange (Migrant Mother) · Robert Capa *(photography as witness)*
 
 ---
 
@@ -159,6 +176,9 @@ Six Characters in Search of an Author. Meta-theatre is born.
 - **Fallingwater** — Frank Lloyd Wright
 - **Sagrada Família · Casa Batlló** — Antoni Gaudí
 - **Auschwitz-Birkenau Memorial** — *(Poland — memory site)*
+- **Tour Eiffel** — Gustave Eiffel (1889) *(industrial engineering as monument)*
+- **Chrysler Building** — William Van Alen (1930) *(Art Deco at its zenith)*
+- **Hiroshima Peace Memorial (Genbaku Dome)** — *(Japan — the ruin left standing; memory site for August 6, 1945)*
 
 ---
 
@@ -174,6 +194,8 @@ Six Characters in Search of an Author. Meta-theatre is born.
 - **Zene húros hangszerekre, ütőkre és cselesztára** — Béla Bartók
 - **Symfoni nr. 4 "Det Uudslukkelige"** — Carl Nielsen *(Danish)*
 - **Blue Train · A Love Supreme** — John Coltrane
+- **Sinfonietta · Glagolská mše** — Leoš Janáček (1926 · 1927) *(Czech modernism; Moravian speech rhythms as music)*
+- **Ромео и Джульетта · Петя и волк** — Sergei Prokofiev (1935 · 1936) *(ballet and orchestral narration at their most vivid)*
 
 ---
 
@@ -190,6 +212,10 @@ Six Characters in Search of an Author. Meta-theatre is born.
 - **8½** — Fellini (1963)
 - **À bout de souffle (Breathless)** — Godard (1960)
 - **Låt den rätte komma in (Let the Right One In)** — Alfredson (2008) *(Swedish)*
+- **La Grande Illusion** — Jean Renoir (1937) *(class and war; humanist cinema's first great statement)*
+- **Casablanca** — Michael Curtiz (1942) *(Hollywood classicism at its peak)*
+- **La Strada** — Federico Fellini (1954) *(innocence, cruelty, grace — Fellini's neorealist soul)*
+- **Psycho** — Alfred Hitchcock (1960) *(the film that changed cinema's moral contract)*
 
 ---
 
