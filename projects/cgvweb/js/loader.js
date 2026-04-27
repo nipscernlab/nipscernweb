@@ -101,15 +101,35 @@ function meshNameToKey(name) {
   return null;
 }
 
-// Detector classifier for show-all-cells mode. Returns null for envelopes.
+// Detector classifier — returns { det, subDet } so the layers panel can
+// toggle Tile barrel / extended / ITC and LAr barrel / end-cap independently.
+//
+// Tile layer numbers `x` in the mesh prefix `T{x}{y}{k}_{k}` follow the build
+// sequence in const/CaloBuild.C:
+//   1, 23, 4   → barrel    (LB: A, BC merged, D — see MergeTile for BC)
+//   5, 6, 7    → extended  (EB samplings A, B, D)
+//   8, 9       → extended  (D4 and C10 — ITC tail kept with EB per user pref)
+//   10-13      → itc       (E1-E4 gap scintillators)
+//   14, 15     → mbts      (8-fold MBTS scintillator paddles)
 function classifyCellDet(name) {
   if (ghostVisible.has(name)) return null;
   const parts = name.split('→');
   if (parts.length < 3) return null;
   for (const p of parts) {
-    if (p.startsWith('EB_') || p.startsWith('EE_')) return 'LAR';
-    if (p.startsWith('H_')) return 'HEC';
-    if (/^T\d/.test(p)) return 'TILE';
+    if (p.startsWith('EB_')) return { det: 'LAR', subDet: 'barrel' };
+    if (p.startsWith('EE_')) return { det: 'LAR', subDet: 'ec' };
+    if (p.startsWith('H_')) return { det: 'HEC', subDet: 'ec' };
+    const tm = /^T(\d+)[pn]\d+_\d+$/.exec(p);
+    if (tm) {
+      const x = +tm[1];
+      let subDet;
+      if (x === 1 || x === 4 || x === 23) subDet = 'barrel';
+      else if (x >= 5 && x <= 9) subDet = 'extended';
+      else if (x >= 10 && x <= 13) subDet = 'itc';
+      else if (x === 14 || x === 15) subDet = 'mbts';
+      else subDet = 'extended';
+      return { det: 'TILE', subDet };
+    }
   }
   return null;
 }
@@ -285,11 +305,12 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
           atlasMeshes.push(o);
           return;
         }
-        const det = classifyCellDet(o.name);
-        if (!det) {
+        const cls = classifyCellDet(o.name);
+        if (!cls) {
           loose.push(o);
           return;
         }
+        const { det, subDet } = cls;
         const gk = `${det}::${o.geometry.uuid}`;
         let bucket = groups.get(gk);
         if (!bucket) {
@@ -300,6 +321,7 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
           matrix: o.matrixWorld.clone(),
           name: o.name,
           key: meshNameToKey(o.name),
+          subDet,
         });
       });
 
@@ -320,7 +342,15 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
           const it = items[i];
           iMesh.setMatrixAt(i, _ZERO_MAT4); // start hidden
           iMesh.setColorAt(i, PAL_TILE_COLOR[0]); // neutral; overwritten on event
-          const h = { iMesh, instId: i, det, name: it.name, origMatrix: it.matrix, visible: false };
+          const h = {
+            iMesh,
+            instId: i,
+            det,
+            subDet: it.subDet,
+            name: it.name,
+            origMatrix: it.matrix,
+            visible: false,
+          };
           handles[i] = h;
           if (it.key !== null) meshByKey.set(it.key, h);
           cellMeshesByDet[det].push(h);

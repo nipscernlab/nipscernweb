@@ -606,23 +606,89 @@
       <button class="layers-qbtn" id="lbtn-none" data-i18n="layers-none">None</button>
     </div>
   </div>
-  <div class="layer-row">
-    <span class="layer-dot" style="background:#c87c18"></span>
-    <div class="layer-info">
-      <div class="layer-name">TILE</div>
-      <div class="layer-sub" data-i18n="layer-sub-tile">TileCal barrel &amp; extended</div>
+  <div class="layer-group">
+    <div class="layer-row layer-row-parent">
+      <span class="layer-twist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+      </span>
+      <span class="layer-dot" style="background:#c87c18"></span>
+      <div class="layer-info">
+        <div class="layer-name">TILE</div>
+        <div class="layer-sub" data-i18n="layer-sub-tile">TileCal barrel, extended &amp; ITC</div>
+      </div>
+      <button class="gswitch on" id="ltog-tile" role="switch" aria-checked="true"
+        style="--gswitch-col:#c87c18"></button>
     </div>
-    <button class="gswitch on" id="ltog-tile" role="switch" aria-checked="true"
-      style="--gswitch-col:#c87c18"></button>
+    <div class="layer-row layer-row-child">
+      <span class="layer-dot" style="background:#c87c18"></span>
+      <div class="layer-info">
+        <div class="layer-name" data-i18n="layer-name-tile-barrel">Barrel (LB)</div>
+        <div class="layer-sub" data-i18n="layer-sub-tile-barrel">Long barrel A/B/C/D</div>
+      </div>
+      <button class="gswitch on" id="ltog-tile-barrel" role="switch" aria-checked="true"
+        style="--gswitch-col:#c87c18"></button>
+    </div>
+    <div class="layer-row layer-row-child">
+      <span class="layer-dot" style="background:#c87c18"></span>
+      <div class="layer-info">
+        <div class="layer-name" data-i18n="layer-name-tile-ext">Extended (EB)</div>
+        <div class="layer-sub" data-i18n="layer-sub-tile-ext">Extended barrel A/B/D</div>
+      </div>
+      <button class="gswitch on" id="ltog-tile-ext" role="switch" aria-checked="true"
+        style="--gswitch-col:#c87c18"></button>
+    </div>
+    <div class="layer-row layer-row-child">
+      <span class="layer-dot" style="background:#c87c18"></span>
+      <div class="layer-info">
+        <div class="layer-name" data-i18n="layer-name-tile-itc">ITC</div>
+        <div class="layer-sub" data-i18n="layer-sub-tile-itc">Gap scintillators E1-E4</div>
+      </div>
+      <button class="gswitch on" id="ltog-tile-itc" role="switch" aria-checked="true"
+        style="--gswitch-col:#c87c18"></button>
+    </div>
   </div>
   <div class="layer-row">
-    <span class="layer-dot" style="background:#27b568"></span>
+    <span class="layer-dot" style="background:#e8c548"></span>
     <div class="layer-info">
-      <div class="layer-name">LAr</div>
-      <div class="layer-sub" data-i18n="layer-sub-lar">EM calorimeter</div>
+      <div class="layer-name">MBTS</div>
+      <div class="layer-sub" data-i18n="layer-sub-mbts">Minimum-bias trigger scintillators</div>
     </div>
-    <button class="gswitch on" id="ltog-lar" role="switch" aria-checked="true"
-      style="--gswitch-col:#27b568"></button>
+    <button class="gswitch on" id="ltog-mbts" role="switch" aria-checked="true"
+      style="--gswitch-col:#e8c548"></button>
+  </div>
+  <div class="layer-group">
+    <div class="layer-row layer-row-parent">
+      <span class="layer-twist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+      </span>
+      <span class="layer-dot" style="background:#27b568"></span>
+      <div class="layer-info">
+        <div class="layer-name">LAr</div>
+        <div class="layer-sub" data-i18n="layer-sub-lar">EM calorimeter</div>
+      </div>
+      <button class="gswitch on" id="ltog-lar" role="switch" aria-checked="true"
+        style="--gswitch-col:#27b568"></button>
+    </div>
+    <div class="layer-row layer-row-child">
+      <span class="layer-dot" style="background:#27b568"></span>
+      <div class="layer-info">
+        <div class="layer-name" data-i18n="layer-name-lar-barrel">Barrel (EMB)</div>
+        <div class="layer-sub" data-i18n="layer-sub-lar-barrel">EM barrel</div>
+      </div>
+      <button class="gswitch on" id="ltog-lar-barrel" role="switch" aria-checked="true"
+        style="--gswitch-col:#27b568"></button>
+    </div>
+    <div class="layer-row layer-row-child">
+      <span class="layer-dot" style="background:#27b568"></span>
+      <div class="layer-info">
+        <div class="layer-name" data-i18n="layer-name-lar-ec">End-cap (EMEC)</div>
+        <div class="layer-sub" data-i18n="layer-sub-lar-ec">EM end-cap</div>
+      </div>
+      <button class="gswitch on" id="ltog-lar-ec" role="switch" aria-checked="true"
+        style="--gswitch-col:#27b568"></button>
+    </div>
   </div>
   <div class="layer-row">
     <span class="layer-dot" style="background:#66e0f6"></span>

@@ -173,22 +173,66 @@ export function setThrFcalMev(v) {
 }
 
 // ── Detector toggle state ─────────────────────────────────────────────────────
-export let showTile = true;
-export let showLAr = true;
+// Tile and LAr expose sub-detector toggles so the user can show barrel and
+// end-cap regions independently. Each cell handle carries its `subDet` tag
+// (set in loader.js classifyCellDet); the threshold loop picks the relevant
+// flag from the maps below.
+//   Tile: barrel (LB samplings A/B/C/D), extended (EB + D4/C9 ITC tail),
+//         itc (E1-E4 gap scintillators), mbts (8-fold MBTS scintillators).
+//   LAr:  barrel (EMB), ec (EMEC).
+//   HEC:  single flag (always end-cap).
+//   FCAL: single flag.
+export let showTileBarrel = true;
+export let showTileExt = true;
+export let showTileItc = true;
+export let showMbts = true;
+export let showLArBarrel = true;
+export let showLArEc = true;
 export let showHec = true;
 export let showFcal = true;
 
-export function setShowTile(v) {
-  showTile = v;
+export function setShowTileBarrel(v) {
+  showTileBarrel = v;
 }
-export function setShowLAr(v) {
-  showLAr = v;
+export function setShowTileExt(v) {
+  showTileExt = v;
+}
+export function setShowTileItc(v) {
+  showTileItc = v;
+}
+export function setShowMbts(v) {
+  showMbts = v;
+}
+export function setShowLArBarrel(v) {
+  showLArBarrel = v;
+}
+export function setShowLArEc(v) {
+  showLArEc = v;
 }
 export function setShowHec(v) {
   showHec = v;
 }
 export function setShowFcal(v) {
   showFcal = v;
+}
+
+// Picks the visibility flag for a given cell handle, based on its sub-detector
+// tag. Used by both the active-cell threshold loop and the show-all sweep.
+function _detOnFor(h) {
+  if (h.det === 'HEC') return showHec;
+  if (h.det === 'LAR') return h.subDet === 'barrel' ? showLArBarrel : showLArEc;
+  // TILE and its sub-regions (h.det === 'TILE')
+  switch (h.subDet) {
+    case 'mbts':
+      return showMbts;
+    case 'itc':
+      return showTileItc;
+    case 'extended':
+      return showTileExt;
+    case 'barrel':
+    default:
+      return showTileBarrel;
+  }
 }
 
 // ── Track threshold state ─────────────────────────────────────────────────────
@@ -568,11 +612,14 @@ export function applyTauPtThreshold() {
 function _syncNonActiveShowAll() {
   if (!_slicer?.isShowAllCells()) return;
   const slicerMask = _slicer.getMaskState();
-  const sweep = (list, detOn, minColor) => {
+  // Each handle resolves its own visibility flag via h.subDet, so the sweep
+  // doesn't need to be split per sub-region — just per top-level detector for
+  // the minimum-palette colour.
+  const sweep = (list, minColor) => {
     for (let i = 0; i < list.length; i++) {
       const h = list[i];
       if (active.has(h)) continue;
-      if (!detOn) {
+      if (!_detOnFor(h)) {
         _setHandleVisible(h, false);
         continue;
       }
@@ -589,9 +636,9 @@ function _syncNonActiveShowAll() {
       _setHandleVisible(h, vis);
     }
   };
-  sweep(cellMeshesByDet.TILE, showTile, PAL_TILE_COLOR[0]);
-  sweep(cellMeshesByDet.LAR, showLAr, PAL_LAR_COLOR[0]);
-  sweep(cellMeshesByDet.HEC, showHec, PAL_HEC_COLOR[0]);
+  sweep(cellMeshesByDet.TILE, PAL_TILE_COLOR[0]);
+  sweep(cellMeshesByDet.LAR, PAL_LAR_COLOR[0]);
+  sweep(cellMeshesByDet.HEC, PAL_HEC_COLOR[0]);
 }
 
 // ── Main threshold application (Tile / LAr EM / HEC) ─────────────────────────
@@ -603,7 +650,7 @@ export function applyThreshold() {
   visHandles = [];
   for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
     const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
-    const detOn = det === 'LAR' ? showLAr : det === 'HEC' ? showHec : showTile;
+    const detOn = _detOnFor(h);
     let inCluster;
     if (activeClusterCellIds === null) {
       inCluster = true;
@@ -633,7 +680,7 @@ function _applySlicerMask() {
   const slicerMask = _slicer.getMaskState();
   for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
     const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
-    const detOn = det === 'LAR' ? showLAr : det === 'HEC' ? showHec : showTile;
+    const detOn = _detOnFor(h);
     let inCluster;
     if (activeClusterCellIds === null) {
       inCluster = true;

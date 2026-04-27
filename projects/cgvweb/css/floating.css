@@ -71,6 +71,51 @@
   background: rgba(36, 103, 224, 0.07);
   border-color: rgba(36, 103, 224, 0.14);
 }
+.layer-row-parent {
+  cursor: pointer;
+}
+.layer-twist {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  transition: transform 0.16s ease;
+}
+.layer-twist svg {
+  width: 12px;
+  height: 12px;
+}
+.layer-group.expanded > .layer-row-parent .layer-twist {
+  transform: rotate(90deg);
+}
+.layer-row-child {
+  padding-left: 22px;
+  position: relative;
+  display: none;
+}
+.layer-group.expanded > .layer-row-child {
+  display: flex;
+}
+.layer-row-child::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: var(--border);
+}
+.layer-row-child .layer-dot {
+  width: 6px;
+  height: 6px;
+  opacity: 0.65;
+}
+.layer-row-child .layer-name {
+  font-size: 0.6rem;
+}
 .layer-dot {
   width: 8px;
   height: 8px;
