@@ -96,6 +96,9 @@ Heteronyms. The fragmented self.
 **Ariel** — Sylvia Plath
 Confessional poetry and psychological intensity.
 
+**Stillheten efterpå — selected poems** — Rolf Jacobsen (Norway)
+Norwegian modernism rooted in technology and nature. The first Scandinavian poet to write about power lines and neon as sacred.
+
 ---
 
 ### Art & Dance
@@ -115,6 +118,15 @@ Geometric communal art and identity.
 **Butoh** — Tatsumi Hijikata
 Japanese post-war dance. Body as trauma and transformation.
 
+**Benefits Supervisor Sleeping** — Lucian Freud (1995)
+Unflinching figurative painting. The body as landscape — against tidied contemporary conventions.
+
+**Untitled (Skull)** — Jean-Michel Basquiat (1981)
+Neo-Expressionist eruption. Race, death, celebrity, and the art market on one canvas.
+
+**Shibboleth** — Doris Salcedo (2007–08)
+A crack running the length of the Tate Modern Turbine Hall. Migration and colonial rupture made literal.
+
 ---
 
 ### Music
@@ -133,6 +145,25 @@ Polynesian contemporary music and navigation songs.
 
 **Ágætis byrjun** — Sigur Rós
 Icelandic post-rock. Ethereal soundscapes and invented language.
+
+**Saxophone Colossus** — Sonny Rollins (1956)
+Hard bop perfection. "St. Thomas" and "Blue Seven" — every note inevitable.
+
+**Misa Criolla** — Mercedes Sosa · Ariel Ramírez (1964)
+The Latin American Mass: Andean rhythms, quena, charango, and Catholic liturgy fused.
+
+**Soro · Folon** — Salif Keita (1987 · 1995)
+Malian griot voice in a modern world. West African soul at its most transcendent.
+
+**Ten Love Songs** — Susanne Sundfør (2015)
+Norwegian art-pop as epic statement. Orchestral grandeur and emotional devastation.
+
+---
+
+### Theater
+
+**The Birthday Party** — Harold Pinter (1958)
+Menace beneath the mundane. Two strangers arrive at a seaside boarding house — Pinter's grammar of threat and silence.
 
 ---
 

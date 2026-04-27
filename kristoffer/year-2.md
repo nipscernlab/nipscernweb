@@ -1,5 +1,5 @@
 # THE ARCHITECT: Year II (2027)
-### Modal Worlds, Faith & The Living Cathedral
+### Structure, Faith & The Living World
 
 **Study Parameters:** Polymath intensity — unrestricted
 
@@ -114,6 +114,9 @@ Persian ghazals. Love, wine, divine longing.
 **अभिज्ञानशाकुन्तलम् (Abhijñānaśākuntalam)** — Kālidāsa
 Sanskrit dramatic peak.
 
+**Mystery Plays of York** — Anonymous (14th–15th c. England)
+48 cycles of Biblical drama performed by the guilds. Theater as civic sacrament in the medieval city.
+
 ---
 
 ### Art — Medieval to Renaissance
@@ -129,6 +132,9 @@ Sanskrit dramatic peak.
 - **Très Riches Heures du Duc de Berry** — Limbourg Brothers
 - **Vinternatt i Rondane (Winter Night in the Mountains)** — Harald Sohlberg
 - **Las Meninas** — Diego Velázquez
+- **Lindisfarne Gospels** — Eadfrith of Lindisfarne (~715 CE) *(Insular illuminated manuscript; interlace, sacred geometry)*
+- **Crocifisso di Santa Croce** — Giovanni Cimabue (~1287–88) *(Byzantine threshold; art beginning to breathe)*
+- **Affreschi del convento di San Marco** — Fra Angelico (1438–45) *(devotional painting as prayer, one cell at a time)*
 
 ---
 
@@ -164,6 +170,8 @@ Sanskrit dramatic peak.
 - **Missa Pange Lingua** — Josquin des Prez
 - **Missa Papae Marcelli** — Palestrina
 - **Madrigali** — Carlo Gesualdo
+- **Organa — Viderunt omnes · Sederunt principes** — Pérotin & Notre-Dame School (~1198–1236) *(birth of organized polyphony)*
+- **Stabat Mater** — Giovanni Battista Pergolesi (1736) & Antonio Vivaldi (1712) *(two supreme settings of the medieval hymn)*
 
 ---
 

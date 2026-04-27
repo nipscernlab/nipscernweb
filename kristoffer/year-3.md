@@ -1,5 +1,5 @@
 # THE ARCHITECT: Year III (2028)
-### Language, Humanism & The Architecture of Meaning
+### Analysis & The Humanist Spark
 
 **Study Parameters:** Polymath intensity — unrestricted
 
@@ -61,6 +61,9 @@ Pinnacle of Chinese classical fiction.
 
 **Hamlet · King Lear · Macbeth · The Tempest** — William Shakespeare
 The invention of the modern human psyche.
+
+**A Midsummer Night's Dream** — William Shakespeare (~1595)
+Dream, desire, transformation — theater as enchantment.
 
 **The Tragical History of Doctor Faustus** — Christopher Marlowe
 Selling the soul. Renaissance ambition meets damnation.
@@ -129,6 +132,8 @@ New Spain Baroque philosophical poem.
 - **The Ambassadors** — Hans Holbein der Jüngere
 - **Theodor Kittelsen — Folktale Illustrations** *(Norwegian)*
 - **Dogon Masks** — Mali
+- **L'Ultima Cena (San Giorgio Maggiore)** — Jacopo Tintoretto (1594) *(Mannerist dynamism; the anti-Leonardo)*
+- **Le nozze di Cana** — Paolo Veronese (1563) *(Venetian opulence; largest canvas in the Louvre)*
 
 ---
 
@@ -155,6 +160,8 @@ New Spain Baroque philosophical poem.
 - **Goldberg-Variationen · Matthäus-Passion · h-Moll-Messe** — J.S. Bach
 - **Le nozze di Figaro · Don Giovanni · Die Zauberflöte · Requiem** — W.A. Mozart
 - **Späte Streichquartette (Op. 130–135)** — Ludwig van Beethoven
+- **Gloria · Stabat Mater** — Antonio Vivaldi (1715 · 1712) *(sacred peak: radiant joy and aching grief)*
+- **Die Schöpfung · Streichquartette Op. 76** — Joseph Haydn (1798 · 1797) *(Enlightenment joy and late-Haydn intimacy)*
 
 ---
 
