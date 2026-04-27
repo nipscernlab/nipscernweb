@@ -101,34 +101,78 @@ function meshNameToKey(name) {
   return null;
 }
 
-// Detector classifier — returns { det, subDet } so the layers panel can
-// toggle Tile barrel / extended / ITC and LAr barrel / end-cap independently.
+// Detector classifier — returns { det, subDet, sampling } so the layers
+// panel can toggle Tile barrel/extended/ITC, LAr barrel/end-cap, and
+// individual samplings within each region.
 //
 // Tile layer numbers `x` in the mesh prefix `T{x}{y}{k}_{k}` follow the build
-// sequence in const/CaloBuild.C:
-//   1, 23, 4   → barrel    (LB: A, BC merged, D — see MergeTile for BC)
-//   5, 6, 7    → extended  (EB samplings A, B, D)
-//   8, 9       → extended  (D4 and C10 — ITC tail kept with EB per user pref)
-//   10-13      → itc       (E1-E4 gap scintillators)
-//   14, 15     → mbts      (8-fold MBTS scintillator paddles)
+// sequence in const/CaloBuild.C; the sampling tag is the standard A/BC/B/D/E
+// (and inner/outer for MBTS modules at x=14/15).
+//   x=1   → barrel/A     x=23 → barrel/BC   x=4 → barrel/D
+//   x=5   → extended/A   x=6  → extended/B  x=7 → extended/D
+//   x=8   → extended/D   (D4 cell, kept under EB-D)
+//   x=9   → extended/B   (C10 cell, kept under EB-B per user request)
+//   x=10..13 → itc/e     (E1-E4 collapse to a single ITC bucket)
+//   x=14  → mbts/outer   x=15 → mbts/inner
 function classifyCellDet(name) {
   if (ghostVisible.has(name)) return null;
   const parts = name.split('→');
   if (parts.length < 3) return null;
   for (const p of parts) {
-    if (p.startsWith('EB_')) return { det: 'LAR', subDet: 'barrel' };
-    if (p.startsWith('EE_')) return { det: 'LAR', subDet: 'ec' };
-    if (p.startsWith('H_')) return { det: 'HEC', subDet: 'ec' };
+    let m = /^EB_(\d+)_/.exec(p);
+    if (m) return { det: 'LAR', subDet: 'barrel', sampling: +m[1] };
+    m = /^EE_(\d+)_/.exec(p);
+    if (m) return { det: 'LAR', subDet: 'ec', sampling: +m[1] };
+    m = /^EM(Barrel|EndCap)_(\d+)_/.exec(p);
+    if (m) return { det: 'LAR', subDet: m[1] === 'Barrel' ? 'barrel' : 'ec', sampling: +m[2] };
+    // HEC mesh prefix encodes the merged layer name (e.g. H_1_, H_23_) — map
+    // it through HEC_NAMES to recover the sampling index 0..3.
+    m = /^H_(\w+?)_/.exec(p);
+    if (m) {
+      const s = HEC_NAMES.indexOf(m[1]);
+      if (s >= 0) return { det: 'HEC', subDet: 'ec', sampling: s };
+    }
+    m = /^HEC_(\w+)_/.exec(p);
+    if (m) {
+      const s = HEC_NAMES.indexOf(m[1]);
+      if (s >= 0) return { det: 'HEC', subDet: 'ec', sampling: s };
+    }
     const tm = /^T(\d+)[pn]\d+_\d+$/.exec(p);
     if (tm) {
       const x = +tm[1];
-      let subDet;
-      if (x === 1 || x === 4 || x === 23) subDet = 'barrel';
-      else if (x >= 5 && x <= 9) subDet = 'extended';
-      else if (x >= 10 && x <= 13) subDet = 'itc';
-      else if (x === 14 || x === 15) subDet = 'mbts';
-      else subDet = 'extended';
-      return { det: 'TILE', subDet };
+      let subDet, sampling;
+      if (x === 1) {
+        subDet = 'barrel';
+        sampling = 'A';
+      } else if (x === 23) {
+        subDet = 'barrel';
+        sampling = 'BC';
+      } else if (x === 4) {
+        subDet = 'barrel';
+        sampling = 'D';
+      } else if (x === 5) {
+        subDet = 'extended';
+        sampling = 'A';
+      } else if (x === 6 || x === 9) {
+        subDet = 'extended';
+        sampling = 'B';
+      } else if (x === 7 || x === 8) {
+        subDet = 'extended';
+        sampling = 'D';
+      } else if (x >= 10 && x <= 13) {
+        subDet = 'itc';
+        sampling = 'E';
+      } else if (x === 14) {
+        subDet = 'mbts';
+        sampling = 'outer';
+      } else if (x === 15) {
+        subDet = 'mbts';
+        sampling = 'inner';
+      } else {
+        subDet = 'extended';
+        sampling = 'D';
+      }
+      return { det: 'TILE', subDet, sampling };
     }
   }
   return null;
@@ -310,7 +354,7 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
           loose.push(o);
           return;
         }
-        const { det, subDet } = cls;
+        const { det, subDet, sampling } = cls;
         const gk = `${det}::${o.geometry.uuid}`;
         let bucket = groups.get(gk);
         if (!bucket) {
@@ -322,6 +366,7 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
           name: o.name,
           key: meshNameToKey(o.name),
           subDet,
+          sampling,
         });
       });
 
@@ -347,6 +392,7 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
             instId: i,
             det,
             subDet: it.subDet,
+            sampling: it.sampling,
             name: it.name,
             origMatrix: it.matrix,
             visible: false,

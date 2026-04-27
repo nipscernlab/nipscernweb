@@ -173,66 +173,76 @@ export function setThrFcalMev(v) {
 }
 
 // ── Detector toggle state ─────────────────────────────────────────────────────
-// Tile and LAr expose sub-detector toggles so the user can show barrel and
-// end-cap regions independently. Each cell handle carries its `subDet` tag
-// (set in loader.js classifyCellDet); the threshold loop picks the relevant
-// flag from the maps below.
-//   Tile: barrel (LB samplings A/B/C/D), extended (EB + D4/C9 ITC tail),
-//         itc (E1-E4 gap scintillators), mbts (8-fold MBTS scintillators).
-//   LAr:  barrel (EMB), ec (EMEC).
-//   HEC:  single flag (always end-cap).
-//   FCAL: single flag.
-export let showTileBarrel = true;
-export let showTileExt = true;
-export let showTileItc = true;
-export let showMbts = true;
-export let showLArBarrel = true;
-export let showLArEc = true;
-export let showHec = true;
-export let showFcal = true;
+// `layerVis` is a tree mirroring the layout of the floating Layers panel. Each
+// leaf is a boolean; aggregate ON/OFF for parent rows is derived (any leaf on).
+// Cell handles carry { det, subDet, sampling } tags set in loader.js, and the
+// threshold loop dispatches through `_detOnFor(h)` which walks the tree.
+//   tile.barrel    — A, BC, D                 (LB samplings)
+//   tile.extended  — A, B, D                  (EB samplings; D4→D, C10→B)
+//   tile.itc       — E                        (E1-E4 gap scintillators)
+//   mbts           — inner, outer
+//   lar.barrel     — 0, 1, 2, 3               (EMB samplings: presampler/strips/middle/back)
+//   lar.ec         — 0, 1, 2, 3               (EMEC samplings)
+//   hec            — 0, 1, 2, 3               (HEC1-HEC4)
+//   fcal           — 1, 2, 3                  (FCAL1 EM, FCAL2 Had1, FCAL3 Had2)
+export const layerVis = {
+  tile: {
+    barrel: { A: true, BC: true, D: true },
+    extended: { A: true, B: true, D: true },
+    itc: { E: true },
+  },
+  mbts: { inner: true, outer: true },
+  lar: {
+    barrel: { 0: true, 1: true, 2: true, 3: true },
+    ec: { 0: true, 1: true, 2: true, 3: true },
+  },
+  hec: { 0: true, 1: true, 2: true, 3: true },
+  fcal: { 1: true, 2: true, 3: true },
+};
 
-export function setShowTileBarrel(v) {
-  showTileBarrel = v;
+// Sets a leaf at the given path (e.g. ['tile','barrel','A']).
+export function setLayerLeaf(path, on) {
+  let node = layerVis;
+  for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
+  node[path[path.length - 1]] = !!on;
 }
-export function setShowTileExt(v) {
-  showTileExt = v;
+// Bulk-set every leaf under a sub-tree to `on`.
+export function setLayerSubtree(path, on) {
+  let node = layerVis;
+  for (const k of path) node = node[k];
+  if (typeof node === 'object') {
+    for (const k of Object.keys(node)) {
+      if (typeof node[k] === 'object') setLayerSubtree([...path, k], on);
+      else node[k] = !!on;
+    }
+  }
 }
-export function setShowTileItc(v) {
-  showTileItc = v;
-}
-export function setShowMbts(v) {
-  showMbts = v;
-}
-export function setShowLArBarrel(v) {
-  showLArBarrel = v;
-}
-export function setShowLArEc(v) {
-  showLArEc = v;
-}
-export function setShowHec(v) {
-  showHec = v;
-}
-export function setShowFcal(v) {
-  showFcal = v;
+// True if any leaf under the sub-tree is on.
+export function anyLayerLeafOn(path) {
+  let node = layerVis;
+  for (const k of path) node = node[k];
+  if (typeof node !== 'object') return !!node;
+  for (const k of Object.keys(node)) {
+    if (typeof node[k] === 'object') {
+      if (anyLayerLeafOn([...path, k])) return true;
+    } else if (node[k]) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // Picks the visibility flag for a given cell handle, based on its sub-detector
-// tag. Used by both the active-cell threshold loop and the show-all sweep.
+// and sampling tags. Used by both the active-cell threshold loop and the
+// show-all sweep. FCAL is filtered separately in _applyFcalDraw.
 function _detOnFor(h) {
-  if (h.det === 'HEC') return showHec;
-  if (h.det === 'LAR') return h.subDet === 'barrel' ? showLArBarrel : showLArEc;
-  // TILE and its sub-regions (h.det === 'TILE')
-  switch (h.subDet) {
-    case 'mbts':
-      return showMbts;
-    case 'itc':
-      return showTileItc;
-    case 'extended':
-      return showTileExt;
-    case 'barrel':
-    default:
-      return showTileBarrel;
+  if (h.det === 'HEC') return !!layerVis.hec[h.sampling];
+  if (h.det === 'LAR') return !!layerVis.lar[h.subDet]?.[h.sampling];
+  if (h.det === 'TILE') {
+    if (h.subDet === 'mbts') return !!layerVis.mbts[h.sampling];
+    return !!layerVis.tile[h.subDet]?.[h.sampling];
   }
+  return false;
 }
 
 // ── Track threshold state ─────────────────────────────────────────────────────
@@ -360,7 +370,9 @@ function _applyFcalDraw() {
   const slicerMask = _slicer?.getMaskState() ?? { active: false };
 
   const visible = fcalCellsData.filter((c) => {
-    if (!showFcal) return false;
+    // FCAL is filtered per-module instead of a single showFcal flag — module
+    // 1=EM, 2=Had1, 3=Had2 (parser/src/lib.rs:694).
+    if (!layerVis.fcal[c.module]) return false;
     if (!_slicer?.isShowAllCells() && c.energy * 1000 < thrFcalMev) return false;
     if (
       !_slicer?.isShowAllCells() &&
