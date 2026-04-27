@@ -11,15 +11,17 @@
 // straw via polyline interpolation) and the muon spectrometer (MDT, RPC, TGC,
 // MM, STGC — all expose x/y/z directly per hit). TRT is the only sub-detector
 // that needs the overlay to do extra work; everything else lands in the
-// `positions` map as a plain Vector3.
+// `positions` map as a plain {x, y, z} object (Vector3-shaped without the
+// class so the result can cross a Worker boundary via structured clone).
 
-import * as THREE from 'three';
-
-// Convert XML coordinate (cm in ATLAS convention) to a THREE.Vector3 in the
-// scene's coords (mm, with x and y negated to match the existing track
-// rendering). Same transform applied to track polylines in the Rust parser.
+// Convert XML coordinate (cm in ATLAS convention) to a plain {x, y, z} in
+// scene mm with x and y negated to match the existing track convention.
+// We avoid THREE.Vector3 here so the parser is structured-clone-friendly
+// and can run inside the WASM worker (off main thread). Consumers that
+// need vector math (Vector3.copy, .subVectors, .distanceToSquared) all
+// read x/y/z properties — plain objects work the same.
 function _toScene(xCm, yCm, zCm) {
-  return new THREE.Vector3(-xCm * 10, -yCm * 10, zCm * 10);
+  return { x: -xCm * 10, y: -yCm * 10, z: zCm * 10 };
 }
 
 function _readStrings(body, tag) {

@@ -67,16 +67,23 @@ let mousePos = { x: 0, y: 0 };
 
 let _getShowInfo = () => true;
 let _getCinemaMode = () => false;
+let _getDragging = () => false;
 let _t = (k) => k;
 
-export function initHoverTooltip({ getShowInfo, getCinemaMode, t }) {
+export function initHoverTooltip({ getShowInfo, getCinemaMode, getDragging, t }) {
   if (getShowInfo) _getShowInfo = getShowInfo;
   if (getCinemaMode) _getCinemaMode = getCinemaMode;
+  if (getDragging) _getDragging = getDragging;
   if (t) _t = t;
 
   document.addEventListener('mousemove', (e) => {
     mousePos.x = e.clientX;
     mousePos.y = e.clientY;
+    // Skip the raycast entirely while the user is orbiting — main.js
+    // already hides tooltip + outline on the controls 'change' event,
+    // and the raycast itself (cells + fcal + tracks + clusters + jets +
+    // ...) would otherwise stall the drag at ~20 Hz on a 30 k-cell event.
+    if (_getDragging()) return;
     const now = Date.now();
     if (now - lastRay < 50) return;
     lastRay = now;
