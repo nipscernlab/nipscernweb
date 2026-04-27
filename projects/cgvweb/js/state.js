@@ -59,11 +59,28 @@ class _WasmParserPool {
     const m = ev.data;
     if (!m) return;
     if (m.type === 'ready') return;
+    // hitsResult arrives AFTER parseXmlResult — the await on parseXmlAndDecode
+    // already resolved by then. Route to the registered listener (set up in
+    // processXml.js) rather than the per-rid pending Promise.
+    if (m.type === 'hitsResult') {
+      if (this._onHits) this._onHits(m.rid, m.hits);
+      return;
+    }
     const pend = this._pending.get(m.rid);
     if (!pend) return;
     this._pending.delete(m.rid);
     if (m.type === 'error') pend.reject(new Error(m.message || 'wasm worker error'));
     else pend.resolve(m);
+  }
+
+  /**
+   * Register a callback invoked whenever the worker finishes parsing the
+   * inner-detector hit positions for an event (delivered AFTER the main
+   * parseXmlResult so the renderer doesn't block on it).
+   * @param {(rid: number, hits: any) => void} cb
+   */
+  onHits(cb) {
+    this._onHits = cb;
   }
 
   /**

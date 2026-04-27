@@ -150,6 +150,7 @@ const topToolbar = setupTopToolbar({
 initHoverTooltip({
   getShowInfo: topToolbar.getShowInfo,
   getCinemaMode: () => cinema.isCinemaMode(),
+  getDragging: () => _ctrlActive,
   t,
 });
 

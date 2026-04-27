@@ -12,10 +12,18 @@
 //              eventInfo, tileCells, larCells, hecCells, mbtsCells, fcalCells,
 //              tracks, photons, clusters, clusterCollections,
 //              tilePacked, larPacked, hecPacked }
+//         then later, ALSO:
+//         { type: 'hitsResult', rid, hits } where hits is the parseHits
+//         output ({ positions, trtParams, chamberPos } as plain Maps of
+//         {x,y,z} so they're structured-clone friendly). The two messages
+//         decouple cell rendering (fast) from inner-detector hit parsing
+//         (~300 ms on a 47 MB XML) so the user sees the event without
+//         waiting on hit positions, which only matter on hover.
 //         tilePacked/larPacked/hecPacked: Int32Array (transferred zero-copy) | null
 //         tracks[i].pts: [{x,y,z}] plain objects (no THREE.Vector3)
 
 import wasmInit, { parse_jivexml } from '../parser/pkg/atlas_id_parser.js';
+import { parseHits } from './hitsParser.js';
 
 let _ready = false;
 let _readyPromise = null;
@@ -45,6 +53,13 @@ self.onmessage = async (ev) => {
       const { rid, xmlText } = msg;
       const result = parse_jivexml(xmlText);
       self.postMessage({ type: 'parseXmlResult', rid, ...result });
+      // Hits parsing is the slowest pure-JS regex pass; running it here
+      // (after the WASM result is already on its way to main) means the
+      // main thread can render the event while we keep working. The
+      // hitsResult message lands later and the overlay picks it up
+      // without stalling cell rendering.
+      const hits = parseHits(xmlText);
+      self.postMessage({ type: 'hitsResult', rid, hits });
       return;
     }
   } catch (e) {

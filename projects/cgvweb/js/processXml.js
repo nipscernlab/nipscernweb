@@ -72,7 +72,6 @@ import {
   getActiveJetCollection,
   onJetStateChange,
 } from './jets.js';
-import { parseHits } from './hitsParser.js';
 import { setHitPositions, clearHitsState } from './hitsOverlay.js';
 import { parseMet, pickPreferredMet } from './metParser.js';
 import { drawMet, clearMet } from './metOverlay.js';
@@ -92,6 +91,15 @@ import { updateMinimap } from './minimap.js';
 // (setActiveJetKey). drawJets(null) on clearJetState removes the group.
 onJetStateChange(() => {
   drawJets(getActiveJetCollection());
+});
+
+// Worker delivers the hit positions in a second message (after the cell-
+// rendering parseXmlResult). Drop the result into the overlay when it
+// matches the latest in-flight event; if a newer event has already landed,
+// the rid mismatch ignores the stale parse.
+_wasmPool.onHits((rid, hits) => {
+  if (rid !== _procXmlRid) return;
+  setHitPositions(hits);
 });
 
 // Sliders + detector-panel init are assigned by setupDetectorPanels(), which
@@ -268,10 +276,10 @@ export async function processXml(xmlText) {
   setJetCollections(parseJets(xmlText));
 
   // ── Inner-detector + muon-spectrometer hits ───────────────────────────────
-  // Cache hit-id → position lookup (with TRT/muon-chamber subtleties handled
-  // inside the overlay) so the hover tooltip can render markers along the
-  // track under the cursor. No rendering happens here.
-  setHitPositions(parseHits(xmlText));
+  // The WASM worker parses these in parallel and posts a separate
+  // `hitsResult` message; the listener installed at module load
+  // (_wasmPool.onHits below) drops it into setHitPositions when it
+  // arrives. resetScene already cleared the previous event's hit state.
 
   // ── Missing transverse energy (MET) ─────────────────────────────────────────
   // JiveXML publishes several MET variants (EMPFlow / EMTopo / Calo / ...).
