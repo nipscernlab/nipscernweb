@@ -42,6 +42,9 @@
       </div>
     </header>
 
+    <!-- Featured story slot (populated dynamically) -->
+    <section id="news-featured-slot" aria-label="Featured story" style="display:none"></section>
+
     <section class="section">
       <div class="container">
         <div class="news-layout">
@@ -111,10 +114,62 @@
 
   <script type="module">
     import { formatDate } from '../assets/js/main.js';
+    import { getLang } from '../assets/js/i18n.js';
 
     async function loadNews() {
       const res = await fetch('../data/news.json');
       return res.ok ? res.json() : [];
+    }
+
+    async function loadFeatured() {
+      try {
+        const res = await fetch('../data/news-featured.json');
+        return res.ok ? res.json() : null;
+      } catch (e) { return null; }
+    }
+
+    function pickLang(featured) {
+      const lang = getLang() || 'en';
+      const t = featured.translations || {};
+      return t[lang] || t.en || t.pt || Object.values(t)[0] || {};
+    }
+
+    function makeFeaturedCard(featured) {
+      const tr = pickLang(featured);
+      const article = document.createElement('article');
+      article.className = 'news-featured fade-up';
+      article.id = featured.id;
+      article.setAttribute('role', 'article');
+      article.setAttribute('aria-labelledby', 'featured-title-' + featured.id);
+
+      const eyebrowText = (getLang() === 'pt') ? 'Destaque' : 'Featured Story';
+      const readText    = (getLang() === 'pt') ? 'Ler a história' : 'Read the story';
+
+      article.innerHTML = `
+        <a href="post?id=${featured.id}" class="news-featured-link" aria-label="${tr.title || ''}">
+          <div class="news-featured-media">
+            <img src="../${featured.image}" alt="" loading="eager"
+                 onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
+            <div class="news-featured-glow" aria-hidden="true"></div>
+          </div>
+          <div class="news-featured-body">
+            <div class="news-featured-eyebrow">
+              <span class="news-featured-pill"><i class="ph ph-star" aria-hidden="true"></i> ${eyebrowText}</span>
+              <span class="news-featured-date">${formatDate(featured.date)}</span>
+              <span class="news-featured-author">— ${featured.author || ''}</span>
+            </div>
+            <h2 class="news-featured-title" id="featured-title-${featured.id}">${tr.title || ''}</h2>
+            <p class="news-featured-subtitle">${tr.subtitle || tr.excerpt || ''}</p>
+            <div class="news-featured-cta">
+              <span class="news-featured-readmore">${readText} <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+              <div class="news-featured-tags">
+                ${(featured.tags || []).slice(0, 4).map(t => `<span class="pub-tag">${t}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+        </a>
+      `;
+      return article;
     }
 
     function catClass(cat) {
@@ -218,10 +273,27 @@
       return div;
     }
 
+    function renderFeatured(featured) {
+      const slot = document.getElementById('news-featured-slot');
+      if (!slot || !featured) return;
+      slot.replaceChildren();
+      const card = makeFeaturedCard(featured);
+      slot.appendChild(card);
+      slot.style.display = 'block';
+      setTimeout(() => card.classList.add('visible'), 100);
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
-      const posts = await loadNews();
+      const [posts, featured] = await Promise.all([loadNews(), loadFeatured()]);
       const feed = document.getElementById('news-feed');
       const sidebarAwards = document.getElementById('sidebar-awards');
+
+      if (featured) renderFeatured(featured);
+
+      // Re-render featured on language change so PT/EN swap takes effect
+      document.addEventListener('langchange', () => {
+        if (featured) renderFeatured(featured);
+      });
 
       if (feed && posts) {
         feed.replaceChildren();
