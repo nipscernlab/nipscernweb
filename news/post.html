@@ -181,6 +181,32 @@
       };
     }
 
+    /** Compute the offset to clear the sticky top navigation when scrolling. */
+    function getHeaderOffset() {
+      const nav = document.getElementById('nav');
+      let navH = 0;
+      if (nav) {
+        const r = nav.getBoundingClientRect();
+        // The nav is fixed; its rect height reflects the rendered height.
+        navH = r.height || nav.offsetHeight || 0;
+      }
+      if (!navH) {
+        const cssVar = getComputedStyle(document.documentElement).getPropertyValue('--nav-h').trim();
+        navH = parseInt(cssVar, 10) || 68;
+      }
+      return navH + 16; // small visual breathing room above the heading
+    }
+
+    /** Smooth-scroll the page so the heading sits below the sticky nav. */
+    function scrollToHeading(id) {
+      const target = document.getElementById(id);
+      if (!target) return false;
+      const rect = target.getBoundingClientRect();
+      const top = rect.top + window.scrollY - getHeaderOffset();
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      return true;
+    }
+
     /** Build the table of contents sidebar for featured posts. */
     function injectToc(bodyEl) {
       const headings = Array.from(bodyEl.querySelectorAll('.story-section h2'));
@@ -188,6 +214,11 @@
 
       // Give each heading a stable ID
       headings.forEach((h, i) => { if (!h.id) h.id = 'ch-' + i; });
+
+      // Snapshot the IDs into the closure — the actual elements may be
+      // replaced later (innerHTML edits, language re-render). We always
+      // resolve by id at click/observe time.
+      const headingIds = headings.map(h => h.id);
 
       // Build sidebar DOM
       const sidebar = document.createElement('nav');
@@ -201,6 +232,7 @@
 
       // Mobile toggle button
       const toggle = document.createElement('button');
+      toggle.type = 'button';
       toggle.className = 'post-toc-toggle';
       toggle.setAttribute('aria-expanded', 'false');
       toggle.innerHTML = 'Chapters <i class="ph ph-list" aria-hidden="true"></i>';
@@ -214,15 +246,28 @@
         a.href = '#' + h.id;
         a.className = 'post-toc-link';
         a.textContent = h.textContent;
-        a.addEventListener('click', function(e) {
-          e.preventDefault();
-          h.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          history.replaceState(null, '', '#' + h.id);
-        });
+        a.dataset.targetId = h.id;
         li.appendChild(a);
         list.appendChild(li);
       });
       sidebar.appendChild(list);
+
+      // Single delegated click handler on the list — keeps working on touch
+      // devices and survives any later DOM swaps inside the body.
+      list.addEventListener('click', function(e) {
+        const a = e.target.closest('.post-toc-link');
+        if (!a || !list.contains(a)) return;
+        e.preventDefault();
+        const id = a.dataset.targetId;
+        if (scrollToHeading(id)) {
+          history.replaceState(null, '', '#' + id);
+        }
+        // Auto-collapse the mobile chip-list once the user picks a chapter.
+        if (list.classList.contains('is-open')) {
+          list.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
 
       // Mobile toggle behaviour
       toggle.addEventListener('click', function() {
@@ -237,18 +282,31 @@
       layout.appendChild(sidebar);
       layout.appendChild(bodyEl);
 
-      // Intersection observer: highlight active section
+      // Intersection observer: highlight active section. Resolve elements by
+      // id so the observer survives later body re-renders.
       const links = list.querySelectorAll('.post-toc-link');
       const obs = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
           if (entry.isIntersecting) {
-            links.forEach(function(a) { a.classList.remove('is-active'); });
-            const active = list.querySelector('a[href="#' + entry.target.id + '"]');
+            links.forEach(function(link) { link.classList.remove('is-active'); });
+            const active = list.querySelector('a[data-target-id="' + entry.target.id + '"]');
             if (active) active.classList.add('is-active');
           }
         });
       }, { rootMargin: '-20% 0px -70% 0px' });
-      headings.forEach(function(h) { obs.observe(h); });
+      headingIds.forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) obs.observe(el);
+      });
+
+      // If the URL already carries a chapter hash, honour it once layout has
+      // settled (so we land below the sticky nav rather than under it).
+      if (location.hash && location.hash.length > 1) {
+        const targetId = location.hash.slice(1);
+        if (headingIds.includes(targetId)) {
+          requestAnimationFrame(function() { scrollToHeading(targetId); });
+        }
+      }
     }
 
     /** Make all .story-figure img elements clickable lightbox triggers. */
@@ -341,22 +399,24 @@
 
       // Render body — featured stories carry rich HTML, regular posts carry plain text
       const bodyEl = document.getElementById('post-body');
-      if (post._featured && post.content_html) {
+      const isFeatured = post._featured && post.content_html;
+      if (isFeatured) {
         bodyEl.classList.add('post-body-featured');
         bodyEl.innerHTML = post.content_html;
         initLightbox(bodyEl);
-        injectToc(bodyEl);
       } else {
         const paragraphs = (post.content || '').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
         bodyEl.innerHTML = paragraphs;
       }
       bodyEl.style.display = 'block';
 
-      // Embedded video (YouTube)
+      // Embedded video (YouTube). insertAdjacentHTML appends without
+      // re-parsing existing children, so anything we touch afterwards keeps
+      // working (handlers, observers, references).
       if (post.video) {
         const ytId = post.video.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
         if (ytId) {
-          bodyEl.innerHTML += `
+          bodyEl.insertAdjacentHTML('beforeend', `
             <div class="post-video-wrap" style="margin:var(--sp-10) 0">
               <iframe
                 src="https://www.youtube-nocookie.com/embed/${ytId}"
@@ -366,13 +426,19 @@
                 loading="lazy"
                 style="width:100%;aspect-ratio:16/9;border:0;border-radius:var(--r-xl);display:block"
               ></iframe>
-            </div>`;
+            </div>`);
         }
       }
 
       // Tags
       if (post.tags && post.tags.length) {
-        bodyEl.innerHTML += `<div class="pub-tags" style="margin-top:var(--sp-8)">${post.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`;
+        bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${post.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
+      }
+
+      // Build the chapter sidebar last, after all body edits, so it sees the
+      // final DOM and its handlers don't get wiped by later innerHTML writes.
+      if (isFeatured) {
+        injectToc(bodyEl);
       }
 
       // Related articles
@@ -457,7 +523,7 @@
         }
         bodyEl.innerHTML = tr.content_html || '';
         if (featured.tags && featured.tags.length) {
-          bodyEl.innerHTML += `<div class="pub-tags" style="margin-top:var(--sp-8)">${featured.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`;
+          bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${featured.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
         }
         initLightbox(bodyEl);
         injectToc(bodyEl);
