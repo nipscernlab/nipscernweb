@@ -64,7 +64,7 @@
     <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
     <div id="post-cover" style="display:none;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"></div>
 
-    <!-- Post body -->
+    <!-- Post body (and TOC injected alongside it for featured posts) -->
     <div class="post-body" id="post-body" style="display:none"></div>
 
     <!-- Related articles (populated by JS) -->
@@ -94,6 +94,12 @@
 
   </main>
 
+  <!-- Lightbox (shared, same as About Us) -->
+  <div id="story-lightbox" class="story-lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button class="story-lightbox__close" type="button" aria-label="Close">&times;</button>
+    <img class="story-lightbox__img" alt="">
+  </div>
+
   <footer id="footer" role="contentinfo"></footer>
 
   <div vw class="enabled">
@@ -119,6 +125,33 @@
   setTimeout(function(){ obs.disconnect(); }, 8000);
 })();
 </script>
+
+  <!-- Lightbox logic -->
+  <script>
+  (function(){
+    const lb    = document.getElementById('story-lightbox');
+    const lbImg = lb.querySelector('.story-lightbox__img');
+    const lbClose = lb.querySelector('.story-lightbox__close');
+    function open(src, alt){
+      lbImg.src = src; lbImg.alt = alt || '';
+      lb.classList.add('is-open'); lb.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function close(){
+      lb.classList.remove('is-open'); lb.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      setTimeout(function(){ lbImg.src = ''; }, 300);
+    }
+    document.addEventListener('click', function(e){
+      const t = e.target.closest('.lightbox-trigger');
+      if(t){ e.preventDefault(); open(t.currentSrc || t.src, t.alt); return; }
+      if(e.target === lb || e.target === lbClose) close();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && lb.classList.contains('is-open')) close();
+    });
+  })();
+  </script>
 
   <script type="module">
     import { formatDate } from '../assets/js/main.js';
@@ -146,6 +179,84 @@
         _featured: true,
         _author: featured.author || ''
       };
+    }
+
+    /** Build the table of contents sidebar for featured posts. */
+    function injectToc(bodyEl) {
+      const headings = Array.from(bodyEl.querySelectorAll('.story-section h2'));
+      if (headings.length < 3) return;
+
+      // Give each heading a stable ID
+      headings.forEach((h, i) => { if (!h.id) h.id = 'ch-' + i; });
+
+      // Build sidebar DOM
+      const sidebar = document.createElement('nav');
+      sidebar.className = 'post-toc-sidebar';
+      sidebar.setAttribute('aria-label', 'Story chapters');
+
+      const label = document.createElement('div');
+      label.className = 'post-toc-label';
+      label.textContent = 'Chapters';
+      sidebar.appendChild(label);
+
+      // Mobile toggle button
+      const toggle = document.createElement('button');
+      toggle.className = 'post-toc-toggle';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.innerHTML = 'Chapters <i class="ph ph-list" aria-hidden="true"></i>';
+      sidebar.appendChild(toggle);
+
+      const list = document.createElement('ol');
+      list.className = 'post-toc-list';
+      headings.forEach(function(h) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.className = 'post-toc-link';
+        a.textContent = h.textContent;
+        a.addEventListener('click', function(e) {
+          e.preventDefault();
+          h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          history.replaceState(null, '', '#' + h.id);
+        });
+        li.appendChild(a);
+        list.appendChild(li);
+      });
+      sidebar.appendChild(list);
+
+      // Mobile toggle behaviour
+      toggle.addEventListener('click', function() {
+        const open = list.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+
+      // Wrap body + sidebar in the flex layout container
+      const layout = document.createElement('div');
+      layout.className = 'post-featured-layout';
+      bodyEl.parentNode.insertBefore(layout, bodyEl);
+      layout.appendChild(sidebar);
+      layout.appendChild(bodyEl);
+
+      // Intersection observer: highlight active section
+      const links = list.querySelectorAll('.post-toc-link');
+      const obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            links.forEach(function(a) { a.classList.remove('is-active'); });
+            const active = list.querySelector('a[href="#' + entry.target.id + '"]');
+            if (active) active.classList.add('is-active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      headings.forEach(function(h) { obs.observe(h); });
+    }
+
+    /** Make all .story-figure img elements clickable lightbox triggers. */
+    function initLightbox(bodyEl) {
+      bodyEl.querySelectorAll('.story-figure img').forEach(function(img) {
+        img.classList.add('lightbox-trigger');
+        img.style.cursor = 'zoom-in';
+      });
     }
 
     async function loadPost() {
@@ -233,6 +344,8 @@
       if (post._featured && post.content_html) {
         bodyEl.classList.add('post-body-featured');
         bodyEl.innerHTML = post.content_html;
+        initLightbox(bodyEl);
+        injectToc(bodyEl);
       } else {
         const paragraphs = (post.content || '').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
         bodyEl.innerHTML = paragraphs;
@@ -321,6 +434,35 @@
     }
 
     document.addEventListener('DOMContentLoaded', loadPost);
+
+    // If the user changes language while reading the featured story, re-render
+    document.addEventListener('langchange', async () => {
+      if (!document.body.classList.contains('post-featured')) return;
+      try {
+        const res = await fetch('../data/news-featured.json');
+        if (!res.ok) return;
+        const featured = await res.json();
+        const params = new URLSearchParams(window.location.search);
+        if (featured.id !== params.get('id')) return;
+        const tr = pickLang(featured);
+        document.getElementById('post-title').textContent   = tr.title || '';
+        document.getElementById('post-excerpt').textContent = tr.subtitle || tr.excerpt || '';
+        document.getElementById('page-title').textContent   = (tr.title || '') + ' — NIPSCERN';
+        const bodyEl = document.getElementById('post-body');
+        // Remove any existing TOC layout wrapper before re-rendering
+        const layout = document.querySelector('.post-featured-layout');
+        if (layout) {
+          layout.parentNode.insertBefore(bodyEl, layout);
+          layout.remove();
+        }
+        bodyEl.innerHTML = tr.content_html || '';
+        if (featured.tags && featured.tags.length) {
+          bodyEl.innerHTML += `<div class="pub-tags" style="margin-top:var(--sp-8)">${featured.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`;
+        }
+        initLightbox(bodyEl);
+        injectToc(bodyEl);
+      } catch (e) { /* keep current rendering on failure */ }
+    });
   </script>
 
   <script type="module" src="../assets/js/main.js"></script>
