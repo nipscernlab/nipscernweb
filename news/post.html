@@ -122,10 +122,30 @@
 
   <script type="module">
     import { formatDate } from '../assets/js/main.js';
+    import { getLang } from '../assets/js/i18n.js';
 
     function catClass(cat) {
       const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
       return m[cat] || 'badge-gray';
+    }
+
+    function pickLang(featured) {
+      const lang = getLang() || 'en';
+      const t = featured.translations || {};
+      return t[lang] || t.en || t.pt || Object.values(t)[0] || {};
+    }
+
+    /** Adapt the featured-story JSON shape to the regular post shape used by the renderer. */
+    function adaptFeatured(featured) {
+      const tr = pickLang(featured);
+      return {
+        ...featured,
+        title: tr.title || '',
+        excerpt: tr.subtitle || tr.excerpt || '',
+        content_html: tr.content_html || '',
+        _featured: true,
+        _author: featured.author || ''
+      };
     }
 
     async function loadPost() {
@@ -135,19 +155,34 @@
       document.getElementById('post-loading').style.display = 'block';
 
       let posts;
+      let featured = null;
       try {
-        const res = await fetch('../data/news.json');
-        posts = await res.json();
+        const [resPosts, resFeat] = await Promise.all([
+          fetch('../data/news.json'),
+          fetch('../data/news-featured.json')
+        ]);
+        posts = resPosts.ok ? await resPosts.json() : [];
+        featured = resFeat.ok ? await resFeat.json() : null;
       } catch (e) {
-        posts = [];
+        posts = posts || [];
       }
 
       document.getElementById('post-loading').style.display = 'none';
 
-      const post = posts.find(p => p.id === id);
+      let post;
+      if (featured && featured.id === id) {
+        post = adaptFeatured(featured);
+      } else {
+        post = posts.find(p => p.id === id);
+      }
       if (!post) {
         document.getElementById('post-not-found').style.display = 'block';
         return;
+      }
+
+      // Mark <body> for featured-only styling
+      if (post._featured) {
+        document.body.classList.add('post-featured');
       }
 
       // Update meta
@@ -169,6 +204,17 @@
       document.getElementById('post-excerpt').textContent = post.excerpt;
       document.getElementById('post-header').style.display = 'block';
 
+      // Author byline (featured stories carry an explicit author)
+      if (post._featured && post._author) {
+        const meta = document.querySelector('.post-meta');
+        if (meta && !meta.querySelector('.post-author')) {
+          const author = document.createElement('span');
+          author.className = 'post-author';
+          author.innerHTML = '<i class="ph ph-user-circle" aria-hidden="true"></i> ' + post._author;
+          meta.appendChild(author);
+        }
+      }
+
       // Cover image — overlaps post-header so the dark bg bleeds ~15% behind the image top
       if (post.image) {
         const coverEl = document.getElementById('post-cover');
@@ -182,10 +228,15 @@
         document.getElementById('post-header').classList.add('has-cover');
       }
 
-      // Render body
+      // Render body — featured stories carry rich HTML, regular posts carry plain text
       const bodyEl = document.getElementById('post-body');
-      const paragraphs = post.content.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
-      bodyEl.innerHTML = paragraphs;
+      if (post._featured && post.content_html) {
+        bodyEl.classList.add('post-body-featured');
+        bodyEl.innerHTML = post.content_html;
+      } else {
+        const paragraphs = (post.content || '').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+        bodyEl.innerHTML = paragraphs;
+      }
       bodyEl.style.display = 'block';
 
       // Embedded video (YouTube)
