@@ -37,7 +37,7 @@ export function registerViewerShortcuts({
         resetCamera();
         break;
       case 'I':
-        document.getElementById('btn-info').click();
+        document.getElementById('hbtn-info')?.click();
         break;
       case 'C':
         state.cinemaMode ? exitCinema() : enterCinema();

@@ -132,22 +132,30 @@
   pointer-events: none;
   top: 50%;
 }
-.thr-input {
-  width: 68px;
-  padding: 3px 4px;
-  background: rgba(2, 11, 28, 0.9);
-  border: 1px solid var(--border);
+/* Floating threshold-input popup — opened on dblclick over a slider track.
+   Positioned absolutely against the slider element by detectorPanels.js;
+   appears just to the LEFT of the rpanel so it doesn't overlap the sval
+   labels above/below the track. */
+#thr-popup {
+  position: fixed;
+  z-index: 9000;
+  background: rgba(2, 11, 28, 0.95);
+  border: 1px solid var(--accent2);
   border-radius: 4px;
-  color: var(--text);
-  font: 400 0.62rem var(--mono);
-  text-align: center;
-  transition: border-color 0.15s;
+  padding: 4px 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
 }
-.thr-input:focus {
-  border-color: var(--accent2);
+#thr-popup input {
+  width: 80px;
+  padding: 2px 4px;
+  background: transparent;
+  border: none;
+  outline: none;
   color: var(--bright);
+  font: 400 0.7rem var(--mono);
+  text-align: center;
 }
-.thr-input::placeholder {
+#thr-popup input::placeholder {
   color: var(--dim);
 }
 /* ── Jet collection dropdown (rpanel2 at level 3) ───────── */

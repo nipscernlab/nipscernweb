@@ -1,839 +1,1417 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="dark">
-  <title>CGV — ATLAS Calorimeter Viewer</title>
-  <link rel="icon" type="image/svg+xml" href="./assets/cgvweb_icon.svg">
-  <!-- All external resources are vendored under ./assets/vendor/ so the site
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>CGV — ATLAS Calorimeter Viewer</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/cgvweb_icon.svg" />
+    <!-- All external resources are vendored under ./assets/vendor/ so the site
        runs fully offline inside ATLAS Point 1 (no GPN / CDN access). -->
-  <!-- Preload critical geometry file (largest asset) -->
-  <link rel="preload" href="./geometry_data/CaloGeometry.glb.gz" as="fetch" crossorigin fetchpriority="high">
-  <!-- Preload WASM parser -->
-  <link rel="preload" href="./parser/pkg/atlas_id_parser_bg.wasm" as="fetch" crossorigin type="application/wasm" fetchpriority="high">
-  <link rel="stylesheet" href="./assets/vendor/fonts/fonts.css">
-  <!-- Tabler Icons webfont (for ghost icon) -->
-  <link rel="stylesheet" href="./assets/vendor/tabler-icons/tabler-icons.min.css">
-  <!-- flag-icons CSS (for language picker flags) -->
-  <link rel="stylesheet" href="./assets/vendor/flag-icons/css/flag-icons.min.css">
-  <!-- Importmap MUST appear before any modulepreload that imports a bare specifier
+    <!-- Preload critical geometry file (largest asset) -->
+    <link
+      rel="preload"
+      href="./geometry_data/CaloGeometry.glb.gz"
+      as="fetch"
+      crossorigin
+      fetchpriority="high"
+    />
+    <!-- Preload WASM parser -->
+    <link
+      rel="preload"
+      href="./parser/pkg/atlas_id_parser_bg.wasm"
+      as="fetch"
+      crossorigin
+      type="application/wasm"
+      fetchpriority="high"
+    />
+    <link rel="stylesheet" href="./assets/vendor/fonts/fonts.css" />
+    <!-- Tabler Icons webfont (for ghost icon) -->
+    <link rel="stylesheet" href="./assets/vendor/tabler-icons/tabler-icons.min.css" />
+    <!-- flag-icons CSS (for language picker flags) -->
+    <link rel="stylesheet" href="./assets/vendor/flag-icons/css/flag-icons.min.css" />
+    <!-- Importmap MUST appear before any modulepreload that imports a bare specifier
        (Firefox tries to resolve "three" during preload — fails if importmap comes later). -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three":         "./assets/vendor/three/build/three.module.js",
-      "three/addons/": "./assets/vendor/three/examples/jsm/"
-    }
-  }
-  </script>
-  <!-- Module preload for the WASM JS shim only. We deliberately do NOT modulepreload
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./assets/vendor/three/build/three.module.js",
+          "three/addons/": "./assets/vendor/three/examples/jsm/"
+        }
+      }
+    </script>
+    <!-- Module preload for the WASM JS shim only. We deliberately do NOT modulepreload
        js/main.js: doing so causes some browsers (Firefox especially) to attempt to
        resolve its bare "three" specifier before the importmap is consulted, even when
        the importmap precedes it. The bottom-of-body <script type="module"> already
        loads main.js with full importmap context. -->
-  <link rel="modulepreload" href="./parser/pkg/atlas_id_parser.js">
-  <!-- Preload the WASM Web Worker script — its module graph is tiny (WASM glue
+    <link rel="modulepreload" href="./parser/pkg/atlas_id_parser.js" />
+    <!-- Preload the WASM Web Worker script — its module graph is tiny (WASM glue
        + our worker) and preloading lets the browser kick off the fetch in
        parallel with main.js module resolution, so the worker is ready sooner. -->
-  <link rel="modulepreload" href="./js/wasm_worker.js">
-  <!-- Stylesheets are split by component; load order matches CSS cascade
+    <link rel="modulepreload" href="./js/wasm_worker.js" />
+    <!-- Stylesheets are split by component; load order matches CSS cascade
        (mobile.css overrides earlier rules via media queries; cinema.css overrides
        panel/toolbar opacity in cinema mode). -->
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/panel-left.css">
-  <link rel="stylesheet" href="./css/panel-right.css">
-  <link rel="stylesheet" href="./css/modes.css">
-  <link rel="stylesheet" href="./css/hud.css">
-  <link rel="stylesheet" href="./css/toolbar.css">
-  <link rel="stylesheet" href="./css/dialogs.css">
-  <link rel="stylesheet" href="./css/loading.css">
-  <link rel="stylesheet" href="./css/floating.css">
-  <link rel="stylesheet" href="./css/cinema.css">
-  <link rel="stylesheet" href="./css/mobile.css">
-</head>
-<body>
-
-<!-- ── Loading overlay ───────────────────────────────────────── -->
-<div id="loading-overlay">
-  <div class="loading-card">
-    <img src="./assets/cgvweb_icon.svg" class="loading-logo" alt="CGV">
-    <div class="loading-title">CGV</div>
-    <div class="loading-sub">Calorimeter Geometry Viewer</div>
-    <div class="loading-lab">NIPSCERN &middot; ATLAS</div>
-    <div class="loading-bar-track">
-      <div class="loading-bar-fill" id="loading-bar"></div>
-    </div>
-    <div class="loading-msg" id="loading-msg">Initializing…</div>
-  </div>
-</div>
-
-<!-- ── SVG sprite ─────────────────────────────────────────── -->
-<svg class="defs" aria-hidden="true"><defs>
-  <symbol id="i-wifi" viewBox="0 0 24 24">
-    <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
-    <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
-    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-    <circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/>
-  </symbol>
-  <symbol id="i-folder" viewBox="0 0 24 24">
-    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-  </symbol>
-  <symbol id="i-up" viewBox="0 0 24 24">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-  </symbol>
-  <symbol id="i-dl" viewBox="0 0 24 24">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-  </symbol>
-  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-    <polygon points="5,3 19,12 5,21"/>
-  </symbol>
-  <symbol id="i-stop" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-  </symbol>
-  <symbol id="i-film" viewBox="0 0 24 24">
-    <rect x="2" y="2" width="20" height="20" rx="2.18"/>
-    <line x1="7"  y1="2"  x2="7"  y2="22"/>
-    <line x1="17" y1="2"  x2="17" y2="22"/>
-    <line x1="2"  y1="12" x2="22" y2="12"/>
-    <line x1="2"  y1="7"  x2="7"  y2="7"/>
-    <line x1="17" y1="7"  x2="22" y2="7"/>
-    <line x1="2"  y1="17" x2="7"  y2="17"/>
-    <line x1="17" y1="17" x2="22" y2="17"/>
-  </symbol>
-  <symbol id="i-eye" viewBox="0 0 24 24">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-    <circle cx="12" cy="12" r="3"/>
-  </symbol>
-  <symbol id="i-eye-off" viewBox="0 0 24 24">
-    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-    <line x1="1" y1="1" x2="23" y2="23"/>
-  </symbol>
-  <symbol id="i-x" viewBox="0 0 24 24">
-    <line x1="18" y1="6"  x2="6"  y2="18"/>
-    <line x1="6"  y1="6"  x2="18" y2="18"/>
-  </symbol>
-  <symbol id="i-info" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="16" x2="12" y2="12"/>
-    <line x1="12" y1="8"  x2="12.01" y2="8"/>
-  </symbol>
-  <symbol id="i-pin" viewBox="0 0 24 24">
-    <line x1="12" y1="17" x2="12" y2="22"/>
-    <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
-  </symbol>
-  <symbol id="i-pin-off" viewBox="0 0 24 24">
-    <line x1="2" y1="2" x2="22" y2="22"/>
-    <line x1="12" y1="17" x2="12" y2="22"/>
-    <path d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h12"/>
-    <path d="M15 9.34V6h1a2 2 0 0 0 0-4H7.89"/>
-  </symbol>
-  <symbol id="i-sidebar" viewBox="0 0 24 24">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <line x1="9" y1="3" x2="9" y2="21"/>
-  </symbol>
-  <symbol id="i-globe" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="2" y1="12" x2="22" y2="12"/>
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-  </symbol>
-  <symbol id="i-camera" viewBox="0 0 24 24">
-    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-    <circle cx="12" cy="13" r="4"/>
-  </symbol>
-  <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-  </symbol>
-  <!-- Vertical sliders (3 tracks + thumbs) — Energy threshold button -->
-  <symbol id="i-sliders" viewBox="0 0 24 24">
-    <line x1="6"  y1="3"  x2="6"  y2="21"/>
-    <line x1="12" y1="3"  x2="12" y2="21"/>
-    <line x1="18" y1="3"  x2="18" y2="21"/>
-    <circle cx="6"  cy="8"  r="2" fill="var(--bg)"/>
-    <circle cx="12" cy="14" r="2" fill="var(--bg)"/>
-    <circle cx="18" cy="10" r="2" fill="var(--bg)"/>
-  </symbol>
-  <!-- Sidebar pin — a left sidebar with a small dot (better than thumbtack) -->
-  <symbol id="i-panel-pin" viewBox="0 0 24 24">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <line x1="9" y1="3" x2="9" y2="21"/>
-    <circle cx="6" cy="7" r="1" fill="currentColor" stroke="none"/>
-    <circle cx="6" cy="11" r="1" fill="currentColor" stroke="none"/>
-    <circle cx="6" cy="15" r="1" fill="currentColor" stroke="none"/>
-  </symbol>
-</defs></svg>
-
-<canvas id="c"></canvas>
-
-<!-- ── Left panel ─────────────────────────────────────────── -->
-<aside id="panel">
-  <div id="panel-head">
-    <div class="panel-head-row panel-head-row-top">
-      <div class="logo">CGV</div>
-      <div class="head-btns">
-        <button class="icon-btn" id="btn-about"
-          data-tip="About — project credits" data-i18n-tip="tip-about">
-          <svg class="ic"><use href="#i-info"/></svg>
-        </button>
-        <button class="icon-btn on" id="btn-pin"
-          data-tip="Pin panel open at all times" data-i18n-tip="tip-pin">
-          <svg class="ic" id="pin-icon"><use href="#i-panel-pin"/></svg>
-        </button>
+    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./css/panel-left.css" />
+    <link rel="stylesheet" href="./css/panel-right.css" />
+    <link rel="stylesheet" href="./css/modes.css" />
+    <link rel="stylesheet" href="./css/hud.css" />
+    <link rel="stylesheet" href="./css/toolbar.css" />
+    <link rel="stylesheet" href="./css/dialogs.css" />
+    <link rel="stylesheet" href="./css/loading.css" />
+    <link rel="stylesheet" href="./css/floating.css" />
+    <link rel="stylesheet" href="./css/cinema.css" />
+    <link rel="stylesheet" href="./css/mobile.css" />
+  </head>
+  <body>
+    <!-- ── Loading overlay ───────────────────────────────────────── -->
+    <div id="loading-overlay">
+      <div class="loading-card">
+        <img src="./assets/cgvweb_icon.svg" class="loading-logo" alt="CGV" />
+        <div class="loading-title">CGV</div>
+        <div class="loading-sub">Calorimeter Geometry Viewer</div>
+        <div class="loading-lab">NIPSCERN &middot; ATLAS</div>
+        <div class="loading-bar-track">
+          <div class="loading-bar-fill" id="loading-bar"></div>
+        </div>
+        <div class="loading-msg" id="loading-msg">Initializing…</div>
       </div>
     </div>
-    <div class="logo-block">
-      <div class="logo-full" data-i18n="logo-full">Calorimeter Geometry Viewer</div>
-      <div class="logo-lab" data-i18n="logo-lab">NIPSCERN · ATLAS</div>
-    </div>
-    <!-- External links strip — full-width row below the title -->
-    <div id="ext-links-top">
-      <a href="https://atlas-live.cern.ch" target="_blank" rel="noopener"
-        data-tip="ATLAS Live — ATLANTIS project">
-        <i class="ti ti-broadcast"></i>
-      </a>
-      <a href="https://atlas.cern" target="_blank" rel="noopener"
-        data-tip="ATLAS Experiment at CERN">
-        <i class="ti ti-atom"></i>
-      </a>
-      <a href="https://home.cern" target="_blank" rel="noopener"
-        data-tip="CERN — European Organisation for Nuclear Research">
-        <i class="ti ti-building-bank"></i>
-      </a>
-      <a href="https://nipscern.com" target="_blank" rel="noopener"
-        data-tip="NIPSCERN Laboratory — UFJF">
-        <i class="ti ti-flask"></i>
-      </a>
-      <a class="docs" href="https://nipscern.com/library/cgvweb/twiki" target="_blank" rel="noopener"
-        data-tip="TWIKI — technical documentation">
-        <i class="ti ti-book-2"></i>
-      </a>
-      <a class="docs" href="https://nipscern.com/library/cgvweb" target="_blank" rel="noopener"
-        data-tip="Full documentation — nipscern.com/library/cgvweb">
-        <i class="ti ti-notebook"></i>
-      </a>
-    </div>
-  </div>
 
-  <div id="mode-bar">
-    <button id="btn-live" class="mbtn on">
-      <svg class="ic" style="width:12px;height:12px"><use href="#i-wifi"/></svg>
-      <span data-i18n="btn-live">Live</span>
-    </button>
-    <button id="btn-sample" class="mbtn">
-      <i class="ti ti-atom" style="font-size:13px;line-height:1"></i>
-      <span data-i18n="btn-sample">Samples</span>
-    </button>
-  </div>
+    <!-- ── SVG sprite ─────────────────────────────────────────── -->
+    <svg class="defs" aria-hidden="true">
+      <defs>
+        <symbol id="i-wifi" viewBox="0 0 24 24">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+          <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+          <circle cx="12" cy="20" r="1" fill="currentColor" stroke="none" />
+        </symbol>
+        <symbol id="i-folder" viewBox="0 0 24 24">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+        </symbol>
+        <symbol id="i-up" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </symbol>
+        <symbol id="i-dl" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+          <polygon points="5,3 19,12 5,21" />
+        </symbol>
+        <symbol id="i-stop" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+        </symbol>
+        <symbol id="i-film" viewBox="0 0 24 24">
+          <rect x="2" y="2" width="20" height="20" rx="2.18" />
+          <line x1="7" y1="2" x2="7" y2="22" />
+          <line x1="17" y1="2" x2="17" y2="22" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <line x1="2" y1="7" x2="7" y2="7" />
+          <line x1="17" y1="7" x2="22" y2="7" />
+          <line x1="2" y1="17" x2="7" y2="17" />
+          <line x1="17" y1="17" x2="22" y2="17" />
+        </symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+        <symbol id="i-eye-off" viewBox="0 0 24 24">
+          <path
+            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
+          />
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+          <line x1="1" y1="1" x2="23" y2="23" />
+        </symbol>
+        <symbol id="i-x" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24">
+          <line x1="12" y1="17" x2="12" y2="22" />
+          <path
+            d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"
+          />
+        </symbol>
+        <symbol id="i-pin-off" viewBox="0 0 24 24">
+          <line x1="2" y1="2" x2="22" y2="22" />
+          <line x1="12" y1="17" x2="12" y2="22" />
+          <path d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h12" />
+          <path d="M15 9.34V6h1a2 2 0 0 0 0-4H7.89" />
+        </symbol>
+        <symbol id="i-sidebar" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+        </symbol>
+        <symbol id="i-globe" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <path
+            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+          />
+        </symbol>
+        <symbol id="i-camera" viewBox="0 0 24 24">
+          <path
+            d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+          />
+          <circle cx="12" cy="13" r="4" />
+        </symbol>
+        <symbol
+          id="i-star"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+          />
+        </symbol>
+        <!-- Vertical sliders (3 tracks + thumbs) — Energy threshold button -->
+        <symbol id="i-sliders" viewBox="0 0 24 24">
+          <line x1="6" y1="3" x2="6" y2="21" />
+          <line x1="12" y1="3" x2="12" y2="21" />
+          <line x1="18" y1="3" x2="18" y2="21" />
+          <circle cx="6" cy="8" r="2" fill="var(--bg)" />
+          <circle cx="12" cy="14" r="2" fill="var(--bg)" />
+          <circle cx="18" cy="10" r="2" fill="var(--bg)" />
+        </symbol>
+        <!-- Sidebar pin — a left sidebar with a small dot (better than thumbtack) -->
+        <symbol id="i-panel-pin" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+          <circle cx="6" cy="7" r="1" fill="currentColor" stroke="none" />
+          <circle cx="6" cy="11" r="1" fill="currentColor" stroke="none" />
+          <circle cx="6" cy="15" r="1" fill="currentColor" stroke="none" />
+        </symbol>
+      </defs>
+    </svg>
 
-  <!-- Live mode -->
-  <div id="live-sec">
-    <div id="live-sub-bar">
-      <button id="btn-live-web" class="sbtn on">
-        <i class="ti ti-world" style="font-size:11px;line-height:1"></i>
-        <span data-i18n="sub-live-web">WEB</span>
-      </button>
-      <button id="btn-live-server" class="sbtn">
-        <i class="ti ti-server" style="font-size:11px;line-height:1"></i>
-        <span data-i18n="sub-live-server">SERVER</span>
-      </button>
-    </div>
+    <canvas id="c"></canvas>
 
-    <!-- WEB: ATLAS live polling -->
-    <div id="live-web-sec" class="live-sub">
-      <div id="live-bar">
-        <span class="ldot pulse" id="ldot"></span>
-        <span id="live-txt" data-i18n="live-starting">Starting…</span>
-        <div id="live-ctrl">
-          <button class="ctrl-btn" id="ibtn-play" hidden
-            data-tip="Resume live polling" data-i18n-tip="tip-poll-play">
-            <svg class="ic" style="width:9px;height:9px"><use href="#i-play"/></svg>
-          </button>
-          <button class="ctrl-btn" id="ibtn-stop"
-            data-tip="Pause live polling" data-i18n-tip="tip-poll-stop">
-            <svg class="ic" style="width:9px;height:9px"><use href="#i-stop"/></svg>
-          </button>
+    <!-- ── Left panel ─────────────────────────────────────────── -->
+    <aside id="panel">
+      <div id="panel-head">
+        <div class="panel-head-row panel-head-row-top">
+          <div class="logo">CGV</div>
+          <div class="head-btns">
+            <button
+              class="icon-btn"
+              id="btn-about"
+              data-tip="About — project credits"
+              data-i18n-tip="tip-about"
+            >
+              <svg class="ic"><use href="#i-info" /></svg>
+            </button>
+            <button
+              class="icon-btn on"
+              id="btn-pin"
+              data-tip="Pin panel open at all times"
+              data-i18n-tip="tip-pin"
+            >
+              <svg class="ic" id="pin-icon"><use href="#i-panel-pin" /></svg>
+            </button>
+          </div>
+        </div>
+        <div class="logo-block">
+          <div class="logo-full" data-i18n="logo-full">Calorimeter Geometry Viewer</div>
+          <div class="logo-lab" data-i18n="logo-lab">NIPSCERN · ATLAS</div>
+        </div>
+        <!-- External links strip — full-width row below the title -->
+        <div id="ext-links-top">
+          <a
+            href="https://atlas-live.cern.ch"
+            target="_blank"
+            rel="noopener"
+            data-tip="ATLAS Live — ATLANTIS project"
+          >
+            <i class="ti ti-broadcast"></i>
+          </a>
+          <a
+            href="https://atlas.cern"
+            target="_blank"
+            rel="noopener"
+            data-tip="ATLAS Experiment at CERN"
+          >
+            <i class="ti ti-atom"></i>
+          </a>
+          <a
+            href="https://home.cern"
+            target="_blank"
+            rel="noopener"
+            data-tip="CERN — European Organisation for Nuclear Research"
+          >
+            <i class="ti ti-building-bank"></i>
+          </a>
+          <a
+            href="https://nipscern.com"
+            target="_blank"
+            rel="noopener"
+            data-tip="NIPSCERN Laboratory — UFJF"
+          >
+            <i class="ti ti-flask"></i>
+          </a>
+          <a
+            class="docs"
+            href="https://nipscern.com/library/cgvweb/twiki"
+            target="_blank"
+            rel="noopener"
+            data-tip="TWIKI — technical documentation"
+          >
+            <i class="ti ti-book-2"></i>
+          </a>
+          <a
+            class="docs"
+            href="https://nipscern.com/library/cgvweb"
+            target="_blank"
+            rel="noopener"
+            data-tip="Full documentation — nipscern.com/library/cgvweb"
+          >
+            <i class="ti ti-notebook"></i>
+          </a>
         </div>
       </div>
-      <div id="live-empty" hidden>
-        <img src="./assets/undraw_server_9eix.svg" class="empty-illus" alt="">
-        <div class="empty-msg" data-i18n="empty-live">No events yet — waiting for ATLAS Live data from ATLANTIS</div>
-      </div>
-      <div id="evt-list"></div>
-    </div>
 
-    <!-- SERVER: folder on user machine, auto-refresh -->
-    <div id="live-server-sec" class="live-sub" hidden>
-      <div id="server-top">
-        <button id="btn-server-pick" class="file-pick-btn sm">
-          <svg class="ic" style="width:11px;height:11px"><use href="#i-folder"/></svg>
-          <span data-i18n="server-folder">Select Folder</span>
+      <div id="mode-bar">
+        <button id="btn-live" class="mbtn on">
+          <svg class="ic" style="width: 12px; height: 12px"><use href="#i-wifi" /></svg>
+          <span data-i18n="btn-live">Live</span>
         </button>
-        <input id="server-folder-in" type="file" accept=".xml" multiple webkitdirectory>
-        <!-- Remote-mode bar: shown when /api/xml/* is reachable -->
-        <div id="server-remote-bar" class="server-remote-bar" hidden>
-          <button id="server-folder-cur" class="file-pick-btn sm server-folder-btn"
-            data-tip="Change folder" data-i18n-tip="tip-server-change">
-            <svg class="ic" style="width:11px;height:11px"><use href="#i-folder"/></svg>
-            <span id="server-folder-cur-text" class="server-folder-cur-text"></span>
-            <i class="ti ti-pencil server-folder-edit-ic"></i>
+        <button id="btn-sample" class="mbtn">
+          <i class="ti ti-atom" style="font-size: 13px; line-height: 1"></i>
+          <span data-i18n="btn-sample">Samples</span>
+        </button>
+      </div>
+
+      <!-- Live mode -->
+      <div id="live-sec">
+        <div id="live-sub-bar">
+          <button id="btn-live-web" class="sbtn on">
+            <i class="ti ti-world" style="font-size: 11px; line-height: 1"></i>
+            <span data-i18n="sub-live-web">WEB</span>
+          </button>
+          <button id="btn-live-server" class="sbtn">
+            <i class="ti ti-server" style="font-size: 11px; line-height: 1"></i>
+            <span data-i18n="sub-live-server">SERVER</span>
           </button>
         </div>
-        <button id="server-refresh-btn" class="server-refresh-btn"
-          data-tip="Pause folder polling" data-i18n-tip="tip-poll-stop" hidden>
-          <i class="ti ti-rotate-clockwise refresh-ic"></i>
-          <svg class="ic pause-ic" style="width:9px;height:9px"><use href="#i-stop"/></svg>
-          <svg class="ic play-ic"  style="width:9px;height:9px"><use href="#i-play"/></svg>
-        </button>
-      </div>
-      <!-- Inline edit row: open via remote bar click -->
-      <div id="server-folder-edit" class="server-folder-edit" hidden>
-        <input id="server-folder-input" type="text" class="server-folder-input"
-          data-i18n-ph="server-folder-placeholder"
-          placeholder="/path/to/jivexml/folder">
-        <button id="server-folder-apply" class="sm-icon-btn server-folder-act"
-          data-tip="Apply" data-i18n-tip="tip-server-apply">
-          <i class="ti ti-check"></i>
-        </button>
-        <button id="server-folder-cancel" class="sm-icon-btn server-folder-act"
-          data-tip="Cancel" data-i18n-tip="tip-server-cancel">
-          <i class="ti ti-x"></i>
-        </button>
-      </div>
-      <div id="server-folder-error" class="server-folder-error warn" hidden></div>
-      <div id="server-empty" data-i18n="server-empty">
-        Pick a folder with JiveXML files. The 100 most recent are shown and refresh every 5s.
-      </div>
-      <div id="server-list" hidden></div>
-    </div>
-  </div>
 
-  <!-- Sample events mode -->
-  <div id="sample-sec" hidden>
-    <div id="sample-top">
-      <button id="btn-sample-add" class="file-pick-btn sm">
-        <svg class="ic" style="width:11px;height:11px"><use href="#i-up"/></svg>
-        <span data-i18n="sample-upload">Add XML</span>
+        <!-- WEB: ATLAS live polling -->
+        <div id="live-web-sec" class="live-sub">
+          <div id="live-bar">
+            <span class="ldot pulse" id="ldot"></span>
+            <span id="live-txt" data-i18n="live-starting">Starting…</span>
+            <div id="live-ctrl">
+              <button
+                class="ctrl-btn"
+                id="ibtn-play"
+                hidden
+                data-tip="Resume live polling"
+                data-i18n-tip="tip-poll-play"
+              >
+                <svg class="ic" style="width: 9px; height: 9px"><use href="#i-play" /></svg>
+              </button>
+              <button
+                class="ctrl-btn"
+                id="ibtn-stop"
+                data-tip="Pause live polling"
+                data-i18n-tip="tip-poll-stop"
+              >
+                <svg class="ic" style="width: 9px; height: 9px"><use href="#i-stop" /></svg>
+              </button>
+            </div>
+          </div>
+          <div id="live-empty" hidden>
+            <img src="./assets/undraw_server_9eix.svg" class="empty-illus" alt="" />
+            <div class="empty-msg" data-i18n="empty-live">
+              No events yet — waiting for ATLAS Live data from ATLANTIS
+            </div>
+          </div>
+          <div id="evt-list"></div>
+        </div>
+
+        <!-- SERVER: folder on user machine, auto-refresh -->
+        <div id="live-server-sec" class="live-sub" hidden>
+          <div id="server-top">
+            <button id="btn-server-pick" class="file-pick-btn sm">
+              <svg class="ic" style="width: 11px; height: 11px"><use href="#i-folder" /></svg>
+              <span data-i18n="server-folder">Select Folder</span>
+            </button>
+            <input id="server-folder-in" type="file" accept=".xml" multiple webkitdirectory />
+            <!-- Remote-mode bar: shown when /api/xml/* is reachable -->
+            <div id="server-remote-bar" class="server-remote-bar" hidden>
+              <button
+                id="server-folder-cur"
+                class="file-pick-btn sm server-folder-btn"
+                data-tip="Change folder"
+                data-i18n-tip="tip-server-change"
+              >
+                <svg class="ic" style="width: 11px; height: 11px"><use href="#i-folder" /></svg>
+                <span id="server-folder-cur-text" class="server-folder-cur-text"></span>
+                <i class="ti ti-pencil server-folder-edit-ic"></i>
+              </button>
+            </div>
+            <button
+              id="server-refresh-btn"
+              class="server-refresh-btn"
+              data-tip="Pause folder polling"
+              data-i18n-tip="tip-poll-stop"
+              hidden
+            >
+              <i class="ti ti-rotate-clockwise refresh-ic"></i>
+              <svg class="ic pause-ic" style="width: 9px; height: 9px"><use href="#i-stop" /></svg>
+              <svg class="ic play-ic" style="width: 9px; height: 9px"><use href="#i-play" /></svg>
+            </button>
+          </div>
+          <!-- Inline edit row: open via remote bar click -->
+          <div id="server-folder-edit" class="server-folder-edit" hidden>
+            <input
+              id="server-folder-input"
+              type="text"
+              class="server-folder-input"
+              data-i18n-ph="server-folder-placeholder"
+              placeholder="/path/to/jivexml/folder"
+            />
+            <button
+              id="server-folder-apply"
+              class="sm-icon-btn server-folder-act"
+              data-tip="Apply"
+              data-i18n-tip="tip-server-apply"
+            >
+              <i class="ti ti-check"></i>
+            </button>
+            <button
+              id="server-folder-cancel"
+              class="sm-icon-btn server-folder-act"
+              data-tip="Cancel"
+              data-i18n-tip="tip-server-cancel"
+            >
+              <i class="ti ti-x"></i>
+            </button>
+          </div>
+          <div id="server-folder-error" class="server-folder-error warn" hidden></div>
+          <div id="server-empty" data-i18n="server-empty">
+            Pick a folder with JiveXML files. The 100 most recent are shown and refresh every 5s.
+          </div>
+          <div id="server-list" hidden></div>
+        </div>
+      </div>
+
+      <!-- Sample events mode -->
+      <div id="sample-sec" hidden>
+        <div id="sample-top">
+          <button id="btn-sample-add" class="file-pick-btn sm">
+            <svg class="ic" style="width: 11px; height: 11px"><use href="#i-up" /></svg>
+            <span data-i18n="sample-upload">Add XML</span>
+          </button>
+          <input id="sample-file-in" type="file" accept=".xml" />
+          <button
+            id="btn-sample-clear"
+            class="sm-icon-btn"
+            data-tip="Remove all XMLs from the list"
+            data-i18n-tip="tip-sample-clear"
+          >
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>
+        <div id="sample-list-msg" data-i18n="sample-loading">Loading events…</div>
+        <div id="sample-list"></div>
+      </div>
+
+      <!-- Download / load progress bar (only visible while loading) -->
+      <div id="dl-progress" hidden>
+        <div class="dl-stages">
+          <div class="dl-stage" id="dlst-request">
+            <div class="dl-dot"></div>
+            <span data-i18n="dl-request">Request</span>
+          </div>
+          <div class="dl-arrow">›</div>
+          <div class="dl-stage" id="dlst-recogn">
+            <div class="dl-dot"></div>
+            <span data-i18n="dl-recogn">Recognize</span>
+          </div>
+          <div class="dl-arrow">›</div>
+          <div class="dl-stage" id="dlst-download">
+            <div class="dl-dot"></div>
+            <span data-i18n="dl-download">Download</span>
+          </div>
+          <div class="dl-arrow">›</div>
+          <div class="dl-stage" id="dlst-acquire">
+            <div class="dl-dot"></div>
+            <span data-i18n="dl-acquire">Acquire</span>
+          </div>
+          <div class="dl-arrow">›</div>
+          <div class="dl-stage" id="dlst-load">
+            <div class="dl-dot"></div>
+            <span data-i18n="dl-load">Load</span>
+          </div>
+        </div>
+        <div id="dl-bar-track"><div id="dl-bar-fill"></div></div>
+      </div>
+
+      <div id="statusbar">
+        <span id="status-txt" data-i18n="status-init">Initializing…</span>
+        <span class="badge" id="req-badge" data-tip="Total requests this session">0 req</span>
+      </div>
+      <div id="panel-resizer"></div>
+    </aside>
+
+    <div id="panel-edge"></div>
+    <div id="rpanel-edge"></div>
+
+    <!-- ── Right retractable panels ───────────────────────────── -->
+    <div id="rpanel-wrap">
+      <!-- ── Cluster panel (top) ─────────────────────────────────── -->
+      <aside id="rpanel2">
+        <div
+          id="det-tab-bar-cluster"
+          style="border-bottom: 1px solid var(--border); flex-shrink: 0"
+        >
+          <div
+            class="det-tab on"
+            id="cluster-tab-label"
+            style="--tab-col: #ff4400; pointer-events: none"
+          >
+            Cluster
+          </div>
+        </div>
+        <select id="jet-collection-select" class="jet-coll-select" style="display: none"></select>
+        <div class="det-pane" id="pane-cluster">
+          <div class="sval" id="cluster-sval-max">– GeV</div>
+          <div
+            class="strak"
+            id="cluster-strak"
+            style="background: linear-gradient(to top, #661a00 0%, #ff4400 100%)"
+          >
+            <div class="sthumb" id="cluster-sthumb"></div>
+          </div>
+          <div class="sval" id="cluster-sval-min">– GeV</div>
+        </div>
+      </aside>
+
+      <!-- ── Detector panel (bottom) ────────────────────────────── -->
+      <aside id="rpanel">
+        <div id="det-tab-bar">
+          <button class="det-tab on" id="tab-tile" style="--tab-col: #c87c18">TILE</button>
+          <button class="det-tab" id="tab-lar" style="--tab-col: #27b568">LAr</button>
+          <button class="det-tab" id="tab-fcal" style="--tab-col: #b87333">FCAL</button>
+          <button class="det-tab" id="tab-hec" style="--tab-col: #66e0f6">HEC</button>
+          <button class="det-tab" id="tab-track" style="--tab-col: #ffea00">Track</button>
+          <button class="det-tab mobile-only" id="tab-cluster" style="--tab-col: #ff4400">
+            Cluster
+          </button>
+        </div>
+
+        <!-- ── TILE pane ──────────────────────────────────────── -->
+        <div class="det-pane" id="pane-tile">
+          <div class="pane-det-row">
+            <span class="pane-det-dot" style="background: #ff8c00"></span>
+            <span class="pane-det-name">TileCal</span>
+          </div>
+          <div class="sval" id="tile-sval-max">2.00 GeV</div>
+          <div
+            class="strak"
+            id="tile-strak"
+            style="background: linear-gradient(to top, #ffff00 0%, #4d0000 100%)"
+          >
+            <div class="sthumb" id="tile-sthumb"></div>
+          </div>
+          <div class="sval" id="tile-sval-min">0 GeV</div>
+        </div>
+
+        <!-- ── LAr pane ───────────────────────────────────────── -->
+        <div class="det-pane" id="pane-lar" style="display: none">
+          <div class="pane-det-row">
+            <span class="pane-det-dot" style="background: #00ff40"></span>
+            <span class="pane-det-name">LAr EM</span>
+          </div>
+          <div class="sval" id="lar-sval-max">1.00 GeV</div>
+          <div
+            class="strak"
+            id="lar-strak"
+            style="background: linear-gradient(to top, #17cf42 0%, #270042 100%)"
+          >
+            <div class="sthumb" id="lar-sthumb"></div>
+          </div>
+          <div class="sval" id="lar-sval-min">0 GeV</div>
+        </div>
+
+        <!-- ── FCAL pane ──────────────────────────────────────── -->
+        <div class="det-pane" id="pane-fcal" style="display: none">
+          <div class="pane-det-row">
+            <span class="pane-det-dot" style="background: #b87333"></span>
+            <span class="pane-det-name">LAr FCAL</span>
+          </div>
+          <div class="sval" id="fcal-sval-max">7.00 GeV</div>
+          <div
+            class="strak"
+            id="fcal-strak"
+            style="
+              background: linear-gradient(
+                to top,
+                #1a0600 0%,
+                #6b2310 25%,
+                #c8642a 55%,
+                #ffb26a 80%,
+                #ffeabe 100%
+              );
+            "
+          >
+            <div class="sthumb" id="fcal-sthumb"></div>
+          </div>
+          <div class="sval" id="fcal-sval-min">0 GeV</div>
+        </div>
+
+        <!-- ── HEC pane ───────────────────────────────────────── -->
+        <div class="det-pane" id="pane-hec" style="display: none">
+          <div class="pane-det-row">
+            <span class="pane-det-dot" style="background: #00e0ff"></span>
+            <span class="pane-det-name">LAr HEC</span>
+          </div>
+          <div class="sval" id="hec-sval-max">5.00 GeV</div>
+          <div
+            class="strak"
+            id="hec-strak"
+            style="background: linear-gradient(to top, #66e0f6 0%, #0c0368 100%)"
+          >
+            <div class="sthumb" id="hec-sthumb"></div>
+          </div>
+          <div class="sval" id="hec-sval-min">0 GeV</div>
+        </div>
+
+        <!-- ── Track pane ──────────────────────────────────────── -->
+        <div class="det-pane" id="pane-track" style="display: none">
+          <div class="pane-det-row">
+            <span class="pane-det-dot" style="background: #ffea00"></span>
+            <span class="pane-det-name">Tracks</span>
+          </div>
+          <div class="sval" id="track-sval-max">– GeV</div>
+          <div
+            class="strak"
+            id="track-strak"
+            style="background: linear-gradient(to top, #665500 0%, #ffea00 100%)"
+          >
+            <div class="sthumb" id="track-sthumb"></div>
+          </div>
+          <div class="sval" id="track-sval-min">– GeV</div>
+          <div class="slbl" data-i18n="slbl-track-pt">Min |p<sub>T</sub>|</div>
+        </div>
+      </aside>
+    </div>
+    <!-- #rpanel-wrap -->
+
+    <!-- ── Bottom toolbar ─────────────────────────────────────── -->
+    <div id="toolbar">
+      <button
+        class="tbtn"
+        id="btn-panel"
+        data-tip="Toggle the sidebar panel (M)"
+        data-i18n-tip="tip-panel"
+      >
+        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-sidebar" /></svg>
       </button>
-      <input id="sample-file-in" type="file" accept=".xml">
-      <button id="btn-sample-clear" class="sm-icon-btn"
-        data-tip="Remove all XMLs from the list" data-i18n-tip="tip-sample-clear">
-        <i class="ti ti-trash"></i>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn"
+        id="btn-cinema"
+        data-tip="Cinema mode — auto-rotation, hide UI (C)"
+        data-i18n-tip="tip-cinema"
+      >
+        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-film" /></svg>
+      </button>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn"
+        id="btn-helpers"
+        data-tip="Helpers — Ghost, Cell Info, Vertices, Jet/Cluster lines"
+        data-i18n-tip="tip-helpers"
+      >
+        <i class="ti ti-adjustments-horizontal" style="font-size: 15px"></i>
+      </button>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn on"
+        id="btn-layers"
+        data-tip="Detector layers — toggle geometry visibility"
+        data-i18n-tip="tip-layers"
+      >
+        <i class="ti ti-layers-subtract" style="font-size: 15px"></i>
+      </button>
+      <div class="tbtn-sep"></div>
+      <div class="tseg" id="view-level">
+        <button
+          class="tseg-btn"
+          data-level="1"
+          data-tip="Level 1 — Hits: raw cells and tracks"
+          data-i18n-tip="tip-view-level-1"
+        >
+          1
+        </button>
+        <button
+          class="tseg-btn"
+          data-level="2"
+          data-tip="Level 2 — Clusters: adds η/φ cluster lines"
+          data-i18n-tip="tip-view-level-2"
+        >
+          2
+        </button>
+        <button
+          class="tseg-btn on"
+          data-level="3"
+          data-tip="Level 3 — Particles: jets, photons, electrons and muons"
+          data-i18n-tip="tip-view-level-3"
+        >
+          3
+        </button>
+      </div>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn on"
+        id="btn-cluster"
+        data-tip="Particles popover — γ / e / μ / τ (level 3 only) (K)"
+        data-i18n-tip="tip-particles"
+      >
+        <i class="ti ti-focus-2" style="font-size: 15px"></i>
+      </button>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn"
+        id="btn-rpanel"
+        data-tip="Energy threshold panel (E)"
+        data-i18n-tip="tip-rpanel"
+      >
+        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-sliders" /></svg>
+      </button>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn"
+        id="btn-reset"
+        data-tip="Reset camera to default position (R)"
+        data-i18n-tip="tip-reset"
+      >
+        <i class="ti ti-refresh"></i>
+      </button>
+      <div class="tbtn-sep"></div>
+      <button class="tbtn" id="btn-shot" data-tip="Save screenshot (P)" data-i18n-tip="tip-shot">
+        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-camera" /></svg>
+      </button>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn"
+        id="btn-bgcolor"
+        data-tip="Background color — pick scene background (Shift+B)"
+        data-i18n-tip="tip-bgcolor"
+      >
+        <i class="ti ti-color-swatch" style="font-size: 15px"></i>
+      </button>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn"
+        id="btn-slicer"
+        data-tip="Slicer — cylindrical-wedge carve (Shift+S)"
+        data-i18n-tip="tip-slicer"
+      >
+        <i class="ti ti-3d-cube-sphere" style="font-size: 15px"></i>
+      </button>
+      <div class="tbtn-sep"></div>
+      <button
+        class="tbtn"
+        id="btn-settings"
+        data-tip="Settings — sponsors, shortcuts, preferences (S)"
+        data-i18n-tip="tip-settings"
+      >
+        <i class="ti ti-settings" style="font-size: 15px"></i>
+      </button>
+      <button
+        class="tbtn"
+        id="btn-lang"
+        data-tip="Switch display language"
+        data-i18n-tip="tip-lang"
+      >
+        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-globe" /></svg>
+      </button>
+      <!-- Close button, visible only in mobile/landscape -->
+      <div class="tbtn-sep" id="toolbar-close-sep"></div>
+      <button class="tbtn" id="btn-toolbar-close" data-tip="Hide toolbar">
+        <svg class="ic" style="width: 12px; height: 12px; stroke-width: 2.5">
+          <use href="#i-x" />
+        </svg>
       </button>
     </div>
-    <div id="sample-list-msg" data-i18n="sample-loading">Loading events…</div>
-    <div id="sample-list"></div>
-  </div>
 
-  <!-- Download / load progress bar (only visible while loading) -->
-  <div id="dl-progress" hidden>
-    <div class="dl-stages">
-      <div class="dl-stage" id="dlst-request"><div class="dl-dot"></div><span data-i18n="dl-request">Request</span></div>
-      <div class="dl-arrow">›</div>
-      <div class="dl-stage" id="dlst-recogn"><div class="dl-dot"></div><span data-i18n="dl-recogn">Recognize</span></div>
-      <div class="dl-arrow">›</div>
-      <div class="dl-stage" id="dlst-download"><div class="dl-dot"></div><span data-i18n="dl-download">Download</span></div>
-      <div class="dl-arrow">›</div>
-      <div class="dl-stage" id="dlst-acquire"><div class="dl-dot"></div><span data-i18n="dl-acquire">Acquire</span></div>
-      <div class="dl-arrow">›</div>
-      <div class="dl-stage" id="dlst-load"><div class="dl-dot"></div><span data-i18n="dl-load">Load</span></div>
+    <!-- ── Language dropdown ──────────────────────────────────── -->
+    <div id="lang-menu">
+      <button class="lang-opt on" data-lang="en"><span class="fi fi-gb"></span>English</button>
+      <button class="lang-opt" data-lang="fr"><span class="fi fi-fr"></span>Français</button>
+      <button class="lang-opt" data-lang="no"><span class="fi fi-no"></span>Norsk</button>
+      <button class="lang-opt" data-lang="pt"><span class="fi fi-br"></span>Português</button>
     </div>
-    <div id="dl-bar-track"><div id="dl-bar-fill"></div></div>
-  </div>
 
-  <div id="statusbar">
-    <span id="status-txt" data-i18n="status-init">Initializing…</span>
-    <span class="badge" id="req-badge" data-tip="Total requests this session">0 req</span>
-  </div>
-  <div id="panel-resizer"></div>
-</aside>
+    <!-- ── Cinema exit ────────────────────────────────────────── -->
+    <button id="cinema-exit">
+      <svg class="ic" style="width: 11px; height: 11px; stroke-width: 2.5"><use href="#i-x" /></svg>
+      <span data-i18n="cinema-exit">Exit Cinema</span>
+    </button>
 
-<div id="panel-edge"></div>
-<div id="rpanel-edge"></div>
-
-<!-- ── Right retractable panels ───────────────────────────── -->
-<div id="rpanel-wrap">
-<!-- ── Cluster panel (top) ─────────────────────────────────── -->
-<aside id="rpanel2">
-  <div id="det-tab-bar-cluster" style="border-bottom:1px solid var(--border);flex-shrink:0">
-    <div class="det-tab on" id="cluster-tab-label" style="--tab-col:#ff4400;pointer-events:none">Cluster</div>
-  </div>
-  <select id="jet-collection-select" class="jet-coll-select" style="display:none"></select>
-  <div class="det-pane" id="pane-cluster">
-    <div class="sval" id="cluster-sval-max">– GeV</div>
-    <div class="strak" id="cluster-strak"
-      style="background:linear-gradient(to top,#661a00 0%,#ff4400 100%)">
-      <div class="sthumb" id="cluster-sthumb"></div>
-    </div>
-    <div class="sval" id="cluster-sval-min">– GeV</div>
-    <div class="slbl" data-i18n="slbl-cluster-et">Min E<sub>T</sub></div>
-    <input id="cluster-thr-input" class="thr-input" type="text"
-      autocomplete="off" spellcheck="false"
-      data-i18n-ph="thr-placeholder-gev" placeholder="e.g. 1.5 GeV">
-  </div>
-</aside>
-
-<!-- ── Detector panel (bottom) ────────────────────────────── -->
-<aside id="rpanel">
-
-  <div id="det-tab-bar">
-    <button class="det-tab on" id="tab-tile"  style="--tab-col:#c87c18">TILE</button>
-    <button class="det-tab"    id="tab-lar"   style="--tab-col:#27b568">LAr</button>
-    <button class="det-tab"    id="tab-fcal"  style="--tab-col:#b87333">FCAL</button>
-    <button class="det-tab"    id="tab-hec"   style="--tab-col:#66e0f6">HEC</button>
-    <button class="det-tab"    id="tab-track" style="--tab-col:#ffea00">Track</button>
-    <button class="det-tab mobile-only" id="tab-cluster" style="--tab-col:#ff4400">Cluster</button>
-  </div>
-
-  <!-- ── TILE pane ──────────────────────────────────────── -->
-  <div class="det-pane" id="pane-tile">
-    <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#ff8c00"></span>
-      <span class="pane-det-name">TileCal</span>
-    </div>
-    <div class="sval" id="tile-sval-max">2.00 GeV</div>
-    <div class="strak" id="tile-strak"
-      style="background:linear-gradient(to top,#ffff00 0%,#4d0000 100%)">
-      <div class="sthumb" id="tile-sthumb"></div>
-    </div>
-    <div class="sval" id="tile-sval-min">0 GeV</div>
-    <div class="slbl" data-i18n="slbl-threshold">Threshold</div>
-    <input id="tile-thr-input" class="thr-input" type="text"
-      autocomplete="off" spellcheck="false"
-      data-i18n-ph="thr-placeholder" placeholder="e.g. 200 MeV">
-  </div>
-
-  <!-- ── LAr pane ───────────────────────────────────────── -->
-  <div class="det-pane" id="pane-lar" style="display:none">
-    <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#00ff40"></span>
-      <span class="pane-det-name">LAr EM</span>
-    </div>
-    <div class="sval" id="lar-sval-max">1.00 GeV</div>
-    <div class="strak" id="lar-strak"
-      style="background:linear-gradient(to top,#17cf42 0%,#270042 100%)">
-      <div class="sthumb" id="lar-sthumb"></div>
-    </div>
-    <div class="sval" id="lar-sval-min">0 GeV</div>
-    <div class="slbl" data-i18n="slbl-threshold">Threshold</div>
-    <input id="lar-thr-input" class="thr-input" type="text"
-      autocomplete="off" spellcheck="false"
-      data-i18n-ph="thr-placeholder" placeholder="e.g. 200 MeV">
-  </div>
-
-  <!-- ── FCAL pane ──────────────────────────────────────── -->
-  <div class="det-pane" id="pane-fcal" style="display:none">
-    <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#b87333"></span>
-      <span class="pane-det-name">LAr FCAL</span>
-    </div>
-    <div class="sval" id="fcal-sval-max">7.00 GeV</div>
-    <div class="strak" id="fcal-strak"
-      style="background:linear-gradient(to top,#1a0600 0%,#6b2310 25%,#c8642a 55%,#ffb26a 80%,#ffeabe 100%)">
-      <div class="sthumb" id="fcal-sthumb"></div>
-    </div>
-    <div class="sval" id="fcal-sval-min">0 GeV</div>
-    <div class="slbl" data-i18n="slbl-threshold">Threshold</div>
-    <input id="fcal-thr-input" class="thr-input" type="text"
-      autocomplete="off" spellcheck="false"
-      data-i18n-ph="thr-placeholder" placeholder="e.g. 200 MeV">
-  </div>
-
-  <!-- ── HEC pane ───────────────────────────────────────── -->
-  <div class="det-pane" id="pane-hec" style="display:none">
-    <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#00e0ff"></span>
-      <span class="pane-det-name">LAr HEC</span>
-    </div>
-    <div class="sval" id="hec-sval-max">5.00 GeV</div>
-    <div class="strak" id="hec-strak"
-      style="background:linear-gradient(to top,#66e0f6 0%,#0c0368 100%)">
-      <div class="sthumb" id="hec-sthumb"></div>
-    </div>
-    <div class="sval" id="hec-sval-min">0 GeV</div>
-    <div class="slbl" data-i18n="slbl-threshold">Threshold</div>
-    <input id="hec-thr-input" class="thr-input" type="text"
-      autocomplete="off" spellcheck="false"
-      data-i18n-ph="thr-placeholder" placeholder="e.g. 200 MeV">
-  </div>
-
-  <!-- ── Track pane ──────────────────────────────────────── -->
-  <div class="det-pane" id="pane-track" style="display:none">
-    <div class="pane-det-row">
-      <span class="pane-det-dot" style="background:#ffea00"></span>
-      <span class="pane-det-name">Tracks</span>
-    </div>
-    <div class="sval" id="track-sval-max">– GeV</div>
-    <div class="strak" id="track-strak"
-      style="background:linear-gradient(to top,#665500 0%,#ffea00 100%)">
-      <div class="sthumb" id="track-sthumb"></div>
-    </div>
-    <div class="sval" id="track-sval-min">– GeV</div>
-    <div class="slbl" data-i18n="slbl-track-pt">Min |p<sub>T</sub>|</div>
-    <input id="track-thr-input" class="thr-input" type="text"
-      autocomplete="off" spellcheck="false"
-      data-i18n-ph="thr-placeholder-gev" placeholder="e.g. 1.5 GeV">
-  </div>
-
-</aside>
-
-
-</div><!-- #rpanel-wrap -->
-
-<!-- ── Bottom toolbar ─────────────────────────────────────── -->
-<div id="toolbar">
-  <button class="tbtn" id="btn-panel"
-    data-tip="Toggle the sidebar panel (M)" data-i18n-tip="tip-panel">
-    <svg class="ic" style="width:14px;height:14px"><use href="#i-sidebar"/></svg>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-cinema"
-    data-tip="Cinema mode — auto-rotation, hide UI (C)" data-i18n-tip="tip-cinema">
-    <svg class="ic" style="width:14px;height:14px"><use href="#i-film"/></svg>
-  </button>
-  <div class="tbtn-sep"></div>
-  <!-- Tabler ghost icon (proper library icon) -->
-  <button class="tbtn on" id="btn-ghost"
-    data-tip="ATLAS ghost — toggle sub-detector outlines (G)" data-i18n-tip="tip-ghost">
-    <i class="ti ti-ghost"></i>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn on" id="btn-info"
-    data-tip="Cell info — show tooltip and outline on hover (I)" data-i18n-tip="tip-info">
-    <svg class="ic" style="width:14px;height:14px"><use href="#i-eye"/></svg>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn on" id="btn-layers"
-    data-tip="Detector layers — toggle geometry visibility" data-i18n-tip="tip-layers">
-    <i class="ti ti-layers-subtract" style="font-size:15px"></i>
-  </button>
-  <div class="tbtn-sep"></div>
-  <div class="tseg" id="view-level">
-    <button class="tseg-btn" data-level="1"
-      data-tip="Level 1 — Hits: raw cells and tracks"
-      data-i18n-tip="tip-view-level-1">1</button>
-    <button class="tseg-btn" data-level="2"
-      data-tip="Level 2 — Clusters: adds η/φ cluster lines"
-      data-i18n-tip="tip-view-level-2">2</button>
-    <button class="tseg-btn on" data-level="3"
-      data-tip="Level 3 — Particles: jets, photons, electrons and muons"
-      data-i18n-tip="tip-view-level-3">3</button>
-  </div>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn on" id="btn-tracks"
-    data-tip="Particle tracks — toggle collision path/tracer (J)" data-i18n-tip="tip-tracks">
-    <i class="ti ti-route" style="font-size:15px"></i>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn on" id="btn-cluster"
-    data-tip="Toggle η/φ overlay — cluster lines at level 2, jet lines at level 3 (K)"
-    data-i18n-tip="tip-cluster">
-    <i class="ti ti-focus-2" style="font-size:15px"></i>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-rpanel"
-    data-tip="Energy threshold panel (E)" data-i18n-tip="tip-rpanel">
-    <svg class="ic" style="width:14px;height:14px"><use href="#i-sliders"/></svg>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-reset"
-    data-tip="Reset camera to default position (R)" data-i18n-tip="tip-reset">
-    <i class="ti ti-refresh"></i>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-shot"
-    data-tip="Save screenshot (P)" data-i18n-tip="tip-shot">
-    <svg class="ic" style="width:14px;height:14px"><use href="#i-camera"/></svg>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-bgcolor"
-    data-tip="Background color — pick scene background (Shift+B)" data-i18n-tip="tip-bgcolor">
-    <i class="ti ti-color-swatch" style="font-size:15px"></i>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-slicer"
-    data-tip="Slicer — cylindrical-wedge carve (Shift+S)"
-    data-i18n-tip="tip-slicer">
-    <i class="ti ti-3d-cube-sphere" style="font-size:15px"></i>
-  </button>
-  <div class="tbtn-sep"></div>
-  <button class="tbtn" id="btn-settings"
-    data-tip="Settings — sponsors, shortcuts, preferences (S)" data-i18n-tip="tip-settings">
-    <i class="ti ti-settings" style="font-size:15px"></i>
-  </button>
-  <button class="tbtn" id="btn-lang"
-    data-tip="Switch display language" data-i18n-tip="tip-lang">
-    <svg class="ic" style="width:14px;height:14px"><use href="#i-globe"/></svg>
-  </button>
-  <!-- Close button, visible only in mobile/landscape -->
-  <div class="tbtn-sep" id="toolbar-close-sep"></div>
-  <button class="tbtn" id="btn-toolbar-close"
-    data-tip="Hide toolbar">
-    <svg class="ic" style="width:12px;height:12px;stroke-width:2.5"><use href="#i-x"/></svg>
-  </button>
-</div>
-
-<!-- ── Language dropdown ──────────────────────────────────── -->
-<div id="lang-menu">
-  <button class="lang-opt on" data-lang="en">
-    <span class="fi fi-gb"></span>English
-  </button>
-  <button class="lang-opt" data-lang="fr">
-    <span class="fi fi-fr"></span>Français
-  </button>
-  <button class="lang-opt" data-lang="no">
-    <span class="fi fi-no"></span>Norsk
-  </button>
-  <button class="lang-opt" data-lang="pt">
-    <span class="fi fi-br"></span>Português
-  </button>
-</div>
-
-<!-- ── Cinema exit ────────────────────────────────────────── -->
-<button id="cinema-exit">
-  <svg class="ic" style="width:11px;height:11px;stroke-width:2.5"><use href="#i-x"/></svg>
-  <span data-i18n="cinema-exit">Exit Cinema</span>
-</button>
-
-<!-- ── Layers panel ───────────────────────────────────────── -->
-<div id="layers-panel">
-  <div class="layers-head">
-    <span class="layers-title" data-i18n="layers-title">Detector Layers</span>
-    <div class="layers-quick">
-      <button class="layers-qbtn" id="lbtn-all" data-i18n="layers-all">All</button>
-      <button class="layers-qbtn" id="lbtn-none" data-i18n="layers-none">None</button>
-    </div>
-  </div>
-  <!-- Layer rows are generated by js/bootstrap/layersPanel.js from a tree
+    <!-- ── Layers panel ───────────────────────────────────────── -->
+    <div id="layers-panel">
+      <div class="layers-head">
+        <span class="layers-title" data-i18n="layers-title">Detector Layers</span>
+        <div class="layers-quick">
+          <button class="layers-qbtn" id="lbtn-all" data-i18n="layers-all">All</button>
+          <button class="layers-qbtn" id="lbtn-none" data-i18n="layers-none">None</button>
+        </div>
+      </div>
+      <!-- Layer rows are generated by js/bootstrap/layersPanel.js from a tree
        config so the markup stays in sync with visibility.layerVis. -->
-  <div id="layers-tree"></div>
-</div>
-
-
-<!-- ── Atlas geometry panel ────────────────────────────────── -->
-
-<!-- ── Settings panel ─────────────────────────────────────── -->
-<div id="settings-panel">
-  <!-- Preferences -->
-  <div class="sett-section">
-    <div class="sett-hdr" data-i18n="sett-preferences">Preferences</div>
-    <div class="sett-row">
-      <div class="sett-info">
-        <div class="sett-label" data-i18n="sett-hints-label">Button hints</div>
-        <div class="sett-sub" data-i18n="sett-hints-sub">Show tooltips on toolbar buttons</div>
+      <div id="layers-tree"></div>
+      <!-- "Inner" group: per-event overlays (Tracks + Hits), placed AFTER the
+       static geometry tree so detector layers come first. Starts collapsed
+       like every other parent in the panel; click the row to expand. The
+       parent gswitch bulk-flips both children. The J keyboard shortcut still
+       clicks #btn-tracks (see js/viewerShortcuts.js). -->
+      <div class="layer-group" id="overlay-inner-detector-group">
+        <div class="layer-row layer-row-parent" id="overlay-inner-detector-row">
+          <span class="layer-twist">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 6 15 12 9 18" />
+            </svg>
+          </span>
+          <span class="layer-dot" style="background: #ffea00"></span>
+          <div class="layer-info">
+            <div class="layer-name" data-i18n="overlay-inner">Inner</div>
+            <div class="layer-sub" data-i18n="overlay-inner-sub">Inner Detector</div>
+          </div>
+          <button
+            class="gswitch on"
+            id="btn-inner-detector"
+            role="switch"
+            aria-checked="true"
+            style="--gswitch-col: #ffea00"
+          ></button>
+        </div>
+        <div class="layer-row layer-row-child">
+          <span class="layer-dot" style="background: #ffea00"></span>
+          <div class="layer-info">
+            <div class="layer-name" data-i18n="overlay-tracks">Tracks</div>
+            <div class="layer-sub" data-i18n="overlay-tracks-sub">Particle paths (J)</div>
+          </div>
+          <button
+            class="gswitch on"
+            id="btn-tracks"
+            role="switch"
+            aria-checked="true"
+            style="--gswitch-col: #ffea00"
+          ></button>
+        </div>
+        <div class="layer-row layer-row-child">
+          <span class="layer-dot" style="background: #ffffff"></span>
+          <div class="layer-info">
+            <div class="layer-name" data-i18n="overlay-hits">Hits</div>
+            <div class="layer-sub" data-i18n="overlay-hits-sub">Per-track hits on hover</div>
+          </div>
+          <button
+            class="gswitch on"
+            id="btn-hits"
+            role="switch"
+            aria-checked="true"
+            style="--gswitch-col: #ffffff"
+          ></button>
+        </div>
       </div>
-      <button class="gswitch on" id="stog-hints" role="switch" aria-checked="true"
-        style="--gswitch-col:#2467e0"></button>
     </div>
-    <div class="sett-row">
-      <div class="sett-info">
-        <div class="sett-label" data-i18n="sett-autopen-label">Auto-open sidebar on hover</div>
-        <div class="sett-sub" data-i18n="sett-autopen-sub">Show panel when cursor reaches screen edge</div>
-      </div>
-      <button class="gswitch on" id="stog-autopen" role="switch" aria-checked="true"
-        style="--gswitch-col:#2467e0"></button>
-    </div>
-    <div class="sett-row">
-      <div class="sett-info">
-        <div class="sett-label" data-i18n="sett-tour-label">Guided tour in cinema</div>
-        <div class="sett-sub" data-i18n="sett-tour-sub">Cinema mode becomes a smooth camera tour through the detector</div>
-      </div>
-      <button class="gswitch" id="stog-tour" role="switch" aria-checked="false"
-        style="--gswitch-col:#ff8a3c"></button>
-    </div>
-    <div class="sett-row">
-      <div class="sett-info">
-        <div class="sett-label" data-i18n="sett-collision-label">Collision info overlay</div>
-        <div class="sett-sub" data-i18n="sett-collision-sub">Top-left HUD with run, event, lumi block &amp; timestamp</div>
-      </div>
-      <button class="gswitch on" id="stog-collision-hud" role="switch" aria-checked="true"
-        style="--gswitch-col:#66ccff"></button>
-    </div>
-    <div class="sett-row">
-      <div class="sett-info">
-        <div class="sett-label" data-i18n="sett-minimap-label">η × φ radar minimap</div>
-        <div class="sett-sub" data-i18n="sett-minimap-sub">Top-right 2D map of active cells, clusters &amp; FCAL hits</div>
-      </div>
-      <button class="gswitch" id="stog-minimap" role="switch" aria-checked="false"
-        style="--gswitch-col:#ffa040"></button>
-    </div>
-  </div>
-  <!-- Keyboard shortcuts -->
-  <div class="sett-section">
-    <div class="sett-hdr" data-i18n="sett-shortcuts">Keyboard Shortcuts</div>
-    <div class="sk-grid">
-      <span class="sk-key">G</span><span class="sk-desc" data-i18n="sk-ghost">Toggle ghost frame</span>
-      <span class="sk-key">B</span><span class="sk-desc" data-i18n="sk-beam">Toggle beam axis</span>
-      <span class="sk-key">I</span><span class="sk-desc" data-i18n="sk-info">Toggle cell info</span>
-      <span class="sk-key">R</span><span class="sk-desc" data-i18n="sk-reset">Reset camera</span>
-      <span class="sk-key">C</span><span class="sk-desc" data-i18n="sk-cinema">Cinema mode</span>
-      <span class="sk-key">M</span><span class="sk-desc" data-i18n="sk-menu">Menu (sidebar)</span>
-      <span class="sk-key">E</span><span class="sk-desc" data-i18n="sk-energy">Energy panel</span>
-      <span class="sk-key">P</span><span class="sk-desc" data-i18n="sk-shot">Screenshot</span>
-      <span class="sk-key">S</span><span class="sk-desc" data-i18n="sk-settings">Settings</span>
-      <span class="sk-key">T</span><span class="sk-desc" data-i18n="sk-tile">Toggle TILE</span>
-      <span class="sk-key">L / A</span><span class="sk-desc" data-i18n="sk-lar">Toggle LAr</span>
-      <span class="sk-key">H</span><span class="sk-desc" data-i18n="sk-hec">Toggle HEC</span>
-      <span class="sk-key">J</span><span class="sk-desc" data-i18n="sk-tracks">Toggle particle tracks</span>
-      <span class="sk-key">K</span><span class="sk-desc" data-i18n="sk-clusters">Toggle clusters</span>
-      <span class="sk-key">Shift+B</span><span class="sk-desc" data-i18n="sk-bg">Pick background color</span>
-      <span class="sk-key">Shift+S</span><span class="sk-desc" data-i18n="sk-slicer">Toggle slicer</span>
-      <span class="sk-key">Shift+K</span><span class="sk-desc" data-i18n="sk-clthr">Toggle cluster threshold</span>
-      <span class="sk-key">Esc</span><span class="sk-desc" data-i18n="sk-esc">Close / exit</span>
-    </div>
-  </div>
-</div>
 
-<!-- ── Rotate-to-landscape hint (portrait phones only) ───── -->
-<div id="rotate-hint">
-  <div class="rotate-hint-gif" role="img" aria-label="rotate device"></div>
-  <div class="rotate-hint-text" data-i18n="rotate-hint">Please rotate your device to landscape</div>
-</div>
-
-<!-- ── Mobile toolbar toggle ──────────────────────────────── -->
-<button id="btn-toolbar-toggle" data-tip="Toggle toolbar">
-  <i class="ti ti-layout-navbar"></i>
-  Toolbar
-</button>
-
-<!-- ── Screenshot dialog ─────────────────────────────────── -->
-<div id="shot-overlay">
-  <div class="shot-card">
-    <div class="shot-title" data-i18n="shot-title">Save Screenshot</div>
-    <div class="shot-sub"   data-i18n="shot-sub">Select resolution. The scene renders at full quality — UI is hidden. The active tooltip is composited if visible.</div>
-    <div class="shot-grid">
-      <button class="shot-res" data-w="1280"  data-h="720">HD<br><span>1280 × 720</span></button>
-      <button class="shot-res" data-w="1920"  data-h="1080">1080p<br><span>1920 × 1080</span></button>
-      <button class="shot-res" data-w="2560"  data-h="1440">2K<br><span>2560 × 1440</span></button>
-      <button class="shot-res" data-w="3840"  data-h="2160">4K<br><span>3840 × 2160</span></button>
-      <button class="shot-res" data-w="7680"  data-h="4320">8K<br><span>7680 × 4320</span></button>
-      <button class="shot-res" data-w="10240" data-h="5760">10K<br><span>10240 × 5760</span></button>
+    <!-- ── Particles panel (level-3 K-button popover) ───────────── -->
+    <div id="particles-panel">
+      <div class="layers-head">
+        <span class="layers-title" data-i18n="particles-title">Particles</span>
+      </div>
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #ffea00"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-photons">γ</div>
+          <div class="layer-sub" data-i18n="particles-photons-sub">Spring lines (γ)</div>
+        </div>
+        <button
+          class="gswitch on"
+          id="ptog-photons"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #ffea00"
+        ></button>
+      </div>
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #ff3030"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-electrons">e±</div>
+          <div class="layer-sub" data-i18n="particles-electrons-sub">e± matched lines</div>
+        </div>
+        <button
+          class="gswitch on"
+          id="ptog-electrons"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #ff3030"
+        ></button>
+      </div>
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #4a90d9"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-muons">μ±</div>
+          <div class="layer-sub" data-i18n="particles-muons-sub">μ± matched lines</div>
+        </div>
+        <button
+          class="gswitch on"
+          id="ptog-muons"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #4a90d9"
+        ></button>
+      </div>
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #b366ff"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-taus">τ±</div>
+          <div class="layer-sub" data-i18n="particles-taus-sub">τ± matched lines</div>
+        </div>
+        <button
+          class="gswitch on"
+          id="ptog-taus"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #b366ff"
+        ></button>
+      </div>
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #ff66cc"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-met">ν</div>
+          <div class="layer-sub" data-i18n="particles-met-sub">Missing-Eᴛ neutrino arrow</div>
+        </div>
+        <button
+          class="gswitch on"
+          id="ptog-met"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #ff66cc"
+        ></button>
+      </div>
+      <!-- Background "unmatched" filters: hide tracks / photons that didn't
+       get associated to any reconstructed object. Both off by default so
+       the user starts on a labelled-physics view. -->
+      <hr class="layer-sep" />
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #ffea00"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-unmatched">Unmatched Tracks</div>
+          <div class="layer-sub" data-i18n="particles-unmatched-sub">No particle association</div>
+        </div>
+        <button
+          class="gswitch"
+          id="ptog-unmatched"
+          role="switch"
+          aria-checked="false"
+          style="--gswitch-col: #ffea00"
+        ></button>
+      </div>
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #ffcc00"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-unmatched-photons">Unmatched γ</div>
+          <div class="layer-sub" data-i18n="particles-unmatched-photons-sub">
+            γ outside any jet / τ cone
+          </div>
+        </div>
+        <button
+          class="gswitch"
+          id="ptog-unmatched-photons"
+          role="switch"
+          aria-checked="false"
+          style="--gswitch-col: #ffcc00"
+        ></button>
+      </div>
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #4a90d9"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-unmatched-muons">Unmatched μ</div>
+          <div class="layer-sub" data-i18n="particles-unmatched-muons-sub">
+            Match w/o chamber, or chamber w/o match
+          </div>
+        </div>
+        <button
+          class="gswitch"
+          id="ptog-unmatched-muons"
+          role="switch"
+          aria-checked="false"
+          style="--gswitch-col: #4a90d9"
+        ></button>
+      </div>
+      <div class="layer-row">
+        <span class="layer-dot" style="background: #b366ff"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="particles-unmatched-taus">Unmatched τ</div>
+          <div class="layer-sub" data-i18n="particles-unmatched-taus-sub">
+            τ candidate w/ charge ≠ ±1
+          </div>
+        </div>
+        <button
+          class="gswitch"
+          id="ptog-unmatched-taus"
+          role="switch"
+          aria-checked="false"
+          style="--gswitch-col: #b366ff"
+        ></button>
+      </div>
     </div>
-    <label class="shot-opt" for="shot-transparent">
-      <input type="checkbox" id="shot-transparent">
-      <span class="shot-check" aria-hidden="true">
-        <svg viewBox="0 0 16 16"><polyline points="3.5,8.5 6.8,11.8 12.5,5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </span>
-      <span class="shot-opt-text">
-        <span class="shot-opt-title" data-i18n="shot-opt-title">Transparent background</span>
-        <span class="shot-opt-sub"   data-i18n="shot-opt-sub">Save PNG with alpha channel (no scene background)</span>
-      </span>
-    </label>
-    <label class="shot-opt" for="shot-show-collision">
-      <input type="checkbox" id="shot-show-collision" checked>
-      <span class="shot-check" aria-hidden="true">
-        <svg viewBox="0 0 16 16"><polyline points="3.5,8.5 6.8,11.8 12.5,5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </span>
-      <span class="shot-opt-text">
-        <span class="shot-opt-title" data-i18n="shot-collision-title">Collision info overlay</span>
-        <span class="shot-opt-sub"   data-i18n="shot-collision-sub">Composite event metadata (run, event, lumi block) onto the screenshot</span>
-      </span>
-    </label>
-    <div id="shot-progress">
-      <span class="shot-spinner"></span>
-      <span id="shot-progress-txt"></span>
-    </div>
-    <div class="shot-actions">
-      <button class="shot-cancel" id="btn-shot-cancel" data-i18n="shot-cancel">Cancel</button>
-      <button class="shot-save"   id="btn-shot-save" disabled data-i18n="shot-save">Save PNG</button>
-    </div>
-  </div>
-</div>
 
-<!-- ── Background color picker popover ───────────────────── -->
-<div id="bgcolor-popover">
-  <div class="bgcp-head">
-    <span class="bgcp-title" data-i18n="bgcp-title">Scene Background</span>
-    <button id="bgcp-close" class="bgcp-close" data-tip="Close">
-      <svg class="ic" style="width:10px;height:10px;stroke-width:2.5"><use href="#i-x"/></svg>
+    <!-- ── Helpers popover (Ghost / Cell Info / Unmatched / Jet-Cluster Lines) ─ -->
+    <div id="helpers-panel">
+      <div class="layers-head">
+        <span class="layers-title" data-i18n="helpers-title">Helpers</span>
+      </div>
+      <div class="layer-row" id="hrow-ghost">
+        <span class="layer-dot" style="background: #4a90d9"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="helpers-ghost">Ghost</div>
+          <div class="layer-sub" data-i18n="helpers-ghost-sub">Sub-detector outlines (G)</div>
+        </div>
+        <button
+          class="gswitch on"
+          id="hbtn-ghost"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #4a90d9"
+        ></button>
+      </div>
+      <div class="layer-row" id="hrow-info">
+        <span class="layer-dot" style="background: #66ccff"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="helpers-info">Cell Info</div>
+          <div class="layer-sub" data-i18n="helpers-info-sub">Hover tooltip + outline (I)</div>
+        </div>
+        <button
+          class="gswitch on"
+          id="hbtn-info"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #66ccff"
+        ></button>
+      </div>
+      <div class="layer-row" id="hrow-vertices">
+        <span class="layer-dot" style="background: #ffffff"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="helpers-vertices">Vertices</div>
+          <div class="layer-sub" data-i18n="helpers-vertices-sub">
+            Primary / pile-up / b-tag dots
+          </div>
+        </div>
+        <button
+          class="gswitch on"
+          id="hbtn-vertices"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #ffffff"
+        ></button>
+      </div>
+      <div class="layer-row" id="hrow-labels">
+        <span class="layer-dot" style="background: #ffea00"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="helpers-labels">Track Labels</div>
+          <div class="layer-sub" data-i18n="helpers-labels-sub">
+            e± / μ± / τ± / ν floating symbols
+          </div>
+        </div>
+        <button
+          class="gswitch on"
+          id="hbtn-labels"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #ffea00"
+        ></button>
+      </div>
+      <!-- Lines row is level-aware: hidden at L1, "Cluster Lines" at L2,
+       "Jet Lines" at L3. Label/sub swapped from JS in helpersPanel.js. -->
+      <div class="layer-row" id="hrow-lines">
+        <span class="layer-dot" style="background: #ff8800"></span>
+        <div class="layer-info">
+          <div class="layer-name" data-i18n="helpers-jet-lines">Jet Lines</div>
+          <div class="layer-sub" data-i18n="helpers-jet-lines-sub">η/φ centerlines (jets + τ)</div>
+        </div>
+        <button
+          class="gswitch on"
+          id="hbtn-lines"
+          role="switch"
+          aria-checked="true"
+          style="--gswitch-col: #ff8800"
+        ></button>
+      </div>
+    </div>
+
+    <!-- ── Atlas geometry panel ────────────────────────────────── -->
+
+    <!-- ── Settings panel ─────────────────────────────────────── -->
+    <div id="settings-panel">
+      <!-- Preferences -->
+      <div class="sett-section">
+        <div class="sett-hdr" data-i18n="sett-preferences">Preferences</div>
+        <div class="sett-row">
+          <div class="sett-info">
+            <div class="sett-label" data-i18n="sett-hints-label">Button hints</div>
+            <div class="sett-sub" data-i18n="sett-hints-sub">Show tooltips on toolbar buttons</div>
+          </div>
+          <button
+            class="gswitch on"
+            id="stog-hints"
+            role="switch"
+            aria-checked="true"
+            style="--gswitch-col: #2467e0"
+          ></button>
+        </div>
+        <div class="sett-row">
+          <div class="sett-info">
+            <div class="sett-label" data-i18n="sett-autopen-label">Auto-open sidebar on hover</div>
+            <div class="sett-sub" data-i18n="sett-autopen-sub">
+              Show panel when cursor reaches screen edge
+            </div>
+          </div>
+          <button
+            class="gswitch on"
+            id="stog-autopen"
+            role="switch"
+            aria-checked="true"
+            style="--gswitch-col: #2467e0"
+          ></button>
+        </div>
+        <div class="sett-row">
+          <div class="sett-info">
+            <div class="sett-label" data-i18n="sett-tour-label">Guided tour in cinema</div>
+            <div class="sett-sub" data-i18n="sett-tour-sub">
+              Cinema mode becomes a smooth camera tour through the detector
+            </div>
+          </div>
+          <button
+            class="gswitch"
+            id="stog-tour"
+            role="switch"
+            aria-checked="false"
+            style="--gswitch-col: #ff8a3c"
+          ></button>
+        </div>
+        <div class="sett-row">
+          <div class="sett-info">
+            <div class="sett-label" data-i18n="sett-collision-label">Collision info overlay</div>
+            <div class="sett-sub" data-i18n="sett-collision-sub">
+              Top-left HUD with run, event, lumi block &amp; timestamp
+            </div>
+          </div>
+          <button
+            class="gswitch on"
+            id="stog-collision-hud"
+            role="switch"
+            aria-checked="true"
+            style="--gswitch-col: #66ccff"
+          ></button>
+        </div>
+        <div class="sett-row">
+          <div class="sett-info">
+            <div class="sett-label" data-i18n="sett-minimap-label">η × φ radar minimap</div>
+            <div class="sett-sub" data-i18n="sett-minimap-sub">
+              Top-right 2D map of active cells, clusters &amp; FCAL hits
+            </div>
+          </div>
+          <button
+            class="gswitch"
+            id="stog-minimap"
+            role="switch"
+            aria-checked="false"
+            style="--gswitch-col: #ffa040"
+          ></button>
+        </div>
+      </div>
+      <!-- Keyboard shortcuts -->
+      <div class="sett-section">
+        <div class="sett-hdr" data-i18n="sett-shortcuts">Keyboard Shortcuts</div>
+        <div class="sk-grid">
+          <span class="sk-key">G</span
+          ><span class="sk-desc" data-i18n="sk-ghost">Toggle ghost frame</span>
+          <span class="sk-key">B</span
+          ><span class="sk-desc" data-i18n="sk-beam">Toggle beam axis</span>
+          <span class="sk-key">I</span
+          ><span class="sk-desc" data-i18n="sk-info">Toggle cell info</span>
+          <span class="sk-key">R</span
+          ><span class="sk-desc" data-i18n="sk-reset">Reset camera</span>
+          <span class="sk-key">C</span
+          ><span class="sk-desc" data-i18n="sk-cinema">Cinema mode</span>
+          <span class="sk-key">M</span
+          ><span class="sk-desc" data-i18n="sk-menu">Menu (sidebar)</span>
+          <span class="sk-key">E</span
+          ><span class="sk-desc" data-i18n="sk-energy">Energy panel</span>
+          <span class="sk-key">P</span><span class="sk-desc" data-i18n="sk-shot">Screenshot</span>
+          <span class="sk-key">S</span><span class="sk-desc" data-i18n="sk-settings">Settings</span>
+          <span class="sk-key">T</span><span class="sk-desc" data-i18n="sk-tile">Toggle TILE</span>
+          <span class="sk-key">L / A</span
+          ><span class="sk-desc" data-i18n="sk-lar">Toggle LAr</span> <span class="sk-key">H</span
+          ><span class="sk-desc" data-i18n="sk-hec">Toggle HEC</span> <span class="sk-key">J</span
+          ><span class="sk-desc" data-i18n="sk-tracks">Toggle particle tracks</span>
+          <span class="sk-key">K</span
+          ><span class="sk-desc" data-i18n="sk-clusters">Toggle clusters</span>
+          <span class="sk-key">Shift+B</span
+          ><span class="sk-desc" data-i18n="sk-bg">Pick background color</span>
+          <span class="sk-key">Shift+S</span
+          ><span class="sk-desc" data-i18n="sk-slicer">Toggle slicer</span>
+          <span class="sk-key">Shift+K</span
+          ><span class="sk-desc" data-i18n="sk-clthr">Toggle cluster threshold</span>
+          <span class="sk-key">Esc</span
+          ><span class="sk-desc" data-i18n="sk-esc">Close / exit</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Rotate-to-landscape hint (portrait phones only) ───── -->
+    <div id="rotate-hint">
+      <div class="rotate-hint-gif" role="img" aria-label="rotate device"></div>
+      <div class="rotate-hint-text" data-i18n="rotate-hint">
+        Please rotate your device to landscape
+      </div>
+    </div>
+
+    <!-- ── Mobile toolbar toggle ──────────────────────────────── -->
+    <button id="btn-toolbar-toggle" data-tip="Toggle toolbar">
+      <i class="ti ti-layout-navbar"></i>
+      Toolbar
     </button>
-  </div>
-  <div class="bgcp-canvas-row">
-    <div class="bgcp-sv" id="bgcp-sv">
-      <div class="bgcp-sv-cursor" id="bgcp-sv-cursor"></div>
-    </div>
-    <div class="bgcp-hue" id="bgcp-hue-strip">
-      <div class="bgcp-hue-cursor" id="bgcp-hue-cursor"></div>
-    </div>
-  </div>
-  <div class="bgcp-preview">
-    <div class="bgcp-swatch" id="bgcp-swatch"></div>
-    <input type="text" id="bgcp-hex" class="bgcp-hex" maxlength="7" autocomplete="off" spellcheck="false">
-  </div>
-  <div class="bgcp-presets-hdr" data-i18n="bgcp-presets">Presets</div>
-  <div class="bgcp-presets">
-    <button class="bgcp-preset" data-c="#020d1c" data-tip="Default — Prussian Blue"></button>
-    <button class="bgcp-preset" data-c="#000000" data-tip="Black"></button>
-    <button class="bgcp-preset" data-c="#1a1a1a" data-tip="Charcoal"></button>
-    <button class="bgcp-preset" data-c="#0b1f3a" data-tip="Deep Navy"></button>
-    <button class="bgcp-preset" data-c="#101820" data-tip="Graphite"></button>
-    <button class="bgcp-preset" data-c="#1f2a44" data-tip="Slate"></button>
-    <button class="bgcp-preset" data-c="#ffffff" data-tip="White"></button>
-  </div>
-  <button id="bgcp-reset" class="bgcp-reset" data-i18n="bgcp-reset">Reset to Default</button>
-</div>
 
-<!-- ── Button hint tooltip ───────────────────────────────── -->
-<div id="btn-tip"></div>
-<!-- ── Collision info HUD (top-left; toggleable in Settings) ── -->
-<div id="collision-hud" hidden></div>
-
-<!-- ── Cell hover tooltip ────────────────────────────────── -->
-<div id="tip" hidden>
-  <div id="tip-cell">—</div>
-  <div id="tip-coords"></div>
-  <hr class="tdiv">
-  <div class="trow">
-    <span class="tkey" data-i18n="tip-energy-key">Energy</span>
-    <span class="tval" id="tip-e">—</span>
-  </div>
-  <div id="tip-extra"></div>
-</div>
-
-<!-- ── About overlay ─────────────────────────────────────── -->
-<div id="about-overlay">
-  <div class="about-card">
-    <div class="about-title" data-i18n="about-title">Calorimeter Geometry Viewer</div>
-    <div class="about-sub"   data-i18n="about-sub">ATLAS · TileCal · NIPSCERN</div>
-    <div class="about-body">
-      <p data-i18n="about-p1">Web continuation of the PhD thesis of <strong>Prof. Dr. Luciano Manhães de Andrade Filho</strong> — now as a browser-based <strong>Calorimeter Geometry Viewer</strong> for the ATLAS Experiment at the LHC.</p>
-      <div class="about-meta">
-        <strong><span data-i18n="about-advisor-lbl">Scientific Advisor</span></strong><br>
-        <span data-i18n="about-advisor-name">Prof. Dr. Luciano Manhães de Andrade Filho</span>
-      </div>
-      <div class="about-meta">
-        <strong><span data-i18n="about-dev-lbl">Undergraduate Developer</span></strong><br>
-        <span data-i18n="about-dev-name">Chrysthofer Arthur Amaro Afonso</span><br>
-        <span style="font-size:.63rem;color:var(--muted)" data-i18n="about-dev-sub">Undergraduate Research · NIPSCERN Laboratory</span>
-      </div>
-      <div class="about-lab">
-        <span data-i18n="about-lab1">NIPSCERN — Núcleo de Instrumentação e Processamento de Sinais for CERN</span><br>
-        <span data-i18n="about-lab2">UFJF — Universidade Federal de Juiz de Fora, Brazil</span>
-      </div>
-      <div class="about-sponsors-hdr" data-i18n="about-supported-by">Supported by</div>
-      <div class="sponsor-grid">
-        <img class="sponsor-img sponsor-atlas" src="./assets/ATLAS-Logo-Blue-transparent.png" alt="ATLAS" data-tip="ATLAS Experiment">
-        <img class="sponsor-img" src="./assets/sponsors/cern.svg"    alt="CERN"   data-tip="CERN">
-        <img class="sponsor-img" src="./assets/sponsors/cnpq.svg"    alt="CNPq"   data-tip="CNPq">
-        <img class="sponsor-img" src="./assets/sponsors/capes.png"   alt="CAPES"  data-tip="CAPES">
-        <img class="sponsor-img" src="./assets/sponsors/fapemig.png" alt="FAPEMIG" data-tip="FAPEMIG">
-        <img class="sponsor-img" src="./assets/sponsors/ufjf.png"    alt="UFJF"   data-tip="UFJF">
+    <!-- ── Screenshot dialog ─────────────────────────────────── -->
+    <div id="shot-overlay">
+      <div class="shot-card">
+        <div class="shot-title" data-i18n="shot-title">Save Screenshot</div>
+        <div class="shot-sub" data-i18n="shot-sub">
+          Select resolution. The scene renders at full quality — UI is hidden. The active tooltip is
+          composited if visible.
+        </div>
+        <div class="shot-grid">
+          <button class="shot-res" data-w="1280" data-h="720">
+            HD<br /><span>1280 × 720</span>
+          </button>
+          <button class="shot-res" data-w="1920" data-h="1080">
+            1080p<br /><span>1920 × 1080</span>
+          </button>
+          <button class="shot-res" data-w="2560" data-h="1440">
+            2K<br /><span>2560 × 1440</span>
+          </button>
+          <button class="shot-res" data-w="3840" data-h="2160">
+            4K<br /><span>3840 × 2160</span>
+          </button>
+          <button class="shot-res" data-w="7680" data-h="4320">
+            8K<br /><span>7680 × 4320</span>
+          </button>
+          <button class="shot-res" data-w="10240" data-h="5760">
+            10K<br /><span>10240 × 5760</span>
+          </button>
+        </div>
+        <label class="shot-opt" for="shot-transparent">
+          <input type="checkbox" id="shot-transparent" />
+          <span class="shot-check" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <polyline
+                points="3.5,8.5 6.8,11.8 12.5,5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <span class="shot-opt-text">
+            <span class="shot-opt-title" data-i18n="shot-opt-title">Transparent background</span>
+            <span class="shot-opt-sub" data-i18n="shot-opt-sub"
+              >Save PNG with alpha channel (no scene background)</span
+            >
+          </span>
+        </label>
+        <label class="shot-opt" for="shot-show-collision">
+          <input type="checkbox" id="shot-show-collision" checked />
+          <span class="shot-check" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <polyline
+                points="3.5,8.5 6.8,11.8 12.5,5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <span class="shot-opt-text">
+            <span class="shot-opt-title" data-i18n="shot-collision-title"
+              >Collision info overlay</span
+            >
+            <span class="shot-opt-sub" data-i18n="shot-collision-sub"
+              >Composite event metadata (run, event, lumi block) onto the screenshot</span
+            >
+          </span>
+        </label>
+        <div id="shot-progress">
+          <span class="shot-spinner"></span>
+          <span id="shot-progress-txt"></span>
+        </div>
+        <div class="shot-actions">
+          <button class="shot-cancel" id="btn-shot-cancel" data-i18n="shot-cancel">Cancel</button>
+          <button class="shot-save" id="btn-shot-save" disabled data-i18n="shot-save">
+            Save PNG
+          </button>
+        </div>
       </div>
     </div>
-    <button class="about-close" id="btn-about-close">
-      <svg class="ic" style="width:11px;height:11px"><use href="#i-x"/></svg>
-      <span data-i18n="about-close">Close</span>
-    </button>
-    <div id="about-watermark">
-      <img src="./assets/cgvweb_icon.svg" id="wm-cgv" alt="">
-      <img src="./assets/eye.svg"         id="wm-eye" alt="">
-    </div>
-  </div>
-</div>
 
-<script type="module" src="./js/main.js"></script>
-<script src="../../assets/js/analytics.js" defer></script>
-</body>
+    <!-- ── Background color picker popover ───────────────────── -->
+    <div id="bgcolor-popover">
+      <div class="bgcp-head">
+        <span class="bgcp-title" data-i18n="bgcp-title">Scene Background</span>
+        <button id="bgcp-close" class="bgcp-close" data-tip="Close">
+          <svg class="ic" style="width: 10px; height: 10px; stroke-width: 2.5">
+            <use href="#i-x" />
+          </svg>
+        </button>
+      </div>
+      <div class="bgcp-canvas-row">
+        <div class="bgcp-sv" id="bgcp-sv">
+          <div class="bgcp-sv-cursor" id="bgcp-sv-cursor"></div>
+        </div>
+        <div class="bgcp-hue" id="bgcp-hue-strip">
+          <div class="bgcp-hue-cursor" id="bgcp-hue-cursor"></div>
+        </div>
+      </div>
+      <div class="bgcp-preview">
+        <div class="bgcp-swatch" id="bgcp-swatch"></div>
+        <input
+          type="text"
+          id="bgcp-hex"
+          class="bgcp-hex"
+          maxlength="7"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <div class="bgcp-presets-hdr" data-i18n="bgcp-presets">Presets</div>
+      <div class="bgcp-presets">
+        <button class="bgcp-preset" data-c="#020d1c" data-tip="Default — Prussian Blue"></button>
+        <button class="bgcp-preset" data-c="#000000" data-tip="Black"></button>
+        <button class="bgcp-preset" data-c="#1a1a1a" data-tip="Charcoal"></button>
+        <button class="bgcp-preset" data-c="#0b1f3a" data-tip="Deep Navy"></button>
+        <button class="bgcp-preset" data-c="#101820" data-tip="Graphite"></button>
+        <button class="bgcp-preset" data-c="#1f2a44" data-tip="Slate"></button>
+        <button class="bgcp-preset" data-c="#ffffff" data-tip="White"></button>
+      </div>
+      <button id="bgcp-reset" class="bgcp-reset" data-i18n="bgcp-reset">Reset to Default</button>
+    </div>
+
+    <!-- ── Button hint tooltip ───────────────────────────────── -->
+    <div id="btn-tip"></div>
+    <!-- ── Collision info HUD (top-left; toggleable in Settings) ── -->
+    <div id="collision-hud" hidden></div>
+
+    <!-- ── Cell hover tooltip ────────────────────────────────── -->
+    <div id="tip" hidden>
+      <div id="tip-cell">—</div>
+      <div id="tip-coords"></div>
+      <hr class="tdiv" />
+      <div class="trow">
+        <span class="tkey" data-i18n="tip-energy-key">Energy</span>
+        <span class="tval" id="tip-e">—</span>
+      </div>
+      <div id="tip-extra"></div>
+    </div>
+
+    <!-- ── About overlay ─────────────────────────────────────── -->
+    <div id="about-overlay">
+      <div class="about-card">
+        <div class="about-title" data-i18n="about-title">Calorimeter Geometry Viewer</div>
+        <div class="about-sub" data-i18n="about-sub">ATLAS · TileCal · NIPSCERN</div>
+        <div class="about-body">
+          <p data-i18n="about-p1">
+            Web continuation of the PhD thesis of
+            <strong>Prof. Dr. Luciano Manhães de Andrade Filho</strong> — now as a browser-based
+            <strong>Calorimeter Geometry Viewer</strong> for the ATLAS Experiment at the LHC.
+          </p>
+          <div class="about-meta">
+            <strong><span data-i18n="about-advisor-lbl">Scientific Advisor</span></strong
+            ><br />
+            <span data-i18n="about-advisor-name">Prof. Dr. Luciano Manhães de Andrade Filho</span>
+          </div>
+          <div class="about-meta">
+            <strong><span data-i18n="about-dev-lbl">Undergraduate Developer</span></strong
+            ><br />
+            <span data-i18n="about-dev-name">Chrysthofer Arthur Amaro Afonso</span><br />
+            <span style="font-size: 0.63rem; color: var(--muted)" data-i18n="about-dev-sub"
+              >Undergraduate Research · NIPSCERN Laboratory</span
+            >
+          </div>
+          <div class="about-lab">
+            <span data-i18n="about-lab1"
+              >NIPSCERN — Núcleo de Instrumentação e Processamento de Sinais for CERN</span
+            ><br />
+            <span data-i18n="about-lab2">UFJF — Universidade Federal de Juiz de Fora, Brazil</span>
+          </div>
+          <div class="about-sponsors-hdr" data-i18n="about-supported-by">Supported by</div>
+          <div class="sponsor-grid">
+            <img
+              class="sponsor-img sponsor-atlas"
+              src="./assets/ATLAS-Logo-Blue-transparent.png"
+              alt="ATLAS"
+              data-tip="ATLAS Experiment"
+            />
+            <img class="sponsor-img" src="./assets/sponsors/cern.svg" alt="CERN" data-tip="CERN" />
+            <img class="sponsor-img" src="./assets/sponsors/cnpq.svg" alt="CNPq" data-tip="CNPq" />
+            <img
+              class="sponsor-img"
+              src="./assets/sponsors/capes.png"
+              alt="CAPES"
+              data-tip="CAPES"
+            />
+            <img
+              class="sponsor-img"
+              src="./assets/sponsors/fapemig.png"
+              alt="FAPEMIG"
+              data-tip="FAPEMIG"
+            />
+            <img class="sponsor-img" src="./assets/sponsors/ufjf.png" alt="UFJF" data-tip="UFJF" />
+          </div>
+        </div>
+        <button class="about-close" id="btn-about-close">
+          <svg class="ic" style="width: 11px; height: 11px"><use href="#i-x" /></svg>
+          <span data-i18n="about-close">Close</span>
+        </button>
+        <div id="about-watermark">
+          <img src="./assets/cgvweb_icon.svg" id="wm-cgv" alt="" />
+          <img src="./assets/eye.svg" id="wm-eye" alt="" />
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+    <script src="../../assets/js/analytics.js" defer></script>
+  </body>
 </html>

@@ -16,6 +16,30 @@ export function fmtMev(v) {
 }
 
 /**
+ * Convention helper: register an event listener and return a `cleanup()`
+ * function that removes it. The codebase has historically been a single-page
+ * app that never re-runs `setup*`, so 99 % of listeners are added and never
+ * removed — but any future hot-reload or re-init path would leak. New code
+ * that adds listeners inside a setup function should bundle the unsubscribes
+ * into a returned `cleanup()` and use this helper to keep the bookkeeping
+ * trivial.
+ *
+ * Returns a function that, when called, removes the listener with the same
+ * options used to register it.
+ *
+ * @template {EventTarget} T
+ * @param {T} target
+ * @param {string} type
+ * @param {EventListenerOrEventListenerObject} handler
+ * @param {boolean | AddEventListenerOptions} [options]
+ * @returns {() => void}
+ */
+export function addCleanupListener(target, type, handler, options) {
+  target.addEventListener(type, handler, options);
+  return () => target.removeEventListener(type, handler, options);
+}
+
+/**
  * HTML-escape &, <, > for safe insertion into innerHTML. Null/undefined
  * become the empty string; other values are stringified first.
  *

@@ -1,31 +1,26 @@
+// Track-vs-muon-chamber geometric intersection pass.
+//
+// Walks every visible (or particle-hidden — see below) track polyline and
+// raycasts each segment against the muon-chamber meshes (subtree roots
+// MUC1_2 / MUCH_1). Chambers a track passes through become visible; the
+// rest stay hidden so the muon spectrometer reads as "lit by physics" not
+// "every chamber on stage".
+//
+// This file ALSO houses the chamber-hover outline API (showChamberHover-
+// Outline / clearChamberHoverOutline) because the per-chamber outline
+// LineSegments it creates are reused by the hover handler.
+//
+// Material assignment (which colour each track line takes) lives in
+// trackMaterials.js. The recompute*Match passes (jet / τ / electron /
+// muon → track) live in trackMatch.js. Both are invoked from this file
+// after the chamber-hit set updates each line's `isHitTrack` flag.
+
 import * as THREE from 'three';
 import { scene, markDirty } from './renderer.js';
+import { applyTrackMaterials } from './trackMaterials.js';
+import { initTrackMatch } from './trackMatch.js';
 
-// Track line materials — shared with drawTracks() so hit/miss restyling stays consistent.
-export const TRACK_MAT = new THREE.LineBasicMaterial({ color: 0xffea00, linewidth: 2 });
-const TRACK_HIT_MAT = new THREE.LineBasicMaterial({ color: 0x4a90d9, linewidth: 2 });
-// Tracks belonging to a jet in the active jet collection: paint them in the
-// jet's own colour (orange) so visually associating "this track came out of
-// that jato" is immediate.
-const TRACK_JET_MAT = new THREE.LineBasicMaterial({ color: 0xff8800, linewidth: 2 });
-// Tracks attached to a hadronic τ candidate: purple, same hue as the τ line.
-const TRACK_TAU_MAT = new THREE.LineBasicMaterial({ color: 0xb366ff, linewidth: 2 });
-// Tracks matched to a reconstructed electron / positron by ΔR — coloured to
-// match the electron arrow so the eye links the track with the e±.
-const TRACK_ELECTRON_NEG_MAT = new THREE.LineBasicMaterial({ color: 0xff3030, linewidth: 2 });
-const TRACK_ELECTRON_POS_MAT = new THREE.LineBasicMaterial({ color: 0x33dd55, linewidth: 2 });
-
-// Maps the xAOD track-collection names that jets reference to the legacy
-// (old-AOD) collection names that JiveXML actually publishes the polylines
-// under. By convention the two run parallel — element i of one matches
-// element i of the other — which is the bridge for jet→track highlighting.
-// Only collections we actually render are listed; mappings for skipped ones
-// (GSFTracks, MS-only-extrapolated, etc.) would never resolve to a line.
-const _XAOD_TO_AOD_TRACK_KEY = {
-  InDetTrackParticles_xAOD: 'CombinedInDetTracks',
-  CombinedMuonTrackParticles_xAOD: 'CombinedMuonTracks',
-};
-
+// Chamber materials (only used here — not exported).
 const atlasTrackHitMat = new THREE.MeshBasicMaterial({
   color: 0x4a90d9,
   transparent: true,
@@ -40,7 +35,12 @@ const trackAtlasOutlineMat = new THREE.LineBasicMaterial({
   depthWrite: false,
 });
 
+// Atlas subtree names whose descendants are the chamber meshes we test.
 const TRACK_ATLAS_TARGET_NODE_NAMES = ['MUCH_1', 'MUC1_2'];
+
+// Reusable scratch objects for the per-segment raycast — avoids allocating
+// inside the per-track loop (called every time a track-affecting state
+// changes, can happen many times per second during slider drags).
 const _trackAtlasRay = new THREE.Raycaster();
 const _trackAtlasSegA = new THREE.Vector3();
 const _trackAtlasSegB = new THREE.Vector3();
@@ -56,8 +56,12 @@ let _trackAtlasMeshBoxes = null;
 
 let _getTrackGroup = () => null;
 
+/** @param {{ getTrackGroup: () => any }} deps */
 export function initTrackAtlasIntersections({ getTrackGroup }) {
   _getTrackGroup = getTrackGroup;
+  // Cascade init to the sibling track-match module so consumers only call
+  // one init at startup (see main.js).
+  initTrackMatch({ getTrackGroup });
 }
 
 export function setAtlasRoot(tree) {
@@ -66,6 +70,55 @@ export function setAtlasRoot(tree) {
   _trackAtlasMeshes = null;
   _trackAtlasOutlineMeshes = null;
   _trackAtlasMeshBoxes = null;
+}
+
+/**
+ * Returns the muon-chamber meshes that the track-vs-chamber intersection
+ * test runs against — the same set hover-raycast wants for tooltip lookup.
+ * Lazily resolves on the first call after setAtlasRoot. Returns an empty
+ * array when atlas isn't loaded yet.
+ * @returns {ReadonlyArray<any>}
+ */
+export function getMuonChamberMeshes() {
+  if (!atlasRoot) return [];
+  return _resolveTrackAtlasTargets().meshes;
+}
+
+// Hover outline for muon chambers — piggy-backs on the per-mesh
+// trackAtlasOutline LineSegments already created by _ensureTrackAtlasOutline.
+// Stores each forced mesh's prior outline.visible so we can restore it on
+// hover-out (the next updateTrackAtlasIntersections will recompute the
+// track-driven state authoritatively, but until then we leave it as we
+// found it).
+/** @type {Map<any, boolean>} */
+const _hoverOutlinePrev = new Map();
+
+/**
+ * Forces the per-mesh outline on every chamber in `meshes` to visible —
+ * typically every mesh of one station, fed in by the hover handler via
+ * getStationMeshes(). Replaces any previous hover set.
+ * @param {ReadonlyArray<any>} meshes
+ */
+export function showChamberHoverOutline(meshes) {
+  clearChamberHoverOutline();
+  for (const m of meshes) {
+    const out = m.userData?.trackAtlasOutline;
+    if (!out) continue;
+    _hoverOutlinePrev.set(m, out.visible);
+    out.visible = true;
+  }
+  if (_hoverOutlinePrev.size) markDirty();
+}
+
+/** Restores every outline forced visible by the last showChamberHoverOutline. */
+export function clearChamberHoverOutline() {
+  if (_hoverOutlinePrev.size === 0) return;
+  for (const [m, prev] of _hoverOutlinePrev) {
+    const out = m.userData?.trackAtlasOutline;
+    if (out) out.visible = prev;
+  }
+  _hoverOutlinePrev.clear();
+  markDirty();
 }
 
 function _findAtlasNodesByName(root, name, out = []) {
@@ -178,12 +231,25 @@ export function updateTrackAtlasIntersections() {
   if (!meshes.length) return;
 
   const trackGroup = _getTrackGroup();
-  const visibleTracks =
-    trackGroup && trackGroup.visible ? trackGroup.children.filter((c) => c.visible) : [];
+  // Two questions, two answers:
+  //   isHitTrack — purely geometric: does THIS track's polyline pass
+  //                through any chamber? Computed for every track in the
+  //                group, regardless of visibility. The Particles-panel
+  //                filters in detectorGroups.js use this flag to decide
+  //                whether a track is "muon-like" (real μ vs unmatched μ),
+  //                so resetting it on hidden tracks would break the cycle:
+  //                hide → reset isHitTrack → next filter pass can't fire →
+  //                track comes back visible.
+  //   hitMeshes  — actually-lit chambers: only tracks whose .visible=true
+  //                or particleHidden=true (the J-button / "Muon Tracks
+  //                off" / etc cases that hide the LINE but keep the
+  //                physics) contribute. Unmatched-μ tracks set
+  //                particleHidden=false so their chambers go dark too.
+  const allTracks = trackGroup ? trackGroup.children : [];
   const hitMeshes = new Set();
   const hitTracks = new Set();
 
-  if (visibleTracks.length) {
+  if (allTracks.length) {
     scene.updateMatrixWorld(true);
 
     // Cache world-space AABBs for all target meshes once (static geometry).
@@ -191,7 +257,7 @@ export function updateTrackAtlasIntersections() {
       _trackAtlasMeshBoxes = meshes.map((m) => new THREE.Box3().setFromObject(m));
     }
 
-    for (const line of visibleTracks) {
+    for (const line of allTracks) {
       const pos = line.geometry?.getAttribute('position');
       if (!pos || pos.count < 2) continue;
 
@@ -210,6 +276,10 @@ export function updateTrackAtlasIntersections() {
       }
       if (!nearMeshes.length) continue;
 
+      // Track contributes to chamber lighting iff its line is rendered
+      // (or in the "hide line, keep physics" mode). Geometric isHitTrack
+      // is recorded for every track regardless.
+      const lightsChambers = line.visible || line.userData.particleHidden;
       let lineHit = false;
       for (let i = 0; i < pos.count - 1; i++) {
         _trackAtlasSegA.fromBufferAttribute(pos, i).applyMatrix4(line.matrixWorld);
@@ -221,7 +291,7 @@ export function updateTrackAtlasIntersections() {
         _trackAtlasRay.set(_trackAtlasSegA, _trackAtlasDir);
         _trackAtlasRay.far = len;
         for (const hit of _trackAtlasRay.intersectObjects(nearMeshes, false)) {
-          hitMeshes.add(hit.object);
+          if (lightsChambers) hitMeshes.add(hit.object);
           lineHit = true;
         }
       }
@@ -229,9 +299,14 @@ export function updateTrackAtlasIntersections() {
     }
   }
 
+  // A muon chamber shows only when a track passes through it AND the user
+  // hasn't turned that station off in the layers panel
+  // (mesh.userData.muonForceVisible). Defaults to AND-true so the prior
+  // hit-driven behaviour is preserved out of the box; flipping a panel toggle
+  // off vetoes the chamber even when a track hits it.
   let changed = false;
   for (const mesh of meshes) {
-    const next = hitMeshes.has(mesh);
+    const next = hitMeshes.has(mesh) && !!mesh.userData.muonForceVisible;
     if (mesh.visible !== next) {
       mesh.visible = next;
       changed = true;
@@ -248,232 +323,8 @@ export function updateTrackAtlasIntersections() {
     for (const line of trackGroup.children) {
       line.userData.isHitTrack = hitTracks.has(line);
     }
-    _applyTrackMaterials(trackGroup);
+    applyTrackMaterials(trackGroup);
   }
   if (!changed) return;
-  markDirty();
-}
-
-// Applies the priority chain to every track line:
-//   electron / positron match (red / green) > muon match (blue) >
-//   jet-match (orange) > τ-match (purple) > muon-chamber hit (blue) >
-//   default (yellow).
-//
-// Rationale (top-down):
-//   1. Electron and Muon win first — both are official lepton-ID matches
-//      (ΔR against the reconstructed <Electron> / <Muon> objects). Most
-//      specific identification a track can carry.
-//   2. Jet beats τ: in this JiveXML's data every <TauJet> carries
-//      isTauString = "xAOD_tauJet_withoutQuality", i.e. they are the τ
-//      algorithm's INPUT list, not τs that passed any ID. Jet is the more
-//      reliable established object; if both claim the same track, paint it
-//      as a jet's. (If a future XML exposes τ-with-quality we can promote
-//      τ above jet again.)
-//   3. Muon-chamber hit (geometric, the track passes through MUC1/MUCH)
-//      sits last because it doesn't claim ownership — it just notes that
-//      the track reaches the chambers. Painted blue, the same as a real
-//      muon match: muon-hit tracks are virtually always real muons that
-//      happen to lack an explicit <Muon> object reference.
-//
-// Each source flag lives on userData; this loop is the single place that
-// knows about the priority ordering.
-function _applyTrackMaterials(trackGroup) {
-  for (const line of trackGroup.children) {
-    const ePdg = line.userData.matchedElectronPdgId;
-    if (ePdg != null) {
-      line.material = ePdg < 0 ? TRACK_ELECTRON_NEG_MAT : TRACK_ELECTRON_POS_MAT;
-    } else if (line.userData.isMuonMatched) {
-      line.material = TRACK_HIT_MAT;
-    } else if (line.userData.isJetMatched) {
-      line.material = TRACK_JET_MAT;
-    } else if (line.userData.isTauMatched) {
-      line.material = TRACK_TAU_MAT;
-    } else if (line.userData.isHitTrack) {
-      line.material = TRACK_HIT_MAT;
-    } else {
-      line.material = TRACK_MAT;
-    }
-  }
-}
-
-// Recomputes the `isJetMatched` flag on each rendered track line based on the
-// active jet collection and the current jet ET threshold. Then re-applies the
-// material priority directly (independent of updateTrackAtlasIntersections,
-// which can early-return before atlasRoot is loaded).
-export function recomputeJetTrackMatch(activeJetCollection, thrJetEtGev) {
-  const trackGroup = _getTrackGroup();
-  if (!trackGroup) return;
-  // Build the matched key set: "<aod_collection>#<index>".
-  const matched = new Set();
-  if (activeJetCollection) {
-    for (const j of activeJetCollection.jets) {
-      if (j.etGev < thrJetEtGev) continue;
-      for (const t of j.tracks) {
-        const aod = _XAOD_TO_AOD_TRACK_KEY[t.key];
-        if (!aod) continue;
-        matched.add(`${aod}#${t.index}`);
-      }
-    }
-  }
-  for (const line of trackGroup.children) {
-    const k = line.userData.storeGateKey;
-    const i = line.userData.indexInCollection;
-    line.userData.isJetMatched = k != null && i != null && matched.has(`${k}#${i}`);
-  }
-  _applyTrackMaterials(trackGroup);
-  markDirty();
-}
-
-// Resolves each TauJet's <trackKey>/<trackIndex> pairs to the rendered track
-// lines and stamps `isTauMatched` accordingly. Direct (key, index) lookup —
-// no heuristic — because <TauJet> publishes the link explicitly. Same xAOD →
-// AOD key bridge as jet→track. `taus` may be null (clears all matches).
-export function recomputeTauTrackMatch(taus) {
-  const trackGroup = _getTrackGroup();
-  if (!trackGroup) return;
-  const matched = new Set();
-  if (taus && taus.length) {
-    for (const t of taus) {
-      for (const trk of t.tracks) {
-        const aod = _XAOD_TO_AOD_TRACK_KEY[trk.key];
-        if (!aod) continue;
-        matched.add(`${aod}#${trk.index}`);
-      }
-    }
-  }
-  for (const line of trackGroup.children) {
-    const k = line.userData.storeGateKey;
-    const i = line.userData.indexInCollection;
-    line.userData.isTauMatched = k != null && i != null && matched.has(`${k}#${i}`);
-  }
-  _applyTrackMaterials(trackGroup);
-  markDirty();
-}
-
-// Heuristic ΔR matching from each electron to its closest track. JiveXML
-// doesn't publish the official egamma → track link, so we use η/φ proximity
-// — sufficient because the ATLAS reconstruction puts electron clusters within
-// ~0.025 of the matched track, and our threshold is generous.
-//
-// Pre-matching filters:
-//   • Electron pT ≥ 3 GeV: cuts out the very softest egamma candidates while
-//     still catching most physics electrons.
-//   • Track must be visible (passes the user's track pT slider): hidden soft
-//     tracks won't steal the match from the real electron track.
-//   • Track must come from the inner-detector-only collection: muons that
-//     happen to fall close in η/φ to an egamma cluster (rare but not zero —
-//     e.g. an EM cluster shadow next to a real muon) would otherwise grab
-//     the slot, and CombinedMuonTracks polylines extend all the way to the
-//     muon chambers, so colouring them red would visually suggest "electron
-//     exiting through the muon system" — physically impossible.
-const _ELECTRON_TRACK_DR_MAX = 0.05;
-const _ELECTRON_PT_MIN_GEV = 3;
-const _ELECTRON_TRACK_COLLECTION = 'CombinedInDetTracks';
-export function recomputeElectronTrackMatch(electrons) {
-  const trackGroup = _getTrackGroup();
-  if (!trackGroup) return;
-  // Reset previous matches.
-  for (const line of trackGroup.children) line.userData.matchedElectronPdgId = null;
-
-  if (electrons && electrons.length) {
-    for (const e of electrons) {
-      if (!Number.isFinite(e.eta) || !Number.isFinite(e.phi)) continue;
-      if (Number.isFinite(e.ptGev) && e.ptGev < _ELECTRON_PT_MIN_GEV) continue;
-      let best = null;
-      let bestDR = _ELECTRON_TRACK_DR_MAX;
-      for (const line of trackGroup.children) {
-        // Only ID-only tracks are eligible: a CombinedMuonTracks line with a
-        // long polyline would, if matched, get coloured red along its full
-        // 10 m extent — making the e± look like a muon.
-        if (line.userData.storeGateKey !== _ELECTRON_TRACK_COLLECTION) continue;
-        // Hidden tracks (below user pT threshold) can't claim a match —
-        // otherwise a soft pile-up track would steal the slot from the real
-        // visible electron track.
-        if (!line.visible) continue;
-        const tEta = line.userData.eta;
-        const tPhi = line.userData.phi;
-        if (!Number.isFinite(tEta) || !Number.isFinite(tPhi)) continue;
-        // Skip already-claimed tracks so two electrons can't grab the same one.
-        if (line.userData.matchedElectronPdgId != null) continue;
-        const dEta = e.eta - tEta;
-        let dPhi = e.phi - tPhi;
-        if (dPhi > Math.PI) dPhi -= 2 * Math.PI;
-        else if (dPhi < -Math.PI) dPhi += 2 * Math.PI;
-        const dR = Math.sqrt(dEta * dEta + dPhi * dPhi);
-        if (dR < bestDR) {
-          bestDR = dR;
-          best = line;
-        }
-      }
-      if (best) best.userData.matchedElectronPdgId = e.pdgId;
-    }
-  }
-  _applyTrackMaterials(trackGroup);
-  markDirty();
-}
-
-// Heuristic ΔR matching from each <Muon> object to its closest CombinedMuon
-// track. JiveXML doesn't publish a Muon → track link, so we approximate with
-// η/φ proximity — analogous to the electron matcher but tuned for muons:
-//   • Match against CombinedMuonTracks only: those polylines run all the way
-//     through the toroid to the muon chambers (~10 m), which is the trajectory
-//     that physically belongs to a Muon object. ID-only tracks would also be
-//     close in η/φ for a high-pT muon, but anchoring the μ± sprite there
-//     would put the label inside the inner detector instead of out on the
-//     blue line that uniquely identifies the muon.
-//   • Wider ΔR cap (0.10) than electrons (0.05): the toroid bends the muon
-//     significantly between the IP and the chambers, so the track endpoint
-//     direction can drift from the muon's IP-pointing (eta, phi) by ~0.05.
-//   • No pT pre-cut: the Muon collection is small (typically 0-3 per event)
-//     and already curated; even a few-GeV muon is interesting to label.
-// `muons` may be null (clears all matches).
-const _MUON_TRACK_DR_MAX = 0.1;
-const _MUON_TRACK_COLLECTION = 'CombinedMuonTracks';
-export function recomputeMuonTrackMatch(muons) {
-  const trackGroup = _getTrackGroup();
-  if (!trackGroup) return;
-  // Two flags: `isMuonMatched` is the binary "this track has a Muon attached"
-  // signal, `matchedMuonPdgId` carries the sign when known. Splitting them
-  // lets the renderer distinguish "no match" from "matched but charge-less"
-  // (parser returns pdgId=null when the XML field is missing or zero).
-  for (const line of trackGroup.children) {
-    line.userData.isMuonMatched = false;
-    line.userData.matchedMuonPdgId = null;
-  }
-
-  if (muons && muons.length) {
-    for (const mu of muons) {
-      if (!Number.isFinite(mu.eta) || !Number.isFinite(mu.phi)) continue;
-      let best = null;
-      let bestDR = _MUON_TRACK_DR_MAX;
-      for (const line of trackGroup.children) {
-        if (line.userData.storeGateKey !== _MUON_TRACK_COLLECTION) continue;
-        if (!line.visible) continue;
-        const tEta = line.userData.eta;
-        const tPhi = line.userData.phi;
-        if (!Number.isFinite(tEta) || !Number.isFinite(tPhi)) continue;
-        if (line.userData.isMuonMatched) continue;
-        const dEta = mu.eta - tEta;
-        let dPhi = mu.phi - tPhi;
-        if (dPhi > Math.PI) dPhi -= 2 * Math.PI;
-        else if (dPhi < -Math.PI) dPhi += 2 * Math.PI;
-        const dR = Math.sqrt(dEta * dEta + dPhi * dPhi);
-        if (dR < bestDR) {
-          bestDR = dR;
-          best = line;
-        }
-      }
-      if (best) {
-        best.userData.isMuonMatched = true;
-        best.userData.matchedMuonPdgId = mu.pdgId;
-      }
-    }
-  }
-  // Re-apply materials: muon match now sits in the priority chain *above*
-  // jet and τ (a track that's both a muon and in a jet should read as a
-  // muon, not a jet). The colour is still the same blue as TRACK_HIT_MAT —
-  // muon tracks virtually always also pass through the chambers — but the
-  // priority guarantees it wins over orange / purple when both apply.
-  _applyTrackMaterials(trackGroup);
   markDirty();
 }

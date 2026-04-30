@@ -1,7 +1,9 @@
+// @ts-check
 // Physical η/φ coordinate helpers — mirror the formulas from parser/src/lib.rs
 // so tooltip values match what the Rust WASM decoder produces.
 
 // ── TileCal cell display label ────────────────────────────────────────────────
+/** @param {number} x  @param {number} k  @returns {string} */
 export function cellLabel(x, k) {
   switch (x) {
     case 1:
@@ -38,6 +40,7 @@ export const HEC_NAMES = ['1', '23', '45', '67'];
 export const HEC_INNER = [10, 10, 9, 8]; // inner η bins per group
 
 // ── LAr EM ────────────────────────────────────────────────────────────────────
+/** @param {number} absbe  @param {number} sampling  @param {number} region  @returns {number} */
 function _larEmGlobalEtaOffset(absbe, sampling, region) {
   if (absbe === 1 && sampling === 1 && region === 1) return 448;
   if (absbe === 1 && sampling === 2 && region === 1) return 56;
@@ -51,6 +54,7 @@ function _larEmGlobalEtaOffset(absbe, sampling, region) {
   if (absbe === 3 && sampling === 2 && region === 0) return 44;
   return 0;
 }
+/** @type {Record<string, [number, number]>} */
 const _LAR_EM_ETA_TABLE = {
   '1,0,0': [0.0, 0.025],
   '1,1,0': [0.003125, 0.003125],
@@ -71,6 +75,13 @@ const _LAR_EM_ETA_TABLE = {
   '3,1,0': [2.5, 0.1],
   '3,2,0': [2.5, 0.1],
 };
+/**
+ * @param {number} be  bec ∈ {-3,-2,-1,1,2,3}
+ * @param {number} sampling
+ * @param {number} region
+ * @param {number} globalEta  cum-eta index from the WASM packed record
+ * @returns {number}  signed pseudo-rapidity
+ */
 export function physLarEmEta(be, sampling, region, globalEta) {
   const absbe = Math.abs(be);
   const offset = _larEmGlobalEtaOffset(absbe, sampling, region);
@@ -78,6 +89,13 @@ export function physLarEmEta(be, sampling, region, globalEta) {
   const absEta = eta0 + (globalEta - offset) * deta + deta / 2;
   return be < 0 ? -absEta : absEta;
 }
+/**
+ * @param {number} be
+ * @param {number} sampling
+ * @param {number} region
+ * @param {number} phiIdx
+ * @returns {number}
+ */
 export function physLarEmPhi(be, sampling, region, phiIdx) {
   const absbe = Math.abs(be);
   let nPhi = 64;
@@ -88,6 +106,7 @@ export function physLarEmPhi(be, sampling, region, phiIdx) {
 }
 
 // ── LAr HEC ──────────────────────────────────────────────────────────────────
+/** @type {Record<string, [number, number]>} */
 const _LAR_HEC_ETA_TABLE = {
   '0,0': [1.5, 0.1],
   '1,0': [1.5, 0.1],
@@ -98,16 +117,31 @@ const _LAR_HEC_ETA_TABLE = {
   '2,1': [2.5, 0.2],
   '3,1': [2.5, 0.2],
 };
+/**
+ * @param {number} be
+ * @param {number} sampling
+ * @param {number} region
+ * @param {number} etaIdx
+ * @returns {number}
+ */
 export function physLarHecEta(be, sampling, region, etaIdx) {
   const [eta0, deta] = _LAR_HEC_ETA_TABLE[`${sampling},${region}`] ?? [1.5, 0.1];
   const absEta = eta0 + etaIdx * deta + deta / 2;
   return be < 0 ? -absEta : absEta;
 }
+/** @param {number} region  @param {number} phiIdx  @returns {number} */
 export function physLarHecPhi(region, phiIdx) {
   return _wrapPhi(((phiIdx + 0.5) * 2 * Math.PI) / (region === 0 ? 64 : 32));
 }
 
 // ── TileCal ───────────────────────────────────────────────────────────────────
+/**
+ * @param {number} section  1=LB, 2=EB, 3=ITC
+ * @param {number} side  +1 = A side, -1 = C side
+ * @param {number} tower  ATLAS tower index
+ * @param {number} sampling  0=A, 1=BC/B, 2=D, 3=E
+ * @returns {number}
+ */
 export function physTileEta(section, side, tower, sampling) {
   let absEta;
   if (section === 3) {
@@ -127,9 +161,11 @@ export function physTileEta(section, side, tower, sampling) {
   return side < 0 ? -absEta : absEta;
 }
 
+/** @param {number} phi  @returns {number}  Wraps φ into (-π, π]. */
 export function _wrapPhi(phi) {
   return phi > Math.PI ? phi - 2 * Math.PI : phi;
 }
+/** @param {number} module  TileCal module index 0..63  @returns {number} */
 export function physTilePhi(module) {
   return _wrapPhi(((module + 0.5) * 2 * Math.PI) / 64);
 }

@@ -13,7 +13,9 @@ import { matTile, matHec, matLAr, PAL_TILE_COLOR } from './palette.js';
 import { scene, markDirty } from './renderer.js';
 import { ghostVisible, ghostMeshByName } from './ghost.js';
 import { HEC_NAMES } from './coords.js';
-import { setLoadProgress } from './loading.js';
+import { setLoadProgress } from './loadingScreen.js';
+import { setMuonTrees } from './visibility.js';
+import { classifyCellName } from './cellClassifier.js';
 import { esc } from './utils.js';
 
 // ── Mesh name → integer key ───────────────────────────────────────────────────
@@ -101,79 +103,24 @@ function meshNameToKey(name) {
   return null;
 }
 
-// Detector classifier — returns { det, subDet, sampling } so the layers
-// panel can toggle Tile barrel/extended/ITC, LAr barrel/end-cap, and
-// individual samplings within each region.
-//
-// Tile layer numbers `x` in the mesh prefix `T{x}{y}{k}_{k}` follow the build
-// sequence in const/CaloBuild.C; the sampling tag is the standard A/BC/B/D/E
-// (and inner/outer for MBTS modules at x=14/15).
-//   x=1   → barrel/A     x=23 → barrel/BC   x=4 → barrel/D
-//   x=5   → extended/A   x=6  → extended/B  x=7 → extended/D
-//   x=8   → extended/D   (D4 cell, kept under EB-D)
-//   x=9   → extended/B   (C10 cell, kept under EB-B per user request)
-//   x=10..13 → itc/e     (E1-E4 collapse to a single ITC bucket)
-//   x=14  → mbts/outer   x=15 → mbts/inner
+// Wraps the pure cellClassifier with the loader's ghost-envelope skip.
+// Some atlas envelope mesh names match the cell regexes but are decorative
+// shells, not actual readout cells — they're tagged in ghostVisible at GLB
+// load time and routed to the ghost group instead.
 function classifyCellDet(name) {
   if (ghostVisible.has(name)) return null;
-  const parts = name.split('→');
-  if (parts.length < 3) return null;
-  for (const p of parts) {
-    let m = /^EB_(\d+)_/.exec(p);
-    if (m) return { det: 'LAR', subDet: 'barrel', sampling: +m[1] };
-    m = /^EE_(\d+)_/.exec(p);
-    if (m) return { det: 'LAR', subDet: 'ec', sampling: +m[1] };
-    m = /^EM(Barrel|EndCap)_(\d+)_/.exec(p);
-    if (m) return { det: 'LAR', subDet: m[1] === 'Barrel' ? 'barrel' : 'ec', sampling: +m[2] };
-    // HEC mesh prefix encodes the merged layer name (e.g. H_1_, H_23_) — map
-    // it through HEC_NAMES to recover the sampling index 0..3.
-    m = /^H_(\w+?)_/.exec(p);
-    if (m) {
-      const s = HEC_NAMES.indexOf(m[1]);
-      if (s >= 0) return { det: 'HEC', subDet: 'ec', sampling: s };
-    }
-    m = /^HEC_(\w+)_/.exec(p);
-    if (m) {
-      const s = HEC_NAMES.indexOf(m[1]);
-      if (s >= 0) return { det: 'HEC', subDet: 'ec', sampling: s };
-    }
-    const tm = /^T(\d+)[pn]\d+_\d+$/.exec(p);
-    if (tm) {
-      const x = +tm[1];
-      let subDet, sampling;
-      if (x === 1) {
-        subDet = 'barrel';
-        sampling = 'A';
-      } else if (x === 23) {
-        subDet = 'barrel';
-        sampling = 'BC';
-      } else if (x === 4) {
-        subDet = 'barrel';
-        sampling = 'D';
-      } else if (x === 5) {
-        subDet = 'extended';
-        sampling = 'A';
-      } else if (x === 6 || x === 9) {
-        subDet = 'extended';
-        sampling = 'B';
-      } else if (x === 7 || x === 8) {
-        subDet = 'extended';
-        sampling = 'D';
-      } else if (x >= 10 && x <= 13) {
-        subDet = 'itc';
-        sampling = 'E';
-      } else if (x === 14) {
-        subDet = 'mbts';
-        sampling = 'outer';
-      } else if (x === 15) {
-        subDet = 'mbts';
-        sampling = 'inner';
-      } else {
-        subDet = 'extended';
-        sampling = 'D';
-      }
-      return { det: 'TILE', subDet, sampling };
-    }
+  return classifyCellName(name);
+}
+
+// Depth-first search for the first atlas-tree node with `name`. Returns null
+// when not found. Used by the muon visibility hook to grab the MUCH_1 / MUC1_2
+// subtrees regardless of where they sit in the hierarchy.
+function _findAtlasNode(root, name) {
+  if (!root) return null;
+  if (root.name === name) return root;
+  for (const child of root.children.values()) {
+    const hit = _findAtlasNode(child, name);
+    if (hit) return hit;
   }
   return null;
 }
@@ -427,6 +374,10 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
         const atlasContainer = new THREE.Group();
         atlasContainer.name = 'atlas-geo';
         atlasContainer.scale.setScalar(10);
+        // The GLB has the ATLAS A/C convention swapped vs the naming: MUCH_1
+        // sits at negative z (C side) and MUC1_2 at positive z (A side). All
+        // atlas meshes start hidden; visibility.js owns the per-node toggles
+        // and writes mesh.userData.muonForceVisible directly.
         for (const o of atlasMeshes) {
           o.material = atlasMat;
           o.frustumCulled = false;
@@ -434,7 +385,12 @@ export async function initScene({ setStatus, atlasMat, onSceneReady, onAtlasRead
           atlasContainer.add(o);
         }
         scene.add(atlasContainer);
-        onAtlasReady(_buildAtlasTree(atlasMeshes));
+        const atlasTree = _buildAtlasTree(atlasMeshes);
+        // MUCH_1 / MUC1_2 may not sit at the top level — search recursively.
+        const aSideTree = _findAtlasNode(atlasTree, 'MUC1_2');
+        const cSideTree = _findAtlasNode(atlasTree, 'MUCH_1');
+        setMuonTrees({ aSide: aSideTree, cSide: cSideTree });
+        onAtlasReady(atlasTree);
       }
 
       markDirty();

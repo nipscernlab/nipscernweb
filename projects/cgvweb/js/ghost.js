@@ -67,7 +67,7 @@ function buildPhiLines() {
   scene.add(ghostPhiGroup);
 }
 
-function anyGhostOn() {
+export function anyGhostOn() {
   for (const v of ghostVisible.values()) if (v) return true;
   return false;
 }
@@ -93,7 +93,10 @@ export function applyAllGhostMeshes() {
 }
 
 function syncGhostToggles() {
-  document.getElementById('btn-ghost').classList.toggle('on', anyGhostOn());
+  // Helpers popover gswitch — see js/bootstrap/helpersPanel.js. The button
+  // may not exist yet during enableDefaultGhosts() called from initial load
+  // before the helpers panel is wired, so guard.
+  document.getElementById('hbtn-ghost')?.classList.toggle('on', anyGhostOn());
 }
 
 function setAllGhosts(on) {

@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import { _wasmPool } from '../state.js';
 import { initScene } from '../loader.js';
-import { setLoadProgress, dismissLoadingScreen } from '../loading.js';
+import { setLoadProgress, dismissLoadingScreen } from '../loadingScreen.js';
 import { enableDefaultGhosts } from '../ghost.js';
 import { esc } from '../utils.js';
 import { markDirty } from '../renderer.js';
