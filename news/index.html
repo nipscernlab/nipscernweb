@@ -142,29 +142,33 @@
       article.setAttribute('role', 'article');
       article.setAttribute('aria-labelledby', 'featured-title-' + featured.id);
 
-      const eyebrowText = (getLang() === 'pt') ? 'Destaque' : 'Featured Story';
-      const readText    = (getLang() === 'pt') ? 'Ler a história' : 'Read the story';
+      const lang = getLang();
+      const ribbonText = (lang === 'pt') ? 'Reportagem em destaque' : 'Featured Story';
+      const readText   = (lang === 'pt') ? 'Ler a reportagem' : 'Read the story';
+      const byText     = (lang === 'pt') ? 'por'              : 'by';
 
       article.innerHTML = `
         <a href="post?id=${featured.id}" class="news-featured-link" aria-label="${tr.title || ''}">
           <div class="news-featured-media">
+            <span class="news-featured-ribbon"><i class="ph ph-star" aria-hidden="true"></i> ${ribbonText}</span>
             <img src="../${featured.image}" alt="" loading="eager"
-                 onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
-            <div class="news-featured-glow" aria-hidden="true"></div>
+                 onerror="this.style.display='none';
+                          var ic=document.createElement('i');
+                          ic.className='ph ph-newspaper';
+                          this.parentElement.appendChild(ic);">
           </div>
           <div class="news-featured-body">
-            <div class="news-featured-eyebrow">
-              <span class="news-featured-pill"><i class="ph ph-star" aria-hidden="true"></i> ${eyebrowText}</span>
-              <span class="news-featured-date">${formatDate(featured.date)}</span>
-              <span class="news-featured-author">— ${featured.author || ''}</span>
+            <div class="news-featured-meta">
+              <span class="news-date">${formatDate(featured.date)}</span>
+              <span class="news-featured-author">${byText} ${featured.author || ''}</span>
             </div>
             <h2 class="news-featured-title" id="featured-title-${featured.id}">${tr.title || ''}</h2>
             <p class="news-featured-subtitle">${tr.subtitle || tr.excerpt || ''}</p>
-            <div class="news-featured-cta">
-              <span class="news-featured-readmore">${readText} <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+            <div class="news-featured-foot">
               <div class="news-featured-tags">
                 ${(featured.tags || []).slice(0, 4).map(t => `<span class="pub-tag">${t}</span>`).join('')}
               </div>
+              <span class="news-featured-readmore">${readText} <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
             </div>
           </div>
         </a>
