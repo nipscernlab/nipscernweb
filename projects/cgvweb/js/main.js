@@ -6,7 +6,7 @@ import { getActiveJetCollection, onJetStateChange } from './jets.js';
 import { registerViewerShortcuts } from './viewerShortcuts.js';
 import { TILE_SCALE, HEC_SCALE, LAR_SCALE, FCAL_SCALE } from './palette.js';
 import { markDirty, canvas, renderer, scene, camera, controls } from './renderer.js';
-import { toggleAllGhosts } from './ghost.js';
+import { toggleAllGhosts, anyGhostOn } from './ghost.js';
 import { setupColorPicker } from './colorpicker.js';
 import { setupCinemaControls } from './cinema.js';
 import { setupScreenshotControls } from './screenshot.js';
@@ -48,12 +48,9 @@ import {
   refreshSceneVisibility,
   getTrackGroup,
 } from './visibility.js';
-import { createDownloadProgressController } from './progress.js';
-import {
-  initTrackAtlasIntersections,
-  updateTrackAtlasIntersections,
-} from './trackAtlasIntersections.js';
-import { clearOutline, rebuildAllOutlines } from './outlines.js';
+import { createDownloadProgressController } from './downloadProgress.js';
+import { initTrackAtlasIntersections } from './trackAtlasIntersections.js';
+import { clearOutline } from './outlines.js';
 import { initHoverTooltip, hideTooltip, tooltip, tipCellEl, tipEEl } from './hoverTooltip.js';
 import { initRenderLoop } from './renderLoop.js';
 import { setupPanelResize } from './panelResize.js';
@@ -70,6 +67,7 @@ import {
 } from './statusHud.js';
 import { setupTopToolbar } from './bootstrap/topToolbar.js';
 import { setupLayersPanel } from './bootstrap/layersPanel.js';
+import { setupHelpersPanel } from './bootstrap/helpersPanel.js';
 import { setupModeWiring } from './bootstrap/modeWiring.js';
 import { setupSceneInit } from './bootstrap/sceneInit.js';
 
@@ -140,21 +138,27 @@ const resetCamera = () => {
   else cinema.resetCamera();
 };
 
-const topToolbar = setupTopToolbar({
-  resetCamera,
+const topToolbar = setupTopToolbar({ resetCamera });
+
+const layersPanel = setupLayersPanel();
+
+// Helpers popover wires Ghost / Cell Info / Unmatched / Jet-Cluster Lines.
+// It owns the showInfo state that hoverTooltip reads via getShowInfo.
+// Mutual exclusivity with the other toolbar popovers is automatic — see the
+// shared registry in js/bootstrap/anchoredPopover.js.
+const helpersPanel = setupHelpersPanel({
+  toggleAllGhosts,
+  anyGhostOn,
   clearOutline,
   hideTooltip,
-  toggleAllGhosts,
 });
 
 initHoverTooltip({
-  getShowInfo: topToolbar.getShowInfo,
+  getShowInfo: helpersPanel.getShowInfo,
   getCinemaMode: () => cinema.isCinemaMode(),
   getDragging: () => _ctrlActive,
   t,
 });
-
-const layersPanel = setupLayersPanel();
 
 setupPanelResize();
 
@@ -272,7 +276,7 @@ const slicer = createSlicerController({
 // inactive or fewer than 2 usable jets are present.
 onJetStateChange(() => slicer.refreshFromActiveJets());
 
-initVisibility({ slicer, rebuildAllOutlines, updateTrackAtlasIntersections });
+initVisibility({ slicer });
 
 setupScreenshotControls({
   camera,

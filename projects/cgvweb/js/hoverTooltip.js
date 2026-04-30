@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { canvas, camera, controls, markDirty } from './renderer.js';
 import { active, rayTargets } from './state.js';
-import { fcalGroup, fcalVisibleMap } from './visibility.js';
 import {
+  fcalGroup,
+  fcalVisibleMap,
   getTrackGroup,
   getPhotonGroup,
   getClusterGroup,
@@ -12,7 +13,11 @@ import {
   getVertexGroup,
 } from './visibility.js';
 import { showOutline, showFcalOutline, clearOutline } from './outlines.js';
-import { showTrackHits, hideTrackHits } from './hitsOverlay.js';
+import { showTrackHits, hideTrackHits, getHitsEnabled } from './overlays/hitsOverlay.js';
+import { buildExtrasHtml } from './tooltipRows.js';
+import { getMuonChamberMeshes, showChamberHoverOutline } from './trackAtlasIntersections.js';
+import { getMuonAliasForMesh, getStationMeshes } from './visibility/muonAliases.js';
+import { leptonSymbol, tauSymbolFromCharge } from './particleSymbols.js';
 
 export const tooltip = document.getElementById('tip');
 export const tipCellEl = document.getElementById('tip-cell');
@@ -21,21 +26,11 @@ export const tipEEl = document.getElementById('tip-e');
 const tipEKeyEl = document.querySelector('#tip .tkey');
 const tipExtraEl = document.getElementById('tip-extra');
 
-// Builds the extra-rows HTML for one tooltip. Each row is a key/value pair in
-// the same `.trow / .tkey / .tval` style as the energy row. innerHTML so the
-// caller can use sub/sup/HTML entities for physics labels (e.g., η, p_T).
+// Renders the extra-rows block. Builder is in tooltipRows.js so the
+// escaping contract (key=raw, value=escaped) can be tested in pure Node.
 function _setExtras(rows) {
   if (!tipExtraEl) return;
-  if (!rows || !rows.length) {
-    tipExtraEl.innerHTML = '';
-    return;
-  }
-  tipExtraEl.innerHTML = rows
-    .map(
-      ([k, v]) =>
-        `<div class="trow"><span class="tkey">${k}</span><span class="tval">${v}</span></div>`,
-    )
-    .join('');
+  tipExtraEl.innerHTML = buildExtrasHtml(rows);
 }
 
 function _fmtEta(eta) {
@@ -51,6 +46,15 @@ export function hideTooltip() {
   tooltip.hidden = true;
 }
 
+// Hides every hover-driven visual: tooltip, cell / FCAL outline, track hit
+// spheres. Used by the doRaycast early-return paths (cinema mode, cursor
+// over UI, no scene to hover) and the function tail (no branch matched).
+function _dismissAll() {
+  hideTooltip();
+  clearOutline();
+  hideTrackHits();
+}
+
 const raycast = new THREE.Raycaster();
 raycast.firstHitOnly = true; // stop after first intersection (much faster)
 raycast.params.Line = { threshold: 40 }; // 40 mm hit zone for ID tracks / photons
@@ -63,7 +67,7 @@ const _DEFAULT_TRACK_THRESHOLD_MM = 40;
 const mxy = new THREE.Vector2();
 
 let lastRay = 0;
-let mousePos = { x: 0, y: 0 };
+const mousePos = { x: 0, y: 0 };
 
 let _getShowInfo = () => true;
 let _getCinemaMode = () => false;
@@ -101,6 +105,14 @@ export function initHoverTooltip({ getShowInfo, getCinemaMode, getDragging, t })
 }
 
 function doRaycast(clientX, clientY) {
+  // Tooltip ("show info") and Hits ("Detector Layers > Inner Detector > Hits")
+  // are independent toggles — see js/overlays/hitsOverlay.js for the hits
+  // state. We can short-circuit when both are off (or cinema mode is on, which
+  // overrides everything), or when there's literally nothing in the scene to
+  // hover over. Otherwise we keep going so the track raycast can still drive
+  // hits even when the tooltip is silenced.
+  const wantTooltip = _getShowInfo() && !_getCinemaMode();
+  const wantHits = getHitsEnabled() && !_getCinemaMode();
   // Electron group only carries sprite labels (not raycastable), so it doesn't
   // participate in the early-return "anything to hover" check below.
   const trackGroup = getTrackGroup();
@@ -110,7 +122,12 @@ function doRaycast(clientX, clientY) {
   const tauGroup = getTauGroup();
   const metGroup = getMetGroup();
   const vertexGroup = getVertexGroup();
-  const hasTrackLines = trackGroup && trackGroup.visible && trackGroup.children.length > 0;
+  // Tracks are raycastable even when the J button is off, so the user can
+  // hover invisible tracks and still see the hit spheres (Hits toggle ON,
+  // Tracks toggle OFF). Per-line .visible (pT slider) is still respected
+  // inside the actual raycast filter below.
+  const hasTrackLines =
+    trackGroup && trackGroup.children.length > 0 && (trackGroup.visible || wantHits);
   const hasPhotonLines = photonGroup && photonGroup.visible && photonGroup.children.length > 0;
   const hasClusterLines = clusterGroup && clusterGroup.visible && clusterGroup.children.length > 0;
   const hasJetLines = jetGroup && jetGroup.visible && jetGroup.children.length > 0;
@@ -119,9 +136,15 @@ function doRaycast(clientX, clientY) {
   const hasVertexMarkers = vertexGroup && vertexGroup.visible && vertexGroup.children.length > 0;
   const hasFcalTubes =
     fcalGroup && fcalGroup.children.some((c) => c.isInstancedMesh) && fcalVisibleMap.length > 0;
+  // Muon chambers: only the meshes currently lit by tracks (or force-shown
+  // via the panel) are .visible — see updateTrackAtlasIntersections. We
+  // raycast against just those so hover doesn't pierce phantom invisible
+  // chambers nearby.
+  const muonChamberMeshes = getMuonChamberMeshes();
+  const visibleChambers = muonChamberMeshes.filter((m) => m.visible);
+  const hasMuonChambers = visibleChambers.length > 0;
   if (
-    !_getShowInfo() ||
-    _getCinemaMode() ||
+    (!wantTooltip && !wantHits) ||
     (!active.size &&
       !hasTrackLines &&
       !hasPhotonLines &&
@@ -130,26 +153,21 @@ function doRaycast(clientX, clientY) {
       !hasTauLines &&
       !hasMetArrow &&
       !hasVertexMarkers &&
-      !hasFcalTubes)
+      !hasFcalTubes &&
+      !hasMuonChambers)
   ) {
-    hideTooltip();
-    clearOutline();
-    hideTrackHits();
+    _dismissAll();
     return;
   }
   // Don't show cell info when the pointer is over any UI element (panels, toolbar, overlays)
   const topEl = document.elementFromPoint(clientX, clientY);
   if (topEl && topEl !== canvas) {
-    hideTooltip();
-    clearOutline();
-    hideTrackHits();
+    _dismissAll();
     return;
   }
   const rect = canvas.getBoundingClientRect();
   if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-    hideTooltip();
-    clearOutline();
-    hideTrackHits();
+    _dismissAll();
     return;
   }
   mxy.set(
@@ -158,6 +176,58 @@ function doRaycast(clientX, clientY) {
   );
   camera.updateMatrixWorld();
   raycast.setFromCamera(mxy, camera);
+
+  // Per-hit display helper (closes over rect, clientX, clientY, wantTooltip).
+  // The pT / energy unit-key field accepts EITHER a plain text key (i18n
+  // string) OR pre-formatted HTML (e.g. 'p<sub>T</sub>'). Visual setup
+  // (showOutline / showTrackHits / clearOutline) stays in each branch since
+  // the choice is hit-type-specific and reads clearer inline.
+  /**
+   * @param {{
+   *   label: string,
+   *   coord?: string,
+   *   valueText: string,
+   *   keyText?: string,
+   *   keyHtml?: string,
+   *   extras?: Array<[string, string]> | null,
+   * }} params
+   */
+  function showHit({ label, coord, valueText, keyText, keyHtml, extras }) {
+    tipCellEl.textContent = label;
+    tipCoordEl.textContent = coord ?? '';
+    tipEEl.textContent = valueText;
+    if (tipEKeyEl) {
+      if (keyHtml != null) tipEKeyEl.innerHTML = keyHtml;
+      else tipEKeyEl.textContent = keyText ?? '';
+    }
+    _setExtras(extras ?? null);
+    tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
+    tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
+    tooltip.hidden = !wantTooltip;
+    markDirty();
+  }
+  // Common end-of-branch resolver. Every hit branch below sets up its data
+  // and calls this with `showHitArgs` (passed through to showHit). Default
+  // `outlineAction` and `trackHitsAction` cover the 5 simple branches
+  // (vertex, cluster, tau, jet, MET); cell / FCAL / chamber / track-photon
+  // pass overrides because their outline / hit-spheres behaviour differs.
+  //
+  // Centralising the cleanup here means a future per-branch flush (the kind
+  // of "I'd need to remember 9 places" change that the SecVtx-highlight
+  // experiment ran into) only touches this one function — branches stay
+  // about *what* the hit is, not *what to clean up before showing it*.
+  /**
+   * @param {{
+   *   showHitArgs: Parameters<typeof showHit>[0],
+   *   outlineAction?: () => void,
+   *   trackHitsAction?: () => void,
+   * }} opts
+   */
+  function _finishHit({ showHitArgs, outlineAction, trackHitsAction }) {
+    (outlineAction ?? clearOutline)();
+    (trackHitsAction ?? hideTrackHits)();
+    showHit(showHitArgs);
+  }
   // ── Cell + FCAL hit (same priority — pick closest) ────────────────────────
   {
     let cellHit = null,
@@ -191,34 +261,30 @@ function doRaycast(clientX, clientY) {
     }
     if (cellHit && cellDist <= fcalDist) {
       const data = active.get(cellHandle);
-      showOutline(cellHandle);
-      hideTrackHits();
-      tipCellEl.textContent = data.cellName;
-      tipCoordEl.textContent = data.coords ?? '';
-      tipEEl.textContent = `${data.energyGev.toFixed(4)} GeV`;
-      if (tipEKeyEl) tipEKeyEl.textContent = _t('tip-energy-key');
-      _setExtras(null);
-      tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
-      tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
-      tooltip.hidden = false;
-      markDirty();
+      _finishHit({
+        outlineAction: () => (wantTooltip ? showOutline(cellHandle) : clearOutline()),
+        showHitArgs: {
+          label: data.cellName,
+          coord: data.coords,
+          valueText: `${data.energyGev.toFixed(4)} GeV`,
+          keyText: _t('tip-energy-key'),
+        },
+      });
       return;
     }
     if (fcalHit) {
       const iid = fcalHit.instanceId;
       const cell = fcalVisibleMap[iid];
-      showFcalOutline(iid);
-      hideTrackHits();
       const side = cell.eta >= 0 ? 'A' : 'C';
-      tipCellEl.textContent = `FCAL${cell.module} (${side}-side)`;
-      tipCoordEl.textContent = `η = ${cell.eta.toFixed(3)}   φ = ${cell.phi.toFixed(3)} rad`;
-      tipEEl.textContent = `${cell.energy.toFixed(4)} GeV`;
-      if (tipEKeyEl) tipEKeyEl.textContent = _t('tip-energy-key');
-      _setExtras(null);
-      tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
-      tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
-      tooltip.hidden = false;
-      markDirty();
+      _finishHit({
+        outlineAction: () => (wantTooltip ? showFcalOutline(iid) : clearOutline()),
+        showHitArgs: {
+          label: `FCAL${cell.module} (${side}-side)`,
+          coord: `η = ${cell.eta.toFixed(3)}   φ = ${cell.phi.toFixed(3)} rad`,
+          valueText: `${cell.energy.toFixed(4)} GeV`,
+          keyText: _t('tip-energy-key'),
+        },
+      });
       return;
     }
   }
@@ -241,17 +307,15 @@ function doRaycast(clientX, clientY) {
             : 'B-tag Vertex';
       const p = v.userData.position;
       const xyzMm = p ? `(${(-p.x).toFixed(2)}, ${(-p.y).toFixed(2)}, ${p.z.toFixed(2)}) mm` : '';
-      clearOutline();
-      hideTrackHits();
-      tipCellEl.textContent = label;
-      tipCoordEl.textContent = v.userData.vertexKey ?? '';
-      tipEEl.textContent = `${v.userData.numTracks ?? 0}`;
-      if (tipEKeyEl) tipEKeyEl.textContent = 'tracks';
-      _setExtras([['x, y, z', xyzMm]]);
-      tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
-      tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
-      tooltip.hidden = false;
-      markDirty();
+      _finishHit({
+        showHitArgs: {
+          label,
+          coord: v.userData.vertexKey,
+          valueText: `${v.userData.numTracks ?? 0}`,
+          keyText: 'tracks',
+          extras: [['x, y, z', xyzMm]],
+        },
+      });
       return;
     }
   }
@@ -293,39 +357,49 @@ function doRaycast(clientX, clientY) {
       const ptGev = line.userData.ptGev ?? 0;
       const storeGateKey = line.userData.storeGateKey ?? '';
       const isPhoton = line.parent === photonGroup;
+      // Tracks-invisible mode (J off + Hits on): we found a track via raycast
+      // only because the parent .visible gate was relaxed up top. Show the
+      // hit spheres and stop — no tooltip / outline, since the user can't
+      // see the track itself and a "Track → Electron" tooltip floating above
+      // empty space is misleading.
+      if (!isPhoton && trackGroup && !trackGroup.visible) {
+        showTrackHits(line);
+        clearOutline();
+        hideTooltip();
+        markDirty();
+        return;
+      }
       let label;
-      if (isPhoton) label = 'Photon';
+      if (isPhoton) label = 'γ';
       else {
         // Track label mirrors the colour priority chain in
         // _applyTrackMaterials: electron > muon > jet > τ > muon-hit >
         // default. Lepton IDs (electron / muon) are official ΔR matches to
         // <Electron> / <Muon> objects, so they win first. Jet beats τ
         // because every τ in this XML carries withoutQuality — they are τ
-        // algorithm INPUT, not τ-ID output. When the muon's pdgId is
-        // unknown we keep a charge-less "Track → Muon".
+        // algorithm INPUT, not τ-ID output. Sign helpers in particleSymbols.js
+        // keep the PDG convention captured in one place — see that module
+        // for the +pdg=lepton / -pdg=anti-lepton mapping.
         const ePdg = line.userData.matchedElectronPdgId;
-        if (ePdg != null) label = ePdg < 0 ? 'Track → Electron' : 'Track → Positron';
+        if (ePdg != null) label = `Track → ${leptonSymbol('e', ePdg)}`;
         else if (line.userData.isMuonMatched) {
-          const muPdg = line.userData.matchedMuonPdgId;
-          if (muPdg == null) label = 'Track → Muon';
-          else label = muPdg < 0 ? 'Track → Muon' : 'Track → Anti-muon';
+          label = `Track → ${leptonSymbol('μ', line.userData.matchedMuonPdgId)}`;
         } else if (line.userData.isJetMatched) label = 'Track → Jet';
-        else if (line.userData.isTauMatched) label = 'Track → Tau';
-        else label = 'Track';
+        else if (line.userData.isTauMatched) {
+          label = `Track → ${tauSymbolFromCharge(line.userData.matchedTauCharge)}`;
+        } else label = 'Track';
       }
       // Show pixel-hit markers for the hovered track; clear them for photons.
-      if (isPhoton) hideTrackHits();
-      else showTrackHits(line);
-      clearOutline();
-      tipCellEl.textContent = label;
-      tipCoordEl.textContent = storeGateKey;
-      tipEEl.textContent = `${ptGev.toFixed(3)} GeV`;
-      if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';
-      _setExtras([[_ETA_LABEL, _fmtEta(line.userData.eta)]]);
-      tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
-      tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
-      tooltip.hidden = false;
-      markDirty();
+      _finishHit({
+        trackHitsAction: () => (isPhoton ? hideTrackHits() : showTrackHits(line)),
+        showHitArgs: {
+          label,
+          coord: storeGateKey,
+          valueText: `${ptGev.toFixed(3)} GeV`,
+          keyHtml: 'p<sub>T</sub>',
+          extras: [[_ETA_LABEL, _fmtEta(line.userData.eta)]],
+        },
+      });
       return;
     }
   }
@@ -336,18 +410,15 @@ function doRaycast(clientX, clientY) {
     if (clusterHits.length) {
       const line = clusterHits[0].object;
       const etGev = line.userData.etGev ?? 0;
-      const storeGateKey = line.userData.storeGateKey ?? '';
-      clearOutline();
-      hideTrackHits();
-      tipCellEl.textContent = 'Cluster';
-      tipCoordEl.textContent = storeGateKey;
-      tipEEl.textContent = `${etGev.toFixed(3)} GeV`;
-      if (tipEKeyEl) tipEKeyEl.innerHTML = 'E<sub>T</sub>';
-      _setExtras([[_ETA_LABEL, _fmtEta(line.userData.eta)]]);
-      tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
-      tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
-      tooltip.hidden = false;
-      markDirty();
+      _finishHit({
+        showHitArgs: {
+          label: 'Cluster',
+          coord: line.userData.storeGateKey ?? '',
+          valueText: `${etGev.toFixed(3)} GeV`,
+          keyHtml: 'E<sub>T</sub>',
+          extras: [[_ETA_LABEL, _fmtEta(line.userData.eta)]],
+        },
+      });
       return;
     }
   }
@@ -361,22 +432,18 @@ function doRaycast(clientX, clientY) {
     if (tauHits.length) {
       const line = tauHits[0].object;
       const ptGev = line.userData.ptGev ?? 0;
-      const storeGateKey = line.userData.storeGateKey ?? '';
-      const numTracks = line.userData.numTracks ?? 0;
-      clearOutline();
-      hideTrackHits();
-      tipCellEl.textContent = 'Tau';
-      tipCoordEl.textContent = storeGateKey;
-      tipEEl.textContent = `${ptGev.toFixed(3)} GeV`;
-      if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';
-      _setExtras([
-        [_ETA_LABEL, _fmtEta(line.userData.eta)],
-        ['tracks', `${numTracks}`],
-      ]);
-      tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
-      tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
-      tooltip.hidden = false;
-      markDirty();
+      _finishHit({
+        showHitArgs: {
+          label: tauSymbolFromCharge(line.userData.charge),
+          coord: line.userData.storeGateKey ?? '',
+          valueText: `${ptGev.toFixed(3)} GeV`,
+          keyHtml: 'p<sub>T</sub>',
+          extras: [
+            [_ETA_LABEL, _fmtEta(line.userData.eta)],
+            ['tracks', `${line.userData.numTracks ?? 0}`],
+          ],
+        },
+      });
       return;
     }
   }
@@ -389,26 +456,23 @@ function doRaycast(clientX, clientY) {
       const ptGev = line.userData.ptGev ?? line.userData.etGev ?? 0;
       const storeGateKey = line.userData.storeGateKey ?? '';
       const massGev = line.userData.massGev ?? 0;
-      clearOutline();
-      hideTrackHits();
-      tipCellEl.textContent = 'Jet';
-      tipCoordEl.textContent = storeGateKey;
-      tipEEl.textContent = `${ptGev.toFixed(3)} GeV`;
-      if (tipEKeyEl) tipEKeyEl.innerHTML = 'p<sub>T</sub>';
       // η is the canonical companion to pT. Mass is only meaningful for
       // large-R (R = 1.0) collections — boosted W/Z/top/H tagging — so we
-      // include it for AntiKt10* and skip it otherwise.
+      // include it for AntiKt10* and skip it otherwise. (The "mass" label is
+      // Latin-only so the default uppercase styling is fine.)
       const extras = [[_ETA_LABEL, _fmtEta(line.userData.eta)]];
-      // (mass label below uses Latin chars, so the default uppercase styling
-      // is fine.)
       if (storeGateKey.includes('AntiKt10')) {
         extras.push(['mass', `${massGev.toFixed(3)} GeV`]);
       }
-      _setExtras(extras);
-      tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
-      tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
-      tooltip.hidden = false;
-      markDirty();
+      _finishHit({
+        showHitArgs: {
+          label: 'Jet',
+          coord: storeGateKey,
+          valueText: `${ptGev.toFixed(3)} GeV`,
+          keyHtml: 'p<sub>T</sub>',
+          extras,
+        },
+      });
       return;
     }
   }
@@ -423,22 +487,51 @@ function doRaycast(clientX, clientY) {
       while (arrow && arrow.userData.magnitude == null && arrow.parent) arrow = arrow.parent;
       const magnitude = arrow?.userData.magnitude ?? 0;
       const sumEt = arrow?.userData.sumEt ?? 0;
-      const key = arrow?.userData.metKey ?? '';
-      clearOutline();
-      hideTrackHits();
-      tipCellEl.textContent = 'MET';
-      tipCoordEl.textContent = key;
-      tipEEl.textContent = `${magnitude.toFixed(2)} GeV`;
-      if (tipEKeyEl) tipEKeyEl.innerHTML = 'E<sub>T</sub><sup>miss</sup>';
-      _setExtras([['Sum E', `${sumEt.toFixed(1)} GeV`]]);
-      tooltip.style.left = Math.min(clientX + 18, rect.right - 210) + 'px';
-      tooltip.style.top = Math.min(clientY + 18, rect.bottom - 90) + 'px';
-      tooltip.hidden = false;
-      markDirty();
+      _finishHit({
+        showHitArgs: {
+          label: 'ν',
+          coord: arrow?.userData.metKey ?? '',
+          valueText: `${magnitude.toFixed(2)} GeV`,
+          keyHtml: 'E<sub>T</sub><sup>miss</sup>',
+          extras: [['Sum E', `${sumEt.toFixed(1)} GeV`]],
+        },
+      });
       return;
     }
   }
-  clearOutline();
-  hideTooltip();
-  hideTrackHits();
+  // ── Muon chamber hit ────────────────────────────────────────────────────
+  // Lowest priority — only checked after every event-overlay branch missed.
+  // Chamber alias (BIS / BIL / NSW / …) + full station name + readout
+  // technology come from getMuonAliasForMesh, which mirrors the renaming
+  // the Detector Layers panel applies plus the MUON_STATION_TECH table.
+  if (hasMuonChambers) {
+    const chamberHits = raycast.intersectObjects(visibleChambers, false);
+    if (chamberHits.length) {
+      const mesh = chamberHits[0].object;
+      const info = getMuonAliasForMesh(mesh);
+      const alias = info?.alias ?? mesh.name ?? 'Muon chamber';
+      const sideLabel = info?.side ? ` (${info.side} side)` : '';
+      const coord = info?.full ? `${info.full}${sideLabel}` : sideLabel.trim() || '—';
+      // Outline every chamber of the same station — getStationMeshes returns
+      // every mesh sharing the (side, alias) of the hovered one, so the user
+      // sees the full BIS / NSW / … ring, not just the single chamber under
+      // the cursor. clearOutline first to drop any stale outline state, then
+      // re-apply on the same call.
+      const stationMeshes = info ? getStationMeshes(mesh) : [mesh];
+      _finishHit({
+        outlineAction: () => {
+          clearOutline();
+          showChamberHoverOutline(stationMeshes.length ? stationMeshes : [mesh]);
+        },
+        showHitArgs: {
+          label: `Muon chamber — ${alias}`,
+          coord,
+          valueText: info?.tech ?? '—',
+          keyText: 'tech',
+        },
+      });
+      return;
+    }
+  }
+  _dismissAll();
 }

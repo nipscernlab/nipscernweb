@@ -23,7 +23,7 @@
 //         tracks[i].pts: [{x,y,z}] plain objects (no THREE.Vector3)
 
 import wasmInit, { parse_jivexml } from '../parser/pkg/atlas_id_parser.js';
-import { parseHits } from './hitsParser.js';
+import { parseHits } from './parsers/hitsParser.js';
 
 let _ready = false;
 let _readyPromise = null;

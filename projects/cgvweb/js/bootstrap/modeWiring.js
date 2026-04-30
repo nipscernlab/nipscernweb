@@ -6,10 +6,10 @@
 // Exposes onSceneAndWasmReady() so the boot code can ask the live tab to
 // start polling once both prerequisites are loaded.
 
-import { setupLiveMode } from '../liveMode.js';
-import { setupServerMode } from '../serverMode.js';
-import { setupSampleMode } from '../sampleMode.js';
-import { bumpReq } from '../loading.js';
+import { setupLiveMode } from '../modes/liveMode.js';
+import { setupServerMode } from '../modes/serverMode.js';
+import { setupSampleMode } from '../modes/sampleMode.js';
+import { bumpReq } from '../loadingScreen.js';
 import { esc, makeRelTime } from '../utils.js';
 
 const TAB_KEY = 'cgv-tab';

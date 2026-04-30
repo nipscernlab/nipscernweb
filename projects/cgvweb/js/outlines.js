@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { scene, markDirty } from './renderer.js';
 import { fcalGroup, fcalEdgeMat4, getFcalEdgeBase, visHandles } from './visibility.js';
+import { clearChamberHoverOutline } from './trackAtlasIntersections.js';
 
 // ── EdgesGeometry outline (hover) ─────────────────────────────────────────────
 // `transparent: true` (at opacity 1.0) moves the hover into Three.js's
@@ -16,6 +17,10 @@ const outlineMat = new THREE.LineBasicMaterial({
 let outlineMesh = null;
 
 export function clearOutline() {
+  // Also drops any per-mesh muon-chamber hover outlines forced visible by
+  // showChamberHoverOutline — keeps "leave hover, every outline goes away"
+  // a single call at every consumer.
+  clearChamberHoverOutline();
   if (!outlineMesh) return;
   scene.remove(outlineMesh);
   outlineMesh = null;

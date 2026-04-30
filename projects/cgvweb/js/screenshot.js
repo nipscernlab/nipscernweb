@@ -186,7 +186,7 @@ export function setupScreenshotControls({
         ctx.font = `400 ${fs * 0.78}px monospace`;
         const keyW = Math.max(...fields.map(([k]) => ctx.measureText(k.toUpperCase()).width));
 
-        let x = margin;
+        const x = margin;
         let y = margin;
         for (const [k, v] of fields) {
           ctx.font = `400 ${fs * 0.78}px monospace`;

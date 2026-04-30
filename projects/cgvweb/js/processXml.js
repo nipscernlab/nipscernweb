@@ -65,20 +65,20 @@ import {
   clearJets,
   clearTaus,
 } from './particles.js';
-import { parseJets } from './jetParser.js';
+import { parseJets } from './parsers/jetParser.js';
 import {
   setJetCollections,
   clearJetState,
   getActiveJetCollection,
   onJetStateChange,
 } from './jets.js';
-import { setHitPositions, clearHitsState } from './hitsOverlay.js';
-import { parseMet, pickPreferredMet } from './metParser.js';
-import { drawMet, clearMet } from './metOverlay.js';
-import { parseVertices } from './vertexParser.js';
-import { drawVertices, clearVertices } from './vertexOverlay.js';
-import { parseTaus } from './tauParser.js';
-import { parseMuons } from './muonParser.js';
+import { setHitPositions, clearHitsState } from './overlays/hitsOverlay.js';
+import { parseMet, pickPreferredMet } from './parsers/metParser.js';
+import { drawMet, clearMet } from './overlays/metOverlay.js';
+import { parseVertices } from './parsers/vertexParser.js';
+import { drawVertices, clearVertices } from './overlays/vertexOverlay.js';
+import { parseTaus } from './parsers/tauParser.js';
+import { parseMuons } from './parsers/muonParser.js';
 import { clearOutline, clearAllOutlines } from './outlines.js';
 import { setStatus, showEventInfo } from './statusHud.js';
 import { markDirty } from './renderer.js';
@@ -104,7 +104,7 @@ _wasmPool.onHits((rid, hits) => {
 
 // Sliders + detector-panel init are assigned by setupDetectorPanels(), which
 // runs after this module loads. Main wires them via setProcessXmlDeps().
-let _deps = {
+const _deps = {
   getWasmOk: () => false,
   tileSlider: null,
   larSlider: null,

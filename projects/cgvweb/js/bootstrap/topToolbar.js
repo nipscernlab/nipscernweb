@@ -1,33 +1,12 @@
-// Wires the bottom-floating button row (info / ghost / beam / reset)
-// plus the About overlay open/close handlers.
-//
-// Owns the `showInfo` state because the only consumer outside this module
-// is the hover tooltip, which we expose via getShowInfo().
+// Wires the bottom-floating button row (view-level segmented control,
+// jet-collection dropdown, About overlay). The Ghost / Cell Info / Unmatched
+// Tracks / Jet Lines toggles previously here moved to the Helpers popover —
+// see js/bootstrap/helpersPanel.js.
 
 import { getViewLevel, setViewLevel, onViewLevelChange } from '../viewLevel.js';
 import { getJetCollections, getActiveJetKey, setActiveJetKey, onJetStateChange } from '../jets.js';
 
-export function setupTopToolbar({ resetCamera, clearOutline, hideTooltip, toggleAllGhosts }) {
-  let showInfo = true;
-
-  const btnInfo = document.getElementById('btn-info');
-  btnInfo.addEventListener('click', () => {
-    showInfo = !showInfo;
-    btnInfo.classList.toggle('on', showInfo);
-    document
-      .querySelector('#btn-info use')
-      .setAttribute('href', showInfo ? '#i-eye' : '#i-eye-off');
-    if (!showInfo) {
-      clearOutline();
-      hideTooltip();
-    }
-  });
-
-  document.getElementById('btn-ghost').addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleAllGhosts();
-  });
-
+export function setupTopToolbar({ resetCamera }) {
   document.getElementById('btn-reset').addEventListener('click', resetCamera);
 
   // View-level segmented control (1/2/3). Sync .on highlight on every click;
@@ -118,8 +97,5 @@ export function setupTopToolbar({ resetCamera, clearOutline, hideTooltip, toggle
     if (e.target === aboutOverlay) aboutOverlay.classList.remove('open');
   });
 
-  return {
-    getShowInfo: () => showInfo,
-    aboutOverlay,
-  };
+  return { aboutOverlay };
 }

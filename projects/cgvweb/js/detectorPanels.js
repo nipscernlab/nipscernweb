@@ -2,6 +2,7 @@ import { fmtMev } from './utils.js';
 import { getViewLevel, onViewLevelChange } from './viewLevel.js';
 import { getActiveJetCollection, onJetStateChange } from './jets.js';
 import { getLastTaus } from './particles.js';
+import { t } from './i18n/index.js';
 
 function fmtGev(v) {
   return v.toFixed(2) + ' GeV';
@@ -41,6 +42,61 @@ export function setupDetectorPanels({
   const TAB_IDS = ['tile', 'lar', 'fcal', 'hec', 'track'];
   const rpanelWrap = document.getElementById('rpanel-wrap');
 
+  // Shared floating popup for "type the threshold" — opens on dblclick over
+  // any slider track. The per-slider input element is gone (HTML is leaner;
+  // the slider thumb + sval-min/max labels still encode the value's position
+  // within its range). Each slider passes its own commit-from-string + a
+  // pre-fill string (current value formatted) + placeholder.
+  /** @type {((raw: string) => void) | null} */
+  let _popupCommit = null;
+  let _popupCancelled = false;
+  const _popup = document.createElement('div');
+  _popup.id = 'thr-popup';
+  _popup.hidden = true;
+  _popup.innerHTML = '<input type="text" autocomplete="off" spellcheck="false">';
+  document.body.appendChild(_popup);
+  const _popupInput = /** @type {HTMLInputElement} */ (_popup.querySelector('input'));
+  function _closePopup(commit) {
+    if (commit && _popupCommit && !_popupCancelled) _popupCommit(_popupInput.value);
+    _popupCommit = null;
+    _popupCancelled = false;
+    _popup.hidden = true;
+  }
+  _popupInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      _popupInput.blur();
+    } else if (e.key === 'Escape') {
+      _popupCancelled = true;
+      _popupInput.blur();
+    }
+  });
+  _popupInput.addEventListener('blur', () => _closePopup(true));
+  /**
+   * @param {HTMLElement} anchor       slider track to position the popup against
+   * @param {string} currentValue      pre-fill (current threshold formatted)
+   * @param {(raw: string) => void} commit  parse + apply the typed string
+   * @param {string} placeholder       hint text for the empty input
+   */
+  function openThrPopup(anchor, currentValue, commit, placeholder) {
+    _popupCommit = commit;
+    _popupCancelled = false;
+    _popupInput.value = currentValue ?? '';
+    _popupInput.placeholder = placeholder ?? '';
+    const r = anchor.getBoundingClientRect();
+    // Position to the LEFT of the slider — sliders live on the right edge of
+    // the viewport (rpanel), so floating left keeps the popup on-screen and
+    // doesn't cover the slider track itself.
+    _popup.style.right = window.innerWidth - r.left + 8 + 'px';
+    _popup.style.left = 'auto';
+    _popup.style.top = r.top + r.height / 2 - 14 + 'px';
+    _popup.hidden = false;
+    requestAnimationFrame(() => {
+      _popupInput.focus();
+      _popupInput.select();
+    });
+  }
+
   function switchTab(det) {
     const tabs = [...TAB_IDS];
     const pc = document.getElementById('pane-cluster');
@@ -56,7 +112,6 @@ export function setupDetectorPanels({
   function makeDetSlider(
     trackId,
     thumbId,
-    inputId,
     getThr,
     setThr,
     maxMev,
@@ -66,7 +121,6 @@ export function setupDetectorPanels({
   ) {
     const track = document.getElementById(trackId);
     const thumb = document.getElementById(thumbId);
-    const input = document.getElementById(inputId);
     const maxLbl = maxLblId ? document.getElementById(maxLblId) : null;
     const minLbl = minLblId ? document.getElementById(minLblId) : null;
     let minMev = 0;
@@ -83,8 +137,6 @@ export function setupDetectorPanels({
           ? Math.max(0, Math.min(1, (mev - minMev) / span))
           : 0;
       thumb.style.top = (1 - ratio) * 100 + '%';
-      if (document.activeElement !== input)
-        input.value = isFinite(mev) && mev > minMev ? fmtMev(mev) : '';
     }
 
     track.addEventListener('pointerdown', (e) => {
@@ -107,17 +159,25 @@ export function setupDetectorPanels({
         rpanelWrap.classList.remove('dragging');
       });
     });
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') input.blur();
-    });
-    input.addEventListener('blur', () => {
-      const value = parseMevInput(input.value);
-      if (value !== null) {
-        const clamped = value === -Infinity ? value : Math.max(minMev, Math.min(maxMev, value));
-        setThr(clamped);
-        onApply();
-      }
-      updateUI(getThr());
+    // Double-click → open the shared float popup so the user can type the
+    // threshold instead of dragging the slider for fine values.
+    track.addEventListener('dblclick', () => {
+      const cur = getThr();
+      const display = isFinite(cur) && cur > minMev ? fmtMev(cur) : '';
+      openThrPopup(
+        track,
+        display,
+        (raw) => {
+          const value = parseMevInput(raw);
+          if (value !== null) {
+            const clamped = value === -Infinity ? value : Math.max(minMev, Math.min(maxMev, value));
+            setThr(clamped);
+            onApply();
+            updateUI(getThr());
+          }
+        },
+        t('thr-placeholder'),
+      );
     });
 
     function update(newMinMev, newMaxMev) {
@@ -131,10 +191,9 @@ export function setupDetectorPanels({
     return { updateUI, update };
   }
 
-  function makeTrackPtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
+  function makeTrackPtSlider(trackId, thumbId, maxLblId, minLblId) {
     const trackEl = document.getElementById(trackId);
     const thumbEl = document.getElementById(thumbId);
-    const inputEl = document.getElementById(inputId);
     const maxLblEl = document.getElementById(maxLblId);
     const minLblEl = document.getElementById(minLblId);
     let drag = false;
@@ -146,12 +205,6 @@ export function setupDetectorPanels({
           ? Math.max(0, Math.min(1, (state.getThrTrackGev() - state.getTrackPtMinGev()) / span))
           : 0;
       thumbEl.style.top = (1 - ratio) * 100 + '%';
-      if (document.activeElement !== inputEl) {
-        inputEl.value =
-          state.getThrTrackGev() > state.getTrackPtMinGev() + 1e-9
-            ? fmtGev(state.getThrTrackGev())
-            : '';
-      }
     }
 
     function setFromRatio(ratio) {
@@ -178,24 +231,30 @@ export function setupDetectorPanels({
         rpanelWrap.classList.remove('dragging');
       });
     });
-    inputEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') inputEl.blur();
-    });
-    inputEl.addEventListener('blur', () => {
-      const value = inputEl.value.trim().toLowerCase();
-      if (!value || value === 'all') {
-        state.setThrTrackGev(state.getTrackPtMinGev());
-      } else {
-        const gev = value.match(/^([\d.]+)\s*gev$/i);
-        const parsed = gev ? parseFloat(gev[1]) : parseFloat(value);
-        if (isFinite(parsed)) {
-          state.setThrTrackGev(
-            Math.max(state.getTrackPtMinGev(), Math.min(state.getTrackPtMaxGev(), parsed)),
-          );
-        }
-      }
-      updateUI();
-      applyTrackThreshold();
+    trackEl.addEventListener('dblclick', () => {
+      const cur = state.getThrTrackGev();
+      const display = cur > state.getTrackPtMinGev() + 1e-9 ? fmtGev(cur) : '';
+      openThrPopup(
+        trackEl,
+        display,
+        (raw) => {
+          const value = raw.trim().toLowerCase();
+          if (!value || value === 'all') {
+            state.setThrTrackGev(state.getTrackPtMinGev());
+          } else {
+            const gev = value.match(/^([\d.]+)\s*gev$/i);
+            const parsed = gev ? parseFloat(gev[1]) : parseFloat(value);
+            if (isFinite(parsed)) {
+              state.setThrTrackGev(
+                Math.max(state.getTrackPtMinGev(), Math.min(state.getTrackPtMaxGev(), parsed)),
+              );
+            }
+          }
+          updateUI();
+          applyTrackThreshold();
+        },
+        t('thr-placeholder-gev'),
+      );
     });
 
     function update(minGev, maxGev) {
@@ -209,10 +268,9 @@ export function setupDetectorPanels({
     return { updateUI, update };
   }
 
-  function makeClusterEtSlider(trackId, thumbId, inputId, maxLblId, minLblId) {
+  function makeClusterEtSlider(trackId, thumbId, maxLblId, minLblId) {
     const trackEl = document.getElementById(trackId);
     const thumbEl = document.getElementById(thumbId);
-    const inputEl = document.getElementById(inputId);
     const maxLblEl = document.getElementById(maxLblId);
     const minLblEl = document.getElementById(minLblId);
     let drag = false;
@@ -245,9 +303,6 @@ export function setupDetectorPanels({
       const span = max - min;
       const ratio = span > 0 ? Math.max(0, Math.min(1, (ops.getThr() - min) / span)) : 0;
       thumbEl.style.top = (1 - ratio) * 100 + '%';
-      if (document.activeElement !== inputEl) {
-        inputEl.value = ops.getThr() > min + 1e-9 ? fmtGev(ops.getThr()) : '';
-      }
       if (maxLblEl) maxLblEl.textContent = fmtGev(max);
       if (minLblEl) minLblEl.textContent = fmtGev(min);
     }
@@ -276,23 +331,30 @@ export function setupDetectorPanels({
         rpanelWrap.classList.remove('dragging');
       });
     });
-    inputEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') inputEl.blur();
-    });
-    inputEl.addEventListener('blur', () => {
+    trackEl.addEventListener('dblclick', () => {
       const ops = currentOps();
-      const value = inputEl.value.trim().toLowerCase();
-      if (!value || value === 'all') {
-        ops.setThr(ops.getMin());
-      } else {
-        const gev = value.match(/^([\d.]+)\s*gev$/i);
-        const parsed = gev ? parseFloat(gev[1]) : parseFloat(value);
-        if (isFinite(parsed)) {
-          ops.setThr(Math.max(ops.getMin(), Math.min(ops.getMax(), parsed)));
-        }
-      }
-      updateUI();
-      ops.apply();
+      const cur = ops.getThr();
+      const display = cur > ops.getMin() + 1e-9 ? fmtGev(cur) : '';
+      openThrPopup(
+        trackEl,
+        display,
+        (raw) => {
+          const opsLive = currentOps();
+          const value = raw.trim().toLowerCase();
+          if (!value || value === 'all') {
+            opsLive.setThr(opsLive.getMin());
+          } else {
+            const gev = value.match(/^([\d.]+)\s*gev$/i);
+            const parsed = gev ? parseFloat(gev[1]) : parseFloat(value);
+            if (isFinite(parsed)) {
+              opsLive.setThr(Math.max(opsLive.getMin(), Math.min(opsLive.getMax(), parsed)));
+            }
+          }
+          updateUI();
+          opsLive.apply();
+        },
+        t('thr-placeholder-gev'),
+      );
     });
 
     // Level switch: redraw the slider against the new mode's bounds + value.
@@ -341,7 +403,6 @@ export function setupDetectorPanels({
   const tileSlider = makeDetSlider(
     'tile-strak',
     'tile-sthumb',
-    'tile-thr-input',
     state.getThrTileMev,
     state.setThrTileMev,
     TILE_SCALE,
@@ -351,7 +412,6 @@ export function setupDetectorPanels({
   const larSlider = makeDetSlider(
     'lar-strak',
     'lar-sthumb',
-    'lar-thr-input',
     state.getThrLArMev,
     state.setThrLArMev,
     LAR_SCALE,
@@ -361,7 +421,6 @@ export function setupDetectorPanels({
   const fcalSlider = makeDetSlider(
     'fcal-strak',
     'fcal-sthumb',
-    'fcal-thr-input',
     state.getThrFcalMev,
     state.setThrFcalMev,
     FCAL_SCALE,
@@ -372,7 +431,6 @@ export function setupDetectorPanels({
   const hecSlider = makeDetSlider(
     'hec-strak',
     'hec-sthumb',
-    'hec-thr-input',
     state.getThrHecMev,
     state.setThrHecMev,
     HEC_SCALE,
@@ -382,14 +440,12 @@ export function setupDetectorPanels({
   const trackPtSlider = makeTrackPtSlider(
     'track-strak',
     'track-sthumb',
-    'track-thr-input',
     'track-sval-max',
     'track-sval-min',
   );
   const clusterEtSlider = makeClusterEtSlider(
     'cluster-strak',
     'cluster-sthumb',
-    'cluster-thr-input',
     'cluster-sval-max',
     'cluster-sval-min',
   );
@@ -401,6 +457,10 @@ export function setupDetectorPanels({
     hecSlider.updateUI(state.getThrHecMev());
     clusterEtSlider.updateUI();
     sidebarControls.setPinnedR(true);
+    // Preserve whichever tab the user is on across new XML loads. Only auto-pick
+    // a tab when nothing is currently selected (e.g. a fresh session).
+    const hasActive = !!document.querySelector('#rpanel .det-tab.on');
+    if (hasActive) return;
     if (hasTile) switchTab('tile');
     else if (hasLAr) switchTab('lar');
     else if (hasFcal) switchTab('fcal');

@@ -107,16 +107,39 @@ export const SUBSYS_LAR_EM = 2;
 export const SUBSYS_LAR_HEC = 3;
 
 // ── Cell handle storage ──────────────────────────────────────────────────────
-// Handles replace one-Mesh-per-cell. Each handle identifies one instance inside
-// an InstancedMesh: { iMesh, instId, det, name, origMatrix, visible, _center? }
+// Handles replace one-Mesh-per-cell. Each handle identifies one instance
+// inside an InstancedMesh; visibility.js / loader.js / outlines.js share the
+// shape via the CellHandle typedef below. _center is added lazily by
+// visibility._cellCenter.
 
-/** @type {Map<number, any>} — int key -> handle */
+/**
+ * @typedef {Object} CellHandle
+ * @property {THREE.InstancedMesh} iMesh
+ * @property {number} instId
+ * @property {string} det              'TILE' | 'LAR' | 'HEC'
+ * @property {string} subDet           'barrel' | 'extended' | 'itc' | 'mbts' | 'ec'
+ * @property {string|number} sampling  per-detector sampling tag (see classifyCellName)
+ * @property {string} name
+ * @property {THREE.Matrix4} origMatrix
+ * @property {boolean} visible
+ * @property {THREE.Vector3} [_center] lazy cache, set by visibility._cellCenter
+ */
+
+/**
+ * @typedef {Object} ActiveEntry
+ * @property {number} energyMev
+ * @property {string} det
+ * @property {number|string} [cellId]
+ * @property {string} [mbtsLabel]
+ */
+
+/** @type {Map<number, CellHandle>} — int key → handle */
 export const meshByKey = new Map();
 
-/** @type {{ TILE: THREE.InstancedMesh[], LAR: THREE.InstancedMesh[], HEC: THREE.InstancedMesh[] }} */
+/** @type {{ TILE: CellHandle[], LAR: CellHandle[], HEC: CellHandle[] }} */
 export const cellMeshesByDet = { TILE: [], LAR: [], HEC: [] };
 
-/** @type {Map<any, any>} — handle -> tooltip data; use .clear() to reset */
+/** @type {Map<CellHandle, ActiveEntry>} — handle → tooltip / threshold data; .clear() to reset */
 export const active = new Map();
 
 /** @type {THREE.InstancedMesh[]} — use .length = 0 to reset */

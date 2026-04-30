@@ -1,3 +1,4 @@
+// @ts-check
 import * as THREE from 'three';
 import {
   active,
@@ -8,11 +9,16 @@ import {
   _flushIMDirty,
   _rayIMeshes,
 } from './state.js';
-import { PAL_TILE_COLOR, PAL_LAR_COLOR, PAL_HEC_COLOR, palColorFcal } from './palette.js';
-import { scene, markDirty } from './renderer.js';
+import { PAL_TILE_COLOR, PAL_LAR_COLOR, PAL_HEC_COLOR } from './palette.js';
+import { markDirty } from './renderer.js';
 import { getViewLevel, onViewLevelChange } from './viewLevel.js';
 import { getActiveJetCollection } from './jets.js';
-import { recomputeJetTrackMatch } from './trackAtlasIntersections.js';
+import { recomputeJetTrackMatch } from './trackMatch.js';
+import { updateTrackAtlasIntersections } from './trackAtlasIntersections.js';
+import { rebuildAllOutlines } from './outlines.js';
+// Internal-use imports below — only the symbols this module's own pipeline
+// orchestration touches. The complete public surface of each sub-module is
+// re-exported via the `export * from` barrel further down.
 import {
   getLastElectrons,
   syncElectronTrackMatch,
@@ -20,104 +26,81 @@ import {
   syncTauTrackMatch,
   getLastMuons,
   syncMuonTrackMatch,
+  syncParticleLabelVisibility,
 } from './particles.js';
+import { isLayerOn } from './visibility/layerVis.js';
+import { applyFcalThreshold } from './visibility/fcalRenderer.js';
+import {
+  setLastClusterData,
+  getActiveClusterCellIds,
+  getActiveMbtsLabels,
+  clearClusterFilter,
+  rebuildActiveClusterCellIds,
+} from './visibility/clusterFilter.js';
+import {
+  getTrackGroup,
+  getPhotonGroup,
+  getClusterGroup,
+  getJetGroup,
+  getTauGroup,
+  getUnmatchedTausVisible,
+  applyDetectorGroupViewLevel,
+  applyParticleTrackFilters,
+  applyPhotonFilters,
+} from './visibility/detectorGroups.js';
+import {
+  thrTileMev,
+  thrLArMev,
+  thrHecMev,
+  thrTrackGev,
+  thrClusterEtGev,
+  thrJetEtGev,
+} from './visibility/thresholds.js';
 
-// ── Late-injected dependencies (set via initVisibility after slicer is ready) ─
+// ── Public-API barrel ──────────────────────────────────────────────────────
+// Every symbol exported by these sub-modules is available via `from
+// './visibility.js'` — adding a new export to a sub-module automatically
+// flows through here, no explicit re-export edit needed. Each sub-module
+// follows the underscore-prefix convention for internals, so there's no
+// risk of leaking private helpers through the barrel.
+export * from './visibility/layerVis.js';
+export * from './visibility/muonVisibility.js';
+export * from './visibility/fcalRenderer.js';
+export * from './visibility/detectorGroups.js';
+export * from './visibility/thresholds.js';
+
+// Sub-set re-exports for modules whose surface is bigger than visibility.js's
+// public contract (they expose internals that other consumers shouldn't
+// import via this barrel — keep these explicit so the public list stays
+// minimal).
+export { setLastClusterData, rebuildActiveClusterCellIds };
+export { syncParticleLabelVisibility };
+
+// ── Late-injected slicer controller ──────────────────────────────────────────
+// Slicer is a per-app controller instance built in main.js — not a stable
+// module export — so it stays late-injected via initVisibility. The other
+// previously-late-injected helpers (rebuildAllOutlines / updateTrackAtlas-
+// Intersections) are now imported directly above; both ES module cycles are
+// safe because the function bodies only run after both modules finish loading.
+
+/**
+ * Subset of slicer.createSlicerController()'s return shape that this module
+ * actually reads. Kept structural (not an import('./slicer.js')) so a future
+ * slicer rewrite only has to honour these four methods.
+ * @typedef {{
+ *   isActive: () => boolean,
+ *   isShowAllCells: () => boolean,
+ *   getMaskState: () => { active: boolean, [key: string]: any },
+ *   isPointInsideWedge: (x: number, y: number, z: number, mask?: any) => boolean,
+ * }} SlicerController
+ */
+
+/** @type {SlicerController | null} */
 let _slicer = null;
-let _rebuildAllOutlines = null;
-let _updateTrackAtlasIntersections = null;
 
-export function initVisibility({ slicer, rebuildAllOutlines, updateTrackAtlasIntersections }) {
+/** @param {{ slicer: SlicerController }} deps */
+export function initVisibility({ slicer }) {
   _slicer = slicer;
-  _rebuildAllOutlines = rebuildAllOutlines;
-  _updateTrackAtlasIntersections = updateTrackAtlasIntersections;
-}
-
-// ── Track / Photon / Electron / Muon / Cluster / Jet / Tau / MET / Vertex groups ──
-let _trackGroup = null;
-let _photonGroup = null;
-let _electronGroup = null;
-let _muonGroup = null;
-let _clusterGroup = null;
-let _jetGroup = null;
-let _tauGroup = null;
-let _metGroup = null;
-let _vertexGroup = null;
-
-let _tracksVisible = true;
-let _clustersVisible = true;
-let _jetsVisible = true;
-let _tausVisible = true;
-
-export const getTrackGroup = () => _trackGroup;
-export const getPhotonGroup = () => _photonGroup;
-export const getElectronGroup = () => _electronGroup;
-export const getMuonGroup = () => _muonGroup;
-export const getClusterGroup = () => _clusterGroup;
-export const getJetGroup = () => _jetGroup;
-export const getTauGroup = () => _tauGroup;
-export const getMetGroup = () => _metGroup;
-export const getVertexGroup = () => _vertexGroup;
-
-export const getTracksVisible = () => _tracksVisible;
-export const getClustersVisible = () => _clustersVisible;
-export const getJetsVisible = () => _jetsVisible;
-
-export function setTrackGroup(g) {
-  _trackGroup = g;
-  if (g) g.visible = _tracksVisible;
-}
-export function setPhotonGroup(g) {
-  _photonGroup = g;
-  if (g) g.visible = getViewLevel() === 3;
-}
-export function setElectronGroup(g) {
-  _electronGroup = g;
-  if (g) g.visible = getViewLevel() === 3;
-}
-export function setMuonGroup(g) {
-  _muonGroup = g;
-  if (g) g.visible = getViewLevel() === 3;
-}
-export function setClusterGroup(g) {
-  _clusterGroup = g;
-  if (g) g.visible = _clustersVisible && getViewLevel() === 2;
-}
-export function setJetGroup(g) {
-  _jetGroup = g;
-  if (g) g.visible = _jetsVisible && getViewLevel() === 3;
-}
-export function setTauGroup(g) {
-  _tauGroup = g;
-  if (g) g.visible = _tausVisible && getViewLevel() === 3;
-}
-export function setMetGroup(g) {
-  _metGroup = g;
-  if (g) g.visible = getViewLevel() === 3;
-}
-// Vertices are event-level summary info — relevant at every view level, so
-// no gate. Always visible while the marker group exists.
-export function setVertexGroup(g) {
-  _vertexGroup = g;
-}
-
-// Tracks toggle (J button): controls only the track lines now. Photons and
-// electrons are no longer linked to this flag — their visibility comes from
-// the view level (level 3 shows them).
-export function setTracksVisible(v) {
-  _tracksVisible = v;
-  if (_trackGroup) _trackGroup.visible = v;
-}
-// User intent for the cluster toggle (K button at level 2). The cluster group
-// is only actually shown when level === 2 AND the user has clusters enabled.
-export function setClustersVisible(v) {
-  _clustersVisible = v;
-  if (_clusterGroup) _clusterGroup.visible = v && getViewLevel() === 2;
-}
-// User intent for the jet toggle (K button at level 3). Same idea, gated to L3.
-export function setJetsVisible(v) {
-  _jetsVisible = v;
-  if (_jetGroup) _jetGroup.visible = v && getViewLevel() === 3;
 }
 
 // Re-applies cluster / photon / electron visibility AND the cell cluster-filter
@@ -125,13 +108,7 @@ export function setJetsVisible(v) {
 // gated only by setTracksVisible).
 function _applyViewLevelGate() {
   const lvl = getViewLevel();
-  if (_clusterGroup) _clusterGroup.visible = _clustersVisible && lvl === 2;
-  if (_photonGroup) _photonGroup.visible = lvl === 3;
-  if (_electronGroup) _electronGroup.visible = lvl === 3;
-  if (_muonGroup) _muonGroup.visible = lvl === 3;
-  if (_jetGroup) _jetGroup.visible = _jetsVisible && lvl === 3;
-  if (_tauGroup) _tauGroup.visible = _tausVisible && lvl === 3;
-  if (_metGroup) _metGroup.visible = lvl === 3;
+  applyDetectorGroupViewLevel();
   // Refresh cell visibility: rebuildActiveClusterCellIds reads getViewLevel()
   // and disables the cluster-membership filter outside level 2; applyThreshold
   // then re-evaluates per-cell visibility.
@@ -149,319 +126,39 @@ function _applyViewLevelGate() {
   syncTauTrackMatch(lvl === 3 ? getLastTaus() : null);
   // μ→track sprite labels — same L3-only gate.
   syncMuonTrackMatch(lvl === 3 ? getLastMuons() : null);
+  // Re-run the track pipeline so the K-popover filters (in particular the
+  // L3-only unmatched filter) get re-evaluated against the new level. Without
+  // this, leaving L3 with unmatched=off leaves the tracks hidden at L1/L2.
+  applyTrackThreshold();
   markDirty();
 }
 onViewLevelChange(_applyViewLevelGate);
 
-// ── Energy threshold state ────────────────────────────────────────────────────
-export let thrTileMev = 50;
-export let thrLArMev = 0;
-export let thrHecMev = 600;
-export let thrFcalMev = 0;
+// Local alias — the dispatcher itself lives in ./layerVis.js so it can be
+// unit-tested without pulling Three.js / scene. The threshold loops below
+// reference _detOnFor for backwards-compatible naming inside this module.
+const _detOnFor = isLayerOn;
 
-export function setThrTileMev(v) {
-  thrTileMev = v;
-}
-export function setThrLArMev(v) {
-  thrLArMev = v;
-}
-export function setThrHecMev(v) {
-  thrHecMev = v;
-}
-export function setThrFcalMev(v) {
-  thrFcalMev = v;
-}
-
-// ── Detector toggle state ─────────────────────────────────────────────────────
-// `layerVis` is a tree mirroring the layout of the floating Layers panel. Each
-// leaf is a boolean; aggregate ON/OFF for parent rows is derived (any leaf on).
-// Cell handles carry { det, subDet, sampling } tags set in loader.js, and the
-// threshold loop dispatches through `_detOnFor(h)` which walks the tree.
-//   tile.barrel    — A, BC, D                 (LB samplings)
-//   tile.extended  — A, B, D                  (EB samplings; D4→D, C10→B)
-//   tile.itc       — E                        (E1-E4 gap scintillators)
-//   mbts           — inner, outer
-//   lar.barrel     — 0, 1, 2, 3               (EMB samplings: presampler/strips/middle/back)
-//   lar.ec         — 0, 1, 2, 3               (EMEC samplings)
-//   hec            — 0, 1, 2, 3               (HEC1-HEC4)
-//   fcal           — 1, 2, 3                  (FCAL1 EM, FCAL2 Had1, FCAL3 Had2)
-export const layerVis = {
-  tile: {
-    barrel: { A: true, BC: true, D: true },
-    extended: { A: true, B: true, D: true },
-    itc: { E: true },
-  },
-  mbts: { inner: true, outer: true },
-  lar: {
-    barrel: { 0: true, 1: true, 2: true, 3: true },
-    ec: { 0: true, 1: true, 2: true, 3: true },
-  },
-  hec: { 0: true, 1: true, 2: true, 3: true },
-  fcal: { 1: true, 2: true, 3: true },
-};
-
-// Sets a leaf at the given path (e.g. ['tile','barrel','A']).
-export function setLayerLeaf(path, on) {
-  let node = layerVis;
-  for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
-  node[path[path.length - 1]] = !!on;
-}
-// Bulk-set every leaf under a sub-tree to `on`.
-export function setLayerSubtree(path, on) {
-  let node = layerVis;
-  for (const k of path) node = node[k];
-  if (typeof node === 'object') {
-    for (const k of Object.keys(node)) {
-      if (typeof node[k] === 'object') setLayerSubtree([...path, k], on);
-      else node[k] = !!on;
-    }
-  }
-}
-// True if any leaf under the sub-tree is on.
-export function anyLayerLeafOn(path) {
-  let node = layerVis;
-  for (const k of path) node = node[k];
-  if (typeof node !== 'object') return !!node;
-  for (const k of Object.keys(node)) {
-    if (typeof node[k] === 'object') {
-      if (anyLayerLeafOn([...path, k])) return true;
-    } else if (node[k]) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Picks the visibility flag for a given cell handle, based on its sub-detector
-// and sampling tags. Used by both the active-cell threshold loop and the
-// show-all sweep. FCAL is filtered separately in _applyFcalDraw.
-function _detOnFor(h) {
-  if (h.det === 'HEC') return !!layerVis.hec[h.sampling];
-  if (h.det === 'LAR') return !!layerVis.lar[h.subDet]?.[h.sampling];
-  if (h.det === 'TILE') {
-    if (h.subDet === 'mbts') return !!layerVis.mbts[h.sampling];
-    return !!layerVis.tile[h.subDet]?.[h.sampling];
-  }
-  return false;
-}
-
-// ── Track threshold state ─────────────────────────────────────────────────────
-export let thrTrackGev = 2;
-export let trackPtMinGev = 0;
-export let trackPtMaxGev = 5;
-
-export function setThrTrackGev(v) {
-  thrTrackGev = v;
-}
-export function setTrackPtMinGev(v) {
-  trackPtMinGev = v;
-}
-export function setTrackPtMaxGev(v) {
-  trackPtMaxGev = v;
-}
-
-// ── Cluster threshold state ───────────────────────────────────────────────────
-export let thrClusterEtGev = 3;
-export let clusterEtMinGev = 0;
-export let clusterEtMaxGev = 1;
-
-export function setThrClusterEtGev(v) {
-  thrClusterEtGev = v;
-}
-export function setClusterEtMinGev(v) {
-  clusterEtMinGev = v;
-}
-export function setClusterEtMaxGev(v) {
-  clusterEtMaxGev = v;
-}
-
-// ── Jet threshold state ───────────────────────────────────────────────────────
-// Independent from cluster — the slider in #rpanel2 reads/writes one or the
-// other based on the current view level (level 2 = cluster, level 3 = jet).
-export let thrJetEtGev = 20;
-export let jetEtMinGev = 0;
-export let jetEtMaxGev = 1;
-
-export function setThrJetEtGev(v) {
-  thrJetEtGev = v;
-}
-export function setJetEtMinGev(v) {
-  jetEtMinGev = v;
-}
-export function setJetEtMaxGev(v) {
-  jetEtMaxGev = v;
-}
-
-// ── Cluster filter sets (computed from cluster data) ─────────────────────────
-let lastClusterData = null;
-let activeClusterCellIds = null;
-let activeMbtsLabels = null;
-
-export function setLastClusterData(v) {
-  lastClusterData = v;
-}
+// Read accessor for the late-injected slicer — used by fcalRenderer.js to
+// avoid a circular value-import. The cluster-filter accessors live in
+// ./clusterFilter.js (re-exported through getActiveClusterCellIds).
+export const getSlicer = () => _slicer;
+export { getActiveClusterCellIds };
 
 // ── Visibility bookkeeping ────────────────────────────────────────────────────
+/** @type {import('./state.js').CellHandle[]} */
 export let visHandles = [];
 
 export function clearVisibilityState() {
   visHandles = [];
-  lastClusterData = null;
-  activeClusterCellIds = null;
-  activeMbtsLabels = null;
-}
-
-// ── FCAL state and rendering ──────────────────────────────────────────────────
-let fcalCellsData = [];
-export let fcalGroup = null;
-export let fcalVisibleMap = [];
-
-// Reusable temporaries allocated once, reused across FCAL rebuilds.
-const _fcalUp = new THREE.Vector3(0, 1, 0);
-const _fcalDir = new THREE.Vector3();
-const _fcalDummy = new THREE.Object3D();
-const _fcalCol = new THREE.Color();
-export const fcalEdgeMat4 = new THREE.Matrix4();
-const _fcalTwist = new THREE.Quaternion();
-const _fcalTwistAxis = new THREE.Vector3(0, 1, 0);
-const _FCAL_TWIST_RAD = (2 * Math.PI) / 16;
-
-let _fcalEdgeBase = null;
-export function getFcalEdgeBase() {
-  if (_fcalEdgeBase) return _fcalEdgeBase;
-  const tmpGeo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, false);
-  const edgeGeo = new THREE.EdgesGeometry(tmpGeo, 30);
-  tmpGeo.dispose();
-  _fcalEdgeBase = edgeGeo.getAttribute('position').array.slice();
-  edgeGeo.dispose();
-  return _fcalEdgeBase;
-}
-
-export function clearFcal() {
-  if (!fcalGroup) return;
-  fcalGroup.traverse((o) => {
-    if (o.geometry) o.geometry.dispose();
-    if (o.material) o.material.dispose();
-  });
-  scene.remove(fcalGroup);
-  fcalGroup = null;
-}
-
-export function drawFcal(cells) {
-  clearFcal();
-  fcalCellsData = cells;
-  if (!cells.length) return;
-  _applyFcalDraw();
-}
-
-export function applyFcalThreshold() {
-  if (!fcalCellsData.length) return;
-  if (fcalGroup) {
-    for (const child of [...fcalGroup.children]) {
-      if (child.geometry) child.geometry.dispose();
-      if (child.material) child.material.dispose();
-      fcalGroup.remove(child);
-    }
-  }
-  _applyFcalDraw();
-}
-
-function _applyFcalDraw() {
-  const slicerMask = _slicer?.getMaskState() ?? { active: false };
-
-  const visible = fcalCellsData.filter((c) => {
-    // FCAL is filtered per-module instead of a single showFcal flag — module
-    // 1=EM, 2=Had1, 3=Had2 (parser/src/lib.rs:694).
-    if (!layerVis.fcal[c.module]) return false;
-    if (!_slicer?.isShowAllCells() && c.energy * 1000 < thrFcalMev) return false;
-    if (
-      !_slicer?.isShowAllCells() &&
-      activeClusterCellIds !== null &&
-      c.id &&
-      !activeClusterCellIds.has(c.id)
-    )
-      return false;
-    if (slicerMask.active) {
-      const cx = -c.x * 10,
-        cy = -c.y * 10,
-        cz = c.z * 10;
-      if (_slicer.isPointInsideWedge(cx, cy, cz, slicerMask)) return false;
-    }
-    return true;
-  });
-  fcalVisibleMap = visible;
-  if (!fcalGroup) {
-    fcalGroup = new THREE.Group();
-    scene.add(fcalGroup);
-  }
-  if (!visible.length) {
-    markDirty();
-    return;
-  }
-
-  const n = visible.length;
-  const cylGeo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, false);
-  const cylMat = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.FrontSide });
-  const iMesh = new THREE.InstancedMesh(cylGeo, cylMat, n);
-
-  for (let i = 0; i < n; i++) {
-    const { x, y, z, dx, dy, dz, energy } = visible[i];
-    const rx = Math.max(Math.abs(dx) * 5, 1e-3);
-    const ry = Math.max(Math.abs(dy) * 5, 1e-3);
-    const len = Math.max(Math.abs(dz) * 2 * 10, 1e-3);
-    const cx = -x * 10,
-      cy = -y * 10,
-      cz = z * 10;
-    _fcalDir.set(0, 0, dz >= 0 ? 1 : -1);
-    _fcalDummy.position.set(cx, cy, cz);
-    _fcalDummy.scale.set(rx, len, ry);
-    _fcalDummy.quaternion.setFromUnitVectors(_fcalUp, _fcalDir);
-    _fcalTwist.setFromAxisAngle(_fcalTwistAxis, _FCAL_TWIST_RAD);
-    _fcalDummy.quaternion.multiply(_fcalTwist);
-    _fcalDummy.updateMatrix();
-    iMesh.setMatrixAt(i, _fcalDummy.matrix);
-    const [r, g, b] = palColorFcal(energy * 1000);
-    _fcalCol.setRGB(r, g, b);
-    iMesh.setColorAt(i, _fcalCol);
-  }
-  iMesh.instanceMatrix.needsUpdate = true;
-  if (iMesh.instanceColor) iMesh.instanceColor.needsUpdate = true;
-  fcalGroup.add(iMesh);
-
-  const eb = getFcalEdgeBase();
-  const outBuf = new Float32Array(n * eb.length);
-  let op = 0;
-  for (let i = 0; i < n; i++) {
-    iMesh.getMatrixAt(i, fcalEdgeMat4);
-    const m = fcalEdgeMat4.elements;
-    for (let j = 0; j < eb.length; j += 3) {
-      const lx = eb[j],
-        ly = eb[j + 1],
-        lz = eb[j + 2];
-      outBuf[op++] = m[0] * lx + m[4] * ly + m[8] * lz + m[12];
-      outBuf[op++] = m[1] * lx + m[5] * ly + m[9] * lz + m[13];
-      outBuf[op++] = m[2] * lx + m[6] * ly + m[10] * lz + m[14];
-    }
-  }
-  const outGeo = new THREE.BufferGeometry();
-  outGeo.setAttribute('position', new THREE.BufferAttribute(outBuf, 3));
-  const outLines = new THREE.LineSegments(
-    outGeo,
-    new THREE.LineBasicMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 0.5,
-      depthWrite: false,
-    }),
-  );
-  outLines.frustumCulled = false;
-  outLines.renderOrder = 3;
-  fcalGroup.add(outLines);
-
-  markDirty();
+  clearClusterFilter();
 }
 
 // ── Core cell handle visibility primitive ─────────────────────────────────────
+/**
+ * @param {import('./state.js').CellHandle} h
+ * @param {boolean} vis
+ */
 function _setHandleVisible(h, vis) {
   if (h.visible === vis) return;
   h.visible = vis;
@@ -477,6 +174,7 @@ function _rebuildRayIMeshes() {
 }
 
 // Cached world-space centre of a cell handle (derived from origMatrix).
+/** @param {import('./state.js').CellHandle} h  @returns {THREE.Vector3} */
 function _cellCenter(h) {
   if (h._center) return h._center;
   const m = h.origMatrix.elements;
@@ -493,7 +191,9 @@ function _cellCenter(h) {
 
 // Called by the slicer's onHideNonActiveShowAll callback: hide all non-active cells.
 export function hideNonActiveCells() {
-  for (const det of ['TILE', 'LAR', 'HEC']) {
+  /** @type {Array<keyof typeof cellMeshesByDet>} */
+  const dets = ['TILE', 'LAR', 'HEC'];
+  for (const det of dets) {
     for (const h of cellMeshesByDet[det]) {
       if (!active.has(h)) _setHandleVisible(h, false);
     }
@@ -501,83 +201,73 @@ export function hideNonActiveCells() {
   _flushIMDirty();
 }
 
-// ── Cell-membership filter (cluster at L2, jet at L3) ─────────────────────────
-// Builds the set of cell IDs that pass the current overlay's filter.
-//   Level 1: filter off (null = pass all).
-//   Level 2: cells belonging to any cluster passing thrClusterEtGev.
-//   Level 3: cells belonging to any jet (in the active collection) passing
-//            thrJetEtGev. Collections without a <cells> field (EMPFlow,
-//            UFOCSSK) yield an empty set, which hides every cell — matches
-//            the strict cluster behaviour the user asked for.
-// activeMbtsLabels is only populated for clusters; jets don't expose MBTS.
-export function rebuildActiveClusterCellIds() {
-  const lvl = getViewLevel();
-  if (lvl === 2 && lastClusterData) {
-    const ids = new Set();
-    const mbts = new Set();
-    for (const { clusters } of lastClusterData.collections) {
-      for (const { eta, phi: rawPhi, etGev, cells } of clusters) {
-        if (etGev < thrClusterEtGev) continue;
-        for (const k of ['TILE', 'LAR_EM', 'HEC', 'FCAL', 'TRACK', 'OTHER'])
-          for (const id of cells[k]) ids.add(id);
-        const absEta = Math.abs(eta);
-        let ch;
-        if (absEta >= 2.78 && absEta <= 3.86) ch = 1;
-        else if (absEta >= 2.08 && absEta < 2.78) ch = 0;
-        else continue;
-        const type = eta >= 0 ? 1 : -1;
-        const phiPos = rawPhi < 0 ? rawPhi + 2 * Math.PI : rawPhi;
-        const mod = Math.floor(phiPos / ((2 * Math.PI) / 8)) % 8;
-        mbts.add(`type_${type}_ch_${ch}_mod_${mod}`);
-      }
-    }
-    activeClusterCellIds = ids;
-    activeMbtsLabels = mbts;
-    return;
-  }
-  if (lvl === 3) {
-    const c = getActiveJetCollection();
-    const ids = new Set();
-    if (c) {
-      for (const j of c.jets) {
-        if (j.etGev < thrJetEtGev) continue;
-        for (const id of j.cells) ids.add(id);
-      }
-    }
-    activeClusterCellIds = ids;
-    activeMbtsLabels = null;
-    return;
-  }
-  // Level 1 (or no data): filter off entirely.
-  activeClusterCellIds = null;
-  activeMbtsLabels = null;
-}
-
 // ── Track threshold ───────────────────────────────────────────────────────────
+// Single pipeline that re-derives all track-related visibility from the
+// current pT slider, the K-popover flags, and the cached particle lists. The
+// stages are ordered by data dependency — every stage reads what the previous
+// stage just wrote — so the function is idempotent and order-stable when
+// called from any of: pT slider, K-popover toggle, applyClusterThreshold,
+// applyJetThreshold, the view-level gate.
+//
+// Stages:
+//   1. pT pass        — c.visible = ptGev >= thr (tracks + photons)
+//   2. ΔR rematch     — recompute electron/muon matches against the now
+//                       pT-visible tracks (a soft track that just dropped
+//                       below thr can no longer steal a match from a real
+//                       lepton above thr; conversely lowering the slider
+//                       can reassign matches). Tau/jet matches are by
+//                       index, independent of visibility, and are owned by
+//                       drawTaus / applyJetThreshold instead.
+//   3. K-popover filter — applyParticleTrackFilters reads the FRESH match
+//                       flags from stage 2 and hides matched tracks that
+//                       the user has untoggled (Electrons, Muons, Taus,
+//                       Unmatched).
+//   4. Derived state  — per-sprite label .visible follows its anchor track,
+//                       muon-chamber outlines follow the visible tracks
+//                       passing through them.
+//
+// Callers must ensure tau/jet match flags are already set when this runs
+// (they don't depend on pT visibility, so they're recomputed elsewhere).
+// The processXml deferral pattern — drawTracks/drawPhotons skip calling
+// this, the tail of processXml runs it once via applyJetThreshold — exists
+// because at draw-tracks time _lastElectrons/_lastMuons are still empty.
 export function applyTrackThreshold() {
-  if (_trackGroup)
-    for (const child of _trackGroup.children) child.visible = child.userData.ptGev >= thrTrackGev;
-  if (_photonGroup)
-    for (const child of _photonGroup.children) child.visible = child.userData.ptGev >= thrTrackGev;
-  if (_electronGroup)
-    for (const child of _electronGroup.children)
+  const trackGroup = getTrackGroup();
+  const photonGroup = getPhotonGroup();
+  // 1. pT pass. Photon spring lines share the slider; the electron / muon
+  // label sprite groups are NOT iterated here — their children carry no
+  // ptGev field, so `undefined >= thr === false` would silently hide every
+  // label. Their group-level visibility is gated by setElectronGroup /
+  // setMuonGroup (level + J button + K-popover flag).
+  if (trackGroup)
+    for (const child of trackGroup.children ?? [])
       child.visible = child.userData.ptGev >= thrTrackGev;
-  _updateTrackAtlasIntersections?.();
-  // Track visibility just changed — soft tracks getting hidden could free up
-  // the closest-track slot for an electron, or vice-versa. Re-run the ΔR match
-  // and rebuild "e±" labels (gated to L3 — at other levels it's a no-op).
-  // Same goes for "μ±" labels.
+  if (photonGroup)
+    for (const child of photonGroup.children ?? [])
+      child.visible = child.userData.ptGev >= thrTrackGev;
+  // 2. ΔR rematch (electron / muon only). Skipped outside L3 — the L3 view
+  // level is the only one that surfaces lepton colours, and the level gate
+  // already cleared the matches when the user left L3.
   if (getViewLevel() === 3) {
     syncElectronTrackMatch(getLastElectrons());
     syncMuonTrackMatch(getLastMuons());
   }
+  // 3. K-popover filters (electron / muon / tau / unmatched on tracks; the
+  // "photons-in-jets" filter on photons reads jet/τ visibility set earlier
+  // by applyJetThreshold's pT pass).
+  applyParticleTrackFilters();
+  applyPhotonFilters();
+  // 4. Derived state.
+  syncParticleLabelVisibility();
+  updateTrackAtlasIntersections();
   markDirty();
 }
 
 // ── Cluster threshold ─────────────────────────────────────────────────────────
 export function applyClusterThreshold() {
-  if (_clusterGroup)
-    for (const child of _clusterGroup.children)
+  const clusterGroup = getClusterGroup();
+  if (clusterGroup)
+    for (const child of clusterGroup.children ?? [])
       child.visible = child.userData.etGev >= thrClusterEtGev;
   rebuildActiveClusterCellIds();
   applyThreshold();
@@ -591,8 +281,10 @@ export function applyClusterThreshold() {
 // level 3 (same behaviour as the cluster view at level 2). Also refreshes the
 // jet→track highlight (orange) for tracks belonging to passing jets.
 export function applyJetThreshold() {
-  if (_jetGroup)
-    for (const child of _jetGroup.children) child.visible = child.userData.etGev >= thrJetEtGev;
+  const jetGroup = getJetGroup();
+  if (jetGroup)
+    for (const child of jetGroup.children ?? [])
+      child.visible = child.userData.etGev >= thrJetEtGev;
   // τ lines share the same L3 ET slider — hadronic τs *are* narrow jets, so
   // letting them pass while real jets are cut would visually dominate the
   // L3 view. <TauJet> publishes pT (not ET); for the cone of objects we're
@@ -602,19 +294,31 @@ export function applyJetThreshold() {
   rebuildActiveClusterCellIds();
   applyThreshold();
   applyFcalThreshold();
-  applyTrackThreshold();
-  // Highlight tracks of passing jets (orange) — only meaningful on level 3.
+  // Jet matches must be set BEFORE applyTrackThreshold's filter pass —
+  // applyTrackThreshold recomputes electron/muon (visibility-dependent) but
+  // not jet/tau (index-dependent), so jet ownership of this stage stays
+  // here. See the pipeline doc above applyTrackThreshold.
   const lvl = getViewLevel();
   recomputeJetTrackMatch(lvl === 3 ? getActiveJetCollection() : null, thrJetEtGev);
+  applyTrackThreshold();
 }
 
-// Hides τ lines whose pT falls below the L3 ET slider. Called from
-// applyJetThreshold when the slider moves and from drawTaus on fresh load.
-// Standalone (not folded into applyJetThreshold) so drawTaus can reuse it
-// without dragging the cell-filter / track-recolour passes along.
+// Hides τ lines whose pT falls below the L3 ET slider OR whose daughter-
+// charge sum isn't ±1 (the "unmatched" τ candidates — algorithm seeds whose
+// charge doesn't match a real τ). Called from applyJetThreshold when the
+// slider moves, from drawTaus on fresh load, and from the K-popover binding
+// when the Unmatched Tau toggle flips. Standalone (not folded into
+// applyJetThreshold) so drawTaus can reuse it without dragging the cell-
+// filter / track-recolour passes along.
 export function applyTauPtThreshold() {
-  if (!_tauGroup) return;
-  for (const child of _tauGroup.children) child.visible = child.userData.ptGev >= thrJetEtGev;
+  const tauGroup = getTauGroup();
+  if (!tauGroup) return;
+  const showUnmatched = getUnmatchedTausVisible();
+  for (const child of tauGroup.children ?? []) {
+    const u = child.userData;
+    const passesCharge = u.charge === -1 || u.charge === 1 || showUnmatched;
+    child.visible = u.ptGev >= thrJetEtGev && passesCharge;
+  }
 }
 
 // ── Non-active cells in show-all mode ────────────────────────────────────────
@@ -623,10 +327,17 @@ export function applyTauPtThreshold() {
 // Appends newly-visible handles to visHandles so outlines and raycasting include them.
 function _syncNonActiveShowAll() {
   if (!_slicer?.isShowAllCells()) return;
-  const slicerMask = _slicer.getMaskState();
+  // Pin a non-null reference for the closure below — TS can't narrow `_slicer`
+  // through the lambda boundary even though we just guarded above.
+  const slicer = _slicer;
+  const slicerMask = slicer.getMaskState();
   // Each handle resolves its own visibility flag via h.subDet, so the sweep
   // doesn't need to be split per sub-region — just per top-level detector for
   // the minimum-palette colour.
+  /**
+   * @param {import('./state.js').CellHandle[]} list
+   * @param {THREE.Color} minColor
+   */
   const sweep = (list, minColor) => {
     for (let i = 0; i < list.length; i++) {
       const h = list[i];
@@ -638,7 +349,7 @@ function _syncNonActiveShowAll() {
       let vis = true;
       if (slicerMask.active) {
         const c = _cellCenter(h);
-        if (_slicer.isPointInsideWedge(c.x, c.y, c.z, slicerMask)) vis = false;
+        if (slicer.isPointInsideWedge(c.x, c.y, c.z, slicerMask)) vis = false;
       }
       if (vis) {
         h.iMesh.setColorAt(h.instId, minColor);
@@ -660,16 +371,18 @@ export function applyThreshold() {
     return;
   }
   visHandles = [];
+  const acIds = getActiveClusterCellIds();
+  const amLabels = getActiveMbtsLabels();
   for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
     const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
     const detOn = _detOnFor(h);
     let inCluster;
-    if (activeClusterCellIds === null) {
+    if (acIds === null) {
       inCluster = true;
     } else if (mbtsLabel != null) {
-      inCluster = activeMbtsLabels !== null && activeMbtsLabels.has(mbtsLabel);
+      inCluster = amLabels !== null && amLabels.has(mbtsLabel);
     } else if (cellId != null) {
-      inCluster = activeClusterCellIds.has(cellId);
+      inCluster = acIds.has(cellId);
     } else {
       inCluster = true;
     }
@@ -682,34 +395,40 @@ export function applyThreshold() {
   _syncNonActiveShowAll();
   _flushIMDirty();
   _rebuildRayIMeshes();
-  _rebuildAllOutlines?.();
+  rebuildAllOutlines();
   markDirty();
 }
 
 // ── Slicer-masked threshold (called by applyThreshold when slicer is active) ──
 function _applySlicerMask() {
+  // Caller (applyThreshold) already gated on `_slicer?.isActive()`, so a null
+  // _slicer here would be a bug — assert and pin a non-null local for TS.
+  if (!_slicer) return;
+  const slicer = _slicer;
   visHandles = [];
-  const slicerMask = _slicer.getMaskState();
+  const slicerMask = slicer.getMaskState();
+  const acIds = getActiveClusterCellIds();
+  const amLabels = getActiveMbtsLabels();
   for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
     const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
     const detOn = _detOnFor(h);
     let inCluster;
-    if (activeClusterCellIds === null) {
+    if (acIds === null) {
       inCluster = true;
     } else if (mbtsLabel != null) {
-      inCluster = activeMbtsLabels !== null && activeMbtsLabels.has(mbtsLabel);
+      inCluster = amLabels !== null && amLabels.has(mbtsLabel);
     } else if (cellId != null) {
-      inCluster = activeClusterCellIds.has(cellId);
+      inCluster = acIds.has(cellId);
     } else {
       inCluster = true;
     }
-    const passThr = _slicer.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
-    const passCl = _slicer.isShowAllCells() || inCluster;
+    const passThr = slicer.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
+    const passCl = slicer.isShowAllCells() || inCluster;
     const passFilter = detOn && passThr && passCl;
     let vis = passFilter;
     if (vis) {
       const c = _cellCenter(h);
-      if (_slicer.isPointInsideWedge(c.x, c.y, c.z, slicerMask)) vis = false;
+      if (slicer.isPointInsideWedge(c.x, c.y, c.z, slicerMask)) vis = false;
     }
     _setHandleVisible(h, vis);
     if (vis) visHandles.push(h);
@@ -717,7 +436,7 @@ function _applySlicerMask() {
   _syncNonActiveShowAll();
   _flushIMDirty();
   _rebuildRayIMeshes();
-  _rebuildAllOutlines?.();
+  rebuildAllOutlines();
   applyFcalThreshold();
   markDirty();
 }
