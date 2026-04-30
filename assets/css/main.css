@@ -2946,6 +2946,48 @@ body.post-featured .post-excerpt {
   color: var(--text-secondary);
 }
 
+/* Subtle name highlight inside the acknowledgements list. */
+.post-body-featured .story-thanks .thanks-name {
+  color: var(--text-primary);
+  font-weight: 500;
+  background-image: linear-gradient(transparent 65%, color-mix(in srgb, var(--brand) 22%, transparent) 65%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  padding: 0 2px;
+  border-radius: 2px;
+  transition: background-size 220ms ease, color 220ms ease;
+}
+.post-body-featured .story-thanks .thanks-name:hover {
+  color: var(--brand);
+}
+
+/* Lists inside story sections — match the body paragraph colour. */
+.post-body-featured .story-section ul,
+.post-body-featured .story-section ol {
+  color: var(--text-secondary);
+  margin: 0 0 var(--sp-5) var(--sp-5);
+  padding-left: var(--sp-4);
+}
+.post-body-featured .story-section li {
+  color: var(--text-secondary);
+  margin-bottom: var(--sp-2);
+  line-height: 1.7;
+}
+.post-body-featured .story-section li strong { color: var(--text-primary); }
+
+/* Inline links — keep the wave underline confined to the text portion only.
+   When a link ends with a trailing arrow icon, the icon is positioned
+   relative and given an opaque background so the wave does not appear
+   beneath it. */
+.post-body-featured a:not(.btn) > i.ph,
+.news-read-more > i.ph {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-1);
+  padding-left: 4px;
+  margin-left: 2px;
+}
+
 /* CTA — minimal, button-only block. */
 .post-body-featured .story-cta {
   margin-top: var(--sp-12);
