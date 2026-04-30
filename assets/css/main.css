@@ -993,6 +993,31 @@ h1, h2, h3, h4, h5, h6 {
 .news-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--t-slow); }
 .news-card:hover .news-card-image img { transform: scale(1.04); }
 
+/* "Featured story" ribbon for the regular news card (smaller variant of the
+   featured cover ribbon, kept consistent visually). */
+.news-card-ribbon {
+  position: absolute;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(7,10,18,0.78);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--brand-mid);
+  border-radius: var(--r-full);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--brand);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  z-index: 1;
+  pointer-events: none;
+}
+.news-card-ribbon .ph { font-size: 11px; }
+
 .news-card-body { padding: var(--sp-5); flex: 1; display: flex; flex-direction: column; gap: var(--sp-3); }
 .news-card-meta { display: flex; align-items: center; gap: var(--sp-3); }
 .news-date { font-size: var(--text-xs); color: var(--text-muted); }
@@ -2946,19 +2971,21 @@ body.post-featured .post-excerpt {
   color: var(--text-secondary);
 }
 
-/* Subtle name highlight inside the acknowledgements list. */
+/* Subtle name highlight inside the acknowledgements list — darker navy tint
+   that contrasts cleanly with the page background, kept gentle. */
 .post-body-featured .story-thanks .thanks-name {
   color: var(--text-primary);
   font-weight: 500;
-  background-image: linear-gradient(transparent 65%, color-mix(in srgb, var(--brand) 22%, transparent) 65%);
+  background-image: linear-gradient(transparent 68%, color-mix(in srgb, var(--accent-cgv) 55%, transparent) 68%);
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  padding: 0 2px;
+  padding: 0 3px;
   border-radius: 2px;
-  transition: background-size 220ms ease, color 220ms ease;
+  transition: color 220ms ease, background-image 220ms ease;
 }
 .post-body-featured .story-thanks .thanks-name:hover {
   color: var(--brand);
+  background-image: linear-gradient(transparent 68%, color-mix(in srgb, var(--accent-cgv) 75%, transparent) 68%);
 }
 
 /* Lists inside story sections — match the body paragraph colour. */
@@ -2975,18 +3002,16 @@ body.post-featured .post-excerpt {
 }
 .post-body-featured .story-section li strong { color: var(--text-primary); }
 
-/* Inline links — keep the wave underline confined to the text portion only.
-   When a link ends with a trailing arrow icon, the icon is positioned
-   relative and given an opaque background so the wave does not appear
-   beneath it. */
-.post-body-featured a:not(.btn) > i.ph,
-.news-read-more > i.ph {
-  position: relative;
-  z-index: 1;
-  background: var(--bg-1);
-  padding-left: 4px;
-  margin-left: 2px;
+/* Inline links with a trailing arrow — keep the wave underline confined to
+   the text portion only by stopping the ::after well short of the right edge
+   so the icon sits beyond it. No background fill on the icon itself. */
+.news-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
+.news-read-more::after { right: 1.6em; }
+.post-body-featured a:not(.btn):has(> i.ph)::after { right: 1.4em; }
 
 /* CTA — minimal, button-only block. */
 .post-body-featured .story-cta {

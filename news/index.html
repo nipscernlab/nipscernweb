@@ -181,9 +181,10 @@
       return m[cat] || 'badge-gray';
     }
 
-    function makeNewsCard(post) {
+    function makeNewsCard(post, opts) {
+      opts = opts || {};
       const article = document.createElement('article');
-      article.className = 'news-card fade-up';
+      article.className = 'news-card fade-up' + (opts.featured ? ' news-card--featured' : '');
       article.setAttribute('role', 'listitem');
       article.id = post.id;
       article.setAttribute('aria-labelledby', 'post-title-' + post.id);
@@ -210,6 +211,17 @@
         const icon = document.createElement('i');
         icon.className = 'ph ph-newspaper';
         imgDiv.appendChild(icon);
+      }
+      if (opts.featured) {
+        const ribbon = document.createElement('span');
+        ribbon.className = 'news-card-ribbon';
+        const star = document.createElement('i');
+        star.className = 'ph ph-star';
+        star.setAttribute('aria-hidden', 'true');
+        ribbon.appendChild(star);
+        const lang = getLang() || 'en';
+        ribbon.appendChild(document.createTextNode(' ' + ((lang === 'pt') ? 'Reportagem em destaque' : 'Featured story')));
+        imgDiv.appendChild(ribbon);
       }
 
       // Body
@@ -287,26 +299,33 @@
       setTimeout(() => card.classList.add('visible'), 100);
     }
 
+    function renderFeed(posts, featuredId) {
+      const feed = document.getElementById('news-feed');
+      if (!feed || !posts) return;
+      feed.replaceChildren();
+      posts.forEach((post, i) => {
+        const card = makeNewsCard(post, { featured: featuredId && post.id === featuredId });
+        feed.appendChild(card);
+        setTimeout(() => card.classList.add('visible'), i * 100 + 200);
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const [posts, featured] = await Promise.all([loadNews(), loadFeatured()]);
-      const feed = document.getElementById('news-feed');
       const sidebarAwards = document.getElementById('sidebar-awards');
 
-      if (featured) renderFeatured(featured);
+      // Featured slot stays hidden — the featured story is shown inline in
+      // the regular feed with a "Featured story" ribbon on its card.
+      const slot = document.getElementById('news-featured-slot');
+      if (slot) slot.style.display = 'none';
 
-      // Re-render featured on language change so PT/EN swap takes effect
+      const featuredId = featured ? featured.id : null;
+      renderFeed(posts, featuredId);
+
+      // Re-render the feed on language change so the ribbon copy swaps too.
       document.addEventListener('langchange', () => {
-        if (featured) renderFeatured(featured);
+        renderFeed(posts, featuredId);
       });
-
-      if (feed && posts) {
-        feed.replaceChildren();
-        posts.forEach((post, i) => {
-          const card = makeNewsCard(post);
-          feed.appendChild(card);
-          setTimeout(() => card.classList.add('visible'), i * 100 + 200);
-        });
-      }
 
       if (sidebarAwards) {
         const awards = posts.flatMap(p => (p.awards || []).map(a => ({ ...a, postId: p.id })));
