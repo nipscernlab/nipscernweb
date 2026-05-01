@@ -1,4 +1,5 @@
 [
+<<<<<<< Updated upstream
   {
     "id": "pub-2026-cba-cgvweb",
     "title": "CGVWeb: Modernização do Calorimeter Geometry Viewer do ATLAS para Plataforma Web",
@@ -24,6 +25,9 @@
     "pdf": "publications/articles/ENMC_2025_Fractal.pdf"
   },
   {
+=======
+{
+>>>>>>> Stashed changes
     "id": "pub-2002-ieee-state machine",
     "title": "An Image Acquisition System Based on State Machine and Sampling ADCs",
     "authors": ["Herman P. Lima"," Jr., Ademarlaudo F. Barbosa", "Germano P. Guedes", "Luciano M. de Andrade Filho"],
@@ -1220,7 +1224,7 @@
     "type": "conference",
     "doi": null,
     "abstract": "O uso de fractais no processamento e na análise de dados tem ganhado destaque em diversas áreas científicas e tecnológicas, impulsionado pela necessidade de modelagem complexa e extração de padrões em sistemas dinâmicos. Projetos recentes nas áreas de física, biomedicina e criptografia demonstram a relevância do cálculo eficiente de fractais como os de Weierstrass–Mandelbrot, Julia e Cantor, cuja complexidade computacional exige soluções de alto desempenho. Nesse contexto, as Field-Programmable Gate Arrays (FPGAs) surgem como plataformas ideais para implementações embarcadas e paralelizadas, oferecendo flexibilidade, baixa latência e eficiência energética. Dentro desse cenário, o Scalable Architecture Processor for Hardware Optimization (SAPHO) se destaca como um processador soft-core projetado com lógica dedicada ao tratamento de números complexos, essenciais no cálculo de fractais. Neste trabalho, é apresentada a implementação do fractal do Conjunto de Mandelbrot utilizando o processador SAPHO em FPGA, explorando sua arquitetura reconfigurável para viabilizar o processamento rápido e eficiente de imagens fractais em tempo real. Além disso, propõem-se otimizações no código Assembly gerado para o SAPHO, que resultam em um ganho de desempenho de aproximadamente 25% em relação à implementação padrão, demonstrando o potencial da arquitetura para aplicações científicas que demandam alto desempenho com baixo consumo de recursos.",
-    "tags": [""],
+    "tags": ["SAPHO", "FPGA", "Fractal", "Mandelbrot", "ENMC", "ENMC"],
     "pdf": "publications/articles/ENEMC_2025_Implementação de Fractal.pdf"
   },
   {
@@ -1308,15 +1312,171 @@
     "pdf": "publications/articles/SBAI_2025_Análise_do_método_linear.pdf"
   },
   {
-    "id": "pub-2025-",
-    "title": "",
-    "authors": [""],
-    "journal": "",
+    "id": "pub-2025-sbcci-Uncorrelated-Pseudo-Random",
+    "title": "Uncorrelated Pseudo-Random Generator for FPGA",
+    "authors": ["Thiago C. A. Paschoalin"," Ualison R. F. Dias"," Melissa S. Aguiar"," Dabson F. dos Santos"," Tiago M. Quirino "," Luciano M. de Andrade Filho."],
+    "journal": "38th Symposium on Integrated Circuits and Systems Design.",
     "year": 2025, 
     "type": "conference",
     "doi": null,
+    "abstract": "Random numbers are used in several applications, including simulations, digital signal processing, machine learning, and others. For high-speed implementations, FPGAs are among the most suitable technologies. In this context, the Linear Feedback Shift Register (LFSR) is a widely used approach due to its parallel digital structure. However, the free-running sequence of the LFSR presents correlation among neighboring samples. This autocorrelated behavior makes the LFSR unsuitable for certain applications. This work proposes a multi-core parallel implementation with different seeds, in which the resulting autocorrelation sequence becomes impulsive. By combining the outputs of multiple LFSR instances, it is possible to overcome this limitation while maintaining circuit simplicity. The FPGA implementation uses low hardware resources and achieves a high clock frequency, demonstrating its efficiency for high-speed applications.",
+    "tags": [""],
+    "pdf": "publications/articles/SBCCI_2025_Uncorrelated_Pseudo-Random.pdf"
+  },
+  {
+    "id": "pub-2025-sforum-Design-and-Implementation",
+    "title": "Design and Implementation of a Digital IIR Filter with Floating-Point Representation",
+    "authors": ["Fabio Luna"," Luciano Andrade "," Thiago Paschoalin"],
+    "journal": "25º Simpósio de Formação em Microeletrónica",
+    "year": 2025, 
+    "type": "conference",
+    "doi": null,
+    "abstract": "This paper presents the implementation of a digital IIR filter on an FPGA using floating-point operations to minimize errors caused by quantization. A fully combinational floating-point multiply-and-accumulate circuit is proposed, avoiding the use of pipeline stages typically required in conventional FPGA implementations. This architectural choice simplifies control, enables immediate output response, and is particularly advantageous in applications requiring low latency and predictable timing. In contrast, the quantization process in fixed-point designs is highly specific to each project and often demands extensive tuning and simulation, significantly increasing development time. By adopting floating-point arithmetic, the proposed method eliminates this overhead, offering greater flexibility and accelerating the design process, albeit at the cost of increased logic utilization. The implementation aims to reduce deviations from the ideal impulse response while maintaining filter stability and achieving high numerical accuracy with fewer bits. The results demonstrate the effectiveness of this approach compared to traditional quantization-based methods, particularly in scenarios where design time and precision are critical.",
+    "tags": [""],
+    "pdf": "publications/articles/Sforum_2025_Design_and_Implementation.pdf"
+  },
+  {
+    "id": "pub-2025-sforum-Multi-memory-Approach",
+    "title": "Multi-memory Approach for Monte Carlo Simulation in FPGA",
+    "authors": ["Vinícius P. D. de Oliveira"," Pedro H. B. Lisboa"," Ualison R. F. Dias"," Thiago C. A. Paschoalin"," Tiago M. Quirino "," Luciano M. de Andrade Filho."],
+    "journal": "25º Simpósio de Formação em Microeletrónica",
+    "year": 2025, 
+    "type": "conference",
+    "doi": null,
+    "abstract": "Simulating specific data with known distributions is essential in various research fields. To generate values of a random variable, Monte Carlo simulations are widely used, relying on the Cumulative Distribution Function (CDF) of the process. Modern FPGAs can perform this task by combining a uniform random number generator with memory that stores CDF values. However, histogram regions with low occupancy tend to suffer from reduced performance, since their contribution to the integral is negligible. To address this issue, this work proposes the use of Read-Only Memory (ROM) blocks with varying resolutions, adapted to the occupancy of different regions. As demonstrated, this approach improves data representation without increasing circuit complexity or consuming excessive FPGA resources. The proposed architecture uses less than 3% of the FPGA logic and supports operation at high clock frequencies.",
+    "tags": [""],
+    "pdf": "publications/articles/Sforum_2025_Multi-memory_Approach.pdf"
+  },
+  {
+    "id": "tcc-2011-rodrigo-araujo",
+    "title": "Detecção de Raios Cósmicos em Calorímetros Altamente Segmentados Usando Transformada de Hough Aleatória",
+    "authors": ["Rodrigo Araujo Pereira"],
+    "journal": "",
+    "year": 2011, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "Em detectores de partículas de altas energias, como o ATLAS (A Toroidal LHC Apparatus), um dos principais experimentos do LHC, o calorímetro é responsável por absorver e medir a energia das partículas. No ATLAS, o calorímetro é dividido em duas partes: a eletromagnética (LAr) e a hadrônica (TileCal), destinadas à detecção de partículas que interagem predominantemente por processos eletromagnéticos ou hadrônicos, respectivamente. Para a certificação experimental dos cerca de 10.000 canais de leitura do TileCal, foram utilizados raios cósmicos durante a fase de comissionamento. A partir da energia depositada por esses raios nas células do calorímetro, é possível reconstruir suas trajetórias. Devido às características dos raios cósmicos, o sinal detectado pelo TileCal apresenta baixa relação sinal-ruído, tornando necessária a utilização de métodos eficientes para reconstrução das trajetórias. O método proposto neste trabalho baseia-se em uma variante da Transformada de Hough, que mapeia o espaço de dados (células ativadas pela energia absorvida) para um espaço de parâmetros, com o objetivo de identificar traços lineares deixados pelos raios cósmicos. O trabalho apresenta a Transformada de Hough Aleatória, capaz de reconhecer trajetórias provenientes de múltiplos raios cósmicos simultaneamente. A validação do método com dados de simulação Monte Carlo alcançou uma eficiência de 99,8% na reconstrução das trajetórias, comprovando a alta eficácia da abordagem proposta.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2011_Rodrigo Araujo.pdf"
+  },
+  {
+    "id": "tcc-2016-Leandro-Silva",
+    "title": "Projeto de um Processador Embarcado Otimizado para Aplicação com Transformada de Fourier",
+    "authors": ["Leandro Silva Lima"],
+    "journal": "",
+    "year": 2016, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "A presente monografia tem como objetivo descrever os procedimentos necessários para a modificação de um processador embarcado em uma FPGA, desenvolvido na UFJF, por meio da linguagem de descrição de hardware Verilog. Para isso, foram empregadas técnicas de otimização com o objetivo de viabilizar a aplicação da Transformada de Fourier com menor custo computacional, permitindo que o processador reduza o tempo de processamento.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2016_Leandro_Silva.pdf"
+  },
+  {
+    "id": "tcc-2016-Pedro-Esperidião-",
+    "title": "Testes e Sugestões de Aplicação de Filtros Digitais Lineares Online ao Detector TileCal do Projeto ATLAS",
+    "authors": ["Pedro Esperidião dos Santos Neto"],
+    "journal": "",
+    "year": 2016, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "O detector ATLAS do CERN (Conselho Europeu para Pesquisa Nuclear) é um sistema complexo composto por diversos subdetectores de partículas, projetados para analisar diferentes formas de interação da matéria. O ATLAS conta com um sistema de transdutores e uma eletrônica de aquisição de dados altamente sofisticada e de alto desempenho. Nos calorímetros do ATLAS, responsáveis por medir a energia das partículas, essas interações geram pulsos elétricos característicos que precisam ser corretamente interpretados para identificar sua ocorrência e reconstruir com precisão sua amplitude. Este trabalho reúne estudos, hipóteses, testes e propostas desenvolvidas no contexto da colaboração brasileira do experimento ATLAS. A investigação parte do questionamento sobre como o aumento da luminosidade (ou seja, o aumento no número de interações por colisão) impacta a detecção e reconstrução de sinais de referência. Dessa forma, foram revisados dois filtros inicialmente considerados: o Filtro Ótimo, já utilizado no CERN, e o Filtro Casado, proposto por pesquisadores brasileiros. Diante dos desafios impostos pela alta luminosidade — especialmente a ocorrência de sinais não sincronizados — duas novas técnicas de detecção foram avaliadas: o Filtro Ótimo Generalizado e a Deconvolução. Do ponto de vista matemático, essas técnicas representam extensões dos filtros clássicos para cenários com múltiplos sinais. Os resultados mostram que, embora essas abordagens permitam detectar sinais anteriormente não previstos e até estimar suas amplitudes, elas podem reduzir a precisão da reconstrução quando não há garantia de ocorrência de sinais defasados. Diante desse compromisso entre detecção e reconstrução — que não era relevante em cenários de baixa luminosidade — o trabalho propõe a combinação de técnicas como forma de equilibrar ambos os objetivos.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2016_Pedro_Esperidião.pdf"
+  },
+  {
+    "id": "tcc-2018-Pedro Brick",
+    "title": "Estudo e implementação de um protocolo de stream de imagem em FPGA",
+    "authors": ["Pedro Brick Soares"],
+    "journal": "",
+    "year": 2018, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "Este trabalho apresenta o desenvolvimento de uma propriedade intelectual a ser implementada em FPGA e descrita em Verilog. Como parte dos objetivos, foi realizada a implementação do protocolo CSI-2, amplamente utilizado em interfaces de câmeras na indústria mobile. Esse protocolo se destaca pela facilidade de uso e pela capacidade de suportar altas taxas de desempenho em fotografias de alta resolução e vídeos em alta definição. Para comprovar a conformidade com o padrão estabelecido pela MIPI Alliance, foram realizadas simulações utilizando os softwares ModelSim Altera e Signal Tap Logic Analyzer. Os resultados demonstraram que a interface implementada segue os padrões definidos para comunicação serial, operando em altas frequências. Isso justifica sua aplicação em sistemas que necessitam de comunicação eficiente entre sensores e processadores de imagem.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2018_Pedro_Brick.pdf"
+  },
+  {
+    "id": "tcc-2019-Túlio-Fernandes",
+    "title": "Estudo de Técnicas de Equalização Aplicadas a Canais PLC de Banda Estreita",
+    "authors": ["Túlio Fernandes Moreira"],
+    "journal": "",
+    "year": 2019, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "Este trabalho apresenta o estudo de três técnicas de equalização aplicadas a canais de comunicação por rede elétrica (Power Line Communication – PLC) de banda estreita. A primeira técnica produz dois equalizadores: um que combina um filtro de resposta ao impulso infinita (IIR) com um filtro de resposta ao impulso finita (FIR), e outro que combina dois filtros FIR, ambos obtidos a partir da transformada z do canal considerado. A segunda técnica gera um equalizador FIR a partir da pseudo-inversa da matriz de convolução da resposta ao impulso do canal. Já a terceira técnica utiliza filtragem adaptativa com o método dos mínimos quadrados recursivos (Recursive Least Squares – RLS) para estimar os coeficientes de um equalizador FIR. As técnicas foram analisadas numericamente em termos da taxa de erro de bit (Bit Error Rate – BER), considerando a transmissão de símbolos modulados por modulação M-PAM através de um canal PLC de banda estreita (9–500 kHz), na presença de ruído branco gaussiano. Os resultados mostram que fatores como a ordem da constelação, o comprimento do equalizador, o intervalo de guarda e a relação entre energia por bit (Eb) e densidade espectral de potência (N₀) influenciam diretamente o desempenho das técnicas de equalização.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2019_Túlio Fernandes.pdf"
+  },
+  {
+    "id": "tcc-2020-Alessa-Monay",
+    "title": "Reconstrução de Energia no Calorímetro Hadrônico do ATLAS para Fase de Alta Luminosidade do LHC",
+    "authors": ["Alessa Monay e Silva"],
+    "journal": "",
+    "year": 2020, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "Este trabalho está ambientado no calorímetro hadrônico (TileCal) do experimento ATLAS, no LHC. O TileCal possui milhares de canais de leitura e opera sob elevada taxa de eventos. Nesse contexto, a reconstrução da energia dos eventos é realizada por meio da detecção e estimação da amplitude do sinal digitalizado. Essa estimativa é tradicionalmente feita utilizando um método linear que busca minimizar a variância, conhecido como Filtro Ótimo (Optimal Filter – OF). Entretanto, em ambientes de alta luminosidade (alta taxa de eventos), ocorre o fenômeno de empilhamento de sinais (pile-up), o que compromete o desempenho de métodos lineares. Em cenários com alta probabilidade de empilhamento, esses métodos apresentam perda significativa de eficiência. Diante disso, este trabalho explora a associação de um método não linear — especificamente, uma rede neural do tipo MLP — ao método linear tradicional, avaliando os ganhos de desempenho e os benefícios dessa abordagem híbrida na reconstrução da energia.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2020_Alessa_Monay.pdf"
+  },
+  {
+    "id": "tcc-2020-Melissa-Santos",
+    "title": "Processamento Multicore Embarcado em FPGA de um Método Iterativo de Deconvolução Baseado em Representação Esparsa de Dados Visando a Reconstrução Online de Energia em Aceleradores de Partículas",
+    "authors": ["Melissa Santos Aguiar"],
+    "journal": "",
+    "year": 2020, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "Os laboratórios de pesquisa em Física Experimental de Altas Energias têm contribuído significativamente para avanços científicos e tecnológicos. Nesses ambientes, são desenvolvidos modernos sistemas para a detecção e estudo de partículas, cujas interações podem ocorrer de forma natural na atmosfera — como no caso dos raios cósmicos — ou de forma controlada em aceleradores de partículas, onde colisões de alta energia permitem investigar propriedades fundamentais das partículas elementares. O LHC, atualmente o maior acelerador de partículas do mundo, passa por um processo contínuo de atualização, com aumento da energia das colisões para elevar a probabilidade de ocorrência de eventos raros. Esse cenário impacta diretamente os sistemas de instrumentação dos detectores, especialmente o calorímetro hadrônico do experimento ATLAS, onde o aumento de colisões adjacentes intensifica o efeito de empilhamento de sinais (pile-up). Como o algoritmo atualmente utilizado na reconstrução de sinais nesse calorímetro não é sensível ao efeito de pile-up, diversos métodos iterativos baseados em deconvolução e Representação Esparsa de Dados vêm sendo propostos, apresentando resultados satisfatórios. No entanto, esses métodos possuem alto custo computacional, tornando desafiadora sua aplicação em tempo real. Nesse contexto, este trabalho apresenta a implementação de um processador dedicado em FPGA, com arquitetura multicore, capaz de executar um algoritmo iterativo baseado em Representação Esparsa de Dados. O objetivo é viabilizar a reconstrução online de energia em calorímetros de altas energias, com foco no calorímetro hadrônico do experimento ATLAS, especialmente em cenários com empilhamento de sinais.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2020_Melissa_Santos.pdf"
+  },
+  {
+    "id": "tcc-2021-Kinn-Belarmino",
+    "title": "Implementação em FPGA de Filtro FIR Utilizando Máquina de Estados para Estimação Online de Energia no Calorímetro de Telhas",
+    "authors": ["Kinn Belarmino Batista Dias"],
+    "journal": "",
+    "year": 2021, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "Este trabalho apresenta um estudo sobre formas de implementação de filtros FIR para a reconstrução online de energia no primeiro nível de trigger do calorímetro hadrônico (TileCal) do ATLAS. Com as atualizações previstas para o LHC, haverá aumento da energia das colisões, elevando a probabilidade de ocorrência de eventos raros. Nesse cenário, cresce também a incidência de colisões adjacentes, resultando na sobreposição de sinais — fenômeno conhecido como empilhamento de sinais (pile-up). Diversos métodos iterativos de deconvolução baseados em filtros FIR vêm sendo propostos e apresentam bons resultados. No entanto, o grande volume de dados gerado pelas colisões impõe um desafio aos algoritmos de reconstrução de energia: utilizar o mínimo de recursos de hardware possível, mantendo o desempenho e reduzindo o erro RMS, sem comprometer o resultado final. Além disso, esses métodos precisam operar de forma online. Nesse contexto, os dispositivos lógicos programáveis (FPGAs) se destacam como solução ideal, devido à sua reconfigurabilidade e alta velocidade de processamento. Assim, este trabalho propõe um método de implementação de filtro FIR baseado em uma máquina de estados, responsável por realizar os cálculos de energia das partículas de forma eficiente, reduzindo o uso de recursos computacionais.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2021_Kinn_Belarmino.pdf"
+  },
+  {
+    "id": "tcc-2023-Lucca-Oliveira",
+    "title": "Otimizações para Processador Soft-Core Embarcado em FPGA Visando Implementação de Métodos de Reconstrução Online de Energia em Aceleradores de Partículas",
+    "authors": ["Lucca Oliveira Facio Viccini"],
+    "journal": "",
+    "year": 2023, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "A busca por respostas sobre os constituintes fundamentais da matéria tem levado o maior acelerador de partículas do mundo, o LHC (no CERN), a passar por atualizações em seus detectores durante seu segundo longo período de desligamento. Essas melhorias visam aumentar a taxa de colisões entre partículas, elevando a luminosidade do experimento. No entanto, esse aumento intensifica o problema do empilhamento de sinais (pile-up), no qual sinais elétricos provenientes dos canais de leitura dos detectores se sobrepõem, dificultando sua detecção e a estimação de seus parâmetros. Atualmente, utiliza-se o Filtro Casado para detecção e estimação da amplitude dos pulsos, mas, devido às características não lineares do ruído associado ao pile-up, essa técnica torna-se inadequada para o ambiente de alta luminosidade esperado. Para lidar com esse problema, os sensores podem ser interpretados como um canal com características dispersivas, permitindo o uso de técnicas como redes neurais ou métodos iterativos baseados em Representação Esparsa de Dados, que atuam como equalizadores do canal. Nesse contexto, foram implementados dois métodos de reconstrução de sinais no sistema de filtragem (trigger) do ATLAS. Um dos métodos consiste em uma rede neural, implementada tanto em ponto fixo — utilizando tabelas de consulta (look-up tables) para representar funções de ativação — quanto em ponto flutuante, utilizando séries de Taylor para reduzir o consumo de memória. O outro método é um algoritmo iterativo baseado em Representação Esparsa de Dados. Ambas as abordagens foram implementadas em uma arquitetura multicore embarcada em FPGA, atendendo aos requisitos de alto desempenho e baixa complexidade. O objetivo deste trabalho é otimizar o processador embarcado responsável por executar esses métodos, por meio da criação de novos circuitos e instruções que aumentem a eficiência da execução. Os resultados mostram que a redução significativa do tamanho do programa embarcado e a otimização de circuitos aritméticos na unidade lógica e aritmética (ULA) tornam o processador mais viável para a implementação de métodos de reconstrução de energia em detectores de partículas, como o ATLAS no LHC.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2023_Lucca_Oliveira.pdf"
+  },
+  {
+    "id": "tcc-2025-Tiago-de-Castro",
+    "title": "Métodos de Implementação de Funções Não Lineares em FPGA",
+    "authors": ["Tiago de Castro Falcão Guimarães"],
+    "journal": "",
+    "year": 2025, 
+    "type": "undergraduate thesis",
+    "doi": null,
+    "abstract": "Este trabalho apresenta a implementação e comparação de diferentes métodos de aproximação para funções não lineares em um processador soft-core de arquitetura reduzida, o SAPHO. São analisadas as funções seno, cosseno, tangente, arco tangente, exponencial, tangente hiperbólica e sigmoide, utilizando três abordagens distintas: séries de Maclaurin, tabelamento e o algoritmo CORDIC. As implementações foram realizadas em duas configurações de largura de dados, 23 e 32 bits. Os resultados foram avaliados com base no erro médio e no número de ciclos de clock necessários para execução. O estudo mostra que as séries de Maclaurin tendem a oferecer maior precisão, especialmente na configuração de 32 bits, porém com maior custo de tempo de processamento. O método de tabelamento apresenta um bom equilíbrio entre precisão e desempenho. Já o algoritmo CORDIC apresentou desempenho inferior no processador SAPHO, devido à necessidade de alta precisão e ao tratamento de erros em operações de ponto flutuante. As conclusões são sustentadas por análises complementares com gráficos, tabelas e trechos de código.",
+    "tags": [""],
+    "pdf": "publications/articles/TCC_2025_Tiago_de_Castro.pdf"
+  },
+  {
+    "id": "tcc-2011-",
+    "title": "",
+    "authors": [""],
+    "journal": "",
+    "year": 2011, 
+    "type": "undergraduate thesis",
+    "doi": null,
     "abstract": "",
     "tags": [""],
-    "pdf": "publications/articles/SBAI_2025_.pdf"
+    "pdf": "publications/articles/TCC.pdf"
   }
 ]
