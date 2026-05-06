@@ -97,7 +97,7 @@ function buildNav() {
         <div class="lang-switcher" role="group" aria-label="Language selector">
           ${langBtns}
         </div>
-        <a href="nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-cgv-link" aria-label="CGVWEB Project" title="CGVWEB">
+        <a href="projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-cgv-link" aria-label="CGVWEB Project" title="CGVWEB">
           <img src="${ROOT}assets/icons/icon_cgv.svg" alt="CGVWEB" class="nav-cgv-icon">
         </a>
         <button class="nav-hamburger" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
