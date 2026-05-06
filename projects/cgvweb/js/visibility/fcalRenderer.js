@@ -19,6 +19,7 @@ import { palColorFcal } from '../palette.js';
 import { thrFcalMev } from './thresholds.js';
 import { layerVis } from './layerVis.js';
 import { getSlicer, getActiveClusterCellIds } from '../visibility.js';
+import { refreshCaloBoundParticles } from '../particles.js';
 
 /**
  * One FCAL cell as decoded by the WASM XML parser. `module` is 1=EM, 2=Had1,
@@ -96,6 +97,12 @@ export function applyFcalThreshold() {
     }
   }
   _applyFcalDraw();
+  // FCAL visibility changed — re-run γ / cluster / jet / τ endpoints so
+  // they don't end at FCAL cells that just got hidden (and pick up newly
+  // shown ones). The flag inside refreshCaloBoundParticles prevents the
+  // applyClusterThreshold → applyThreshold → applyFcalThreshold chain from
+  // re-entering.
+  refreshCaloBoundParticles();
 }
 
 function _applyFcalDraw() {

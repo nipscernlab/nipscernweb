@@ -27,6 +27,7 @@ import {
   getLastMuons,
   syncMuonTrackMatch,
   syncParticleLabelVisibility,
+  withCoalescedCaloBoundRefresh,
 } from './particles.js';
 import { isLayerOn } from './visibility/layerVis.js';
 import { applyFcalThreshold } from './visibility/fcalRenderer.js';
@@ -106,31 +107,44 @@ export function initVisibility({ slicer }) {
 // Re-applies cluster / photon / electron visibility AND the cell cluster-filter
 // when the view level changes. Tracks are unaffected (they show at every level,
 // gated only by setTracksVisible).
+//
+// applyThreshold + applyFcalThreshold each have their own particle-endpoint
+// refresh hook; suppress them inside the wrapper so a single refresh runs
+// after the full sub-stage chain — same pattern as applyClusterThreshold /
+// applyJetThreshold / refreshSceneVisibility.
+//
+// Lepton match resolution is owned by applyTrackThreshold when on L3 (it
+// re-runs syncElectronTrackMatch / syncMuonTrackMatch in its stage 2). Here
+// we only need to *clear* those matches when leaving L3. τ match has no
+// equivalent inside applyTrackThreshold so this function owns it on every
+// transition.
 function _applyViewLevelGate() {
   const lvl = getViewLevel();
   applyDetectorGroupViewLevel();
-  // Refresh cell visibility: rebuildActiveClusterCellIds reads getViewLevel()
-  // and disables the cluster-membership filter outside level 2; applyThreshold
-  // then re-evaluates per-cell visibility.
-  rebuildActiveClusterCellIds();
-  applyThreshold();
-  applyFcalThreshold();
-  // Track jet-match highlight is only meaningful on level 3; passing null
-  // (off levels) makes recompute clear all isJetMatched flags.
-  recomputeJetTrackMatch(lvl === 3 ? getActiveJetCollection() : null, thrJetEtGev);
-  // Same gate for the electron→track ΔR match — outside L3 we don't want the
-  // red/green colours bleeding into the simpler views. syncElectronTrackMatch
-  // re-marks tracks AND rebuilds the floating "e±" label sprites.
-  syncElectronTrackMatch(lvl === 3 ? getLastElectrons() : null);
-  // τ→track colour mirrors the same L3-only gate.
-  syncTauTrackMatch(lvl === 3 ? getLastTaus() : null);
-  // μ→track sprite labels — same L3-only gate.
-  syncMuonTrackMatch(lvl === 3 ? getLastMuons() : null);
-  // Re-run the track pipeline so the K-popover filters (in particular the
-  // L3-only unmatched filter) get re-evaluated against the new level. Without
-  // this, leaving L3 with unmatched=off leaves the tracks hidden at L1/L2.
-  applyTrackThreshold();
-  markDirty();
+  withCoalescedCaloBoundRefresh(() => {
+    // Refresh cell visibility: rebuildActiveClusterCellIds reads getViewLevel()
+    // and disables the cluster-membership filter outside level 2; applyThreshold
+    // then re-evaluates per-cell visibility.
+    rebuildActiveClusterCellIds();
+    applyThreshold();
+    applyFcalThreshold();
+    // Track jet-match highlight is only meaningful on level 3; passing null
+    // (off levels) makes recompute clear all isJetMatched flags.
+    recomputeJetTrackMatch(lvl === 3 ? getActiveJetCollection() : null, thrJetEtGev);
+    if (lvl !== 3) {
+      // Leaving L3: clear lepton matches so the red/green colouring drops out
+      // of the L1/L2 views. On L3 → L3 transitions (or entering L3 from
+      // L1/L2) applyTrackThreshold below re-establishes the matches.
+      syncElectronTrackMatch(null);
+      syncMuonTrackMatch(null);
+    }
+    syncTauTrackMatch(lvl === 3 ? getLastTaus() : null);
+    // Re-run the track pipeline so the K-popover filters (in particular the
+    // L3-only unmatched filter) get re-evaluated against the new level.
+    // applyTrackThreshold's stage 2 also re-syncs electron/muon matches when
+    // L3, so we don't pre-call them above.
+    applyTrackThreshold();
+  });
 }
 onViewLevelChange(_applyViewLevelGate);
 
@@ -264,15 +278,33 @@ export function applyTrackThreshold() {
 }
 
 // ── Cluster threshold ─────────────────────────────────────────────────────────
+//
+// applyTrackThreshold is intentionally NOT called from here, unlike
+// applyJetThreshold which does need it (jet visibility feeds the
+// "photons-in-jets" filter inside applyPhotonFilters, AND jet matches must
+// be re-set via recomputeJetTrackMatch before the track filter pass). The
+// cluster ET threshold's effect is fully contained in (a) the cluster line
+// .visible flags above and (b) the cluster-cell membership filter rebuilt
+// via rebuildActiveClusterCellIds, both of which only feed cell visibility
+// (applyThreshold + applyFcalThreshold). Tracks are pT-driven, lepton
+// matches are ΔR-driven against a static track set, and the K-popover
+// filters depend on jet/τ visibility — none of which the cluster slider
+// touches.
+//
+// applyThreshold + applyFcalThreshold each have their own particle-endpoint
+// refresh hook; suppress them inside this composite so we run a single
+// refresh after all sub-stages have updated cell visibility (otherwise the
+// refresh between applyThreshold and applyFcalThreshold sees a stale FCAL).
 export function applyClusterThreshold() {
-  const clusterGroup = getClusterGroup();
-  if (clusterGroup)
-    for (const child of clusterGroup.children ?? [])
-      child.visible = child.userData.etGev >= thrClusterEtGev;
-  rebuildActiveClusterCellIds();
-  applyThreshold();
-  applyFcalThreshold();
-  applyTrackThreshold();
+  withCoalescedCaloBoundRefresh(() => {
+    const clusterGroup = getClusterGroup();
+    if (clusterGroup)
+      for (const child of clusterGroup.children ?? [])
+        child.visible = child.userData.etGev >= thrClusterEtGev;
+    rebuildActiveClusterCellIds();
+    applyThreshold();
+    applyFcalThreshold();
+  });
 }
 
 // ── Jet threshold ─────────────────────────────────────────────────────────────
@@ -281,26 +313,30 @@ export function applyClusterThreshold() {
 // level 3 (same behaviour as the cluster view at level 2). Also refreshes the
 // jet→track highlight (orange) for tracks belonging to passing jets.
 export function applyJetThreshold() {
-  const jetGroup = getJetGroup();
-  if (jetGroup)
-    for (const child of jetGroup.children ?? [])
-      child.visible = child.userData.etGev >= thrJetEtGev;
-  // τ lines share the same L3 ET slider — hadronic τs *are* narrow jets, so
-  // letting them pass while real jets are cut would visually dominate the
-  // L3 view. <TauJet> publishes pT (not ET); for the cone of objects we're
-  // dealing with the two are close enough to compare against a single
-  // threshold.
-  applyTauPtThreshold();
-  rebuildActiveClusterCellIds();
-  applyThreshold();
-  applyFcalThreshold();
-  // Jet matches must be set BEFORE applyTrackThreshold's filter pass —
-  // applyTrackThreshold recomputes electron/muon (visibility-dependent) but
-  // not jet/tau (index-dependent), so jet ownership of this stage stays
-  // here. See the pipeline doc above applyTrackThreshold.
-  const lvl = getViewLevel();
-  recomputeJetTrackMatch(lvl === 3 ? getActiveJetCollection() : null, thrJetEtGev);
-  applyTrackThreshold();
+  // Single particle-endpoint refresh after the full sub-stage chain — see
+  // applyClusterThreshold for the rationale.
+  withCoalescedCaloBoundRefresh(() => {
+    const jetGroup = getJetGroup();
+    if (jetGroup)
+      for (const child of jetGroup.children ?? [])
+        child.visible = child.userData.etGev >= thrJetEtGev;
+    // τ lines share the same L3 ET slider — hadronic τs *are* narrow jets, so
+    // letting them pass while real jets are cut would visually dominate the
+    // L3 view. <TauJet> publishes pT (not ET); for the cone of objects we're
+    // dealing with the two are close enough to compare against a single
+    // threshold.
+    applyTauPtThreshold();
+    rebuildActiveClusterCellIds();
+    applyThreshold();
+    applyFcalThreshold();
+    // Jet matches must be set BEFORE applyTrackThreshold's filter pass —
+    // applyTrackThreshold recomputes electron/muon (visibility-dependent) but
+    // not jet/tau (index-dependent), so jet ownership of this stage stays
+    // here. See the pipeline doc above applyTrackThreshold.
+    const lvl = getViewLevel();
+    recomputeJetTrackMatch(lvl === 3 ? getActiveJetCollection() : null, thrJetEtGev);
+    applyTrackThreshold();
+  });
 }
 
 // Hides τ lines whose pT falls below the L3 ET slider OR whose daughter-
@@ -365,38 +401,44 @@ function _syncNonActiveShowAll() {
 }
 
 // ── Main threshold application (Tile / LAr EM / HEC) ─────────────────────────
+// Both branches (slicer-active via _applySlicerMask, regular per-cell sweep)
+// fall through to the same particle-endpoint refresh at the end. The internal
+// applyFcalThreshold call inside _applySlicerMask has its own hook — the
+// suppress wrapper around the body silences it so we only refresh once.
 export function applyThreshold() {
-  if (_slicer?.isActive()) {
-    _applySlicerMask();
-    return;
-  }
-  visHandles = [];
-  const acIds = getActiveClusterCellIds();
-  const amLabels = getActiveMbtsLabels();
-  for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
-    const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
-    const detOn = _detOnFor(h);
-    let inCluster;
-    if (acIds === null) {
-      inCluster = true;
-    } else if (mbtsLabel != null) {
-      inCluster = amLabels !== null && amLabels.has(mbtsLabel);
-    } else if (cellId != null) {
-      inCluster = acIds.has(cellId);
-    } else {
-      inCluster = true;
+  withCoalescedCaloBoundRefresh(() => {
+    if (_slicer?.isActive()) {
+      _applySlicerMask();
+      return;
     }
-    const passThr = _slicer?.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
-    const passCl = _slicer?.isShowAllCells() || inCluster;
-    const vis = detOn && passThr && passCl;
-    _setHandleVisible(h, vis);
-    if (vis) visHandles.push(h);
-  }
-  _syncNonActiveShowAll();
-  _flushIMDirty();
-  _rebuildRayIMeshes();
-  rebuildAllOutlines();
-  markDirty();
+    visHandles = [];
+    const acIds = getActiveClusterCellIds();
+    const amLabels = getActiveMbtsLabels();
+    for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
+      const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
+      const detOn = _detOnFor(h);
+      let inCluster;
+      if (acIds === null) {
+        inCluster = true;
+      } else if (mbtsLabel != null) {
+        inCluster = amLabels !== null && amLabels.has(mbtsLabel);
+      } else if (cellId != null) {
+        inCluster = acIds.has(cellId);
+      } else {
+        inCluster = true;
+      }
+      const passThr = _slicer?.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
+      const passCl = _slicer?.isShowAllCells() || inCluster;
+      const vis = detOn && passThr && passCl;
+      _setHandleVisible(h, vis);
+      if (vis) visHandles.push(h);
+    }
+    _syncNonActiveShowAll();
+    _flushIMDirty();
+    _rebuildRayIMeshes();
+    rebuildAllOutlines();
+    markDirty();
+  });
 }
 
 // ── Slicer-masked threshold (called by applyThreshold when slicer is active) ──
@@ -439,12 +481,18 @@ function _applySlicerMask() {
   rebuildAllOutlines();
   applyFcalThreshold();
   markDirty();
+  // Particle-endpoint refresh is owned by the caller (applyThreshold's slicer
+  // branch) — _applySlicerMask runs inside applyFcalThreshold's hook (skipped
+  // via the suppress flag during applyThreshold's downstream call).
 }
 
 // ── High-level entry point ────────────────────────────────────────────────────
 // Avoids double FCAL rebuild when slicer is active (_applySlicerMask already
-// calls applyFcalThreshold internally).
+// calls applyFcalThreshold internally). Single particle-endpoint refresh at
+// the end — see applyClusterThreshold for the rationale.
 export function refreshSceneVisibility() {
-  applyThreshold();
-  if (!_slicer?.isActive()) applyFcalThreshold();
+  withCoalescedCaloBoundRefresh(() => {
+    applyThreshold();
+    if (!_slicer?.isActive()) applyFcalThreshold();
+  });
 }

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
     <title>CGV — ATLAS Calorimeter Viewer</title>
-    <link rel="icon" type="image/svg+xml" href="./assets/cgvweb_icon.svg" />
-    <!-- All external resources are vendored under ./assets/vendor/ so the site
+    <link rel="icon" type="image/svg+xml" href="./assets/icons/cgvweb_icon.svg" />
+    <!-- All external resources are vendored under ./vendor/ so the site
        runs fully offline inside ATLAS Point 1 (no GPN / CDN access). -->
     <!-- Preload critical geometry file (largest asset) -->
     <link
@@ -25,18 +25,18 @@
       type="application/wasm"
       fetchpriority="high"
     />
-    <link rel="stylesheet" href="./assets/vendor/fonts/fonts.css" />
+    <link rel="stylesheet" href="./vendor/fonts/fonts.css" />
     <!-- Tabler Icons webfont (for ghost icon) -->
-    <link rel="stylesheet" href="./assets/vendor/tabler-icons/tabler-icons.min.css" />
+    <link rel="stylesheet" href="./vendor/tabler-icons/tabler-icons.min.css" />
     <!-- flag-icons CSS (for language picker flags) -->
-    <link rel="stylesheet" href="./assets/vendor/flag-icons/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="./vendor/flag-icons/css/flag-icons.min.css" />
     <!-- Importmap MUST appear before any modulepreload that imports a bare specifier
        (Firefox tries to resolve "three" during preload — fails if importmap comes later). -->
     <script type="importmap">
       {
         "imports": {
-          "three": "./assets/vendor/three/build/three.module.js",
-          "three/addons/": "./assets/vendor/three/examples/jsm/"
+          "three": "./vendor/three/build/three.module.js",
+          "three/addons/": "./vendor/three/examples/jsm/"
         }
       }
     </script>
@@ -69,7 +69,7 @@
     <!-- ── Loading overlay ───────────────────────────────────────── -->
     <div id="loading-overlay">
       <div class="loading-card">
-        <img src="./assets/cgvweb_icon.svg" class="loading-logo" alt="CGV" />
+        <img src="./assets/icons/cgvweb_icon.svg" class="loading-logo" alt="CGV" />
         <div class="loading-title">CGV</div>
         <div class="loading-sub">Calorimeter Geometry Viewer</div>
         <div class="loading-lab">NIPSCERN &middot; ATLAS</div>
@@ -335,7 +335,7 @@
             </div>
           </div>
           <div id="live-empty" hidden>
-            <img src="./assets/undraw_server_9eix.svg" class="empty-illus" alt="" />
+            <img src="./assets/illustrations/undraw_server_9eix.svg" class="empty-illus" alt="" />
             <div class="empty-msg" data-i18n="empty-live">
               No events yet — waiting for ATLAS Live data from ATLANTIS
             </div>
@@ -1379,25 +1379,40 @@
           <div class="sponsor-grid">
             <img
               class="sponsor-img sponsor-atlas"
-              src="./assets/ATLAS-Logo-Blue-transparent.png"
+              src="./assets/branding/ATLAS-Logo-Blue-transparent.png"
               alt="ATLAS"
               data-tip="ATLAS Experiment"
             />
-            <img class="sponsor-img" src="./assets/sponsors/cern.svg" alt="CERN" data-tip="CERN" />
-            <img class="sponsor-img" src="./assets/sponsors/cnpq.svg" alt="CNPq" data-tip="CNPq" />
             <img
               class="sponsor-img"
-              src="./assets/sponsors/capes.png"
+              src="./assets/branding/sponsors/cern.svg"
+              alt="CERN"
+              data-tip="CERN"
+            />
+            <img
+              class="sponsor-img"
+              src="./assets/branding/sponsors/cnpq.svg"
+              alt="CNPq"
+              data-tip="CNPq"
+            />
+            <img
+              class="sponsor-img"
+              src="./assets/branding/sponsors/capes.png"
               alt="CAPES"
               data-tip="CAPES"
             />
             <img
               class="sponsor-img"
-              src="./assets/sponsors/fapemig.png"
+              src="./assets/branding/sponsors/fapemig.png"
               alt="FAPEMIG"
               data-tip="FAPEMIG"
             />
-            <img class="sponsor-img" src="./assets/sponsors/ufjf.png" alt="UFJF" data-tip="UFJF" />
+            <img
+              class="sponsor-img"
+              src="./assets/branding/sponsors/ufjf.png"
+              alt="UFJF"
+              data-tip="UFJF"
+            />
           </div>
         </div>
         <button class="about-close" id="btn-about-close">
@@ -1405,8 +1420,8 @@
           <span data-i18n="about-close">Close</span>
         </button>
         <div id="about-watermark">
-          <img src="./assets/cgvweb_icon.svg" id="wm-cgv" alt="" />
-          <img src="./assets/eye.svg" id="wm-eye" alt="" />
+          <img src="./assets/icons/cgvweb_icon.svg" id="wm-cgv" alt="" />
+          <img src="./assets/icons/eye.svg" id="wm-eye" alt="" />
         </div>
       </div>
     </div>

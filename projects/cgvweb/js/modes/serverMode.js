@@ -2,7 +2,7 @@ import { dateGroup } from '../utils.js';
 
 const MAX_ENTRIES = 100;
 const REFRESH_MS = 5000;
-const REMOTE_API = '/api/xml';
+const REMOTE_API = './api/xml';
 const HAS_FSA = typeof window !== 'undefined' && 'showDirectoryPicker' in window;
 
 function fmtTime(ts) {

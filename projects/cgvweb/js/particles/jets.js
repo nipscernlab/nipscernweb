@@ -4,7 +4,11 @@
 
 import * as THREE from 'three';
 import { getJetGroup, setJetGroup, applyJetThreshold } from '../visibility.js';
-import { _disposeGroup, _buildEtaPhiLineGroup } from './_internal.js';
+import {
+  _disposeGroup,
+  _buildEtaPhiLineGroup,
+  _refreshEtaPhiLineGroupGeometry,
+} from './_internal.js';
 
 const JET_MAT = new THREE.LineDashedMaterial({
   color: 0xff8800,
@@ -45,4 +49,10 @@ export function drawJets(collection) {
     });
   }
   applyJetThreshold();
+}
+
+// Visibility-driven refresh: rewrites the existing jet-line position
+// attributes in place rather than rebuilding the group.
+export function refreshJetsGeometry() {
+  _refreshEtaPhiLineGroupGeometry(getJetGroup(), true);
 }

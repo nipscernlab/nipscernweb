@@ -23,7 +23,12 @@ import { recomputeTauTrackMatch } from '../trackMatch.js';
 import { getViewLevel } from '../viewLevel.js';
 import { makeLabelSprite } from '../labelSprite.js';
 import { tauSymbolFromCharge } from '../particleSymbols.js';
-import { _disposeGroup, _buildEtaPhiLineGroup, _buildAnchoredLabelGroup } from './_internal.js';
+import {
+  _disposeGroup,
+  _buildEtaPhiLineGroup,
+  _buildAnchoredLabelGroup,
+  _refreshEtaPhiLineGroupGeometry,
+} from './_internal.js';
 
 const TAU_MAT = new THREE.LineDashedMaterial({
   color: 0xb366ff,
@@ -103,4 +108,11 @@ export function drawTaus(taus) {
 // load and by the visibility level gate when entering / leaving L3.
 export function syncTauTrackMatch(taus) {
   recomputeTauTrackMatch(taus);
+}
+
+// Visibility-driven refresh: rewrites the existing τ-line position attributes
+// in place rather than rebuilding the group. Cheaper than drawTaus on every
+// slider tick.
+export function refreshTausGeometry() {
+  _refreshEtaPhiLineGroupGeometry(getTauGroup(), true);
 }

@@ -18,14 +18,23 @@ const CLUSTER_MAT = new THREE.LineDashedMaterial({
   depthWrite: false,
 });
 
+// Cached cluster list so refreshCaloBoundParticles (in particles.js) can
+// re-run drawClusters after a visibility change without re-parsing the XML.
+let _lastClusters = [];
+export function getLastClusters() {
+  return _lastClusters;
+}
+
 export function clearClusters() {
+  _lastClusters = [];
   _disposeGroup(getClusterGroup, setClusterGroup);
 }
 
 export function drawClusters(clusters) {
   clearClusters();
+  _lastClusters = Array.isArray(clusters) ? clusters : [];
   _buildEtaPhiLineGroup({
-    items: clusters,
+    items: _lastClusters,
     mat: CLUSTER_MAT,
     mapToUserData: (c) => ({
       etGev: c.etGev,
@@ -34,6 +43,11 @@ export function drawClusters(clusters) {
       storeGateKey: c.storeGateKey ?? '',
     }),
     setter: setClusterGroup,
+    // Cluster events routinely carry thousands of lines (most then hidden
+    // by the ET threshold); per-cluster raycasting freezes slider drags.
+    // Use the surface-based inner-face intersect — accurate to tens of mm,
+    // invisible at the band scale (1.4–3.8 m radial).
+    useCellRaycast: false,
   });
   applyClusterThreshold();
 }

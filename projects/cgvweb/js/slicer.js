@@ -14,16 +14,22 @@ export function createSlicerController({
   // two leading-ET jets — the cross-section faces then frame the event's
   // most energetic deposits, which is the prettiest way to "open" the calo.
   getActiveJetCollection,
+  // Optional: returns true when any muon-spectrometer station is enabled in
+  // the layers panel. When on, the slicer's mask grows from the calo-only
+  // envelope (R 5 m, H 12 m) to the muon-spectrometer envelope
+  // (R 12 m, H 50 m) so the wedge cut also carves through the chambers.
+  isMuonOn,
 }) {
-  const SLICER_RADIUS = 5000;
+  // Mask sizes. Calo-only is the historical default; muon-on expands to
+  // cover the spectrometer endcaps (±25 m in Z) and barrel chambers (~10 m R).
+  const SLICER_R_CALO = 5000;
+  const SLICER_R_MUON = 12000;
+  const SLICER_H_CALO = 12000;
+  const SLICER_H_MUON = 50000;
   const SLICER_HEIGHT_MIN = 0;
-  // Calorimeter outer cylinder spans 12 m total (CLUSTER_CYL_OUT_HALF_H =
-  // 6000 mm in particles.js). Initial wedge matches that exactly so the cut
-  // covers the whole calo on first activation, and the max equals the init —
-  // dragging the height larger than the cylinder would just expose empty
-  // space outside the calo, which is never useful.
-  const SLICER_HEIGHT_INIT = 12000;
-  const SLICER_HEIGHT_MAX = 12000;
+  // Mutable mirrors selected by isMuonOn() via refreshSize().
+  let _radius = SLICER_R_CALO;
+  let _maxHeight = SLICER_H_CALO;
   const SLICER_THETA_INIT = 0.5 * Math.PI;
   const SLICER_EPS = 1e-6;
   const SLICER_THETA_DRAG_PX = 300;
@@ -39,7 +45,7 @@ export function createSlicerController({
 
   let slicerGroup = null;
   let slicerActive = false;
-  let slicerHalfHeight = SLICER_HEIGHT_INIT * 0.5;
+  let slicerHalfHeight = _maxHeight * 0.5;
   let slicerThetaLength = TWO_PI;
   let slicerYOffset = 0;
   let slicerZOffset = 0;
@@ -50,11 +56,34 @@ export function createSlicerController({
   }
 
   function resetState() {
-    slicerHalfHeight = SLICER_HEIGHT_INIT * 0.5;
+    slicerHalfHeight = _maxHeight * 0.5;
     slicerThetaLength = SLICER_THETA_INIT;
     slicerYOffset = 0;
     slicerZOffset = 0;
     slicerPhi = 0;
+  }
+
+  // Re-reads isMuonOn(), updates radius / max height, and recenters the
+  // cylinder. Called by main.js whenever the user toggles a muon station in
+  // the layers panel (via onMuonVisibilityChange). When the slicer is
+  // inactive the new sizes just sit in _radius / _maxHeight and take effect
+  // on the next enable(); when active, position resets to centre and the
+  // mask is re-applied immediately.
+  function refreshSize() {
+    const muonShown = !!isMuonOn?.();
+    const nextR = muonShown ? SLICER_R_MUON : SLICER_R_CALO;
+    const nextH = muonShown ? SLICER_H_MUON : SLICER_H_CALO;
+    if (nextR === _radius && nextH === _maxHeight) return;
+    _radius = nextR;
+    _maxHeight = nextH;
+    if (!slicerActive) return;
+    // Recenter and resize the active cut. theta/phi (the wedge angle the
+    // user picked) are intentionally preserved.
+    slicerHalfHeight = _maxHeight * 0.5;
+    slicerYOffset = 0;
+    slicerZOffset = 0;
+    updateBasis();
+    onMaskChange?.();
   }
 
   // Tries to override (slicerPhi, slicerThetaLength) with values that put the
@@ -96,7 +125,7 @@ export function createSlicerController({
     const thetaLen = slicerActive ? slicerThetaLength : 0;
     return {
       active: slicerActive,
-      r2: SLICER_RADIUS * SLICER_RADIUS,
+      r2: _radius * _radius,
       yOff: slicerYOffset,
       zMin: slicerZOffset - slicerHalfHeight,
       zMax: slicerZOffset + slicerHalfHeight,
@@ -391,7 +420,7 @@ export function createSlicerController({
 
         const dx = e.clientX - dragStartX;
         const newHeight = dragStartHeight + dx * SLICER_HEIGHT_MM_PER_PX;
-        const clampedH = Math.max(SLICER_HEIGHT_MIN, Math.min(SLICER_HEIGHT_MAX, newHeight));
+        const clampedH = Math.max(SLICER_HEIGHT_MIN, Math.min(_maxHeight, newHeight));
         slicerHalfHeight = clampedH * 0.5;
         updateBasis();
       } else {
@@ -528,6 +557,7 @@ export function createSlicerController({
     isPointInsideWedge,
     isShowAllCells: () => slicerActive,
     refreshFromActiveJets,
+    refreshSize,
     resetCamera,
     toggle,
   };

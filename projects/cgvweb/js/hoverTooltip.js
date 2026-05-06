@@ -509,15 +509,25 @@ function doRaycast(clientX, clientY) {
     if (chamberHits.length) {
       const mesh = chamberHits[0].object;
       const info = getMuonAliasForMesh(mesh);
-      const alias = info?.alias ?? mesh.name ?? 'Muon chamber';
-      const sideLabel = info?.side ? ` (${info.side} side)` : '';
-      const coord = info?.full ? `${info.full}${sideLabel}` : sideLabel.trim() || '—';
+      // No alias = chamber not in MUON_STATION_RENAMES / MUON_MERGED_GROUPS,
+      // or a descendant of a MUON_HIDDEN_NODES subtree. These only surface in
+      // slicer show-all mode (the depth-trim filter still includes them) and
+      // would show a generic "Muon chamber" tooltip with no useful station /
+      // tech info. Better to dismiss silently — the user gets the visual but
+      // no half-empty tooltip.
+      if (!info) {
+        _dismissAll();
+        return;
+      }
+      const alias = info.alias;
+      const sideLabel = info.side ? ` (${info.side} side)` : '';
+      const coord = info.full ? `${info.full}${sideLabel}` : sideLabel.trim() || '—';
       // Outline every chamber of the same station — getStationMeshes returns
       // every mesh sharing the (side, alias) of the hovered one, so the user
       // sees the full BIS / NSW / … ring, not just the single chamber under
       // the cursor. clearOutline first to drop any stale outline state, then
       // re-apply on the same call.
-      const stationMeshes = info ? getStationMeshes(mesh) : [mesh];
+      const stationMeshes = getStationMeshes(mesh);
       _finishHit({
         outlineAction: () => {
           clearOutline();
@@ -526,7 +536,7 @@ function doRaycast(clientX, clientY) {
         showHitArgs: {
           label: `Muon chamber — ${alias}`,
           coord,
-          valueText: info?.tech ?? '—',
+          valueText: info.tech ?? '—',
           keyText: 'tech',
         },
       });

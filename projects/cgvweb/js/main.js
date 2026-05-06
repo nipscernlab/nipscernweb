@@ -49,7 +49,11 @@ import {
   getTrackGroup,
 } from './visibility.js';
 import { createDownloadProgressController } from './downloadProgress.js';
-import { initTrackAtlasIntersections } from './trackAtlasIntersections.js';
+import {
+  initTrackAtlasIntersections,
+  updateTrackAtlasIntersections,
+} from './trackAtlasIntersections.js';
+import { isAnyMuonVisible, onMuonVisibilityChange } from './visibility/muonVisibility.js';
 import { clearOutline } from './outlines.js';
 import { initHoverTooltip, hideTooltip, tooltip, tipCellEl, tipEEl } from './hoverTooltip.js';
 import { initRenderLoop } from './renderLoop.js';
@@ -81,8 +85,6 @@ setupLanguagePicker();
 initMinimap();
 
 let sidebarControls = null;
-
-initTrackAtlasIntersections({ getTrackGroup });
 
 const sceneInit = setupSceneInit({ t });
 
@@ -257,6 +259,17 @@ setupMobileToolbar();
 // ── Slicer gizmo ──────────────────────────────────────────────────────────────
 // _cellCenter, _applySlicerMask, and all visibility logic live in visibility.js.
 
+// Slicer state changes (enable / disable / drag / muon-driven resize) need to
+// recompute BOTH calo-cell visibility (refreshSceneVisibility → applyThreshold)
+// AND muon-chamber visibility (updateTrackAtlasIntersections — owns the
+// show-all-chambers + wedge-mask pass). refreshSceneVisibility doesn't cascade
+// into the chamber pass because cell vs chamber pipelines are otherwise
+// independent; coupling them at the slicer hook keeps the rest decoupled.
+const onSlicerStateChanged = () => {
+  refreshSceneVisibility();
+  updateTrackAtlasIntersections();
+};
+
 const slicer = createSlicerController({
   THREE,
   camera,
@@ -264,12 +277,25 @@ const slicer = createSlicerController({
   controls,
   scene,
   slicerButton: document.getElementById('btn-slicer'),
-  onMaskChange: refreshSceneVisibility,
-  onDisable: refreshSceneVisibility,
+  onMaskChange: onSlicerStateChanged,
+  onDisable: onSlicerStateChanged,
   onHideNonActiveShowAll: hideNonActiveCells,
   markDirty,
   getActiveJetCollection,
+  isMuonOn: isAnyMuonVisible,
 });
+
+// Wire the muon-chamber pass to the slicer so show-all-cells mode drops the
+// track-hit gate on chambers and the wedge cut carves through them. Late
+// binding via getSlicer because slicer was just created above; the pass is
+// only invoked from applyMuonVisibility after the GLB has loaded, well past
+// the synchronous reach of this file.
+initTrackAtlasIntersections({ getTrackGroup, getSlicer: () => slicer });
+
+// User toggled a muon station (or the initial GLB load fired the first
+// applyMuonVisibility). Tell the slicer to grow/shrink its mask cylinder
+// and recenter — the chamber envelope dwarfs the calo when muon is on.
+onMuonVisibilityChange(() => slicer.refreshSize());
 
 // New event lands or user picks a different jet collection — if the slicer
 // is active, snap its walls to the new top-2 jets. No-op when slicer is
