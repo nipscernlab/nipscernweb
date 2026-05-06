@@ -69,6 +69,25 @@ function _cylIntersect(dx, dy, dz, r, halfH){
   return halfH / Math.abs(dz);
 }
 
+// Inner calo face — composite from CaloGeometry.glb with ATLAS-standard |η|
+// transitions (1.5 / 1.8). Dispatch is by |η|, kept in sync with bake.js and
+// js/particles/_internal.js. Used for γ/e label anchor positions.
+const CALO_BPS_R       = 1423.445;
+const CALO_ECPS_Z      = 3680.75;
+const CALO_ECSTRIP_Z   = 3754.240;
+const ETA_BPS_TO_ECPS    = 1.5;
+const ETA_ECPS_TO_STRIP  = 1.8;
+
+function _innerCaloFaceIntersect(dx, dy, dz){
+  const rT = Math.sqrt(dx*dx + dy*dy);
+  const dzAbs = Math.abs(dz);
+  if(rT < 1e-9) return CALO_ECSTRIP_Z / dzAbs;
+  const absEta = Math.asinh(dzAbs / rT);
+  if(absEta <= ETA_BPS_TO_ECPS)   return CALO_BPS_R / rT;
+  if(absEta <= ETA_ECPS_TO_STRIP) return CALO_ECPS_Z / dzAbs;
+  return CALO_ECSTRIP_Z / dzAbs;
+}
+
 // ── Billboard label sprite ────────────────────────────────────────────────────
 const _labelVec2 = new THREE.Vector2();
 function makeLabelSprite(text, hexColor){
@@ -340,29 +359,43 @@ async function main(){
   // ── Particle labels ───────────────────────────────────────────────────────────
   const labelGroup = new THREE.Group();
   labelGroup.renderOrder = 10;
-  const CALO_IN_R = 1421.73, CALO_IN_Z = 3680.75;
   const MUON_R = 10000, MUON_Z = 22000;
   const LABEL_OFFSET = 180; // mm, radial push so label clears the line
 
-  function labelPos(eta, phi, r, halfH, offset){
+  function labelPosFromT(eta, phi, t, offset){
     const theta = 2 * Math.atan(Math.exp(-eta));
     const sinT = Math.sin(theta);
     const dx = -sinT * Math.cos(phi);
     const dy = -sinT * Math.sin(phi);
     const dz =  Math.cos(theta);
-    const t = _cylIntersect(dx, dy, dz, r, halfH);
     const px = dx*t, py = dy*t, pz = dz*t;
     const rxy = Math.hypot(px, py);
     const nx = rxy > 1e-6 ? px/rxy : 1;
     const ny = rxy > 1e-6 ? py/rxy : 0;
     return new THREE.Vector3(px + nx*offset, py + ny*offset, pz);
   }
+  function caloLabelPos(eta, phi, offset){
+    const theta = 2 * Math.atan(Math.exp(-eta));
+    const sinT = Math.sin(theta);
+    const dx = -sinT * Math.cos(phi);
+    const dy = -sinT * Math.sin(phi);
+    const dz =  Math.cos(theta);
+    return labelPosFromT(eta, phi, _innerCaloFaceIntersect(dx, dy, dz), offset);
+  }
+  function muonLabelPos(eta, phi, offset){
+    const theta = 2 * Math.atan(Math.exp(-eta));
+    const sinT = Math.sin(theta);
+    const dx = -sinT * Math.cos(phi);
+    const dy = -sinT * Math.sin(phi);
+    const dz =  Math.cos(theta);
+    return labelPosFromT(eta, phi, _cylIntersect(dx, dy, dz, MUON_R, MUON_Z), offset);
+  }
 
   // Photon labels — γ at the inner calo face
   if(header.photonList){
     for(const {eta, phi} of header.photonList){
       const sprite = makeLabelSprite('γ', 0xffcc00);
-      sprite.position.copy(labelPos(eta, phi, CALO_IN_R, CALO_IN_Z, LABEL_OFFSET));
+      sprite.position.copy(caloLabelPos(eta, phi, LABEL_OFFSET));
       labelGroup.add(sprite);
     }
   }
@@ -372,7 +405,7 @@ async function main(){
     for(const {eta, phi, pdgId} of header.electronList){
       const isNeg = pdgId != null ? pdgId < 0 : true;
       const sprite = makeLabelSprite(isNeg ? 'e-' : 'e+', isNeg ? 0xff3030 : 0x33dd55);
-      sprite.position.copy(labelPos(eta, phi, CALO_IN_R, CALO_IN_Z, LABEL_OFFSET));
+      sprite.position.copy(caloLabelPos(eta, phi, LABEL_OFFSET));
       labelGroup.add(sprite);
     }
   }
@@ -383,7 +416,7 @@ async function main(){
       const isNeg = pdgId != null ? pdgId < 0 : null;
       const text = isNeg === null ? 'μ' : isNeg ? 'μ-' : 'μ+';
       const sprite = makeLabelSprite(text, 0x4a90d9);
-      sprite.position.copy(labelPos(eta, phi, MUON_R, MUON_Z, LABEL_OFFSET));
+      sprite.position.copy(muonLabelPos(eta, phi, LABEL_OFFSET));
       labelGroup.add(sprite);
     }
   }

@@ -47,18 +47,27 @@ const _trackAtlasSegB = new THREE.Vector3();
 const _trackAtlasDir = new THREE.Vector3();
 const _trackAtlasTrackBox = new THREE.Box3();
 const _trackAtlasEdgeGeoCache = new Map();
+// Shared sentinel for tracks that touch zero chambers — lets the per-track
+// `if (cached.size === 0) continue;` short-circuit work without each empty
+// track allocating its own Set.
+const _EMPTY_CHAMBER_SET = new Set();
 
 let atlasRoot = null;
 let _trackAtlasNodes = null;
 let _trackAtlasMeshes = null;
 let _trackAtlasOutlineMeshes = null;
+/** @type {Set<any> | null} */
+let _trackAtlasOutlineMeshSet = null;
 let _trackAtlasMeshBoxes = null;
 
 let _getTrackGroup = () => null;
+/** @type {() => any} */
+let _getSlicer = () => null;
 
-/** @param {{ getTrackGroup: () => any }} deps */
-export function initTrackAtlasIntersections({ getTrackGroup }) {
+/** @param {{ getTrackGroup: () => any, getSlicer?: () => any }} deps */
+export function initTrackAtlasIntersections({ getTrackGroup, getSlicer }) {
   _getTrackGroup = getTrackGroup;
+  if (getSlicer) _getSlicer = getSlicer;
   // Cascade init to the sibling track-match module so consumers only call
   // one init at startup (see main.js).
   initTrackMatch({ getTrackGroup });
@@ -69,7 +78,13 @@ export function setAtlasRoot(tree) {
   _trackAtlasNodes = null;
   _trackAtlasMeshes = null;
   _trackAtlasOutlineMeshes = null;
+  _trackAtlasOutlineMeshSet = null;
   _trackAtlasMeshBoxes = null;
+  // Chamber meshes change with a new atlas tree → per-track chamber caches
+  // are stale. Lines stay between events; explicit reset here. (Fresh-event
+  // path goes through clearTracks → new line objects → no cache to drop.)
+  const tg = _getTrackGroup?.();
+  if (tg) for (const line of tg.children) line.userData._atlasChambers = null;
 }
 
 /**
@@ -222,6 +237,10 @@ function _resolveTrackAtlasTargets() {
   _trackAtlasNodes = nodes;
   _trackAtlasMeshes = meshes;
   _trackAtlasOutlineMeshes = outlineMeshes;
+  // O(1) membership lookup for the show-all visibility loop below — used to
+  // restrict slicer-mode rendering to outer chamber boxes only (skip the
+  // inner-leaf hierarchy that would otherwise show through the cut faces).
+  _trackAtlasOutlineMeshSet = new Set(outlineMeshes);
   return { nodes, meshes, outlineMeshes };
 }
 
@@ -249,64 +268,108 @@ export function updateTrackAtlasIntersections() {
   const hitMeshes = new Set();
   const hitTracks = new Set();
 
-  if (allTracks.length) {
+  // Slicer state — when active in show-all mode, every chamber the panel
+  // allows is shown (no track-hit gate) and the wedge cut carves through them
+  // just like through calo cells.
+  const slicer = _getSlicer();
+  const slicerMask = slicer?.getMaskState() ?? null;
+  const showAllChambers = !!slicer?.isShowAllCells();
+
+  if (allTracks.length || slicerMask?.active) {
     scene.updateMatrixWorld(true);
 
     // Cache world-space AABBs for all target meshes once (static geometry).
+    // Needed both for per-track raycast AABB pre-filter and for the per-mesh
+    // wedge-mask centre test below.
     if (!_trackAtlasMeshBoxes) {
       _trackAtlasMeshBoxes = meshes.map((m) => new THREE.Box3().setFromObject(m));
     }
+  }
 
+  if (allTracks.length) {
     for (const line of allTracks) {
-      const pos = line.geometry?.getAttribute('position');
-      if (!pos || pos.count < 2) continue;
+      // Per-track chamber-hit cache. The geometric question "which chambers
+      // does this polyline pass through?" is fully determined by the line's
+      // (immutable) vertex buffer and the chamber meshes' (also static)
+      // world transforms — neither changes between slider ticks. Compute
+      // once on first encounter, reuse forever. Drops the dominant cost of
+      // applyTrackThreshold from ~150 ms to <1 ms per call on busy events
+      // (979 tracks × ray-vs-mesh-triangles → cached Set lookup).
+      let cached = line.userData._atlasChambers;
+      if (!cached) {
+        const pos = line.geometry?.getAttribute('position');
+        if (!pos || pos.count < 2) {
+          line.userData._atlasChambers = _EMPTY_CHAMBER_SET;
+          continue;
+        }
+        cached = new Set();
 
-      // Compute track world-space AABB to pre-filter candidate meshes.
-      _trackAtlasTrackBox.makeEmpty();
-      for (let i = 0; i < pos.count; i++) {
-        _trackAtlasSegA.fromBufferAttribute(pos, i).applyMatrix4(line.matrixWorld);
-        _trackAtlasTrackBox.expandByPoint(_trackAtlasSegA);
+        // Compute track world-space AABB to pre-filter candidate meshes.
+        _trackAtlasTrackBox.makeEmpty();
+        for (let i = 0; i < pos.count; i++) {
+          _trackAtlasSegA.fromBufferAttribute(pos, i).applyMatrix4(line.matrixWorld);
+          _trackAtlasTrackBox.expandByPoint(_trackAtlasSegA);
+        }
+
+        // Only test meshes whose AABB overlaps this track's AABB.
+        const nearMeshes = [];
+        for (let mi = 0; mi < meshes.length; mi++) {
+          if (_trackAtlasMeshBoxes[mi].intersectsBox(_trackAtlasTrackBox))
+            nearMeshes.push(meshes[mi]);
+        }
+
+        if (nearMeshes.length) {
+          for (let i = 0; i < pos.count - 1; i++) {
+            _trackAtlasSegA.fromBufferAttribute(pos, i).applyMatrix4(line.matrixWorld);
+            _trackAtlasSegB.fromBufferAttribute(pos, i + 1).applyMatrix4(line.matrixWorld);
+            _trackAtlasDir.subVectors(_trackAtlasSegB, _trackAtlasSegA);
+            const len = _trackAtlasDir.length();
+            if (len <= 1e-6) continue;
+            _trackAtlasDir.multiplyScalar(1 / len);
+            _trackAtlasRay.set(_trackAtlasSegA, _trackAtlasDir);
+            _trackAtlasRay.far = len;
+            for (const hit of _trackAtlasRay.intersectObjects(nearMeshes, false))
+              cached.add(hit.object);
+          }
+        }
+        line.userData._atlasChambers = cached.size === 0 ? _EMPTY_CHAMBER_SET : cached;
       }
 
-      // Only test meshes whose AABB overlaps this track's AABB.
-      const nearMeshes = [];
-      for (let mi = 0; mi < meshes.length; mi++) {
-        if (_trackAtlasMeshBoxes[mi].intersectsBox(_trackAtlasTrackBox))
-          nearMeshes.push(meshes[mi]);
-      }
-      if (!nearMeshes.length) continue;
+      if (cached.size === 0) continue;
 
       // Track contributes to chamber lighting iff its line is rendered
       // (or in the "hide line, keep physics" mode). Geometric isHitTrack
       // is recorded for every track regardless.
       const lightsChambers = line.visible || line.userData.particleHidden;
-      let lineHit = false;
-      for (let i = 0; i < pos.count - 1; i++) {
-        _trackAtlasSegA.fromBufferAttribute(pos, i).applyMatrix4(line.matrixWorld);
-        _trackAtlasSegB.fromBufferAttribute(pos, i + 1).applyMatrix4(line.matrixWorld);
-        _trackAtlasDir.subVectors(_trackAtlasSegB, _trackAtlasSegA);
-        const len = _trackAtlasDir.length();
-        if (len <= 1e-6) continue;
-        _trackAtlasDir.multiplyScalar(1 / len);
-        _trackAtlasRay.set(_trackAtlasSegA, _trackAtlasDir);
-        _trackAtlasRay.far = len;
-        for (const hit of _trackAtlasRay.intersectObjects(nearMeshes, false)) {
-          if (lightsChambers) hitMeshes.add(hit.object);
-          lineHit = true;
-        }
-      }
-      if (lineHit) hitTracks.add(line);
+      if (lightsChambers) for (const m of cached) hitMeshes.add(m);
+      hitTracks.add(line);
     }
   }
 
-  // A muon chamber shows only when a track passes through it AND the user
-  // hasn't turned that station off in the layers panel
-  // (mesh.userData.muonForceVisible). Defaults to AND-true so the prior
-  // hit-driven behaviour is preserved out of the box; flipping a panel toggle
-  // off vetoes the chamber even when a track hits it.
+  // Per-chamber visibility rule:
+  //   - Default: shown when a track passes through it AND the layers-panel
+  //     toggle for its station is on (mesh.userData.muonForceVisible).
+  //   - Show-all (slicer active): track-hit gate is dropped — every OUTER
+  //     chamber the panel allows shows up. Inner-leaf meshes (the deeper
+  //     hierarchy) stay hidden because they'd render as overlapping shapes
+  //     inside the outer box. The wedge then carves chambers whose AABB
+  //     centre falls inside the cut, mirroring how cells behave.
   let changed = false;
-  for (const mesh of meshes) {
-    const next = hitMeshes.has(mesh) && !!mesh.userData.muonForceVisible;
+  for (let mi = 0; mi < meshes.length; mi++) {
+    const mesh = meshes[mi];
+    const baseShow = showAllChambers
+      ? (_trackAtlasOutlineMeshSet?.has(mesh) ?? false)
+      : hitMeshes.has(mesh);
+    let next = baseShow && !!mesh.userData.muonForceVisible;
+    if (next && slicerMask?.active) {
+      const box = _trackAtlasMeshBoxes?.[mi];
+      if (box) {
+        const cx = (box.min.x + box.max.x) * 0.5;
+        const cy = (box.min.y + box.max.y) * 0.5;
+        const cz = (box.min.z + box.max.z) * 0.5;
+        if (slicer.isPointInsideWedge(cx, cy, cz, slicerMask)) next = false;
+      }
+    }
     if (mesh.visible !== next) {
       mesh.visible = next;
       changed = true;

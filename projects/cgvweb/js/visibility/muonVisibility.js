@@ -32,6 +32,8 @@ import { setupMuonAliasMap } from './muonAliases.js';
 let _muonAtlasTrees = { aSide: null, cSide: null };
 /** @type {MuonChangeListener[]} */
 const _muonChangeListeners = [];
+/** @type {Array<() => void>} */
+const _muonVisibilityListeners = [];
 
 /**
  * Registers the A/C atlas subtrees, rebuilds the layerVis.muon mirror, and
@@ -59,6 +61,27 @@ export function getMuonAtlasTrees() {
 /** @param {MuonChangeListener} cb */
 export function onMuonTreesChange(cb) {
   _muonChangeListeners.push(cb);
+}
+
+/**
+ * Subscribe to per-toggle changes in layerVis.muon (every applyMuonVisibility
+ * call fires listeners). Used by the slicer to grow/shrink its mask cylinder
+ * when the user enables/disables muon stations.
+ * @param {() => void} cb
+ */
+export function onMuonVisibilityChange(cb) {
+  _muonVisibilityListeners.push(cb);
+}
+
+/**
+ * True when any muon station leaf in either A- or C-side panel state is on.
+ * Cheap to call (recursive boolean walk over a small tree).
+ */
+export function isAnyMuonVisible() {
+  /** @type {any} */
+  const lv = layerVis;
+  if (!lv?.muon) return false;
+  return _muonStateAnyOn(lv.muon.aSide) || _muonStateAnyOn(lv.muon.cSide);
 }
 
 /**
@@ -122,4 +145,5 @@ export function applyMuonVisibility() {
   _applyMuonNode(_muonAtlasTrees.cSide, lv.muon.cSide);
   updateTrackAtlasIntersections();
   markDirty();
+  for (const cb of _muonVisibilityListeners) cb();
 }

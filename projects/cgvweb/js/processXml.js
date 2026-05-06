@@ -64,6 +64,7 @@ import {
   clearMuons,
   clearJets,
   clearTaus,
+  withSuppressedCaloBoundRefresh,
 } from './particles.js';
 import { parseJets } from './parsers/jetParser.js';
 import {
@@ -234,13 +235,17 @@ export async function processXml(xmlText) {
     _deps.trackPtSlider.update(0, ptMax);
   }
   drawTracks(rawTracks);
-  drawPhotons(rawPhotons);
   drawElectrons(rawElectrons);
   // Muons parsed JS-side (the WASM worker doesn't extract them yet). The
   // <Muon> regex pass over xmlText is cheap — typically 0-3 muons per event.
   drawMuons(parseMuons(xmlText));
 
-  // ── Cluster η/φ lines ────────────────────────────────────────────────────────
+  // Calo-face-bound particle drawing (γ spring / cluster / τ / jet η-φ lines)
+  // is deferred until after applyThreshold below — those endpoints raycast
+  // against rayTargets to land on the first VISIBLE cell, so the cells must
+  // be in their energized matrices first. Parse the xml-derived bits now (cheap
+  // regex passes) and stash them; setLastClusterData / cluster-slider update
+  // are ok here since they don't draw.
   setLastClusterData({ collections: _clusterCollections });
   if (rawClusters.length) {
     let etMin = Infinity,
@@ -254,26 +259,8 @@ export async function processXml(xmlText) {
       etMax === -Infinity ? 1 : etMax,
     );
   }
-  // drawClusters → applyClusterThreshold internally rebuilds the cluster
-  // cell-id set and refreshes thresholds; no extra rebuildActiveClusterCellIds
-  // call is needed here.
-  drawClusters(rawClusters);
-
-  // ── Hadronic τ candidates (TauJets_xAOD) ──────────────────────────────────
-  // 6-9 per event typical. drawTaus also re-runs the τ→track colour sync so
-  // tracks attached to a τ pick up the purple material. Drawn BEFORE
-  // setJetCollections so the L3 ET-slider listener (in detectorPanels.js)
-  // can pick up τ pT values via getLastTaus when it recomputes the range —
-  // τs share the same slider as jets.
-  drawTaus(parseTaus(xmlText));
-
-  // ── Jets ────────────────────────────────────────────────────────────────────
-  // The Rust WASM parser doesn't extract jets yet — do a light JS pass over
-  // the same xmlText (regex-based, jets are a tiny fraction of the file).
-  // setJetCollections triggers onJetStateChange (installed at module load
-  // below); the listener handles the redraw, both for fresh events and when
-  // the user later picks a different collection.
-  setJetCollections(parseJets(xmlText));
+  const tausParsed = parseTaus(xmlText);
+  const jetsParsed = parseJets(xmlText);
 
   // ── Inner-detector + muon-spectrometer hits ───────────────────────────────
   // The WASM worker parses these in parallel and posts a separate
@@ -489,6 +476,21 @@ export async function processXml(xmlText) {
     fcalCells.length > 0,
   );
   applyThreshold();
+
+  // Calo-bound particle endpoints (γ / clusters / τ / jets) — drawn AFTER
+  // applyThreshold so _firstVisibleCellHit can raycast against the now-
+  // energized cells. Wrapped in withSuppressedCaloBoundRefresh so the inner
+  // applyClusterThreshold / applyJetThreshold / applyFcalThreshold calls
+  // don't each kick off an additional full refresh of all four particle
+  // groups. Order preserves the drawTaus → setJetCollections dependency
+  // (the L3 ET-slider listener fired by setJetCollections reads getLastTaus()).
+  withSuppressedCaloBoundRefresh(() => {
+    drawPhotons(rawPhotons);
+    drawClusters(rawClusters);
+    drawTaus(tausParsed);
+    setJetCollections(jetsParsed);
+  });
+
   showEventInfo(currentEventInfo);
   updateMinimap({ active, fcalCells, clusters: rawClusters });
 }

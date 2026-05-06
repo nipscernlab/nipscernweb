@@ -8,7 +8,7 @@
 // names match the regexes but are not actual cells).
 //
 // Tile layer numbers `x` in the mesh prefix `T{x}{y}{k}_{k}` follow the
-// build sequence in const/CaloBuild.C; the sampling tag is the standard
+// build sequence in tools/const/CaloBuild.C; the sampling tag is the standard
 // A/BC/B/D/E (and inner/outer for MBTS modules at x=14/15).
 //   x=1   → barrel/A     x=23 → barrel/BC   x=4 → barrel/D
 //   x=5   → extended/A   x=6  → extended/B  x=7 → extended/D
