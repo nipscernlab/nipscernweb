@@ -479,7 +479,20 @@
             Cluster
           </div>
         </div>
-        <select id="jet-collection-select" class="jet-coll-select" style="display: none"></select>
+        <!-- Custom jet-collection dropdown (replaces native <select>) -->
+        <button
+          id="jet-coll-trigger"
+          class="jet-coll-trigger"
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          style="display: none"
+        >
+          <span class="jet-coll-label" id="jet-coll-label">—</span>
+          <svg class="jet-coll-chev" viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
         <div class="det-pane" id="pane-cluster">
           <div class="sval" id="cluster-sval-max">– GeV</div>
           <div
@@ -742,6 +755,11 @@
         </svg>
       </button>
     </div>
+
+    <!-- ── Jet collection dropdown (custom popover, anchored to #jet-coll-trigger) ─
+         Lives at <body> root so it escapes the backdrop-filter containing
+         block on #rpanel2 (which would otherwise trap position:fixed). -->
+    <div id="jet-coll-menu" class="jet-coll-menu" role="listbox"></div>
 
     <!-- ── Language dropdown ──────────────────────────────────── -->
     <div id="lang-menu">

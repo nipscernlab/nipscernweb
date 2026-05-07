@@ -16,7 +16,9 @@ export function setupTopToolbar({ resetCamera }) {
   const rpanel2 = document.getElementById('rpanel2');
   const tabLabel = document.getElementById('cluster-tab-label');
   const strak = document.getElementById('cluster-strak');
-  const jetSelect = document.getElementById('jet-collection-select');
+  const jetTrigger = document.getElementById('jet-coll-trigger');
+  const jetLabel = document.getElementById('jet-coll-label');
+  const jetMenu = document.getElementById('jet-coll-menu');
 
   // Panel skin per level: cluster (red) at L2, jet (cyan) at L3, hidden at L1.
   const PANEL_SKIN = {
@@ -29,7 +31,8 @@ export function setupTopToolbar({ resetCamera }) {
     const skin = PANEL_SKIN[lvl];
     if (!skin) {
       if (rpanel2) rpanel2.style.display = 'none';
-      if (jetSelect) jetSelect.style.display = 'none';
+      if (jetTrigger) jetTrigger.style.display = 'none';
+      closeJetMenu();
       return;
     }
     if (rpanel2) rpanel2.style.display = '';
@@ -41,30 +44,114 @@ export function setupTopToolbar({ resetCamera }) {
       strak.style.background = `linear-gradient(to top, ${skin.gradFrom} 0%, ${skin.gradTo} 100%)`;
     // Dropdown only shows at level 3 and only when there's at least one
     // collection in the current event.
-    if (jetSelect) {
-      jetSelect.style.display = lvl === 3 && getJetCollections().length ? '' : 'none';
+    if (jetTrigger) {
+      const show = lvl === 3 && getJetCollections().length;
+      jetTrigger.style.display = show ? '' : 'none';
+      if (!show) closeJetMenu();
     }
   }
 
-  // Re-populate the <option>s whenever the parsed jet collections change.
-  // Keeps the user's selected key in sync via the jets module.
+  // ── Custom dropdown logic ──────────────────────────────
+  function closeJetMenu() {
+    if (!jetMenu) return;
+    jetMenu.classList.remove('open');
+    if (jetTrigger) jetTrigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function positionJetMenu() {
+    if (!jetMenu || !jetTrigger) return;
+    const br = jetTrigger.getBoundingClientRect();
+    const mw = jetMenu.offsetWidth;
+    const mh = jetMenu.offsetHeight;
+    // Anchor the menu's top-right to the trigger's bottom-right, then
+    // clamp so it never spills off-screen (top/left fallback handled too).
+    let left = br.right - mw;
+    let top = br.bottom + 6;
+    left = Math.max(6, Math.min(left, window.innerWidth - mw - 6));
+    if (top + mh > window.innerHeight - 6) {
+      // Flip above the trigger if there isn't room below.
+      top = Math.max(6, br.top - mh - 6);
+    }
+    jetMenu.style.left = `${left}px`;
+    jetMenu.style.top = `${top}px`;
+  }
+
+  function openJetMenu() {
+    if (!jetMenu || !jetTrigger) return;
+    // Display first so we can measure, then position, then add .open
+    // on the next frame to let the animation play from the start state.
+    jetMenu.style.display = 'flex';
+    jetMenu.style.visibility = 'hidden';
+    positionJetMenu();
+    jetMenu.style.visibility = '';
+    requestAnimationFrame(() => {
+      jetMenu.classList.add('open');
+      jetTrigger.setAttribute('aria-expanded', 'true');
+    });
+  }
+
+  // Re-populate the menu rows whenever the parsed jet collections change.
+  // Keeps the trigger label in sync with the active key.
   function syncJetSelectOptions() {
-    if (!jetSelect) return;
+    if (!jetMenu || !jetTrigger || !jetLabel) return;
     const colls = getJetCollections();
     const activeKey = getActiveJetKey();
-    jetSelect.innerHTML = '';
+    jetMenu.innerHTML = '';
     for (const c of colls) {
-      const opt = document.createElement('option');
-      opt.value = c.key;
-      opt.textContent = `${c.key}  (${c.jets.length})`;
-      if (c.key === activeKey) opt.selected = true;
-      jetSelect.appendChild(opt);
+      const opt = document.createElement('button');
+      opt.type = 'button';
+      opt.className = 'jet-coll-opt';
+      opt.setAttribute('role', 'option');
+      opt.dataset.key = c.key;
+      if (c.key === activeKey) {
+        opt.classList.add('on');
+        opt.setAttribute('aria-selected', 'true');
+      }
+      const name = document.createElement('span');
+      name.className = 'jet-coll-opt-name';
+      name.textContent = c.key;
+      const count = document.createElement('span');
+      count.className = 'jet-coll-opt-count';
+      count.textContent = c.jets.length;
+      opt.appendChild(name);
+      opt.appendChild(count);
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setActiveJetKey(c.key);
+        closeJetMenu();
+      });
+      jetMenu.appendChild(opt);
     }
-    // Hidden when no collections; visibility itself driven by syncRightPanelSkin.
+    // Update the trigger label with the active collection key.
+    jetLabel.textContent = activeKey || '—';
+    // If menu is open while options changed, re-clamp position.
+    if (jetMenu.classList.contains('open')) positionJetMenu();
     syncRightPanelSkin();
   }
-  if (jetSelect) {
-    jetSelect.addEventListener('change', () => setActiveJetKey(jetSelect.value));
+  if (jetTrigger && jetMenu) {
+    jetTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (jetMenu.classList.contains('open')) closeJetMenu();
+      else openJetMenu();
+    });
+    document.addEventListener('click', (e) => {
+      if (!jetMenu.classList.contains('open')) return;
+      if (e.target === jetMenu || jetMenu.contains(e.target)) return;
+      closeJetMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && jetMenu.classList.contains('open')) closeJetMenu();
+    });
+    window.addEventListener('resize', () => {
+      if (jetMenu.classList.contains('open')) positionJetMenu();
+    });
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (jetMenu.classList.contains('open')) positionJetMenu();
+      },
+      true,
+    );
     onJetStateChange(syncJetSelectOptions);
     syncJetSelectOptions();
   }
