@@ -74,6 +74,7 @@ import { setupLayersPanel } from './bootstrap/layersPanel.js';
 import { setupHelpersPanel } from './bootstrap/helpersPanel.js';
 import { setupModeWiring } from './bootstrap/modeWiring.js';
 import { setupSceneInit } from './bootstrap/sceneInit.js';
+import { setupRowToggle } from './bootstrap/rowToggle.js';
 
 let LivePoller = null;
 try {
@@ -236,6 +237,7 @@ setProcessXmlDeps({
 });
 
 setupButtonTooltips();
+setupRowToggle();
 
 const modeWiring = setupModeWiring({
   LivePoller,

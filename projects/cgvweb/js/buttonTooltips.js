@@ -41,13 +41,27 @@ export function setupButtonTooltips() {
     else btnTipEl.textContent = text;
     btnTipEl.classList.add('show');
     const ar = anchor.getBoundingClientRect();
-    const tw = btnTipEl.offsetWidth,
-      th = btnTipEl.offsetHeight,
-      gap = 8;
-    let left, top;
+    const tw = btnTipEl.offsetWidth;
+    const th = btnTipEl.offsetHeight;
+    const gap = 8;
+    let left;
+    let top;
+
+    // Detect activity-bar orientation: vertical (left edge) vs. horizontal
+    // (mobile dock at the bottom). Anchored buttons inside #toolbar get
+    // tooltips positioned accordingly; everything else uses right-of.
+    const tb = document.getElementById('toolbar');
+    const tbr = tb ? tb.getBoundingClientRect() : { left: 0, height: 0, width: 0 };
+    const isVerticalDock = tbr.left < 8 && tbr.height > tbr.width;
+
     if (anchor.closest('#toolbar')) {
-      left = ar.left + ar.width / 2 - tw / 2;
-      top = ar.top - th - gap;
+      if (isVerticalDock) {
+        left = ar.right + gap;
+        top = ar.top + ar.height / 2 - th / 2;
+      } else {
+        left = ar.left + ar.width / 2 - tw / 2;
+        top = ar.top - th - gap;
+      }
     } else {
       left = ar.right + gap;
       top = ar.top + ar.height / 2 - th / 2;

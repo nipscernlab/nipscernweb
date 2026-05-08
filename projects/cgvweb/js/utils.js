@@ -62,9 +62,19 @@ export function esc(s) {
 
 /**
  * Build a relative-time formatter bound to a translator. The returned
- * function takes a past Unix-ms timestamp and returns "just now" for
- * anything under 10s, then Ns/Nm/Nh buckets using the translator's
- * suffix strings.
+ * function takes a past Unix-ms timestamp and walks the bucket ladder
+ * once, promoting to a coarser unit at each boundary:
+ *
+ *   < 10 s            → "just now"
+ *   < 60 s            → Ns
+ *   < 60 min          → Nm
+ *   < 24 h            → Nh
+ *   < 30 days         → Nd
+ *   < 365 days        → Nmo  (months, using a flat 30-day month)
+ *   ≥ 365 days        → Ny
+ *
+ * The 30-day month is a deliberate simplification — exact calendar
+ * arithmetic isn't worth the cognitive load for an "X ago" badge.
  *
  * @param {Translator} t
  * @returns {(ts: number) => string}
@@ -75,7 +85,10 @@ export function makeRelTime(t) {
     if (s < 10) return t('just-now');
     if (s < 60) return `${Math.floor(s)}${t('s-ago')}`;
     if (s < 3600) return `${Math.floor(s / 60)}${t('m-ago')}`;
-    return `${Math.floor(s / 3600)}${t('h-ago')}`;
+    if (s < 86400) return `${Math.floor(s / 3600)}${t('h-ago')}`;
+    if (s < 30 * 86400) return `${Math.floor(s / 86400)}${t('d-ago')}`;
+    if (s < 365 * 86400) return `${Math.floor(s / (30 * 86400))}${t('mo-ago')}`;
+    return `${Math.floor(s / (365 * 86400))}${t('y-ago')}`;
   };
 }
 

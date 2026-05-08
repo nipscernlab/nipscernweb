@@ -1,28 +1,84 @@
-/* ── Prussian Blue Variables ─────────────────────────── */
+/* ───────────────────────────────────────────────────────────
+   CGV — Design tokens & base reset
+   Calm, high-contrast dark UI. Surfaces stay dim so the 3-D scene
+   carries the gaze; chrome intervenes only where it adds meaning.
+   ─────────────────────────────────────────────────────────── */
+
 :root {
-  --bg: #020d1c;
-  --panel: rgba(2, 16, 38, 0.62);
-  --border: rgba(22, 72, 168, 0.22);
-  --border2: rgba(22, 72, 168, 0.42);
-  --text: #93bade;
-  --muted: #2c5270;
-  --dim: #162e45;
-  --bright: #d6eaff;
-  --accent: #1a52c0;
-  --accent2: #2467e0;
-  --ok: #27b568;
-  --warn: #c87c18;
-  --err: #c42e2e;
-  --font: 'Inter', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', 'Courier New', monospace;
-  --blur: blur(26px) saturate(1.8);
-  --r: 10px;
-  --pw: 245px;
-  --rpw: 76px;
-  --pt: 0.34s;
+  /* ── Surfaces ────────────────────────────────────────── */
+  --bg: #0e1014; /* canvas backdrop */
+  --surface-0: #11141a; /* activity bar */
+  --surface-1: #161a21; /* sidebar / right dock */
+  --surface-2: #1b2029; /* popovers / dialogs */
+  --surface-3: #232934; /* raised cards */
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  --surface-active: rgba(255, 255, 255, 0.07);
+
+  /* ── Border / divider ────────────────────────────────── */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --divider: rgba(255, 255, 255, 0.04);
+
+  /* ── Foreground ──────────────────────────────────────── */
+  --bright: #f4f6fa; /* highest-emphasis */
+  --text: #d3d7de; /* primary body */
+  --muted: #828a96; /* secondary */
+  --dim: #50596a; /* tertiary, hints */
+
+  /* ── Accent (electric blue, restrained) ──────────────── */
+  --accent: #6398ff;
+  --accent-strong: #4d83ee;
+  --accent-soft: rgba(99, 152, 255, 0.1);
+  --accent-edge: rgba(99, 152, 255, 0.32);
+  --accent-text: #93b6ff;
+
+  /* ── Status colors ───────────────────────────────────── */
+  --ok: #4eba7d;
+  --warn: #d4a045;
+  --err: #e3776a;
+
+  /* ── Detector colors (physics-meaningful, kept) ──────── */
+  --c-tile: #f0a050;
+  --c-lar: #4dd680;
+  --c-fcal: #cd8e4f;
+  --c-hec: #6bd4ed;
+  --c-track: #f0d040;
+  --c-cluster: #ff5a3a;
+  --c-jet: #ffa040;
+
+  /* ── Typography ──────────────────────────────────────── */
+  --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --fs-xs: 10.5px;
+  --fs-sm: 11.5px;
+  --fs-md: 12.5px;
+  --fs-lg: 14px;
+  --fs-xl: 16px;
+
+  /* ── Geometry ────────────────────────────────────────── */
+  --r-sm: 4px;
+  --r: 6px;
+  --r-lg: 10px;
+
+  /* ── Activity bar / panel widths ─────────────────────── */
+  --ab-w: 44px; /* activity bar width (desktop) */
+  --pw: 292px; /* sidebar width — overridden via JS */
+  --rpw: 78px; /* right dock card width */
+
+  /* ── Motion ──────────────────────────────────────────── */
+  --motion-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-slow: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  --pt: 320ms; /* legacy alias used by panel slide */
+
+  /* ── Effects ─────────────────────────────────────────── */
+  --shadow-1: 0 2px 8px rgba(0, 0, 0, 0.32);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --blur: blur(18px) saturate(1.4);
 }
 
-/* ── Reset ───────────────────────────────────────────── */
+/* ── Reset ─────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -30,27 +86,32 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 html,
 body {
   height: 100%;
 }
+
 html {
-  /* Bumped from the browser default (16px) so every rem-based size used
-         throughout the UI grows proportionally without per-rule edits. */
-  font-size: 18px;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
+
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
+  font-size: var(--fs-md);
+  line-height: 1.45;
   overflow: hidden;
 }
+
 [hidden] {
   display: none !important;
 }
+
 canvas {
   display: block;
   position: fixed;
@@ -58,30 +119,96 @@ canvas {
   width: 100%;
   height: 100%;
 }
+
 button {
-  font-family: var(--font);
+  font-family: inherit;
+  font-size: inherit;
   cursor: pointer;
   background: none;
   border: none;
   outline: none;
+  color: inherit;
 }
+
 input {
-  font-family: var(--mono);
+  font-family: inherit;
   outline: none;
+  color: inherit;
 }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 svg.defs {
   display: none;
 }
+
 .ic {
   display: inline-block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   stroke: currentColor;
   fill: none;
-  stroke-width: 1.8;
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
   vertical-align: middle;
   flex-shrink: 0;
-  overflow: visible;
+}
+
+/* Focus rings — keyboard only. */
+:focus-visible {
+  outline: 2px solid var(--accent-edge);
+  outline-offset: 1px;
+  border-radius: var(--r-sm);
+}
+
+/* Scrollbars — minimal, only on overflow */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* Utility — reusable subtle dividers between text blocks. */
+.divider {
+  height: 1px;
+  background: var(--divider);
+  border: 0;
+}
+
+/* Status text colors (used inline by setStatus()) */
+.ok {
+  color: var(--ok);
+}
+.warn {
+  color: var(--warn);
+}
+.err {
+  color: var(--err);
+}
+
+/* Selection */
+::selection {
+  background: rgba(99, 152, 255, 0.32);
+  color: var(--bright);
 }

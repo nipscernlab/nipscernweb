@@ -57,13 +57,23 @@ export function setupLanguagePicker() {
     if (!open) return;
 
     const br = langButton.getBoundingClientRect();
-    const mw = langMenu.offsetWidth || 140;
-    const mh = langMenu.offsetHeight || 110;
-    let left = br.left + br.width / 2 - mw / 2;
-    let top = br.top - mh - 10;
+    const mw = langMenu.offsetWidth || 158;
+    const mh = langMenu.offsetHeight || 138;
+    const tb = document.getElementById('toolbar');
+    const tbr = tb ? tb.getBoundingClientRect() : { left: 0, height: 0, width: 0 };
+    const isVerticalDock = tbr.left < 8 && tbr.height > tbr.width;
 
-    left = Math.max(6, Math.min(left, window.innerWidth - mw - 6));
-    top = Math.max(6, top);
+    let left;
+    let top;
+    if (isVerticalDock) {
+      left = Math.min(window.innerWidth - mw - 8, br.right + 8);
+      top = br.top + br.height / 2 - mh / 2;
+    } else {
+      left = br.left + br.width / 2 - mw / 2;
+      top = br.top - mh - 10;
+    }
+    left = Math.max(8, Math.min(left, window.innerWidth - mw - 8));
+    top = Math.max(8, Math.min(top, window.innerHeight - mh - 8));
 
     langMenu.style.left = `${left}px`;
     langMenu.style.top = `${top}px`;

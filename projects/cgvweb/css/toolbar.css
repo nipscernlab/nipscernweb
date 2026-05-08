@@ -1,190 +1,247 @@
-/* ── Bottom-center toolbar ────────────────────────────── */
+/* ───────────────────────────────────────────────────────────
+   Activity bar — vertical icon strip pinned to the left edge.
+   Element id is #toolbar (kept for backwards compat with
+   mobileToolbar.js / cinema.css). Functionally it is the
+   "activity bar" in the VSCode sense.
+   ─────────────────────────────────────────────────────────── */
+
 #toolbar {
   position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9000;
+  top: 0;
+  left: 0;
+  width: var(--ab-w);
+  height: 100vh;
+  z-index: 40;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 0 10px;
+
+  background: var(--surface-0);
+  border-right: 1px solid var(--border);
+
+  /* Cinema mode hides this via opacity, NOT display, so transitions stay smooth. */
+  transition: opacity var(--motion-slow);
+}
+
+/* ── Brand mark — top corner ─────────────────────────── */
+.ab-brand {
+  width: 100%;
+  height: 32px;
   display: flex;
   align-items: center;
-  gap: 3px;
-  padding: 5px 10px;
-  background: var(--panel);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  border: 1px solid var(--border);
-  border-radius: 26px;
-  opacity: 0.22;
-  transition: opacity 0.36s ease;
+  justify-content: center;
+  margin-bottom: 4px;
+  pointer-events: none;
 }
-#toolbar:hover {
-  opacity: 1;
+.ab-brand-mark {
+  font: 700 11px/1 var(--font);
+  letter-spacing: 0.16em;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  padding: 5px 7px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--accent-edge);
 }
+
+/* Spacer to push remaining items to the bottom on desktop */
+.ab-spacer {
+  flex: 1;
+}
+
+/* ── Buttons (all activity-bar items use .tbtn) ──────── */
 .tbtn {
   position: relative;
   width: 32px;
   height: 32px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--r);
   color: var(--muted);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.16s;
+  flex-shrink: 0;
+  transition:
+    color var(--motion-fast),
+    background var(--motion-fast);
+}
+.tbtn .ti {
+  font-size: 17px;
+  line-height: 1;
+}
+.tbtn .ic {
+  width: 17px;
+  height: 17px;
 }
 .tbtn:hover {
   color: var(--bright);
-  border-color: rgba(36, 103, 224, 0.38);
-  background: rgba(26, 82, 192, 0.1);
+  background: var(--surface-hover);
 }
 .tbtn.on {
-  color: #7ab8ff;
-  border-color: rgba(26, 82, 192, 0.48);
-  background: rgba(26, 82, 192, 0.16);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+.tbtn.on::before {
+  /* VSCode-style activity rail indicator */
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
 }
 .tbtn.disabled {
-  opacity: 0.35;
+  opacity: 0.32;
   cursor: not-allowed;
   pointer-events: none;
 }
+
+/* Subtle divider between item groups */
 .tbtn-sep {
-  width: 1px;
-  height: 18px;
-  background: var(--border);
-  margin: 0 2px;
+  width: 24px;
+  height: 1px;
+  background: var(--divider);
+  margin: 4px auto;
   flex-shrink: 0;
 }
 
-/* Segmented 1/2/3 control — view-level selector */
+/* ── View-level segmented control (1 / 2 / 3) ─────────── */
 .tseg {
-  display: inline-flex;
-  align-items: stretch;
-  height: 32px;
+  display: flex;
+  flex-direction: column;
+  width: 32px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--r);
   overflow: hidden;
+  background: var(--surface-1);
 }
 .tseg-btn {
-  width: 22px;
-  background: transparent;
-  border: 0;
+  flex: 1;
+  padding: 5px 0;
+  font: 600 10px/1 var(--mono);
   color: var(--muted);
-  cursor: pointer;
-  font: 600 11px/1 inherit;
-  padding: 0;
-  transition: all 0.16s;
+  letter-spacing: 0.04em;
+  transition:
+    color var(--motion-fast),
+    background var(--motion-fast);
 }
 .tseg-btn:hover {
   color: var(--bright);
+  background: var(--surface-hover);
 }
 .tseg-btn.on {
-  color: #7ab8ff;
-  background: rgba(26, 82, 192, 0.16);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 .tseg-btn + .tseg-btn {
-  border-left: 1px solid var(--border);
+  border-top: 1px solid var(--border);
 }
 
-/* Tabler icon size inside buttons */
-.tbtn .ti {
-  font-size: 15px;
-  line-height: 1;
-}
-
-/* ── Language dropdown ────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────
+   Language menu (anchored popover spawned from #btn-lang)
+   ───────────────────────────────────────────────────────── */
 #lang-menu {
   position: fixed;
-  z-index: 50;
+  z-index: 60;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 6px;
-  background: rgba(2, 9, 24, 0.68);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+  gap: 1px;
+  padding: 4px;
+  min-width: 158px;
+
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-2);
+
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateX(-4px);
   pointer-events: none;
   transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
+    opacity var(--motion-fast),
+    transform var(--motion-fast);
 }
 #lang-menu.open {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0);
   pointer-events: auto;
 }
 .lang-opt {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 7px 12px;
-  border-radius: 6px;
-  color: var(--muted);
-  font: 400 0.68rem var(--font);
-  transition: all 0.13s;
-  white-space: nowrap;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  text-align: left;
+  transition:
+    color var(--motion-fast),
+    background var(--motion-fast);
 }
 .lang-opt:hover {
   color: var(--bright);
-  background: rgba(36, 103, 224, 0.12);
+  background: var(--surface-hover);
 }
 .lang-opt.on {
-  color: #7ab8ff;
-  background: rgba(26, 82, 192, 0.16);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 .fi {
   width: 18px;
-  height: 14px;
-  flex-shrink: 0;
+  height: 13px;
   border-radius: 2px;
+  flex-shrink: 0;
 }
 
-/* ── Button hint tooltip ─────────────────────────────── */
+/* ─────────────────────────────────────────────────────────
+   Hover button-tip (rendered by buttonTooltips.js).
+   Stays minimal — single line, mono-spaced kbd chips.
+   ───────────────────────────────────────────────────────── */
 #btn-tip {
   position: fixed;
   z-index: 200;
   pointer-events: none;
-  padding: 5px 11px;
-  background: rgba(2, 9, 22, 0.97);
-  border: 1px solid var(--border2);
-  border-radius: 5px;
-  font: 400 0.61rem var(--font);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 5px 9px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-1);
+
+  font-size: var(--fs-sm);
   color: var(--bright);
-  letter-spacing: 0.01em;
   white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateX(-4px);
   transition:
-    opacity 0.13s ease,
-    transform 0.13s ease;
+    opacity var(--motion-fast),
+    transform var(--motion-fast);
 }
 #btn-tip.show {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0);
 }
 #btn-tip .tip-kbd {
   display: inline-flex;
   gap: 3px;
-  margin-left: 2px;
   align-items: center;
 }
 #btn-tip kbd {
   display: inline-block;
-  padding: 1px 5px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-bottom-color: rgba(255, 255, 255, 0.28);
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom-color: rgba(255, 255, 255, 0.24);
   border-radius: 3px;
-  color: #d4e4ff;
-  font: 600 0.58rem/1 var(--font-mono, ui-monospace, monospace);
+  color: var(--bright);
+  font: 600 10px/1 var(--mono);
   letter-spacing: 0.02em;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
-  vertical-align: baseline;
 }

@@ -1,191 +1,196 @@
-/* ── Right retractable panel — floating slim card ───── */
-/* No `transform`/`will-change` here at rest: those would create a
-       stacking context on the wrapper and prevent the children's
-       backdrop-filter from sampling the page behind. The .collapsed rule
-       still uses transform — that's fine, the panel is animating out. */
+/* ───────────────────────────────────────────────────────────
+   Right dock — vertical energy sliders + cluster/jet panel.
+   Two stacked cards (#rpanel2 above, #rpanel below).
+   Detector tabs run vertically along the left edge of #rpanel.
+   ─────────────────────────────────────────────────────────── */
+
 #rpanel-wrap {
   position: fixed;
-  top: 14px;
-  right: 14px;
+  top: 12px;
+  right: 12px;
+  z-index: 30;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  z-index: 30;
-  opacity: 1;
-  transition:
-    transform var(--pt) cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.38s ease;
+
+  transition: transform var(--pt) cubic-bezier(0.4, 0, 0.2, 1);
 }
 #rpanel-wrap.collapsed {
-  transform: translateX(calc(var(--rpw) + 18px));
+  transform: translateX(calc(var(--rpw) + 24px));
 }
+
 #rpanel,
 #rpanel2 {
   width: var(--rpw);
-  background: var(--panel);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
+  background: var(--surface-1);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 4px 4px 32px rgba(0, 0, 0, 0.45);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-2);
   display: flex;
   flex-direction: column;
 }
 #rpanel {
-  max-height: calc(100vh - 28px);
+  max-height: calc(100vh - 32px);
 }
 #rpanel2 {
-  max-height: calc(100vh - 28px);
+  max-height: calc(100vh - 32px);
 }
 
-/* ── Detector tab bar ────────────────────────────────── */
-#det-tab-bar {
+/* ── Detector tabs ─────────────────────────────────────── */
+#det-tab-bar,
+#det-tab-bar-cluster {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   border-bottom: 1px solid var(--border);
+  padding: 4px 0;
 }
 .det-tab {
-  flex: none;
-  padding: 5px 8px;
-  font: 600 0.62rem var(--mono);
-  letter-spacing: 0.04em;
+  padding: 6px 8px;
+  font: 600 10.5px/1 var(--mono);
+  letter-spacing: 0.06em;
   color: var(--muted);
-  border: none;
   text-align: center;
+  border: 0;
   border-left: 2px solid transparent;
+  background: transparent;
   cursor: pointer;
   transition:
-    color 0.14s,
-    border-color 0.14s,
-    background 0.14s;
+    color var(--motion-fast),
+    border-color var(--motion-fast),
+    background var(--motion-fast);
 }
 .det-tab:hover {
   color: var(--text);
 }
 .det-tab.on {
   color: var(--bright);
-  border-left-color: var(--tab-col, var(--accent2));
-  background: rgba(36, 103, 224, 0.06);
+  border-left-color: var(--tab-col, var(--accent));
+  background: rgba(255, 255, 255, 0.03);
 }
 
-/* ── Detector pane — slim compact layout ───���─────────── */
+/* ── Detector pane (vertical slider area) ──────────────── */
 .det-pane {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 6px 0 8px;
+  gap: 4px;
+  padding: 10px 0 12px;
 }
 .pane-det-row {
   display: flex;
   align-items: center;
   gap: 5px;
-  margin-bottom: 1px;
+  margin-bottom: 4px;
 }
 .pane-det-dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 .pane-det-name {
-  font: 500 0.62rem var(--font);
+  font: 500 10.5px/1 var(--font);
   color: var(--text);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 .slbl {
-  font: 400 0.6rem var(--font);
-  letter-spacing: 0.13em;
+  font: 400 10px/1 var(--font);
+  letter-spacing: 0.12em;
   color: var(--muted);
   text-transform: uppercase;
   text-align: center;
 }
 .sval {
-  font: 400 0.62rem var(--mono);
+  font: 500 10.5px/1 var(--mono);
   color: var(--muted);
   text-align: center;
+  letter-spacing: 0.02em;
 }
+
+/* ── Slider track + thumb ──────────────────────────────── */
 .strak {
   position: relative;
   width: 12px;
-  height: 160px;
-  border-radius: 6px;
+  height: 168px;
+  border-radius: var(--r-sm);
   cursor: ns-resize;
   user-select: none;
   touch-action: none;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  box-shadow: inset 0 1px 8px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 6px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.32);
 }
 .sthumb {
   position: absolute;
-  left: -8px;
-  right: -8px;
+  left: -7px;
+  right: -7px;
   height: 3px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--bright);
   box-shadow:
-    0 0 10px rgba(255, 255, 255, 0.9),
-    0 0 4px rgba(255, 255, 255, 0.6);
+    0 0 8px rgba(255, 255, 255, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   top: 50%;
 }
-/* Floating threshold-input popup — opened on dblclick over a slider track.
-   Positioned absolutely against the slider element by detectorPanels.js;
-   appears just to the LEFT of the rpanel so it doesn't overlap the sval
-   labels above/below the track. */
+
+/* ── Threshold input pop-up (dblclick on slider) ───────── */
 #thr-popup {
   position: fixed;
   z-index: 9000;
-  background: rgba(2, 11, 28, 0.95);
-  border: 1px solid var(--accent2);
-  border-radius: 4px;
-  padding: 4px 4px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-sm);
+  padding: 4px 6px;
+  box-shadow: var(--shadow-2);
 }
 #thr-popup input {
-  width: 80px;
+  width: 84px;
   padding: 2px 4px;
   background: transparent;
-  border: none;
-  outline: none;
+  border: 0;
   color: var(--bright);
-  font: 400 0.7rem var(--mono);
+  font: 500 12px var(--mono);
   text-align: center;
 }
 #thr-popup input::placeholder {
   color: var(--dim);
 }
-/* ── Jet collection dropdown (rpanel2 at level 3) ───────── */
-/* Trigger button — sits inside the narrow rpanel2 column. */
+
+/* ─────────────────────────────────────────────────────────
+   Jet collection dropdown — opens from #jet-coll-trigger
+   inside #rpanel2; menu lives at <body> root for layering.
+   ───────────────────────────────────────────────────────── */
 .jet-coll-trigger {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin: 6px 8px 0;
-  padding: 4px 6px;
-  background: rgba(255, 255, 255, 0.04);
+  margin: 6px 7px 0;
+  padding: 5px 7px;
+  background: var(--surface-3);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   color: var(--text);
-  font: 500 0.62rem var(--mono);
+  font: 500 10.5px var(--mono);
+  letter-spacing: 0.02em;
   cursor: pointer;
   transition:
-    border-color 0.15s,
-    background 0.15s,
-    color 0.15s;
+    border-color var(--motion-fast),
+    background var(--motion-fast),
+    color var(--motion-fast);
 }
 .jet-coll-trigger:hover {
-  border-color: var(--border2);
-  background: rgba(36, 103, 224, 0.08);
+  border-color: var(--border-strong);
   color: var(--bright);
 }
 .jet-coll-trigger[aria-expanded='true'] {
-  border-color: var(--accent2);
-  background: rgba(36, 103, 224, 0.12);
+  border-color: var(--accent);
   color: var(--bright);
+  background: var(--accent-soft);
 }
 .jet-coll-label {
   flex: 1;
@@ -204,53 +209,41 @@
   stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--motion-base);
 }
 .jet-coll-trigger[aria-expanded='true'] .jet-coll-chev {
   transform: rotate(180deg);
 }
 
-/* Floating popover — positioned by JS (fixed) so it can extend past the
-   narrow rpanel2 column. Animates in with a soft scale + fade + slide. */
 .jet-coll-menu {
   position: fixed;
   z-index: 60;
   display: none;
   flex-direction: column;
   gap: 1px;
-  min-width: 180px;
+  min-width: 200px;
   max-width: 320px;
   max-height: 50vh;
   overflow-y: auto;
-  padding: 5px;
-  background: rgba(2, 9, 24, 0.78);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+  padding: 4px;
+
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-2);
+
   opacity: 0;
-  transform: translateY(-6px) scale(0.97);
-  transform-origin: top right;
+  transform: translateY(-4px);
   pointer-events: none;
   transition:
-    opacity 0.18s ease,
-    transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity var(--motion-fast),
+    transform var(--motion-fast);
 }
 .jet-coll-menu.open {
   display: flex;
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
   pointer-events: auto;
-}
-
-/* Custom thin scrollbar inside the menu when overflowing. */
-.jet-coll-menu::-webkit-scrollbar {
-  width: 6px;
-}
-.jet-coll-menu::-webkit-scrollbar-thumb {
-  background: var(--border2);
-  border-radius: 3px;
 }
 
 .jet-coll-opt {
@@ -258,26 +251,26 @@
   align-items: center;
   gap: 8px;
   padding: 6px 9px;
-  border-radius: 6px;
-  border: none;
+  border-radius: var(--r-sm);
   background: transparent;
+  border: 0;
   color: var(--muted);
-  font: 500 0.64rem var(--mono);
+  font: 500 11px var(--mono);
   letter-spacing: 0.02em;
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
   transition:
-    background 0.13s,
-    color 0.13s;
+    color var(--motion-fast),
+    background var(--motion-fast);
 }
 .jet-coll-opt:hover {
   color: var(--bright);
-  background: rgba(36, 103, 224, 0.14);
+  background: var(--surface-hover);
 }
 .jet-coll-opt.on {
-  color: #7ab8ff;
-  background: rgba(26, 82, 192, 0.18);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 .jet-coll-opt-name {
   flex: 1;
@@ -287,47 +280,58 @@
 }
 .jet-coll-opt-count {
   flex-shrink: 0;
-  font: 400 0.58rem var(--mono);
-  color: var(--dim);
+  font: 500 10px var(--mono);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.05);
   padding: 1px 6px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  letter-spacing: 0.02em;
 }
 .jet-coll-opt.on .jet-coll-opt-count {
   color: var(--bright);
-  background: rgba(36, 103, 224, 0.28);
+  background: rgba(99, 152, 255, 0.28);
 }
 
-/* ── Ghost switches (CSS-only toggle pill, no text inside) ─── */
+/* ─────────────────────────────────────────────────────────
+   Generic switch (used in popovers, helpers, settings).
+   Color comes from inline style: --gswitch-col.
+   ───────────────────────────────────────────────────────── */
 .gswitch {
   position: relative;
   width: 28px;
-  height: 15px;
+  height: 16px;
   flex-shrink: 0;
-  background: var(--dim);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 9px;
   cursor: pointer;
-  transition: background 0.18s;
+  transition: background var(--motion-base);
 }
 .gswitch::after {
   content: '';
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--muted);
   transition:
-    transform 0.18s,
-    background 0.18s;
+    transform var(--motion-base),
+    background var(--motion-base);
 }
 .gswitch.on {
-  background: var(--gswitch-col, var(--accent2));
+  background: var(--gswitch-col, var(--accent));
   border-color: transparent;
 }
 .gswitch.on::after {
-  transform: translateX(13px);
+  transform: translateX(12px);
   background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.gswitch:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.gswitch.on:hover {
+  filter: brightness(1.08);
 }
