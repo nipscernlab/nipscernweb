@@ -1,16 +1,34 @@
-/* ── Status bar ───────────────────────────────────────── */
+/* ───────────────────────────────────────────────────────────
+   HUD elements that overlay the 3-D scene:
+   - Sidebar status footer
+   - Cell-hover tooltip
+   - Top-left collision metadata
+   - Top-right η×φ minimap
+   ─────────────────────────────────────────────────────────── */
+
+/* ── Sidebar status footer ─────────────────────────────── */
 #statusbar {
-  padding: 7px 12px;
-  font-size: 0.63rem;
-  color: var(--muted);
-  line-height: 1.6;
-  min-height: 30px;
   flex-shrink: 0;
-  border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px 14px;
+  min-height: 32px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-1);
+
+  font-size: var(--fs-xs);
+  color: var(--muted);
   cursor: default;
+  user-select: none;
+}
+#statusbar .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 6px rgba(78, 186, 125, 0.45);
+  flex-shrink: 0;
 }
 #status-txt {
   flex: 1;
@@ -18,126 +36,142 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  font: 500 var(--fs-xs) var(--font);
+  letter-spacing: 0.02em;
+  color: var(--text);
 }
-#statusbar #req-badge {
-  flex-shrink: 0;
-}
-/* Event metadata pills inside the statusbar */
+
 .ev-meta {
-  font: 400 0.58rem var(--font);
+  font: 400 10.5px var(--font);
   color: var(--muted);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   flex-shrink: 0;
 }
 .ev-meta b {
-  font: 500 0.6rem var(--mono);
+  font: 500 11px var(--mono);
   color: var(--text);
-  font-weight: 500;
-}
-/* Request count badge in the statusbar (#req-badge) */
-.badge {
-  font: 600 0.62rem var(--mono);
-  color: var(--accent2);
-  background: rgba(36, 103, 224, 0.12);
-  border: 1px solid rgba(36, 103, 224, 0.28);
-  border-radius: 10px;
-  padding: 1px 7px;
-}
-.ok {
-  color: var(--ok);
-}
-.warn {
-  color: var(--warn);
-}
-.err {
-  color: var(--err);
 }
 
-/* ── Hover tooltip (cell info) ───────────────────────── */
+.badge {
+  font: 500 10.5px var(--mono);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-edge);
+  border-radius: 8px;
+  padding: 1px 7px;
+  letter-spacing: 0.02em;
+}
+
+/* ── Cell-hover tooltip ────────────────────────────────── */
 #tip {
   position: fixed;
   pointer-events: none;
   z-index: 25;
-  padding: 11px 14px;
-  background: rgba(2, 11, 28, 0.95);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  border: 1px solid var(--border);
+  padding: 10px 12px;
+  min-width: 160px;
+
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+  box-shadow: var(--shadow-2);
+
   white-space: nowrap;
 }
 #tip-cell {
-  font: 600 1rem var(--font);
+  font: 600 var(--fs-md) var(--font);
   color: var(--bright);
+  letter-spacing: 0.01em;
   margin-bottom: 2px;
 }
 #tip-coords {
-  font: 400 0.72rem var(--mono);
+  font: 400 10.5px var(--mono);
   color: var(--muted);
   margin-bottom: 4px;
+  letter-spacing: 0;
 }
 .tdiv {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 5px 0;
+  border: 0;
+  border-top: 1px solid var(--divider);
+  margin: 6px 0;
 }
 .trow {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   margin-top: 3px;
 }
 .tkey {
-  font: 400 0.58rem var(--font);
+  font: 500 9.5px var(--font);
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.12em;
   align-self: center;
 }
 .tval {
-  font: 500 0.69rem var(--mono);
+  font: 500 11.5px var(--mono);
   color: var(--bright);
+  letter-spacing: 0.01em;
 }
 
-/* ── Collision info HUD (top-left corner) ────────────── */
+/* ── Collision-info HUD (top-left, toggleable) ─────────── */
+/* Sits right of the sidebar when it's pinned open, right of the
+   activity bar when the sidebar is collapsed. Body class
+   .panel-unpinned is set by sidebarControls.js when the sidebar
+   is unpinned (collapsible/hover-open). */
 #collision-hud {
   position: fixed;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: calc(var(--ab-w) + var(--pw) + 16px);
   z-index: 25;
+
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 2px 8px;
-  font-family: monospace;
-  font-size: 11px;
-  color: #66ccff;
-  opacity: 0.45;
+  gap: 3px 10px;
+
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text);
+  opacity: 0.7;
   pointer-events: none;
   user-select: none;
-  line-height: 1.55;
+  line-height: 1.5;
+
+  transition:
+    left var(--pt) cubic-bezier(0.4, 0, 0.2, 1),
+    opacity var(--motion-base);
+}
+body.panel-unpinned #collision-hud {
+  left: calc(var(--ab-w) + 14px);
+  opacity: 0.85;
 }
 #collision-hud[hidden] {
   display: none !important;
 }
+#collision-hud .ch-key {
+  color: var(--muted);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+#collision-hud .ch-val {
+  color: var(--bright);
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
 
-/* η × φ radar minimap (top-right) */
+/* ── η × φ minimap (top-right) ─────────────────────────── */
 #minimap {
   position: fixed;
-  top: 10px;
-  right: 10px;
-  left: auto;
-  bottom: auto;
+  top: 12px;
+  right: calc(var(--rpw) + 24px);
   z-index: 24;
-  border: 1px solid rgba(120, 150, 190, 0.25);
-  border-radius: 6px;
-  background: rgba(8, 14, 28, 0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  background: rgba(8, 14, 28, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-1);
   pointer-events: none;
 }
 @media (max-width: 720px) {
@@ -145,14 +179,8 @@
     display: none;
   }
 }
-#collision-hud .ch-key {
-  color: #66ccff;
-  opacity: 0.6;
-  font-size: 9px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-#collision-hud .ch-val {
-  color: #66ccff;
-  font-size: 11px;
+
+/* When the right panel is collapsed, sit flush against the right edge */
+body.rpanel-unpinned #minimap {
+  right: 12px;
 }

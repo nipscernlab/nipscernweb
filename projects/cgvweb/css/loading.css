@@ -1,4 +1,7 @@
-/* ── Loading overlay ──────────────────────────────────── */
+/* ───────────────────────────────────────────────────────────
+   Loading overlay (boot) and inline download progress.
+   ─────────────────────────────────────────────────────────── */
+
 #loading-overlay {
   position: fixed;
   inset: 0;
@@ -6,48 +9,65 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* anim_worker.js paints the same color via its canvas. The fallback
+     only matters for the brief instant before the worker mounts. */
   background: var(--bg);
   transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 #loading-overlay.done {
   opacity: 0;
   pointer-events: none;
 }
+#loading-overlay > canvas {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Card sits on top of the canvas with no panel — the type is hardened
+   with a text-shadow so it stays readable against the moving lines. */
 .loading-card {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
   user-select: none;
+  pointer-events: none;
+  text-shadow: 0 2px 12px rgba(0, 6, 18, 0.7);
 }
 .loading-logo {
   width: 56px;
   height: 56px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
+  filter: drop-shadow(0 4px 16px rgba(99, 152, 255, 0.18));
 }
 .loading-title {
-  font: 700 2.2rem var(--font);
+  font: 700 36px/1 var(--font);
   color: var(--bright);
   letter-spacing: 0.18em;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .loading-sub {
-  font: 400 0.68rem var(--font);
+  font: 400 12px/1 var(--font);
   color: var(--text);
   letter-spacing: 0.08em;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 .loading-lab {
-  font: 500 0.54rem var(--font);
+  font: 500 9.5px/1 var(--font);
   color: var(--muted);
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin-bottom: 36px;
+  margin-bottom: 38px;
 }
+
 .loading-bar-track {
   width: 220px;
   height: 2px;
-  background: var(--dim);
+  background: var(--surface-3);
   border-radius: 2px;
   overflow: hidden;
   margin-bottom: 14px;
@@ -55,11 +75,9 @@
 .loading-bar-fill {
   height: 100%;
   width: 0%;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--accent) 0%, #4a9eff 100%);
-  box-shadow: 0 0 8px rgba(36, 103, 224, 0.6);
+  background: linear-gradient(90deg, var(--accent-strong) 0%, var(--accent) 100%);
+  box-shadow: 0 0 8px rgba(99, 152, 255, 0.5);
   position: relative;
-  overflow: hidden;
 }
 .loading-bar-fill::after {
   content: '';
@@ -68,7 +86,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.18) 50%,
     transparent 100%
   );
   animation: bar-shimmer 1.6s ease-in-out infinite;
@@ -83,19 +101,19 @@
   }
 }
 .loading-msg {
-  font: 400 0.6rem var(--mono);
+  font: 400 11px var(--mono);
   color: var(--muted);
   letter-spacing: 0.06em;
   min-height: 1.4em;
   transition: opacity 0.2s;
 }
 
-/* ── Download progress (Live & Local) ─────────────────── */
+/* ── Inline download progress (in sidebar footer area) ─── */
 #dl-progress {
   flex-shrink: 0;
-  padding: 8px 10px;
+  padding: 9px 12px 11px;
   border-top: 1px solid var(--border);
-  background: rgba(2, 9, 24, 0.55);
+  background: var(--surface-1);
 }
 #dl-progress[hidden] {
   display: none;
@@ -104,24 +122,24 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
-  overflow: hidden;
-  font: 500 0.54rem var(--font);
+  font: 500 10px var(--font);
   color: var(--muted);
   letter-spacing: 0.04em;
 }
 .dl-stage {
   display: flex;
   align-items: center;
-  gap: 3px;
-  font: 500 0.6rem var(--mono);
+  gap: 4px;
+  font: 500 10px var(--mono);
   color: var(--muted);
   white-space: nowrap;
-  transition: color 0.15s;
+  letter-spacing: 0.02em;
+  transition: color var(--motion-fast);
 }
 .dl-stage.active {
-  color: var(--accent2);
+  color: var(--accent-text);
 }
 .dl-stage.done {
   color: var(--ok);
@@ -130,15 +148,15 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.14);
   flex-shrink: 0;
   transition:
-    background 0.15s,
-    box-shadow 0.15s;
+    background var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 .dl-stage.active .dl-dot {
-  background: var(--accent2);
-  box-shadow: 0 0 6px var(--accent2);
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
   animation: pulse 0.9s ease-in-out infinite;
 }
 .dl-stage.done .dl-dot {
@@ -147,22 +165,21 @@
 }
 .dl-arrow {
   color: var(--dim);
-  font-size: 0.6rem;
+  font-size: 10px;
 }
 #dl-bar-track {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.06);
+  height: 3px;
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 2px;
   overflow: hidden;
 }
 #dl-bar-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  border-radius: 1px;
+  background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+  border-radius: 2px;
   transition: width 0.25s ease;
 }
-/* Local-mode tint for distinguishing source */
 #dl-progress.local #dl-bar-fill {
   background: linear-gradient(90deg, #5a8c2a, #8fd64a);
 }

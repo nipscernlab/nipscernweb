@@ -202,14 +202,30 @@ export function setupColorPicker() {
   // ── Popover open/close/position ────────────────────────────────────
   function position() {
     const r = btn.getBoundingClientRect();
-    const pw = pop.offsetWidth || 260;
+    const pw = pop.offsetWidth || 264;
     const ph = pop.offsetHeight || 340;
-    let left = r.left + r.width / 2 - pw / 2;
-    let top = r.top - ph - 10;
-    left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
-    if (top < 8) top = r.bottom + 10;
-    pop.style.left = left + 'px';
-    pop.style.top = top + 'px';
+    const tb = document.getElementById('toolbar');
+    const tbr = tb ? tb.getBoundingClientRect() : { left: 0, height: 0, width: 0 };
+    const isVerticalDock = tbr.left < 8 && tbr.height > tbr.width;
+
+    if (isVerticalDock) {
+      // Anchor right of the activity bar.
+      const left = Math.min(window.innerWidth - pw - 8, r.right + 8);
+      let top = r.top + r.height / 2 - ph / 2;
+      top = Math.max(8, Math.min(top, window.innerHeight - ph - 8));
+      pop.style.left = `${Math.max(8, left)}px`;
+      pop.style.top = `${top}px`;
+      pop.style.bottom = '';
+    } else {
+      // Anchor above the horizontal dock.
+      let left = r.left + r.width / 2 - pw / 2;
+      let top = r.top - ph - 10;
+      left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+      if (top < 8) top = r.bottom + 10;
+      pop.style.left = `${left}px`;
+      pop.style.top = `${top}px`;
+      pop.style.bottom = '';
+    }
   }
   function openPop() {
     open = true;

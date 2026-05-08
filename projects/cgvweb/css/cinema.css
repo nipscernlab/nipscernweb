@@ -1,64 +1,70 @@
-/* ── Cinema mode ──────────────────────────────────────── */
-body.cinema #panel {
+/* ───────────────────────────────────────────────────────────
+   Cinema mode — hide all chrome, leave just the scene.
+   ─────────────────────────────────────────────────────────── */
+
+body.cinema #toolbar,
+body.cinema #panel,
+body.cinema #rpanel-wrap,
+body.cinema #btn-toolbar-toggle,
+body.cinema #panel-edge,
+body.cinema #rpanel-edge,
+body.cinema #collision-hud,
+body.cinema #minimap {
   opacity: 0 !important;
   pointer-events: none;
 }
-body.cinema #toolbar,
-body.cinema #btn-toolbar-toggle {
-  opacity: 0 !important;
-  pointer-events: none;
+
+body.cinema #panel {
+  transform: translateX(calc(-1 * (var(--pw) + var(--ab-w) + 32px)));
+}
+body.cinema #toolbar {
+  transform: translateX(calc(-1 * (var(--ab-w) + 32px)));
 }
 body.cinema #rpanel-wrap {
-  opacity: 0 !important;
-  pointer-events: none;
+  transform: translateX(calc(var(--rpw) + 40px));
 }
 body.cinema #tip {
   display: none;
 }
+
+/* Cinema-exit chip — bottom-center floater. */
 #cinema-exit {
   position: fixed;
-  bottom: 64px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
-  display: flex;
+
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 18px;
-  background: rgba(2, 9, 24, 0.62);
-  backdrop-filter: var(--blur);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 22px;
-  color: rgba(185, 215, 255, 0.4);
-  font: 400 0.6rem var(--font);
-  letter-spacing: 0.11em;
+  gap: 8px;
+  padding: 8px 18px;
+
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted);
+  font: 500 11px var(--font);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
+  box-shadow: var(--shadow-2);
+
   opacity: 0;
   pointer-events: none;
   transition:
-    opacity 0.38s ease,
-    color 0.2s,
-    border-color 0.2s;
+    opacity var(--motion-slow),
+    color var(--motion-base),
+    border-color var(--motion-base),
+    background var(--motion-base);
 }
 body.cinema #cinema-exit {
-  opacity: 0.45;
+  opacity: 0.65;
   pointer-events: auto;
 }
 #cinema-exit:hover {
   opacity: 1 !important;
-  color: #d8eeff;
-  border-color: rgba(255, 255, 255, 0.28);
-}
-
-/* ── Cinema mode: smooth right panel fade-out ────────── */
-body.cinema #rpanel-wrap {
-  opacity: 0 !important;
-  pointer-events: none;
-  transform: translateX(calc(var(--rpw) + 40px));
-}
-body.cinema #panel {
-  opacity: 0 !important;
-  pointer-events: none;
-  transform: translateX(calc(-1 * (var(--pw) + 40px)));
+  color: var(--bright);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }

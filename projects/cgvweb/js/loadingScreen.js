@@ -38,6 +38,13 @@ export function dismissLoadingScreen() {
   if (_loadBar) _loadBar.style.width = '100%';
   overlay.classList.add('done');
   setTimeout(() => {
+    // Stop the OffscreenCanvas animation worker started in index.html.
+    const worker = /** @type {any} */ (window)._cgvAnimWorker;
+    if (worker) {
+      worker.postMessage({ type: 'stop' });
+      worker.terminate();
+      /** @type {any} */ (window)._cgvAnimWorker = null;
+    }
     if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
   }, 750);
 }

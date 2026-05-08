@@ -6,9 +6,7 @@
     <meta name="color-scheme" content="dark" />
     <title>CGV — ATLAS Calorimeter Viewer</title>
     <link rel="icon" type="image/svg+xml" href="./assets/icons/cgvweb_icon.svg" />
-    <!-- All external resources are vendored under ./vendor/ so the site
-       runs fully offline inside ATLAS Point 1 (no GPN / CDN access). -->
-    <!-- Preload critical geometry file (largest asset) -->
+
     <link
       rel="preload"
       href="./geometry_data/CaloGeometry.glb.gz"
@@ -17,12 +15,9 @@
       fetchpriority="high"
     />
     <link rel="stylesheet" href="./vendor/fonts/fonts.css" />
-    <!-- Tabler Icons webfont (for ghost icon) -->
     <link rel="stylesheet" href="./vendor/tabler-icons/tabler-icons.min.css" />
-    <!-- flag-icons CSS (for language picker flags) -->
     <link rel="stylesheet" href="./vendor/flag-icons/css/flag-icons.min.css" />
-    <!-- Importmap MUST appear before any modulepreload that imports a bare specifier
-       (Firefox tries to resolve "three" during preload — fails if importmap comes later). -->
+
     <script type="importmap">
       {
         "imports": {
@@ -31,19 +26,10 @@
         }
       }
     </script>
-    <!-- Module preload for the WASM JS shim only. We deliberately do NOT modulepreload
-       js/main.js: doing so causes some browsers (Firefox especially) to attempt to
-       resolve its bare "three" specifier before the importmap is consulted, even when
-       the importmap precedes it. The bottom-of-body <script type="module"> already
-       loads main.js with full importmap context. -->
+
     <link rel="modulepreload" href="./parser/pkg/atlas_id_parser.js" />
-    <!-- Preload the WASM Web Worker script — its module graph is tiny (WASM glue
-       + our worker) and preloading lets the browser kick off the fetch in
-       parallel with main.js module resolution, so the worker is ready sooner. -->
     <link rel="modulepreload" href="./js/wasm_worker.js" />
-    <!-- Stylesheets are split by component; load order matches CSS cascade
-       (mobile.css overrides earlier rules via media queries; cinema.css overrides
-       panel/toolbar opacity in cinema mode). -->
+
     <link rel="stylesheet" href="./css/base.css" />
     <link rel="stylesheet" href="./css/panel-left.css" />
     <link rel="stylesheet" href="./css/panel-right.css" />
@@ -55,15 +41,37 @@
     <link rel="stylesheet" href="./css/floating.css" />
     <link rel="stylesheet" href="./css/cinema.css" />
     <link rel="stylesheet" href="./css/mobile.css" />
+
+    <!-- Loading screen backdrop — OffscreenCanvas animation running in a
+         dedicated Web Worker (js/anim_worker.js).  The worker owns its own
+         RAF loop so the animation keeps running even when the main thread is
+         blocked by GLTFLoader.parse() or WASM initialisation. -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var cv = document.getElementById('anim-canvas');
+        if (!cv || !cv.transferControlToOffscreen) return;
+        cv.width  = window.innerWidth;
+        cv.height = window.innerHeight;
+        var offscreen = cv.transferControlToOffscreen();
+        var worker = new Worker('./js/anim_worker.js');
+        worker.postMessage({ type: 'init', canvas: offscreen }, [offscreen]);
+        window.addEventListener('resize', function () {
+          worker.postMessage({ type: 'resize', w: window.innerWidth, h: window.innerHeight });
+        });
+        window._cgvAnimWorker = worker;
+      });
+    </script>
   </head>
+
   <body>
-    <!-- ── Loading overlay ───────────────────────────────────────── -->
+    <!-- ── Loading overlay ─────────────────────────────────── -->
     <div id="loading-overlay">
+      <canvas id="anim-canvas" aria-hidden="true"></canvas>
       <div class="loading-card">
         <img src="./assets/icons/cgvweb_icon.svg" class="loading-logo" alt="CGV" />
         <div class="loading-title">CGV</div>
         <div class="loading-sub">Calorimeter Geometry Viewer</div>
-        <div class="loading-lab">NIPSCERN &middot; ATLAS</div>
+        <div class="loading-lab">NIPSCERN · ATLAS</div>
         <div class="loading-bar-track">
           <div class="loading-bar-fill" id="loading-bar"></div>
         </div>
@@ -71,7 +79,7 @@
       </div>
     </div>
 
-    <!-- ── SVG sprite ─────────────────────────────────────────── -->
+    <!-- ── SVG sprite (icons reused throughout the UI) ──────── -->
     <svg class="defs" aria-hidden="true">
       <defs>
         <symbol id="i-wifi" viewBox="0 0 24 24">
@@ -98,27 +106,6 @@
         </symbol>
         <symbol id="i-stop" viewBox="0 0 24 24" fill="currentColor" stroke="none">
           <rect x="3" y="3" width="18" height="18" rx="2" />
-        </symbol>
-        <symbol id="i-film" viewBox="0 0 24 24">
-          <rect x="2" y="2" width="20" height="20" rx="2.18" />
-          <line x1="7" y1="2" x2="7" y2="22" />
-          <line x1="17" y1="2" x2="17" y2="22" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-          <line x1="2" y1="7" x2="7" y2="7" />
-          <line x1="17" y1="7" x2="22" y2="7" />
-          <line x1="2" y1="17" x2="7" y2="17" />
-          <line x1="17" y1="17" x2="22" y2="17" />
-        </symbol>
-        <symbol id="i-eye" viewBox="0 0 24 24">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-          <circle cx="12" cy="12" r="3" />
-        </symbol>
-        <symbol id="i-eye-off" viewBox="0 0 24 24">
-          <path
-            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
-          />
-          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-          <line x1="1" y1="1" x2="23" y2="23" />
         </symbol>
         <symbol id="i-x" viewBox="0 0 24 24">
           <line x1="18" y1="6" x2="6" y2="18" />
@@ -158,20 +145,6 @@
           />
           <circle cx="12" cy="13" r="4" />
         </symbol>
-        <symbol
-          id="i-star"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polygon
-            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-          />
-        </symbol>
-        <!-- Vertical sliders (3 tracks + thumbs) — Energy threshold button -->
         <symbol id="i-sliders" viewBox="0 0 24 24">
           <line x1="6" y1="3" x2="6" y2="21" />
           <line x1="12" y1="3" x2="12" y2="21" />
@@ -180,7 +153,6 @@
           <circle cx="12" cy="14" r="2" fill="var(--bg)" />
           <circle cx="18" cy="10" r="2" fill="var(--bg)" />
         </symbol>
-        <!-- Sidebar pin — a left sidebar with a small dot (better than thumbtack) -->
         <symbol id="i-panel-pin" viewBox="0 0 24 24">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <line x1="9" y1="3" x2="9" y2="21" />
@@ -188,46 +160,185 @@
           <circle cx="6" cy="11" r="1" fill="currentColor" stroke="none" />
           <circle cx="6" cy="15" r="1" fill="currentColor" stroke="none" />
         </symbol>
+        <symbol id="i-chevron-right" viewBox="0 0 24 24">
+          <polyline points="9 6 15 12 9 18" />
+        </symbol>
       </defs>
     </svg>
 
     <canvas id="c"></canvas>
 
-    <!-- ── Left panel ─────────────────────────────────────────── -->
-    <aside id="panel">
-      <div id="panel-head">
+    <!-- ─────────────────────────────────────────────────────────
+         ACTIVITY BAR — vertical icon strip (left, desktop) /
+         horizontal floating dock (mobile landscape).
+         Aliased to #toolbar to keep mobileToolbar.js wiring valid.
+         ───────────────────────────────────────────────────────── -->
+    <nav id="toolbar" aria-label="Activity bar">
+      <!-- ── Brand mark + sidebar toggle ──────────────────── -->
+      <div class="ab-brand">
+        <span class="ab-brand-mark">CGV</span>
+      </div>
+      <button
+        class="tbtn"
+        id="btn-panel"
+        data-tip="Toggle the sidebar (M)"
+        data-i18n-tip="tip-panel"
+      >
+        <svg class="ic"><use href="#i-sidebar" /></svg>
+      </button>
+
+      <div class="tbtn-sep"></div>
+
+      <!-- ── View popovers (anchored to these buttons) ────── -->
+      <button
+        class="tbtn on"
+        id="btn-layers"
+        data-tip="Detector layers — toggle geometry visibility"
+        data-i18n-tip="tip-layers"
+      >
+        <i class="ti ti-layers-subtract"></i>
+      </button>
+      <button
+        class="tbtn on"
+        id="btn-cluster"
+        data-tip="Particles — γ / e / μ / τ filters (level 3) (K)"
+        data-i18n-tip="tip-particles"
+      >
+        <i class="ti ti-focus-2"></i>
+      </button>
+      <button
+        class="tbtn"
+        id="btn-helpers"
+        data-tip="Helpers — Ghost, Cell Info, Vertices, Lines"
+        data-i18n-tip="tip-helpers"
+      >
+        <i class="ti ti-adjustments-horizontal"></i>
+      </button>
+      <button
+        class="tbtn"
+        id="btn-rpanel"
+        data-tip="Energy thresholds (E)"
+        data-i18n-tip="tip-rpanel"
+      >
+        <svg class="ic"><use href="#i-sliders" /></svg>
+      </button>
+
+      <!-- ── Level segmented control (1 / 2 / 3) ──────────── -->
+      <div class="tbtn-sep"></div>
+      <div class="tseg" id="view-level" role="group" aria-label="View level">
+        <button
+          class="tseg-btn"
+          data-level="1"
+          data-tip="Level 1 — Hits"
+          data-i18n-tip="tip-view-level-1"
+        >
+          1
+        </button>
+        <button
+          class="tseg-btn"
+          data-level="2"
+          data-tip="Level 2 — Clusters"
+          data-i18n-tip="tip-view-level-2"
+        >
+          2
+        </button>
+        <button
+          class="tseg-btn on"
+          data-level="3"
+          data-tip="Level 3 — Particles"
+          data-i18n-tip="tip-view-level-3"
+        >
+          3
+        </button>
+      </div>
+
+      <div class="tbtn-sep"></div>
+
+      <!-- ── Tools / actions ──────────────────────────────── -->
+      <button class="tbtn" id="btn-cinema" data-tip="Cinema mode (C)" data-i18n-tip="tip-cinema">
+        <i class="ti ti-movie"></i>
+      </button>
+      <button
+        class="tbtn"
+        id="btn-slicer"
+        data-tip="Slicer — cylindrical wedge carve (Shift+S)"
+        data-i18n-tip="tip-slicer"
+      >
+        <i class="ti ti-cut"></i>
+      </button>
+      <button class="tbtn" id="btn-shot" data-tip="Save screenshot (P)" data-i18n-tip="tip-shot">
+        <svg class="ic"><use href="#i-camera" /></svg>
+      </button>
+      <button
+        class="tbtn"
+        id="btn-bgcolor"
+        data-tip="Background color (Shift+B)"
+        data-i18n-tip="tip-bgcolor"
+      >
+        <i class="ti ti-palette"></i>
+      </button>
+      <button class="tbtn" id="btn-reset" data-tip="Reset camera (R)" data-i18n-tip="tip-reset">
+        <i class="ti ti-refresh"></i>
+      </button>
+
+      <!-- ── Spacer — push the rest to the bottom (desktop) ─ -->
+      <div class="ab-spacer"></div>
+
+      <button class="tbtn" id="btn-lang" data-tip="Change language" data-i18n-tip="tip-lang">
+        <svg class="ic"><use href="#i-globe" /></svg>
+      </button>
+      <button class="tbtn" id="btn-about" data-tip="About CGV" data-i18n-tip="tip-about">
+        <svg class="ic"><use href="#i-info" /></svg>
+      </button>
+      <button
+        class="tbtn"
+        id="btn-settings"
+        data-tip="Settings — preferences, shortcuts (S)"
+        data-i18n-tip="tip-settings"
+      >
+        <i class="ti ti-settings"></i>
+      </button>
+
+      <!-- Mobile-landscape close (handled by mobileToolbar.js). -->
+      <div class="tbtn-sep" id="toolbar-close-sep"></div>
+      <button class="tbtn" id="btn-toolbar-close" data-tip="Hide dock">
+        <svg class="ic" style="stroke-width: 2.5"><use href="#i-x" /></svg>
+      </button>
+    </nav>
+
+    <!-- ─────────────────────────────────────────────────────────
+         SIDEBAR — Events (Live / Sample) + status footer
+         ───────────────────────────────────────────────────────── -->
+    <aside id="panel" aria-label="Events sidebar">
+      <header id="panel-head">
         <div class="panel-head-row panel-head-row-top">
-          <div class="logo">CGV</div>
+          <div class="logo-block">
+            <div class="logo-title">
+              <span class="logo">CGV</span>
+              <span class="logo-sep">/</span>
+              <span class="logo-context" data-i18n="logo-full">Calorimeter Geometry Viewer</span>
+            </div>
+            <div class="logo-lab" data-i18n="logo-lab">NIPSCERN · ATLAS</div>
+          </div>
           <div class="head-btns">
-            <button
-              class="icon-btn"
-              id="btn-about"
-              data-tip="About — project credits"
-              data-i18n-tip="tip-about"
-            >
-              <svg class="ic"><use href="#i-info" /></svg>
-            </button>
             <button
               class="icon-btn on"
               id="btn-pin"
-              data-tip="Pin panel open at all times"
+              data-tip="Pin sidebar — keep open"
               data-i18n-tip="tip-pin"
             >
               <svg class="ic" id="pin-icon"><use href="#i-panel-pin" /></svg>
             </button>
           </div>
         </div>
-        <div class="logo-block">
-          <div class="logo-full" data-i18n="logo-full">Calorimeter Geometry Viewer</div>
-          <div class="logo-lab" data-i18n="logo-lab">NIPSCERN · ATLAS</div>
-        </div>
-        <!-- External links strip — full-width row below the title -->
+
+        <!-- External links — quick access strip -->
         <div id="ext-links-top">
           <a
             href="https://atlas-live.cern.ch"
             target="_blank"
             rel="noopener"
-            data-tip="ATLAS Live — ATLANTIS project"
+            data-tip="ATLAS Live — ATLANTIS"
           >
             <i class="ti ti-broadcast"></i>
           </a>
@@ -239,20 +350,10 @@
           >
             <i class="ti ti-atom"></i>
           </a>
-          <a
-            href="https://home.cern"
-            target="_blank"
-            rel="noopener"
-            data-tip="CERN — European Organisation for Nuclear Research"
-          >
+          <a href="https://home.cern" target="_blank" rel="noopener" data-tip="CERN">
             <i class="ti ti-building-bank"></i>
           </a>
-          <a
-            href="https://nipscern.com"
-            target="_blank"
-            rel="noopener"
-            data-tip="NIPSCERN Laboratory — UFJF"
-          >
+          <a href="https://nipscern.com" target="_blank" rel="noopener" data-tip="NIPSCERN — UFJF">
             <i class="ti ti-flask"></i>
           </a>
           <a
@@ -260,7 +361,7 @@
             href="https://nipscern.com/library/cgvweb/twiki"
             target="_blank"
             rel="noopener"
-            data-tip="TWIKI — technical documentation"
+            data-tip="Technical TWiki"
           >
             <i class="ti ti-book-2"></i>
           </a>
@@ -269,38 +370,38 @@
             href="https://nipscern.com/library/cgvweb"
             target="_blank"
             rel="noopener"
-            data-tip="Full documentation — nipscern.com/library/cgvweb"
+            data-tip="Documentation"
           >
             <i class="ti ti-notebook"></i>
           </a>
         </div>
-      </div>
+      </header>
 
-      <div id="mode-bar">
-        <button id="btn-live" class="mbtn on">
-          <svg class="ic" style="width: 12px; height: 12px"><use href="#i-wifi" /></svg>
+      <!-- ── Mode tabs ────────────────────────────────────── -->
+      <div id="mode-bar" role="tablist">
+        <button id="btn-live" class="mbtn on" role="tab" aria-selected="true">
+          <svg class="ic"><use href="#i-wifi" /></svg>
           <span data-i18n="btn-live">Live</span>
         </button>
-        <button id="btn-sample" class="mbtn">
-          <i class="ti ti-atom" style="font-size: 13px; line-height: 1"></i>
+        <button id="btn-sample" class="mbtn" role="tab" aria-selected="false">
+          <i class="ti ti-atom"></i>
           <span data-i18n="btn-sample">Samples</span>
         </button>
       </div>
 
-      <!-- Live mode -->
+      <!-- ── Live mode ────────────────────────────────────── -->
       <div id="live-sec">
         <div id="live-sub-bar">
           <button id="btn-live-web" class="sbtn on">
-            <i class="ti ti-world" style="font-size: 11px; line-height: 1"></i>
+            <i class="ti ti-world"></i>
             <span data-i18n="sub-live-web">WEB</span>
           </button>
           <button id="btn-live-server" class="sbtn">
-            <i class="ti ti-server" style="font-size: 11px; line-height: 1"></i>
+            <i class="ti ti-server"></i>
             <span data-i18n="sub-live-server">SERVER</span>
           </button>
         </div>
 
-        <!-- WEB: ATLAS live polling -->
         <div id="live-web-sec" class="live-sub">
           <div id="live-bar">
             <span class="ldot pulse" id="ldot"></span>
@@ -310,39 +411,37 @@
                 class="ctrl-btn"
                 id="ibtn-play"
                 hidden
-                data-tip="Resume live polling"
+                data-tip="Resume polling"
                 data-i18n-tip="tip-poll-play"
               >
-                <svg class="ic" style="width: 9px; height: 9px"><use href="#i-play" /></svg>
+                <svg class="ic"><use href="#i-play" /></svg>
               </button>
               <button
                 class="ctrl-btn"
                 id="ibtn-stop"
-                data-tip="Pause live polling"
+                data-tip="Pause polling"
                 data-i18n-tip="tip-poll-stop"
               >
-                <svg class="ic" style="width: 9px; height: 9px"><use href="#i-stop" /></svg>
+                <svg class="ic"><use href="#i-stop" /></svg>
               </button>
             </div>
           </div>
           <div id="live-empty" hidden>
             <img src="./assets/illustrations/undraw_server_9eix.svg" class="empty-illus" alt="" />
             <div class="empty-msg" data-i18n="empty-live">
-              No events yet — waiting for ATLAS Live data from ATLANTIS
+              No events yet — waiting for ATLAS Live data
             </div>
           </div>
           <div id="evt-list"></div>
         </div>
 
-        <!-- SERVER: folder on user machine, auto-refresh -->
         <div id="live-server-sec" class="live-sub" hidden>
           <div id="server-top">
             <button id="btn-server-pick" class="file-pick-btn sm">
-              <svg class="ic" style="width: 11px; height: 11px"><use href="#i-folder" /></svg>
+              <svg class="ic"><use href="#i-folder" /></svg>
               <span data-i18n="server-folder">Select Folder</span>
             </button>
             <input id="server-folder-in" type="file" accept=".xml" multiple webkitdirectory />
-            <!-- Remote-mode bar: shown when /api/xml/* is reachable -->
             <div id="server-remote-bar" class="server-remote-bar" hidden>
               <button
                 id="server-folder-cur"
@@ -350,7 +449,7 @@
                 data-tip="Change folder"
                 data-i18n-tip="tip-server-change"
               >
-                <svg class="ic" style="width: 11px; height: 11px"><use href="#i-folder" /></svg>
+                <svg class="ic"><use href="#i-folder" /></svg>
                 <span id="server-folder-cur-text" class="server-folder-cur-text"></span>
                 <i class="ti ti-pencil server-folder-edit-ic"></i>
               </button>
@@ -358,16 +457,15 @@
             <button
               id="server-refresh-btn"
               class="server-refresh-btn"
-              data-tip="Pause folder polling"
+              data-tip="Pause polling"
               data-i18n-tip="tip-poll-stop"
               hidden
             >
               <i class="ti ti-rotate-clockwise refresh-ic"></i>
-              <svg class="ic pause-ic" style="width: 9px; height: 9px"><use href="#i-stop" /></svg>
-              <svg class="ic play-ic" style="width: 9px; height: 9px"><use href="#i-play" /></svg>
+              <svg class="ic pause-ic"><use href="#i-stop" /></svg>
+              <svg class="ic play-ic"><use href="#i-play" /></svg>
             </button>
           </div>
-          <!-- Inline edit row: open via remote bar click -->
           <div id="server-folder-edit" class="server-folder-edit" hidden>
             <input
               id="server-folder-input"
@@ -401,18 +499,18 @@
         </div>
       </div>
 
-      <!-- Sample events mode -->
+      <!-- ── Sample events ────────────────────────────────── -->
       <div id="sample-sec" hidden>
         <div id="sample-top">
           <button id="btn-sample-add" class="file-pick-btn sm">
-            <svg class="ic" style="width: 11px; height: 11px"><use href="#i-up" /></svg>
+            <svg class="ic"><use href="#i-up" /></svg>
             <span data-i18n="sample-upload">Add XML</span>
           </button>
           <input id="sample-file-in" type="file" accept=".xml" />
           <button
             id="btn-sample-clear"
             class="sm-icon-btn"
-            data-tip="Remove all XMLs from the list"
+            data-tip="Clear all uploaded XMLs"
             data-i18n-tip="tip-sample-clear"
           >
             <i class="ti ti-trash"></i>
@@ -422,7 +520,7 @@
         <div id="sample-list"></div>
       </div>
 
-      <!-- Download / load progress bar (only visible while loading) -->
+      <!-- ── Inline download progress ─────────────────────── -->
       <div id="dl-progress" hidden>
         <div class="dl-stages">
           <div class="dl-stage" id="dlst-request">
@@ -453,33 +551,26 @@
         <div id="dl-bar-track"><div id="dl-bar-fill"></div></div>
       </div>
 
-      <div id="statusbar">
+      <footer id="statusbar">
+        <span class="status-dot" aria-hidden="true"></span>
         <span id="status-txt" data-i18n="status-init">Initializing…</span>
         <span class="badge" id="req-badge" data-tip="Total requests this session">0 req</span>
-      </div>
+      </footer>
+
       <div id="panel-resizer"></div>
     </aside>
 
     <div id="panel-edge"></div>
     <div id="rpanel-edge"></div>
 
-    <!-- ── Right retractable panels ───────────────────────────── -->
+    <!-- ─────────────────────────────────────────────────────────
+         RIGHT DOCK — energy threshold sliders + cluster/jet panel
+         ───────────────────────────────────────────────────────── -->
     <div id="rpanel-wrap">
-      <!-- ── Cluster panel (top) ─────────────────────────────────── -->
-      <aside id="rpanel2">
-        <div
-          id="det-tab-bar-cluster"
-          style="border-bottom: 1px solid var(--border); flex-shrink: 0"
-        >
-          <div
-            class="det-tab on"
-            id="cluster-tab-label"
-            style="--tab-col: #ff4400; pointer-events: none"
-          >
-            Cluster
-          </div>
+      <aside id="rpanel2" aria-label="Cluster / jet thresholds">
+        <div id="det-tab-bar-cluster">
+          <div class="det-tab on" id="cluster-tab-label" style="--tab-col: #ff5a3a">Cluster</div>
         </div>
-        <!-- Custom jet-collection dropdown (replaces native <select>) -->
         <button
           id="jet-coll-trigger"
           class="jet-coll-trigger"
@@ -498,7 +589,7 @@
           <div
             class="strak"
             id="cluster-strak"
-            style="background: linear-gradient(to top, #661a00 0%, #ff4400 100%)"
+            style="background: linear-gradient(to top, #4a1a14 0%, #ff5a3a 100%)"
           >
             <div class="sthumb" id="cluster-sthumb"></div>
           </div>
@@ -506,57 +597,53 @@
         </div>
       </aside>
 
-      <!-- ── Detector panel (bottom) ────────────────────────────── -->
-      <aside id="rpanel">
-        <div id="det-tab-bar">
-          <button class="det-tab on" id="tab-tile" style="--tab-col: #c87c18">TILE</button>
-          <button class="det-tab" id="tab-lar" style="--tab-col: #27b568">LAr</button>
-          <button class="det-tab" id="tab-fcal" style="--tab-col: #b87333">FCAL</button>
-          <button class="det-tab" id="tab-hec" style="--tab-col: #66e0f6">HEC</button>
-          <button class="det-tab" id="tab-track" style="--tab-col: #ffea00">Track</button>
-          <button class="det-tab mobile-only" id="tab-cluster" style="--tab-col: #ff4400">
-            Cluster
+      <aside id="rpanel" aria-label="Detector thresholds">
+        <div id="det-tab-bar" role="tablist">
+          <button class="det-tab on" id="tab-tile" style="--tab-col: #f0a050">TILE</button>
+          <button class="det-tab" id="tab-lar" style="--tab-col: #4dd680">LAr</button>
+          <button class="det-tab" id="tab-fcal" style="--tab-col: #cd8e4f">FCAL</button>
+          <button class="det-tab" id="tab-hec" style="--tab-col: #6bd4ed">HEC</button>
+          <button class="det-tab" id="tab-track" style="--tab-col: #f0d040">Trk</button>
+          <button class="det-tab mobile-only" id="tab-cluster" style="--tab-col: #ff5a3a">
+            Clu
           </button>
         </div>
 
-        <!-- ── TILE pane ──────────────────────────────────────── -->
         <div class="det-pane" id="pane-tile">
           <div class="pane-det-row">
-            <span class="pane-det-dot" style="background: #ff8c00"></span>
+            <span class="pane-det-dot" style="background: #f0a050"></span>
             <span class="pane-det-name">TileCal</span>
           </div>
           <div class="sval" id="tile-sval-max">2.00 GeV</div>
           <div
             class="strak"
             id="tile-strak"
-            style="background: linear-gradient(to top, #ffff00 0%, #4d0000 100%)"
+            style="background: linear-gradient(to top, #ffe066 0%, #4d0000 100%)"
           >
             <div class="sthumb" id="tile-sthumb"></div>
           </div>
           <div class="sval" id="tile-sval-min">0 GeV</div>
         </div>
 
-        <!-- ── LAr pane ───────────────────────────────────────── -->
         <div class="det-pane" id="pane-lar" style="display: none">
           <div class="pane-det-row">
-            <span class="pane-det-dot" style="background: #00ff40"></span>
+            <span class="pane-det-dot" style="background: #4dd680"></span>
             <span class="pane-det-name">LAr EM</span>
           </div>
           <div class="sval" id="lar-sval-max">1.00 GeV</div>
           <div
             class="strak"
             id="lar-strak"
-            style="background: linear-gradient(to top, #17cf42 0%, #270042 100%)"
+            style="background: linear-gradient(to top, #4dd680 0%, #2a0a4a 100%)"
           >
             <div class="sthumb" id="lar-sthumb"></div>
           </div>
           <div class="sval" id="lar-sval-min">0 GeV</div>
         </div>
 
-        <!-- ── FCAL pane ──────────────────────────────────────── -->
         <div class="det-pane" id="pane-fcal" style="display: none">
           <div class="pane-det-row">
-            <span class="pane-det-dot" style="background: #b87333"></span>
+            <span class="pane-det-dot" style="background: #cd8e4f"></span>
             <span class="pane-det-name">LAr FCAL</span>
           </div>
           <div class="sval" id="fcal-sval-max">7.00 GeV</div>
@@ -579,34 +666,32 @@
           <div class="sval" id="fcal-sval-min">0 GeV</div>
         </div>
 
-        <!-- ── HEC pane ───────────────────────────────────────── -->
         <div class="det-pane" id="pane-hec" style="display: none">
           <div class="pane-det-row">
-            <span class="pane-det-dot" style="background: #00e0ff"></span>
+            <span class="pane-det-dot" style="background: #6bd4ed"></span>
             <span class="pane-det-name">LAr HEC</span>
           </div>
           <div class="sval" id="hec-sval-max">5.00 GeV</div>
           <div
             class="strak"
             id="hec-strak"
-            style="background: linear-gradient(to top, #66e0f6 0%, #0c0368 100%)"
+            style="background: linear-gradient(to top, #6bd4ed 0%, #0c0368 100%)"
           >
             <div class="sthumb" id="hec-sthumb"></div>
           </div>
           <div class="sval" id="hec-sval-min">0 GeV</div>
         </div>
 
-        <!-- ── Track pane ──────────────────────────────────────── -->
         <div class="det-pane" id="pane-track" style="display: none">
           <div class="pane-det-row">
-            <span class="pane-det-dot" style="background: #ffea00"></span>
+            <span class="pane-det-dot" style="background: #f0d040"></span>
             <span class="pane-det-name">Tracks</span>
           </div>
           <div class="sval" id="track-sval-max">– GeV</div>
           <div
             class="strak"
             id="track-strak"
-            style="background: linear-gradient(to top, #665500 0%, #ffea00 100%)"
+            style="background: linear-gradient(to top, #5a4a08 0%, #f0d040 100%)"
           >
             <div class="sthumb" id="track-sthumb"></div>
           </div>
@@ -615,153 +700,11 @@
         </div>
       </aside>
     </div>
-    <!-- #rpanel-wrap -->
 
-    <!-- ── Bottom toolbar ─────────────────────────────────────── -->
-    <div id="toolbar">
-      <button
-        class="tbtn"
-        id="btn-panel"
-        data-tip="Toggle the sidebar panel (M)"
-        data-i18n-tip="tip-panel"
-      >
-        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-sidebar" /></svg>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn"
-        id="btn-cinema"
-        data-tip="Cinema mode — auto-rotation, hide UI (C)"
-        data-i18n-tip="tip-cinema"
-      >
-        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-film" /></svg>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn"
-        id="btn-helpers"
-        data-tip="Helpers — Ghost, Cell Info, Vertices, Jet/Cluster lines"
-        data-i18n-tip="tip-helpers"
-      >
-        <i class="ti ti-adjustments-horizontal" style="font-size: 15px"></i>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn on"
-        id="btn-layers"
-        data-tip="Detector layers — toggle geometry visibility"
-        data-i18n-tip="tip-layers"
-      >
-        <i class="ti ti-layers-subtract" style="font-size: 15px"></i>
-      </button>
-      <div class="tbtn-sep"></div>
-      <div class="tseg" id="view-level">
-        <button
-          class="tseg-btn"
-          data-level="1"
-          data-tip="Level 1 — Hits: raw cells and tracks"
-          data-i18n-tip="tip-view-level-1"
-        >
-          1
-        </button>
-        <button
-          class="tseg-btn"
-          data-level="2"
-          data-tip="Level 2 — Clusters: adds η/φ cluster lines"
-          data-i18n-tip="tip-view-level-2"
-        >
-          2
-        </button>
-        <button
-          class="tseg-btn on"
-          data-level="3"
-          data-tip="Level 3 — Particles: jets, photons, electrons and muons"
-          data-i18n-tip="tip-view-level-3"
-        >
-          3
-        </button>
-      </div>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn on"
-        id="btn-cluster"
-        data-tip="Particles popover — γ / e / μ / τ (level 3 only) (K)"
-        data-i18n-tip="tip-particles"
-      >
-        <i class="ti ti-focus-2" style="font-size: 15px"></i>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn"
-        id="btn-rpanel"
-        data-tip="Energy threshold panel (E)"
-        data-i18n-tip="tip-rpanel"
-      >
-        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-sliders" /></svg>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn"
-        id="btn-reset"
-        data-tip="Reset camera to default position (R)"
-        data-i18n-tip="tip-reset"
-      >
-        <i class="ti ti-refresh"></i>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button class="tbtn" id="btn-shot" data-tip="Save screenshot (P)" data-i18n-tip="tip-shot">
-        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-camera" /></svg>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn"
-        id="btn-bgcolor"
-        data-tip="Background color — pick scene background (Shift+B)"
-        data-i18n-tip="tip-bgcolor"
-      >
-        <i class="ti ti-color-swatch" style="font-size: 15px"></i>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn"
-        id="btn-slicer"
-        data-tip="Slicer — cylindrical-wedge carve (Shift+S)"
-        data-i18n-tip="tip-slicer"
-      >
-        <i class="ti ti-3d-cube-sphere" style="font-size: 15px"></i>
-      </button>
-      <div class="tbtn-sep"></div>
-      <button
-        class="tbtn"
-        id="btn-settings"
-        data-tip="Settings — sponsors, shortcuts, preferences (S)"
-        data-i18n-tip="tip-settings"
-      >
-        <i class="ti ti-settings" style="font-size: 15px"></i>
-      </button>
-      <button
-        class="tbtn"
-        id="btn-lang"
-        data-tip="Switch display language"
-        data-i18n-tip="tip-lang"
-      >
-        <svg class="ic" style="width: 14px; height: 14px"><use href="#i-globe" /></svg>
-      </button>
-      <!-- Close button, visible only in mobile/landscape -->
-      <div class="tbtn-sep" id="toolbar-close-sep"></div>
-      <button class="tbtn" id="btn-toolbar-close" data-tip="Hide toolbar">
-        <svg class="ic" style="width: 12px; height: 12px; stroke-width: 2.5">
-          <use href="#i-x" />
-        </svg>
-      </button>
-    </div>
-
-    <!-- ── Jet collection dropdown (custom popover, anchored to #jet-coll-trigger) ─
-         Lives at <body> root so it escapes the backdrop-filter containing
-         block on #rpanel2 (which would otherwise trap position:fixed). -->
+    <!-- ── Jet collection dropdown (escapes rpanel containing block) ─ -->
     <div id="jet-coll-menu" class="jet-coll-menu" role="listbox"></div>
 
-    <!-- ── Language dropdown ──────────────────────────────────── -->
+    <!-- ── Language menu ────────────────────────────────────── -->
     <div id="lang-menu">
       <button class="lang-opt on" data-lang="en"><span class="fi fi-gb"></span>English</button>
       <button class="lang-opt" data-lang="fr"><span class="fi fi-fr"></span>Français</button>
@@ -769,14 +712,17 @@
       <button class="lang-opt" data-lang="pt"><span class="fi fi-br"></span>Português</button>
     </div>
 
-    <!-- ── Cinema exit ────────────────────────────────────────── -->
+    <!-- ── Cinema-mode exit chip ────────────────────────────── -->
     <button id="cinema-exit">
-      <svg class="ic" style="width: 11px; height: 11px; stroke-width: 2.5"><use href="#i-x" /></svg>
+      <svg class="ic" style="stroke-width: 2.5"><use href="#i-x" /></svg>
       <span data-i18n="cinema-exit">Exit Cinema</span>
     </button>
 
-    <!-- ── Layers panel ───────────────────────────────────────── -->
-    <div id="layers-panel">
+    <!-- ─────────────────────────────────────────────────────────
+         Floating popovers — Layers / Particles / Helpers
+         (positioned by anchoredPopover.js relative to their button)
+         ───────────────────────────────────────────────────────── -->
+    <div id="layers-panel" class="popover" role="dialog" aria-label="Detector layers">
       <div class="layers-head">
         <span class="layers-title" data-i18n="layers-title">Detector Layers</span>
         <div class="layers-quick">
@@ -784,14 +730,7 @@
           <button class="layers-qbtn" id="lbtn-none" data-i18n="layers-none">None</button>
         </div>
       </div>
-      <!-- Layer rows are generated by js/bootstrap/layersPanel.js from a tree
-       config so the markup stays in sync with visibility.layerVis. -->
       <div id="layers-tree"></div>
-      <!-- "Inner" group: per-event overlays (Tracks + Hits), placed AFTER the
-       static geometry tree so detector layers come first. Starts collapsed
-       like every other parent in the panel; click the row to expand. The
-       parent gswitch bulk-flips both children. The J keyboard shortcut still
-       clicks #btn-tracks (see js/viewerShortcuts.js). -->
       <div class="layer-group" id="overlay-inner-detector-group">
         <div class="layer-row layer-row-parent" id="overlay-inner-detector-row">
           <span class="layer-twist">
@@ -799,14 +738,14 @@
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2.5"
+              stroke-width="2.4"
               stroke-linecap="round"
               stroke-linejoin="round"
             >
               <polyline points="9 6 15 12 9 18" />
             </svg>
           </span>
-          <span class="layer-dot" style="background: #ffea00"></span>
+          <span class="layer-dot" style="background: #f0d040"></span>
           <div class="layer-info">
             <div class="layer-name" data-i18n="overlay-inner">Inner</div>
             <div class="layer-sub" data-i18n="overlay-inner-sub">Inner Detector</div>
@@ -816,11 +755,11 @@
             id="btn-inner-detector"
             role="switch"
             aria-checked="true"
-            style="--gswitch-col: #ffea00"
+            style="--gswitch-col: #f0d040"
           ></button>
         </div>
         <div class="layer-row layer-row-child">
-          <span class="layer-dot" style="background: #ffea00"></span>
+          <span class="layer-dot" style="background: #f0d040"></span>
           <div class="layer-info">
             <div class="layer-name" data-i18n="overlay-tracks">Tracks</div>
             <div class="layer-sub" data-i18n="overlay-tracks-sub">Particle paths (J)</div>
@@ -830,11 +769,11 @@
             id="btn-tracks"
             role="switch"
             aria-checked="true"
-            style="--gswitch-col: #ffea00"
+            style="--gswitch-col: #f0d040"
           ></button>
         </div>
         <div class="layer-row layer-row-child">
-          <span class="layer-dot" style="background: #ffffff"></span>
+          <span class="layer-dot" style="background: #f5f7fa"></span>
           <div class="layer-info">
             <div class="layer-name" data-i18n="overlay-hits">Hits</div>
             <div class="layer-sub" data-i18n="overlay-hits-sub">Per-track hits on hover</div>
@@ -844,19 +783,18 @@
             id="btn-hits"
             role="switch"
             aria-checked="true"
-            style="--gswitch-col: #ffffff"
+            style="--gswitch-col: #f5f7fa"
           ></button>
         </div>
       </div>
     </div>
 
-    <!-- ── Particles panel (level-3 K-button popover) ───────────── -->
-    <div id="particles-panel">
+    <div id="particles-panel" class="popover" role="dialog" aria-label="Particles">
       <div class="layers-head">
         <span class="layers-title" data-i18n="particles-title">Particles</span>
       </div>
       <div class="layer-row">
-        <span class="layer-dot" style="background: #ffea00"></span>
+        <span class="layer-dot" style="background: #f0d040"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-photons">γ</div>
           <div class="layer-sub" data-i18n="particles-photons-sub">Spring lines (γ)</div>
@@ -866,11 +804,11 @@
           id="ptog-photons"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #ffea00"
+          style="--gswitch-col: #f0d040"
         ></button>
       </div>
       <div class="layer-row">
-        <span class="layer-dot" style="background: #ff3030"></span>
+        <span class="layer-dot" style="background: #ff5a4a"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-electrons">e±</div>
           <div class="layer-sub" data-i18n="particles-electrons-sub">e± matched lines</div>
@@ -880,11 +818,11 @@
           id="ptog-electrons"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #ff3030"
+          style="--gswitch-col: #ff5a4a"
         ></button>
       </div>
       <div class="layer-row">
-        <span class="layer-dot" style="background: #4a90d9"></span>
+        <span class="layer-dot" style="background: #5b8cff"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-muons">μ±</div>
           <div class="layer-sub" data-i18n="particles-muons-sub">μ± matched lines</div>
@@ -894,11 +832,11 @@
           id="ptog-muons"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #4a90d9"
+          style="--gswitch-col: #5b8cff"
         ></button>
       </div>
       <div class="layer-row">
-        <span class="layer-dot" style="background: #b366ff"></span>
+        <span class="layer-dot" style="background: #b87aff"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-taus">τ±</div>
           <div class="layer-sub" data-i18n="particles-taus-sub">τ± matched lines</div>
@@ -908,11 +846,11 @@
           id="ptog-taus"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #b366ff"
+          style="--gswitch-col: #b87aff"
         ></button>
       </div>
       <div class="layer-row">
-        <span class="layer-dot" style="background: #ff66cc"></span>
+        <span class="layer-dot" style="background: #ff7ad0"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-met">ν</div>
           <div class="layer-sub" data-i18n="particles-met-sub">Missing-Eᴛ neutrino arrow</div>
@@ -922,15 +860,14 @@
           id="ptog-met"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #ff66cc"
+          style="--gswitch-col: #ff7ad0"
         ></button>
       </div>
-      <!-- Background "unmatched" filters: hide tracks / photons that didn't
-       get associated to any reconstructed object. Both off by default so
-       the user starts on a labelled-physics view. -->
+
       <hr class="layer-sep" />
+
       <div class="layer-row">
-        <span class="layer-dot" style="background: #ffea00"></span>
+        <span class="layer-dot" style="background: #f0d040"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-unmatched">Unmatched Tracks</div>
           <div class="layer-sub" data-i18n="particles-unmatched-sub">No particle association</div>
@@ -940,11 +877,11 @@
           id="ptog-unmatched"
           role="switch"
           aria-checked="false"
-          style="--gswitch-col: #ffea00"
+          style="--gswitch-col: #f0d040"
         ></button>
       </div>
       <div class="layer-row">
-        <span class="layer-dot" style="background: #ffcc00"></span>
+        <span class="layer-dot" style="background: #ffc940"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-unmatched-photons">Unmatched γ</div>
           <div class="layer-sub" data-i18n="particles-unmatched-photons-sub">
@@ -956,11 +893,11 @@
           id="ptog-unmatched-photons"
           role="switch"
           aria-checked="false"
-          style="--gswitch-col: #ffcc00"
+          style="--gswitch-col: #ffc940"
         ></button>
       </div>
       <div class="layer-row">
-        <span class="layer-dot" style="background: #4a90d9"></span>
+        <span class="layer-dot" style="background: #5b8cff"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-unmatched-muons">Unmatched μ</div>
           <div class="layer-sub" data-i18n="particles-unmatched-muons-sub">
@@ -972,11 +909,11 @@
           id="ptog-unmatched-muons"
           role="switch"
           aria-checked="false"
-          style="--gswitch-col: #4a90d9"
+          style="--gswitch-col: #5b8cff"
         ></button>
       </div>
       <div class="layer-row">
-        <span class="layer-dot" style="background: #b366ff"></span>
+        <span class="layer-dot" style="background: #b87aff"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="particles-unmatched-taus">Unmatched τ</div>
           <div class="layer-sub" data-i18n="particles-unmatched-taus-sub">
@@ -988,18 +925,17 @@
           id="ptog-unmatched-taus"
           role="switch"
           aria-checked="false"
-          style="--gswitch-col: #b366ff"
+          style="--gswitch-col: #b87aff"
         ></button>
       </div>
     </div>
 
-    <!-- ── Helpers popover (Ghost / Cell Info / Unmatched / Jet-Cluster Lines) ─ -->
-    <div id="helpers-panel">
+    <div id="helpers-panel" class="popover" role="dialog" aria-label="Helpers">
       <div class="layers-head">
         <span class="layers-title" data-i18n="helpers-title">Helpers</span>
       </div>
       <div class="layer-row" id="hrow-ghost">
-        <span class="layer-dot" style="background: #4a90d9"></span>
+        <span class="layer-dot" style="background: #5b8cff"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="helpers-ghost">Ghost</div>
           <div class="layer-sub" data-i18n="helpers-ghost-sub">Sub-detector outlines (G)</div>
@@ -1009,11 +945,11 @@
           id="hbtn-ghost"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #4a90d9"
+          style="--gswitch-col: #5b8cff"
         ></button>
       </div>
       <div class="layer-row" id="hrow-info">
-        <span class="layer-dot" style="background: #66ccff"></span>
+        <span class="layer-dot" style="background: #6bd4ed"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="helpers-info">Cell Info</div>
           <div class="layer-sub" data-i18n="helpers-info-sub">Hover tooltip + outline (I)</div>
@@ -1023,11 +959,11 @@
           id="hbtn-info"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #66ccff"
+          style="--gswitch-col: #6bd4ed"
         ></button>
       </div>
       <div class="layer-row" id="hrow-vertices">
-        <span class="layer-dot" style="background: #ffffff"></span>
+        <span class="layer-dot" style="background: #f5f7fa"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="helpers-vertices">Vertices</div>
           <div class="layer-sub" data-i18n="helpers-vertices-sub">
@@ -1039,11 +975,11 @@
           id="hbtn-vertices"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #ffffff"
+          style="--gswitch-col: #f5f7fa"
         ></button>
       </div>
       <div class="layer-row" id="hrow-labels">
-        <span class="layer-dot" style="background: #ffea00"></span>
+        <span class="layer-dot" style="background: #f0d040"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="helpers-labels">Track Labels</div>
           <div class="layer-sub" data-i18n="helpers-labels-sub">
@@ -1055,13 +991,11 @@
           id="hbtn-labels"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #ffea00"
+          style="--gswitch-col: #f0d040"
         ></button>
       </div>
-      <!-- Lines row is level-aware: hidden at L1, "Cluster Lines" at L2,
-       "Jet Lines" at L3. Label/sub swapped from JS in helpersPanel.js. -->
       <div class="layer-row" id="hrow-lines">
-        <span class="layer-dot" style="background: #ff8800"></span>
+        <span class="layer-dot" style="background: #ffa040"></span>
         <div class="layer-info">
           <div class="layer-name" data-i18n="helpers-jet-lines">Jet Lines</div>
           <div class="layer-sub" data-i18n="helpers-jet-lines-sub">η/φ centerlines (jets + τ)</div>
@@ -1071,16 +1005,15 @@
           id="hbtn-lines"
           role="switch"
           aria-checked="true"
-          style="--gswitch-col: #ff8800"
+          style="--gswitch-col: #ffa040"
         ></button>
       </div>
     </div>
 
-    <!-- ── Atlas geometry panel ────────────────────────────────── -->
-
-    <!-- ── Settings panel ─────────────────────────────────────── -->
-    <div id="settings-panel">
-      <!-- Preferences -->
+    <!-- ─────────────────────────────────────────────────────────
+         Settings popover (anchored to #btn-settings)
+         ───────────────────────────────────────────────────────── -->
+    <div id="settings-panel" class="popover" role="dialog" aria-label="Settings">
       <div class="sett-section">
         <div class="sett-hdr" data-i18n="sett-preferences">Preferences</div>
         <div class="sett-row">
@@ -1093,7 +1026,7 @@
             id="stog-hints"
             role="switch"
             aria-checked="true"
-            style="--gswitch-col: #2467e0"
+            style="--gswitch-col: #5b8cff"
           ></button>
         </div>
         <div class="sett-row">
@@ -1108,7 +1041,7 @@
             id="stog-autopen"
             role="switch"
             aria-checked="true"
-            style="--gswitch-col: #2467e0"
+            style="--gswitch-col: #5b8cff"
           ></button>
         </div>
         <div class="sett-row">
@@ -1123,7 +1056,7 @@
             id="stog-tour"
             role="switch"
             aria-checked="false"
-            style="--gswitch-col: #ff8a3c"
+            style="--gswitch-col: #ffa040"
           ></button>
         </div>
         <div class="sett-row">
@@ -1138,7 +1071,7 @@
             id="stog-collision-hud"
             role="switch"
             aria-checked="true"
-            style="--gswitch-col: #66ccff"
+            style="--gswitch-col: #6bd4ed"
           ></button>
         </div>
         <div class="sett-row">
@@ -1157,7 +1090,6 @@
           ></button>
         </div>
       </div>
-      <!-- Keyboard shortcuts -->
       <div class="sett-section">
         <div class="sett-hdr" data-i18n="sett-shortcuts">Keyboard Shortcuts</div>
         <div class="sk-grid">
@@ -1172,7 +1104,7 @@
           <span class="sk-key">C</span
           ><span class="sk-desc" data-i18n="sk-cinema">Cinema mode</span>
           <span class="sk-key">M</span
-          ><span class="sk-desc" data-i18n="sk-menu">Menu (sidebar)</span>
+          ><span class="sk-desc" data-i18n="sk-menu">Toggle sidebar</span>
           <span class="sk-key">E</span
           ><span class="sk-desc" data-i18n="sk-energy">Energy panel</span>
           <span class="sk-key">P</span><span class="sk-desc" data-i18n="sk-shot">Screenshot</span>
@@ -1196,27 +1128,170 @@
       </div>
     </div>
 
-    <!-- ── Rotate-to-landscape hint (portrait phones only) ───── -->
-    <div id="rotate-hint">
-      <div class="rotate-hint-gif" role="img" aria-label="rotate device"></div>
-      <div class="rotate-hint-text" data-i18n="rotate-hint">
-        Please rotate your device to landscape
+    <!-- ─────────────────────────────────────────────────────────
+         Background-color picker popover (anchored to #btn-bgcolor)
+         ───────────────────────────────────────────────────────── -->
+    <div id="bgcolor-popover" class="popover" role="dialog" aria-label="Background color">
+      <div class="bgcp-head">
+        <span class="bgcp-title" data-i18n="bgcp-title">Scene Background</span>
+        <button id="bgcp-close" class="bgcp-close" data-tip="Close">
+          <svg class="ic" style="stroke-width: 2.5"><use href="#i-x" /></svg>
+        </button>
+      </div>
+      <div class="bgcp-canvas-row">
+        <div class="bgcp-sv" id="bgcp-sv">
+          <div class="bgcp-sv-cursor" id="bgcp-sv-cursor"></div>
+        </div>
+        <div class="bgcp-hue" id="bgcp-hue-strip">
+          <div class="bgcp-hue-cursor" id="bgcp-hue-cursor"></div>
+        </div>
+      </div>
+      <div class="bgcp-preview">
+        <div class="bgcp-swatch" id="bgcp-swatch"></div>
+        <input
+          type="text"
+          id="bgcp-hex"
+          class="bgcp-hex"
+          maxlength="7"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <div class="bgcp-presets-hdr" data-i18n="bgcp-presets">Presets</div>
+      <div class="bgcp-presets">
+        <button class="bgcp-preset" data-c="#0e1014" data-tip="Default — Graphite"></button>
+        <button class="bgcp-preset" data-c="#000000" data-tip="Black"></button>
+        <button class="bgcp-preset" data-c="#1a1a1a" data-tip="Charcoal"></button>
+        <button class="bgcp-preset" data-c="#0b1f3a" data-tip="Deep Navy"></button>
+        <button class="bgcp-preset" data-c="#020d1c" data-tip="Prussian Blue"></button>
+        <button class="bgcp-preset" data-c="#1f2a44" data-tip="Slate"></button>
+        <button class="bgcp-preset" data-c="#ffffff" data-tip="White"></button>
+      </div>
+      <button id="bgcp-reset" class="bgcp-reset" data-i18n="bgcp-reset">Reset to Default</button>
+    </div>
+
+    <!-- ── Floating button-tip (hover hint) ──────────────────── -->
+    <div id="btn-tip"></div>
+
+    <!-- ── Collision info HUD (top-left) ─────────────────────── -->
+    <div id="collision-hud" hidden></div>
+
+    <!-- ── Cell hover tooltip ─────────────────────────────────── -->
+    <div id="tip" hidden>
+      <div id="tip-cell">—</div>
+      <div id="tip-coords"></div>
+      <hr class="tdiv" />
+      <div class="trow">
+        <span class="tkey" data-i18n="tip-energy-key">Energy</span>
+        <span class="tval" id="tip-e">—</span>
+      </div>
+      <div id="tip-extra"></div>
+    </div>
+
+    <!-- ── Threshold input pop-up (dblclick on slider track) ─── -->
+    <!-- Created lazily by detectorPanels.js but the styles live in panel-right.css -->
+
+    <!-- ─────────────────────────────────────────────────────────
+         About modal
+         ───────────────────────────────────────────────────────── -->
+    <div id="about-overlay">
+      <div class="about-card">
+        <div class="about-title-row">
+          <div class="about-title" data-i18n="about-title">Calorimeter Geometry Viewer</div>
+          <!-- ============================================================
+               BUMP VERSION ON RELEASE.
+               Edit just the text inside #cgv-version when cutting a new
+               .rpm for ATLAS Point 1. The element id stays stable so the
+               build script (or grep) can find it without ambiguity.
+               ============================================================ -->
+          <span id="cgv-version" class="about-version">v1.0.3</span>
+        </div>
+        <div class="about-sub" data-i18n="about-sub">ATLAS · TileCal · NIPSCERN</div>
+        <div class="about-body">
+          <p data-i18n="about-p1">
+            Web continuation of the PhD thesis of
+            <strong>Prof. Dr. Luciano Manhães de Andrade Filho</strong> — now as a browser-based
+            <strong>Calorimeter Geometry Viewer</strong> for the ATLAS Experiment at the LHC.
+          </p>
+          <div class="about-meta">
+            <strong><span data-i18n="about-advisor-lbl">Scientific Advisor</span></strong
+            ><br />
+            <span data-i18n="about-advisor-name">Prof. Dr. Luciano Manhães de Andrade Filho</span>
+          </div>
+          <div class="about-meta">
+            <strong><span data-i18n="about-dev-lbl">Undergraduate Developer</span></strong
+            ><br />
+            <span data-i18n="about-dev-name">Chrysthofer Arthur Amaro Afonso</span><br />
+            <span class="about-dev-affil" data-i18n="about-dev-sub"
+              >Undergraduate Research · NIPSCERN Laboratory</span
+            >
+          </div>
+          <div class="about-lab">
+            <span data-i18n="about-lab1"
+              >NIPSCERN — Núcleo de Instrumentação e Processamento de Sinais for CERN</span
+            ><br />
+            <span data-i18n="about-lab2">UFJF — Universidade Federal de Juiz de Fora, Brazil</span>
+          </div>
+          <div class="about-sponsors-hdr" data-i18n="about-supported-by">Supported by</div>
+          <div class="sponsor-grid">
+            <img
+              class="sponsor-img sponsor-atlas"
+              src="./assets/branding/ATLAS-Logo-Blue-transparent.png"
+              alt="ATLAS"
+              data-tip="ATLAS Experiment"
+            />
+            <img
+              class="sponsor-img"
+              src="./assets/branding/sponsors/cern.svg"
+              alt="CERN"
+              data-tip="CERN"
+            />
+            <img
+              class="sponsor-img"
+              src="./assets/branding/sponsors/cnpq.svg"
+              alt="CNPq"
+              data-tip="CNPq"
+            />
+            <img
+              class="sponsor-img"
+              src="./assets/branding/sponsors/capes.png"
+              alt="CAPES"
+              data-tip="CAPES"
+            />
+            <img
+              class="sponsor-img"
+              src="./assets/branding/sponsors/fapemig.png"
+              alt="FAPEMIG"
+              data-tip="FAPEMIG"
+            />
+            <img
+              class="sponsor-img"
+              src="./assets/branding/sponsors/ufjf.png"
+              alt="UFJF"
+              data-tip="UFJF"
+            />
+          </div>
+        </div>
+        <button class="about-close" id="btn-about-close">
+          <svg class="ic"><use href="#i-x" /></svg>
+          <span data-i18n="about-close">Close</span>
+        </button>
+        <div id="about-watermark">
+          <img src="./assets/icons/cgvweb_icon.svg" id="wm-cgv" alt="" />
+          <img src="./assets/icons/eye.svg" id="wm-eye" alt="" />
+        </div>
       </div>
     </div>
 
-    <!-- ── Mobile toolbar toggle ──────────────────────────────── -->
-    <button id="btn-toolbar-toggle" data-tip="Toggle toolbar">
-      <i class="ti ti-layout-navbar"></i>
-      Toolbar
-    </button>
-
-    <!-- ── Screenshot dialog ─────────────────────────────────── -->
+    <!-- ─────────────────────────────────────────────────────────
+         Screenshot dialog
+         ───────────────────────────────────────────────────────── -->
     <div id="shot-overlay">
       <div class="shot-card">
         <div class="shot-title" data-i18n="shot-title">Save Screenshot</div>
         <div class="shot-sub" data-i18n="shot-sub">
-          Select resolution. The scene renders at full quality — UI is hidden. The active tooltip is
-          composited if visible.
+          Pick a resolution. The scene renders at full quality with the UI hidden; the active cell
+          tooltip is composited if visible.
         </div>
         <div class="shot-grid">
           <button class="shot-res" data-w="1280" data-h="720">
@@ -1295,145 +1370,19 @@
       </div>
     </div>
 
-    <!-- ── Background color picker popover ───────────────────── -->
-    <div id="bgcolor-popover">
-      <div class="bgcp-head">
-        <span class="bgcp-title" data-i18n="bgcp-title">Scene Background</span>
-        <button id="bgcp-close" class="bgcp-close" data-tip="Close">
-          <svg class="ic" style="width: 10px; height: 10px; stroke-width: 2.5">
-            <use href="#i-x" />
-          </svg>
-        </button>
-      </div>
-      <div class="bgcp-canvas-row">
-        <div class="bgcp-sv" id="bgcp-sv">
-          <div class="bgcp-sv-cursor" id="bgcp-sv-cursor"></div>
-        </div>
-        <div class="bgcp-hue" id="bgcp-hue-strip">
-          <div class="bgcp-hue-cursor" id="bgcp-hue-cursor"></div>
-        </div>
-      </div>
-      <div class="bgcp-preview">
-        <div class="bgcp-swatch" id="bgcp-swatch"></div>
-        <input
-          type="text"
-          id="bgcp-hex"
-          class="bgcp-hex"
-          maxlength="7"
-          autocomplete="off"
-          spellcheck="false"
-        />
-      </div>
-      <div class="bgcp-presets-hdr" data-i18n="bgcp-presets">Presets</div>
-      <div class="bgcp-presets">
-        <button class="bgcp-preset" data-c="#020d1c" data-tip="Default — Prussian Blue"></button>
-        <button class="bgcp-preset" data-c="#000000" data-tip="Black"></button>
-        <button class="bgcp-preset" data-c="#1a1a1a" data-tip="Charcoal"></button>
-        <button class="bgcp-preset" data-c="#0b1f3a" data-tip="Deep Navy"></button>
-        <button class="bgcp-preset" data-c="#101820" data-tip="Graphite"></button>
-        <button class="bgcp-preset" data-c="#1f2a44" data-tip="Slate"></button>
-        <button class="bgcp-preset" data-c="#ffffff" data-tip="White"></button>
-      </div>
-      <button id="bgcp-reset" class="bgcp-reset" data-i18n="bgcp-reset">Reset to Default</button>
-    </div>
-
-    <!-- ── Button hint tooltip ───────────────────────────────── -->
-    <div id="btn-tip"></div>
-    <!-- ── Collision info HUD (top-left; toggleable in Settings) ── -->
-    <div id="collision-hud" hidden></div>
-
-    <!-- ── Cell hover tooltip ────────────────────────────────── -->
-    <div id="tip" hidden>
-      <div id="tip-cell">—</div>
-      <div id="tip-coords"></div>
-      <hr class="tdiv" />
-      <div class="trow">
-        <span class="tkey" data-i18n="tip-energy-key">Energy</span>
-        <span class="tval" id="tip-e">—</span>
-      </div>
-      <div id="tip-extra"></div>
-    </div>
-
-    <!-- ── About overlay ─────────────────────────────────────── -->
-    <div id="about-overlay">
-      <div class="about-card">
-        <div class="about-title" data-i18n="about-title">Calorimeter Geometry Viewer</div>
-        <div class="about-sub" data-i18n="about-sub">ATLAS · TileCal · NIPSCERN</div>
-        <div class="about-body">
-          <p data-i18n="about-p1">
-            Web continuation of the PhD thesis of
-            <strong>Prof. Dr. Luciano Manhães de Andrade Filho</strong> — now as a browser-based
-            <strong>Calorimeter Geometry Viewer</strong> for the ATLAS Experiment at the LHC.
-          </p>
-          <div class="about-meta">
-            <strong><span data-i18n="about-advisor-lbl">Scientific Advisor</span></strong
-            ><br />
-            <span data-i18n="about-advisor-name">Prof. Dr. Luciano Manhães de Andrade Filho</span>
-          </div>
-          <div class="about-meta">
-            <strong><span data-i18n="about-dev-lbl">Undergraduate Developer</span></strong
-            ><br />
-            <span data-i18n="about-dev-name">Chrysthofer Arthur Amaro Afonso</span><br />
-            <span style="font-size: 0.63rem; color: var(--muted)" data-i18n="about-dev-sub"
-              >Undergraduate Research · NIPSCERN Laboratory</span
-            >
-          </div>
-          <div class="about-lab">
-            <span data-i18n="about-lab1"
-              >NIPSCERN — Núcleo de Instrumentação e Processamento de Sinais for CERN</span
-            ><br />
-            <span data-i18n="about-lab2">UFJF — Universidade Federal de Juiz de Fora, Brazil</span>
-          </div>
-          <div class="about-sponsors-hdr" data-i18n="about-supported-by">Supported by</div>
-          <div class="sponsor-grid">
-            <img
-              class="sponsor-img sponsor-atlas"
-              src="./assets/branding/ATLAS-Logo-Blue-transparent.png"
-              alt="ATLAS"
-              data-tip="ATLAS Experiment"
-            />
-            <img
-              class="sponsor-img"
-              src="./assets/branding/sponsors/cern.svg"
-              alt="CERN"
-              data-tip="CERN"
-            />
-            <img
-              class="sponsor-img"
-              src="./assets/branding/sponsors/cnpq.svg"
-              alt="CNPq"
-              data-tip="CNPq"
-            />
-            <img
-              class="sponsor-img"
-              src="./assets/branding/sponsors/capes.png"
-              alt="CAPES"
-              data-tip="CAPES"
-            />
-            <img
-              class="sponsor-img"
-              src="./assets/branding/sponsors/fapemig.png"
-              alt="FAPEMIG"
-              data-tip="FAPEMIG"
-            />
-            <img
-              class="sponsor-img"
-              src="./assets/branding/sponsors/ufjf.png"
-              alt="UFJF"
-              data-tip="UFJF"
-            />
-          </div>
-        </div>
-        <button class="about-close" id="btn-about-close">
-          <svg class="ic" style="width: 11px; height: 11px"><use href="#i-x" /></svg>
-          <span data-i18n="about-close">Close</span>
-        </button>
-        <div id="about-watermark">
-          <img src="./assets/icons/cgvweb_icon.svg" id="wm-cgv" alt="" />
-          <img src="./assets/icons/eye.svg" id="wm-eye" alt="" />
-        </div>
+    <!-- ── Rotate-to-landscape hint (portrait phones only) ──── -->
+    <div id="rotate-hint">
+      <div class="rotate-hint-gif" role="img" aria-label="rotate device"></div>
+      <div class="rotate-hint-text" data-i18n="rotate-hint">
+        Please rotate your device to landscape
       </div>
     </div>
+
+    <!-- ── Mobile-landscape dock toggle ──────────────────────── -->
+    <button id="btn-toolbar-toggle" data-tip="Toggle dock">
+      <i class="ti ti-layout-navbar"></i>
+      <span data-i18n="dock-label">Dock</span>
+    </button>
 
     <script type="module" src="./js/main.js"></script>
     <script src="../../assets/js/analytics.js" defer></script>

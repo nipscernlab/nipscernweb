@@ -69,14 +69,29 @@ export function setupSidebarControls({
     btnSettings.classList.add('on');
     const br = btnSettings.getBoundingClientRect();
     requestAnimationFrame(() => {
-      const pw = settingsPanel.offsetWidth || 290;
+      const pw = settingsPanel.offsetWidth || 304;
       const ph = settingsPanel.offsetHeight || 320;
-      let left = br.left + br.width / 2 - pw / 2;
-      let top = br.top - ph - 10;
-      left = Math.max(6, Math.min(left, window.innerWidth - pw - 6));
-      top = Math.max(6, top);
-      settingsPanel.style.left = left + 'px';
-      settingsPanel.style.top = top + 'px';
+      const tb = document.getElementById('toolbar');
+      const tbr = tb ? tb.getBoundingClientRect() : { left: 0, height: 0, width: 0 };
+      const isVerticalDock = tbr.left < 8 && tbr.height > tbr.width;
+
+      if (isVerticalDock) {
+        // Right-of activity bar. Settings sits at the bottom of the bar
+        // so anchor near the button, clamped to the viewport.
+        const left = Math.min(window.innerWidth - pw - 8, br.right + 8);
+        let top = br.top + br.height / 2 - ph / 2;
+        top = Math.max(8, Math.min(top, window.innerHeight - ph - 8));
+        settingsPanel.style.left = `${Math.max(8, left)}px`;
+        settingsPanel.style.top = `${top}px`;
+        settingsPanel.style.bottom = '';
+      } else {
+        // Above-anchor (mobile horizontal dock).
+        let left = br.left + br.width / 2 - pw / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+        settingsPanel.style.left = `${left}px`;
+        settingsPanel.style.top = '';
+        settingsPanel.style.bottom = `${window.innerHeight - br.top + 10}px`;
+      }
     });
   }
 
