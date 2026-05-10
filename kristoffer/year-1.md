@@ -5,7 +5,7 @@
 
 ---
 
-## LOGIC — Trivium & Origins (13 texts)
+## LOGIC — Trivium & Origins (12 texts)
 
 ### 1. An Introduction to Formal Logic — Peter Smith
 Propositional & predicate logic syntax. Foundation of all formal reasoning.
@@ -42,9 +42,6 @@ Islamic medieval logic. Bridge between Aristotle and the Latin Schoolmen.
 
 ### 12. Konungs skuggsjá (The King's Mirror) — Anonymous (Old Norwegian, 13th c.)
 Medieval Norse philosophical dialogue. Reason, kingship, and natural philosophy.
-
-### 13. Escher on Escher: Exploring the Infinite — M.C. Escher
-Paradox, tessellation, and the visualization of infinity.
 
 ---
 
@@ -206,6 +203,7 @@ Aztec philosopher-king. Impermanence and beauty.
 - **San Rock Paintings (Drakensberg)** — Southern Africa
 - **Lapita Pottery** — Pacific Islands (~1600–500 BCE) *(ceramic art tracing Austronesian migration across Oceania)*
 - **Oseberg Ship & Viking Funerary Art** — Norway (9th c.)
+- **Escher on Escher: Exploring the Infinite** — M.C. Escher *(book; paradox, tessellation, visualization of infinity — visual culture meeting the limits of logic)*
 
 ---
 
@@ -281,7 +279,7 @@ Aztec philosopher-king. Impermanence and beauty.
 
 ## YEAR I COMPLETE SUMMARY
 
-### Logic (13 texts)
+### Logic (12 texts)
 1. An Introduction to Formal Logic — Peter Smith
 2. Ὄργανον — Aristotle
 3. Stoic Logic Fragments — Chrysippus
@@ -294,12 +292,11 @@ Aztec philosopher-king. Impermanence and beauty.
 10. Later Mohist Logic, Ethics and Science — A.C. Graham
 11. Avicenna on the Logic of Conditionals — Street
 12. Konungs skuggsjá — Anonymous (Old Norwegian)
-13. Escher on Escher — M.C. Escher
 
 ### Culture
 - **Books & Poetry:** 38 items (foundational myths, ancient epics, sacred texts)
 - **Documentaries:** 7 series
-- **Art:** 21 ancient/prehistoric works
+- **Art:** 22 works (prehistoric to ancient + Escher's book on visual paradox)
 - **Places & Architecture:** 22 sites
 - **Music:** 19 traditional/ancient forms
 - **Theater:** 4 ritual-drama traditions
