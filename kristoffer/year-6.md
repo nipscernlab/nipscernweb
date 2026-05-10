@@ -243,6 +243,9 @@ Swedish pipe-organ doom as liturgy. Enormous, dark, and sacred.
 **Apocalypse, girl · Blood Bitch** — Jenny Hval (2015 · 2016)
 Norwegian experimental pop as feminist theory in sound. Body, horror, desire, and politics as music.
 
+**Stjernestøv** — Aurora Aksnes
+Norwegian — "Stardust." Lullaby for the cosmic and the small. Music for the people who, in pain, still want to live.
+
 ---
 
 ### Film
@@ -352,7 +355,7 @@ With personal annotations on each.
 
 **Architecture & Places:** Brasília · Barcelona Pavilion · Therme Vals · Bruder Klaus · Naoshima · Guggenheim Bilbao · Oslo Opera House · Nasjonalmuseet · Munchmuseet · Allianz Arena
 
-**Music:** 4'33" · Music for 18 Musicians · Different Trains · In C · In Rainbows · Loveless · Pärt · Górecki · Glass · Adams · Ligeti · Penderecki · Saariaho · Aphex Twin · Boards of Canada · Burial · Sufjan Stevens · Nick Cave · Anna von Hausswolff · Jenny Hval
+**Music:** 4'33" · Music for 18 Musicians · Different Trains · In C · In Rainbows · Loveless · Pärt · Górecki · Glass · Adams · Ligeti · Penderecki · Saariaho · Aphex Twin · Boards of Canada · Burial · Sufjan Stevens · Nick Cave · Anna von Hausswolff · Jenny Hval · Aurora (Stjernestøv)
 
 **Film:** Melancholia · Bong Joon-ho · Park Chan-wook · Lee Chang-dong · Lanthimos · Apichatpong · Roy Andersson · Östlund · Béla Tarr · Dardenne · Haneke
 
@@ -370,13 +373,13 @@ Global synthesis — all prior regions revisited and unified
 
 | Year | Theme | Logic Texts | Culture Items | Total |
 |------|-------|-------------|---------------|-------|
-| I (2026) | Origins, Myth & The Foundations of Reason | 13 | 117 | 130 |
+| I (2026) | Origins, Myth & The Foundations of Reason | 12 | 118 | 130 |
 | II (2027) | Structure, Faith & The Living World | 6 | 67 | 73 |
 | III (2028) | Analysis & The Humanist Spark | 8 | 62 | 70 |
 | IV (2029) | Computation, Modernity & The Broken Mirror | 9 | 86 | 95 |
 | V (2030) | Categories, Plurality & The Global Chorus | 9 | 84 | 93 |
-| VI (2031) | Synthesis & Contemporary | 11 | 77 | 88 |
+| VI (2031) | Synthesis & Contemporary | 11 | 78 | 89 |
 
-**Total Logic Texts: 56 | Total Culture Items: 493 | Grand Total: 549**
+**Total Logic Texts: 55 | Total Culture Items: 495 | Grand Total: 550**
 
 **MAGNUM OPUS COMPLETE**
