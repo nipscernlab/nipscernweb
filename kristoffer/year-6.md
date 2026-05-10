@@ -1,7 +1,7 @@
 # THE ARCHITECT: Year VI (2031)
 ### Synthesis & Contemporary
 
-**Study Parameters:** 4 hours/day | 120 hours/month
+**Study Parameters:** Polymath intensity — unrestricted
 
 ---
 
@@ -368,15 +368,15 @@ Global synthesis — all prior regions revisited and unified
 
 ## THE COMPLETE ARCHITECT — ALL SIX YEARS
 
-| Year | Theme | Logic Texts | Culture Items |
-|------|-------|-------------|---------------|
-| I (2026) | Origins, Myth & Foundations of Reason | 9 | 33+ |
-| II (2027) | Structure, Faith & The Living World | 4 | 30+ |
-| III (2028) | Analysis, Topology & The Humanist Spark | 5 | 20+ |
-| IV (2029) | Computation, Modernity & The Broken Mirror | 7 | 26+ |
-| V (2030) | Categories, Plurality & The Global Chorus | 7 | 28+ |
-| VI (2031) | Synthesis & Contemporary | 11 | 75+ |
+| Year | Theme | Logic Texts | Culture Items | Total |
+|------|-------|-------------|---------------|-------|
+| I (2026) | Origins, Myth & The Foundations of Reason | 13 | 117 | 130 |
+| II (2027) | Structure, Faith & The Living World | 6 | 67 | 73 |
+| III (2028) | Analysis & The Humanist Spark | 8 | 62 | 70 |
+| IV (2029) | Computation, Modernity & The Broken Mirror | 9 | 86 | 95 |
+| V (2030) | Categories, Plurality & The Global Chorus | 9 | 84 | 93 |
+| VI (2031) | Synthesis & Contemporary | 11 | 77 | 88 |
 
-**Total Logic Texts: 49 | Total Culture Items: 465+**
+**Total Logic Texts: 56 | Total Culture Items: 493 | Grand Total: 549**
 
 **MAGNUM OPUS COMPLETE**
