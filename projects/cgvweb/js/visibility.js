@@ -104,6 +104,40 @@ export function initVisibility({ slicer }) {
   _slicer = slicer;
 }
 
+// ── η/φ region gate (driven by the minimap rectangle) ───────────────────────
+// When non-null, cells outside the rectangle in (η, φ) space are forced
+// invisible regardless of the energy threshold / cluster filter. Cleared when
+// the user wipes the rectangle or hides the minimap.
+/** @type {{etaMin:number, etaMax:number, phiMin:number, phiMax:number} | null} */
+let _etaPhiRegion = null;
+
+export function setEtaPhiRegion(region) {
+  _etaPhiRegion =
+    region &&
+    Number.isFinite(region.etaMin) &&
+    Number.isFinite(region.etaMax) &&
+    Number.isFinite(region.phiMin) &&
+    Number.isFinite(region.phiMax)
+      ? region
+      : null;
+  refreshSceneVisibility();
+}
+
+export function getEtaPhiRegion() {
+  return _etaPhiRegion;
+}
+
+function _inEtaPhiRegion(eta, phi) {
+  if (!_etaPhiRegion) return true;
+  if (!Number.isFinite(eta) || !Number.isFinite(phi)) return false;
+  return (
+    eta >= _etaPhiRegion.etaMin &&
+    eta <= _etaPhiRegion.etaMax &&
+    phi >= _etaPhiRegion.phiMin &&
+    phi <= _etaPhiRegion.phiMax
+  );
+}
+
 // Re-applies cluster / photon / electron visibility AND the cell cluster-filter
 // when the view level changes. Tracks are unaffected (they show at every level,
 // gated only by setTracksVisible).
@@ -414,7 +448,7 @@ export function applyThreshold() {
     visHandles = [];
     const acIds = getActiveClusterCellIds();
     const amLabels = getActiveMbtsLabels();
-    for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
+    for (const [h, { energyMev, det, cellId, mbtsLabel, eta, phi }] of active) {
       const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
       const detOn = _detOnFor(h);
       let inCluster;
@@ -429,7 +463,8 @@ export function applyThreshold() {
       }
       const passThr = _slicer?.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
       const passCl = _slicer?.isShowAllCells() || inCluster;
-      const vis = detOn && passThr && passCl;
+      const passRegion = _inEtaPhiRegion(eta, phi);
+      const vis = detOn && passThr && passCl && passRegion;
       _setHandleVisible(h, vis);
       if (vis) visHandles.push(h);
     }
@@ -451,7 +486,7 @@ function _applySlicerMask() {
   const slicerMask = slicer.getMaskState();
   const acIds = getActiveClusterCellIds();
   const amLabels = getActiveMbtsLabels();
-  for (const [h, { energyMev, det, cellId, mbtsLabel }] of active) {
+  for (const [h, { energyMev, det, cellId, mbtsLabel, eta, phi }] of active) {
     const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
     const detOn = _detOnFor(h);
     let inCluster;
@@ -466,7 +501,8 @@ function _applySlicerMask() {
     }
     const passThr = slicer.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
     const passCl = slicer.isShowAllCells() || inCluster;
-    const passFilter = detOn && passThr && passCl;
+    const passRegion = _inEtaPhiRegion(eta, phi);
+    const passFilter = detOn && passThr && passCl && passRegion;
     let vis = passFilter;
     if (vis) {
       const c = _cellCenter(h);

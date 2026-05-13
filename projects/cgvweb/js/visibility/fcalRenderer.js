@@ -18,7 +18,7 @@ import { scene, markDirty } from '../renderer.js';
 import { palColorFcal } from '../palette.js';
 import { thrFcalMev } from './thresholds.js';
 import { layerVis } from './layerVis.js';
-import { getSlicer, getActiveClusterCellIds } from '../visibility.js';
+import { getSlicer, getActiveClusterCellIds, getEtaPhiRegion } from '../visibility.js';
 import { refreshCaloBoundParticles } from '../particles.js';
 
 /**
@@ -114,6 +114,11 @@ function _applyFcalDraw() {
   // an index signature, so we read through `any`.
   const lv = /** @type {any} */ (layerVis);
 
+  // Minimap-driven η/φ window. FCAL records carry (x, y, z) in JiveXML cm —
+  // compute η/φ on the fly to test against the rect. Same flip convention as
+  // the renderer below (cx=-x*10 etc.) so φ matches the 3D scene's φ axis.
+  const region = getEtaPhiRegion();
+
   const visible = fcalCellsData.filter((c) => {
     // FCAL is filtered per-module instead of a single showFcal flag — module
     // 1=EM, 2=Had1, 3=Had2 (parser/src/lib.rs:694).
@@ -126,6 +131,19 @@ function _applyFcalDraw() {
       !activeClusterCellIds.has(c.id)
     )
       return false;
+    if (region) {
+      const r = Math.hypot(c.x, c.y);
+      const theta = Math.atan2(r, c.z);
+      const eta = -Math.log(Math.tan(theta / 2));
+      const phi = Math.atan2(-c.y, -c.x);
+      if (
+        eta < region.etaMin ||
+        eta > region.etaMax ||
+        phi < region.phiMin ||
+        phi > region.phiMax
+      )
+        return false;
+    }
     // slicerMask.active implies slicer was non-null (default literal has
     // active:false); guard explicitly for the type-checker.
     if (slicerMask.active && slicer) {

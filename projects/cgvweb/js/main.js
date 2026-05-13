@@ -46,6 +46,7 @@ import {
   applyClusterThreshold,
   applyJetThreshold,
   refreshSceneVisibility,
+  setEtaPhiRegion,
   getTrackGroup,
 } from './visibility.js';
 import { createDownloadProgressController } from './downloadProgress.js';
@@ -61,13 +62,14 @@ import { setupPanelResize } from './panelResize.js';
 import { setupButtonTooltips } from './buttonTooltips.js';
 import { setupMobileToolbar } from './mobileToolbar.js';
 import { processXml, setProcessXmlDeps } from './processXml.js';
-import { initMinimap, setMinimapVisible } from './minimap.js';
+import { initMinimap, setMinimapVisible, setMinimapRegionListener } from './minimap.js';
 import {
   initStatusHud,
   setStatus,
   updateCollisionHud,
   getLastEventInfo,
   setCollisionHudEnabled,
+  setCollisionHudSuppressed,
 } from './statusHud.js';
 import { setupTopToolbar } from './bootstrap/topToolbar.js';
 import { setupLayersPanel } from './bootstrap/layersPanel.js';
@@ -84,6 +86,7 @@ try {
 initLanguage();
 setupLanguagePicker();
 initMinimap();
+setMinimapRegionListener(setEtaPhiRegion);
 
 let sidebarControls = null;
 
@@ -172,7 +175,13 @@ sidebarControls = setupSidebarControls({
   onDisableTourMode: () => cinema.disableTourMode(),
   onEnableTourMode: () => cinema.enableTourMode(),
   onToggleCollisionHud: (enabled) => setCollisionHudEnabled(enabled),
-  onToggleMinimap: (enabled) => setMinimapVisible(enabled),
+  onToggleMinimap: (enabled) => {
+    // Minimap and collision-hud share the top-left slot — force-hide the HUD
+    // while the minimap is on, restore it when off. The user toggle for the
+    // collision HUD is preserved underneath (suppression is a separate flag).
+    setCollisionHudSuppressed(enabled);
+    setMinimapVisible(enabled);
+  },
   t,
   updateCollisionHud,
 });

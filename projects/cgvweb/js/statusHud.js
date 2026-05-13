@@ -5,6 +5,7 @@ const collisionHud = document.getElementById('collision-hud');
 
 let _lastEventInfo = null;
 let _collisionHudEnabled = true;
+let _collisionHudSuppressed = false;
 let _getPanelPinned = () => false;
 let _t = (k) => k;
 
@@ -37,12 +38,24 @@ function _buildCollisionHud() {
 
 export function updateCollisionHud() {
   const hiddenByPanel = _getPanelPinned();
-  collisionHud.hidden = !(_collisionHudEnabled && _lastEventInfo && !hiddenByPanel);
+  collisionHud.hidden = !(
+    _collisionHudEnabled &&
+    !_collisionHudSuppressed &&
+    _lastEventInfo &&
+    !hiddenByPanel
+  );
   if (!collisionHud.hidden) _buildCollisionHud();
 }
 
 export function setCollisionHudEnabled(enabled) {
   _collisionHudEnabled = !!enabled;
+  updateCollisionHud();
+}
+
+// Force-hide the HUD regardless of the user toggle. Used by the minimap when
+// it's enabled so the two top-left widgets never overlap.
+export function setCollisionHudSuppressed(suppressed) {
+  _collisionHudSuppressed = !!suppressed;
   updateCollisionHud();
 }
 

@@ -159,12 +159,16 @@ body.panel-unpinned #collision-hud {
   letter-spacing: 0.01em;
 }
 
-/* ── η × φ minimap (top-right) ─────────────────────────── */
+/* ── η × φ energy heatmap (top-left, overlays the collision HUD slot) ─── */
+/* Mutually exclusive with #collision-hud — while the minimap is visible the
+   collision HUD is force-hidden by statusHud.setCollisionHudSuppressed(). The
+   minimap accepts mouse input (draw a rectangle to gate the 3D scene to that
+   η×φ window; drag the rectangle to scan). */
 #minimap {
   position: fixed;
   top: 12px;
-  right: calc(var(--rpw) + 24px);
-  z-index: 24;
+  left: calc(var(--ab-w) + var(--pw) + 16px);
+  z-index: 26;
 
   border: 1px solid var(--border-strong);
   border-radius: var(--r);
@@ -172,15 +176,17 @@ body.panel-unpinned #collision-hud {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   box-shadow: var(--shadow-1);
-  pointer-events: none;
+  cursor: crosshair;
+  user-select: none;
+  touch-action: none;
+
+  transition: left var(--pt) cubic-bezier(0.4, 0, 0.2, 1);
+}
+body.panel-unpinned #minimap {
+  left: calc(var(--ab-w) + 14px);
 }
 @media (max-width: 720px) {
   #minimap {
     display: none;
   }
-}
-
-/* When the right panel is collapsed, sit flush against the right edge */
-body.rpanel-unpinned #minimap {
-  right: 12px;
 }
