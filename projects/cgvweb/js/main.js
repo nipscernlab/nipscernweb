@@ -47,6 +47,7 @@ import {
   applyJetThreshold,
   refreshSceneVisibility,
   setEtaPhiRegion,
+  setHeatmapListener,
   getTrackGroup,
 } from './visibility.js';
 import { createDownloadProgressController } from './downloadProgress.js';
@@ -62,7 +63,12 @@ import { setupPanelResize } from './panelResize.js';
 import { setupButtonTooltips } from './buttonTooltips.js';
 import { setupMobileToolbar } from './mobileToolbar.js';
 import { processXml, setProcessXmlDeps } from './processXml.js';
-import { initMinimap, setMinimapVisible, setMinimapRegionListener } from './minimap.js';
+import {
+  initMinimap,
+  setMinimapVisible,
+  setMinimapRegionListener,
+  updateMinimap,
+} from './minimap.js';
 import {
   initStatusHud,
   setStatus,
@@ -87,6 +93,10 @@ initLanguage();
 setupLanguagePicker();
 initMinimap();
 setMinimapRegionListener(setEtaPhiRegion);
+// Visibility pipeline pushes pre-rectangle visible cells into the minimap
+// heatmap every time a filter changes (threshold sliders, detector toggles,
+// view-level switch, slicer move).
+setHeatmapListener((cells, fcal) => updateMinimap({ cells, fcal }));
 
 let sidebarControls = null;
 
@@ -175,13 +185,6 @@ sidebarControls = setupSidebarControls({
   onDisableTourMode: () => cinema.disableTourMode(),
   onEnableTourMode: () => cinema.enableTourMode(),
   onToggleCollisionHud: (enabled) => setCollisionHudEnabled(enabled),
-  onToggleMinimap: (enabled) => {
-    // Minimap and collision-hud share the top-left slot — force-hide the HUD
-    // while the minimap is on, restore it when off. The user toggle for the
-    // collision HUD is preserved underneath (suppression is a separate flag).
-    setCollisionHudSuppressed(enabled);
-    setMinimapVisible(enabled);
-  },
   t,
   updateCollisionHud,
 });
@@ -290,6 +293,11 @@ const slicer = createSlicerController({
   slicerButton: document.getElementById('btn-slicer'),
   onMaskChange: onSlicerStateChanged,
   onDisable: onSlicerStateChanged,
+  // Enabling the slicer carves the 3D scene; the minimap heatmap doesn't
+  // share that affordance and the two can confuse each other if both are
+  // on, so they're mutually exclusive — turning the slicer on disables the
+  // minimap (and vice versa via the toolbar button below).
+  onEnable: () => setMinimapEnabled(false),
   onHideNonActiveShowAll: hideNonActiveCells,
   markDirty,
   getActiveJetCollection,
@@ -312,6 +320,38 @@ onMuonVisibilityChange(() => slicer.refreshSize());
 // is active, snap its walls to the new top-2 jets. No-op when slicer is
 // inactive or fewer than 2 usable jets are present.
 onJetStateChange(() => slicer.refreshFromActiveJets());
+
+// ── Minimap toggle controller ────────────────────────────────────────────────
+// Single source of truth for "is the minimap on": owns the toolbar button's
+// .on class, the persisted preference, suppressing the collision HUD while
+// active, and the mutual exclusion with the slicer (turning the minimap on
+// disables the slicer; the slicer's onEnable callback turns the minimap off
+// in the opposite direction). Function declaration so it's hoisted into the
+// slicer's onEnable closure above.
+const btnMinimap = document.getElementById('btn-minimap');
+let _minimapOn = false;
+function setMinimapEnabled(on) {
+  on = !!on;
+  if (on === _minimapOn) return;
+  _minimapOn = on;
+  if (on && slicer.isActive()) slicer.disable();
+  setMinimapVisible(on);
+  setCollisionHudSuppressed(on);
+  btnMinimap?.classList.toggle('on', on);
+  btnMinimap?.setAttribute('aria-pressed', on ? 'true' : 'false');
+  try {
+    localStorage.setItem('cgv-minimap', on ? '1' : '0');
+  } catch (_) {}
+}
+function toggleMinimap() {
+  setMinimapEnabled(!_minimapOn);
+}
+btnMinimap?.addEventListener('click', toggleMinimap);
+// Restore last session's preference. Defaults to off — heatmap stays out of
+// the way until the user asks for it.
+try {
+  if (localStorage.getItem('cgv-minimap') === '1') setMinimapEnabled(true);
+} catch (_) {}
 
 initVisibility({ slicer });
 
@@ -348,4 +388,5 @@ registerViewerShortcuts({
   setPinnedR: sidebarControls.setPinnedR,
   slicer,
   toggleAllGhosts,
+  toggleMinimap,
 });

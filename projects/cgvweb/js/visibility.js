@@ -104,38 +104,103 @@ export function initVisibility({ slicer }) {
   _slicer = slicer;
 }
 
-// ── η/φ region gate (driven by the minimap rectangle) ───────────────────────
-// When non-null, cells outside the rectangle in (η, φ) space are forced
-// invisible regardless of the energy threshold / cluster filter. Cleared when
-// the user wipes the rectangle or hides the minimap.
-/** @type {{etaMin:number, etaMax:number, phiMin:number, phiMax:number} | null} */
-let _etaPhiRegion = null;
+// ── η/φ region gate (driven by minimap rectangles) ──────────────────────────
+// When non-empty, only cells/particles whose (η, φ) lies inside AT LEAST ONE
+// rectangle are shown. Cleared when all rects are removed or the minimap hides.
+// Ghost wireframes are exempt (controlled entirely by ghost.js).
+/** @type {Array<{etaMin:number, etaMax:number, phiMin:number, phiMax:number}>} */
+let _etaPhiRegions = [];
 
-export function setEtaPhiRegion(region) {
-  _etaPhiRegion =
-    region &&
-    Number.isFinite(region.etaMin) &&
-    Number.isFinite(region.etaMax) &&
-    Number.isFinite(region.phiMin) &&
-    Number.isFinite(region.phiMax)
-      ? region
-      : null;
+export function setEtaPhiRegion(regions) {
+  if (Array.isArray(regions) && regions.length > 0) {
+    _etaPhiRegions = regions.filter(
+      (r) =>
+        Number.isFinite(r.etaMin) &&
+        Number.isFinite(r.etaMax) &&
+        Number.isFinite(r.phiMin) &&
+        Number.isFinite(r.phiMax),
+    );
+  } else {
+    _etaPhiRegions = [];
+  }
   refreshSceneVisibility();
+  // refreshSceneVisibility only covers calo cells. Tracks, clusters, jets and
+  // taus each have their own pipelines that must be refreshed when the region
+  // changes so they hide/show in sync with the cells.
+  _refreshParticleRegions();
+}
+
+// Re-applies the η×φ region gate to all particle line groups without
+// triggering the expensive ΔR rematch or jet-cell rebuild.
+function _refreshParticleRegions() {
+  // applyTrackThreshold handles tracks + photons + ΔR colours + K-popover +
+  // label visibility in one idempotent pass — calling it here is safe.
+  applyTrackThreshold();
+  // Cluster lines.
+  const clusterGroup = getClusterGroup();
+  if (clusterGroup)
+    for (const child of clusterGroup.children ?? []) {
+      const { etGev, eta, phi } = child.userData;
+      child.visible = etGev >= thrClusterEtGev && _inEtaPhiRegion(eta, phi);
+    }
+  // Jet + tau lines (applyTauPtThreshold already carries the region gate).
+  const jetGroup = getJetGroup();
+  if (jetGroup)
+    for (const child of jetGroup.children ?? []) {
+      const { etGev, eta, phi } = child.userData;
+      child.visible = etGev >= thrJetEtGev && _inEtaPhiRegion(eta, phi);
+    }
+  applyTauPtThreshold();
 }
 
 export function getEtaPhiRegion() {
-  return _etaPhiRegion;
+  return _etaPhiRegions;
 }
 
+// Returns true when (eta, phi) is inside at least one active rectangle, or
+// when no rectangles are defined (no filter). Also returns true when eta/phi
+// are undefined — callers that pass objects without those fields (e.g. sprite
+// labels) should not be gated; their visibility follows their anchor's.
 function _inEtaPhiRegion(eta, phi) {
-  if (!_etaPhiRegion) return true;
-  if (!Number.isFinite(eta) || !Number.isFinite(phi)) return false;
-  return (
-    eta >= _etaPhiRegion.etaMin &&
-    eta <= _etaPhiRegion.etaMax &&
-    phi >= _etaPhiRegion.phiMin &&
-    phi <= _etaPhiRegion.phiMax
+  if (_etaPhiRegions.length === 0) return true;
+  if (!Number.isFinite(eta) || !Number.isFinite(phi)) return true;
+  return _etaPhiRegions.some(
+    (r) => eta >= r.etaMin && eta <= r.etaMax && phi >= r.phiMin && phi <= r.phiMax,
   );
+}
+
+// Exported for fcalRenderer and other sub-modules that need the same test
+// without importing the private array.
+export { _inEtaPhiRegion as inEtaPhiRegion };
+
+// ── Pre-region "visible for heatmap" entries ────────────────────────────────
+// The minimap's η×φ energy heatmap must reflect everything currently passing
+// the detector / threshold / cluster / slicer filters, but NOT the η×φ
+// rectangle filter (otherwise the heatmap would only show inside the rect —
+// the user needs to see what's *outside* the rect to decide where to drag it).
+//
+// applyThreshold (and its slicer cousin) fills _visibleForHeatmap with one
+// entry per cell that passes everything-except-region. fcalRenderer fills the
+// FCAL side. A registered listener (set by main.js) gets notified after each
+// rebuild so the minimap can re-bin.
+/** @type {Array<{eta:number, phi:number, energyMev:number}>} */
+let _visibleForHeatmap = [];
+/** @type {Array<{eta:number, phi:number, energyMev:number}>} */
+let _fcalVisibleForHeatmap = [];
+/** @type {((cells: any[], fcal: any[]) => void) | null} */
+let _heatmapListener = null;
+
+export function setHeatmapListener(cb) {
+  _heatmapListener = typeof cb === 'function' ? cb : null;
+}
+
+function _notifyHeatmap() {
+  if (_heatmapListener) _heatmapListener(_visibleForHeatmap, _fcalVisibleForHeatmap);
+}
+
+export function setFcalHeatmapEntries(entries) {
+  _fcalVisibleForHeatmap = entries || [];
+  _notifyHeatmap();
 }
 
 // Re-applies cluster / photon / electron visibility AND the cell cluster-filter
@@ -288,11 +353,15 @@ export function applyTrackThreshold() {
   // label. Their group-level visibility is gated by setElectronGroup /
   // setMuonGroup (level + J button + K-popover flag).
   if (trackGroup)
-    for (const child of trackGroup.children ?? [])
-      child.visible = child.userData.ptGev >= thrTrackGev;
+    for (const child of trackGroup.children ?? []) {
+      const { ptGev, eta, phi } = child.userData;
+      child.visible = ptGev >= thrTrackGev && _inEtaPhiRegion(eta, phi);
+    }
   if (photonGroup)
-    for (const child of photonGroup.children ?? [])
-      child.visible = child.userData.ptGev >= thrTrackGev;
+    for (const child of photonGroup.children ?? []) {
+      const { ptGev, eta, phi } = child.userData;
+      child.visible = ptGev >= thrTrackGev && _inEtaPhiRegion(eta, phi);
+    }
   // 2. ΔR rematch (electron / muon only). Skipped outside L3 — the L3 view
   // level is the only one that surfaces lepton colours, and the level gate
   // already cleared the matches when the user left L3.
@@ -333,8 +402,10 @@ export function applyClusterThreshold() {
   withCoalescedCaloBoundRefresh(() => {
     const clusterGroup = getClusterGroup();
     if (clusterGroup)
-      for (const child of clusterGroup.children ?? [])
-        child.visible = child.userData.etGev >= thrClusterEtGev;
+      for (const child of clusterGroup.children ?? []) {
+        const { etGev, eta, phi } = child.userData;
+        child.visible = etGev >= thrClusterEtGev && _inEtaPhiRegion(eta, phi);
+      }
     rebuildActiveClusterCellIds();
     applyThreshold();
     applyFcalThreshold();
@@ -352,8 +423,10 @@ export function applyJetThreshold() {
   withCoalescedCaloBoundRefresh(() => {
     const jetGroup = getJetGroup();
     if (jetGroup)
-      for (const child of jetGroup.children ?? [])
-        child.visible = child.userData.etGev >= thrJetEtGev;
+      for (const child of jetGroup.children ?? []) {
+        const { etGev, eta, phi } = child.userData;
+        child.visible = etGev >= thrJetEtGev && _inEtaPhiRegion(eta, phi);
+      }
     // τ lines share the same L3 ET slider — hadronic τs *are* narrow jets, so
     // letting them pass while real jets are cut would visually dominate the
     // L3 view. <TauJet> publishes pT (not ET); for the cone of objects we're
@@ -387,7 +460,8 @@ export function applyTauPtThreshold() {
   for (const child of tauGroup.children ?? []) {
     const u = child.userData;
     const passesCharge = u.charge === -1 || u.charge === 1 || showUnmatched;
-    child.visible = u.ptGev >= thrJetEtGev && passesCharge;
+    child.visible =
+      u.ptGev >= thrJetEtGev && passesCharge && _inEtaPhiRegion(u.eta, u.phi);
   }
 }
 
@@ -446,6 +520,7 @@ export function applyThreshold() {
       return;
     }
     visHandles = [];
+    _visibleForHeatmap = [];
     const acIds = getActiveClusterCellIds();
     const amLabels = getActiveMbtsLabels();
     for (const [h, { energyMev, det, cellId, mbtsLabel, eta, phi }] of active) {
@@ -463,16 +538,27 @@ export function applyThreshold() {
       }
       const passThr = _slicer?.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
       const passCl = _slicer?.isShowAllCells() || inCluster;
+      const passPreRegion = detOn && passThr && passCl;
       const passRegion = _inEtaPhiRegion(eta, phi);
-      const vis = detOn && passThr && passCl && passRegion;
+      const vis = passPreRegion && passRegion;
       _setHandleVisible(h, vis);
       if (vis) visHandles.push(h);
+      // Heatmap inclusion uses a CONSISTENT filter set regardless of slicer
+      // state: detector toggle + energy threshold + cluster filter. The
+      // slicer wedge and the minimap rect are intentionally excluded — the
+      // minimap is meant as a stable overview the user can rely on while
+      // they scan the 3D scene with the slicer (no holes that move with the
+      // wedge).
+      const passHeatmap =
+        detOn && (!isFinite(thr) || energyMev >= thr) && inCluster;
+      if (passHeatmap) _visibleForHeatmap.push({ eta, phi, energyMev });
     }
     _syncNonActiveShowAll();
     _flushIMDirty();
     _rebuildRayIMeshes();
     rebuildAllOutlines();
     markDirty();
+    _notifyHeatmap();
   });
 }
 
@@ -483,6 +569,7 @@ function _applySlicerMask() {
   if (!_slicer) return;
   const slicer = _slicer;
   visHandles = [];
+  _visibleForHeatmap = [];
   const slicerMask = slicer.getMaskState();
   const acIds = getActiveClusterCellIds();
   const amLabels = getActiveMbtsLabels();
@@ -501,15 +588,26 @@ function _applySlicerMask() {
     }
     const passThr = slicer.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
     const passCl = slicer.isShowAllCells() || inCluster;
+    const passPreRegion = detOn && passThr && passCl;
     const passRegion = _inEtaPhiRegion(eta, phi);
-    const passFilter = detOn && passThr && passCl && passRegion;
-    let vis = passFilter;
-    if (vis) {
+    let passSlicer = true;
+    if (passPreRegion) {
       const c = _cellCenter(h);
-      if (slicer.isPointInsideWedge(c.x, c.y, c.z, slicerMask)) vis = false;
+      if (slicer.isPointInsideWedge(c.x, c.y, c.z, slicerMask)) passSlicer = false;
     }
+    const vis = passPreRegion && passRegion && passSlicer;
     _setHandleVisible(h, vis);
     if (vis) visHandles.push(h);
+    // Heatmap inclusion: detector + energy threshold + cluster filter only.
+    // The slicer wedge is deliberately NOT applied here — it would punch
+    // wedge-shaped holes into the heatmap that move with the slicer drag,
+    // making the overview hard to read. The minimap stays as a stable map
+    // of the event while the slicer carves the 3D scene. (Also applies the
+    // raw threshold even when slicer.isShowAllCells() is true, so toggling
+    // the slicer doesn't suddenly repaint a flood of low-energy cells.)
+    const passHeatmap =
+      detOn && (!isFinite(thr) || energyMev >= thr) && inCluster;
+    if (passHeatmap) _visibleForHeatmap.push({ eta, phi, energyMev });
   }
   _syncNonActiveShowAll();
   _flushIMDirty();
@@ -517,6 +615,7 @@ function _applySlicerMask() {
   rebuildAllOutlines();
   applyFcalThreshold();
   markDirty();
+  _notifyHeatmap();
   // Particle-endpoint refresh is owned by the caller (applyThreshold's slicer
   // branch) — _applySlicerMask runs inside applyFcalThreshold's hook (skipped
   // via the suppress flag during applyThreshold's downstream call).

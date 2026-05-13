@@ -85,7 +85,6 @@ import { setStatus, showEventInfo } from './statusHud.js';
 import { markDirty } from './renderer.js';
 import { hideTooltip } from './hoverTooltip.js';
 import { esc } from './utils.js';
-import { updateMinimap } from './minimap.js';
 
 // Single subscription that re-draws jets whenever jet state changes — fires on
 // fresh events (setJetCollections) and on user-driven collection switches
@@ -492,5 +491,7 @@ export async function processXml(xmlText) {
   });
 
   showEventInfo(currentEventInfo);
-  updateMinimap({ active, fcalCells, clusters: rawClusters });
+  // Cells/fcal heatmap entries are pushed by the visibility pipeline
+  // (applyThreshold / applyFcalThreshold) every time per-cell filters change
+  // — nothing to push here on event load.
 }

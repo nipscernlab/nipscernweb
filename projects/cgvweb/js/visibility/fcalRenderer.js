@@ -18,7 +18,12 @@ import { scene, markDirty } from '../renderer.js';
 import { palColorFcal } from '../palette.js';
 import { thrFcalMev } from './thresholds.js';
 import { layerVis } from './layerVis.js';
-import { getSlicer, getActiveClusterCellIds, getEtaPhiRegion } from '../visibility.js';
+import {
+  getSlicer,
+  getActiveClusterCellIds,
+  inEtaPhiRegion,
+  setFcalHeatmapEntries,
+} from '../visibility.js';
 import { refreshCaloBoundParticles } from '../particles.js';
 
 /**
@@ -114,46 +119,48 @@ function _applyFcalDraw() {
   // an index signature, so we read through `any`.
   const lv = /** @type {any} */ (layerVis);
 
-  // Minimap-driven η/φ window. FCAL records carry (x, y, z) in JiveXML cm —
-  // compute η/φ on the fly to test against the rect. Same flip convention as
-  // the renderer below (cx=-x*10 etc.) so φ matches the 3D scene's φ axis.
-  const region = getEtaPhiRegion();
+  // η/φ is computed per-cell below (from JiveXML x,y,z) and tested via the
+  // shared inEtaPhiRegion helper — same union-of-rects logic as the other
+  // detectors. No local region snapshot needed; inEtaPhiRegion reads the
+  // current _etaPhiRegions array directly each call.
+
+  // Heatmap entries are populated in parallel with the visibility filter.
+  // They use a CONSISTENT filter set regardless of slicer state (module +
+  // raw energy threshold + cluster filter) and ignore both the slicer wedge
+  // and the minimap rect — see the matching comment in
+  // visibility.js#_applySlicerMask for the rationale.
+  /** @type {Array<{eta:number, phi:number, energyMev:number}>} */
+  const heatmapEntries = [];
 
   const visible = fcalCellsData.filter((c) => {
-    // FCAL is filtered per-module instead of a single showFcal flag — module
-    // 1=EM, 2=Had1, 3=Had2 (parser/src/lib.rs:694).
     if (!lv.fcal[c.module]) return false;
-    if (!slicer?.isShowAllCells() && c.energy * 1000 < thrFcalMev) return false;
-    if (
-      !slicer?.isShowAllCells() &&
-      activeClusterCellIds !== null &&
-      c.id &&
-      !activeClusterCellIds.has(c.id)
-    )
+    const eMev = Math.abs(c.energy * 1000);
+    const inCluster =
+      activeClusterCellIds === null || (c.id && activeClusterCellIds.has(c.id));
+    const r = Math.hypot(c.x, c.y);
+    const theta = Math.atan2(r, c.z);
+    const eta = -Math.log(Math.tan(theta / 2));
+    const phi = Math.atan2(-c.y, -c.x);
+    // Heatmap: module on + raw threshold + cluster membership. No slicer,
+    // no rect — the minimap is a stable overview.
+    if (eMev >= thrFcalMev && inCluster) heatmapEntries.push({ eta, phi, energyMev: eMev });
+
+    // From here on: per-cell visibility for the 3D scene. Re-applies the
+    // slicer's show-all-cells bypass for threshold + cluster, then the
+    // slicer wedge and the rect.
+    if (!slicer?.isShowAllCells() && eMev < thrFcalMev) return false;
+    if (!slicer?.isShowAllCells() && activeClusterCellIds !== null && c.id && !activeClusterCellIds.has(c.id))
       return false;
-    if (region) {
-      const r = Math.hypot(c.x, c.y);
-      const theta = Math.atan2(r, c.z);
-      const eta = -Math.log(Math.tan(theta / 2));
-      const phi = Math.atan2(-c.y, -c.x);
-      if (
-        eta < region.etaMin ||
-        eta > region.etaMax ||
-        phi < region.phiMin ||
-        phi > region.phiMax
-      )
-        return false;
-    }
-    // slicerMask.active implies slicer was non-null (default literal has
-    // active:false); guard explicitly for the type-checker.
     if (slicerMask.active && slicer) {
       const cx = -c.x * 10,
         cy = -c.y * 10,
         cz = c.z * 10;
       if (slicer.isPointInsideWedge(cx, cy, cz, slicerMask)) return false;
     }
+    if (!inEtaPhiRegion(eta, phi)) return false;
     return true;
   });
+  setFcalHeatmapEntries(heatmapEntries);
   fcalVisibleMap = visible;
   if (!fcalGroup) {
     fcalGroup = new THREE.Group();

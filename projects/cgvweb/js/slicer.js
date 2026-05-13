@@ -7,6 +7,7 @@ export function createSlicerController({
   slicerButton,
   onMaskChange,
   onDisable,
+  onEnable,
   onHideNonActiveShowAll,
   markDirty,
   // Optional: returns the active jet collection (or null). When present, the
@@ -287,6 +288,7 @@ export function createSlicerController({
     slicerGroup.visible = true;
     syncButtons();
     _frameWedgeView();
+    onEnable?.();
   }
 
   function disable() {

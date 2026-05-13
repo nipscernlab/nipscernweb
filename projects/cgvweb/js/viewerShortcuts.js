@@ -11,6 +11,7 @@ export function registerViewerShortcuts({
   setPinnedR,
   slicer,
   toggleAllGhosts,
+  toggleMinimap,
 }) {
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -23,6 +24,9 @@ export function registerViewerShortcuts({
           return;
         case 'S':
           slicer.toggle();
+          return;
+        case 'M':
+          toggleMinimap?.();
           return;
       }
       return;
