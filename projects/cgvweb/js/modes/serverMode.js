@@ -2,7 +2,15 @@ import { dateGroup } from '../utils.js';
 
 const MAX_ENTRIES = 100;
 const REFRESH_MS = 5000;
-const REMOTE_API = './api/xml';
+// Resolve the /api/xml endpoint relative to where this module was actually
+// loaded from, not relative to the page URL. This file lives at
+// <app-root>/js/modes/serverMode.js, so two ".." steps land on <app-root>/
+// (e.g. https://host/cgv-web/  ->  https://host/cgv-web/api/xml). This keeps
+// the SERVER (live-folder) endpoints working whatever prefix the app is
+// mounted under, and is robust to a missing trailing-slash redirect on the
+// front-end host -- a plain "./api/xml" would resolve to the wrong place if
+// the page is served as ".../cgv-web" without the trailing slash.
+const REMOTE_API = new URL('../../api/xml', import.meta.url).href;
 const HAS_FSA = typeof window !== 'undefined' && 'showDirectoryPicker' in window;
 
 function fmtTime(ts) {

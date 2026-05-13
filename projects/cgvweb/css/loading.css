@@ -9,25 +9,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* anim_worker.js paints the same color via its canvas. The fallback
-     only matters for the brief instant before the worker mounts. */
-  background: var(--bg);
+  background-color: #020d1c;
+  background-image: url('../assets/images/cgv_topography_cgv.svg');
+  background-repeat: repeat;
+  background-size: 600px 600px;
   transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+}
+#loading-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(2, 13, 28, 0) 0%,
+    rgba(2, 13, 28, 0.45) 55%,
+    rgba(2, 13, 28, 0.85) 100%
+  );
 }
 #loading-overlay.done {
   opacity: 0;
   pointer-events: none;
 }
-#loading-overlay > canvas {
-  position: absolute !important;
-  inset: 0;
-  width: 100% !important;
-  height: 100% !important;
-}
 
-/* Card sits on top of the canvas with no panel — the type is hardened
-   with a text-shadow so it stays readable against the moving lines. */
 .loading-card {
   position: relative;
   z-index: 1;
