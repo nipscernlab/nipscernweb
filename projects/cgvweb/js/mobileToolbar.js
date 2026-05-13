@@ -16,10 +16,16 @@ export function setupMobileToolbar() {
     tb.classList.toggle('tb-visible', tbVisible);
     btn.classList.toggle('tb-open', tbVisible && isLandscapeMobile());
   }
-  // Apply initial state without animation
+  // Apply initial state without animation — suppress both elements so the
+  // browser commits bottom:12px for the button before transitions are live.
   tb.style.transition = 'none';
+  btn.style.transition = 'none';
   apply();
-  setTimeout(() => (tb.style.transition = ''), 50);
+  void btn.offsetHeight; // force reflow to commit initial bottom value
+  setTimeout(() => {
+    tb.style.transition = '';
+    btn.style.transition = '';
+  }, 50);
 
   btn.addEventListener('click', () => {
     if (isLandscapeMobile()) {
