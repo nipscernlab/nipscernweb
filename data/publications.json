@@ -1654,5 +1654,77 @@
     "abstract": "Esta tese propõe uma nova abordagem baseada em representação esparsa para o problema de estimação de energia em calorimetria de altas energias em cenários com empilhamento de sinais. Inserida no contexto do programa de atualização do experimento ATLAS experiment, no Large Hadron Collider, a principal motivação do trabalho foi o aumento progressivo da luminosidade do colisionador e seus impactos na estimação de energia nos canais do calorímetro eletromagnético LAr. Foram propostos dois métodos de estimação denominados SPARSE e SPARSE-COF, ambos baseados em programação linear para busca de esparsidade. O desempenho desses métodos foi avaliado em diferentes simulações e comparado com o método clássico utilizado nos calorímetros do ATLAS, o filtro ótimo (OF), além do DM-COF, método desenvolvido para o calorímetro hadrônico do ATLAS que considera o problema de empilhamento de sinais em sua formulação. Os resultados mostraram que os métodos SPARSE e SPARSE-COF apresentaram desempenho superior aos demais, principalmente em cenários nos quais a janela de observação utilizada para a estimação não contém todas as amostras do pulso típico do calorímetro sob condições de empilhamento de sinais. Além disso, utilizando dados de simulações de Monte Carlo do calorímetro LAr, os métodos baseados em representação esparsa também foram avaliados com algoritmos de menor complexidade computacional, como IRLS, OMP e LS-OMP. Os resultados indicaram que o método LS-OMP apresentou desempenho equivalente aos métodos SPARSE e SPARSE-COF, tornando-se um candidato promissor para aplicações de estimação online de energia no calorímetro LAr.",
     "tags": [""],
     "pdf": "publications/articles/DOUT_2017_Davis_Pereira.pdf"
+  },
+  {
+    "id": "dout-2019-João-Paulo-Bittencourt",
+    "title": "Deconvolução Free-running Aplicada à Estimação Online de Energia na Calorimetria do ATLAS",
+    "authors": ["João Paulo Bittencourt da Silveira Duarte"],
+    "journal": "",
+    "year": 2019, 
+    "type": "doctoral thesis",
+    "doi": null,
+    "abstract": "Esta tese propõe algoritmos de processamento de sinais para realizar a desconvolução da informação de energia nos calorímetros do ATLAS experiment. Como os calorímetros modernos possuem uma resposta ao impulso com duração maior do que a taxa de eventos adquiridos, pode ocorrer o efeito de empilhamento de sinais na eletrônica de leitura. O ambiente de alta taxa de eventos previsto para os próximos anos no Large Hadron Collider aumenta a probabilidade de colisões adjacentes nos detectores, tornando esse problema ainda mais crítico. No ATLAS, o primeiro nível de seleção online de eventos opera continuamente e deve fornecer a estimação de energia a cada colisão. O empilhamento de sinais pode comprometer essa estimativa, e algumas soluções baseadas em modificações do filtro ótimo tratam esse efeito apenas como ruído aditivo. Como alternativa, esta tese propõe técnicas de desconvolução capazes de compensar diretamente o efeito de empilhamento, incluindo abordagens independentes de parâmetros no caso dos métodos não supervisionados. Foram desenvolvidos dois algoritmos para esse cenário. O primeiro é supervisionado e utiliza um filtro FIR seguido de uma função não linear de shrinkage, sendo baseado em desconvolução por representação esparsa. O segundo, denominado Bussgang-Sparse, é não supervisionado e combina o algoritmo de Bussgang com critérios de esparsidade. Os resultados demonstram que a desconvolução baseada em representação esparsa apresenta melhor desempenho na atenuação de ruído aditivo em comparação com a desconvolução por filtros FIR baseada na resposta ao impulso inversa do calorímetro. Para a abordagem não supervisionada, os resultados indicaram convergência para técnicas supervisionadas baseadas em filtros FIR.",
+    "tags": [""],
+    "pdf": "publications/articles/DOUT_2019_João_Paulo_Bittencourt.pdf"
+  },
+  {
+    "id": "dout-2021-Dayane-Oliveira",
+    "title": "Deteção Online Embarcada de Sinais Raros com Baixa Relação Sinal-Ruído em Ambientes com Alta Taxa Eventos",
+    "authors": ["Dayane Oliveira Gonçalves"],
+    "journal": "",
+    "year": 2021, 
+    "type": "doctoral thesis",
+    "doi": null,
+    "abstract": "Esta tese foi desenvolvida no contexto do programa de atualização do ATLAS experiment, um dos principais experimentos do Large Hadron Collider, responsável por importantes descobertas na física de partículas, como a observação do Higgs boson. Com as atualizações do LHC para operar em energias mais elevadas, um dos grandes desafios do ATLAS é detectar sinais de interesse corrompidos por ruído e misturados a informações ordinárias. Para isso, o experimento utiliza um sistema de filtragem online responsável por selecionar eventos relevantes em tempo real. Estudos mostraram que, com o aumento do ruído de fundo nas novas condições operacionais, a banda passante disponível para esse sistema seria excedida. Como alternativa para reduzir esse problema, foi incorporado ao sistema de filtragem online do ATLAS um método baseado na fusão das informações da calorimetria e do detector de múons, com o objetivo de melhorar a rejeição de eventos irrelevantes para a física do LHC. Atualmente, esse sistema utiliza um algoritmo baseado em uma aproximação da filtragem casada para detectar sinais de interesse provenientes da calorimetria. Embora o algoritmo atual apresente desempenho satisfatório, estudos indicaram que ele não alcança desempenho ótimo. Dessa forma, esta tese investiga novos algoritmos para aumentar a eficiência da detecção de sinais por meio do sistema de calorimetria do ATLAS. Os resultados mostram que é possível reduzir em até 20% a taxa de falsos alarmes em comparação ao algoritmo atualmente implementado, mantendo aproximadamente 98% das classificações corretas do sistema de filtragem.",
+    "tags": [""],
+    "pdf": "publications/articles/DOUT_2021_Dayane_Oliveira.pdf"
+  },
+  {
+    "id": "dout-2021-Tiago-Aparecido-Teixeira",
+    "title": "Implementação de métodos esparsos para deconvolução on-line de sinais no calorímetro hadrônico do ATLAS",
+    "authors": ["Tiago Aparecido Teixeira"],
+    "journal": "",
+    "year": 2021, 
+    "type": "doctoral thesis",
+    "doi": null,
+    "abstract": "Desde que entrou em operação em 2008, o Large Hadron Collider vem passando por constantes atualizações, com aumento da energia das colisões e da quantidade de partículas por bunch. Essas mudanças impactam diretamente os detectores, especialmente o ATLAS experiment. No sistema de trigger do ATLAS, esse impacto é mais evidente devido ao aumento de colisões adjacentes, que gera o efeito de pile-up (sobreposição de sinais), dificultando a seleção de eventos de interesse. Para lidar com esse problema, métodos de desconvolução online vêm sendo propostos. A maioria dessas abordagens utiliza filtros FIR (finite impulse response), pois sua estrutura favorece a implementação em tempo real. Entretanto, o LHC opera com trens de bunches, alternando períodos com colisões e períodos sem colisões. Essa característica pode ser interpretada como janelas fixas de aquisição, permitindo a utilização de métodos iterativos de desconvolução não causais. Esses métodos tendem a apresentar melhor desempenho do que os filtros FIR tradicionais, pois possibilitam o uso de conhecimento especialista e algoritmos mais sofisticados. Neste trabalho, são propostos métodos iterativos de desconvolução baseados em teorias modernas de representação esparsa de dados, e seu desempenho é comparado com técnicas baseadas em filtros FIR. Entre os métodos avaliados, destaca-se o separable surrogate functionals, para o qual também foi proposta uma implementação em Field-Programmable Gate Array. Os resultados indicam a possibilidade de executar múltiplas instâncias desse método em paralelo em uma única FPGA, viabilizando o processamento online exigido pelo primeiro nível de trigger do ATLAS.",
+    "tags": [""],
+    "pdf": "publications/articles/DOUT_2021_Tiago_Aparecido_Teixeira.pdf"
+  },
+  {
+    "id": "dout-2022-Tiago-Motta-Quirino",
+    "title": "Aprendizado Online de Redes Neurais Artificiais Aplicadas à Reconstrução de Energia no Calorímetro Hadrônico do ATLAS",
+    "authors": ["Tiago Motta Quirino"],
+    "journal": "",
+    "year": 2022, 
+    "type": "doctoral thesis",
+    "doi": null,
+    "abstract": "Este trabalho tem como objetivo recuperar informações de partículas subatômicas incidentes em calorímetros, tratando especificamente os sinais da eletrônica de leitura do TileCal, o calorímetro hadrônico do ATLAS experiment, instalado no Large Hadron Collider. Com o programa de atualização do LHC e o aumento da luminosidade, cresce a probabilidade de colisões em intervalos fixos de tempo, o que, considerando o tempo de resposta do TileCal, provoca o efeito de empilhamento de sinais (pile-up). Esse fenômeno dificulta a estimação da amplitude dos pulsos, grandeza diretamente relacionada à energia das partículas detectadas. Para lidar com esse problema, o trabalho propõe o aprendizado online de Artificial Neural Network, explorando as não linearidades intrínsecas do canal de leitura e comparando seu desempenho com métodos lineares tradicionais. A abordagem utiliza o sistema de seleção de eventos do ATLAS, aproveitando o conhecimento fornecido pelo sinal de aceitação no primeiro nível de trigger (L1A), responsável por indicar quais dados devem ser armazenados e quais podem ser descartados. Essa informação permite aplicar ou treinar a rede neural online. O processo de treinamento é realizado a partir da simulação de um sinal central com amplitude conhecida, somado aos sinais ordinários responsáveis pelo efeito de empilhamento. Após aprender os padrões de pile-up, a rede neural é capaz de remover essas interferências e recuperar a amplitude dos sinais de interesse durante a etapa de aplicação. Os resultados mostram que o método proposto apresenta desempenho competitivo em relação às técnicas atualmente utilizadas na recuperação de energia do calorímetro hadrônico do ATLAS.",
+    "tags": [""],
+    "pdf": "publications/articles/DOUT_2022_Tiago_Motta_Quirino.pdf"
+  },
+  {
+    "id": "dout-2026-Thiago-Campos",
+    "title": "Implementação Online de Representação Esparsa para Reconstrução de Energia no Calorímetro Hadrônico do ATLAS",
+    "authors": ["Thiago Campos Acácio Paschoalin"],
+    "journal": "",
+    "year": 2026, 
+    "type": "doctoral thesis",
+    "doi": null,
+    "abstract": "Nos experimentos de Física de Altas Energias, a reconstrução digital de sinais é uma etapa fundamental para a estimação precisa da energia das partículas produzidas em colisões. Sob a perspectiva da Engenharia Elétrica, esse problema pode ser tratado como uma tarefa de processamento digital de sinais discretos, envolvendo filtragem, desconvolução e estimação de parâmetros em ambientes altamente ruidosos. No ATLAS experiment, do Large Hadron Collider, o calorímetro hadrônico TileCal utiliza eletrônica dedicada e técnicas de filtragem digital no sistema de trigger para realizar a seleção inicial de eventos em tempo real. Com a atualização para o High-Luminosity Large Hadron Collider, o aumento significativo da taxa de eventos simultâneos intensifica o efeito de pile-up, reduzindo o desempenho dos métodos clássicos de reconstrução baseados em filtragem linear. Esse cenário motiva o desenvolvimento de novas abordagens capazes de operar sob restrições rigorosas de latência e complexidade computacional. A representação esparsa de sinais tem se mostrado promissora nesse contexto por explorar a estrutura intrínseca dos sinais para melhorar a estimação em ambientes com alta interferência. Entretanto, sua aplicação prática em sistemas de tempo real é limitada pelo uso de algoritmos iterativos. Para contornar essa limitação, este trabalho propõe uma adaptação não iterativa baseada em um filtro de desconvolução seguido por uma feedforward neural network, responsável por aplicar uma função de shrinkage com limiar adaptativo definido amostra a amostra. O método proposto foi comparado com técnicas da literatura e apresentou desempenho superior tanto em cenários de baixa quanto de alta ocupação, alcançando reduções de até 54% no erro de reconstrução. Além disso, a abordagem mantém baixa complexidade computacional e apresenta uma estrutura compatível com processamento em tempo real, tornando-se adequada para implementação em sistemas digitais embarcados, como o sistema de trigger do TileCal.",
+    "tags": [""],
+    "pdf": "publications/articles/DOUT_2026_Thiago_Campos.pdf"
+  },
+  {
+    "id": "dout-2017-",
+    "title": "",
+    "authors": [""],
+    "journal": "",
+    "year": 2017, 
+    "type": "doctoral thesis",
+    "doi": null,
+    "abstract": "",
+    "tags": [""],
+    "pdf": "publications/articles/DOUT_2017_.pdf"
   }
 ]
