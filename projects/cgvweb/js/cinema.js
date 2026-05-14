@@ -1,4 +1,12 @@
 import * as THREE from 'three';
+import {
+  extractPOIs,
+  buildTourCurves,
+  buildFallbackCurves,
+  filterPOIsBySlicer,
+  filterPOIsByMinimap,
+  pathFingerprint,
+} from './cinema/tourPath.js';
 
 export function setupCinemaControls({
   camera,
@@ -12,49 +20,48 @@ export function setupCinemaControls({
   let cinemaMode = false;
   let tourMode = localStorage.getItem('cgv-tour-mode') !== '0';
 
-  const tourCamWaypoints = [
-    new THREE.Vector3(8500, 3500, 12500),
-    new THREE.Vector3(3000, 1200, 13000),
-    new THREE.Vector3(0, 12, 11500),
-    new THREE.Vector3(0, 10, 8500),
-    new THREE.Vector3(0, 10, 7000),
-    new THREE.Vector3(0, 10, 4500),
-    new THREE.Vector3(0, 10, 2500),
-    new THREE.Vector3(0, 10, 1000),
-    new THREE.Vector3(0, 10, -500),
-    new THREE.Vector3(0, 10, -2000),
-    new THREE.Vector3(0, 10, -4000),
-    new THREE.Vector3(0, 10, -7000),
-    new THREE.Vector3(0, 12, -8500),
-    new THREE.Vector3(0, 15, -11500),
-    new THREE.Vector3(5500, 2500, -9500),
-    new THREE.Vector3(9000, 2000, 0),
-    new THREE.Vector3(5500, 3200, 8500),
-    new THREE.Vector3(1000, 4500, 12000),
-  ];
-  const tourTgtWaypoints = [
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(0, 0, 3000),
-    new THREE.Vector3(0, 0, 5800),
-    new THREE.Vector3(0, 0, 5800),
-    new THREE.Vector3(0, 0, 5500),
-    new THREE.Vector3(0, 0, 1500),
-    new THREE.Vector3(2800, 800, 1800),
-    new THREE.Vector3(1200, 2400, 400),
-    new THREE.Vector3(-1200, 2400, -400),
-    new THREE.Vector3(-2800, 800, -1800),
-    new THREE.Vector3(0, 0, -1500),
-    new THREE.Vector3(0, 0, -5500),
-    new THREE.Vector3(0, 0, -5500),
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(0, 0, 0),
-  ];
-  const tourPosCurve = new THREE.CatmullRomCurve3(tourCamWaypoints, true, 'centripetal', 0.5);
-  const tourTgtCurve = new THREE.CatmullRomCurve3(tourTgtWaypoints, true, 'centripetal', 0.5);
-  const TOUR_TOTAL_DURATION = 105_000;
+  // Safe-envelope fallback orbit: lives on r = 14 m at all azimuths, gentle
+  // z-wave so the camera doesn't sit on the equator forever. Used until an
+  // event is loaded and whenever the current event has too few POIs to drive
+  // an adaptive path. Like the adaptive curves, it never crosses cells.
+  const _fallback = buildFallbackCurves();
+  const fallbackPosCurve = _fallback.posCurve;
+  const fallbackTgtCurve = _fallback.tgtCurve;
+  let tourPosCurve = fallbackPosCurve;
+  let tourTgtCurve = fallbackTgtCurve;
+  let _isAdaptive = false;
+  let _lastFingerprint = '';
+
+  // Cached inputs that drive curve rebuilds. Each notifier slots its own
+  // input into the cache and triggers the debounced recompute. The
+  // fingerprint inside _rebuildNow then decides whether the curves actually
+  // need to change. Slicer / minimap filters are read here (not by visibility
+  // pipeline) because their effect on the tour is independent of how they
+  // affect cell visibility.
+  let _lastCells = /** @type {any[]} */ ([]);
+  let _lastFcal = /** @type {any[]} */ ([]);
+  let _lastSlicerMask = /** @type {any} */ (null);
+  let _lastIsInsideWedge = /** @type {((x:number,y:number,z:number,m:any)=>boolean) | null} */ (
+    null
+  );
+  let _lastMinimapRects = /** @type {any[] | null} */ (null);
+  // View level (1=hits, 2=clusters, 3=particles). Always part of the
+  // fingerprint so L2↔L3 transitions trigger a rebuild even when the
+  // visible cell set happens to be identical between the two levels.
+  let _lastViewLevel = 1;
+
+  // Coalesce repeated notifications to a single rebuild ~250 ms after the
+  // last call. The heatmap listener fires once per visibility pass, and an
+  // event load triggers TILE/LAr/HEC/FCAL passes back-to-back. The
+  // fingerprint check inside the timer skips redundant rebuilds when the
+  // accumulated state ends up the same.
+  const PATH_DEBOUNCE_MS = 250;
+  let _pathDebounceTimer = null;
+
+  // Total tour duration in arc-length space. Camera moves at constant
+  // linear speed along the curve (via getPointAt) so this scales 1:1 with
+  // perceived velocity regardless of how the control points are spaced.
+  const TOUR_TOTAL_DURATION = 60_000;
   const TOUR_BLEND_MS = 2200;
   const TOUR_EXIT_DURATION = 1400;
 
@@ -79,13 +86,17 @@ export function setupCinemaControls({
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
 
+  // Arc-length nearest-U: scans the curve at uniform ARC-LENGTH positions
+  // (not parameter positions) so the resolution is the same everywhere
+  // regardless of how the control points are spaced. Returns u in [0, 1]
+  // where 0 is the curve start and 1 is the closed loop's wrap-around.
   function tourNearestU(v) {
     const samples = 240;
     let bestU = 0;
     let bestD = Infinity;
     for (let i = 0; i < samples; i++) {
       const u = i / samples;
-      tourPosCurve.getPoint(u, tourTmpPos);
+      tourPosCurve.getPointAt(u, tourTmpPos);
       const d = tourTmpPos.distanceToSquared(v);
       if (d < bestD) {
         bestD = d;
@@ -95,10 +106,15 @@ export function setupCinemaControls({
     return bestU;
   }
 
+  // Sample by arc length so the camera moves at constant linear speed along
+  // the curve — no dwelling on densely-spaced waypoints, no zooming through
+  // long segments. Both curves share the same u so position and target stay
+  // in sync; they have similar arc-length-to-parameter mappings since they
+  // were built from the same POIs.
   function tourSampleU(u) {
     u = ((u % 1) + 1) % 1;
-    tourPosCurve.getPoint(u, tourTmpPos);
-    tourTgtCurve.getPoint(u, tourTmpTgt);
+    tourPosCurve.getPointAt(u, tourTmpPos);
+    tourTgtCurve.getPointAt(u, tourTmpTgt);
   }
 
   // Two blends drive the inner-detector camera overrides:
@@ -222,7 +238,10 @@ export function setupCinemaControls({
     tourPrevT = now;
   }
 
-  function startTour() {
+  // Shared blend setup: snapshot camera state and target the nearest point on
+  // whatever curves are currently active. Used both by startTour (entering
+  // cinema) and _applyNewCurves (live path swap when a new event arrives).
+  function _startBlendToCurves() {
     const now = performance.now();
     tourU0 = tourNearestU(camera.position);
     tourBlending = true;
@@ -236,7 +255,119 @@ export function setupCinemaControls({
     tourVelTgt.set(0, 0, 0);
     tourPrevT = now;
     tourExiting = false;
+  }
+
+  function startTour() {
+    _startBlendToCurves();
     controls.autoRotate = false;
+  }
+
+  // Live curve swap. If the user is currently in the tour, the existing
+  // blend machinery interpolates from where the camera is RIGHT NOW (which
+  // may itself be mid-blend) to the nearest point on the new curves over
+  // TOUR_BLEND_MS — same easing the cinema entry uses, so the visual feel
+  // is consistent. Outside cinema (or with tour mode off) we just replace
+  // the curves silently; the next enterCinema() picks them up.
+  function _applyNewCurves(newPosCurve, newTgtCurve, isAdaptive) {
+    tourPosCurve = newPosCurve;
+    tourTgtCurve = newTgtCurve;
+    _isAdaptive = !!isAdaptive;
+    if (cinemaMode && tourMode) {
+      _startBlendToCurves();
+    }
+  }
+
+  function _scheduleRebuild() {
+    if (_pathDebounceTimer) clearTimeout(_pathDebounceTimer);
+    _pathDebounceTimer = setTimeout(_rebuildNow, PATH_DEBOUNCE_MS);
+  }
+
+  function _rebuildNow() {
+    _pathDebounceTimer = null;
+    const fp = pathFingerprint(
+      _lastCells,
+      _lastFcal,
+      _lastSlicerMask,
+      _lastMinimapRects,
+      _lastViewLevel,
+    );
+    if (fp === _lastFingerprint) return;
+    _lastFingerprint = fp;
+
+    let pois = extractPOIs(_lastCells, _lastFcal);
+    // POI filters: slicer drops POIs whose 3D centre is in the hidden
+    // wedge; minimap drops POIs outside the user-defined rects. Either
+    // can leave fewer than 2 POIs, which falls back to the safe orbit.
+    if (_lastSlicerMask && _lastIsInsideWedge) {
+      pois = filterPOIsBySlicer(pois, _lastSlicerMask, _lastIsInsideWedge);
+    }
+    if (_lastMinimapRects) {
+      pois = filterPOIsByMinimap(pois, _lastMinimapRects);
+    }
+
+    const built = pois.length >= 2 ? buildTourCurves(pois) : null;
+    if (built) {
+      _applyNewCurves(built.posCurve, built.tgtCurve, true);
+    } else if (_isAdaptive) {
+      // No usable POIs — restore the safe-envelope fallback so the tour
+      // keeps moving.
+      _applyNewCurves(fallbackPosCurve, fallbackTgtCurve, false);
+    }
+  }
+
+  /**
+   * Heatmap-listener entry point. The visibility pipeline pushes its
+   * pre-region cell set here after every refresh. Stored cells/fcal feed
+   * the next rebuild; the rebuild itself is debounced + fingerprinted to
+   * avoid 60-Hz churn during slider drags.
+   *
+   * @param {{cells?: any[], fcal?: any[]}} data
+   */
+  function updateTourFromEvent({ cells, fcal } = {}) {
+    _lastCells = cells || [];
+    _lastFcal = fcal || [];
+    _scheduleRebuild();
+  }
+
+  /**
+   * Called when the slicer is enabled, disabled, or its mask moves.
+   * mask is the live state object from slicer.getMaskState(); isInside is
+   * the slicer.isPointInsideWedge function (a free fn that takes (x,y,z,mask)).
+   * Passing both keeps the cinema decoupled from the slicer module.
+   *
+   * @param {any} mask
+   * @param {((x:number,y:number,z:number,m:any)=>boolean) | null} isInside
+   */
+  function notifySlicerChanged(mask, isInside) {
+    _lastSlicerMask = mask || null;
+    _lastIsInsideWedge = typeof isInside === 'function' ? isInside : null;
+    _scheduleRebuild();
+  }
+
+  /**
+   * Called when the minimap rectangles change. regions is the array of
+   * {etaMin,etaMax,phiMin,phiMax} rects returned by getMinimapRegion(),
+   * or null when no rects are active.
+   *
+   * @param {any[] | null} regions
+   */
+  function notifyMinimapChanged(regions) {
+    _lastMinimapRects = Array.isArray(regions) && regions.length ? regions : null;
+    _scheduleRebuild();
+  }
+
+  /**
+   * Called when the view level switches between 1 / 2 / 3. The level itself
+   * doesn't change POI positions but is folded into the fingerprint so
+   * L2↔L3 transitions force a rebuild even when the cell set is identical
+   * between the two — keeps rule "recompute on every mode change" honest.
+   *
+   * @param {number} level
+   */
+  function notifyViewLevelChanged(level) {
+    if (!Number.isFinite(level)) return;
+    _lastViewLevel = level | 0;
+    _scheduleRebuild();
   }
 
   function enterCinema() {
@@ -323,5 +454,9 @@ export function setupCinemaControls({
     isTourMode: () => tourMode,
     disableTourMode,
     enableTourMode,
+    updateTourFromEvent,
+    notifySlicerChanged,
+    notifyMinimapChanged,
+    notifyViewLevelChanged,
   };
 }

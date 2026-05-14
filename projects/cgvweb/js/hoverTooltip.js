@@ -18,6 +18,7 @@ import { buildExtrasHtml } from './tooltipRows.js';
 import { getMuonChamberMeshes, showChamberHoverOutline } from './trackAtlasIntersections.js';
 import { getMuonAliasForMesh, getStationMeshes } from './visibility/muonAliases.js';
 import { leptonSymbol, tauSymbolFromCharge } from './particleSymbols.js';
+import { getCellMetric, etMevFromE } from './cellMetric.js';
 
 export const tooltip = document.getElementById('tip');
 export const tipCellEl = document.getElementById('tip-cell');
@@ -259,15 +260,20 @@ function doRaycast(clientX, clientY) {
         }
       }
     }
+    // E_T mode swaps the tooltip's energy row for transverse energy
+    // (E_T = E / cosh η). The cell metric is a global toggle in #rpanel.
+    const isET = getCellMetric() === 'ET';
     if (cellHit && cellDist <= fcalDist) {
       const data = active.get(cellHandle);
+      const valGev = isET ? data.etMev / 1000 : data.energyGev;
       _finishHit({
         outlineAction: () => (wantTooltip ? showOutline(cellHandle) : clearOutline()),
         showHitArgs: {
           label: data.cellName,
           coord: data.coords,
-          valueText: `${data.energyGev.toFixed(4)} GeV`,
-          keyText: _t('tip-energy-key'),
+          valueText: `${valGev.toFixed(4)} GeV`,
+          // E_T renders with a real subscript T; energy stays a plain word.
+          ...(isET ? { keyHtml: 'E<sub>T</sub>' } : { keyText: _t('tip-energy-key') }),
         },
       });
       return;
@@ -275,14 +281,23 @@ function doRaycast(clientX, clientY) {
     if (fcalHit) {
       const iid = fcalHit.instanceId;
       const cell = fcalVisibleMap[iid];
-      const side = cell.eta >= 0 ? 'A' : 'C';
+      // Derive η/φ from the cell's JiveXML geometry, NOT the parser's
+      // cell.eta/cell.phi — those come from the compact-ID index (φ
+      // quantised to 16 sectors, range [0,2π)). Physics φ = atan2(y,x) on
+      // the RAW x/y ∈ [-π,π] — same as the renderer's heatmap/region φ.
+      const r = Math.hypot(cell.x, cell.y);
+      const eta = -Math.log(Math.tan(Math.atan2(r, cell.z) / 2));
+      const phi = Math.atan2(cell.y, cell.x);
+      const side = eta >= 0 ? 'A' : 'C';
+      let valGev = cell.energy;
+      if (isET) valGev = etMevFromE(cell.energy * 1000, eta) / 1000;
       _finishHit({
         outlineAction: () => (wantTooltip ? showFcalOutline(iid) : clearOutline()),
         showHitArgs: {
           label: `FCAL${cell.module} (${side}-side)`,
-          coord: `η = ${cell.eta.toFixed(3)}   φ = ${cell.phi.toFixed(3)} rad`,
-          valueText: `${cell.energy.toFixed(4)} GeV`,
-          keyText: _t('tip-energy-key'),
+          coord: `η = ${eta.toFixed(3)}   φ = ${phi.toFixed(3)} rad`,
+          valueText: `${valGev.toFixed(4)} GeV`,
+          ...(isET ? { keyHtml: 'E<sub>T</sub>' } : { keyText: _t('tip-energy-key') }),
         },
       });
       return;

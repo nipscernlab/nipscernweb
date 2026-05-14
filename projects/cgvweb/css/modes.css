@@ -127,6 +127,13 @@
   color: var(--bright);
   background: var(--surface-hover);
 }
+/* The play/stop toggle relies on the `hidden` attribute, but the UA
+   `[hidden] { display: none }` rule loses the specificity tie to
+   `.ctrl-btn { display: inline-flex }` above — so without this both
+   buttons would always show. Re-assert hidden with class+attr specificity. */
+.ctrl-btn[hidden] {
+  display: none;
+}
 
 /* ── Event list (live + server) ─────────────────────────── */
 #evt-list {

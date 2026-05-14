@@ -15,7 +15,8 @@
 // defined here only run after both modules finish loading.
 import * as THREE from 'three';
 import { scene, markDirty } from '../renderer.js';
-import { palColorFcal } from '../palette.js';
+import { palColorFcal, setPalMinFcal, setPalMaxFcal } from '../palette.js';
+import { getCellMetric, etMevFromE } from '../cellMetric.js';
 import { thrFcalMev } from './thresholds.js';
 import { layerVis } from './layerVis.js';
 import {
@@ -110,6 +111,39 @@ export function applyFcalThreshold() {
   refreshCaloBoundParticles();
 }
 
+// Re-derives the FCAL palette range for the current cell metric (E or E_T)
+// over the loaded FCAL cells, sets the palette bounds, and returns [min,max]
+// so the caller can refresh the FCAL threshold slider. Mirrors processXml's
+// rangeMev(fcalCells, 0.5, 0.99) on signed energy, with eta-aware E_T support.
+// Caller runs applyFcalThreshold afterwards to recolour with the new bounds.
+/** @returns {[number, number]} */
+export function computeFcalMetricRange() {
+  const metric = getCellMetric();
+  /** @type {number[]} */
+  const vals = [];
+  for (const c of fcalCellsData) {
+    let v = c.energy * 1000;
+    if (!isFinite(v)) continue;
+    if (metric === 'ET') {
+      const r = Math.hypot(c.x, c.y);
+      const eta = -Math.log(Math.tan(Math.atan2(r, c.z) / 2));
+      v = etMevFromE(v, eta);
+    }
+    vals.push(v);
+  }
+  if (!vals.length) {
+    setPalMinFcal(0);
+    setPalMaxFcal(1);
+    return [0, 1];
+  }
+  vals.sort((a, b) => a - b);
+  const lo = vals[Math.floor(0.5 * vals.length)] ?? vals[0];
+  const hi = vals[Math.floor(0.99 * vals.length)] ?? vals[vals.length - 1];
+  setPalMinFcal(lo);
+  setPalMaxFcal(hi);
+  return [lo, hi];
+}
+
 function _applyFcalDraw() {
   const slicer = getSlicer();
   const slicerMask = slicer?.getMaskState() ?? { active: false };
@@ -132,26 +166,41 @@ function _applyFcalDraw() {
   /** @type {Array<{eta:number, phi:number, energyMev:number}>} */
   const heatmapEntries = [];
 
+  // Threshold + heatmap compare against the active metric (E or E_T). E_T
+  // needs the per-cell η, which is derived from the JiveXML geometry below.
+  const metric = getCellMetric();
+
   const visible = fcalCellsData.filter((c) => {
     if (!lv.fcal[c.module]) return false;
     const eMev = Math.abs(c.energy * 1000);
-    const inCluster =
-      activeClusterCellIds === null || (c.id && activeClusterCellIds.has(c.id));
+    const inCluster = activeClusterCellIds === null || (c.id && activeClusterCellIds.has(c.id));
     const r = Math.hypot(c.x, c.y);
     const theta = Math.atan2(r, c.z);
     const eta = -Math.log(Math.tan(theta / 2));
-    const phi = Math.atan2(-c.y, -c.x);
+    // φ is physics (ATLAS) φ — atan2 on the RAW x/y. The -x,-y below is the
+    // scene-placement convention (scene = -ATLAS x/y, matches the GLB), NOT
+    // a physics transform: applying it to φ too rotated the heatmap/region
+    // gate by π. Keep the two separate. φ ∈ [-π, π].
+    const phi = Math.atan2(c.y, c.x);
+    const cellVal = metric === 'ET' ? etMevFromE(eMev, eta) : eMev;
     // Heatmap: module on + raw threshold + cluster membership. No slicer,
     // no rect — the minimap is a stable overview.
-    if (eMev >= thrFcalMev && inCluster) heatmapEntries.push({ eta, phi, energyMev: eMev });
+    if (cellVal >= thrFcalMev && inCluster) heatmapEntries.push({ eta, phi, energyMev: cellVal });
 
     // From here on: per-cell visibility for the 3D scene. Re-applies the
     // slicer's show-all-cells bypass for threshold + cluster, then the
     // slicer wedge and the rect.
-    if (!slicer?.isShowAllCells() && eMev < thrFcalMev) return false;
-    if (!slicer?.isShowAllCells() && activeClusterCellIds !== null && c.id && !activeClusterCellIds.has(c.id))
+    if (!slicer?.isShowAllCells() && cellVal < thrFcalMev) return false;
+    if (
+      !slicer?.isShowAllCells() &&
+      activeClusterCellIds !== null &&
+      c.id &&
+      !activeClusterCellIds.has(c.id)
+    )
       return false;
     if (slicerMask.active && slicer) {
+      // Scene-space position (scene = -ATLAS x/y) — the wedge is defined in
+      // scene coords, same as the GLB cells it tests against.
       const cx = -c.x * 10,
         cy = -c.y * 10,
         cz = c.z * 10;
@@ -181,6 +230,7 @@ function _applyFcalDraw() {
     const rx = Math.max(Math.abs(dx) * 5, 1e-3);
     const ry = Math.max(Math.abs(dy) * 5, 1e-3);
     const len = Math.max(Math.abs(dz) * 2 * 10, 1e-3);
+    // Scene placement: scene x/y = -ATLAS x/y (matches the GLB cells).
     const cx = -x * 10,
       cy = -y * 10,
       cz = z * 10;
@@ -192,7 +242,16 @@ function _applyFcalDraw() {
     _fcalDummy.quaternion.multiply(_fcalTwist);
     _fcalDummy.updateMatrix();
     iMesh.setMatrixAt(i, _fcalDummy.matrix);
-    const [r, g, b] = palColorFcal(energy * 1000);
+    // Colour uses the SIGNED metric value (palColorFcal's range is built on
+    // signed energy — ATLAS FCAL cells run negative). E_T keeps the sign
+    // since cosh(η) > 0.
+    let colorVal = energy * 1000;
+    if (metric === 'ET') {
+      const cr = Math.hypot(x, y);
+      const cEta = -Math.log(Math.tan(Math.atan2(cr, z) / 2));
+      colorVal = etMevFromE(colorVal, cEta);
+    }
+    const [r, g, b] = palColorFcal(colorVal);
     _fcalCol.setRGB(r, g, b);
     iMesh.setColorAt(i, _fcalCol);
   }

@@ -85,6 +85,7 @@ import { setStatus, showEventInfo } from './statusHud.js';
 import { markDirty } from './renderer.js';
 import { hideTooltip } from './hoverTooltip.js';
 import { esc } from './utils.js';
+import { etMevFromE, getCellMetric } from './cellMetric.js';
 
 // Single subscription that re-draws jets whenever jet state changes — fires on
 // fresh events (setJetCollections) and on user-driven collection switches
@@ -113,6 +114,10 @@ const _deps = {
   trackPtSlider: null,
   clusterEtSlider: null,
   initDetPanel: null,
+  // When the cell metric is E_T, re-derive per-detector ranges + palette +
+  // cell colours from the freshly-built `active` map. No-op in E mode (the
+  // load path already coloured everything from the energy percentiles).
+  syncCellMetric: null,
 };
 
 export function setProcessXmlDeps(deps) {
@@ -348,6 +353,7 @@ export async function processXml(xmlText) {
     active.set(h, {
       energyGev: energy,
       energyMev: eMev,
+      etMev: etMevFromE(eMev, tEta),
       cellName: `${tilePrefix} ${cellLabel(x, k)}`,
       coords: `η = ${tEta.toFixed(3)}   φ = ${tPhi.toFixed(3)} rad`,
       eta: tEta,
@@ -387,6 +393,7 @@ export async function processXml(xmlText) {
     active.set(h, {
       energyGev: energy,
       energyMev: eMev,
+      etMev: etMevFromE(eMev, lEta),
       cellName: rName,
       coords: `η = ${lEta.toFixed(3)}   φ = ${lPhi.toFixed(3)} rad`,
       eta: lEta,
@@ -420,6 +427,7 @@ export async function processXml(xmlText) {
     active.set(h, {
       energyGev: energy,
       energyMev: eMev,
+      etMev: etMevFromE(eMev, hEta),
       cellName: hLabel,
       coords: `η = ${hEta.toFixed(3)}   φ = ${hPhi.toFixed(3)} rad`,
       eta: hEta,
@@ -457,6 +465,7 @@ export async function processXml(xmlText) {
     active.set(h, {
       energyGev: energy,
       energyMev: eMev,
+      etMev: etMevFromE(eMev, mbtsEta),
       cellName: _mbtsCellName,
       coords: mbtsCoords,
       eta: mbtsEta,
@@ -474,6 +483,10 @@ export async function processXml(xmlText) {
     tg && tg.children.length > 0,
     fcalCells.length > 0,
   );
+  // The cell loops above always colour from the energy percentiles. If the
+  // user left the panel in E_T mode, re-derive ranges + palette + colours
+  // from the now-complete `active` map before the first applyThreshold.
+  if (getCellMetric() !== 'E') _deps.syncCellMetric?.();
   applyThreshold();
 
   // Calo-bound particle endpoints (γ / clusters / τ / jets) — drawn AFTER

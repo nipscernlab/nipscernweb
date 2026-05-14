@@ -9,6 +9,7 @@ import { markDirty, canvas, renderer, scene, camera, controls } from './renderer
 import { toggleAllGhosts, anyGhostOn } from './ghost.js';
 import { setupColorPicker } from './colorpicker.js';
 import { setupCinemaControls } from './cinema.js';
+import { getViewLevel, onViewLevelChange } from './viewLevel.js';
 import { setupScreenshotControls } from './screenshot.js';
 import { setupDetectorPanels } from './detectorPanels.js';
 import {
@@ -92,11 +93,25 @@ try {
 initLanguage();
 setupLanguagePicker();
 initMinimap();
-setMinimapRegionListener(setEtaPhiRegion);
+// Minimap rectangle changes feed BOTH the 3D-scene gate (setEtaPhiRegion)
+// AND the cinema tour (so a user-defined area of interest narrows the path).
+// cinema is declared further below; the closure captures the const binding
+// and only fires once the user has actually drawn or moved a rect.
+setMinimapRegionListener((regions) => {
+  setEtaPhiRegion(regions);
+  cinema.notifyMinimapChanged(regions);
+});
 // Visibility pipeline pushes pre-rectangle visible cells into the minimap
 // heatmap every time a filter changes (threshold sliders, detector toggles,
-// view-level switch, slicer move).
-setHeatmapListener((cells, fcal) => updateMinimap({ cells, fcal }));
+// view-level switch, slicer move). The cinema reuses the same data feed to
+// rebuild its event-driven tour path — debounced + fingerprint-gated inside
+// cinema so slider drags don't churn the curve. cinema is declared further
+// below but the closure only fires after the first visibility refresh, well
+// past cinema's initialisation.
+setHeatmapListener((cells, fcal) => {
+  updateMinimap({ cells, fcal });
+  cinema.updateTourFromEvent({ cells, fcal });
+});
 
 let sidebarControls = null;
 
@@ -131,6 +146,7 @@ let hecSlider = null;
 let trackPtSlider = null;
 let clusterEtSlider = null;
 let initDetPanel = null;
+let syncCellMetric = null;
 const { startProgress, advanceProgress, endProgress } = createDownloadProgressController();
 
 const cinema = setupCinemaControls({
@@ -142,6 +158,12 @@ const cinema = setupCinemaControls({
   hideTooltip,
   updateCollisionHud,
 });
+// Seed the cinema's view-level cache with the starting level and refresh it
+// on every transition between modes 1/2/3 — the fingerprint includes the
+// level so the adaptive tour rebuilds even when the underlying cell set
+// happens to be identical between two modes.
+cinema.notifyViewLevelChanged(getViewLevel());
+onViewLevelChange((level) => cinema.notifyViewLevelChanged(level));
 const enterCinema = () => cinema.enterCinema();
 const exitCinema = () => cinema.exitCinema();
 // Reset-camera button: when the slicer is active, re-snap to the slicer's
@@ -195,47 +217,55 @@ initStatusHud({
   getPanelPinned: () => sidebarControls.getState().panelPinned,
 });
 
-({ tileSlider, larSlider, fcalSlider, hecSlider, trackPtSlider, clusterEtSlider, initDetPanel } =
-  setupDetectorPanels({
-    TILE_SCALE,
-    LAR_SCALE,
-    FCAL_SCALE,
-    HEC_SCALE,
-    applyThreshold,
-    applyFcalThreshold,
-    applyTrackThreshold,
-    applyClusterThreshold,
-    applyJetThreshold,
-    sidebarControls,
-    state: {
-      getThrTileMev: () => thrTileMev,
-      setThrTileMev,
-      getThrLArMev: () => thrLArMev,
-      setThrLArMev,
-      getThrFcalMev: () => thrFcalMev,
-      setThrFcalMev,
-      getThrHecMev: () => thrHecMev,
-      setThrHecMev,
-      getThrTrackGev: () => thrTrackGev,
-      setThrTrackGev,
-      getTrackPtMinGev: () => trackPtMinGev,
-      setTrackPtMinGev,
-      getTrackPtMaxGev: () => trackPtMaxGev,
-      setTrackPtMaxGev,
-      getThrClusterEtGev: () => thrClusterEtGev,
-      setThrClusterEtGev,
-      getClusterEtMinGev: () => clusterEtMinGev,
-      setClusterEtMinGev,
-      getClusterEtMaxGev: () => clusterEtMaxGev,
-      setClusterEtMaxGev,
-      getThrJetEtGev: () => thrJetEtGev,
-      setThrJetEtGev,
-      getJetEtMinGev: () => jetEtMinGev,
-      setJetEtMinGev,
-      getJetEtMaxGev: () => jetEtMaxGev,
-      setJetEtMaxGev,
-    },
-  }));
+({
+  tileSlider,
+  larSlider,
+  fcalSlider,
+  hecSlider,
+  trackPtSlider,
+  clusterEtSlider,
+  initDetPanel,
+  syncCellMetric,
+} = setupDetectorPanels({
+  TILE_SCALE,
+  LAR_SCALE,
+  FCAL_SCALE,
+  HEC_SCALE,
+  applyThreshold,
+  applyFcalThreshold,
+  applyTrackThreshold,
+  applyClusterThreshold,
+  applyJetThreshold,
+  sidebarControls,
+  state: {
+    getThrTileMev: () => thrTileMev,
+    setThrTileMev,
+    getThrLArMev: () => thrLArMev,
+    setThrLArMev,
+    getThrFcalMev: () => thrFcalMev,
+    setThrFcalMev,
+    getThrHecMev: () => thrHecMev,
+    setThrHecMev,
+    getThrTrackGev: () => thrTrackGev,
+    setThrTrackGev,
+    getTrackPtMinGev: () => trackPtMinGev,
+    setTrackPtMinGev,
+    getTrackPtMaxGev: () => trackPtMaxGev,
+    setTrackPtMaxGev,
+    getThrClusterEtGev: () => thrClusterEtGev,
+    setThrClusterEtGev,
+    getClusterEtMinGev: () => clusterEtMinGev,
+    setClusterEtMinGev,
+    getClusterEtMaxGev: () => clusterEtMaxGev,
+    setClusterEtMaxGev,
+    getThrJetEtGev: () => thrJetEtGev,
+    setThrJetEtGev,
+    getJetEtMinGev: () => jetEtMinGev,
+    setJetEtMinGev,
+    getJetEtMaxGev: () => jetEtMaxGev,
+    setJetEtMaxGev,
+  },
+}));
 
 setProcessXmlDeps({
   getWasmOk: sceneInit.isWasmOk,
@@ -246,6 +276,7 @@ setProcessXmlDeps({
   trackPtSlider,
   clusterEtSlider,
   initDetPanel,
+  syncCellMetric,
 });
 
 setupButtonTooltips();
@@ -279,9 +310,19 @@ setupMobileToolbar();
 // show-all-chambers + wedge-mask pass). refreshSceneVisibility doesn't cascade
 // into the chamber pass because cell vs chamber pipelines are otherwise
 // independent; coupling them at the slicer hook keeps the rest decoupled.
+// Every slicer transition (enable / disable / mask drag) needs to notify
+// the cinema so the adaptive tour drops POIs in the cut wedge. Done in a
+// shared helper so all three callbacks share the same notification path.
+// slicer is the variable captured below; this fn only runs from user
+// interaction, well past slicer's initialisation.
+const _notifyCinemaSlicer = () => {
+  cinema.notifySlicerChanged(slicer.getMaskState(), slicer.isPointInsideWedge);
+};
+
 const onSlicerStateChanged = () => {
   refreshSceneVisibility();
   updateTrackAtlasIntersections();
+  _notifyCinemaSlicer();
 };
 
 const slicer = createSlicerController({
@@ -296,8 +337,12 @@ const slicer = createSlicerController({
   // Enabling the slicer carves the 3D scene; the minimap heatmap doesn't
   // share that affordance and the two can confuse each other if both are
   // on, so they're mutually exclusive — turning the slicer on disables the
-  // minimap (and vice versa via the toolbar button below).
-  onEnable: () => setMinimapEnabled(false),
+  // minimap (and vice versa via the toolbar button below). Also notify the
+  // cinema so the tour drops POIs in the cut wedge.
+  onEnable: () => {
+    setMinimapEnabled(false);
+    _notifyCinemaSlicer();
+  },
   onHideNonActiveShowAll: hideNonActiveCells,
   markDirty,
   getActiveJetCollection,

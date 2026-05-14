@@ -23,11 +23,13 @@ const BIN_PHI = 0.1;
 const NBINS_ETA = Math.ceil((ETA_MAX - ETA_MIN) / BIN_ETA);
 const NBINS_PHI = Math.ceil((PHI_MAX - PHI_MIN) / BIN_PHI);
 
-const W = 400;
+const W = 342;
 const H = 220;
 
 const INSET_L = 26;
-const INSET_R = 78;
+// Right inset only has to clear the legend colour bar now (no value labels) —
+// LEGEND_GAP + LEGEND_W + a 4px margin to the canvas edge.
+const INSET_R = 20;
 const INSET_T = 10;
 const INSET_B = 20;
 
@@ -216,11 +218,9 @@ function _drawHeatmap() {
   const plotH = area.y1 - area.y0;
 
   const xEdges = new Int16Array(NBINS_ETA + 1);
-  for (let i = 0; i <= NBINS_ETA; i++)
-    xEdges[i] = Math.round(area.x0 + (i * plotW) / NBINS_ETA);
+  for (let i = 0; i <= NBINS_ETA; i++) xEdges[i] = Math.round(area.x0 + (i * plotW) / NBINS_ETA);
   const yEdges = new Int16Array(NBINS_PHI + 1);
-  for (let i = 0; i <= NBINS_PHI; i++)
-    yEdges[i] = Math.round(area.y0 + (i * plotH) / NBINS_PHI);
+  for (let i = 0; i <= NBINS_PHI; i++) yEdges[i] = Math.round(area.y0 + (i * plotH) / NBINS_PHI);
 
   ctx.save();
   ctx.beginPath();
@@ -243,10 +243,12 @@ function _drawHeatmap() {
   ctx.restore();
 }
 
+// Bare colour bar — no min/max value labels, no title, no empty-state text.
+// The bar conveys the relative scale; everything else was clutter, and
+// dropping it lets the window hug the palette (see INSET_R).
 function _drawLegend() {
   const ctx = _ctx;
   const area = _plotArea();
-  const { min, max } = _buildBins();
 
   const xL = area.x1 + LEGEND_GAP;
   const yTop = area.y0 + 4;
@@ -261,32 +263,6 @@ function _drawLegend() {
   ctx.strokeStyle = 'rgba(120, 150, 190, 0.55)';
   ctx.lineWidth = 1;
   ctx.strokeRect(xL + 0.5, yTop + 0.5, LEGEND_W, barH);
-
-  ctx.fillStyle = 'rgba(190, 210, 235, 0.9)';
-  ctx.font = '9px ui-monospace, monospace';
-  ctx.textAlign = 'left';
-  if (max > 0) {
-    ctx.textBaseline = 'top';
-    ctx.fillText(_fmtEnergy(max), xL + LEGEND_W + 3, yTop - 2);
-    ctx.textBaseline = 'bottom';
-    ctx.fillText(_fmtEnergy(min), xL + LEGEND_W + 3, yBot + 2);
-  } else {
-    ctx.textBaseline = 'middle';
-    ctx.fillText('no data', xL + LEGEND_W + 3, (yTop + yBot) / 2);
-  }
-  ctx.textBaseline = 'bottom';
-  ctx.textAlign = 'center';
-  ctx.fillText('E', xL + LEGEND_W / 2, yTop - 4);
-}
-
-function _fmtEnergy(eMev) {
-  const eGev = eMev / 1000;
-  if (eGev >= 100) return `${eGev.toFixed(0)} GeV`;
-  if (eGev >= 10) return `${eGev.toFixed(1)} GeV`;
-  if (eGev >= 1) return `${eGev.toFixed(2)} GeV`;
-  if (eGev >= 0.1) return `${eGev.toFixed(2)} GeV`;
-  if (eGev >= 0.01) return `${(eGev * 1000).toFixed(0)} MeV`;
-  return `${(eGev * 1000).toFixed(1)} MeV`;
 }
 
 // Draws all active rectangles. No per-rect label — with multiple rects the
@@ -422,10 +398,14 @@ function _onMouseMove(ev) {
     const ddy = y - _dragAnchor.y;
     if (Math.hypot(ddx, ddy) >= DRAG_THRESHOLD_PX) {
       _mouseState = 'drawing';
-      _rects.push(_normalizeRect({
-        etaMin: _dragAnchor.eta, etaMax: eta,
-        phiMin: _dragAnchor.phi, phiMax: phi,
-      }));
+      _rects.push(
+        _normalizeRect({
+          etaMin: _dragAnchor.eta,
+          etaMax: eta,
+          phiMin: _dragAnchor.phi,
+          phiMax: phi,
+        }),
+      );
       _notifyRegion();
       _redraw();
     }
@@ -434,8 +414,10 @@ function _onMouseMove(ev) {
 
   if (_mouseState === 'drawing') {
     _rects[_rects.length - 1] = _normalizeRect({
-      etaMin: _dragAnchor.eta, etaMax: eta,
-      phiMin: _dragAnchor.phi, phiMax: phi,
+      etaMin: _dragAnchor.eta,
+      etaMax: eta,
+      phiMin: _dragAnchor.phi,
+      phiMax: phi,
     });
     _notifyRegion();
     _redraw();
@@ -461,8 +443,10 @@ function _onMouseMove(ev) {
     const cE = Math.max(ETA_MIN + halfE, Math.min(ETA_MAX - halfE, ncx));
     const cP = Math.max(PHI_MIN + halfP, Math.min(PHI_MAX - halfP, ncy));
     _rects[_activeRectIdx] = {
-      etaMin: cE - halfE, etaMax: cE + halfE,
-      phiMin: cP - halfP, phiMax: cP + halfP,
+      etaMin: cE - halfE,
+      etaMax: cE + halfE,
+      phiMin: cP - halfP,
+      phiMax: cP + halfP,
     };
     _notifyRegion();
     _redraw();

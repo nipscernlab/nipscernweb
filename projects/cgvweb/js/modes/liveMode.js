@@ -14,6 +14,11 @@ export function setupLiveMode({
 }) {
   let currentEventId = null;
   const poller = LivePoller ? new LivePoller() : null;
+  // Tracks an explicit user stop. The boot path (modeWiring.onSceneAndWasm-
+  // Ready → start()) fires AFTER the scene/WASM finish loading — if the user
+  // pressed stop during that load window, the autostart must not override
+  // them. The play button clears the flag (explicit resume).
+  let _userStopped = false;
 
   function setLiveDot(state) {
     const dot = document.getElementById('ldot');
@@ -94,11 +99,14 @@ export function setupLiveMode({
 
   function start() {
     if (!poller) return;
+    // Boot / sub-tab autostart — honour an explicit user stop.
+    if (_userStopped) return;
     poller.start();
   }
 
   function stop() {
     if (!poller) return;
+    _userStopped = true;
     poller.stop();
     document.getElementById('ibtn-stop').hidden = true;
     document.getElementById('ibtn-play').hidden = false;
@@ -116,6 +124,9 @@ export function setupLiveMode({
 
   document.getElementById('ibtn-play').addEventListener('click', () => {
     if (!poller) return;
+    // Explicit resume — clears the user-stop latch so the boot autostart
+    // path works again on later sub-tab switches.
+    _userStopped = false;
     poller.start();
     document.getElementById('ibtn-play').hidden = true;
     document.getElementById('ibtn-stop').hidden = false;

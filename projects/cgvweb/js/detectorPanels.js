@@ -3,6 +3,9 @@ import { getViewLevel, onViewLevelChange } from './viewLevel.js';
 import { getActiveJetCollection, onJetStateChange } from './jets.js';
 import { getLastTaus } from './particles.js';
 import { t } from './i18n/index.js';
+import { getCellMetric, setCellMetric, onCellMetricChange } from './cellMetric.js';
+import { recolorActiveCells } from './visibility.js';
+import { computeFcalMetricRange } from './visibility/fcalRenderer.js';
 
 function fmtGev(v) {
   return v.toFixed(2) + ' GeV';
@@ -450,6 +453,104 @@ export function setupDetectorPanels({
     'cluster-sval-min',
   );
 
+  // ── Cell-metric (E vs E_T) ───────────────────────────────────────────────
+  // Recolours every calo cell + FCAL for the current metric and re-derives the
+  // per-detector percentile ranges that feed the colour palette + the slider
+  // min/max labels. The threshold *values* are deliberately left untouched —
+  // the user keeps whatever cut they had; only the slider's range relabels, so
+  // the thumb just lands at a new position within the rescaled track.
+  // processXml calls this on load when the panel sits in E_T mode; the
+  // select-change handler below calls it on every flip.
+  function syncCellMetric() {
+    const { tile, lar, hec } = recolorActiveCells();
+    const fcal = computeFcalMetricRange();
+    tileSlider.update(tile[0], tile[1]);
+    larSlider.update(lar[0], lar[1]);
+    hecSlider.update(hec[0], hec[1]);
+    fcalSlider.update(fcal[0], fcal[1]);
+    // FCAL fully rebuilds on applyFcalThreshold → repaints with the new
+    // palette + metric. Calo cell colours were already rewritten by
+    // recolorActiveCells; the caller runs applyThreshold for cell visibility.
+    applyFcalThreshold();
+  }
+
+  // Custom listbox dropdown (mirrors the jet-collection one in topToolbar.js)
+  // rather than a native <select> so the E_T option can carry a real <sub>.
+  // Two static options — no repopulation, just open/close/position + select.
+  const metricTrigger = document.getElementById('cell-metric-trigger');
+  const metricMenu = document.getElementById('cell-metric-menu');
+  const metricLabelEl = document.getElementById('cell-metric-label');
+  /** @type {Record<string, string>} */
+  const METRIC_HTML = { E: 'Energy', ET: 'E<sub>T</sub>' };
+
+  function syncMetricUI() {
+    const m = getCellMetric();
+    if (metricLabelEl) metricLabelEl.innerHTML = METRIC_HTML[m] ?? METRIC_HTML.E;
+    if (metricMenu)
+      for (const opt of metricMenu.querySelectorAll('.cell-metric-opt')) {
+        const on = opt.getAttribute('data-metric') === m;
+        opt.classList.toggle('on', on);
+        opt.setAttribute('aria-selected', on ? 'true' : 'false');
+      }
+  }
+  function closeMetricMenu() {
+    if (!metricMenu) return;
+    metricMenu.classList.remove('open');
+    metricTrigger?.setAttribute('aria-expanded', 'false');
+  }
+  function positionMetricMenu() {
+    if (!metricMenu || !metricTrigger) return;
+    const br = metricTrigger.getBoundingClientRect();
+    const left = Math.max(6, Math.min(br.left, window.innerWidth - metricMenu.offsetWidth - 6));
+    metricMenu.style.left = `${left}px`;
+    metricMenu.style.top = `${br.bottom + 6}px`;
+  }
+  function openMetricMenu() {
+    if (!metricMenu || !metricTrigger) return;
+    metricMenu.style.display = 'flex';
+    metricMenu.style.visibility = 'hidden';
+    positionMetricMenu();
+    metricMenu.style.visibility = '';
+    requestAnimationFrame(() => {
+      metricMenu.classList.add('open');
+      metricTrigger.setAttribute('aria-expanded', 'true');
+    });
+  }
+  if (metricTrigger && metricMenu) {
+    metricTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (metricMenu.classList.contains('open')) closeMetricMenu();
+      else openMetricMenu();
+    });
+    for (const opt of metricMenu.querySelectorAll('.cell-metric-opt')) {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setCellMetric(opt.getAttribute('data-metric') === 'ET' ? 'ET' : 'E');
+        closeMetricMenu();
+      });
+    }
+    document.addEventListener('click', (e) => {
+      if (!metricMenu.classList.contains('open')) return;
+      if (e.target === metricMenu || metricMenu.contains(/** @type {Node} */ (e.target))) return;
+      closeMetricMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && metricMenu.classList.contains('open')) closeMetricMenu();
+    });
+    window.addEventListener('resize', () => {
+      if (metricMenu.classList.contains('open')) positionMetricMenu();
+    });
+  }
+  syncMetricUI();
+
+  // Metric flip: update the dropdown UI, recolour + re-range (threshold
+  // values stay fixed), then re-run the cell-visibility pass.
+  onCellMetricChange(() => {
+    syncMetricUI();
+    syncCellMetric();
+    applyThreshold();
+  });
+
   function initDetPanel(hasTile, hasLAr, hasHec, hasTracks, hasFcal) {
     tileSlider.updateUI(state.getThrTileMev());
     larSlider.updateUI(state.getThrLArMev());
@@ -482,6 +583,7 @@ export function setupDetectorPanels({
   return {
     switchTab,
     initDetPanel,
+    syncCellMetric,
     tileSlider,
     larSlider,
     fcalSlider,

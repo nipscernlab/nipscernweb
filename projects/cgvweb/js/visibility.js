@@ -9,7 +9,21 @@ import {
   _flushIMDirty,
   _rayIMeshes,
 } from './state.js';
-import { PAL_TILE_COLOR, PAL_LAR_COLOR, PAL_HEC_COLOR } from './palette.js';
+import {
+  PAL_TILE_COLOR,
+  PAL_LAR_COLOR,
+  PAL_HEC_COLOR,
+  palColorTile,
+  palColorLAr,
+  palColorHec,
+  setPalMinTile,
+  setPalMaxTile,
+  setPalMinLAr,
+  setPalMaxLAr,
+  setPalMinHec,
+  setPalMaxHec,
+} from './palette.js';
+import { metricValueOf } from './cellMetric.js';
 import { markDirty } from './renderer.js';
 import { getViewLevel, onViewLevelChange } from './viewLevel.js';
 import { getActiveJetCollection } from './jets.js';
@@ -111,6 +125,7 @@ export function initVisibility({ slicer }) {
 /** @type {Array<{etaMin:number, etaMax:number, phiMin:number, phiMax:number}>} */
 let _etaPhiRegions = [];
 
+/** @param {Array<{etaMin:number, etaMax:number, phiMin:number, phiMax:number}> | null} regions */
 export function setEtaPhiRegion(regions) {
   if (Array.isArray(regions) && regions.length > 0) {
     _etaPhiRegions = regions.filter(
@@ -161,6 +176,7 @@ export function getEtaPhiRegion() {
 // when no rectangles are defined (no filter). Also returns true when eta/phi
 // are undefined — callers that pass objects without those fields (e.g. sprite
 // labels) should not be gated; their visibility follows their anchor's.
+/** @param {number} eta @param {number} phi */
 function _inEtaPhiRegion(eta, phi) {
   if (_etaPhiRegions.length === 0) return true;
   if (!Number.isFinite(eta) || !Number.isFinite(phi)) return true;
@@ -190,6 +206,7 @@ let _fcalVisibleForHeatmap = [];
 /** @type {((cells: any[], fcal: any[]) => void) | null} */
 let _heatmapListener = null;
 
+/** @param {((cells: any[], fcal: any[]) => void) | null} cb */
 export function setHeatmapListener(cb) {
   _heatmapListener = typeof cb === 'function' ? cb : null;
 }
@@ -198,6 +215,7 @@ function _notifyHeatmap() {
   if (_heatmapListener) _heatmapListener(_visibleForHeatmap, _fcalVisibleForHeatmap);
 }
 
+/** @param {Array<{eta:number, phi:number, energyMev:number}> | null} entries */
 export function setFcalHeatmapEntries(entries) {
   _fcalVisibleForHeatmap = entries || [];
   _notifyHeatmap();
@@ -460,8 +478,7 @@ export function applyTauPtThreshold() {
   for (const child of tauGroup.children ?? []) {
     const u = child.userData;
     const passesCharge = u.charge === -1 || u.charge === 1 || showUnmatched;
-    child.visible =
-      u.ptGev >= thrJetEtGev && passesCharge && _inEtaPhiRegion(u.eta, u.phi);
+    child.visible = u.ptGev >= thrJetEtGev && passesCharge && _inEtaPhiRegion(u.eta, u.phi);
   }
 }
 
@@ -523,8 +540,10 @@ export function applyThreshold() {
     _visibleForHeatmap = [];
     const acIds = getActiveClusterCellIds();
     const amLabels = getActiveMbtsLabels();
-    for (const [h, { energyMev, det, cellId, mbtsLabel, eta, phi }] of active) {
+    for (const [h, { energyMev, etMev, det, cellId, mbtsLabel, eta, phi }] of active) {
       const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
+      // Threshold + heatmap compare against the active metric (E or E_T).
+      const cellVal = metricValueOf(energyMev, etMev);
       const detOn = _detOnFor(h);
       let inCluster;
       if (acIds === null) {
@@ -536,7 +555,7 @@ export function applyThreshold() {
       } else {
         inCluster = true;
       }
-      const passThr = _slicer?.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
+      const passThr = _slicer?.isShowAllCells() || !isFinite(thr) || cellVal >= thr;
       const passCl = _slicer?.isShowAllCells() || inCluster;
       const passPreRegion = detOn && passThr && passCl;
       const passRegion = _inEtaPhiRegion(eta, phi);
@@ -548,10 +567,9 @@ export function applyThreshold() {
       // slicer wedge and the minimap rect are intentionally excluded — the
       // minimap is meant as a stable overview the user can rely on while
       // they scan the 3D scene with the slicer (no holes that move with the
-      // wedge).
-      const passHeatmap =
-        detOn && (!isFinite(thr) || energyMev >= thr) && inCluster;
-      if (passHeatmap) _visibleForHeatmap.push({ eta, phi, energyMev });
+      // wedge). energyMev field carries the active-metric value.
+      const passHeatmap = detOn && (!isFinite(thr) || cellVal >= thr) && inCluster;
+      if (passHeatmap) _visibleForHeatmap.push({ eta, phi, energyMev: cellVal });
     }
     _syncNonActiveShowAll();
     _flushIMDirty();
@@ -573,8 +591,10 @@ function _applySlicerMask() {
   const slicerMask = slicer.getMaskState();
   const acIds = getActiveClusterCellIds();
   const amLabels = getActiveMbtsLabels();
-  for (const [h, { energyMev, det, cellId, mbtsLabel, eta, phi }] of active) {
+  for (const [h, { energyMev, etMev, det, cellId, mbtsLabel, eta, phi }] of active) {
     const thr = det === 'LAR' ? thrLArMev : det === 'HEC' ? thrHecMev : thrTileMev;
+    // Threshold + heatmap compare against the active metric (E or E_T).
+    const cellVal = metricValueOf(energyMev, etMev);
     const detOn = _detOnFor(h);
     let inCluster;
     if (acIds === null) {
@@ -586,7 +606,7 @@ function _applySlicerMask() {
     } else {
       inCluster = true;
     }
-    const passThr = slicer.isShowAllCells() || !isFinite(thr) || energyMev >= thr;
+    const passThr = slicer.isShowAllCells() || !isFinite(thr) || cellVal >= thr;
     const passCl = slicer.isShowAllCells() || inCluster;
     const passPreRegion = detOn && passThr && passCl;
     const passRegion = _inEtaPhiRegion(eta, phi);
@@ -605,9 +625,9 @@ function _applySlicerMask() {
     // of the event while the slicer carves the 3D scene. (Also applies the
     // raw threshold even when slicer.isShowAllCells() is true, so toggling
     // the slicer doesn't suddenly repaint a flood of low-energy cells.)
-    const passHeatmap =
-      detOn && (!isFinite(thr) || energyMev >= thr) && inCluster;
-    if (passHeatmap) _visibleForHeatmap.push({ eta, phi, energyMev });
+    // energyMev field carries the active-metric value.
+    const passHeatmap = detOn && (!isFinite(thr) || cellVal >= thr) && inCluster;
+    if (passHeatmap) _visibleForHeatmap.push({ eta, phi, energyMev: cellVal });
   }
   _syncNonActiveShowAll();
   _flushIMDirty();
@@ -619,6 +639,61 @@ function _applySlicerMask() {
   // Particle-endpoint refresh is owned by the caller (applyThreshold's slicer
   // branch) — _applySlicerMask runs inside applyFcalThreshold's hook (skipped
   // via the suppress flag during applyThreshold's downstream call).
+}
+
+// ── Cell-metric recolour ─────────────────────────────────────────────────────
+// Re-derives per-detector percentile ranges, palette bounds, and per-cell
+// colours from the current cell metric (E or E_T) over the active-map. Called
+// by detectorPanels.js on a metric switch and by processXml on load when the
+// panel is already in E_T mode. Returns the new [min,max] ranges so the
+// caller can refresh the threshold sliders. Does NOT touch visibility — the
+// caller runs applyThreshold afterwards.
+/** @returns {{ tile: [number, number], lar: [number, number], hec: [number, number] }} */
+export function recolorActiveCells() {
+  /** @type {number[]} */ const tileVals = [];
+  /** @type {number[]} */ const larVals = [];
+  /** @type {number[]} */ const hecVals = [];
+  for (const [, e] of active) {
+    const v = metricValueOf(e.energyMev, e.etMev);
+    if (!isFinite(v)) continue;
+    if (e.det === 'LAR') larVals.push(v);
+    else if (e.det === 'HEC') hecVals.push(v);
+    else tileVals.push(v); // TILE + MBTS share the tile palette
+  }
+  // Same tail percentiles as processXml.rangeMev — a single extreme cell
+  // can't blow out the colour scale.
+  /**
+   * @param {number[]} vals
+   * @param {number} pctLo
+   * @param {number} pctHi
+   * @returns {[number, number]}
+   */
+  const range = (vals, pctLo, pctHi) => {
+    if (!vals.length) return [0, 1];
+    vals.sort((a, b) => a - b);
+    const lo = vals[Math.floor(pctLo * vals.length)] ?? vals[0];
+    const hi = vals[Math.floor(pctHi * vals.length)] ?? vals[vals.length - 1];
+    return [lo, hi];
+  };
+  const tile = range(tileVals, 0.05, 0.995);
+  const lar = range(larVals, 0.03, 0.97);
+  const hec = range(hecVals, 0.02, 0.98);
+  setPalMinTile(tile[0]);
+  setPalMaxTile(tile[1]);
+  setPalMinLAr(lar[0]);
+  setPalMaxLAr(lar[1]);
+  setPalMinHec(hec[0]);
+  setPalMaxHec(hec[1]);
+  for (const [h, e] of active) {
+    const v = metricValueOf(e.energyMev, e.etMev);
+    const col =
+      e.det === 'LAR' ? palColorLAr(v) : e.det === 'HEC' ? palColorHec(v) : palColorTile(v);
+    h.iMesh.setColorAt(h.instId, col);
+    _markIMDirty(h.iMesh);
+  }
+  _flushIMDirty();
+  markDirty();
+  return { tile, lar, hec };
 }
 
 // ── High-level entry point ────────────────────────────────────────────────────

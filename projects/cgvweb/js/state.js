@@ -127,8 +127,14 @@ export const SUBSYS_LAR_HEC = 3;
 
 /**
  * @typedef {Object} ActiveEntry
+ * @property {number} energyGev
  * @property {number} energyMev
+ * @property {number} etMev      transverse energy E_T = energyMev / cosh(eta)
  * @property {string} det
+ * @property {number} eta
+ * @property {number} phi
+ * @property {string} cellName
+ * @property {string} coords
  * @property {number|string} [cellId]
  * @property {string} [mbtsLabel]
  */
