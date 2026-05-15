@@ -23,18 +23,22 @@ export function setupLiveMode({
   function setLiveDot(state) {
     const dot = document.getElementById('ldot');
     const txt = document.getElementById('live-txt');
+    const bar = document.getElementById('live-bar');
     dot.className = 'ldot';
     switch (state) {
       case 'polling':
         dot.classList.add('ok', 'pulse');
+        bar?.classList.remove('paused');
         txt.textContent = t('live-polling');
         break;
       case 'same':
         dot.classList.add('ok');
+        bar?.classList.remove('paused');
         txt.textContent = t('live-same');
         break;
       case 'downloading':
         dot.classList.add('dl', 'pulse');
+        bar?.classList.remove('paused');
         txt.textContent = t('live-fetching');
         bumpReq();
         startProgress();
@@ -44,9 +48,23 @@ export function setupLiveMode({
         dot.classList.add('err');
         txt.textContent = t('live-error');
         break;
-      default:
+      default: // 'stopped'
+        dot.classList.add('stopped');
+        bar?.classList.add('paused');
         txt.textContent = t('live-stopped');
     }
+  }
+
+  function cancelProgressIfActive() {
+    const pEl = document.getElementById('dl-progress');
+    if (!pEl || pEl.hidden) return;
+    pEl.classList.add('cancelled');
+    setTimeout(() => {
+      pEl.hidden = true;
+      pEl.classList.remove('cancelled');
+      const fill = document.getElementById('dl-bar-fill');
+      if (fill) fill.style.width = '0%';
+    }, 500);
   }
 
   function renderEventList() {
@@ -108,6 +126,7 @@ export function setupLiveMode({
     if (!poller) return;
     _userStopped = true;
     poller.stop();
+    cancelProgressIfActive();
     document.getElementById('ibtn-stop').hidden = true;
     document.getElementById('ibtn-play').hidden = false;
     setLiveDot('stopped');
@@ -130,6 +149,14 @@ export function setupLiveMode({
     poller.start();
     document.getElementById('ibtn-play').hidden = true;
     document.getElementById('ibtn-stop').hidden = false;
+    // Immediately show the most recent cached event (top of list) while the
+    // new poll cycle runs in the background.
+    const list = poller.getList();
+    if (list.length > 0) {
+      currentEventId = list[0].id;
+      processXml(list[0].text);
+      renderEventList();
+    }
   });
 
   document.getElementById('ibtn-stop').addEventListener('click', stop);

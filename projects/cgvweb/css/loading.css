@@ -248,3 +248,15 @@
   background: #8fd64a;
   box-shadow: 0 0 6px #8fd64a;
 }
+#dl-progress.cancelled #dl-bar-fill {
+  background: linear-gradient(90deg, #7a2222, var(--err));
+  transition: background 0.2s ease;
+}
+#dl-progress.cancelled .dl-stage.active .dl-dot {
+  background: var(--err);
+  box-shadow: 0 0 6px var(--err);
+  animation: none;
+}
+#dl-progress.cancelled .dl-stage.active {
+  color: var(--err);
+}

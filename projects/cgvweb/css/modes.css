@@ -66,6 +66,11 @@
   color: var(--muted);
   border-bottom: 1px solid var(--divider);
   flex-shrink: 0;
+  transition: background var(--motion-base), border-bottom-color var(--motion-base);
+}
+#live-bar.paused {
+  background: rgba(220, 70, 70, 0.05);
+  border-bottom-color: var(--err);
 }
 .ldot {
   width: 7px;
@@ -84,6 +89,10 @@
 }
 .ldot.dl {
   background: var(--warn);
+}
+.ldot.stopped {
+  background: var(--err);
+  box-shadow: 0 0 8px rgba(220, 70, 70, 0.45);
 }
 .ldot.pulse {
   animation: pulse 1.4s ease-in-out infinite;

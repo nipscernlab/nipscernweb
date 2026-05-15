@@ -62,6 +62,7 @@ export class LivePoller extends EventTarget {
     this._running   = false;
     this._timer     = null;
     this._failCount = 0;
+    this._abortCtrl = null;   // aborts any in-flight fetch when stop() is called
   }
 
   // ── Public API ──────────────────────────────────────────────────────────────
@@ -82,6 +83,10 @@ export class LivePoller extends EventTarget {
   stop() {
     this._running = false;
     clearTimeout(this._timer);
+    if (this._abortCtrl) {
+      this._abortCtrl.abort();
+      this._abortCtrl = null;
+    }
     this._emit('status', { state: 'stopped' });
   }
 
@@ -116,11 +121,15 @@ export class LivePoller extends EventTarget {
   async _poll() {
     if (!this._running) return;
 
+    this._abortCtrl = new AbortController();
+    const { signal } = this._abortCtrl;
+
     // Step 1 — Fetch the /latest page through the proxy
     let html;
     try {
-      html = await this._fetchText(LATEST_URL);
+      html = await this._fetchText(LATEST_URL, signal);
     } catch (err) {
+      if (err.name === 'AbortError') return;
       // Network / proxy failure — reset proxy lock to re-probe next cycle
       this._proxyIdx = null;
       this._failCount++;
@@ -150,13 +159,14 @@ export class LivePoller extends EventTarget {
     try {
       if (eventId !== this._lastId) {
         this._emit('status', { state: 'downloading', eventId });
-        const text = await this._fetchText(xmlUrl);
+        const text = await this._fetchText(xmlUrl, signal);
         await this._addEntry(eventId, xmlUrl, text);
         this._lastId = eventId;
       } else {
         this._emit('status', { state: 'same', eventId, lastChecked: Date.now() });
       }
     } catch (err) {
+      if (err.name === 'AbortError') return;
       this._failCount++;
       this._emit('error',  { message: err.message });
       this._emit('status', { state: 'error', retryIn: POLL_MS, fails: this._failCount, lastChecked: Date.now() });
@@ -167,40 +177,50 @@ export class LivePoller extends EventTarget {
     if (this._running) this._schedule();
   }
 
-  async _fetchText(url) {
+  async _fetchText(url, signal) {
     // Use locked-in proxy if we found one that works
     if (this._proxyIdx !== null) {
-      return this._tryProxy(this._proxies[this._proxyIdx], url);
+      return this._tryProxy(this._proxies[this._proxyIdx], url, signal);
     }
     // Probe all proxies in order
     const errors = [];
     for (let i = 0; i < this._proxies.length; i++) {
       try {
-        const text = await this._tryProxy(this._proxies[i], url);
+        const text = await this._tryProxy(this._proxies[i], url, signal);
         this._proxyIdx = i;
         if (i > 0 || this._proxies[i].label !== 'direct') {
           this._emit('proxydetected', { proxy: this._proxies[i].prefix, label: this._proxies[i].label });
         }
         return text;
       } catch (e) {
+        if (e.name === 'AbortError') throw e;  // propagate immediately — user stopped
         errors.push(`[${this._proxies[i].label}] ${e.message}`);
       }
     }
     throw new Error('All proxies failed:\n' + errors.join('\n'));
   }
 
-  async _tryProxy(proxy, url) {
+  async _tryProxy(proxy, url, signal) {
     const target = proxy.prefix
       ? proxy.prefix + encodeURIComponent(url)
       : url;
 
-    const ctrl = new AbortController();
-    const tid  = setTimeout(() => ctrl.abort(), 15_000);
+    const timeoutCtrl = new AbortController();
+    const tid = setTimeout(() => timeoutCtrl.abort(), 15_000);
+
+    // Wire the outer abort signal into the local timeout controller
+    let onAbort;
+    if (signal) {
+      onAbort = () => timeoutCtrl.abort(signal.reason);
+      signal.addEventListener('abort', onAbort, { once: true });
+    }
+
     let res;
     try {
-      res = await fetch(target, { cache: 'no-store', signal: ctrl.signal });
+      res = await fetch(target, { cache: 'no-store', signal: timeoutCtrl.signal });
     } finally {
       clearTimeout(tid);
+      if (onAbort) signal.removeEventListener('abort', onAbort);
     }
 
     if (!res.ok) throw new Error(`HTTP ${res.status} from ${proxy.label}`);
