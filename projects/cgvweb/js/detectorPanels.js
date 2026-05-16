@@ -75,6 +75,24 @@ export function setupDetectorPanels({
     }
   });
   _popupInput.addEventListener('blur', () => _closePopup(true));
+
+  // ── Floating value tooltip (hover + drag) ───────────────────────────────
+  // Single element shared across all sliders. Each slider's hover / pointer
+  // handlers feed _showValTip with the pre-formatted current threshold.
+  const _valTip = document.createElement('div');
+  _valTip.id = 'thr-val-tip';
+  _valTip.hidden = true;
+  document.body.appendChild(_valTip);
+  /** @param {MouseEvent|PointerEvent} e  @param {string} text */
+  function _showValTip(e, text) {
+    _valTip.textContent = text;
+    _valTip.style.left = e.clientX + 12 + 'px';
+    _valTip.style.top = e.clientY - 22 + 'px';
+    _valTip.hidden = false;
+  }
+  function _hideValTip() {
+    _valTip.hidden = true;
+  }
   /**
    * @param {HTMLElement} anchor       slider track to position the popup against
    * @param {string} currentValue      pre-fill (current threshold formatted)
@@ -142,6 +160,25 @@ export function setupDetectorPanels({
       thumb.style.top = (1 - ratio) * 100 + '%';
     }
 
+    // Pre-formatted threshold for the floating value tooltip — MeV with
+     // 'all' fallback for the bottom-snap (-Infinity) state.
+    const fmtVal = () => {
+      const v = getThr();
+      return isFinite(v) ? fmtMev(v) : 'all';
+    };
+    let hover = false;
+    track.addEventListener('mouseenter', (e) => {
+      hover = true;
+      _showValTip(e, fmtVal());
+    });
+    track.addEventListener('mousemove', (e) => {
+      if (hover || drag) _showValTip(e, fmtVal());
+    });
+    track.addEventListener('mouseleave', () => {
+      hover = false;
+      if (!drag) _hideValTip();
+    });
+
     track.addEventListener('pointerdown', (e) => {
       drag = true;
       rpanelWrap.classList.add('dragging');
@@ -149,17 +186,20 @@ export function setupDetectorPanels({
       setThr(fromRatio(ratioFromPtr(e, track)));
       updateUI(getThr());
       onApply();
+      _showValTip(e, fmtVal());
     });
     track.addEventListener('pointermove', (e) => {
       if (!drag) return;
       setThr(fromRatio(ratioFromPtr(e, track)));
       updateUI(getThr());
       onApply();
+      _showValTip(e, fmtVal());
     });
     ['pointerup', 'pointercancel'].forEach((eventName) => {
       track.addEventListener(eventName, () => {
         drag = false;
         rpanelWrap.classList.remove('dragging');
+        if (!hover) _hideValTip();
       });
     });
     // Double-click → open the shared float popup so the user can type the
@@ -219,19 +259,39 @@ export function setupDetectorPanels({
       applyTrackThreshold();
     }
 
+    // Floating value tooltip — same hover + drag pattern as the cell sliders.
+    let hover = false;
+    const fmtVal = () => fmtGev(state.getThrTrackGev());
+    trackEl.addEventListener('mouseenter', (e) => {
+      hover = true;
+      _showValTip(e, fmtVal());
+    });
+    trackEl.addEventListener('mousemove', (e) => {
+      if (hover || drag) _showValTip(e, fmtVal());
+    });
+    trackEl.addEventListener('mouseleave', () => {
+      hover = false;
+      if (!drag) _hideValTip();
+    });
+
     trackEl.addEventListener('pointerdown', (e) => {
       drag = true;
       rpanelWrap.classList.add('dragging');
       trackEl.setPointerCapture(e.pointerId);
       setFromRatio(ratioFromPtr(e, trackEl));
+      _showValTip(e, fmtVal());
     });
     trackEl.addEventListener('pointermove', (e) => {
-      if (drag) setFromRatio(ratioFromPtr(e, trackEl));
+      if (drag) {
+        setFromRatio(ratioFromPtr(e, trackEl));
+        _showValTip(e, fmtVal());
+      }
     });
     ['pointerup', 'pointercancel'].forEach((eventName) => {
       trackEl.addEventListener(eventName, () => {
         drag = false;
         rpanelWrap.classList.remove('dragging');
+        if (!hover) _hideValTip();
       });
     });
     trackEl.addEventListener('dblclick', () => {
@@ -319,19 +379,39 @@ export function setupDetectorPanels({
       ops.apply();
     }
 
+    // Floating value tooltip — same hover + drag pattern as the cell sliders.
+    let hover = false;
+    const fmtVal = () => fmtGev(currentOps().getThr());
+    trackEl.addEventListener('mouseenter', (e) => {
+      hover = true;
+      _showValTip(e, fmtVal());
+    });
+    trackEl.addEventListener('mousemove', (e) => {
+      if (hover || drag) _showValTip(e, fmtVal());
+    });
+    trackEl.addEventListener('mouseleave', () => {
+      hover = false;
+      if (!drag) _hideValTip();
+    });
+
     trackEl.addEventListener('pointerdown', (e) => {
       drag = true;
       rpanelWrap.classList.add('dragging');
       trackEl.setPointerCapture(e.pointerId);
       setFromRatio(ratioFromPtr(e, trackEl));
+      _showValTip(e, fmtVal());
     });
     trackEl.addEventListener('pointermove', (e) => {
-      if (drag) setFromRatio(ratioFromPtr(e, trackEl));
+      if (drag) {
+        setFromRatio(ratioFromPtr(e, trackEl));
+        _showValTip(e, fmtVal());
+      }
     });
     ['pointerup', 'pointercancel'].forEach((eventName) => {
       trackEl.addEventListener(eventName, () => {
         drag = false;
         rpanelWrap.classList.remove('dragging');
+        if (!hover) _hideValTip();
       });
     });
     trackEl.addEventListener('dblclick', () => {

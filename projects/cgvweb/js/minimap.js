@@ -74,10 +74,11 @@ let _binCache = null;
 /** @type {Array<{etaMin:number, etaMax:number, phiMin:number, phiMax:number}>} */
 let _rects = [];
 
-// Mouse state machine.
-let _mouseState    = 'idle';
-let _dragAnchor    = null;
-let _activeRectIdx = -1;
+// Mouse / pointer state machine.
+let _mouseState     = 'idle';
+let _dragAnchor     = null;
+let _activeRectIdx  = -1;
+let _activePointerId = -1;
 const DRAG_THRESHOLD_PX = 3;
 const MIN_RECT_ETA = 0.05;
 const MIN_RECT_PHI = 0.05;
@@ -153,9 +154,26 @@ function _yToPhi(y, area) {
   const phi  = _phiSeam + frac * TWO_PI;
   return ((phi + Math.PI) % TWO_PI + TWO_PI) % TWO_PI - Math.PI;
 }
+// φ at canvas Y as a CONTINUOUS value (NO ±π wrap). Used while drawing a rect
+// so the swept φ-arc stays contiguous even when the seam puts ±π mid-plot —
+// min/max of two continuous endpoints is always the exact arc, never the
+// complement. Y is clamped 1 px below the top so the arc never reaches a full
+// 2π (which would alias to a zero-width display row).
+function _yToPhiCont(y, area) {
+  const cy   = Math.max(area.y0 + 1, Math.min(area.y1, y));
+  const [lo, hi] = _viewPhiFrac();
+  const t    = (area.y1 - cy) / (area.y1 - area.y0);
+  const frac = lo + t * (hi - lo);
+  return _phiSeam + frac * TWO_PI;
+}
+// Map a pointer event to internal canvas coords (W×H), independent of any CSS
+// scaling on #minimap-wrap (mobile shrinks the widget via transform: scale()).
 function _clientToCanvas(ev) {
   const r = _canvas.getBoundingClientRect();
-  return { x: ev.clientX - r.left, y: ev.clientY - r.top };
+  return {
+    x: (ev.clientX - r.left) * (W / r.width),
+    y: (ev.clientY - r.top)  * (H / r.height),
+  };
 }
 
 function _ramp(t) {
@@ -459,8 +477,18 @@ function _notifyRegion() {
   });
 }
 
+// True when φ lies on the arc [phiMin, phiMax]. The arc is continuous and may
+// extend past ±π (drawn across the seam, or pushed there by panning), so the
+// test is done modulo 2π rather than with a plain numeric compare.
+function _phiInArc(phi, phiMin, phiMax) {
+  const w = phiMax - phiMin;
+  if (w >= TWO_PI - 1e-9) return true;
+  const d = ((phi - phiMin) % TWO_PI + TWO_PI) % TWO_PI;
+  return d <= w;
+}
+
 function _pointInRect(eta, phi, r) {
-  return eta >= r.etaMin && eta <= r.etaMax && phi >= r.phiMin && phi <= r.phiMax;
+  return eta >= r.etaMin && eta <= r.etaMax && _phiInArc(phi, r.phiMin, r.phiMax);
 }
 
 function _hitRectAt(eta, phi) {
@@ -581,11 +609,14 @@ function _onMouseDown(ev) {
     _dragAnchor = { dEta: eta - cx, x, y, phi0Display, halfP: (r.phiMax - r.phiMin) / 2 };
   } else {
     _mouseState = 'maybe-draw';
-    _dragAnchor = { eta, phi, x, y };
+    // Anchor φ is stored CONTINUOUS (no ±π wrap) so the drag stays a single
+    // contiguous arc whatever the seam rotation — see issue with rects that
+    // appeared split top+bottom after the seam was moved.
+    _dragAnchor = { eta, phi: _yToPhiCont(y, area), x, y };
   }
   _updateCursor(true, eta, phi);
-  window.addEventListener('mousemove', _onMouseMove);
-  window.addEventListener('mouseup',   _onMouseUp);
+  _activePointerId = ev.pointerId;
+  try { _canvas.setPointerCapture(ev.pointerId); } catch (_) { /* no-op */ }
 }
 
 function _onMouseMove(ev) {
@@ -595,14 +626,13 @@ function _onMouseMove(ev) {
   const cx        = Math.max(area.x0, Math.min(area.x1, x));
   const cy        = Math.max(area.y0, Math.min(area.y1, y));
   const eta       = _xToEta(cx, area);
-  const phi       = _yToPhi(cy, area);
 
   if (_mouseState === 'maybe-draw') {
     if (Math.hypot(x - _dragAnchor.x, y - _dragAnchor.y) >= DRAG_THRESHOLD_PX) {
       _mouseState = 'drawing';
       _rects.push(_normalizeRect({
         etaMin: _dragAnchor.eta, etaMax: eta,
-        phiMin: _dragAnchor.phi, phiMax: phi,
+        phiMin: _dragAnchor.phi, phiMax: _yToPhiCont(cy, area),
       }));
       _notifyRegion();
       _redraw();
@@ -611,12 +641,11 @@ function _onMouseMove(ev) {
   }
 
   if (_mouseState === 'drawing') {
-    // 1 px headroom at top: _yToPhi(area.y0) = _phiSeam which wraps the rect to the full height.
-    const safeCy  = Math.max(area.y0 + 1, cy);
-    const safePhi = _yToPhi(safeCy, area);
+    // Both φ endpoints are CONTINUOUS — the rect is exactly the arc swept by
+    // the pointer, never the ±π complement, at any seam rotation.
     _rects[_rects.length - 1] = _normalizeRect({
       etaMin: _dragAnchor.eta, etaMax: eta,
-      phiMin: _dragAnchor.phi, phiMax: safePhi,
+      phiMin: _dragAnchor.phi, phiMax: _yToPhiCont(cy, area),
     });
     _notifyRegion();
     _redraw();
@@ -658,9 +687,9 @@ function _onMouseMove(ev) {
 }
 
 function _onMouseUp(ev) {
-  if (ev.button !== 0) return;
-  window.removeEventListener('mousemove', _onMouseMove);
-  window.removeEventListener('mouseup',   _onMouseUp);
+  if (ev.pointerId !== _activePointerId) return;
+  try { _canvas.releasePointerCapture(ev.pointerId); } catch (_) { /* no-op */ }
+  _activePointerId = -1;
 
   if (_mouseState === 'maybe-pan') {
     _rects.splice(_activeRectIdx, 1);
@@ -734,9 +763,15 @@ export function initMinimap() {
   _ctx = _canvas.getContext('2d');
   _ctx.scale(dpr, dpr);
 
-  _canvas.addEventListener('mousedown',  _onMouseDown);
-  _canvas.addEventListener('mousemove',  _onMouseMoveHover);
-  _canvas.addEventListener('mouseleave', () => {
+  // Pointer events (not mouse) so draw / pan / delete work with touch on
+  // mobile. Pointer capture keeps the drag alive even past the canvas edge,
+  // so no window-level listeners are needed.
+  _canvas.addEventListener('pointerdown',   _onMouseDown);
+  _canvas.addEventListener('pointermove',   _onMouseMoveHover);
+  _canvas.addEventListener('pointermove',   _onMouseMove);
+  _canvas.addEventListener('pointerup',     _onMouseUp);
+  _canvas.addEventListener('pointercancel', _onMouseUp);
+  _canvas.addEventListener('pointerleave', () => {
     if (_mouseState === 'idle') _canvas.style.cursor = '';
   });
   _wrapEl.appendChild(_canvas);

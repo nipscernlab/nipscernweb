@@ -180,9 +180,17 @@ export function getEtaPhiRegion() {
 function _inEtaPhiRegion(eta, phi) {
   if (_etaPhiRegions.length === 0) return true;
   if (!Number.isFinite(eta) || !Number.isFinite(phi)) return true;
-  return _etaPhiRegions.some(
-    (r) => eta >= r.etaMin && eta <= r.etaMax && phi >= r.phiMin && phi <= r.phiMax,
-  );
+  // A rect's [phiMin, phiMax] is a CONTINUOUS arc that may run past ±π — drawn
+  // across a rotated seam, or pushed there by panning. Test φ modulo 2π so the
+  // gate matches the rectangle the user actually sees on the minimap.
+  const TWO_PI = Math.PI * 2;
+  return _etaPhiRegions.some((r) => {
+    if (eta < r.etaMin || eta > r.etaMax) return false;
+    const w = r.phiMax - r.phiMin;
+    if (w >= TWO_PI - 1e-9) return true;
+    const d = ((phi - r.phiMin) % TWO_PI + TWO_PI) % TWO_PI;
+    return d <= w;
+  });
 }
 
 // Exported for fcalRenderer and other sub-modules that need the same test

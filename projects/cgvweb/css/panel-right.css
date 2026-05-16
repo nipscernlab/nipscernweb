@@ -69,6 +69,27 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+/* ── Floating threshold-value tooltip ────────────────────
+   Singleton element appended to <body> by detectorPanels.js. Follows the
+   cursor while hovering or dragging any slider track. */
+#thr-val-tip {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  padding: 3px 7px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  color: var(--bright);
+  font: 500 11px/1 var(--mono);
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-2);
+  white-space: nowrap;
+}
+#thr-val-tip[hidden] {
+  display: none;
+}
+
 /* ── Cell-metric selector (E vs E_T) ─────────────────────
    Custom dropdown — same skin as the jet-collection dropdown below, so the
    E_T option can carry a real <sub>. Trigger sits in #rpanel; the menu lives

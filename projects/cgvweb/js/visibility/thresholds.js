@@ -13,7 +13,7 @@
 // ── Cell energy thresholds (MeV, per detector) ───────────────────────────────
 export let thrTileMev = 50;
 export let thrLArMev = 0;
-export let thrHecMev = 600;
+export let thrHecMev = 200;
 export let thrFcalMev = 0;
 
 /** @param {number} v */

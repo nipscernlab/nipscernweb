@@ -205,10 +205,17 @@ export function filterPOIsBySlicer(pois, slicerMask, isPointInsideWedge) {
  */
 export function filterPOIsByMinimap(pois, rects) {
   if (!rects || !rects.length) return pois;
+  // phiMin/phiMax form a continuous arc that may wrap past ±π (rotated seam /
+  // panning) — test φ modulo 2π, matching visibility.js's region gate.
+  const TWO_PI = Math.PI * 2;
   return pois.filter((p) =>
-    rects.some(
-      (r) => p.eta >= r.etaMin && p.eta <= r.etaMax && p.phi >= r.phiMin && p.phi <= r.phiMax,
-    ),
+    rects.some((r) => {
+      if (p.eta < r.etaMin || p.eta > r.etaMax) return false;
+      const w = r.phiMax - r.phiMin;
+      if (w >= TWO_PI - 1e-9) return true;
+      const d = ((p.phi - r.phiMin) % TWO_PI + TWO_PI) % TWO_PI;
+      return d <= w;
+    }),
   );
 }
 
