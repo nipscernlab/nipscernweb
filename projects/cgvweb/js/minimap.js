@@ -90,6 +90,7 @@ let _phiSeam      = PHI_MIN;
 let _seamTrackEl  = null;
 let _seamThumbEl  = null;
 let _seamLblEl    = null;
+let _seamPaneEl   = null;
 let _seamDragging = false;
 
 // ── Zoom state ───────────────────────────────────────────────────────────────
@@ -521,7 +522,7 @@ function _onSeamPointerDown(ev) {
   if (ev.button !== 0) return;
   ev.preventDefault();
   _seamDragging = true;
-  _seamTrackEl.setPointerCapture(ev.pointerId);
+  _seamPaneEl.setPointerCapture(ev.pointerId);
   _applySeamFromPointer(ev);
 }
 
@@ -533,7 +534,7 @@ function _onSeamPointerMove(ev) {
 function _onSeamPointerUp(ev) {
   if (!_seamDragging) return;
   _seamDragging = false;
-  _seamTrackEl.releasePointerCapture(ev.pointerId);
+  _seamPaneEl.releasePointerCapture(ev.pointerId);
 }
 
 function _onSeamDblClick() {
@@ -727,16 +728,14 @@ export function initMinimap() {
   _wrapEl.id = 'minimap-wrap';
 
   // ── φ seam slider pane (left side) ────────────────────────────────────────
-  const pane    = document.createElement('div');
-  pane.id       = 'minimap-phi-pane';
+  const pane     = document.createElement('div');
+  pane.className = 'minimap-phi-pane';
+  _seamPaneEl    = pane;
 
   _seamTrackEl           = document.createElement('div');
   _seamTrackEl.id        = 'minimap-phi-track';
   _seamTrackEl.className = 'strak';
   _seamTrackEl.title     = 'φ seam — drag to rotate the display cut (dbl-click to reset)';
-  _seamTrackEl.style.background =
-    'linear-gradient(to top, ' +
-    'rgba(80,130,210,0.12) 0%, rgba(80,130,210,0.48) 50%, rgba(80,130,210,0.12) 100%)';
 
   _seamThumbEl           = document.createElement('div');
   _seamThumbEl.className = 'sthumb';
@@ -777,11 +776,11 @@ export function initMinimap() {
   _wrapEl.appendChild(_canvas);
 
   // ── Slider events ─────────────────────────────────────────────────────────
-  _seamTrackEl.addEventListener('pointerdown',   _onSeamPointerDown);
-  _seamTrackEl.addEventListener('pointermove',   _onSeamPointerMove);
-  _seamTrackEl.addEventListener('pointerup',     _onSeamPointerUp);
-  _seamTrackEl.addEventListener('pointercancel', _onSeamPointerUp);
-  _seamTrackEl.addEventListener('dblclick',      _onSeamDblClick);
+  _seamPaneEl.addEventListener('pointerdown',   _onSeamPointerDown);
+  _seamPaneEl.addEventListener('pointermove',   _onSeamPointerMove);
+  _seamPaneEl.addEventListener('pointerup',     _onSeamPointerUp);
+  _seamPaneEl.addEventListener('pointercancel', _onSeamPointerUp);
+  _seamPaneEl.addEventListener('dblclick',      _onSeamDblClick);
 
   // ── Zoom: keyboard while hovered; scroll wheel on the minimap ─────────────
   _wrapEl.addEventListener('mouseenter', () => window.addEventListener('keydown',    _onZoomKey));

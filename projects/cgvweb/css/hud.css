@@ -174,7 +174,6 @@ body.panel-unpinned #collision-hud {
   align-items: flex-start;
 
   border: 1px solid var(--border-strong);
-  border-radius: var(--r);
   background: rgba(8, 14, 28, 0.68);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -193,45 +192,47 @@ body.panel-unpinned #minimap-wrap {
   cursor: crosshair;
   user-select: none;
   touch-action: none;
-  border-radius: 0 var(--r) var(--r) 0;
 }
-/* φ seam slider — left pane inside #minimap-wrap */
-#minimap-phi-pane {
+/* φ seam slider — absolute overlay on the canvas left margin (INSET_L = 26px).
+   No separate column means no dark rectangle beside the canvas. */
+.minimap-phi-pane {
   display: flex;
   flex-direction: column;
   align-items: center;
   /* padding-top = INSET_T + LEGEND_BAR_M = 14px so track top aligns with legend bar */
   padding: 14px 0 4px;
   gap: 3px;
-  /* Fixed width — the φ label text below changes width as the seam moves
-     (−π → +0.45π …). Without a locked width the pane (and the whole canvas)
-     would visibly grow / shift sideways while the slider is dragged. */
-  width: 40px;
+  /* Width = INSET_L so the slider sits in the canvas left margin, not in a separate column. */
+  width: 26px;
   height: 220px;   /* = canvas H */
   box-sizing: border-box;
-  flex-shrink: 0;
-  border-right: 1px solid rgba(120, 150, 190, 0.2);
-  /* Raise above the canvas sibling so pointer events reach the slider */
-  position: relative;
+  overflow: hidden;
+  background: transparent;
+  cursor: ns-resize;
+  position: absolute;
+  left: 0;
+  top: 0;
   z-index: 2;
 }
 
-/* Minimap thumb: centered within the 12px track, no wide overhang */
+/* Minimap thumb: flat crosshair line spanning the full track width */
 #minimap-phi-track.strak .sthumb {
-  left: 2px;
-  right: 2px;
-  height: 5px;
-  border-radius: 3px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 0;
 }
 
 /* Track height = H - INSET_T - INSET_B - 2*LEGEND_BAR_M = 220 - 10 - 20 - 8 = 182px.
    Border matches the legend colour bar on the right edge of the canvas
-   exactly: same 182px height, same single 1px rgba(120,150,190,0.55) stroke
-   (the base .strak white border + outer ring are overridden away here). */
+   exactly: same 182px height, same single 1px rgba(120,150,190,0.30) stroke. */
 #minimap-phi-track.strak {
+  width: 8px;   /* narrower to fit the 26px INSET_L overlay */
   height: 182px;
-  border: 1px solid rgba(120, 150, 190, 0.55);
-  box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(120, 150, 190, 0.30);
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
 }
 
 #minimap-phi-lbl {
