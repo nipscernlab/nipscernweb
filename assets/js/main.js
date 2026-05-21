@@ -14,7 +14,7 @@ const NAV_LINKS = [
   { key: 'nav.about',        href: 'about',      paths: ['/about', '/about.html'] },
   { key: 'nav.cern',         href: 'cern',       paths: ['/cern', '/cern.html'] },
   { key: 'nav.projects',     href: 'projects/',  paths: ['/projects/', '/projects/index.html', '/projects', '/projects/sapho', '/projects/sapho.html', '/projects/yanc', '/projects/yanc.html', '/projects/polaris', '/projects/polaris.html', '/projects/aurora', '/projects/aurora.html', '/projects/cgv', '/projects/cgv.html'] },
-  { key: 'nav.publications', href: 'publications', paths: ['/publications', '/publications.html'] },
+  { key: 'nav.publications', href: 'publications.html', paths: ['/publications', '/publications/', '/publications.html'] },
   { key: 'nav.news',         href: 'news/',      paths: ['/news/', '/news/index.html', '/news', '/news/post', '/news/post.html'] },
 ];
 
@@ -383,9 +383,18 @@ async function initHomeLatest() {
   const pubEl = document.getElementById('latest-pub-card');
   if (pubEl && pubData && pubData.length > 0) {
     const pub = pubData[0];
-    const typeMap = { article: 'badge-blue', conference: 'badge-green', tcc: 'badge-amber', dissertation: 'badge-purple' };
+    const typeMap = {
+      article: 'badge-blue',
+      journal: 'badge-blue',
+      conference: 'badge-green',
+      tcc: 'badge-amber',
+      dissertation: 'badge-purple',
+      "master's thesis": 'badge-purple',
+      'undergraduate thesis': 'badge-amber',
+      'doctoral thesis': 'badge-purple',
+    };
     pubEl.innerHTML = `
-      <a href="${rootPath('publications')}" class="pub-card" style="height:100%;display:block;text-decoration:none">
+      <a href="${rootPath('publications.html')}" class="pub-card" style="height:100%;display:block;text-decoration:none">
         <div class="pub-card-body">
           <div class="pub-card-meta">
             <span class="badge ${typeMap[pub.type] || 'badge-gray'}" data-i18n="publications.types.${pub.type}">${pub.type}</span>
