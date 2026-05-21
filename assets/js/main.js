@@ -382,7 +382,7 @@ async function initHomeLatest() {
   // Latest publication card
   const pubEl = document.getElementById('latest-pub-card');
   if (pubEl && pubData && pubData.length > 0) {
-    const pub = pubData[0];
+    const pub = pubData.reduce((latest, p) => (Number(p.year) > Number(latest.year) ? p : latest), pubData[0]);
     const typeMap = {
       article: 'badge-blue',
       journal: 'badge-blue',
