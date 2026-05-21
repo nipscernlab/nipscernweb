@@ -45,6 +45,8 @@
       "stats": {
         "years": "Years of Research",
         "publications": "Publications",
+        "collaborators": "Brazilian Collaborator",
+        "countries": "National Institutes Involved",
         "students": "Students Trained",
         "experiments": "CERN Experiments"
       }
@@ -120,20 +122,47 @@
       },
       "experiments": {
         "title": "The Four Main Experiments",
-        "atlas": { "name": "ATLAS", "desc": "A Toroidal LHC Apparatus — the largest general-purpose detector, designed to study the full range of particle physics including Higgs searches and BSM physics." },
-        "cms": { "name": "CMS", "desc": "Compact Muon Solenoid — complementary to ATLAS with a different technical design; together they confirmed the Higgs boson in 2012." },
-        "alice": { "name": "ALICE", "desc": "A Large Ion Collider Experiment — studies quark-gluon plasma produced in heavy-ion collisions to understand the early universe." },
-        "lhcb": { "name": "LHCb", "desc": "Large Hadron Collider beauty — specialised in CP violation and matter-antimatter asymmetry using B meson decays." }
+        "atlas": {
+          "name": "ATLAS",
+          "desc": "A Toroidal LHC Apparatus — the largest general-purpose detector, designed to study the full range of particle physics including Higgs searches and BSM physics."
+        },
+        "cms": {
+          "name": "CMS",
+          "desc": "Compact Muon Solenoid — complementary to ATLAS with a different technical design; together they confirmed the Higgs boson in 2012."
+        },
+        "alice": {
+          "name": "ALICE",
+          "desc": "A Large Ion Collider Experiment — studies quark-gluon plasma produced in heavy-ion collisions to understand the early universe."
+        },
+        "lhcb": {
+          "name": "LHCb",
+          "desc": "Large Hadron Collider beauty — specialised in CP violation and matter-antimatter asymmetry using B meson decays."
+        }
       },
       "atlas": {
         "title": "Inside the ATLAS Detector",
         "subtitle": "A layered onion of subdetectors — 46 metres long, 25 metres tall, weighing 7,000 tonnes",
         "layers": {
-          "inner": { "name": "Inner Detector", "desc": "Tracks charged particle trajectories using pixel sensors, silicon strips, and transition radiation tracking within a 2 T solenoidal magnetic field." },
-          "lar": { "name": "LAr EM Calorimeter", "desc": "Liquid argon electromagnetic calorimeter measures energy of electrons and photons with an accordion-shaped lead absorber structure." },
-          "tile": { "name": "TileCal Hadronic Calorimeter", "desc": "Scintillating tile calorimeter measures hadronic jet energy. The NIPSCERN team makes direct contributions to TileCal operations and calibration." },
-          "hec": { "name": "Hadronic Endcap (HEC)", "desc": "Liquid argon hadronic endcap calorimeter covering the forward region, complementing TileCal for full calorimetric coverage." },
-          "muon": { "name": "Muon Spectrometer", "desc": "The outermost layer — a toroidal magnetic system with drift tube chambers tracks muons over the detector's full acceptance." }
+          "inner": {
+            "name": "Inner Detector",
+            "desc": "Tracks charged particle trajectories using pixel sensors, silicon strips, and transition radiation tracking within a 2 T solenoidal magnetic field."
+          },
+          "lar": {
+            "name": "LAr EM Calorimeter",
+            "desc": "Liquid argon electromagnetic calorimeter measures energy of electrons and photons with an accordion-shaped lead absorber structure."
+          },
+          "tile": {
+            "name": "TileCal Hadronic Calorimeter",
+            "desc": "Scintillating tile calorimeter measures hadronic jet energy. The NIPSCERN team makes direct contributions to TileCal operations and calibration."
+          },
+          "hec": {
+            "name": "Hadronic Endcap (HEC)",
+            "desc": "Liquid argon hadronic endcap calorimeter covering the forward region, complementing TileCal for full calorimetric coverage."
+          },
+          "muon": {
+            "name": "Muon Spectrometer",
+            "desc": "The outermost layer — a toroidal magnetic system with drift tube chambers tracks muons over the detector's full acceptance."
+          }
         }
       },
       "trigger": {
@@ -147,11 +176,31 @@
       "achievements": {
         "title": "Key Achievements",
         "items": {
-          "wz": { "year": "1983", "title": "W and Z Bosons Discovered", "desc": "UA1 and UA2 experiments at the SPS collider confirm the carriers of the weak force. Nobel Prize 1984." },
-          "web": { "year": "1989", "title": "The World Wide Web Invented", "desc": "Tim Berners-Lee proposes an information management system at CERN. The web is born as a scientific tool." },
-          "antiH": { "year": "1995", "title": "Antihydrogen Created", "desc": "LEAR produces the first atoms of antihydrogen — the antimatter counterpart of the simplest atom." },
-          "higgs": { "year": "2012", "title": "Higgs Boson Discovered", "desc": "ATLAS and CMS jointly announce the discovery of the Higgs boson. Nobel Prize awarded 2013 to Higgs and Englert." },
-          "run3": { "year": "2022", "title": "Run 3 at 13.6 TeV", "desc": "The LHC begins its third run at record 13.6 TeV centre-of-mass energy, opening a new frontier of precision physics." }
+          "wz": {
+            "year": "1983",
+            "title": "W and Z Bosons Discovered",
+            "desc": "UA1 and UA2 experiments at the SPS collider confirm the carriers of the weak force. Nobel Prize 1984."
+          },
+          "web": {
+            "year": "1989",
+            "title": "The World Wide Web Invented",
+            "desc": "Tim Berners-Lee proposes an information management system at CERN. The web is born as a scientific tool."
+          },
+          "antiH": {
+            "year": "1995",
+            "title": "Antihydrogen Created",
+            "desc": "LEAR produces the first atoms of antihydrogen — the antimatter counterpart of the simplest atom."
+          },
+          "higgs": {
+            "year": "2012",
+            "title": "Higgs Boson Discovered",
+            "desc": "ATLAS and CMS jointly announce the discovery of the Higgs boson. Nobel Prize awarded 2013 to Higgs and Englert."
+          },
+          "run3": {
+            "year": "2022",
+            "title": "Run 3 at 13.6 TeV",
+            "desc": "The LHC begins its third run at record 13.6 TeV centre-of-mass energy, opening a new frontier of precision physics."
+          }
         }
       },
       "links": {
@@ -242,11 +291,17 @@
       "search_placeholder": "Search by title, author, or keyword…",
       "filter_type": "Filter by type",
       "filter_year": "Filter by year",
+      "filter_author": "Filter by author",
       "filter_all": "All types",
       "all_years": "All years",
+      "all_authors": "All authors",
       "types": {
         "article": "Journal Article",
+        "journal": "Journal Article",
         "conference": "Conference",
+        "master's thesis": "Master's Thesis",
+        "undergraduate thesis": "Undergraduate Thesis",
+        "doctoral thesis": "Doctoral Thesis",
         "tcc": "Undergraduate Thesis",
         "dissertation": "Dissertation"
       },
@@ -254,7 +309,8 @@
       "no_results": "No publications match your search.",
       "abstract": "Abstract",
       "authors": "Authors",
-      "published": "Published in"
+      "published": "Published in",
+      "no_authors": "No authors found"
     },
     "news": {
       "title": "News & Updates",
@@ -337,6 +393,8 @@
       "stats": {
         "years": "Anos de Pesquisa",
         "publications": "Publicações",
+        "collaborators": "Colaborador Brasileiro",
+        "countries": "Institutos Nacionais Envolvidos",
         "students": "Estudantes Formados",
         "experiments": "Experimentos no CERN"
       }
@@ -412,20 +470,47 @@
       },
       "experiments": {
         "title": "Os Quatro Experimentos Principais",
-        "atlas": { "name": "ATLAS", "desc": "A Toroidal LHC Apparatus — o maior detector de uso geral, projetado para estudar toda a gama de física de partículas, incluindo buscas pelo Higgs e física além do modelo padrão." },
-        "cms": { "name": "CMS", "desc": "Compact Muon Solenoid — complementar ao ATLAS com um design técnico diferente; juntos confirmaram o bóson de Higgs em 2012." },
-        "alice": { "name": "ALICE", "desc": "A Large Ion Collider Experiment — estuda o plasma de quarks e glúons produzido em colisões de íons pesados para entender o universo primitivo." },
-        "lhcb": { "name": "LHCb", "desc": "Large Hadron Collider beauty — especializado em violação de CP e assimetria matéria-antimatéria usando decaimentos de mésons B." }
+        "atlas": {
+          "name": "ATLAS",
+          "desc": "A Toroidal LHC Apparatus — o maior detector de uso geral, projetado para estudar toda a gama de física de partículas, incluindo buscas pelo Higgs e física além do modelo padrão."
+        },
+        "cms": {
+          "name": "CMS",
+          "desc": "Compact Muon Solenoid — complementar ao ATLAS com um design técnico diferente; juntos confirmaram o bóson de Higgs em 2012."
+        },
+        "alice": {
+          "name": "ALICE",
+          "desc": "A Large Ion Collider Experiment — estuda o plasma de quarks e glúons produzido em colisões de íons pesados para entender o universo primitivo."
+        },
+        "lhcb": {
+          "name": "LHCb",
+          "desc": "Large Hadron Collider beauty — especializado em violação de CP e assimetria matéria-antimatéria usando decaimentos de mésons B."
+        }
       },
       "atlas": {
         "title": "Dentro do Detector ATLAS",
         "subtitle": "Uma cebola de subcamadas — 46 metros de comprimento, 25 metros de altura, 7.000 toneladas",
         "layers": {
-          "inner": { "name": "Detector Interno", "desc": "Rastreia trajetórias de partículas carregadas usando sensores de pixels, tiras de silício e rastreamento de radiação de transição em um campo magnético solenoidal de 2 T." },
-          "lar": { "name": "Calorímetro EM de Árgon Líquido", "desc": "Mede a energia de elétrons e fótons com uma estrutura em forma de acordeão de absorvedores de chumbo em árgon líquido." },
-          "tile": { "name": "TileCal — Calorímetro Hadrônico", "desc": "Calorímetro de telhas cintilantes que mede a energia de jatos hadrônicos. A equipe do NIPSCERN faz contribuições diretas às operações e calibração do TileCal." },
-          "hec": { "name": "Extremidade Hadrônica (HEC)", "desc": "Calorímetro hadrônico de extremidade em árgon líquido que cobre a região frontal, complementando o TileCal para cobertura calorimétrica completa." },
-          "muon": { "name": "Espectrômetro de Múons", "desc": "A camada mais externa — um sistema magnético toroidal com câmaras de tubos de deriva que rastreia múons em toda a aceitação do detector." }
+          "inner": {
+            "name": "Detector Interno",
+            "desc": "Rastreia trajetórias de partículas carregadas usando sensores de pixels, tiras de silício e rastreamento de radiação de transição em um campo magnético solenoidal de 2 T."
+          },
+          "lar": {
+            "name": "Calorímetro EM de Árgon Líquido",
+            "desc": "Mede a energia de elétrons e fótons com uma estrutura em forma de acordeão de absorvedores de chumbo em árgon líquido."
+          },
+          "tile": {
+            "name": "TileCal — Calorímetro Hadrônico",
+            "desc": "Calorímetro de telhas cintilantes que mede a energia de jatos hadrônicos. A equipe do NIPSCERN faz contribuições diretas às operações e calibração do TileCal."
+          },
+          "hec": {
+            "name": "Extremidade Hadrônica (HEC)",
+            "desc": "Calorímetro hadrônico de extremidade em árgon líquido que cobre a região frontal, complementando o TileCal para cobertura calorimétrica completa."
+          },
+          "muon": {
+            "name": "Espectrômetro de Múons",
+            "desc": "A camada mais externa — um sistema magnético toroidal com câmaras de tubos de deriva que rastreia múons em toda a aceitação do detector."
+          }
         }
       },
       "trigger": {
@@ -439,11 +524,31 @@
       "achievements": {
         "title": "Conquistas Históricas",
         "items": {
-          "wz": { "year": "1983", "title": "Bósons W e Z Descobertos", "desc": "Os experimentos UA1 e UA2 no colisor SPS confirmam os portadores da força fraca. Prêmio Nobel 1984." },
-          "web": { "year": "1989", "title": "A World Wide Web Inventada", "desc": "Tim Berners-Lee propõe um sistema de gestão da informação no CERN. A web nasce como ferramenta científica." },
-          "antiH": { "year": "1995", "title": "Anti-hidrogênio Criado", "desc": "O LEAR produz os primeiros átomos de anti-hidrogênio — a contraparte de antimatéria do átomo mais simples." },
-          "higgs": { "year": "2012", "title": "Bóson de Higgs Descoberto", "desc": "ATLAS e CMS anunciam conjuntamente a descoberta do bóson de Higgs. Prêmio Nobel concedido em 2013 a Higgs e Englert." },
-          "run3": { "year": "2022", "title": "Run 3 a 13,6 TeV", "desc": "O LHC inicia sua terceira corrida com energia recorde de 13,6 TeV no centro de massa, abrindo uma nova fronteira da física de precisão." }
+          "wz": {
+            "year": "1983",
+            "title": "Bósons W e Z Descobertos",
+            "desc": "Os experimentos UA1 e UA2 no colisor SPS confirmam os portadores da força fraca. Prêmio Nobel 1984."
+          },
+          "web": {
+            "year": "1989",
+            "title": "A World Wide Web Inventada",
+            "desc": "Tim Berners-Lee propõe um sistema de gestão da informação no CERN. A web nasce como ferramenta científica."
+          },
+          "antiH": {
+            "year": "1995",
+            "title": "Anti-hidrogênio Criado",
+            "desc": "O LEAR produz os primeiros átomos de anti-hidrogênio — a contraparte de antimatéria do átomo mais simples."
+          },
+          "higgs": {
+            "year": "2012",
+            "title": "Bóson de Higgs Descoberto",
+            "desc": "ATLAS e CMS anunciam conjuntamente a descoberta do bóson de Higgs. Prêmio Nobel concedido em 2013 a Higgs e Englert."
+          },
+          "run3": {
+            "year": "2022",
+            "title": "Run 3 a 13,6 TeV",
+            "desc": "O LHC inicia sua terceira corrida com energia recorde de 13,6 TeV no centro de massa, abrindo uma nova fronteira da física de precisão."
+          }
         }
       },
       "links": {
@@ -534,11 +639,17 @@
       "search_placeholder": "Buscar por título, autor ou palavra-chave…",
       "filter_type": "Filtrar por tipo",
       "filter_year": "Filtrar por ano",
+      "filter_author": "Filtrar por autor",
       "filter_all": "Todos os tipos",
       "all_years": "Todos os anos",
+      "all_authors": "Todos os autores",
       "types": {
         "article": "Artigo de Periódico",
+        "journal": "Artigo de Periódico",
         "conference": "Conferência",
+        "master's thesis": "Dissertação de Mestrado",
+        "undergraduate thesis": "Trabalho de Conclusão de Curso",
+        "doctoral thesis": "Tese de Doutorado",
         "tcc": "Trabalho de Conclusão de Curso",
         "dissertation": "Dissertação"
       },
@@ -546,7 +657,8 @@
       "no_results": "Nenhuma publicação corresponde à sua busca.",
       "abstract": "Resumo",
       "authors": "Autores",
-      "published": "Publicado em"
+      "published": "Publicado em",
+      "no_authors": "Nenhum autor encontrado"
     },
     "news": {
       "title": "Notícias e Atualizações",
@@ -629,6 +741,8 @@
       "stats": {
         "years": "Années de Recherche",
         "publications": "Publications",
+        "collaborators": "Collaborateur Brésilien",
+        "countries": "Instituts Nationaux Impliqués",
         "students": "Étudiants Formés",
         "experiments": "Expériences au CERN"
       }
@@ -704,20 +818,47 @@
       },
       "experiments": {
         "title": "Les Quatre Expériences Principales",
-        "atlas": { "name": "ATLAS", "desc": "A Toroidal LHC Apparatus — le plus grand détecteur polyvalent, conçu pour étudier toute la gamme de la physique des particules, y compris la recherche du boson de Higgs et la physique au-delà du modèle standard." },
-        "cms": { "name": "CMS", "desc": "Compact Muon Solenoid — complémentaire d'ATLAS avec une conception technique différente ; ensemble ils ont confirmé le boson de Higgs en 2012." },
-        "alice": { "name": "ALICE", "desc": "A Large Ion Collider Experiment — étudie le plasma quark-gluon produit lors de collisions d'ions lourds pour comprendre l'univers primitif." },
-        "lhcb": { "name": "LHCb", "desc": "Large Hadron Collider beauty — spécialisé dans la violation de CP et l'asymétrie matière-antimatière en utilisant les désintégrations de mésons B." }
+        "atlas": {
+          "name": "ATLAS",
+          "desc": "A Toroidal LHC Apparatus — le plus grand détecteur polyvalent, conçu pour étudier toute la gamme de la physique des particules, y compris la recherche du boson de Higgs et la physique au-delà du modèle standard."
+        },
+        "cms": {
+          "name": "CMS",
+          "desc": "Compact Muon Solenoid — complémentaire d'ATLAS avec une conception technique différente ; ensemble ils ont confirmé le boson de Higgs en 2012."
+        },
+        "alice": {
+          "name": "ALICE",
+          "desc": "A Large Ion Collider Experiment — étudie le plasma quark-gluon produit lors de collisions d'ions lourds pour comprendre l'univers primitif."
+        },
+        "lhcb": {
+          "name": "LHCb",
+          "desc": "Large Hadron Collider beauty — spécialisé dans la violation de CP et l'asymétrie matière-antimatière en utilisant les désintégrations de mésons B."
+        }
       },
       "atlas": {
         "title": "À l'intérieur du Détecteur ATLAS",
         "subtitle": "Un oignon de sous-détecteurs — 46 mètres de long, 25 mètres de haut, 7 000 tonnes",
         "layers": {
-          "inner": { "name": "Détecteur Interne", "desc": "Suit les trajectoires des particules chargées à l'aide de capteurs à pixels, de pistes en silicium et d'un trajectographe à rayonnement de transition dans un champ magnétique solénoïdal de 2 T." },
-          "lar": { "name": "Calorimètre EM à Argon Liquide", "desc": "Mesure l'énergie des électrons et des photons avec une structure en accordéon d'absorbeurs en plomb dans de l'argon liquide." },
-          "tile": { "name": "TileCal — Calorimètre Hadronique", "desc": "Calorimètre à tuiles scintillantes qui mesure l'énergie des jets hadroniques. L'équipe NIPSCERN apporte des contributions directes aux opérations et à la calibration du TileCal." },
-          "hec": { "name": "Bouchon Hadronique (HEC)", "desc": "Calorimètre hadronique à bouchon en argon liquide couvrant la région avant, complétant le TileCal pour une couverture calorimétrique complète." },
-          "muon": { "name": "Spectromètre à Muons", "desc": "La couche la plus externe — un système magnétique toroïdal avec des chambres à tubes de dérive qui suit les muons sur toute l'acceptance du détecteur." }
+          "inner": {
+            "name": "Détecteur Interne",
+            "desc": "Suit les trajectoires des particules chargées à l'aide de capteurs à pixels, de pistes en silicium et d'un trajectographe à rayonnement de transition dans un champ magnétique solénoïdal de 2 T."
+          },
+          "lar": {
+            "name": "Calorimètre EM à Argon Liquide",
+            "desc": "Mesure l'énergie des électrons et des photons avec une structure en accordéon d'absorbeurs en plomb dans de l'argon liquide."
+          },
+          "tile": {
+            "name": "TileCal — Calorimètre Hadronique",
+            "desc": "Calorimètre à tuiles scintillantes qui mesure l'énergie des jets hadroniques. L'équipe NIPSCERN apporte des contributions directes aux opérations et à la calibration du TileCal."
+          },
+          "hec": {
+            "name": "Bouchon Hadronique (HEC)",
+            "desc": "Calorimètre hadronique à bouchon en argon liquide couvrant la région avant, complétant le TileCal pour une couverture calorimétrique complète."
+          },
+          "muon": {
+            "name": "Spectromètre à Muons",
+            "desc": "La couche la plus externe — un système magnétique toroïdal avec des chambres à tubes de dérive qui suit les muons sur toute l'acceptance du détecteur."
+          }
         }
       },
       "trigger": {
@@ -731,11 +872,31 @@
       "achievements": {
         "title": "Réalisations Historiques",
         "items": {
-          "wz": { "year": "1983", "title": "Bosons W et Z Découverts", "desc": "Les expériences UA1 et UA2 au collisionneur SPS confirment les porteurs de la force faible. Prix Nobel 1984." },
-          "web": { "year": "1989", "title": "Le World Wide Web Inventé", "desc": "Tim Berners-Lee propose un système de gestion de l'information au CERN. Le web naît comme outil scientifique." },
-          "antiH": { "year": "1995", "title": "Anti-hydrogène Créé", "desc": "LEAR produit les premiers atomes d'anti-hydrogène — la contrepartie antimatière de l'atome le plus simple." },
-          "higgs": { "year": "2012", "title": "Boson de Higgs Découvert", "desc": "ATLAS et CMS annoncent conjointement la découverte du boson de Higgs. Prix Nobel attribué en 2013 à Higgs et Englert." },
-          "run3": { "year": "2022", "title": "Run 3 à 13,6 TeV", "desc": "Le LHC commence son troisième run à l'énergie record de 13,6 TeV dans le centre de masse, ouvrant une nouvelle frontière de la physique de précision." }
+          "wz": {
+            "year": "1983",
+            "title": "Bosons W et Z Découverts",
+            "desc": "Les expériences UA1 et UA2 au collisionneur SPS confirment les porteurs de la force faible. Prix Nobel 1984."
+          },
+          "web": {
+            "year": "1989",
+            "title": "Le World Wide Web Inventé",
+            "desc": "Tim Berners-Lee propose un système de gestion de l'information au CERN. Le web naît comme outil scientifique."
+          },
+          "antiH": {
+            "year": "1995",
+            "title": "Anti-hydrogène Créé",
+            "desc": "LEAR produit les premiers atomes d'anti-hydrogène — la contrepartie antimatière de l'atome le plus simple."
+          },
+          "higgs": {
+            "year": "2012",
+            "title": "Boson de Higgs Découvert",
+            "desc": "ATLAS et CMS annoncent conjointement la découverte du boson de Higgs. Prix Nobel attribué en 2013 à Higgs et Englert."
+          },
+          "run3": {
+            "year": "2022",
+            "title": "Run 3 à 13,6 TeV",
+            "desc": "Le LHC commence son troisième run à l'énergie record de 13,6 TeV dans le centre de masse, ouvrant une nouvelle frontière de la physique de précision."
+          }
         }
       },
       "links": {
@@ -748,11 +909,77 @@
       "github": "Voir sur GitHub",
       "docs": "Documentation",
       "releases": "Versions",
-      "sapho": { "name": "SAPHO", "full": "Scalable Architecture for Hardware Optimization", "short": "Suite complète d'outils pour la création de processeurs et la co-conception matériel–logiciel.", "desc": "SAPHO est une suite complète d'architecture matérielle et d'outils conçue pour la création de processeurs, l'expérimentation et la co-conception matériel–logiciel.", "features": { "title": "Ce que SAPHO Inclut", "yanc": "Chaîne de compilation YANC (CMM + assembleur)", "polaris": "IDE multiplateforme POLARIS", "yawt": "YAWT Wave Tracer pour l'analyse de signaux", "prism": "PRISM RTL Viewer pour la visualisation de processeurs", "platforms": "Support Windows et Linux" } },
-      "yanc": { "name": "YANC", "full": "Yet Another Compiler", "short": "La chaîne de compilation qui alimente l'écosystème SAPHO.", "desc": "YANC est l'épine dorsale de compilation de SAPHO.", "features": { "title": "Composants de la Chaîne d'Outils", "cmmcomp": "cmmcomp: compilateur de langage de haut niveau CMM", "asmcomp": "asmcomp: compilateur de niveau assembleur", "tech": "Écrit en C avec Flex, Bison et GCC", "integration": "Entièrement intégré à l'écosystème SAPHO" } },
-      "polaris": { "name": "POLARIS", "full": "IDE Graphique Multiplateforme pour SAPHO", "short": "IDE moderne et léger construit avec Tauri et Rust.", "desc": "POLARIS est un environnement de développement graphique multiplateforme construit avec Tauri et Rust.", "features": { "title": "Caractéristiques Principales", "tauri": "Construit avec Tauri + Rust — léger et rapide", "monaco": "Monaco Editor (même moteur que VS Code)", "prism": "PRISM RTL Viewer intégré", "yawt": "YAWT Wave Tracer intégré", "cross": "Binaires natifs pour Linux et Windows" } },
-      "aurora": { "name": "AURORA", "full": "IDE Windows pour l'Écosystème SAPHO", "short": "IDE puissant basé sur Electron — prédécesseur de POLARIS, avec 25 versions.", "desc": "AURORA était un IDE puissant, exclusif Windows, construit avec Electron pour l'écosystème SAPHO.", "features": { "title": "Fonctionnalités d'AURORA", "cmm": "Environnement de programmation CMM", "verilog": "Intégration de simulation Icarus Verilog", "gtkwave": "Visualisation de formes d'onde GTKWave", "prism": "PRISM RTL Viewer", "releases": "25 versions — dernière v4.27.10" }, "legacy": "Projet Héritage — succédé par POLARIS" },
-      "cgv": { "name": "CGV-WEB", "full": "Calorimeter Geometry Viewer Web", "short": "Visualisation 3D d'événements de calorimètre — accessible dans le monde entier.", "desc": "CGV-WEB est l'évolution en ligne de CaloGeoView.", "features": { "title": "Pile Technique", "rust": "Moteur Rust/WebAssembly", "threejs": "Rendu 3D Three.js", "atlas": "Géométrie TileCal, LAr et HEC d'ATLAS", "energy": "Cartographie des couleurs par énergie (gradient bleu→rouge)", "access": "Accessible mondialement — sans installation requise" }, "open": "Ouvrir le CGV Complet" }
+      "sapho": {
+        "name": "SAPHO",
+        "full": "Scalable Architecture for Hardware Optimization",
+        "short": "Suite complète d'outils pour la création de processeurs et la co-conception matériel–logiciel.",
+        "desc": "SAPHO est une suite complète d'architecture matérielle et d'outils conçue pour la création de processeurs, l'expérimentation et la co-conception matériel–logiciel.",
+        "features": {
+          "title": "Ce que SAPHO Inclut",
+          "yanc": "Chaîne de compilation YANC (CMM + assembleur)",
+          "polaris": "IDE multiplateforme POLARIS",
+          "yawt": "YAWT Wave Tracer pour l'analyse de signaux",
+          "prism": "PRISM RTL Viewer pour la visualisation de processeurs",
+          "platforms": "Support Windows et Linux"
+        }
+      },
+      "yanc": {
+        "name": "YANC",
+        "full": "Yet Another Compiler",
+        "short": "La chaîne de compilation qui alimente l'écosystème SAPHO.",
+        "desc": "YANC est l'épine dorsale de compilation de SAPHO.",
+        "features": {
+          "title": "Composants de la Chaîne d'Outils",
+          "cmmcomp": "cmmcomp: compilateur de langage de haut niveau CMM",
+          "asmcomp": "asmcomp: compilateur de niveau assembleur",
+          "tech": "Écrit en C avec Flex, Bison et GCC",
+          "integration": "Entièrement intégré à l'écosystème SAPHO"
+        }
+      },
+      "polaris": {
+        "name": "POLARIS",
+        "full": "IDE Graphique Multiplateforme pour SAPHO",
+        "short": "IDE moderne et léger construit avec Tauri et Rust.",
+        "desc": "POLARIS est un environnement de développement graphique multiplateforme construit avec Tauri et Rust.",
+        "features": {
+          "title": "Caractéristiques Principales",
+          "tauri": "Construit avec Tauri + Rust — léger et rapide",
+          "monaco": "Monaco Editor (même moteur que VS Code)",
+          "prism": "PRISM RTL Viewer intégré",
+          "yawt": "YAWT Wave Tracer intégré",
+          "cross": "Binaires natifs pour Linux et Windows"
+        }
+      },
+      "aurora": {
+        "name": "AURORA",
+        "full": "IDE Windows pour l'Écosystème SAPHO",
+        "short": "IDE puissant basé sur Electron — prédécesseur de POLARIS, avec 25 versions.",
+        "desc": "AURORA était un IDE puissant, exclusif Windows, construit avec Electron pour l'écosystème SAPHO.",
+        "features": {
+          "title": "Fonctionnalités d'AURORA",
+          "cmm": "Environnement de programmation CMM",
+          "verilog": "Intégration de simulation Icarus Verilog",
+          "gtkwave": "Visualisation de formes d'onde GTKWave",
+          "prism": "PRISM RTL Viewer",
+          "releases": "25 versions — dernière v4.27.10"
+        },
+        "legacy": "Projet Héritage — succédé par POLARIS"
+      },
+      "cgv": {
+        "name": "CGV-WEB",
+        "full": "Calorimeter Geometry Viewer Web",
+        "short": "Visualisation 3D d'événements de calorimètre — accessible dans le monde entier.",
+        "desc": "CGV-WEB est l'évolution en ligne de CaloGeoView.",
+        "features": {
+          "title": "Pile Technique",
+          "rust": "Moteur Rust/WebAssembly",
+          "threejs": "Rendu 3D Three.js",
+          "atlas": "Géométrie TileCal, LAr et HEC d'ATLAS",
+          "energy": "Cartographie des couleurs par énergie (gradient bleu→rouge)",
+          "access": "Accessible mondialement — sans installation requise"
+        },
+        "open": "Ouvrir le CGV Complet"
+      }
     },
     "publications": {
       "title": "Publications",
@@ -760,20 +987,37 @@
       "search_placeholder": "Rechercher par titre, auteur ou mot-clé…",
       "filter_type": "Filtrer par type",
       "filter_year": "Filtrer par année",
+      "filter_author": "Filtrer par auteur",
       "filter_all": "Tous les types",
       "all_years": "Toutes les années",
-      "types": { "article": "Article de revue", "conference": "Conférence", "tcc": "Mémoire de licence", "dissertation": "Thèse" },
+      "all_authors": "Tous les auteurs",
+      "types": {
+        "article": "Article de revue",
+        "journal": "Article de revue",
+        "conference": "Conférence",
+        "master's thesis": "Mémoire de master",
+        "undergraduate thesis": "Mémoire de licence",
+        "doctoral thesis": "Thèse de doctorat",
+        "tcc": "Mémoire de licence",
+        "dissertation": "Thèse"
+      },
       "open_pdf": "Ouvrir le PDF",
       "no_results": "Aucune publication ne correspond à votre recherche.",
       "abstract": "Résumé",
       "authors": "Auteurs",
-      "published": "Publié dans"
+      "published": "Publié dans",
+      "no_authors": "Aucun auteur trouvé"
     },
     "news": {
       "title": "Actualités",
       "subtitle": "Publications, prix, événements et jalons du laboratoire NIPSCERN.",
       "read_more": "Lire la suite",
-      "categories": { "publication": "Publication", "award": "Prix", "event": "Événement", "milestone": "Jalon" },
+      "categories": {
+        "publication": "Publication",
+        "award": "Prix",
+        "event": "Événement",
+        "milestone": "Jalon"
+      },
       "sidebar_awards": "Prix Récents",
       "back": "Retour aux Actualités",
       "share": "Partager",
@@ -845,6 +1089,8 @@
       "stats": {
         "years": "År med Forskning",
         "publications": "Publikasjoner",
+        "collaborators": "Brasiliansk Samarbeidspartner",
+        "countries": "Nasjonale Institutter Involvert",
         "students": "Utdannede Studenter",
         "experiments": "CERN-eksperimenter"
       }
@@ -920,20 +1166,47 @@
       },
       "experiments": {
         "title": "De Fire Hovedeksperimentene",
-        "atlas": { "name": "ATLAS", "desc": "A Toroidal LHC Apparatus — den største allbruksdetektor, designet for å studere hele spekteret av partikkelfysikk inkludert Higgs-søk og BSM-fysikk." },
-        "cms": { "name": "CMS", "desc": "Compact Muon Solenoid — komplementær til ATLAS med et annet teknisk design; sammen bekreftet de Higgs-bosonet i 2012." },
-        "alice": { "name": "ALICE", "desc": "A Large Ion Collider Experiment — studerer kvark-gluon-plasma produsert i tungionkollisjoner for å forstå det tidlige universet." },
-        "lhcb": { "name": "LHCb", "desc": "Large Hadron Collider beauty — spesialisert i CP-brudd og stoff-antimateriaassymmetri ved bruk av B-meson-henfall." }
+        "atlas": {
+          "name": "ATLAS",
+          "desc": "A Toroidal LHC Apparatus — den største allbruksdetektor, designet for å studere hele spekteret av partikkelfysikk inkludert Higgs-søk og BSM-fysikk."
+        },
+        "cms": {
+          "name": "CMS",
+          "desc": "Compact Muon Solenoid — komplementær til ATLAS med et annet teknisk design; sammen bekreftet de Higgs-bosonet i 2012."
+        },
+        "alice": {
+          "name": "ALICE",
+          "desc": "A Large Ion Collider Experiment — studerer kvark-gluon-plasma produsert i tungionkollisjoner for å forstå det tidlige universet."
+        },
+        "lhcb": {
+          "name": "LHCb",
+          "desc": "Large Hadron Collider beauty — spesialisert i CP-brudd og stoff-antimateriaassymmetri ved bruk av B-meson-henfall."
+        }
       },
       "atlas": {
         "title": "Inne i ATLAS-detektoren",
         "subtitle": "En lagdelt løk av underdetektorer — 46 meter lang, 25 meter høy, 7 000 tonn",
         "layers": {
-          "inner": { "name": "Indre Detektor", "desc": "Sporer ladede partikkelbaner ved hjelp av piksel-sensorer, silisiumstriper og transisjonsstrålingssporing i et 2 T solenoidalt magnetfelt." },
-          "lar": { "name": "LAr EM-kalorimeter", "desc": "Flytende argon elektromagnetisk kalorimeter måler energi til elektroner og fotoner med en trekkspillformet blyabsorberstruktur." },
-          "tile": { "name": "TileCal Hadronisk Kalorimeter", "desc": "Scintillerende flis-kalorimeter måler hadronisk jet-energi. NIPSCERN-teamet bidrar direkte til TileCal-operasjoner og kalibrering." },
-          "hec": { "name": "Hadronisk Endehette (HEC)", "desc": "Flytende argon hadronisk endehette-kalorimeter som dekker fremre region, komplementær til TileCal for full kalorimetrisk dekning." },
-          "muon": { "name": "Muon-spektrometer", "desc": "Det ytterste laget — et toroidalt magnetsystem med driftesrørkamre som sporer muoner over hele detektorens akseptanse." }
+          "inner": {
+            "name": "Indre Detektor",
+            "desc": "Sporer ladede partikkelbaner ved hjelp av piksel-sensorer, silisiumstriper og transisjonsstrålingssporing i et 2 T solenoidalt magnetfelt."
+          },
+          "lar": {
+            "name": "LAr EM-kalorimeter",
+            "desc": "Flytende argon elektromagnetisk kalorimeter måler energi til elektroner og fotoner med en trekkspillformet blyabsorberstruktur."
+          },
+          "tile": {
+            "name": "TileCal Hadronisk Kalorimeter",
+            "desc": "Scintillerende flis-kalorimeter måler hadronisk jet-energi. NIPSCERN-teamet bidrar direkte til TileCal-operasjoner og kalibrering."
+          },
+          "hec": {
+            "name": "Hadronisk Endehette (HEC)",
+            "desc": "Flytende argon hadronisk endehette-kalorimeter som dekker fremre region, komplementær til TileCal for full kalorimetrisk dekning."
+          },
+          "muon": {
+            "name": "Muon-spektrometer",
+            "desc": "Det ytterste laget — et toroidalt magnetsystem med driftesrørkamre som sporer muoner over hele detektorens akseptanse."
+          }
         }
       },
       "trigger": {
@@ -947,11 +1220,31 @@
       "achievements": {
         "title": "Viktige Resultater",
         "items": {
-          "wz": { "year": "1983", "title": "W- og Z-bosonene Oppdaget", "desc": "UA1 og UA2-eksperimentene ved SPS-kollideren bekrefter bærerne av svak kraft. Nobelprisen 1984." },
-          "web": { "year": "1989", "title": "World Wide Web Oppfunnet", "desc": "Tim Berners-Lee foreslår et informasjonsstyringssystem ved CERN. Nettet fødes som et vitenskapelig verktøy." },
-          "antiH": { "year": "1995", "title": "Anti-hydrogen Skapt", "desc": "LEAR produserer de første atomene av anti-hydrogen — antimotparten til det enkleste atomet." },
-          "higgs": { "year": "2012", "title": "Higgs-bosonet Oppdaget", "desc": "ATLAS og CMS kunngjør i fellesskap oppdagelsen av Higgs-bosonet. Nobelprisen tildelt i 2013 til Higgs og Englert." },
-          "run3": { "year": "2022", "title": "Run 3 ved 13,6 TeV", "desc": "LHC begynner sitt tredje run ved rekord 13,6 TeV massesenterenergi, og åpner en ny grense for presisjonsflysikk." }
+          "wz": {
+            "year": "1983",
+            "title": "W- og Z-bosonene Oppdaget",
+            "desc": "UA1 og UA2-eksperimentene ved SPS-kollideren bekrefter bærerne av svak kraft. Nobelprisen 1984."
+          },
+          "web": {
+            "year": "1989",
+            "title": "World Wide Web Oppfunnet",
+            "desc": "Tim Berners-Lee foreslår et informasjonsstyringssystem ved CERN. Nettet fødes som et vitenskapelig verktøy."
+          },
+          "antiH": {
+            "year": "1995",
+            "title": "Anti-hydrogen Skapt",
+            "desc": "LEAR produserer de første atomene av anti-hydrogen — antimotparten til det enkleste atomet."
+          },
+          "higgs": {
+            "year": "2012",
+            "title": "Higgs-bosonet Oppdaget",
+            "desc": "ATLAS og CMS kunngjør i fellesskap oppdagelsen av Higgs-bosonet. Nobelprisen tildelt i 2013 til Higgs og Englert."
+          },
+          "run3": {
+            "year": "2022",
+            "title": "Run 3 ved 13,6 TeV",
+            "desc": "LHC begynner sitt tredje run ved rekord 13,6 TeV massesenterenergi, og åpner en ny grense for presisjonsflysikk."
+          }
         }
       },
       "links": {
@@ -964,11 +1257,77 @@
       "github": "Se på GitHub",
       "docs": "Dokumentasjon",
       "releases": "Utgivelser",
-      "sapho": { "name": "SAPHO", "full": "Scalable Architecture for Hardware Optimization", "short": "Komplett verktøykjede for prosessorskapelse og maskinvare-programvare samdesign.", "desc": "SAPHO er en komplett maskinvarearkitektur og verktøykjede for prosessorskapelse, eksperimentering og maskinvare-programvare samdesign.", "features": { "title": "Hva SAPHO Inkluderer", "yanc": "YANC kompilatorverktøykjede (CMM + assembly)", "polaris": "POLARIS kryssplattform-IDE", "yawt": "YAWT Wave Tracer for signalanalyse", "prism": "PRISM RTL Viewer for prosessorvisualisering", "platforms": "Windows og Linux støtte" } },
-      "yanc": { "name": "YANC", "full": "Yet Another Compiler", "short": "Kompilatorverktøykjeden som driver SAPHO-økosystemet.", "desc": "YANC er kompileringsryggraden til SAPHO.", "features": { "title": "Verktøykjedekomponenter", "cmmcomp": "cmmcomp: CMM høynivåspråkkompilator", "asmcomp": "asmcomp: Assembly-nivå kompilator", "tech": "Skrevet i C med Flex, Bison og GCC", "integration": "Fullt integrert i SAPHO-økosystemet" } },
-      "polaris": { "name": "POLARIS", "full": "Kryssplattform Grafisk IDE for SAPHO", "short": "Moderne, lettvekts IDE bygget med Tauri og Rust.", "desc": "POLARIS er et moderne, kryssplattform grafisk utviklingsmiljø bygget med Tauri og Rust.", "features": { "title": "Nøkkelfunksjoner", "tauri": "Bygget med Tauri + Rust — lettvekts og rask", "monaco": "Monaco Editor (samme motor som VS Code)", "prism": "Integrert PRISM RTL Viewer", "yawt": "Integrert YAWT Wave Tracer", "cross": "Native Linux og Windows binærfiler" } },
-      "aurora": { "name": "AURORA", "full": "Windows IDE for SAPHO-økosystemet", "short": "Kraftig Electron-basert IDE — forgjenger til POLARIS, med 25 utgivelser.", "desc": "AURORA var en kraftig, Windows-native IDE bygget med Electron for SAPHO-økosystemet.", "features": { "title": "AURORA Funksjoner", "cmm": "CMM programmeringsmiljø", "verilog": "Icarus Verilog simuleringsintegrasjon", "gtkwave": "GTKWave bølgeformvisualisering", "prism": "PRISM RTL Viewer", "releases": "25 utgivelser — siste v4.27.10" }, "legacy": "Arveprosjekt — etterfulgt av POLARIS" },
-      "cgv": { "name": "CGV-WEB", "full": "Calorimeter Geometry Viewer Web", "short": "3D kalorimeter-hendelsesvisualisering — tilgjengelig over hele verden.", "desc": "CGV-WEB er den nettbaserte utviklingen av CaloGeoView.", "features": { "title": "Teknisk Stabel", "rust": "Rust/WebAssembly kjernemotor", "threejs": "Three.js 3D-gjengivelse", "atlas": "ATLAS TileCal, LAr og HEC geometri", "energy": "Energifargekartlegging (blå→rød gradient)", "access": "Tilgjengelig over hele verden — ingen installasjon nødvendig" }, "open": "Åpne Fullt CGV" }
+      "sapho": {
+        "name": "SAPHO",
+        "full": "Scalable Architecture for Hardware Optimization",
+        "short": "Komplett verktøykjede for prosessorskapelse og maskinvare-programvare samdesign.",
+        "desc": "SAPHO er en komplett maskinvarearkitektur og verktøykjede for prosessorskapelse, eksperimentering og maskinvare-programvare samdesign.",
+        "features": {
+          "title": "Hva SAPHO Inkluderer",
+          "yanc": "YANC kompilatorverktøykjede (CMM + assembly)",
+          "polaris": "POLARIS kryssplattform-IDE",
+          "yawt": "YAWT Wave Tracer for signalanalyse",
+          "prism": "PRISM RTL Viewer for prosessorvisualisering",
+          "platforms": "Windows og Linux støtte"
+        }
+      },
+      "yanc": {
+        "name": "YANC",
+        "full": "Yet Another Compiler",
+        "short": "Kompilatorverktøykjeden som driver SAPHO-økosystemet.",
+        "desc": "YANC er kompileringsryggraden til SAPHO.",
+        "features": {
+          "title": "Verktøykjedekomponenter",
+          "cmmcomp": "cmmcomp: CMM høynivåspråkkompilator",
+          "asmcomp": "asmcomp: Assembly-nivå kompilator",
+          "tech": "Skrevet i C med Flex, Bison og GCC",
+          "integration": "Fullt integrert i SAPHO-økosystemet"
+        }
+      },
+      "polaris": {
+        "name": "POLARIS",
+        "full": "Kryssplattform Grafisk IDE for SAPHO",
+        "short": "Moderne, lettvekts IDE bygget med Tauri og Rust.",
+        "desc": "POLARIS er et moderne, kryssplattform grafisk utviklingsmiljø bygget med Tauri og Rust.",
+        "features": {
+          "title": "Nøkkelfunksjoner",
+          "tauri": "Bygget med Tauri + Rust — lettvekts og rask",
+          "monaco": "Monaco Editor (samme motor som VS Code)",
+          "prism": "Integrert PRISM RTL Viewer",
+          "yawt": "Integrert YAWT Wave Tracer",
+          "cross": "Native Linux og Windows binærfiler"
+        }
+      },
+      "aurora": {
+        "name": "AURORA",
+        "full": "Windows IDE for SAPHO-økosystemet",
+        "short": "Kraftig Electron-basert IDE — forgjenger til POLARIS, med 25 utgivelser.",
+        "desc": "AURORA var en kraftig, Windows-native IDE bygget med Electron for SAPHO-økosystemet.",
+        "features": {
+          "title": "AURORA Funksjoner",
+          "cmm": "CMM programmeringsmiljø",
+          "verilog": "Icarus Verilog simuleringsintegrasjon",
+          "gtkwave": "GTKWave bølgeformvisualisering",
+          "prism": "PRISM RTL Viewer",
+          "releases": "25 utgivelser — siste v4.27.10"
+        },
+        "legacy": "Arveprosjekt — etterfulgt av POLARIS"
+      },
+      "cgv": {
+        "name": "CGV-WEB",
+        "full": "Calorimeter Geometry Viewer Web",
+        "short": "3D kalorimeter-hendelsesvisualisering — tilgjengelig over hele verden.",
+        "desc": "CGV-WEB er den nettbaserte utviklingen av CaloGeoView.",
+        "features": {
+          "title": "Teknisk Stabel",
+          "rust": "Rust/WebAssembly kjernemotor",
+          "threejs": "Three.js 3D-gjengivelse",
+          "atlas": "ATLAS TileCal, LAr og HEC geometri",
+          "energy": "Energifargekartlegging (blå→rød gradient)",
+          "access": "Tilgjengelig over hele verden — ingen installasjon nødvendig"
+        },
+        "open": "Åpne Fullt CGV"
+      }
     },
     "publications": {
       "title": "Publikasjoner",
@@ -976,20 +1335,37 @@
       "search_placeholder": "Søk etter tittel, forfatter eller nøkkelord…",
       "filter_type": "Filtrer etter type",
       "filter_year": "Filtrer etter år",
+      "filter_author": "Filtrer etter forfatter",
       "filter_all": "Alle typer",
       "all_years": "Alle år",
-      "types": { "article": "Tidsskriftartikkel", "conference": "Konferanse", "tcc": "Bacheloroppgave", "dissertation": "Avhandling" },
+      "all_authors": "Alle forfattere",
+      "types": {
+        "article": "Tidsskriftartikkel",
+        "journal": "Tidsskriftartikkel",
+        "conference": "Konferanse",
+        "master's thesis": "Masteroppgave",
+        "undergraduate thesis": "Bacheloroppgave",
+        "doctoral thesis": "Doktoravhandling",
+        "tcc": "Bacheloroppgave",
+        "dissertation": "Avhandling"
+      },
       "open_pdf": "Åpne PDF",
       "no_results": "Ingen publikasjoner samsvarer med søket ditt.",
       "abstract": "Sammendrag",
       "authors": "Forfattere",
-      "published": "Publisert i"
+      "published": "Publisert i",
+      "no_authors": "Ingen forfattere funnet"
     },
     "news": {
       "title": "Nyheter og Oppdateringer",
       "subtitle": "Publikasjoner, priser, arrangementer og milepæler fra NIPSCERN-laboratoriet.",
       "read_more": "Les mer",
-      "categories": { "publication": "Publikasjon", "award": "Pris", "event": "Arrangement", "milestone": "Milepæl" },
+      "categories": {
+        "publication": "Publikasjon",
+        "award": "Pris",
+        "event": "Arrangement",
+        "milestone": "Milepæl"
+      },
       "sidebar_awards": "Nylige Priser",
       "back": "Tilbake til Nyheter",
       "share": "Del",
