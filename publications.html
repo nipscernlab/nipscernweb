@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
-  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/main.css?v=author-count-20260520">
 </head>
 <body>
 
@@ -67,11 +67,33 @@
           <select id="pub-filter-type" class="select-filter" aria-label="Filter by type" data-i18n-aria="publications.filter_type">
             <option value="" data-i18n="publications.filter_all">All types</option>
             <option value="journal" data-i18n="publications.types.journal">Journal Article</option>
-            <option value="revista" data-i18n="publications.types.revista">Conference / Revista</option>
             <option value="conference" data-i18n="publications.types.conference">Conference</option>
-            <option value="tcc" data-i18n="publications.types.tcc">Undergraduate Thesis</option>
-            <option value="dissertation" data-i18n="publications.types.dissertation">Dissertation</option>
+            <option value="master's thesis" data-i18n="publications.types.master's thesis">Master's Thesis</option>
+            <option value="undergraduate thesis" data-i18n="publications.types.undergraduate thesis">Undergraduate Thesis</option>
+            <option value="doctoral thesis" data-i18n="publications.types.doctoral thesis">Doctoral Thesis</option>
           </select>
+
+          <div class="author-combo" id="pub-author-combo">
+            <i class="ph ph-user" aria-hidden="true"></i>
+            <input
+              type="text"
+              id="pub-author-input"
+              class="author-combo-input"
+              role="combobox"
+              aria-expanded="false"
+              aria-controls="pub-author-list"
+              aria-autocomplete="list"
+              aria-label="Filter by author"
+              data-i18n-aria="publications.filter_author"
+              data-i18n-placeholder="publications.all_authors"
+              placeholder="All authors"
+              autocomplete="off"
+            >
+            <button type="button" class="author-combo-clear" id="pub-author-clear" aria-label="Clear author filter" hidden>
+              <i class="ph ph-x" aria-hidden="true"></i>
+            </button>
+            <ul class="author-combo-list" id="pub-author-list" role="listbox" aria-label="Authors" hidden></ul>
+          </div>
 
           <select id="pub-filter-year" class="select-filter" aria-label="Filter by year" data-i18n-aria="publications.filter_year">
             <option value="" data-i18n="publications.all_years">All years</option>
@@ -166,7 +188,7 @@
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
   <script type="module" src="assets/js/main.js"></script>
   <script type="module">
-    import { initPublications } from './assets/js/publications.js';
+    import { initPublications } from './assets/js/publications.js?v=author-count-20260520';
     // Defer until after DOMContentLoaded so main.js has already run
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
