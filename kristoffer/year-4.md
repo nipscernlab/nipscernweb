@@ -5,7 +5,7 @@
 
 ---
 
-## LOGIC — Paraconsistency & Computation (9 texts)
+## LOGIC — Paraconsistency & Computation (16 texts)
 
 **Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
 
@@ -35,6 +35,27 @@ Natural deduction & sequent calculus founding paper.
 
 ### 9. Grundbegriffe der Wahrscheinlichkeitsrechnung — Andrey Kolmogorov (1933) *(Paper · Breadth)*
 Russian — measure-theoretic axiomatization of probability. Probability as a tool for living and deciding.
+
+### 10. Entailment: The Logic of Relevance and Necessity — Alan Anderson & Nuel Belnap *(Core)*
+Relevance logic. Rejecting the paradoxes of material implication — the immediate neighbourhood of paraconsistency.
+
+### 11. Model Theory: An Introduction — David Marker *(Breadth)*
+The semantic side of proof: soundness, completeness, compactness, Löwenheim–Skolem. How to prove things *about* a logic.
+
+### 12. The Logic of Provability — George Boolos *(Core)*
+The modal logic GL of "it is provable that". Gödel's incompleteness tied into one clean modal knot.
+
+### 13. Foundations without Foundationalism: The Case for Second-Order Logic — Stewart Shapiro *(Breadth)*
+Second- and higher-order quantification: expressive power against the price of incompleteness.
+
+### 14. Many-Valued Logics (Łukasiewicz & Kleene systems) *(Breadth)*
+Truth beyond true/false: three-valued and n-valued logics — the systematic step past Priest's survey.
+
+### 15. Mathematical Fuzzy Logic — Petr Hájek *(Curiosity)*
+Degrees of truth formalized. One pass, for the map.
+
+### 16. Computability and Logic — Boolos, Burgess & Jeffrey *(Curiosity)*
+Church–Turing, the halting problem, decidability — the limits on which incompleteness rests.
 
 ---
 
@@ -112,6 +133,30 @@ Caribbean postcolonial voice.
 **The Sound and the Fury · Absalom, Absalom!** — William Faulkner (1929 · 1936)
 Stream of consciousness and the Southern Gothic. Time fractured, memory unhinged.
 
+**Madame Bovary** — Gustave Flaubert
+The modern novel is born. Style as morality, irony as precision.
+
+**Bleak House · Great Expectations** — Charles Dickens
+The Victorian world entire — institutions, poverty, and the long arm of the past.
+
+**Middlemarch** — George Eliot
+Often called the greatest English novel. A whole town's moral life.
+
+**Moby-Dick** — Herman Melville
+The American epic. Obsession, the whale, and the unknowable.
+
+**Les Misérables** — Victor Hugo
+Justice, mercy, and revolution. The Romantic novel at its grandest.
+
+**Tales & Poems** — Edgar Allan Poe
+The birth of the detective story and modern horror. Death, dread, and ratiocination.
+
+**Евгений Онегин (Eugene Onegin)** — Alexander Pushkin
+The fountainhead of Russian literature. The novel in verse.
+
+**Мёртвые души · Шинель (Dead Souls · The Overcoat)** — Nikolai Gogol
+Satire and the grotesque. The seed of all Russian prose to come.
+
 ### Poetry
 
 **The Waste Land** — T.S. Eliot
@@ -135,6 +180,9 @@ Death Fugue. The Holocaust's central poem.
 **Марина Цветаева — избранные стихи (Selected Poems)** — Marina Tsvetaeva
 Russian Silver Age. Passionate, syntactically fractured verse — lyric intensity at its most extreme.
 
+**The Complete Poems** — Emily Dickinson
+Eternity in a dash. The most original voice in American poetry.
+
 ### Theater
 
 **Mutter Courage und ihre Kinder · Galileo** — Bertolt Brecht
@@ -151,6 +199,12 @@ American tragedy at its rawest. A family dismantling itself over one day.
 
 **La Cantatrice chauve · Rhinocéros** — Eugène Ionesco (1950 · 1959)
 Theater of the Absurd. Language collapses; conformism spreads like a virus.
+
+**Bodas de Sangre · La Casa de Bernarda Alba** — Federico García Lorca
+Spanish tragedy of blood, desire, and repression. Poetry made theatre.
+
+**Le Théâtre et son double** — Antonin Artaud
+The Theatre of Cruelty. Theatre as ritual, shock, and the body before language.
 
 ---
 
@@ -174,6 +228,12 @@ Theater of the Absurd. Language collapses; conformism spreads like a virus.
 - **Straße, Berlin** — Ernst Ludwig Kirchner (1913) *(German Expressionism; urban alienation at its most anxious)*
 - **Der Krieg (War Triptych)** — Otto Dix (1929–32) *(the most unflinching painting of WWI; Dix as new Grünewald)*
 - **Documentary Photography** — Eugène Atget · Walker Evans · Dorothea Lange (Migrant Mother) · Robert Capa *(photography as witness)*
+- **Le Déjeuner sur l'herbe · Olympia** — Édouard Manet *(where modern painting begins; the gaze that broke the Salon)*
+- **De sterrennacht (The Starry Night) · Zonnebloemen** — Vincent van Gogh *(emotion rendered as colour and brushstroke)*
+- **Mont Sainte-Victoire · Les Joueurs de cartes** — Paul Cézanne *("the father of us all" — form rebuilt from cylinder, sphere, cone)*
+- **D'où venons-nous ? Que sommes-nous ?** — Paul Gauguin *(symbolism and the flight from Europe)*
+- **L'Absinthe · La Classe de danse** — Edgar Degas *(the Impressionist of movement and the indoor gaze)*
+- **Un dimanche après-midi à l'Île de la Grande Jatte** — Georges Seurat *(Pointillism; painting built atom by atom)*
 
 ---
 
@@ -204,6 +264,15 @@ Theater of the Absurd. Language collapses; conformism spreads like a virus.
 - **Blue Train · A Love Supreme** — John Coltrane
 - **Sinfonietta · Glagolská mše** — Leoš Janáček (1926 · 1927) *(Czech modernism; Moravian speech rhythms as music)*
 - **Ромео и Джульетта · Петя и волк** — Sergei Prokofiev (1935 · 1936) *(ballet and orchestral narration at their most vivid)*
+- **Der Ring des Nibelungen · Tristan und Isolde** — Richard Wagner *(the total artwork; harmony pushed to the edge of tonality)*
+- **Otello · Requiem · La Traviata** — Giuseppe Verdi *(Italian opera at its dramatic summit)*
+- **Ein deutsches Requiem · Symphonie Nr. 4** — Johannes Brahms *(Romantic rigour; Beethoven's heir)*
+- **Symphonie Nr. 6 "Pathétique" · Schwanensee** — Pyotr Tchaikovsky *(Romantic melody and the heart of ballet)*
+- **Symphonie Nr. 8** — Anton Bruckner *(cathedrals of sound)*
+- **Symphony No. 9 "From the New World"** — Antonín Dvořák *(Bohemian song meets the symphony)*
+- **Картинки с выставки · Борис Годунов (Pictures at an Exhibition · Boris Godunov)** — Modest Mussorgsky *(raw Russian nationalism in sound)*
+- **La Bohème · Tosca** — Giacomo Puccini *(verismo; melody that breaks the heart)*
+- **Carmen** — Georges Bizet *(opera's most irresistible tragedy)*
 
 ---
 
@@ -224,12 +293,34 @@ Theater of the Absurd. Language collapses; conformism spreads like a virus.
 - **Casablanca** — Michael Curtiz (1942) *(Hollywood classicism at its peak)*
 - **La Strada** — Federico Fellini (1954) *(innocence, cruelty, grace — Fellini's neorealist soul)*
 - **Psycho** — Alfred Hitchcock (1960) *(the film that changed cinema's moral contract)*
+- **The Kid · City Lights · Modern Times** — Charlie Chaplin *(silent comedy as humanism; the Tramp)*
+- **The General** — Buster Keaton (1926) *(the stone-faced genius of physical cinema)*
+- **Sunrise: A Song of Two Humans** — F.W. Murnau (1927) *(the silent film at its most lyrical)*
+- **Человек с киноаппаратом (Man with a Movie Camera)** — Dziga Vertov (1929) *(documentary as pure montage; the camera-eye)*
+- **Ladri di biciclette (Bicycle Thieves)** — Vittorio De Sica (1948) *(Italian neorealism; the street as truth)*
+- **Roma città aperta (Rome, Open City)** — Roberto Rossellini (1945) *(neorealism's founding cry)*
+
+---
+
+### Animation
+
+- **Die Abenteuer des Prinzen Achmed** — Lotte Reiniger (1926) *(the first feature-length animation; silhouette as enchantment)*
+- **Snow White · Fantasia** — Walt Disney (1937 · 1940) *(animation becomes both an art and an industry)*
+
+---
+
+### Dance
+
+- **Swan Lake · The Sleeping Beauty** — Marius Petipa *(classical ballet codified; the grammar of the art)*
+- **Ballets Russes (Le Sacre du printemps)** — Diaghilev & Nijinsky (1913) *(the riot that launched modern dance)*
+- **Free Dance** — Isadora Duncan *(barefoot, against the corset of ballet; the modern body begins)*
+- **Appalachian Spring · Lamentation** — Martha Graham *(modern dance as inner necessity; contraction and release)*
 
 ---
 
 ## YEAR IV COMPLETE SUMMARY
 
-### Logic (9 texts)
+### Logic (16 texts)
 1. Sistemas Formais Inconsistentes — Newton da Costa
 2. In Contradiction — Graham Priest
 3. The Annotated Turing — Petzold
@@ -239,17 +330,26 @@ Theater of the Absurd. Language collapses; conformism spreads like a virus.
 7. Über die Vollständigkeit des Logikkalküls — Gödel *(paper)*
 8. Untersuchungen über das logische Schließen — Gentzen *(paper)*
 9. Grundbegriffe der Wahrscheinlichkeitsrechnung — Kolmogorov *(paper)*
+10. Entailment: Relevance and Necessity — Anderson & Belnap
+11. Model Theory: An Introduction — Marker
+12. The Logic of Provability — Boolos
+13. Foundations without Foundationalism (Second-Order Logic) — Shapiro
+14. Many-Valued Logics — Łukasiewicz & Kleene
+15. Mathematical Fuzzy Logic — Hájek *(curiosity)*
+16. Computability and Logic — Boolos, Burgess & Jeffrey *(curiosity)*
 
-### Culture
-- **Philosophy & Mind:** 5 (Heidegger, Camus, Freud, Searle, Varela)
+### Culture (125 items)
+- **Philosophy & Mind:** 7 (Heidegger, Camus, Nietzsche, Kierkegaard, Freud, Searle, Varela)
 - **Science:** 2 (Feynman, Gleick)
-- **Literature:** 12 (Dostoevsky ×2, Tolstoy, Proust, Kafka, Joyce, Woolf, Mann, Hamsun, Knausgård, Achebe, Rhys)
-- **Poetry:** 6 (Eliot, Baudelaire, Neruda, Rilke, Akhmatova, Celan)
-- **Theater:** 3 (Brecht, Strindberg, Pirandello)
-- **Art:** 13 modernist works
-- **Architecture & Places:** 5
-- **Music:** 10 modernist scores
-- **Film:** 11
+- **Literature:** 21 (Dostoevsky ×2, Tolstoy, Proust, Kafka, Joyce, Woolf, Mann, Hamsun, Knausgård, Achebe, Rhys, Faulkner + Flaubert, Dickens, Eliot, Melville, Hugo, Poe, Pushkin, Gogol)
+- **Poetry:** 8 (Eliot, Baudelaire, Neruda, Rilke, Akhmatova, Celan, Tsvetaeva + Dickinson)
+- **Theater:** 7 (Brecht, Strindberg, Pirandello, O'Neill, Ionesco + Lorca, Artaud)
+- **Art:** 24 modernist + Impressionist/Post-Impressionist
+- **Architecture & Places:** 8
+- **Music:** 21 modernist + late-Romantic & opera
+- **Film:** 21 (+ Chaplin, Keaton, Murnau, Vertov, De Sica, Rossellini)
+- **Animation:** 2 (Reiniger, Disney)
+- **Dance:** 4 (Petipa, Ballets Russes, Duncan, Graham)
 
 ### Geographic Coverage
 Germany · Russia · France · Italy · Spain · Denmark · Sweden · Norway · Finland · Hungary · Romania · Austria · Czechia · England · Ireland · USA · Africa · Caribbean · Japan · Brazil (da Costa)

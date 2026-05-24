@@ -5,7 +5,7 @@
 
 ---
 
-## LOGIC — Language & Foundations (8 texts)
+## LOGIC — Language & Foundations (11 texts)
 
 **Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
 
@@ -33,6 +33,15 @@ Speech act theory. Performatives and the philosophy of saying.
 ### 8. Über Sinn und Bedeutung — Gottlob Frege (1892) *(Paper · Core)*
 On Sense and Reference. The founding paper of philosophy of language.
 
+### 9. Collected Papers (Relations, Abduction & Existential Graphs) — Charles Sanders Peirce *(Core)*
+Abduction — inference to the best explanation — and the logic of relations. A founder absent from no serious map of logic.
+
+### 10. Wissenschaftslehre (Theory of Science) — Bernard Bolzano (1837) *(Core)*
+The modern notion of logical consequence, decades before Frege. Propositions-in-themselves and objective truth.
+
+### 11. Naive Set Theory — Paul Halmos *(Breadth)*
+The language of proof: relations, functions, cardinals, ordinals, the axiom of choice. The formal base for the philosophical branch.
+
 ---
 
 ## CULTURE — Humanism, Renaissance & The Architecture of Meaning
@@ -54,6 +63,21 @@ Categorical imperative. Deontological ethics foundation.
 **Il Principe** — Niccolò Machiavelli
 Realpolitik and power dynamics.
 
+**Ethica, ordine geometrico demonstrata (Ethics)** — Baruch Spinoza
+Philosophy written *more geometrico* — axioms, definitions, proofs. God, nature, and freedom as one substance.
+
+**Philosophiæ Naturalis Principia Mathematica** — Isaac Newton
+The birth of modern physics. Motion and gravitation from three laws.
+
+**Dialogo sopra i due massimi sistemi del mondo** — Galileo Galilei
+The Copernican turn defended. Observation against authority.
+
+**Phänomenologie des Geistes (Phenomenology of Spirit)** — G.W.F. Hegel
+Consciousness unfolding through history. The dialectic at full ambition.
+
+**Die Welt als Wille und Vorstellung (The World as Will and Representation)** — Arthur Schopenhauer
+Will, suffering, and aesthetic release. The bridge to Wagner, Nietzsche, and Buddhism.
+
 ### Books — Literature
 
 **El ingenioso hidalgo don Quijote de la Mancha** — Miguel de Cervantes
@@ -61,6 +85,12 @@ Meta-fiction, idealism vs. reality.
 
 **紅樓夢 (Hóng lóu mèng / Dream of the Red Chamber)** — Cao Xueqin
 Pinnacle of Chinese classical fiction.
+
+**Faust (Part I)** — Johann Wolfgang von Goethe
+The pact with knowledge. The central work of German letters.
+
+**Pride and Prejudice** — Jane Austen
+The modern novel of manners. Irony as a moral instrument.
 
 ### Theater
 
@@ -93,6 +123,9 @@ Spanish Golden Age. Collective village resistance.
 
 **La vida es sueño** — Pedro Calderón de la Barca
 Spanish Baroque. Reality as dream.
+
+**Arlecchino servitore di due padroni** — Carlo Goldoni
+The commedia dell'arte refined into modern comedy.
 
 ### Poetry
 
@@ -133,12 +166,21 @@ New Spain Baroque philosophical poem.
 - **Selbstbildnis · Melencolia I · Ritter, Tod und Teufel** — Albrecht Dürer
 - **De tuin der lusten (Garden of Earthly Delights)** — Hieronymus Bosch
 - **Jagers in de Sneeuw · De Toren van Babel** — Pieter Bruegel de Oude
-- **Het Lam Gods (Ghent Altarpiece)** — Jan van Eyck
+- **Het Lam Gods (Ghent Altarpiece) · Portret van Giovanni Arnolfini** — Jan van Eyck
 - **The Ambassadors** — Hans Holbein der Jüngere
 - **Theodor Kittelsen — Folktale Illustrations** *(Norwegian)*
 - **Dogon Masks** — Mali
 - **L'Ultima Cena (San Giorgio Maggiore)** — Jacopo Tintoretto (1594) *(Mannerist dynamism; the anti-Leonardo)*
 - **Le nozze di Cana** — Paolo Veronese (1563) *(Venetian opulence; largest canvas in the Louvre)*
+- **De Nachtwacht (The Night Watch) · Self-Portraits** — Rembrandt van Rijn *(the Dutch Golden Age; light, shadow, and the inner life)*
+- **Het meisje met de parel (Girl with a Pearl Earring) · Het melkmeisje** — Johannes Vermeer *(silence, light, and domestic eternity)*
+- **El entierro del conde de Orgaz** — El Greco *(Mannerist ecstasy; earth and heaven on one canvas)*
+- **Pinturas Negras · El 3 de mayo de 1808 · Saturno** — Francisco de Goya *(the bridge to modernity; the sleep of reason and its monsters)*
+- **Der Wanderer über dem Nebelmeer** — Caspar David Friedrich *(the Romantic sublime; the soul before the infinite)*
+- **The Fighting Temeraire · Rain, Steam and Speed** — J.M.W. Turner *(light dissolving form; the proto-Impressionist)*
+- **La Liberté guidant le peuple** — Eugène Delacroix *(Romantic painting at full voice)*
+- **Mughal Miniature (Pādshāhnāma)** — Mughal court ateliers (17th c.) *(imperial India painted in jewel and gold)*
+- **浮世絵 — Hiroshige & Utamaro (Ukiyo-e)** — Edo Japan *(the floating world: landscape and the human face)*
 
 ---
 
@@ -151,6 +193,9 @@ New Spain Baroque philosophical poem.
 - **Château de Versailles** — Le Vau · Hardouin-Mansart
 - **Süleymaniye Camii** — Mimar Sinan
 - **میدان نقش جهان (Naqsh-e Jahān, Isfahan)** — Safavid Persia
+- **姫路城 (Himeji Castle)** — Japan (1609) *(the "White Heron"; the apex of Japanese castle architecture)*
+- **桂離宮 (Katsura Imperial Villa)** — Kyoto (17th c.) *(restraint, asymmetry, and the garden as path)*
+- **San Carlo alle Quattro Fontane** — Francesco Borromini *(Baroque geometry in motion; the counter-voice to Bernini)*
 
 ---
 
@@ -167,6 +212,17 @@ New Spain Baroque philosophical poem.
 - **Späte Streichquartette (Op. 130–135)** — Ludwig van Beethoven
 - **Gloria · Stabat Mater** — Antonio Vivaldi (1715 · 1712) *(sacred peak: radiant joy and aching grief)*
 - **Die Schöpfung · Streichquartette Op. 76** — Joseph Haydn (1798 · 1797) *(Enlightenment joy and late-Haydn intimacy)*
+- **Winterreise · Die schöne Müllerin** — Franz Schubert (1827 · 1823) *(the Lied perfected; a winter pilgrimage toward death)*
+- **Nocturnes · Préludes · Ballades** — Frédéric Chopin *(the piano as confession)*
+- **Dichterliebe · Kinderszenen** — Robert Schumann *(Romantic interiority in song and miniature)*
+- **Symphonie fantastique** — Hector Berlioz (1830) *(programme music; obsession scored for orchestra)*
+- **Violinkonzert · Ein Sommernachtstraum** — Felix Mendelssohn *(Romantic clarity and lightness)*
+
+---
+
+### Dance
+
+- **Ballet de cour → Ballet classique** — Lully & the French court *(the birth of ballet as an art; dance codified at Versailles)*
 
 ---
 
@@ -179,7 +235,7 @@ New Spain Baroque philosophical poem.
 
 ## YEAR III COMPLETE SUMMARY
 
-### Logic (8 texts)
+### Logic (11 texts)
 1. Mūlamadhyamakakārikā — Nāgārjuna
 2. Die Grundlagen der Arithmetik — Frege
 3. Begriffsschrift — Frege
@@ -188,15 +244,19 @@ New Spain Baroque philosophical poem.
 6. Philosophische Untersuchungen — Wittgenstein
 7. How to Do Things with Words — Austin
 8. Über Sinn und Bedeutung — Frege *(paper)*
+9. Collected Papers (Abduction, Relations) — C.S. Peirce
+10. Wissenschaftslehre — Bolzano
+11. Naive Set Theory — Halmos *(set theory base)*
 
-### Culture
-- **Philosophy & History:** 4 (Frankopan, Heilbroner, Kant, Machiavelli)
-- **Literature:** 2 (Cervantes, Cao Xueqin)
-- **Theater:** 9 (Shakespeare, Marlowe, Ibsen ×3, Molière, Racine, Lope, Calderón)
+### Culture (88 items)
+- **Philosophy & History:** 10 (Frankopan, Heilbroner, Montaigne, Kant, Machiavelli, Spinoza, Newton, Galileo, Hegel, Schopenhauer)
+- **Literature:** 4 (Cervantes, Cao Xueqin, Goethe, Austen)
+- **Theater:** 11 (Shakespeare, Marlowe, Ibsen ×3, Molière, Racine, Lope, Calderón, Goldoni)
 - **Poetry:** 7 (Shakespeare, Donne, Milton, Whitman, Bashō, Browning, Sor Juana)
-- **Art:** 16 Renaissance-Baroque masterworks
-- **Architecture & Places:** 7 sites
-- **Music:** 9 Baroque-Classical works
+- **Art:** 27 (Renaissance-Baroque + Dutch Golden Age + Romantic + Asian)
+- **Architecture & Places:** 10 sites
+- **Music:** 16 (Baroque-Classical + early Romantic)
+- **Dance:** 1 (the birth of ballet)
 - **Film:** 2
 
 ### Geographic Coverage
