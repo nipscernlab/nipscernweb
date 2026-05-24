@@ -5,42 +5,47 @@
 
 ---
 
-## LOGIC — Trivium & Origins (12 texts)
+## LOGIC — Trivium & Origins (13 texts)
 
-### 1. An Introduction to Formal Logic — Peter Smith
+**Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
+
+### 1. An Introduction to Formal Logic — Peter Smith *(Core)*
 Propositional & predicate logic syntax. Foundation of all formal reasoning.
 
-### 2. Ὄργανον (Categories & Prior Analytics) — Aristotle
+### 2. Ὄργανον (Categories & Prior Analytics) — Aristotle *(Core)*
 Classification and syllogistic reasoning. Western logic begins here.
 
-### 3. Stoic Logic Fragments — Chrysippus *(Paper)*
+### 3. Πολιτεία (Republic) & Socratic Dialogues — Plato *(Core)*
+The examined life begins here. Justice, the good, knowledge, and the Socratic method of question and refutation.
+
+### 4. Stoic Logic Fragments — Chrysippus *(Paper · Core)*
 Early propositional logic. Conditional reasoning before Boole.
 
-### 4. Τέχνη Ῥητορική (Ars Rhetorica) — Aristotle
+### 5. Τέχνη Ῥητορική (Ars Rhetorica) — Aristotle *(Core)*
 Persuasion, argumentation, practical reasoning.
 
-### 5. न्यायसूत्र (Nyāya Sūtras) — Akṣapāda Gautama
+### 6. न्यायसूत्र (Nyāya Sūtras) — Akṣapāda Gautama *(Breadth)*
 Indian logic basics. Inference, comparison, and testimony.
 
-### 6. Materials For the Study of Navya-Nyāya Logic — Daniel H. H. Ingalls
+### 7. Materials For the Study of Navya-Nyāya Logic — Daniel H. H. Ingalls *(Breadth)*
 Technical exposition of Navya-Nyāya. Expands the scope of general logic.
 
-### 7. A Rulebook for Arguments — Anthony Weston
+### 8. A Rulebook for Arguments — Anthony Weston *(Core)*
 Critical thinking handbook. Essential for detecting fallacies.
 
-### 8. An Introduction to Non-Classical Logic — Graham Priest
+### 9. An Introduction to Non-Classical Logic — Graham Priest *(Breadth)*
 Paraconsistent, relevant, fuzzy, intuitionistic logic. Survey for diverse systems.
 
-### 9. The Development of Logic — William & Martha Kneale
+### 10. The Development of Logic — William & Martha Kneale *(Breadth)*
 Definitive history of logic from Aristotle to the modern age.
 
-### 10. Later Mohist Logic, Ethics and Science — A.C. Graham
+### 11. Later Mohist Logic, Ethics and Science — A.C. Graham *(Breadth)*
 Ancient Chinese logic. The Mohist canon and disputation theory.
 
-### 11. Avicenna on the Logic of Conditionals — Tony Street *(Paper)*
+### 12. Avicenna on the Logic of Conditionals — Tony Street *(Paper · Breadth)*
 Islamic medieval logic. Bridge between Aristotle and the Latin Schoolmen.
 
-### 12. Konungs skuggsjá (The King's Mirror) — Anonymous (Old Norwegian, 13th c.)
+### 13. Konungs skuggsjá (The King's Mirror) — Anonymous (Old Norwegian, 13th c.) *(Breadth)*
 Medieval Norse philosophical dialogue. Reason, kingship, and natural philosophy.
 
 ---
@@ -279,19 +284,20 @@ Aztec philosopher-king. Impermanence and beauty.
 
 ## YEAR I COMPLETE SUMMARY
 
-### Logic (12 texts)
+### Logic (13 texts)
 1. An Introduction to Formal Logic — Peter Smith
 2. Ὄργανον — Aristotle
-3. Stoic Logic Fragments — Chrysippus
-4. Τέχνη Ῥητορική — Aristotle
-5. न्यायसूत्र — Akṣapāda Gautama
-6. Materials For Navya-Nyāya Logic — Ingalls
-7. A Rulebook for Arguments — Weston
-8. An Introduction to Non-Classical Logic — Priest
-9. The Development of Logic — Kneale & Kneale
-10. Later Mohist Logic, Ethics and Science — A.C. Graham
-11. Avicenna on the Logic of Conditionals — Street
-12. Konungs skuggsjá — Anonymous (Old Norwegian)
+3. Πολιτεία (Republic) & Socratic Dialogues — Plato
+4. Stoic Logic Fragments — Chrysippus
+5. Τέχνη Ῥητορική — Aristotle
+6. न्यायसूत्र — Akṣapāda Gautama
+7. Materials For Navya-Nyāya Logic — Ingalls
+8. A Rulebook for Arguments — Weston
+9. An Introduction to Non-Classical Logic — Priest
+10. The Development of Logic — Kneale & Kneale
+11. Later Mohist Logic, Ethics and Science — A.C. Graham
+12. Avicenna on the Logic of Conditionals — Street
+13. Konungs skuggsjá — Anonymous (Old Norwegian)
 
 ### Culture
 - **Books & Poetry:** 38 items (foundational myths, ancient epics, sacred texts)
