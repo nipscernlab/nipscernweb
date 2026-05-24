@@ -5,7 +5,7 @@
 
 ---
 
-## LOGIC — Deontic & Argumentation (9 texts)
+## LOGIC — Deontic & Argumentation (14 texts)
 
 **Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
 
@@ -35,6 +35,21 @@ Systematic treatment of informal argumentation and dialogue schemes.
 
 ### 9. Om det tragiske (On the Tragic) — Peter Wessel Zapffe *(Core)*
 Norwegian philosopher. Tragic logic and philosophical anthropology.
+
+### 10. On the Logic of Theory Change (AGM) — Alchourrón, Gärdenfors & Makinson (1985) *(Paper · Core)*
+Belief revision. How a rational agent changes its mind — the same Alchourrón of deontic logic.
+
+### 11. Counterfactuals — David Lewis (1973) *(Core)*
+The logic of "if it had been". Possible worlds and similarity — the partner to Pearl's causality.
+
+### 12. The Logic of Decision — Richard Jeffrey *(Core)*
+Decision theory. Choosing under uncertainty — the logic of decisions made formal.
+
+### 13. Fact, Fiction, and Forecast — Nelson Goodman *(Core)*
+The new riddle of induction ("grue"). Confirmation theory and the paradox at the heart of learning from experience.
+
+### 14. Truth and Probability — Frank Ramsey · Bruno de Finetti *(Paper · Breadth)*
+The foundations of Bayesian / formal epistemology. Degrees of belief as a coherent measure.
 
 ---
 
@@ -117,6 +132,12 @@ Chinese Nobel. Hallucinatory rural epic.
 
 **Beloved · Song of Solomon** — Toni Morrison
 Slavery's haunting. African-American literature at its peak.
+
+**Rayuela (Hopscotch)** — Julio Cortázar
+The novel as labyrinth — read in any order. Argentine experiment and play.
+
+**Lolita · Pale Fire** — Vladimir Nabokov
+Style as seduction and trap. Pale Fire is a poem, its own false commentary, and a puzzle.
 
 ---
 
@@ -229,12 +250,36 @@ Japanese post-war dance. Body as trauma and transformation.
 - **Orfeu Negro (Black Orpheus)** — Marcel Camus (1959)
 - **Touki Bouki · Mandabi** — Djibril Diop Mambéty · Ousmane Sembène
 - **Verdens verste menneske (The Worst Person in the World)** — Joachim Trier (2021)
+- **2001: A Space Odyssey · Barry Lyndon** — Stanley Kubrick *(cinema as cosmic philosophy; the cut from bone to spaceship)*
+- **Shoah** — Claude Lanzmann (1985) *(nine hours of testimony; documentary as the impossibility of representing the camps)*
+- **Sans Soleil** — Chris Marker (1983) *(the essay-film; memory, image, and time)*
+
+---
+
+### Animation
+
+- **千と千尋の神隠し · となりのトトロ (Spirited Away · My Neighbor Totoro)** — Hayao Miyazaki *(Studio Ghibli; animation as a complete art)*
+- **火垂るの墓 (Grave of the Fireflies)** — Isao Takahata (1988) *(the most devastating war film, drawn by hand)*
+- **Ёжик в тумане (Hedgehog in the Fog)** — Yuri Norshteyn (1975) *(the summit of Soviet poetic animation)*
+- **パプリカ (Paprika)** — Satoshi Kon (2006) *(dream and reality spliced; the grammar of the subconscious)*
+- **Surrealist Animation** — Jan Švankmajer *(Czech stop-motion; the uncanny made tactile)*
+
+---
+
+### Dance
+
+- **Café Müller · Le Sacre du printemps** — Pina Bausch *(Tanztheater; one of the great artists of the century)*
+- **Events (chance choreography)** — Merce Cunningham *(movement freed from music and meaning)*
+- **Apollo · Agon** — George Balanchine *(neoclassical ballet; the body as pure structure)*
+- **Revelations** — Alvin Ailey (1960) *(the African-American experience as modern dance)*
+- **Flamenco (baile)** — Andalusia *(duende; the body as raw feeling)*
+- **Tango (danza)** — Río de la Plata *(embrace, tension, and improvisation)*
 
 ---
 
 ## YEAR V COMPLETE SUMMARY
 
-### Logic (9 texts)
+### Logic (14 texts)
 1. Norm and Action — von Wright
 2. Deontic Logic — von Wright *(paper)*
 3. Normative Systems — Alchourrón & Bulygin
@@ -244,16 +289,23 @@ Japanese post-war dance. Body as trauma and transformation.
 7. The Book of Why — Pearl
 8. Informal Logic — Walton
 9. Om det tragiske — Zapffe
+10. On the Logic of Theory Change (AGM) — Alchourrón, Gärdenfors & Makinson *(paper)*
+11. Counterfactuals — David Lewis
+12. The Logic of Decision — Jeffrey
+13. Fact, Fiction, and Forecast — Goodman
+14. Truth and Probability — Ramsey & de Finetti *(paper)*
 
-### Culture (84 items)
+### Culture (100 items)
 - **Cognition & Ethics:** 9 (Lakoff, Kahneman, Galef, Duke, Christian/Griffiths, Taleb, Haidt, Singer, Jonas)
-- **Literature:** 15 (García Márquez, Bulgakov, Borges, Camus, Roy, Salih, Laxness, Fosse, Vesaas, Petterson, Soyinka, Adichie, Murakami, Mo Yan, Morrison)
+- **Literature:** 17 (García Márquez, Bulgakov, Borges, Camus, Roy, Salih, Laxness, Fosse, Vesaas, Petterson, Soyinka, Adichie, Murakami, Mo Yan, Morrison, Cortázar, Nabokov)
 - **Poetry:** 5 (Neruda, Pessoa, Plath, Tranströmer, Jacobsen)
 - **Theater:** 7 (Chekhov, Williams, Miller, Beckett, Kane, Pinter, Butoh)
 - **Art:** 13 modern–contemporary works
 - **Architecture:** 3 (Kahn, Utzon, Bo Bardi)
 - **Music:** 22 jazz / world / contemporary works
-- **Film:** 10 international auteurs
+- **Film:** 13 international auteurs (+ Kubrick, Lanzmann, Marker)
+- **Animation:** 5 (Miyazaki, Takahata, Norshteyn, Satoshi Kon, Švankmajer)
+- **Dance:** 6 (Pina Bausch, Cunningham, Balanchine, Ailey, flamenco, tango)
 
 ### Geographic Coverage
 Latin America (Mexico · Argentina · Cuba · Brazil · Colombia · Chile) · Africa (Nigeria · Senegal · Mali · South Africa · Sudan · Cape Verde · Sahara) · Asia (Japan · China · India · Iran · Hong Kong) · Europe (Norway · Iceland · Sweden · Denmark · Russia · Italy · France · UK · Spain · Portugal) · Pacific · USA

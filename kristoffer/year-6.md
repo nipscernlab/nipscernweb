@@ -40,6 +40,42 @@ Types as spaces, proofs as paths. A frontier of formal foundations — read for 
 ### 10. Seven Sketches in Compositionality — Brendan Fong & David I. Spivak *(Curiosity)*
 Applied Category Theory. The logic of systems.
 
+### 11. Word and Object · Philosophy of Logic — W.V.O. Quine *(Core)*
+Ontological commitment, holism, the assault on the analytic/synthetic. The central logician-philosopher of the century.
+
+### 12. The Logical Basis of Metaphysics — Michael Dummett *(Core)*
+Anti-realism: logic grounded in provability, not truth. The philosophical case behind intuitionism.
+
+### 13. Logical Pluralism — JC Beall & Greg Restall *(Core)*
+One true logic, or many? The terrain where paraconsistency defends itself.
+
+### 14. On the Concept of Logical Consequence — Alfred Tarski + Etchemendy's critique *(Paper · Core)*
+What it means for one thing to follow from another — and whether Tarski got it right.
+
+### 15. Is Logic Empirical? (Anti-exceptionalism) — Hilary Putnam · Timothy Williamson *(Core)*
+Is logic revisable in the face of evidence? The live debate behind choosing a non-classical logic.
+
+### 16. Philosophy of Logics · Deviant Logic — Susan Haack *(Core)*
+The synthesizing survey that ties the whole frontier together. A spine for the final year.
+
+### 17. Vagueness — Timothy Williamson (+ Fine on supervaluation) *(Core)*
+The sorites paradox and the limits of bivalence. Where does the heap begin?
+
+### 18. Free Logic & Plural Logic — Oliver & Smiley · Boolos *(Breadth)*
+Reference without existence; quantifying over many things at once.
+
+### 19. Parts: A Study in Ontology — Peter Simons *(Curiosity)*
+Mereology — the logic of parts and wholes. One pass, for the map.
+
+### 20. Linear Logic — Jean-Yves Girard *(Breadth)*
+Substructural logic; truth as a consumable resource. The computational cousin of relevance and paraconsistency.
+
+### 21. Conceptual Mathematics (Categorical Logic & Topos) — Lawvere & Schanuel *(Curiosity)*
+Logic as the internal language of a topos — an alternative foundation, alongside HoTT.
+
+### 22. Insolubilia (Sophismata) — Jean Buridan *(Curiosity)*
+The medieval treatment of the Liar — centuries before Tarski and Kripke. The frontier has deep roots.
+
 ---
 
 ## SYNTHESIS & CONTEMPORARY
@@ -88,6 +124,9 @@ Korean Nobel laureate. A woman's refusal as violence; the Gwangju massacre's sur
 
 **The Marriage of Cadmus and Harmony** — Roberto Calasso (1988)
 Greek myth retold from the inside — gods, seduction, metamorphosis, and the sacred origins of Western culture.
+
+**Maus** — Art Spiegelman (1980–91)
+The graphic novel comes of age. The Holocaust told in mice and cats — memory, survival, and the limits of representation.
 
 ---
 
@@ -178,6 +217,9 @@ Norway's cultural infrastructure rebuilt for the 21st century. Two landmark muse
 
 **Allianz Arena** — Herzog & de Meuron (2005)
 ETFE membrane inflated by air, lit by LED. A stadium that glows red, white, or blue — engineering as urban lighting.
+
+**Heydar Aliyev Center · MAXXI** — Zaha Hadid (2012 · 2010)
+Parametric architecture; the building as one continuous curve. The most influential contemporary form-giver.
 
 ---
 
@@ -313,6 +355,12 @@ A prequel that surpassed its origin. Jimmy McGill's moral disintegration told wi
 
 ---
 
+### Dance
+
+**Gaga · Decadance** — Ohad Naharin / Batsheva *(contemporary dance language; movement as listening to the body)*
+
+---
+
 ## MAGNUM OPUS — FINAL SYNTHESIS PROJECTS
 
 ### The Architect's Compendium
@@ -331,7 +379,7 @@ With personal annotations on each.
 
 ## YEAR VI COMPLETE SUMMARY
 
-### Logic (10 texts)
+### Logic (22 texts)
 1. Basic Proof Theory — Troelstra & Schwichtenberg
 2. Types and Programming Languages — Benjamin C. Pierce
 3. Philosophical Logic — John P. Burgess
@@ -342,23 +390,37 @@ With personal annotations on each.
 8. Quantum Logic and Probability Theory — Itamar Pitowsky
 9. Homotopy Type Theory — Univalent Foundations Program
 10. Seven Sketches in Compositionality — Fong & Spivak
+11. Word and Object · Philosophy of Logic — Quine
+12. The Logical Basis of Metaphysics — Dummett
+13. Logical Pluralism — Beall & Restall
+14. On the Concept of Logical Consequence — Tarski + Etchemendy
+15. Is Logic Empirical? (anti-exceptionalism) — Putnam · Williamson
+16. Philosophy of Logics · Deviant Logic — Haack
+17. Vagueness — Williamson (+ Fine)
+18. Free Logic & Plural Logic — Oliver & Smiley · Boolos
+19. Parts: A Study in Ontology (Mereology) — Simons
+20. Linear Logic — Girard
+21. Conceptual Mathematics (Categorical Logic & Topos) — Lawvere & Schanuel
+22. Insolubilia — Buridan
 
-### Culture (expanded)
+### Culture (82 items)
 **Meta-Synthesis:** Gödel, Escher, Bach · Orientalism · The Structure of Scientific Revolutions · The Nordic Theory of Everything
 
-**Literature:** Invisible Cities · If on a winter's night a traveler · Midnight's Children · 2666 · Los detectives salvajes · White Noise · Infinite Jest · Austerlitz · The Rings of Saturn · 채식주의자 · 소년이 온다 · The Marriage of Cadmus and Harmony
+**Literature:** Invisible Cities · If on a winter's night a traveler · Midnight's Children · 2666 · Los detectives salvajes · White Noise · Infinite Jest · Austerlitz · The Rings of Saturn · 채식주의자 · 소년이 온다 · The Marriage of Cadmus and Harmony · Maus
 
 **Poetry:** View with a Grain of Sand · The Collected Poems (Paz)
 
 **Art:** Ai Weiwei · Spiral Jetty · The Gates · El Anatsui · Kiefer · Richter · Dumas · Twombly · Kara Walker · Kerry James Marshall · Cindy Sherman · Nan Goldin · Eliasson · Turrell · Goldsworthy · Boltanski
 
-**Architecture & Places:** Brasília · Barcelona Pavilion · Therme Vals · Bruder Klaus · Naoshima · Guggenheim Bilbao · Oslo Opera House · Nasjonalmuseet · Munchmuseet · Allianz Arena
+**Architecture & Places:** Brasília · Barcelona Pavilion · Therme Vals · Bruder Klaus · Naoshima · Guggenheim Bilbao · Oslo Opera House · Nasjonalmuseet · Munchmuseet · Allianz Arena · Zaha Hadid
 
 **Music:** 4'33" · Music for 18 Musicians · Different Trains · In C · In Rainbows · Loveless · Pärt · Górecki · Glass · Adams · Ligeti · Penderecki · Saariaho · Aphex Twin · Boards of Canada · Burial · Sufjan Stevens · Nick Cave · Anna von Hausswolff · Jenny Hval · Aurora (Stjernestøv)
 
 **Film:** Melancholia · Bong Joon-ho · Park Chan-wook · Lee Chang-dong · Lanthimos · Apichatpong · Roy Andersson · Östlund · Béla Tarr · Dardenne · Haneke
 
 **Series:** Dekalog · Twin Peaks: The Return · Berlin Alexanderplatz · The Wire · Chernobyl · Heimat · The Leftovers · Better Call Saul
+
+**Dance:** Ohad Naharin (Gaga · Decadance)
 
 ### Geographic Coverage
 Global synthesis — all prior regions revisited and unified
@@ -372,13 +434,13 @@ Global synthesis — all prior regions revisited and unified
 
 | Year | Theme | Logic Texts | Culture Items | Total |
 |------|-------|-------------|---------------|-------|
-| I (2026) | Origins, Myth & The Foundations of Reason | 12 | 118 | 130 |
-| II (2027) | Structure, Faith & The Living World | 6 | 67 | 73 |
-| III (2028) | Analysis & The Humanist Spark | 8 | 62 | 70 |
-| IV (2029) | Computation, Modernity & The Broken Mirror | 9 | 86 | 95 |
-| V (2030) | Categories, Plurality & The Global Chorus | 9 | 84 | 93 |
-| VI (2031) | Synthesis & Contemporary | 11 | 78 | 89 |
+| I (2026) | Origins, Myth & The Foundations of Reason | 13 | 133 | 146 |
+| II (2027) | Structure, Faith & The Living World | 9 | 75 | 84 |
+| III (2028) | Analysis & The Humanist Spark | 11 | 88 | 99 |
+| IV (2029) | Computation, Modernity & The Broken Mirror | 16 | 125 | 141 |
+| V (2030) | Categories, Plurality & The Global Chorus | 14 | 100 | 114 |
+| VI (2031) | Synthesis & Contemporary | 22 | 82 | 104 |
 
-**Total Logic Texts: 55 | Total Culture Items: 495 | Grand Total: 550**
+**Total Logic Texts: 85 | Total Culture Items: 603 | Grand Total: 688**
 
 **MAGNUM OPUS COMPLETE**

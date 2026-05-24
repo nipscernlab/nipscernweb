@@ -150,6 +150,29 @@ Read as literature: Genesis, Job, Psalms, Ecclesiastes.
 **Sinuhe the Egyptian (Story of Sinuhe)** — Anonymous (Egypt, ~1875 BCE)
 One of the finest works of ancient Egyptian literature. Exile, identity, nostalgia, and return.
 
+### Books — Classical Antiquity
+
+**Aeneis (Aeneid)** — Virgil
+Rome's national epic. Destiny, duty, and the cost of empire.
+
+**Metamorphōseōn librī (Metamorphoses)** — Ovid
+The source-book of Western myth. Transformation as the law of the world.
+
+**De Rerum Natura (On the Nature of Things)** — Lucretius
+Epicurean physics in verse — atoms, void, and a universe without fear.
+
+**Ἱστορίαι (The Histories)** — Herodotus
+The first work of history. Inquiry into the Greco-Persian wars.
+
+**Ἱστορίαι (History of the Peloponnesian War)** — Thucydides
+The foundation of political realism and rigorous historiography.
+
+**Βίοι Παράλληλοι (Parallel Lives)** — Plutarch
+Paired Greek and Roman lives. Character as the engine of history.
+
+**Στοιχεῖα (Elements)** — Euclid
+The original axiomatic-deductive text — the model of all proof.
+
 ### Poetry
 
 **Dreamtime Songlines** — Aboriginal Australia
@@ -209,6 +232,8 @@ Aztec philosopher-king. Impermanence and beauty.
 - **Lapita Pottery** — Pacific Islands (~1600–500 BCE) *(ceramic art tracing Austronesian migration across Oceania)*
 - **Oseberg Ship & Viking Funerary Art** — Norway (9th c.)
 - **Escher on Escher: Exploring the Infinite** — M.C. Escher *(book; paradox, tessellation, visualization of infinity — visual culture meeting the limits of logic)*
+- **Early Chinese Landscape Painting (Travelers Among Mountains and Streams)** — Fan Kuan · Guo Xi (Song Dynasty) *(the birth of monumental ink landscape)*
+- **蘭亭集序 (Lantingji Xu) & Chinese Calligraphy** — Wang Xizhi *(the "Sage of Calligraphy"; the brushstroke as the highest art)*
 
 ---
 
@@ -236,6 +261,7 @@ Aztec philosopher-king. Impermanence and beauty.
 - **Teōtīhuacān** — Mesoamerica
 - **Pantheon, Rome** — Roman Empire
 - **Bagan** — Burma/Myanmar
+- **伊勢神宮 (Ise Grand Shrine)** — Japan *(rebuilt every 20 years for over a millennium; Shinto sacred architecture)*
 
 ---
 
@@ -269,6 +295,16 @@ Aztec philosopher-king. Impermanence and beauty.
 - **കഥകളി (Kathakali)** — Kerala, India
 - **Wayang Kulit** — Indonesian shadow puppets
 - **文楽 (Bunraku)** — Japanese puppet theater
+- **Ὀρέστεια (Oresteia)** — Aeschylus *(Greek tragedy; justice moves from blood-feud to the law-court)*
+- **Ἀντιγόνη · Οἰδίπους Τύραννος (Antigone · Oedipus Rex)** — Sophocles *(duty against duty; the summit of tragic conflict)*
+- **Μήδεια · Βάκχαι (Medea · Bacchae)** — Euripides *(passion, vengeance, and the irrational)*
+- **Λυσιστράτη · Νεφέλαι (Lysistrata · The Clouds)** — Aristophanes *(Greek Old Comedy)*
+
+---
+
+### Dance
+
+- **नाट्य शास्त्र (Nāṭya Śāstra) & Bharatanatyam** — Bharata Muni *(the ancient treatise on dance-drama; root of all Indian classical dance)*
 
 ---
 
@@ -299,13 +335,14 @@ Aztec philosopher-king. Impermanence and beauty.
 12. Avicenna on the Logic of Conditionals — Street
 13. Konungs skuggsjá — Anonymous (Old Norwegian)
 
-### Culture
-- **Books & Poetry:** 38 items (foundational myths, ancient epics, sacred texts)
+### Culture (133 items)
+- **Books & Poetry:** 45 items (foundational myths, ancient epics, sacred texts, Greco-Roman classics)
 - **Documentaries:** 7 series
-- **Art:** 22 works (prehistoric to ancient + Escher's book on visual paradox)
-- **Places & Architecture:** 22 sites
+- **Art:** 25 works (prehistoric to ancient + early Chinese landscape & calligraphy)
+- **Places & Architecture:** 23 sites
 - **Music:** 19 traditional/ancient forms
-- **Theater:** 4 ritual-drama traditions
+- **Theater:** 8 (ritual-drama traditions + Greek tragedy & comedy)
+- **Dance:** 1 (the root of Indian classical dance)
 - **Film:** 5 contemplative cinema works
 
 ### Geographic Coverage

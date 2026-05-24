@@ -5,7 +5,7 @@
 
 ---
 
-## LOGIC — Modal & Epistemic (8 texts)
+## LOGIC — Modal & Epistemic (9 texts)
 
 **Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
 
@@ -32,6 +32,9 @@ Radical doubt and the search for a certain foundation of knowledge. The cogito.
 
 ### 8. An Enquiry Concerning Human Understanding — David Hume (1748) *(Core)*
 Cause, induction, and the limits of reason. The problem of knowing more than we can justify.
+
+### 9. Past, Present and Future — Arthur Prior (1967) *(Core)*
+The founder of tense logic. Time formalized — the sea-battle, future contingents, and determinism.
 
 ---
 
@@ -106,6 +109,18 @@ Medieval allegory of courtly love.
 **Parzival** — Wolfram von Eschenbach
 Middle High German Grail romance.
 
+**La Divina Commedia (The Divine Comedy)** — Dante Alighieri
+The summit of medieval literature. Hell, Purgatory, Paradise — the cosmos as moral architecture.
+
+**Il Canzoniere** — Francesco Petrarca
+The sonnet perfected. The invention of the modern lyric self.
+
+**Il Decameron** — Giovanni Boccaccio
+A hundred tales told against the plague. The birth of European prose fiction.
+
+**The Canterbury Tales** — Geoffrey Chaucer
+The father of English literature. A whole society on the road, in its own voices.
+
 ### Poetry
 
 **رباعیات (Rubaiyat)** — Omar Khayyām
@@ -143,6 +158,8 @@ Sanskrit dramatic peak.
 - **Lindisfarne Gospels** — Eadfrith of Lindisfarne (~715 CE) *(Insular illuminated manuscript; interlace, sacred geometry)*
 - **Crocifisso di Santa Croce** — Giovanni Cimabue (~1287–88) *(Byzantine threshold; art beginning to breathe)*
 - **Affreschi del convento di San Marco** — Fra Angelico (1438–45) *(devotional painting as prayer, one cell at a time)*
+- **Persian Miniature (Bihzād)** — Herat School (15th c.) *(the summit of Persian book-painting; jewelled detail and lyric space)*
+- **水墨画 (Sumi-e Ink Painting)** — Sesshū Tōyō (15th c.) *(Japanese Zen landscape; emptiness and the single decisive brushstroke)*
 
 ---
 
@@ -162,6 +179,8 @@ Sanskrit dramatic peak.
 - **Topkapı Sarayı** — Ottoman Empire
 - **Sankoré Madrasah, Timbuktu** — Mali Empire
 - **Lalibela Rock-Hewn Churches** — Ethiopia
+- **कैलास मन्दिर (Kailāsa Temple, Ellora)** — Rashtrakuta Dynasty (8th c.) *(a temple carved top-down from a single rock)*
+- **பெருவுடையார் கோயில் (Brihadīśvara Temple)** — Chola Dynasty (1010) *(the apex of Dravidian temple architecture)*
 
 ---
 
@@ -185,7 +204,7 @@ Sanskrit dramatic peak.
 
 ## YEAR II COMPLETE SUMMARY
 
-### Logic (8 texts)
+### Logic (9 texts)
 1. How to Prove It — Velleman
 2. Modal Logic for Philosophers — Garson
 3. Naming and Necessity — Kripke
@@ -194,15 +213,16 @@ Sanskrit dramatic peak.
 6. Reasoning about Knowledge — Fagin, Halpern, Moses, Vardi
 7. Meditationes de Prima Philosophia (Meditations) — Descartes
 8. An Enquiry Concerning Human Understanding — Hume
+9. Past, Present and Future — Arthur Prior *(temporal logic)*
 
-### Culture
+### Culture (75 items)
 - **Biology & Living World:** 8 books (Wilson, Darwin, Dawkins, Lieberman, Mukherjee, Moore, Gawande, Sapolsky)
-- **Literature & Philosophy:** 13 books (Genji, 1001 Nights, Aurelius, Epictetus, Cid, ʿAṭṭār, Njáls saga, Hamsun, Undset, Hagakure, Rūmī, Roman de la Rose, Parzival)
+- **Literature & Philosophy:** 17 books (Genji, 1001 Nights, Aurelius, Epictetus, Cid, ʿAṭṭār, Njáls saga, Hamsun, Undset, Hagakure, Rūmī, Roman de la Rose, Parzival, Dante, Petrarca, Boccaccio, Chaucer)
 - **Poetry:** 3 (Khayyām, Sappho, Hafez)
-- **Theater:** 1 (Kālidāsa)
-- **Art:** 11 medieval–Renaissance works
-- **Architecture & Places:** 14 sites
-- **Music:** 11 medieval–Baroque pieces
+- **Theater:** 2 (Kālidāsa, Mystery Plays of York)
+- **Art:** 16 medieval–Renaissance works (+ Persian miniature, Sesshū sumi-e)
+- **Architecture & Places:** 16 sites (+ Kailāsa, Brihadīśvara)
+- **Music:** 13 medieval–Baroque pieces
 
 ### Geographic Coverage
 Europe (Spain · France · Germany · Italy · Iceland · Norway · Russia · Britain) · Mediterranean · Persia · Arab world · India · China · Japan · Africa (Mali · Ethiopia · Zimbabwe · Benin)
