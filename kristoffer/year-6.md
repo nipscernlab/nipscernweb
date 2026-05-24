@@ -435,12 +435,12 @@ Global synthesis — all prior regions revisited and unified
 | Year | Theme | Logic Texts | Culture Items | Total |
 |------|-------|-------------|---------------|-------|
 | I (2026) | Origins, Myth & The Foundations of Reason | 13 | 133 | 146 |
-| II (2027) | Structure, Faith & The Living World | 9 | 75 | 84 |
+| II (2027) | Structure, Faith & The Living World | 9 | 80 | 89 |
 | III (2028) | Analysis & The Humanist Spark | 11 | 88 | 99 |
 | IV (2029) | Computation, Modernity & The Broken Mirror | 16 | 125 | 141 |
 | V (2030) | Categories, Plurality & The Global Chorus | 14 | 100 | 114 |
 | VI (2031) | Synthesis & Contemporary | 22 | 82 | 104 |
 
-**Total Logic Texts: 85 | Total Culture Items: 603 | Grand Total: 688**
+**Total Logic Texts: 85 | Total Culture Items: 608 | Grand Total: 693**
 
 **MAGNUM OPUS COMPLETE**

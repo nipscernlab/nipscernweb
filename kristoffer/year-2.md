@@ -66,6 +66,23 @@ Aging, death, end-of-life.
 **Behave** — Robert M. Sapolsky
 Neurobiology meets behavior.
 
+### Books — Body, Health & Care
+
+**Atlas Fotográfico de Anatomia Humana** — Yokochi · Rohen · Lütjen-Drecoll
+Real dissection photographs of every body system, without the mediation of illustration.
+
+**Essentials of Human Anatomy and Physiology** — Elaine N. Marieb
+Systems and organs with rigor and brevity — the textbook for understanding the body without becoming a doctor.
+
+**The Body: A Guide for Occupants** — Bill Bryson
+The narrative of the body. System by system, with curiosity and clinical stories.
+
+**Manual de Primeiros Socorros** — Cruz Vermelha Brasileira
+Practical emergency: choking, burns, stroke, CPR. The book that can save a life.
+
+**Expecting Better** — Emily Oster
+Pregnancy without alarmism: decisions, science, data. The world of gestation for those not yet in it.
+
 ---
 
 ### Books — Literature & Philosophy
@@ -215,8 +232,9 @@ Sanskrit dramatic peak.
 8. An Enquiry Concerning Human Understanding — Hume
 9. Past, Present and Future — Arthur Prior *(temporal logic)*
 
-### Culture (75 items)
+### Culture (80 items)
 - **Biology & Living World:** 8 books (Wilson, Darwin, Dawkins, Lieberman, Mukherjee, Moore, Gawande, Sapolsky)
+- **Body, Health & Care:** 5 books (Yokochi/Rohen atlas, Marieb essentials, Bryson [The Body], Cruz Vermelha first aid, Oster [Expecting Better])
 - **Literature & Philosophy:** 17 books (Genji, 1001 Nights, Aurelius, Epictetus, Cid, ʿAṭṭār, Njáls saga, Hamsun, Undset, Hagakure, Rūmī, Roman de la Rose, Parzival, Dante, Petrarca, Boccaccio, Chaucer)
 - **Poetry:** 3 (Khayyām, Sappho, Hafez)
 - **Theater:** 2 (Kālidāsa, Mystery Plays of York)
