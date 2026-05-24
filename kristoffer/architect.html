@@ -44,6 +44,11 @@
         --tag-doc: #3d5351;
         --tag-theater: #533d4d;
         --tag-series: #3d5337;
+
+        /* Intensity Tiers — how deep to go */
+        --tag-core: #6b5526;
+        --tag-breadth: #2e4a53;
+        --tag-curiosity: #2b2b2b;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -217,6 +222,11 @@
     .tag-theater { background: var(--tag-theater); color: #e1b0d6; }
     .tag-series { background: var(--tag-series); color: #b0dea8; }
 
+    /* Intensity Tiers — depth of study, not type of work */
+    .tag-core { background: var(--tag-core); color: #e6c27a; }
+    .tag-breadth { background: var(--tag-breadth); color: #a8cdd6; }
+    .tag-curiosity { background: var(--tag-curiosity); color: #8a8a8a; border: 1px solid #444; }
+
     /* Card Typography */
     .card-title { font-size: 1.05rem; color: #fff; margin-bottom: 2px; line-height: 1.3; font-weight: 600; }
     .card-author { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px; }
@@ -380,6 +390,10 @@
                     <span class="hud-label">Culture</span>
                 </div>
                 <div class="hud-item">
+                    <span class="hud-num" id="stat-core">0/0</span>
+                    <span class="hud-label">Core</span>
+                </div>
+                <div class="hud-item">
                     <span class="hud-num" id="stat-percent">0%</span>
                     <span class="hud-label">Total</span>
                 </div>
@@ -418,7 +432,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                     <div class="card-title">An Introduction to Formal Logic</div>
                     <span class="card-author">Peter Smith</span>
                     <div class="card-desc">Propositional & predicate logic syntax. Foundation of all formal reasoning.</div>
@@ -428,7 +442,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                     <div class="card-title">Ὄργανον (Categories &amp; Prior Analytics)</div>
                     <span class="card-author">Aristotle</span>
                     <div class="card-desc">Classification and syllogistic reasoning. Western logic begins here.</div>
@@ -438,7 +452,17 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
+                    <div class="card-title">Πολιτεία (Republic) &amp; Socratic Dialogues</div>
+                    <span class="card-author">Plato</span>
+                    <div class="card-desc">The examined life begins here. Justice, the good, knowledge, and the Socratic method of question and refutation.</div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleItem(this, 1)">
+                <div class="check-circle"></div>
+                <div class="card-content">
+                    <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-core">CORE</span></div>
                     <div class="card-title">Stoic Logic Fragments</div>
                     <span class="card-author">Chrysippus</span>
                     <div class="card-desc">Early propositional logic. Conditional reasoning before Boole.</div>
@@ -448,7 +472,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                     <div class="card-title">Τέχνη Ῥητορική (Ars Rhetorica)</div>
                     <span class="card-author">Aristotle</span>
                     <div class="card-desc">Persuasion, argumentation, practical reasoning.</div>
@@ -458,7 +482,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-breadth">BREADTH</span></div>
                     <div class="card-title">न्यायसूत्र (Nyāya Sūtras)</div>
                     <span class="card-author">Akṣapāda Gautama</span>
                     <div class="card-desc">Indian logic basics. Inference, comparison, and testimony.</div>
@@ -468,7 +492,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-breadth">BREADTH</span></div>
                     <div class="card-title">Materials For the Study of Navya-Nyāya Logic</div>
                     <span class="card-author">Daniel H. H. Ingalls</span>
                     <div class="card-desc">Technical exposition of Navya-Nyāya. Expands the scope of general logic.</div>
@@ -478,7 +502,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                     <div class="card-title">A Rulebook for Arguments</div>
                     <span class="card-author">Anthony Weston</span>
                     <div class="card-desc">Critical thinking handbook. Essential for detecting fallacies and constructing solid arguments.</div>
@@ -488,7 +512,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-breadth">BREADTH</span></div>
                     <div class="card-title">An Introduction to Non-Classical Logic</div>
                     <span class="card-author">Graham Priest</span>
                     <div class="card-desc">Paraconsistent, relevant, fuzzy, intuitionistic logic. Prepares for diverse logical systems.</div>
@@ -498,7 +522,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-breadth">BREADTH</span></div>
                     <div class="card-title">The Development of Logic</div>
                     <span class="card-author">William &amp; Martha Kneale</span>
                     <div class="card-desc">Definitive history of logic from Aristotle to the modern age.</div>
@@ -508,7 +532,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-breadth">BREADTH</span></div>
                     <div class="card-title">Later Mohist Logic, Ethics and Science</div>
                     <span class="card-author">A.C. Graham</span>
                     <div class="card-desc">Ancient Chinese logic. The Mohist canon and disputation theory.</div>
@@ -518,7 +542,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                    <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-breadth">BREADTH</span></div>
                     <div class="card-title">Avicenna on the Logic of Conditionals</div>
                     <span class="card-author">Tony Street</span>
                     <div class="card-desc">Islamic medieval logic. Bridge between Aristotle and the Latin Schoolmen.</div>
@@ -528,7 +552,7 @@
             <div class="card" onclick="toggleItem(this, 1)">
                 <div class="check-circle"></div>
                 <div class="card-content">
-                    <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                    <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-breadth">BREADTH</span></div>
                     <div class="card-title">Konungs skuggsjá (The King's Mirror)</div>
                     <span class="card-author">Anonymous (Old Norwegian, 13th c.)</span>
                     <div class="card-desc">Medieval Norse philosophical dialogue. Reason, kingship, and natural philosophy.</div>
@@ -1746,7 +1770,7 @@
                         <div class="card" onclick="toggleItem(this, 2)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">How to Prove It: A Structured Approach</div>
                                 <span class="card-author">Daniel J. Velleman</span>
                                 <div class="card-desc">The missing link. Bridges calculation to rigorous mathematical proof.</div>
@@ -1756,7 +1780,7 @@
                         <div class="card" onclick="toggleItem(this, 2)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Modal Logic for Philosophers</div>
                                 <span class="card-author">James Garson</span>
                                 <div class="card-desc">Modal core. Necessity and possibility for the philosophically minded.</div>
@@ -1766,7 +1790,7 @@
                         <div class="card" onclick="toggleItem(this, 2)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Naming and Necessity</div>
                                 <span class="card-author">Saul Kripke</span>
                                 <div class="card-desc">Possible worlds, rigid designators, and truth.</div>
@@ -1776,7 +1800,7 @@
                         <div class="card" onclick="toggleItem(this, 2)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">An Essay in Modal Logic</div>
                                 <span class="card-author">Georg Henrik von Wright</span>
                                 <div class="card-desc">Finnish founder. First systematic treatment of modal logic.</div>
@@ -1786,7 +1810,7 @@
                         <div class="card" onclick="toggleItem(this, 2)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">The Mathematical Analysis of Logic</div>
                                 <span class="card-author">George Boole (1847)</span>
                                 <div class="card-desc">Boolean algebra. Logic becomes mathematics.</div>
@@ -1796,10 +1820,30 @@
                         <div class="card" onclick="toggleItem(this, 2)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Reasoning about Knowledge</div>
                                 <span class="card-author">Fagin, Halpern, Moses, Vardi</span>
                                 <div class="card-desc">Epistemic logic. Common knowledge, distributed systems, agents.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
+                                <div class="card-title">Meditationes de Prima Philosophia (Meditations)</div>
+                                <span class="card-author">René Descartes (1641)</span>
+                                <div class="card-desc">Radical doubt and the search for a certain foundation of knowledge. The cogito.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 2)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
+                                <div class="card-title">An Enquiry Concerning Human Understanding</div>
+                                <span class="card-author">David Hume (1748)</span>
+                                <div class="card-desc">Cause, induction, and the limits of reason. The problem of knowing more than we can justify.</div>
                             </div>
                         </div>
                     </div>
@@ -2493,7 +2537,7 @@
                         <div class="card" onclick="toggleItem(this, 3)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">मूलमध्यमककारिका (Mūlamadhyamakakārikā)</div>
                                 <span class="card-author">Nāgārjuna</span>
                                 <div class="card-desc">Buddhist tetralemma. Logical deconstruction of reality.</div>
@@ -2503,7 +2547,7 @@
                         <div class="card" onclick="toggleItem(this, 3)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-breadth">BREADTH</span></div>
                                 <div class="card-title">Die Grundlagen der Arithmetik</div>
                                 <span class="card-author">Gottlob Frege</span>
                                 <div class="card-desc">Logicism. Numbers defined as logical objects.</div>
@@ -2513,7 +2557,7 @@
                         <div class="card" onclick="toggleItem(this, 3)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Begriffsschrift</div>
                                 <span class="card-author">Gottlob Frege (1879)</span>
                                 <div class="card-desc">The birth of modern logic. Concept-script as universal language.</div>
@@ -2523,7 +2567,7 @@
                         <div class="card" onclick="toggleItem(this, 3)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Gödel's Theorem: An Incomplete Guide to Its Use and Abuse</div>
                                 <span class="card-author">Torkel Franzén</span>
                                 <div class="card-desc">Swedish — accessible, philosophically careful exposition of incompleteness.</div>
@@ -2533,7 +2577,7 @@
                         <div class="card" onclick="toggleItem(this, 3)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Tractatus Logico-Philosophicus</div>
                                 <span class="card-author">Ludwig Wittgenstein</span>
                                 <div class="card-desc">"Whereof one cannot speak, thereof one must be silent."</div>
@@ -2543,7 +2587,7 @@
                         <div class="card" onclick="toggleItem(this, 3)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Philosophische Untersuchungen (Philosophical Investigations)</div>
                                 <span class="card-author">Ludwig Wittgenstein</span>
                                 <div class="card-desc">Meaning is use. Language games. The cure for dogmatic logic.</div>
@@ -2553,7 +2597,7 @@
                         <div class="card" onclick="toggleItem(this, 3)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">How to Do Things with Words</div>
                                 <span class="card-author">J.L. Austin</span>
                                 <div class="card-desc">Speech act theory. Performatives and the philosophy of saying.</div>
@@ -2563,7 +2607,7 @@
                         <div class="card" onclick="toggleItem(this, 3)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Über Sinn und Bedeutung</div>
                                 <span class="card-author">Gottlob Frege (1892)</span>
                                 <div class="card-desc">On Sense and Reference. The founding paper of philosophy of language.</div>
@@ -2591,6 +2635,16 @@
                                 <div class="card-title">The Worldly Philosophers</div>
                                 <span class="card-author">Robert Heilbroner</span>
                                 <div class="card-desc">Economic thinkers who shaped history. Value, labor, and capital.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 3)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Essais (Essays)</div>
+                                <span class="card-author">Michel de Montaigne</span>
+                                <div class="card-desc">The invention of the essay and of self-examination. "Que sais-je?" — skepticism turned inward on a single living mind.</div>
                             </div>
                         </div>
 
@@ -3210,7 +3264,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Sistemas Formais Inconsistentes</div>
                                 <span class="card-author">Newton da Costa (1963)</span>
                                 <div class="card-desc">Brazilian — paraconsistency founder. C-systems and the rejection of explosion.</div>
@@ -3220,7 +3274,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">In Contradiction</div>
                                 <span class="card-author">Graham Priest</span>
                                 <div class="card-desc">Dialetheism. True contradictions as a serious philosophical position.</div>
@@ -3230,7 +3284,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">The Annotated Turing</div>
                                 <span class="card-author">Charles Petzold</span>
                                 <div class="card-desc">The Turing Machine. What is computable?</div>
@@ -3240,7 +3294,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">A Mathematical Theory of Communication</div>
                                 <span class="card-author">Claude Shannon (1948)</span>
                                 <div class="card-desc">Information as entropy. The physics of logic.</div>
@@ -3250,7 +3304,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Cybernetics</div>
                                 <span class="card-author">Norbert Wiener</span>
                                 <div class="card-desc">Control and communication in the animal and the machine.</div>
@@ -3260,7 +3314,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">The Uses of Argument</div>
                                 <span class="card-author">Stephen Toulmin</span>
                                 <div class="card-desc">The Toulmin model. How argumentation functions in the real world beyond mathematical form.</div>
@@ -3270,7 +3324,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Über die Vollständigkeit des Logikkalküls</div>
                                 <span class="card-author">Kurt Gödel (1929)</span>
                                 <div class="card-desc">Completeness theorem. Foundation of model theory.</div>
@@ -3280,7 +3334,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Untersuchungen über das logische Schließen</div>
                                 <span class="card-author">Gerhard Gentzen (1935)</span>
                                 <div class="card-desc">Natural deduction & sequent calculus founding paper.</div>
@@ -3290,7 +3344,7 @@
                         <div class="card" onclick="toggleItem(this, 4)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-breadth">BREADTH</span></div>
                                 <div class="card-title">Grundbegriffe der Wahrscheinlichkeitsrechnung</div>
                                 <span class="card-author">Andrey Kolmogorov (1933)</span>
                                 <div class="card-desc">Russian — measure-theoretic axiomatization of probability.</div>
@@ -3318,6 +3372,26 @@
                                 <div class="card-title">Le Mythe de Sisyphe</div>
                                 <span class="card-author">Albert Camus</span>
                                 <div class="card-desc">Absurdism. The only serious philosophical question is suicide.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Zur Genealogie der Moral (On the Genealogy of Morals)</div>
+                                <span class="card-author">Friedrich Nietzsche</span>
+                                <div class="card-desc">Moral values questioned at the root. Where do "good" and "evil" come from, and who decided?</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 4)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="card-title">Frygt og Bæven (Fear and Trembling)</div>
+                                <span class="card-author">Søren Kierkegaard</span>
+                                <div class="card-desc">Faith, dread, and the leap. The single individual against the universal, and the weight of a free choice.</div>
                             </div>
                         </div>
 
@@ -4177,7 +4251,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Norm and Action</div>
                                 <span class="card-author">Georg Henrik von Wright (1963)</span>
                                 <div class="card-desc">Finnish — deontic logic founder. Logic of obligations, permissions, prohibitions.</div>
@@ -4187,7 +4261,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Deontic Logic</div>
                                 <span class="card-author">Georg Henrik von Wright (1951)</span>
                                 <div class="card-desc">The founding paper of deontic logic.</div>
@@ -4197,7 +4271,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Normative Systems</div>
                                 <span class="card-author">Carlos E. Alchourrón &amp; Eugenio Bulygin (1971)</span>
                                 <div class="card-desc">Argentine classic. Deontic logic meets legal theory.</div>
@@ -4207,7 +4281,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-breadth">BREADTH</span></div>
                                 <div class="card-title">On the Acceptability of Arguments and its Fundamental Role in Nonmonotonic Reasoning</div>
                                 <span class="card-author">Phan Minh Dung (1995)</span>
                                 <div class="card-desc">Argumentation Frameworks. Abstracting arguments as a graph. Logic meets AI.</div>
@@ -4217,7 +4291,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">The Concept of Law</div>
                                 <span class="card-author">H.L.A. Hart</span>
                                 <div class="card-desc">Legal logic — light touch. The rule of recognition and primary/secondary rules.</div>
@@ -4227,7 +4301,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Modal Logic</div>
                                 <span class="card-author">Blackburn, de Rijke, Venema</span>
                                 <div class="card-desc">Definitive technical treatment. Necessity and possibility formalized.</div>
@@ -4237,7 +4311,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-breadth">BREADTH</span></div>
                                 <div class="card-title">The Book of Why</div>
                                 <span class="card-author">Judea Pearl</span>
                                 <div class="card-desc">Causal diagrams, counterfactuals, causation vs. correlation.</div>
@@ -4247,7 +4321,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Informal Logic</div>
                                 <span class="card-author">Douglas Walton</span>
                                 <div class="card-desc">Systematic treatment of informal argumentation and dialogue schemes.</div>
@@ -4257,7 +4331,7 @@
                         <div class="card" onclick="toggleItem(this, 5)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Om det tragiske (On the Tragic)</div>
                                 <span class="card-author">Peter Wessel Zapffe</span>
                                 <div class="card-desc">Norwegian philosopher. Tragic logic and philosophical anthropology.</div>
@@ -5119,12 +5193,12 @@
                 </div>
                 <div class="parallel-grid">
                     <div class="col">
-                        <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic (Frontier)</span></div>
+                        <div class="col-header col-logic"><i class="fa-solid fa-brain"></i><span class="col-title">Logic (Philosophical Frontier)</span></div>
                         
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Basic Proof Theory</div>
                                 <span class="card-author">A.S. Troelstra & H. Schwichtenberg</span>
                                 <div class="card-desc">Proofs as objects. Natural deduction, sequent calculus.</div>
@@ -5134,7 +5208,7 @@
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Types and Programming Languages</div>
                                 <span class="card-author">Benjamin C. Pierce</span>
                                 <div class="card-desc">Type theory, lambda calculus, Curry-Howard correspondence.</div>
@@ -5144,57 +5218,59 @@
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Philosophical Logic</div>
                                 <span class="card-author">John P. Burgess</span>
                                 <div class="card-desc">Systematic overview: free logic, identity, vagueness, conditionals, deontic logic.</div>
                             </div>
                         </div>
 
-                        <div class="card" onclick="toggleItem(this, 6)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">In Contradiction</div>
-                                <span class="card-author">Graham Priest</span>
-                                <div class="card-desc">Paraconsistent logic deep dive. TRUE contradictions and dialethism.</div>
-                            </div>
-                        </div>
 
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-core">CORE</span></div>
                                 <div class="card-title">Deontic Logic and Legal Systems</div>
                                 <span class="card-author">Carlos E. Alchourrón & Eugenio Bulygin</span>
                                 <div class="card-desc">Logic of obligations, permissions, prohibitions. Normative reasoning.</div>
                             </div>
                         </div>
                         
+
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
-                                <div class="card-title">On the Acceptability of Arguments</div>
-                                <span class="card-author">Phan Minh Dung</span>
-                                <div class="card-desc">Argumentation Frameworks. Abstracting arguments as nodes in a graph. Logic meets AI.</div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-core">CORE</span></div>
+                                <div class="card-title">Paradoxes and Contemporary Logic</div>
+                                <span class="card-author">Andrea Cantini</span>
+                                <div class="card-desc">Survey of major paradoxes: Liar, Sorites, Russell, Curry. Resolution strategies.</div>
                             </div>
                         </div>
 
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-paper">PAPER</span></div>
-                                <div class="card-title">Paradoxes and Contemporary Logic</div>
-                                <span class="card-author">Andrea Cantini</span>
-                                <div class="card-desc">Survey of major paradoxes: Liar, Sorites, Russell, Curry. Resolution strategies.</div>
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-core">CORE</span></div>
+                                <div class="card-title">The Concept of Truth in Formalized Languages</div>
+                                <span class="card-author">Alfred Tarski (1933)</span>
+                                <div class="card-desc">The classical theory of truth. The object-language / metalanguage split that first tamed the Liar.</div>
+                            </div>
+                        </div>
+
+                        <div class="card" onclick="toggleItem(this, 6)">
+                            <div class="check-circle"></div>
+                            <div class="card-content">
+                                <div class="tag-row"><span class="tag tag-paper">PAPER</span><span class="tag tag-core">CORE</span></div>
+                                <div class="card-title">Outline of a Theory of Truth</div>
+                                <span class="card-author">Saul Kripke (1975)</span>
+                                <div class="card-desc">Fixed-point theory of truth. The modern gateway into the Liar and self-reference.</div>
                             </div>
                         </div>
                         
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Quantum Logic and Probability Theory</div>
                                 <span class="card-author">Itamar Pitowsky</span>
                                 <div class="card-desc">Conceptual quantum logic: non-Boolean structures.</div>
@@ -5204,32 +5280,23 @@
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Homotopy Type Theory</div>
                                 <span class="card-author">Univalent Foundations Program</span>
-                                <div class="card-desc">THE GOAL. Types as spaces, proofs as paths. The new foundation of math.</div>
+                                <div class="card-desc">Types as spaces, proofs as paths. A frontier of formal foundations — read for the map, not to master.</div>
                             </div>
                         </div>
                         
                         <div class="card" onclick="toggleItem(this, 6)">
                             <div class="check-circle"></div>
                             <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
+                                <div class="tag-row"><span class="tag tag-book">BOOK</span><span class="tag tag-curiosity">CURIOSITY</span></div>
                                 <div class="card-title">Seven Sketches in Compositionality</div>
                                 <span class="card-author">Brendan Fong & David I. Spivak</span>
                                 <div class="card-desc">Applied Category Theory. The logic of systems.</div>
                             </div>
                         </div>
                         
-                        <div class="card" onclick="toggleItem(this, 6)">
-                            <div class="check-circle"></div>
-                            <div class="card-content">
-                                <div class="tag-row"><span class="tag tag-book">BOOK</span></div>
-                                <div class="card-title">Philosophical Investigations</div>
-                                <span class="card-author">Ludwig Wittgenstein</span>
-                                <div class="card-desc">Meaning is use. Language games. The cure for dogmatic logic.</div>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="col">
@@ -6275,6 +6342,11 @@
 
         document.getElementById('stat-logic').innerText = `${logicDone}/${logicTotal}`;
         document.getElementById('stat-culture').innerText = `${cultureDone}/${cultureTotal}`;
+
+        const coreCards = document.querySelectorAll('.card:has(.tag-core)');
+        const coreTotal = coreCards.length;
+        const coreDone = Array.from(coreCards).filter(c => c.classList.contains('completed')).length;
+        document.getElementById('stat-core').innerText = `${coreDone}/${coreTotal}`;
 
         const total = logicTotal + cultureTotal;
         const done = logicDone + cultureDone;

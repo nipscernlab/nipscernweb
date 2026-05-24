@@ -7,32 +7,34 @@
 
 ## LOGIC — Paraconsistency & Computation (9 texts)
 
-### 1. Sistemas Formais Inconsistentes — Newton da Costa (1963)
+**Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
+
+### 1. Sistemas Formais Inconsistentes — Newton da Costa (1963) *(Core)*
 Brazilian — paraconsistency founder. C-systems and the rejection of explosion.
 
-### 2. In Contradiction — Graham Priest
+### 2. In Contradiction — Graham Priest *(Core)*
 Dialetheism. True contradictions as a serious philosophical position.
 
-### 3. The Annotated Turing — Charles Petzold
+### 3. The Annotated Turing — Charles Petzold *(Curiosity)*
 The Turing Machine. What is computable?
 
-### 4. A Mathematical Theory of Communication — Claude Shannon (1948) *(Paper)*
+### 4. A Mathematical Theory of Communication — Claude Shannon (1948) *(Paper · Curiosity)*
 Information as entropy. The physics of logic.
 
-### 5. Cybernetics — Norbert Wiener
+### 5. Cybernetics — Norbert Wiener *(Curiosity)*
 Control and communication in the animal and the machine.
 
-### 6. The Uses of Argument — Stephen Toulmin
+### 6. The Uses of Argument — Stephen Toulmin *(Core)*
 The Toulmin model. How argumentation functions in the real world.
 
-### 7. Über die Vollständigkeit des Logikkalküls — Kurt Gödel (1929) *(Paper)*
+### 7. Über die Vollständigkeit des Logikkalküls — Kurt Gödel (1929) *(Paper · Curiosity)*
 Completeness theorem. Foundation of model theory.
 
-### 8. Untersuchungen über das logische Schließen — Gerhard Gentzen (1935) *(Paper)*
+### 8. Untersuchungen über das logische Schließen — Gerhard Gentzen (1935) *(Paper · Curiosity)*
 Natural deduction & sequent calculus founding paper.
 
-### 9. Grundbegriffe der Wahrscheinlichkeitsrechnung — Andrey Kolmogorov (1933) *(Paper)*
-Russian — measure-theoretic axiomatization of probability.
+### 9. Grundbegriffe der Wahrscheinlichkeitsrechnung — Andrey Kolmogorov (1933) *(Paper · Breadth)*
+Russian — measure-theoretic axiomatization of probability. Probability as a tool for living and deciding.
 
 ---
 
@@ -45,6 +47,12 @@ Phenomenology and ontology. Being-in-the-world and temporality.
 
 **Le Mythe de Sisyphe** — Albert Camus
 Absurdism.
+
+**Zur Genealogie der Moral (On the Genealogy of Morals)** — Friedrich Nietzsche
+Moral values questioned at the root. Where do "good" and "evil" come from, and who decided?
+
+**Frygt og Bæven (Fear and Trembling)** — Søren Kierkegaard
+Faith, dread, and the leap. The single individual against the universal, and the weight of a free choice.
 
 **Die Traumdeutung** — Sigmund Freud
 The subconscious and symbolic logic of the mind.

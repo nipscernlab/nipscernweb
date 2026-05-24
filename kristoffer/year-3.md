@@ -7,28 +7,30 @@
 
 ## LOGIC — Language & Foundations (8 texts)
 
-### 1. मूलमध्यमककारिका (Mūlamadhyamakakārikā) — Nāgārjuna
+**Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
+
+### 1. मूलमध्यमककारिका (Mūlamadhyamakakārikā) — Nāgārjuna *(Core)*
 Buddhist tetralemma. Logical deconstruction of reality.
 
-### 2. Die Grundlagen der Arithmetik — Gottlob Frege
+### 2. Die Grundlagen der Arithmetik — Gottlob Frege *(Breadth)*
 Logicism. Numbers defined as logical objects.
 
-### 3. Begriffsschrift — Gottlob Frege (1879)
+### 3. Begriffsschrift — Gottlob Frege (1879) *(Core)*
 The birth of modern logic. Concept-script as universal language.
 
-### 4. Gödel's Theorem: An Incomplete Guide to Its Use and Abuse — Torkel Franzén
+### 4. Gödel's Theorem: An Incomplete Guide to Its Use and Abuse — Torkel Franzén *(Core)*
 Swedish — accessible, philosophically careful exposition of incompleteness.
 
-### 5. Tractatus Logico-Philosophicus — Ludwig Wittgenstein
+### 5. Tractatus Logico-Philosophicus — Ludwig Wittgenstein *(Core)*
 "Whereof one cannot speak, thereof one must be silent."
 
-### 6. Philosophische Untersuchungen — Ludwig Wittgenstein
+### 6. Philosophische Untersuchungen — Ludwig Wittgenstein *(Core)*
 Meaning is use. Language games. The cure for dogmatic logic.
 
-### 7. How to Do Things with Words — J.L. Austin
+### 7. How to Do Things with Words — J.L. Austin *(Core)*
 Speech act theory. Performatives and the philosophy of saying.
 
-### 8. Über Sinn und Bedeutung — Gottlob Frege (1892) *(Paper)*
+### 8. Über Sinn und Bedeutung — Gottlob Frege (1892) *(Paper · Core)*
 On Sense and Reference. The founding paper of philosophy of language.
 
 ---
@@ -42,6 +44,9 @@ A non-Eurocentric history of the world.
 
 **The Worldly Philosophers** — Robert Heilbroner
 Economic thinkers who shaped history.
+
+**Essais (Essays)** — Michel de Montaigne
+The invention of the essay and of self-examination. "Que sais-je?" — skepticism turned inward on a single living mind.
 
 **Grundlegung zur Metaphysik der Sitten** — Immanuel Kant
 Categorical imperative. Deontological ethics foundation.

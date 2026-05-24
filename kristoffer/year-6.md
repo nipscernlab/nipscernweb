@@ -5,40 +5,40 @@
 
 ---
 
-## LOGIC (FRONTIER) — The Final Synthesis
+## LOGIC (PHILOSOPHICAL FRONTIER) — The Final Synthesis
 
-### 1. Basic Proof Theory — A.S. Troelstra & H. Schwichtenberg
+**Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
+The summit is no longer formal foundations but the philosophical frontier — truth, paradox, and the ought. The formal-foundations texts remain as curiosity reads, not the goal.
+
+### 1. Basic Proof Theory — A.S. Troelstra & H. Schwichtenberg *(Curiosity)*
 Proofs as objects. Natural deduction, sequent calculus.
 
-### 2. Types and Programming Languages — Benjamin C. Pierce
+### 2. Types and Programming Languages — Benjamin C. Pierce *(Curiosity)*
 Type theory, lambda calculus, Curry-Howard correspondence.
 
-### 3. Philosophical Logic — John P. Burgess
+### 3. Philosophical Logic — John P. Burgess *(Core)*
 Systematic overview: free logic, identity, vagueness, conditionals, deontic logic.
 
-### 4. In Contradiction — Graham Priest
-Paraconsistent logic deep dive. TRUE contradictions and dialethism.
-
-### 5. Deontic Logic and Legal Systems — Carlos E. Alchourrón & Eugenio Bulygin
+### 4. Deontic Logic and Legal Systems — Carlos E. Alchourrón & Eugenio Bulygin *(Core)*
 Logic of obligations, permissions, prohibitions. Normative reasoning.
 
-### 6. On the Acceptability of Arguments — Phan Minh Dung *(Paper)*
-Argumentation Frameworks. Abstracting arguments as nodes in a graph. Logic meets AI.
-
-### 7. Paradoxes and Contemporary Logic — Andrea Cantini *(Paper)*
+### 5. Paradoxes and Contemporary Logic — Andrea Cantini *(Paper · Core)*
 Survey of major paradoxes: Liar, Sorites, Russell, Curry. Resolution strategies.
 
-### 8. Quantum Logic and Probability Theory — Itamar Pitowsky
+### 6. The Concept of Truth in Formalized Languages — Alfred Tarski (1933) *(Paper · Core)*
+The classical theory of truth. The object-language / metalanguage split that first tamed the Liar.
+
+### 7. Outline of a Theory of Truth — Saul Kripke (1975) *(Paper · Core)*
+Fixed-point theory of truth. The modern gateway into the Liar and self-reference.
+
+### 8. Quantum Logic and Probability Theory — Itamar Pitowsky *(Curiosity)*
 Conceptual quantum logic: non-Boolean structures.
 
-### 9. Homotopy Type Theory — Univalent Foundations Program
-**THE GOAL.** Types as spaces, proofs as paths. The new foundation of mathematics.
+### 9. Homotopy Type Theory — Univalent Foundations Program *(Curiosity)*
+Types as spaces, proofs as paths. A frontier of formal foundations — read for the map, not to master.
 
-### 10. Seven Sketches in Compositionality — Brendan Fong & David I. Spivak
+### 10. Seven Sketches in Compositionality — Brendan Fong & David I. Spivak *(Curiosity)*
 Applied Category Theory. The logic of systems.
-
-### 11. Philosophical Investigations — Ludwig Wittgenstein
-Meaning is use. Language games. The cure for dogmatic logic.
 
 ---
 
@@ -331,18 +331,17 @@ With personal annotations on each.
 
 ## YEAR VI COMPLETE SUMMARY
 
-### Logic (11 texts)
+### Logic (10 texts)
 1. Basic Proof Theory — Troelstra & Schwichtenberg
 2. Types and Programming Languages — Benjamin C. Pierce
 3. Philosophical Logic — John P. Burgess
-4. In Contradiction — Graham Priest
-5. Deontic Logic and Legal Systems — Alchourrón & Bulygin
-6. On the Acceptability of Arguments — Phan Minh Dung
-7. Paradoxes and Contemporary Logic — Andrea Cantini
+4. Deontic Logic and Legal Systems — Alchourrón & Bulygin
+5. Paradoxes and Contemporary Logic — Andrea Cantini
+6. The Concept of Truth in Formalized Languages — Alfred Tarski
+7. Outline of a Theory of Truth — Saul Kripke
 8. Quantum Logic and Probability Theory — Itamar Pitowsky
-9. **Homotopy Type Theory — Univalent Foundations Program**
+9. Homotopy Type Theory — Univalent Foundations Program
 10. Seven Sketches in Compositionality — Fong & Spivak
-11. Philosophical Investigations — Ludwig Wittgenstein
 
 ### Culture (expanded)
 **Meta-Synthesis:** Gödel, Escher, Bach · Orientalism · The Structure of Scientific Revolutions · The Nordic Theory of Everything

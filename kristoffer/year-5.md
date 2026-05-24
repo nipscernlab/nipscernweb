@@ -7,31 +7,33 @@
 
 ## LOGIC — Deontic & Argumentation (9 texts)
 
-### 1. Norm and Action — Georg Henrik von Wright (1963)
+**Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
+
+### 1. Norm and Action — Georg Henrik von Wright (1963) *(Core)*
 Finnish — deontic logic founder. Logic of obligations, permissions, prohibitions.
 
-### 2. Deontic Logic — Georg Henrik von Wright (1951) *(Paper)*
+### 2. Deontic Logic — Georg Henrik von Wright (1951) *(Paper · Core)*
 The founding paper of deontic logic.
 
-### 3. Normative Systems — Carlos E. Alchourrón & Eugenio Bulygin (1971)
+### 3. Normative Systems — Carlos E. Alchourrón & Eugenio Bulygin (1971) *(Core)*
 Argentine classic. Deontic logic meets legal theory.
 
-### 4. On the Acceptability of Arguments and its Fundamental Role in Nonmonotonic Reasoning — Phan Minh Dung (1995) *(Paper)*
+### 4. On the Acceptability of Arguments and its Fundamental Role in Nonmonotonic Reasoning — Phan Minh Dung (1995) *(Paper · Breadth)*
 Argumentation Frameworks. Abstracting arguments as a graph. Logic meets AI.
 
-### 5. The Concept of Law — H.L.A. Hart
+### 5. The Concept of Law — H.L.A. Hart *(Curiosity)*
 Legal logic — light touch. The rule of recognition and primary/secondary rules.
 
-### 6. Modal Logic — Blackburn, de Rijke, Venema
+### 6. Modal Logic — Blackburn, de Rijke, Venema *(Curiosity)*
 Definitive technical treatment. Necessity and possibility formalized.
 
-### 7. The Book of Why — Judea Pearl
+### 7. The Book of Why — Judea Pearl *(Breadth)*
 Causal diagrams, counterfactuals, causation vs. correlation.
 
-### 8. Informal Logic — Douglas Walton
+### 8. Informal Logic — Douglas Walton *(Core)*
 Systematic treatment of informal argumentation and dialogue schemes.
 
-### 9. Om det tragiske (On the Tragic) — Peter Wessel Zapffe
+### 9. Om det tragiske (On the Tragic) — Peter Wessel Zapffe *(Core)*
 Norwegian philosopher. Tragic logic and philosophical anthropology.
 
 ---

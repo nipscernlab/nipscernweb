@@ -5,25 +5,33 @@
 
 ---
 
-## LOGIC — Modal & Epistemic (6 texts)
+## LOGIC — Modal & Epistemic (8 texts)
 
-### 1. How to Prove It: A Structured Approach — Daniel J. Velleman
+**Intensity:** CORE = depth, to the frontier · BREADTH = study solidly · CURIOSITY = one pass, for the map
+
+### 1. How to Prove It: A Structured Approach — Daniel J. Velleman *(Curiosity)*
 The missing link. Bridges calculation to rigorous mathematical proof.
 
-### 2. Modal Logic for Philosophers — James Garson
+### 2. Modal Logic for Philosophers — James Garson *(Core)*
 Modal core. Necessity and possibility for the philosophically minded.
 
-### 3. Naming and Necessity — Saul Kripke
+### 3. Naming and Necessity — Saul Kripke *(Core)*
 Possible worlds, rigid designators, and truth.
 
-### 4. An Essay in Modal Logic — Georg Henrik von Wright
+### 4. An Essay in Modal Logic — Georg Henrik von Wright *(Core)*
 Finnish founder. First systematic treatment of modal logic.
 
-### 5. The Mathematical Analysis of Logic — George Boole (1847) *(Paper)*
+### 5. The Mathematical Analysis of Logic — George Boole (1847) *(Paper · Curiosity)*
 Boolean algebra. Logic becomes mathematics.
 
-### 6. Reasoning about Knowledge — Fagin, Halpern, Moses, Vardi
+### 6. Reasoning about Knowledge — Fagin, Halpern, Moses, Vardi *(Curiosity)*
 Epistemic logic. Common knowledge, distributed systems, agents.
+
+### 7. Meditationes de Prima Philosophia (Meditations) — René Descartes (1641) *(Core)*
+Radical doubt and the search for a certain foundation of knowledge. The cogito.
+
+### 8. An Enquiry Concerning Human Understanding — David Hume (1748) *(Core)*
+Cause, induction, and the limits of reason. The problem of knowing more than we can justify.
 
 ---
 
@@ -177,13 +185,15 @@ Sanskrit dramatic peak.
 
 ## YEAR II COMPLETE SUMMARY
 
-### Logic (6 texts)
+### Logic (8 texts)
 1. How to Prove It — Velleman
 2. Modal Logic for Philosophers — Garson
 3. Naming and Necessity — Kripke
 4. An Essay in Modal Logic — von Wright
 5. The Mathematical Analysis of Logic — Boole *(paper)*
 6. Reasoning about Knowledge — Fagin, Halpern, Moses, Vardi
+7. Meditationes de Prima Philosophia (Meditations) — Descartes
+8. An Enquiry Concerning Human Understanding — Hume
 
 ### Culture
 - **Biology & Living World:** 8 books (Wilson, Darwin, Dawkins, Lieberman, Mukherjee, Moore, Gawande, Sapolsky)
