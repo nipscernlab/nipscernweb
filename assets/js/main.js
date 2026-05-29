@@ -327,6 +327,24 @@ export function pubLangFlag(title, abstract) {
   return `<span class="pub-lang-flag" role="img" title="${name}" aria-label="${name}">${FLAG_SVGS[lang] || ''}</span>`;
 }
 
+/**
+ * Resolve which language a news post is actually shown in: the current UI
+ * language if a translation exists for it, otherwise English (the flat
+ * fields / the `en` translation are English).
+ */
+export function newsResolvedLang(post) {
+  const lang = (typeof getLang === 'function' && getLang()) || 'en';
+  const t = (post && post.translations) || {};
+  return t[lang] ? lang : 'en';
+}
+
+/** Flag badge marking the language a news post is displayed in. */
+export function newsLangFlag(post) {
+  const lang = newsResolvedLang(post);
+  const name = LANG_NAMES[lang] || lang;
+  return `<span class="pub-lang-flag" role="img" title="${name}" aria-label="${name}">${FLAG_SVGS[lang] || ''}</span>`;
+}
+
 // Format date like "18 Nov 2024"
 export function formatDate(isoDate) {
   const d = new Date(isoDate + 'T12:00:00Z');
@@ -389,14 +407,18 @@ async function initHomeLatest() {
     dateEl.textContent = formatDate(post.date);
     meta.appendChild(badge);
     meta.appendChild(dateEl);
+    meta.insertAdjacentHTML('beforeend', newsLangFlag(post));
+
+    const _nl = newsResolvedLang(post);
+    const _tr = (post.translations && post.translations[_nl]) || {};
 
     const titleEl = document.createElement('div');
     titleEl.className = 'news-title';
-    titleEl.textContent = post.title;
+    titleEl.textContent = _tr.title || post.title;
 
     const excerptEl = document.createElement('div');
     excerptEl.className = 'news-excerpt';
-    excerptEl.textContent = post.excerpt;
+    excerptEl.textContent = _tr.excerpt || post.excerpt;
 
     const readMore = document.createElement('span');
     readMore.className = 'news-read-more';

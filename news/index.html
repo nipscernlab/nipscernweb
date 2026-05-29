@@ -113,7 +113,7 @@
 </script>
 
   <script type="module">
-    import { formatDate } from '../assets/js/main.js';
+    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=news-flags-20260529';
     import { getLang } from '../assets/js/i18n.js';
 
     async function loadNews() {
@@ -132,6 +132,14 @@
       const lang = getLang() || 'en';
       const t = featured.translations || {};
       return t[lang] || t.en || t.pt || Object.values(t)[0] || {};
+    }
+
+    // Pick a translatable field from a regular post; falls back to the flat
+    // (English) field when no translation exists for the current language.
+    function postText(post, field) {
+      const lang = getLang() || 'en';
+      const t = post.translations || {};
+      return (t[lang] && t[lang][field]) || (t.en && t.en[field]) || post[field] || '';
     }
 
     function makeFeaturedCard(featured) {
@@ -239,15 +247,16 @@
       dateEl.textContent = formatDate(post.date);
       meta.appendChild(badge);
       meta.appendChild(dateEl);
+      meta.insertAdjacentHTML('beforeend', newsLangFlag(post));
 
       const title = document.createElement('h2');
       title.className = 'news-title';
       title.id = 'post-title-' + post.id;
-      title.textContent = post.title;
+      title.textContent = postText(post, 'title');
 
       const excerpt = document.createElement('p');
       excerpt.className = 'news-excerpt';
-      excerpt.textContent = post.excerpt;
+      excerpt.textContent = postText(post, 'excerpt');
 
       const readMore = document.createElement('a');
       readMore.href = 'post?id=' + post.id;
@@ -342,7 +351,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.js"></script>
+  <script type="module" src="../assets/js/main.js?v=news-flags-20260529"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>
