@@ -257,8 +257,8 @@ export async function initPublications() {
     const countEl = document.getElementById('pub-result-count');
     if (countEl) {
       countEl.textContent = filtered.length === publications.length
-        ? `${filtered.length} publications`
-        : `${filtered.length} of ${publications.length} publications`;
+        ? t('publications.count').replace('{n}', filtered.length)
+        : t('publications.count_filtered').replace('{n}', filtered.length).replace('{total}', publications.length);
     }
 
     if (filtered.length === 0) {
@@ -274,6 +274,9 @@ export async function initPublications() {
       });
     }
   }
+
+  // Re-render when the UI language changes so the result count localises
+  document.addEventListener('langchange', render);
 
   // Search
   searchEl?.addEventListener('input', e => { currentSearch = e.target.value; render(); });
