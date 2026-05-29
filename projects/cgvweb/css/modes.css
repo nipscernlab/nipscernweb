@@ -66,7 +66,9 @@
   color: var(--muted);
   border-bottom: 1px solid var(--divider);
   flex-shrink: 0;
-  transition: background var(--motion-base), border-bottom-color var(--motion-base);
+  transition:
+    background var(--motion-base),
+    border-bottom-color var(--motion-base);
 }
 #live-bar.paused {
   background: rgba(220, 70, 70, 0.05);
@@ -656,6 +658,20 @@ input[type='file'] {
   flex-shrink: 0;
 }
 .server-folder-error[hidden] {
+  display: none;
+}
+.server-api-hint {
+  font: 400 var(--fs-xs) var(--font);
+  color: var(--muted);
+  padding: 12px 10px;
+  margin-top: 2px;
+  text-align: center;
+  line-height: 1.6;
+  border-top: 1px solid var(--border);
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+.server-api-hint[hidden] {
   display: none;
 }
 

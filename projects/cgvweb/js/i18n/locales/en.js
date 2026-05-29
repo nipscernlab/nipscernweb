@@ -27,6 +27,8 @@ export default {
   'server-no-watch':
     'Auto-refresh unavailable in this browser — re-pick the folder to see new files.',
   'server-try-chromium': 'For automatic updates without re-picking, try Chrome or Edge.',
+  'server-api-down':
+    'Server mode unavailable: the /api/xml endpoint did not respond. Check the reverse proxy.',
   'server-folder-not-set': 'No folder configured',
   'server-folder-placeholder': '/path/to/jivexml/folder',
   'tip-server-change': 'Change folder',

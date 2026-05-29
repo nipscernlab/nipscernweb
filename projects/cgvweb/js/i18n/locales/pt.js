@@ -27,6 +27,8 @@ export default {
     'Atualização automática indisponível neste navegador — re-selecione a pasta para ver novos arquivos.',
   'server-try-chromium':
     'Para atualização automática sem precisar re-selecionar, experimente o Chrome ou Edge.',
+  'server-api-down':
+    'Modo servidor indisponível: o endpoint /api/xml não respondeu. Verifique o reverse-proxy.',
   'server-folder-not-set': 'Nenhuma pasta configurada',
   'server-folder-placeholder': '/caminho/para/pasta/jivexml',
   'tip-server-change': 'Mudar pasta',

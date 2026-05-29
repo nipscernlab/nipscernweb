@@ -12,12 +12,30 @@ const REFRESH_MS = 5000;
 // the page is served as ".../cgv-web" without the trailing slash.
 const REMOTE_API = new URL('../../api/xml', import.meta.url).href;
 const HAS_FSA = typeof window !== 'undefined' && 'showDirectoryPicker' in window;
+// localStorage key for the per-origin remote folder choice. Each browser
+// (each tab/PC) keeps its own; the backend no longer holds shared state.
+const STORAGE_KEY = 'cgv-server-folder';
 
 function fmtTime(ts) {
   if (!Number.isFinite(ts)) return '';
   const d = new Date(ts);
   const pad = (n) => n.toString().padStart(2, '0');
   return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+function readSavedPath() {
+  try {
+    return localStorage.getItem(STORAGE_KEY) || null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function writeSavedPath(path) {
+  try {
+    if (path) localStorage.setItem(STORAGE_KEY, path);
+    else localStorage.removeItem(STORAGE_KEY);
+  } catch (_) {}
 }
 
 async function walkDirectoryHandle(dirHandle, out, prefix = '') {
@@ -72,6 +90,7 @@ export function setupServerMode({
   let isPaused = false;
   let canPoll = false;
   let remoteMode = false;
+  let remoteProbing = false;
   let remoteFolderPath = null;
 
   const sec = document.getElementById('live-server-sec');
@@ -88,6 +107,7 @@ export function setupServerMode({
   const remoteApplyBtn = document.getElementById('server-folder-apply');
   const remoteCancelBtn = document.getElementById('server-folder-cancel');
   const remoteErrorEl = document.getElementById('server-folder-error');
+  const apiHintEl = document.getElementById('server-api-hint');
 
   function keyFor(f, rel) {
     return `${rel || f.name}|${f.size}|${f.lastModified}`;
@@ -97,6 +117,12 @@ export function setupServerMode({
     if (!refreshBtn) return;
     refreshBtn.classList.remove('state-active', 'state-paused');
     if (!canPoll) {
+      refreshBtn.hidden = true;
+      return;
+    }
+    // In remote mode the button is meaningful only when a folder is set;
+    // otherwise polling has nothing to refresh.
+    if (remoteMode && !remoteFolderPath) {
       refreshBtn.hidden = true;
       return;
     }
@@ -241,8 +267,10 @@ export function setupServerMode({
     updateEntries(out);
   }
 
-  function makeRemoteFile(meta) {
-    const url = `${REMOTE_API}/file/${encodeURIComponent(meta.name)}`;
+  function makeRemoteFile(meta, folder) {
+    const url =
+      `${REMOTE_API}/file?path=${encodeURIComponent(folder)}` +
+      `&name=${encodeURIComponent(meta.name)}`;
     return {
       name: meta.name,
       size: meta.size,
@@ -256,17 +284,21 @@ export function setupServerMode({
   }
 
   async function reloadFromRemote() {
+    if (!remoteFolderPath) return;
+    const folder = remoteFolderPath;
     try {
-      const r = await fetch(`${REMOTE_API}/list`, { cache: 'no-store' });
+      const r = await fetch(`${REMOTE_API}/list?path=${encodeURIComponent(folder)}`, {
+        cache: 'no-store',
+      });
       if (!r.ok) {
-        if (r.status === 503) {
-          entries = [];
-          renderList();
-        }
+        // Folder went away, became unreadable, or any 4xx: clear the list
+        // but keep the bar so the operator can fix the path.
+        entries = [];
+        renderList();
         return;
       }
       const list = await r.json();
-      const out = list.map((it) => ({ file: makeRemoteFile(it), rel: it.name }));
+      const out = list.map((it) => ({ file: makeRemoteFile(it, folder), rel: it.name }));
       updateEntries(out);
     } catch (err) {
       console.warn('[serverMode] remote reload failed:', err);
@@ -276,15 +308,22 @@ export function setupServerMode({
   async function refreshTick() {
     if (!isActive || isPaused) return;
     flashRefresh();
-    if (remoteMode) await reloadFromRemote();
-    else if (folderHandle) await reloadFromHandle();
+    if (remoteMode) {
+      if (remoteFolderPath) await reloadFromRemote();
+    } else if (folderHandle) {
+      await reloadFromHandle();
+    }
     scheduleRefresh();
   }
 
   function scheduleRefresh() {
     clearTimeout(refreshTimer);
     if (!isActive || isPaused) return;
-    if (!remoteMode && !folderHandle) return;
+    if (remoteMode) {
+      if (!remoteFolderPath) return;
+    } else if (!folderHandle) {
+      return;
+    }
     refreshTimer = setTimeout(refreshTick, REFRESH_MS);
   }
 
@@ -305,6 +344,7 @@ export function setupServerMode({
         const handle = await window.showDirectoryPicker({ mode: 'read' });
         folderHandle = handle;
         inputFiles = null;
+        showApiHint(false);
         canPoll = true;
         isPaused = false;
         lastAutoLoadedKey = null;
@@ -330,6 +370,7 @@ export function setupServerMode({
     if (!files.length) return;
     folderHandle = null;
     inputFiles = files;
+    showApiHint(false);
     canPoll = false;
     isPaused = false;
     lastAutoLoadedKey = null;
@@ -390,6 +431,7 @@ export function setupServerMode({
     if (!out.length) return;
     folderHandle = null;
     inputFiles = out.map((o) => o.file);
+    showApiHint(false);
     canPoll = false;
     isPaused = false;
     lastAutoLoadedKey = null;
@@ -402,6 +444,10 @@ export function setupServerMode({
   function setActive(b) {
     isActive = !!b;
     if (isActive) {
+      // Re-probe each time the SERVER sub-tab is opened, so the remote bar
+      // appears without a page reload once the reverse proxy is fixed (the
+      // initial boot probe runs only once). No-op if already in remote mode.
+      if (!remoteMode) tryEnterRemoteMode();
       scheduleRefresh();
     } else {
       clearRefresh();
@@ -409,6 +455,21 @@ export function setupServerMode({
   }
 
   // ── Remote mode (server-side folder via /api/xml/*) ───────────────────
+  // Only nudge the operator about a dead backend where one is actually
+  // expected: localhost (dev) or a CERN host (the P1 deployment). On the
+  // public static demo (nipscern.com, *.pages.dev, …) there is deliberately
+  // no backend, so the SERVER mode is meant to be local-only and we stay
+  // silent.
+  function expectsBackend() {
+    if (typeof location === 'undefined') return false;
+    const h = location.hostname || '';
+    return h === 'localhost' || h === '127.0.0.1' || h === '::1' || h.endsWith('.cern.ch');
+  }
+
+  function showApiHint(show) {
+    if (apiHintEl) apiHintEl.hidden = !show;
+  }
+
   function updateRemoteFolderDisplay() {
     if (!remoteFolderText) return;
     remoteFolderText.textContent = remoteFolderPath || t('server-folder-not-set');
@@ -445,51 +506,76 @@ export function setupServerMode({
   async function applyFolderEdit() {
     const path = (remoteEditInput?.value || '').trim();
     if (!path) return;
+    showRemoteError('');
     try {
-      const r = await fetch(`${REMOTE_API}/set-folder`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path }),
+      // Validate by listing. The backend returns 4xx if the path is
+      // missing/unreadable, with a JSON {"error": "..."} body we can show.
+      const r = await fetch(`${REMOTE_API}/list?path=${encodeURIComponent(path)}`, {
+        cache: 'no-store',
       });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
-      remoteFolderPath = data.path || path;
+      if (!r.ok) {
+        const data = await r.json().catch(() => ({}));
+        throw new Error(data.error || `HTTP ${r.status}`);
+      }
+      const list = await r.json();
+      remoteFolderPath = path;
+      writeSavedPath(path);
       updateRemoteFolderDisplay();
       lastAutoLoadedKey = null;
       currentKey = null;
       closeFolderEdit();
-      await reloadFromRemote();
+      const out = list.map((it) => ({ file: makeRemoteFile(it, path), rel: it.name }));
+      updateEntries(out);
+      syncRefreshBtn();
+      scheduleRefresh();
     } catch (err) {
       showRemoteError(err.message || String(err));
     }
   }
 
+  // When the probe fails, surface a subtle, non-blocking hint instead of just
+  // leaving the pencil hidden — but only on a backend-expecting host and only
+  // while no local folder is in use (the hint is about the SERVER capability).
+  function failRemote() {
+    if (!remoteMode && !folderHandle && !inputFiles) showApiHint(expectsBackend());
+    return false;
+  }
+
   async function tryEnterRemoteMode() {
+    if (remoteMode || remoteProbing) return remoteMode;
+    remoteProbing = true;
     try {
-      const r = await fetch(`${REMOTE_API}/folder`, {
+      const r = await fetch(`${REMOTE_API}/default`, {
         cache: 'no-store',
         headers: { Accept: 'application/json' },
       });
-      if (!r.ok) return false;
-      // Guard against static hosts (Cloudflare Pages, etc.) that return a 200
-      // HTML 404 page on unknown routes — only accept a JSON body with `path`.
+      if (!r.ok) return failRemote();
+      // Guard against static hosts (Cloudflare Pages, etc.) and a reverse
+      // proxy that 404s /api/xml as a static lookup; both can return HTML,
+      // so only accept a JSON body with a `path` key.
       const ct = r.headers.get('content-type') || '';
-      if (!ct.toLowerCase().includes('json')) return false;
+      if (!ct.toLowerCase().includes('json')) return failRemote();
       const data = await r.json();
-      if (!data || typeof data !== 'object' || !('path' in data)) return false;
+      if (!data || typeof data !== 'object' || !('path' in data)) return failRemote();
       remoteMode = true;
-      remoteFolderPath = data.path || null;
-      // Hide the local picker; show the remote bar.
+      // Prefer this client's previously chosen path (per-origin localStorage);
+      // fall back to the backend-supplied default for first-time visits.
+      const saved = readSavedPath();
+      remoteFolderPath = saved || data.path || null;
+      // Hide the local picker and the hint; show the remote bar.
+      showApiHint(false);
       if (pickBtn) pickBtn.hidden = true;
       if (remoteBar) remoteBar.hidden = false;
       updateRemoteFolderDisplay();
       canPoll = true;
       isPaused = false;
       syncRefreshBtn();
-      await reloadFromRemote();
+      if (remoteFolderPath) await reloadFromRemote();
       return true;
     } catch (_) {
-      return false;
+      return failRemote();
+    } finally {
+      remoteProbing = false;
     }
   }
 

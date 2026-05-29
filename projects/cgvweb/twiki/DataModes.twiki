@@ -1,0 +1,149 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Data Modes
+
+%TOC%
+
+Events enter CGV Web through two top-level modes selected in the mode
+bar at the top of the left panel: _Live_ for streaming JiveXML events
+and _Samples_ for bundled or user-supplied files. Only one mode is
+active at a time; switching modes stops the previous ingestion without
+discarding the scene, so you can hop between _Live_ and a local file
+without losing the camera state, the threshold configuration or the
+collision history.
+
+<img src="images/mode-bar.png" alt="Left-panel mode bar: Live and Samples" style="width:100%;max-width:560px;height:auto;display:block;" />
+
+---++ Live
+
+Live mode subscribes to a streaming JiveXML source and refreshes the
+event list as new files arrive. It exposes two sub-modes &mdash; _WEB_
+and _SERVER_ &mdash; chosen with the second-row tab bar. Both feed the
+same downstream pipeline (parser, threshold engine, scene), so the only
+difference between them is _where_ the JiveXML payload is fetched from.
+
+<img src="images/live-sub-modes.png" alt="Live mode showing the WEB and SERVER sub-tabs" style="width:100%;max-width:560px;height:auto;display:block;" />
+
+---+++ WEB
+
+WEB sub-mode long-polls the ATLAS Live HTTP service hosted by the
+ATLANTIS project at =atlas-live.cern.ch=. This is the default mode for
+off-site deployments and the mode that was used during initial
+development of CGV Web.
+
+<img src="images/atlas-live-landing.png" alt="ATLAS Live landing page served by ATLANTIS" style="width:100%;max-width:900px;height:auto;display:block;" />
+
+The CGV Web event list mirrors exactly the list served by
+=atlas-live.cern.ch=: same run / event numbers, same ordering, same
+back-pressure during a busy run.
+
+<img src="images/live-mode.png" alt="WEB sub-mode — streaming events from atlas-live.cern.ch" style="width:100%;max-width:900px;height:auto;display:block;" />
+
+   * _Status indicator_ &mdash; green pulsing dot when the feed is live, amber if the last event is older than 60&nbsp;s, red if the endpoint is unreachable.
+   * _Event list_ &mdash; populates with events as they arrive. Each row shows run / event numbers and a relative timestamp (=12s ago=).
+   * _Play / pause controls_ &mdash; =⏸= stops polling, =▶= resumes. =Space= toggles the same state from the keyboard.
+   * _Network_ &mdash; requires outbound HTTPS to =atlas-live.cern.ch=. From the ATLAS Control Room this is whitelisted by default; off-site hosts may need VPN or proxy adjustments.
+
+The data path of WEB sub-mode is:
+
+<verbatim>
+P1 (ATHENA / JiveXML)  →  atlasop  →  atlas-live.cern.ch  →  CGV Web
+</verbatim>
+
+---+++ SERVER
+
+SERVER sub-mode reads JiveXML files directly from a folder on the
+machine that runs the browser (or, in the P1 deployment, from a
+read-only mount on the host VM). It does not depend on
+=atlas-live.cern.ch= and therefore continues to work if the GPN
+connection is degraded.
+
+The shifter clicks =Select Folder= and points the picker at the
+directory where new JiveXML events are being deposited. CGV Web then:
+
+   * walks the folder and lists every =.xml= file found, recursively;
+   * sorts the list by file modification time, newest first;
+   * keeps the 100 most recent entries (older files stay on disk but are not shown);
+   * re-walks the folder every 5 seconds to pick up new events;
+   * automatically loads the newest event each time a brand-new file appears at the top of the list.
+
+The control to the right of =Select Folder= is a tri-state button:
+
+   * _Spinning arrow_ (idle) &mdash; auto-refresh is active. The arrow completes a 360° rotation each time the folder is re-walked.
+   * _Hover_ &mdash; turns into a pause icon; click to suspend auto-refresh.
+   * _Play icon_ &mdash; auto-refresh is paused. Click to resume; a refresh runs immediately on resume.
+
+Auto-refresh requires the [[https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API][File System Access API]],
+which is currently implemented by Chromium-based browsers (Chrome,
+Edge) on desktop and Android. Firefox, Safari and iOS fall back to the
+legacy =&lt;input webkitdirectory&gt;= picker, which only returns a
+_snapshot_ of the folder at the time of the click. In that case CGV
+Web shows a subtle warning in the status bar; the shifter has to
+re-select the folder to refresh the list. The spinner and pause/play
+button are hidden in fallback mode.
+
+---++++ P1 deployment
+
+In Point-1 the EventDisplay events are written by the ATHENA
+=JiveXML= algorithm to a dedicated area on the FileServer NetApp
+storage, currently mounted on a subset of the =pc-tdq-mon-*= nodes at:
+
+<verbatim>
+/atlas/EventDisplayEvents
+</verbatim>
+
+The same area is mounted read-only on the VM that hosts CGV Web,
+which removes the need to round-trip through =atlas-live.cern.ch= and
+makes the viewer resilient to GPN outages. The shifter selects this
+mount point in =Select Folder= once, and the 5&nbsp;s polling loop
+takes care of the rest.
+
+The data path of SERVER sub-mode in the P1 deployment is therefore:
+
+<verbatim>
+P1 (ATHENA / JiveXML)  →  /atlas/EventDisplayEvents  →  CGV Web
+</verbatim>
+
+---++ Samples
+
+Samples mode lists a curated set of events shipped in =default_xml/=
+plus any =.xml= file the user adds locally. It is the right mode for
+demos, shifter training, regression tests of a new build and for
+working with a flagged event off-shift.
+
+<img src="images/samples-mode.png" alt="Samples mode — bundled events plus user uploads" style="width:100%;max-width:900px;height:auto;display:block;" />
+
+   * _Built-in samples_ &mdash; populated from =default_xml/index.json=. Each entry is labelled _Built-in sample_ in the row subtitle.
+   * _Add XML_ &mdash; opens a file picker; the chosen file appears at the top of the list, labelled _Local file_. Files never leave the browser; the parse is fully client-side.
+   * _Drag-and-drop_ &mdash; dropping =.xml= (or gzipped =.xml.gz=) files anywhere on the panel adds them to the list.
+   * _Clear_ &mdash; the trash icon removes every user-added entry. Built-in samples cannot be removed.
+
+Selecting a row loads the event the same way SERVER does. Multi-event
+XMLs are not auto-expanded into individual rows in the current build
+&mdash; the first event is rendered.
+
+---++ Accepted file formats
+
+| *Format*           | *Source*                               | *Status*                                     |
+| JiveXML =.xml=     | ATHENA =JiveXML= algorithm / ATLANTIS  | supported                                    |
+| JiveXML =.xml.gz=  | gzipped JiveXML                        | supported (auto-decompressed)                |
+| =.root=            | xAOD / D3PD                            | not supported &mdash; convert via ATHENA first |
+| =.json=            | custom formats                         | not supported                                |
+| =.xml.zst=         | Zstandard-compressed JiveXML           | not supported                                |
+
+See [[EventData][Event Data]] for the JiveXML element layout and the
+compact ATLAS-ID decoding used by CGV Web.
+
+---++ Mode interaction cheat-sheet
+
+| *Current mode*  | *Action*                      | *Effect*                                                          |
+| Live / WEB      | Click _SERVER_                | WEB polling stops; folder picker exposed                          |
+| Live / SERVER   | Click _WEB_                   | Folder polling stops; ATLAS Live polling resumes                  |
+| Live            | Click _Samples_               | All Live polling stops; sample list shown                         |
+| Samples         | Click _Live_                  | Returns to whichever Live sub-mode was last active                |
+| SERVER          | Pause button                  | 5 s polling suspended; folder is not re-walked until resumed      |
+| SERVER          | Drop a folder on the panel    | Equivalent to =Select Folder=                                     |
+| Any             | Drop =.xml= on the canvas     | Switches to _Samples_ and loads the file as a user entry          |
+| Any             | Close tab / reload            | All in-memory state lost &mdash; collision history too            |
+
+%BR% %BR%
+<em>Next: [[EnergyThresholds][Energy Thresholds &rarr;]]</em>

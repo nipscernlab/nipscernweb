@@ -1,0 +1,59 @@
+%META:TOPICPARENT{name="WebHome"}%
+---+ Glossary
+
+%TOC%
+
+$ *All cells*: CGV Web display mode (=V= hotkey) that reveals every GLB cell of the enabled sub-detectors, painting cells with no XML hit using the coldest colour of their sub-detector palette. Bypasses the energy threshold and cluster filters for display.
+
+$ *ATLAS*: A Toroidal LHC ApparatuS. One of the two general-purpose experiments at the CERN LHC.
+
+$ *ATHENA*: ATLAS' offline software framework (Gaudi-based). Produces the JiveXML that CGV Web reads.
+
+$ *ATLANTIS*: The legacy Java event display. Still the source of the live event feed consumed by CGV Web (=atlas-live.cern.ch=).
+
+$ *ATLAS-ID (compact)*: A 32-bit integer packing =(subDet, side, sampling, η-bin, φ-bin)= for every calorimeter cell. Decoded by CGV Web's WASM parser.
+
+$ *Cell*: A single readout channel of a calorimeter sampling.
+
+$ *Cinema mode*: CGV Web display state (=C= hotkey) that hides the UI and rotates the camera around the detector; with _Guided tour_ enabled, the rotation is replaced by a scripted fly-through.
+
+$ *Cluster*: A topological grouping of adjacent cells produced by ATHENA's =CaloTopoCluster=. Drawn as dashed red outlines.
+
+$ *Collision HUD*: Top-left overlay that mirrors the left-panel collision footer (run, event, lumi block, timestamp, version). Auto-visible when the sidebar is unpinned or cinema mode is active.
+
+$ *EB / LB*: Extended / Long barrel &mdash; the two tile-calorimeter cylinders.
+
+$ *EMB / EMEC*: EM Barrel / EM End-Cap &mdash; the LAr electromagnetic calorimeters.
+
+$ *FCAL*: Forward Calorimeter &mdash; three LAr modules at very high pseudorapidity (=η= 3.1&ndash;4.9).
+
+$ *GeoModel*: ATLAS' unified detector-geometry description. The source-of-truth for CGV Web's =CaloGeometry.glb.gz=.
+
+$ *Ghost*: An inactive support or cryostat volume. Rendered semi-transparent for spatial context.
+
+$ *GLB / glTF*: Binary / JSON forms of the Khronos 3D asset format. Used for the packaged geometry.
+
+$ *HEC*: Hadronic End-Cap calorimeter (LAr-based, 4 wheels).
+
+$ *JiveXML*: XML event format used by ATLANTIS and CGV Web. See [[EventData]].
+
+$ *P97*: The 97th percentile of the current event's cell energies for a given sub-detector. Used as the auto ceiling of each threshold slider.
+
+$ *Sampling*: A depth layer inside a calorimeter (=EMB1=, =EMB2=, =TileA=, etc.).
+
+$ *Slicer*: A cylindrical-wedge carve gizmo (=Shift+S=). Hides every cell whose centre lies inside the cut volume without removing the sub-detector from the scene.
+
+$ *Tile*: Scintillating-tile hadronic calorimeter forming the central barrel of ATLAS.
+
+$ *Track*: Inner-detector reconstructed trajectory. Drawn as thin yellow lines.
+
+$ *WASM*: WebAssembly &mdash; low-level bytecode format used by the Rust ATLAS-ID parser shipped in =parser/pkg/=.
+
+$ *WebGL2*: OpenGL ES 3.0 bindings for browsers. Required by Three.js and by CGV Web.
+
+$ *η (eta)*: Pseudorapidity, =η = &minus;ln tan(θ/2)=.
+
+$ *φ (phi)*: Azimuthal angle around the beam axis.
+
+%BR% %BR%
+<em>Next: [[References][References &rarr;]]</em>

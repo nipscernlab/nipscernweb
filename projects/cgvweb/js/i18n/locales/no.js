@@ -27,6 +27,8 @@ export default {
     'Auto-oppdatering er ikke tilgjengelig i denne nettleseren — velg mappen på nytt for å se nye filer.',
   'server-try-chromium':
     'For automatiske oppdateringer uten å måtte velge på nytt, prøv Chrome eller Edge.',
+  'server-api-down':
+    'Servermodus utilgjengelig: endepunktet /api/xml svarte ikke. Sjekk revers-proxyen.',
   'server-folder-not-set': 'Ingen mappe konfigurert',
   'server-folder-placeholder': '/sti/til/jivexml/mappe',
   'tip-server-change': 'Bytt mappe',

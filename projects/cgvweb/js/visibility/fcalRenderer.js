@@ -20,6 +20,12 @@ import { getCellMetric, etMevFromE } from '../cellMetric.js';
 import { thrFcalMev } from './thresholds.js';
 import { layerVis } from './layerVis.js';
 import {
+  FCAL_WIDTH_SCALE_DENOMINATOR,
+  FCAL_WIDTH_SCALE_FIXED,
+  FCAL_WIDTH_SCALE_GEOMETRY_KEY,
+  FCAL_WIDTH_SCALE_IDS,
+} from './fcalWidthScales.js';
+import {
   getSlicer,
   getActiveClusterCellIds,
   inEtaPhiRegion,
@@ -43,6 +49,10 @@ import { refreshCaloBoundParticles } from '../particles.js';
 
 /** @type {FcalCell[]} */
 let fcalCellsData = [];
+/** @type {WeakMap<FcalCell, number>} */
+let fcalWidthScale = new WeakMap();
+/** @type {Map<string, number> | null} */
+let fcalWidthScaleById = null;
 /** @type {THREE.Group | null} */
 export let fcalGroup = null;
 /** @type {FcalCell[]} */
@@ -71,6 +81,79 @@ export function getFcalEdgeBase() {
   return _fcalEdgeBase;
 }
 
+/**
+ * @param {number} hash
+ * @param {string} s
+ * @returns {number}
+ */
+function _fcalHashString(hash, s) {
+  for (let i = 0; i < s.length; i++) {
+    hash ^= s.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+/**
+ * The FCAL geometry is event-stable for the built-in samples, while energies
+ * vary. Hash only shape/placement fields so repeated events reuse the scale
+ * table instead of recomputing pair intersections.
+ * @param {FcalCell[]} cells
+ * @returns {string}
+ */
+function _fcalGeometryKey(cells) {
+  let hash = 2166136261;
+  hash = _fcalHashString(hash, String(cells.length));
+  for (const c of cells) {
+    hash = _fcalHashString(hash, '|');
+    hash = _fcalHashString(hash, String(c.id ?? ''));
+    hash = _fcalHashString(hash, ',');
+    hash = _fcalHashString(hash, String(c.x));
+    hash = _fcalHashString(hash, ',');
+    hash = _fcalHashString(hash, String(c.y));
+    hash = _fcalHashString(hash, ',');
+    hash = _fcalHashString(hash, String(c.z));
+    hash = _fcalHashString(hash, ',');
+    hash = _fcalHashString(hash, String(c.dx));
+    hash = _fcalHashString(hash, ',');
+    hash = _fcalHashString(hash, String(c.dy));
+    hash = _fcalHashString(hash, ',');
+    hash = _fcalHashString(hash, String(c.dz));
+  }
+  return `${cells.length}:${hash.toString(36)}`;
+}
+
+/** @returns {Map<string, number>} */
+function _getFcalWidthScaleById() {
+  if (fcalWidthScaleById) return fcalWidthScaleById;
+  fcalWidthScaleById = new Map();
+  for (let i = 0; i < FCAL_WIDTH_SCALE_IDS.length; i++) {
+    fcalWidthScaleById.set(
+      FCAL_WIDTH_SCALE_IDS[i],
+      (FCAL_WIDTH_SCALE_FIXED[i] ?? FCAL_WIDTH_SCALE_DENOMINATOR) / FCAL_WIDTH_SCALE_DENOMINATOR,
+    );
+  }
+  return fcalWidthScaleById;
+}
+
+/** @param {FcalCell[]} cells */
+function _installFcalWidthScales(cells) {
+  const key = _fcalGeometryKey(cells);
+  const useTable =
+    key === FCAL_WIDTH_SCALE_GEOMETRY_KEY && cells.length === FCAL_WIDTH_SCALE_FIXED.length;
+  const scaleById = useTable ? null : _getFcalWidthScaleById();
+
+  fcalWidthScale = new WeakMap();
+  for (let i = 0; i < cells.length; i++) {
+    const fixed = useTable ? FCAL_WIDTH_SCALE_FIXED[i] : undefined;
+    const scale =
+      fixed != null
+        ? fixed / FCAL_WIDTH_SCALE_DENOMINATOR
+        : (scaleById?.get(String(cells[i].id ?? '')) ?? 1);
+    fcalWidthScale.set(cells[i], scale);
+  }
+}
+
 export function clearFcal() {
   if (!fcalGroup) return;
   fcalGroup.traverse((o) => {
@@ -89,6 +172,7 @@ export function drawFcal(cells) {
   clearFcal();
   fcalCellsData = cells;
   if (!cells.length) return;
+  _installFcalWidthScales(cells);
   _applyFcalDraw();
 }
 
@@ -227,8 +311,9 @@ function _applyFcalDraw() {
 
   for (let i = 0; i < n; i++) {
     const { x, y, z, dx, dy, dz, energy } = visible[i];
-    const rx = Math.max(Math.abs(dx) * 5, 1e-3);
-    const ry = Math.max(Math.abs(dy) * 5, 1e-3);
+    const widthScale = fcalWidthScale.get(visible[i]) ?? 1;
+    const rx = Math.max(Math.abs(dx) * 5 * widthScale, 1e-3);
+    const ry = Math.max(Math.abs(dy) * 5 * widthScale, 1e-3);
     const len = Math.max(Math.abs(dz) * 2 * 10, 1e-3);
     // Scene placement: scene x/y = -ATLAS x/y (matches the GLB cells).
     const cx = -x * 10,

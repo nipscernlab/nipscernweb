@@ -47,6 +47,29 @@ const clusterMat     = new THREE.LineDashedMaterial({
   color:0xff4400, transparent:true, opacity:0.55,
   dashSize:40, gapSize:60, depthWrite:false,
 });
+const jetMat         = new THREE.LineDashedMaterial({
+  color:0xff8800, transparent:true, opacity:0.75,
+  dashSize:40, gapSize:60, depthWrite:false,
+});
+const tauMat         = new THREE.LineDashedMaterial({
+  color:0xb366ff, transparent:true, opacity:0.80,
+  dashSize:40, gapSize:60, depthWrite:false,
+});
+const metShaftMat    = new THREE.LineBasicMaterial({color:0xff0066, transparent:true, opacity:0.95, depthTest:false, depthWrite:false});
+const metConeMat     = new THREE.MeshBasicMaterial({color:0xff0066, depthTest:false, depthWrite:false});
+// Atlas-prefixed meshes (muon spectrometer + toroid + ID volumes). Same
+// translucent grey as the calo ghosts but tinted slightly blue to read as
+// "outer structure" rather than "calo envelope". Two-sided so the inner
+// chamber faces aren't culled when the camera sits inside.
+const atlasMat       = new THREE.MeshBasicMaterial({
+  color:0x6076a0, transparent:true, opacity:0.05, depthWrite:false, side:THREE.DoubleSide,
+});
+const vertexMatPrimary   = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.95, depthTest:false, depthWrite:false});
+const vertexMatPileup    = new THREE.MeshBasicMaterial({color:0x88aaff, transparent:true, opacity:0.55, depthTest:false, depthWrite:false});
+const vertexMatSecondary = new THREE.MeshBasicMaterial({color:0x00ff88, transparent:true, opacity:0.95, depthTest:false, depthWrite:false});
+const _VTX_GEO_PRIMARY   = new THREE.SphereGeometry(60, 16, 10);
+const _VTX_GEO_PILEUP    = new THREE.SphereGeometry(30, 12, 8);
+const _VTX_GEO_SECONDARY = new THREE.SphereGeometry(45, 14, 9);
 
 const matCache = new Map();
 function matForRgb(r, g, b){
@@ -283,6 +306,25 @@ async function main(){
     scene.add(mesh);
   }
 
+  // ── Atlas-prefixed meshes (muon spectrometer + structural envelopes) ─────────
+  if(header.atlas && header.atlas.length){
+    const atlasGroup = new THREE.Group();
+    atlasGroup.name = 'atlas-geo';
+    atlasGroup.renderOrder = 4;
+    for(const g of header.atlas){
+      const pos = f32(g.pos[0], g.pos[1]);
+      const idx = u32(g.idx[0], g.idx[1]);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setIndex(new THREE.BufferAttribute(idx, 1));
+      const mesh = new THREE.Mesh(geo, atlasMat);
+      mesh.matrixAutoUpdate = false;
+      mesh.frustumCulled = false;
+      atlasGroup.add(mesh);
+    }
+    scene.add(atlasGroup);
+  }
+
   // ── Tracks ───────────────────────────────────────────────────────────────────
   if(header.tracks && header.tracks.length){
     const group = new THREE.Group();
@@ -305,6 +347,36 @@ async function main(){
       const geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
       const line = new THREE.Line(geo, clusterMat);
+      line.computeLineDistances();
+      group.add(line);
+    }
+    scene.add(group);
+  }
+
+  // ── Jets ─────────────────────────────────────────────────────────────────────
+  if(header.jets && header.jets.length){
+    const group = new THREE.Group();
+    group.renderOrder = 6;
+    for(const [off, byteLen] of header.jets){
+      const pts = f32(off, byteLen);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+      const line = new THREE.Line(geo, jetMat);
+      line.computeLineDistances();
+      group.add(line);
+    }
+    scene.add(group);
+  }
+
+  // ── Taus ─────────────────────────────────────────────────────────────────────
+  if(header.taus && header.taus.length){
+    const group = new THREE.Group();
+    group.renderOrder = 6;
+    for(const [off, byteLen] of header.taus){
+      const pts = f32(off, byteLen);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+      const line = new THREE.Line(geo, tauMat);
       line.computeLineDistances();
       group.add(line);
     }
@@ -354,6 +426,63 @@ async function main(){
       group.add(new THREE.Line(geo, muonMat));
     }
     scene.add(group);
+  }
+
+  // ── MET arrow ────────────────────────────────────────────────────────────────
+  // Drawn in the xy plane (z=0), pointing at the missing-transverse-energy
+  // vector. Magnitude maps to arrow length (clamped) and a ν label sits past
+  // the tip. Coordinates are negated to match the scene's (-ATLAS x, -ATLAS y)
+  // convention used by tracks and vertices.
+  let metShaftLen = 0;
+  let metDir = null;
+  if(header.met && Number.isFinite(header.met.magnitude) && header.met.magnitude > 0){
+    const sx = -header.met.etx;
+    const sy = -header.met.ety;
+    const dirLen = Math.hypot(sx, sy);
+    if(dirLen > 1e-9){
+      const dx = sx/dirLen, dy = sy/dirLen;
+      metDir = { dx, dy };
+      const MET_SCALE = 50, MET_MIN = 400, MET_MAX = 6000;
+      metShaftLen = Math.max(MET_MIN, Math.min(MET_MAX, MET_SCALE * header.met.magnitude));
+      const metGroup = new THREE.Group();
+      metGroup.renderOrder = 9;
+      const shaftGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(dx*metShaftLen, dy*metShaftLen, 0),
+      ]);
+      const shaft = new THREE.Line(shaftGeo, metShaftMat);
+      shaft.renderOrder = 9;
+      metGroup.add(shaft);
+      // Cone sized in world units (static; no per-frame screen scaling here).
+      const coneH = 220, coneR = 60;
+      const coneGeo = new THREE.ConeGeometry(coneR, coneH, 14);
+      const cone = new THREE.Mesh(coneGeo, metConeMat);
+      cone.position.set(dx*(metShaftLen + coneH*0.5), dy*(metShaftLen + coneH*0.5), 0);
+      cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), new THREE.Vector3(dx, dy, 0));
+      cone.renderOrder = 9;
+      metGroup.add(cone);
+      scene.add(metGroup);
+    }
+  }
+
+  // ── Vertices (primary / pile-up / b-tag secondary) ───────────────────────────
+  if(header.vertices){
+    const vGroup = new THREE.Group();
+    vGroup.renderOrder = 8;
+    function addVtxList(entry, geo, mat){
+      if(!entry) return;
+      const [off, byteLen] = entry;
+      const arr = f32(off, byteLen);
+      for(let i=0;i<arr.length;i+=3){
+        const m = new THREE.Mesh(geo, mat);
+        m.position.set(arr[i], arr[i+1], arr[i+2]);
+        vGroup.add(m);
+      }
+    }
+    addVtxList(header.vertices.primary,   _VTX_GEO_PRIMARY,   vertexMatPrimary);
+    addVtxList(header.vertices.pileup,    _VTX_GEO_PILEUP,    vertexMatPileup);
+    addVtxList(header.vertices.secondary, _VTX_GEO_SECONDARY, vertexMatSecondary);
+    if(vGroup.children.length) scene.add(vGroup);
   }
 
   // ── Particle labels ───────────────────────────────────────────────────────────
@@ -419,6 +548,28 @@ async function main(){
       sprite.position.copy(muonLabelPos(eta, phi, LABEL_OFFSET));
       labelGroup.add(sprite);
     }
+  }
+
+  // Tau labels — τ-/τ+ (or τ when charge is undetermined) at calo face
+  if(header.tauList){
+    for(const {eta, phi, charge} of header.tauList){
+      let text = 'τ';
+      if(charge < 0) text = 'τ-';
+      else if(charge > 0) text = 'τ+';
+      const sprite = makeLabelSprite(text, 0xb366ff);
+      sprite.position.copy(caloLabelPos(eta, phi, LABEL_OFFSET));
+      labelGroup.add(sprite);
+    }
+  }
+
+  // MET ν label — sits just past the arrow tip along its direction
+  if(metDir && metShaftLen > 0){
+    const MET_LABEL_OFFSET = 260;
+    const px = metDir.dx * (metShaftLen + MET_LABEL_OFFSET);
+    const py = metDir.dy * (metShaftLen + MET_LABEL_OFFSET);
+    const sprite = makeLabelSprite('ν', 0xff0066);
+    sprite.position.set(px, py, 0);
+    labelGroup.add(sprite);
   }
 
   if(labelGroup.children.length) scene.add(labelGroup);

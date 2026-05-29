@@ -434,6 +434,121 @@ function _makeMuonLine(eta, phi){
   return arr;
 }
 
+// ── η/φ line spanning the calorimeter (used by jets and τ-jets) ───────────────
+function _makeEtaPhiLine(eta, phi){
+  const theta = 2 * Math.atan(Math.exp(-eta));
+  const sinT = Math.sin(theta);
+  const dx = -sinT * Math.cos(phi);
+  const dy = -sinT * Math.sin(phi);
+  const dz =  Math.cos(theta);
+  const t0 = _innerCaloFaceIntersect(dx, dy, dz);
+  const t1 = _cylIntersect(dx, dy, dz, CLUSTER_CYL_OUT_R, CLUSTER_CYL_OUT_HALF_H);
+  const arr = new Float32Array(6);
+  arr[0] = dx*t0; arr[1] = dy*t0; arr[2] = dz*t0;
+  arr[3] = dx*t1; arr[4] = dy*t1; arr[5] = dz*t1;
+  return arr;
+}
+
+// ── MET parser (Missing Transverse Energy) ────────────────────────────────────
+// Picks AntiKt4EMPFlow preferred, falls back to first available collection.
+const MET_PREFERRED_KEY = 'MET_Reference_AntiKt4EMPFlow_xAOD';
+function parseMet(doc){
+  const collections = [];
+  for(const el of doc.getElementsByTagName('ETMis')){
+    const sgk = el.getAttribute('storeGateKey') || '';
+    const etxEl = el.querySelector('etx'), etyEl = el.querySelector('ety'), etEl = el.querySelector('et');
+    if(!etxEl || !etyEl) continue;
+    const etx = parseFloat(etxEl.textContent.trim().split(/\s+/)[0]);
+    const ety = parseFloat(etyEl.textContent.trim().split(/\s+/)[0]);
+    if(!isFinite(etx) || !isFinite(ety)) continue;
+    const sumEt = etEl ? parseFloat(etEl.textContent.trim().split(/\s+/)[0]) : 0;
+    collections.push({
+      key: sgk, etx, ety,
+      sumEt: isFinite(sumEt) ? sumEt : 0,
+      magnitude: Math.hypot(etx, ety),
+    });
+  }
+  if(!collections.length) return null;
+  return collections.find(c => c.key === MET_PREFERRED_KEY) || collections[0];
+}
+
+// ── Vertex parser (primary / pile-up / b-tag secondary) ───────────────────────
+// XML is in cm; convert to scene mm with x and y negated to match tracks.
+function parseVertices(doc){
+  const out = { primary: [], pileup: [], secondary: [] };
+  for(const el of doc.getElementsByTagName('RVx')){
+    const sgk = el.getAttribute('storeGateKey') || '';
+    const xEl = el.querySelector('x'), yEl = el.querySelector('y'), zEl = el.querySelector('z');
+    const tEl = el.querySelector('vertexType');
+    if(!xEl || !yEl || !zEl) continue;
+    const xs = xEl.textContent.trim().split(/\s+/).map(Number);
+    const ys = yEl.textContent.trim().split(/\s+/).map(Number);
+    const zs = zEl.textContent.trim().split(/\s+/).map(Number);
+    const ts = tEl ? tEl.textContent.trim().split(/\s+/).map(Number) : [];
+    const isBTag = sgk.includes('SecVtx');
+    const n = Math.min(xs.length, ys.length, zs.length);
+    for(let i=0;i<n;i++){
+      if(!isFinite(xs[i]) || !isFinite(ys[i]) || !isFinite(zs[i])) continue;
+      const p = [-xs[i]*10, -ys[i]*10, zs[i]*10];
+      const t = ts[i] ?? 0;
+      if(isBTag) out.secondary.push(p);
+      else if(t === 1) out.primary.push(p);
+      else if(t === 3) out.pileup.push(p);
+      // type=0 in PrimaryVertices is the dummy placeholder, skipped.
+    }
+  }
+  return out;
+}
+
+// ── Jet parser (η/φ lines, AntiKt4EMTopoJets preferred) ──────────────────────
+const JET_PREFERRED_KEY = 'AntiKt4EMTopoJets_xAOD';
+const JET_THR_GEV = 5;
+function parseJets(doc){
+  const collections = [];
+  for(const el of doc.getElementsByTagName('Jet')){
+    const sgk = el.getAttribute('storeGateKey') || '';
+    const etas = _readTextNums(el, 'eta');
+    const phis = _readTextNums(el, 'phi');
+    const ets  = _readTextNums(el, 'et');
+    const pxs  = _readTextNums(el, 'px');
+    const pys  = _readTextNums(el, 'py');
+    const n = Math.min(etas.length, phis.length);
+    const jets = [];
+    for(let i=0;i<n;i++){
+      const px = pxs[i], py = pys[i];
+      const pt = isFinite(px) && isFinite(py)
+        ? Math.sqrt(px*px + py*py)
+        : (isFinite(ets[i]) ? ets[i] : 0);
+      jets.push({ eta: etas[i], phi: phis[i], ptGev: pt });
+    }
+    collections.push({ key: sgk, jets });
+  }
+  if(!collections.length) return [];
+  const preferred = collections.find(c => c.key === JET_PREFERRED_KEY && c.jets.length);
+  const chosen = preferred || collections.find(c => c.jets.length) || null;
+  return chosen ? chosen.jets : [];
+}
+
+// ── Tau parser (η/φ lines + charge for label) ────────────────────────────────
+const TAU_THR_GEV = 10;
+function parseTaus(doc){
+  const out = [];
+  for(const el of doc.getElementsByTagName('TauJet')){
+    const etas = _readTextNums(el, 'eta');
+    const phis = _readTextNums(el, 'phi');
+    const pts  = _readTextNums(el, 'pt');
+    const chs  = _readTextNums(el, 'charge');
+    const n = Math.min(etas.length, phis.length);
+    for(let i=0;i<n;i++){
+      if(!isFinite(etas[i]) || !isFinite(phis[i])) continue;
+      const charge = isFinite(chs[i]) ? chs[i] : 0;
+      const ptGev  = isFinite(pts[i]) ? pts[i] : 0;
+      out.push({ eta: etas[i], phi: phis[i], ptGev, charge });
+    }
+  }
+  return out;
+}
+
 // ── MBTS key lookup ───────────────────────────────────────────────────────────
 function mbtsMeshKey(label){
   const m=/^type_(-?1)_ch_([01])_mod_([0-7])$/.exec(label);
@@ -509,6 +624,29 @@ function bakeGhost(mesh){
   return { pos: posF32, idx };
 }
 
+// Atlas-prefixed meshes (muon spectrometer + structural envelopes) live in the
+// same GLB but the live app wraps them in a Group scaled by 10. We pre-apply
+// that same scale to the world matrix here so the baked vertices land in scene
+// coordinates (mm), consistent with every other baked geometry.
+const _ATLAS_SCALE_MAT = new THREE.Matrix4().makeScale(10, 10, 10);
+function bakeAtlasMesh(mesh){
+  mesh.updateWorldMatrix(true, false);
+  const g = mesh.geometry.clone();
+  const worldWithScale = mesh.matrixWorld.clone().premultiply(_ATLAS_SCALE_MAT);
+  g.applyMatrix4(worldWithScale);
+  const pos = g.getAttribute('position').array;
+  let idx = g.index ? g.index.array : null;
+  if(!idx){
+    idx = new Uint32Array(pos.length/3);
+    for(let i=0;i<idx.length;i++) idx[i]=i;
+  } else if(!(idx instanceof Uint32Array)){
+    idx = new Uint32Array(idx);
+  }
+  const posF32 = pos instanceof Float32Array ? pos : new Float32Array(pos);
+  g.dispose();
+  return { pos: posF32, idx };
+}
+
 // ── Main bake routine ──────────────────────────────────────────────────────────
 async function main(){
   btn.disabled = true;
@@ -518,11 +656,21 @@ async function main(){
   log('Loading GLB...');
   const meshByKey  = new Map();
   const meshByName = new Map();
+  // Atlas-prefixed meshes are the muon spectrometer + structural envelopes
+  // (MUCH_1 on the C side, MUC1_2 on the A side, plus the toroid, ID volumes,
+  // solenoid, etc.). The live app hides them by default behind a toggle; here
+  // we bake every one so the preview shows the full apparatus around the
+  // event without any interactive UI.
+  const atlasMeshes = [];
   await new Promise((res, rej)=>{
     new GLTFLoader().load('../geometry_data/CaloGeometry.glb', ({scene:g}) => {
       g.updateMatrixWorld(true);
       g.traverse(o => {
         if(!o.isMesh) return;
+        if(o.name.split('→')[0] === 'atlas'){
+          atlasMeshes.push(o);
+          return;
+        }
         meshByName.set(o.name, o);
         const key = meshNameToKey(o.name);
         if(key !== null) meshByKey.set(key, o);
@@ -530,7 +678,7 @@ async function main(){
       res();
     }, undefined, rej);
   });
-  log('  meshes:', meshByName.size, '  keyed:', meshByKey.size);
+  log('  meshes:', meshByName.size, '  keyed:', meshByKey.size, '  atlas:', atlasMeshes.length);
 
   log('Fetching XML...');
   const xmlText = await (await fetch('../default_xml/JiveXML_518084_14173642443.xml')).text();
@@ -551,10 +699,20 @@ async function main(){
   const photonParticles   = parsePhotons(doc);
   const electronParticles = parseElectrons(doc);
   const muonParticles     = parseMuons(doc);
+  const jetParticles      = parseJets(doc).filter(j => j.ptGev >= JET_THR_GEV);
+  const tauParticles      = parseTaus(doc).filter(t => t.ptGev >= TAU_THR_GEV);
+  const metInfo           = parseMet(doc);
+  const verticesInfo      = parseVertices(doc);
   log('  tracks:', tracks.length, '  clusters:', clusters.length,
       '  photons:', photonParticles.length,
       '  electrons:', electronParticles.length,
-      '  muons:', muonParticles.length);
+      '  muons:', muonParticles.length,
+      '  jets:', jetParticles.length,
+      '  taus:', tauParticles.length);
+  log('  vertices:  primary', verticesInfo.primary.length,
+      '  pileup', verticesInfo.pileup.length,
+      '  secondary', verticesInfo.secondary.length);
+  log('  MET:', metInfo ? `${metInfo.key} mag=${metInfo.magnitude.toFixed(1)} GeV` : '(none)');
 
   const idsToStr = cs => cs.map(c=>c.id).join(' ');
   const tilePacked = tileCells.length ? parse_atlas_ids_bulk(idsToStr(tileCells)) : null;
@@ -650,6 +808,19 @@ async function main(){
     ghostHeaders.push({ pos: pushChunk(pos), idx: pushChunk(idx) });
   }
 
+  log('Baking atlas / muon spectrometer meshes...');
+  const atlasHeaders = [];
+  let atlasBytes = 0;
+  for(const mesh of atlasMeshes){
+    const {pos, idx} = bakeAtlasMesh(mesh);
+    const posEntry = pushChunk(pos);
+    const idxEntry = pushChunk(idx);
+    atlasHeaders.push({ pos: posEntry, idx: idxEntry });
+    atlasBytes += posEntry[1] + idxEntry[1];
+  }
+  log('  atlas meshes baked:', atlasHeaders.length,
+      '  body bytes:', (atlasBytes/1024/1024).toFixed(2), 'MB');
+
   log('Packing tracks...');
   const trackHeaders = [];
   for(const arr of tracks) trackHeaders.push(pushChunk(arr));
@@ -657,6 +828,35 @@ async function main(){
   log('Packing clusters...');
   const clusterHeaders = [];
   for(const arr of clusters) clusterHeaders.push(pushChunk(arr));
+
+  log('Packing jets...');
+  const jetHeaders = [];
+  for(const {eta, phi} of jetParticles){
+    jetHeaders.push(pushChunk(_makeEtaPhiLine(eta, phi)));
+  }
+
+  log('Packing taus...');
+  const tauHeaders = [];
+  for(const {eta, phi} of tauParticles){
+    tauHeaders.push(pushChunk(_makeEtaPhiLine(eta, phi)));
+  }
+
+  log('Packing vertices...');
+  function _packVtxArr(list){
+    if(!list.length) return null;
+    const arr = new Float32Array(list.length * 3);
+    for(let i=0;i<list.length;i++){
+      arr[i*3  ] = list[i][0];
+      arr[i*3+1] = list[i][1];
+      arr[i*3+2] = list[i][2];
+    }
+    return pushChunk(arr);
+  }
+  const vertexHeaders = {
+    primary:   _packVtxArr(verticesInfo.primary),
+    pileup:    _packVtxArr(verticesInfo.pileup),
+    secondary: _packVtxArr(verticesInfo.secondary),
+  };
 
   log('Packing photons...');
   const photonHeaders = [];
@@ -698,18 +898,29 @@ async function main(){
   }
 
   const header = {
-    v: 4,
-    cells:   cellHeaders,
-    ghosts:  ghostHeaders,
-    tracks:  trackHeaders,
-    clusters:clusterHeaders,
-    photons: photonHeaders,
-    electrons: electronHeaders,
-    muons:   muonHeaders,
-    // Particle lists for label sprites (eta/phi/pdgId stored in JSON header)
+    v: 5,
+    cells:    cellHeaders,
+    ghosts:   ghostHeaders,
+    atlas:    atlasHeaders,
+    tracks:   trackHeaders,
+    clusters: clusterHeaders,
+    jets:     jetHeaders,
+    taus:     tauHeaders,
+    photons:  photonHeaders,
+    electrons:electronHeaders,
+    muons:    muonHeaders,
+    vertices: vertexHeaders,
+    met: metInfo ? {
+      etx: +metInfo.etx.toFixed(3),
+      ety: +metInfo.ety.toFixed(3),
+      sumEt: +metInfo.sumEt.toFixed(3),
+      magnitude: +metInfo.magnitude.toFixed(3),
+    } : null,
+    // Particle lists for label sprites (eta/phi/pdgId/charge stored in JSON header)
     photonList:   photonParticles.map(({eta,phi,ptGev})=>({eta,phi,ptGev})),
     electronList: electronParticles.map(({eta,phi,pdgId,ptGev})=>({eta,phi,pdgId,ptGev})),
     muonList:     muonParticles.map(({eta,phi,pdgId,ptGev})=>({eta,phi,pdgId,ptGev})),
+    tauList:      tauParticles.map(({eta,phi,ptGev,charge})=>({eta,phi,ptGev,charge})),
   };
   let headerJson = JSON.stringify(header);
   while(((4 + headerJson.length) & 3) !== 0) headerJson += ' ';
@@ -724,10 +935,14 @@ async function main(){
   log('  header JSON:', (headerBytes.byteLength/1024).toFixed(1), 'KB');
   log('  body       :', (body.byteLength/1024/1024).toFixed(2), 'MB');
   log('  cells:', cellHeaders.length, ' ghosts:', ghostHeaders.length,
+      ' atlas:', atlasHeaders.length,
       ' tracks:', trackHeaders.length, ' clusters:', clusterHeaders.length,
+      ' jets:', jetHeaders.length, ' taus:', tauHeaders.length,
       ' photons:', photonHeaders.length,
       ' electrons:', electronHeaders.filter(Boolean).length,
-      ' muons:', muonHeaders.length);
+      ' muons:', muonHeaders.length,
+      ' met:', metInfo ? 'yes' : 'no',
+      ' vtx:', (verticesInfo.primary.length+verticesInfo.pileup.length+verticesInfo.secondary.length));
 
   const blob = new Blob([out], {type:'application/octet-stream'});
   const url = URL.createObjectURL(blob);

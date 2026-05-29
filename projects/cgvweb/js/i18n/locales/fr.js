@@ -27,6 +27,8 @@ export default {
     'Actualisation automatique indisponible dans ce navigateur — re-sélectionnez le dossier pour voir les nouveaux fichiers.',
   'server-try-chromium':
     'Pour des mises à jour automatiques sans re-sélection, essayez Chrome ou Edge.',
+  'server-api-down':
+    'Mode serveur indisponible : le point d’accès /api/xml n’a pas répondu. Vérifiez le reverse-proxy.',
   'server-folder-not-set': 'Aucun dossier configuré',
   'server-folder-placeholder': '/chemin/vers/dossier/jivexml',
   'tip-server-change': 'Changer de dossier',

@@ -351,7 +351,7 @@
           </a>
           <a
             class="docs"
-            href="https://nipscern.com/library/cgvweb/twiki"
+            href="twiki/"
             target="_blank"
             rel="noopener"
             data-tip="Technical TWiki"
@@ -485,6 +485,9 @@
             </button>
           </div>
           <div id="server-folder-error" class="server-folder-error warn" hidden></div>
+          <div id="server-api-hint" class="server-api-hint" data-i18n="server-api-down" hidden>
+            Server mode unavailable: the /api/xml endpoint did not respond. Check the reverse proxy.
+          </div>
           <div id="server-empty" data-i18n="server-empty">
             Pick a folder with JiveXML files. The 100 most recent are shown and refresh every 5s.
           </div>
@@ -666,11 +669,11 @@
             style="
               background: linear-gradient(
                 to top,
-                #1a0600 0%,
-                #6b2310 25%,
+                #ffeabe 0%,
+                #ffb26a 25%,
                 #c8642a 55%,
-                #ffb26a 80%,
-                #ffeabe 100%
+                #6b2310 80%,
+                #1a0600 100%
               );
             "
           >
