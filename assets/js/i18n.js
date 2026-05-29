@@ -83,6 +83,16 @@ function applyTranslations(lang) {
     }
   });
 
+  // Rich-text translations: replace the element's full innerHTML.
+  // Use for paragraphs that contain inline markup (<strong>, <em>, <a>, <code>…).
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    const val = getKey(t, key);
+    if (val !== null && typeof val === 'string') {
+      el.innerHTML = val;
+    }
+  });
+
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     const val = getKey(t, key);
