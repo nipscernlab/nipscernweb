@@ -155,12 +155,27 @@
   </script>
 
   <script type="module">
-    import { formatDate } from '../assets/js/main.js';
+    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=news-flags-20260529';
     import { getLang } from '../assets/js/i18n.js';
 
     function catClass(cat) {
       const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
       return m[cat] || 'badge-gray';
+    }
+
+    /** Show a flag marking the language this article is displayed in. */
+    function renderLangFlag(post) {
+      const metaEl = document.querySelector('.post-meta');
+      if (!metaEl) return;
+      let holder = document.getElementById('post-lang-flag');
+      if (!holder) {
+        holder = document.createElement('span');
+        holder.id = 'post-lang-flag';
+        holder.style.display = 'inline-flex';
+        holder.style.alignItems = 'center';
+        metaEl.appendChild(holder);
+      }
+      holder.innerHTML = newsLangFlag(post);
     }
 
     /** Show an "Updated on <date>" stamp when the post carries an edit date. */
@@ -386,6 +401,7 @@
       document.getElementById('post-date').textContent = formatDate(post.date);
       document.getElementById('post-date').setAttribute('datetime', post.date);
       renderEditedDate(post.date_edited);
+      renderLangFlag(post);
       document.getElementById('post-title').textContent = post.title;
       document.getElementById('post-excerpt').textContent = post.excerpt;
       document.getElementById('post-header').style.display = 'block';
@@ -532,6 +548,7 @@
         document.getElementById('post-excerpt').textContent = tr.subtitle || tr.excerpt || '';
         document.getElementById('page-title').textContent   = (tr.title || '') + ' — NIPSCERN';
         renderEditedDate(featured.date_edited);
+        renderLangFlag(featured);
         const bodyEl = document.getElementById('post-body');
         // Remove any existing TOC layout wrapper before re-rendering
         const layout = document.querySelector('.post-featured-layout');
@@ -549,7 +566,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.js"></script>
+  <script type="module" src="../assets/js/main.js?v=news-flags-20260529"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>
