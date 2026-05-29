@@ -4,7 +4,7 @@
  */
 
 import { t } from './i18n.js';
-import { formatDate } from './main.js';
+import { formatDate, pubLangFlag } from './main.js?v=lang-flags-20260529';
 
 const TYPE_BADGE = {
   article:      'badge-blue',
@@ -81,6 +81,7 @@ function renderCard(pub) {
         <div class="pub-card-meta">
           <span class="badge ${typeClass}" data-i18n="${typeKey}">${pub.type}</span>
           <span class="news-date">${pub.year}</span>
+          ${pubLangFlag(pub.title, pub.abstract)}
         </div>
         <h2 class="pub-title" id="pub-${pub.id}-title">${pub.title}</h2>
         <p class="pub-authors"><span data-i18n="publications.authors">Authors</span>: ${pub.authors.join(', ')}</p>

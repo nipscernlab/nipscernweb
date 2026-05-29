@@ -25,7 +25,7 @@ const NAV_LINKS = [
  */
 const ROOT = new URL('../../', import.meta.url).href;
 
-const FLAG_SVGS = {
+export const FLAG_SVGS = {
   en: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
 <defs>
 <clipPath id="uk-outer"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
@@ -289,6 +289,44 @@ async function fetchJSON(path) {
   }
 }
 
+// ============================================================
+// Publication language detection (title + abstract heuristic)
+// ============================================================
+const LANG_WORDS = {
+  pt: ['que','não','são','uma','um','com','para','do','da','dos','das','também','é','às','mais','como','pelo','pela','este','esta','esse','essa','foram','foi','utilizados','trabalho','sistema','através','desenvolvimento','aplicação','dados','partir','ao','os','as','no','na','nos','nas','sua','seu','por','em'],
+  en: ['the','and','of','this','was','with','for','which','based','are','we','that','system','present','results','using','these','from','an','is','to','in','on','by','as','were','paper','work','detector'],
+  fr: ['le','les','des','une','et','est','pour','avec','dans','cette','qui','sur','nous','au','aux','été','par','plus','ce','sont','leur','être'],
+  no: ['og','av','som','er','til','på','med','det','ikke','denne','et','for','har','ble','blir','disse'],
+};
+const LANG_DIA = { pt: ['ã','õ'], fr: ['ê','è','ù','œ'], no: ['ø','å'] };
+export const LANG_NAMES = { pt: 'Português', en: 'English', fr: 'Français', no: 'Norsk' };
+
+/** Detect the language of a publication from its title + abstract. */
+export function detectLang(title, abstract) {
+  const text = ((title || '') + ' ' + (abstract || '')).toLowerCase();
+  const tokens = text.match(/[a-zàâçéèêëîïôûùüÿñæœãõáíóú]+/g) || [];
+  if (tokens.length < 3) return 'en';
+  const n = tokens.length;
+  const scores = {};
+  for (const lang in LANG_WORDS) {
+    const wset = new Set(LANG_WORDS[lang]);
+    let c = 0;
+    for (const tok of tokens) if (wset.has(tok)) c++;
+    scores[lang] = c / n;
+  }
+  for (const lang in LANG_DIA) {
+    if (LANG_DIA[lang].some(ch => text.includes(ch))) scores[lang] += 0.02;
+  }
+  return Object.keys(scores).reduce((a, b) => (scores[b] > scores[a] ? b : a), 'en');
+}
+
+/** Build the small flag badge HTML for a publication's detected language. */
+export function pubLangFlag(title, abstract) {
+  const lang = detectLang(title, abstract);
+  const name = LANG_NAMES[lang] || lang;
+  return `<span class="pub-lang-flag" role="img" title="${name}" aria-label="${name}">${FLAG_SVGS[lang] || ''}</span>`;
+}
+
 // Format date like "18 Nov 2024"
 export function formatDate(isoDate) {
   const d = new Date(isoDate + 'T12:00:00Z');
@@ -399,6 +437,7 @@ async function initHomeLatest() {
           <div class="pub-card-meta">
             <span class="badge ${typeMap[pub.type] || 'badge-gray'}" data-i18n="publications.types.${pub.type}">${pub.type}</span>
             <span class="news-date">${pub.year}</span>
+            ${pubLangFlag(pub.title, pub.abstract)}
           </div>
           <div class="pub-title">${pub.title}</div>
           <div class="pub-authors">${pub.authors.join(', ')}</div>
