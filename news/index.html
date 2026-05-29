@@ -43,7 +43,7 @@
     </header>
 
     <!-- Featured story slot (populated dynamically) -->
-    <section id="news-featured-slot" aria-label="Featured story" style="display:none"></section>
+    <section id="news-featured-slot" data-i18n-aria="news.featured_story" aria-label="Featured story" style="display:none"></section>
 
     <section class="section">
       <div class="container">
@@ -113,8 +113,8 @@
 </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=news-flags-20260529';
-    import { getLang } from '../assets/js/i18n.js';
+    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=catA-20260529';
+    import { getLang, t } from '../assets/js/i18n.js';
 
     async function loadNews() {
       const res = await fetch('../data/news.json');
@@ -151,9 +151,9 @@
       article.setAttribute('aria-labelledby', 'featured-title-' + featured.id);
 
       const lang = getLang();
-      const ribbonText = (lang === 'pt') ? 'Reportagem em destaque' : 'Featured Story';
-      const readText   = (lang === 'pt') ? 'Ler a reportagem' : 'Read the story';
-      const byText     = (lang === 'pt') ? 'por'              : 'by';
+      const ribbonText = t('news.featured_story');
+      const readText   = t('news.read_story');
+      const byText     = t('news.by');
 
       article.innerHTML = `
         <a href="post?id=${featured.id}" class="news-featured-link" aria-label="${tr.title || ''}">
@@ -228,7 +228,7 @@
         star.setAttribute('aria-hidden', 'true');
         ribbon.appendChild(star);
         const lang = getLang() || 'en';
-        ribbon.appendChild(document.createTextNode(' ' + ((lang === 'pt') ? 'Reportagem em destaque' : 'Featured story')));
+        ribbon.appendChild(document.createTextNode(' ' + t('news.featured_story')));
         imgDiv.appendChild(ribbon);
       }
 
@@ -262,7 +262,7 @@
       readMore.href = 'post?id=' + post.id;
       readMore.className = 'news-read-more';
       readMore.setAttribute('data-i18n', 'news.read_more');
-      readMore.textContent = 'Read more ';
+      readMore.textContent = t('news.read_more') + ' ';
       const arrow = document.createElement('i');
       arrow.className = 'ph ph-arrow-right';
       arrow.setAttribute('aria-hidden', 'true');
@@ -351,7 +351,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.js?v=news-flags-20260529"></script>
+  <script type="module" src="../assets/js/main.js?v=catA-20260529"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>

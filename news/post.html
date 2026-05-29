@@ -48,8 +48,8 @@
     <!-- Post not found -->
     <div id="post-not-found" style="display:none;text-align:center;padding:var(--sp-32) var(--container-pad)">
       <i class="ph ph-file-x" style="font-size:60px;color:var(--text-muted);margin-bottom:var(--sp-6)" aria-hidden="true"></i>
-      <h1 class="heading-lg" style="margin-bottom:var(--sp-4)">Post not found</h1>
-      <p class="body-base" style="margin-bottom:var(--sp-8)">The news post you are looking for does not exist or has been removed.</p>
+      <h1 class="heading-lg" style="margin-bottom:var(--sp-4)" data-i18n="news.post_not_found_title">Post not found</h1>
+      <p class="body-base" style="margin-bottom:var(--sp-8)" data-i18n="news.post_not_found_desc">The news post you are looking for does not exist or has been removed.</p>
       <a href="./" class="btn btn-primary" data-i18n="news.back">
         <i class="ph ph-arrow-left" aria-hidden="true"></i>
         Back to News
@@ -71,7 +71,7 @@
     <!-- Related articles (populated by JS) -->
     <div id="post-related" style="display:none;border-top:1px solid var(--border-subtle);padding:var(--sp-8) var(--container-pad)">
       <div style="max-width:720px;margin:0 auto">
-        <p style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)">Related</p>
+        <p style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)" data-i18n="news.related">Related</p>
         <div id="post-related-list" style="display:flex;flex-direction:column;gap:var(--sp-3)"></div>
       </div>
     </div>
@@ -84,8 +84,8 @@
           Back to News
         </a>
         <div style="display:flex;align-items:center;gap:var(--sp-2)">
-          <span id="share-toast" style="font-size:var(--text-xs);color:#39ff14;display:none;font-weight:700;text-shadow:0 0 8px rgba(57,255,20,0.6)">Link copied!</span>
-          <button id="share-btn" class="btn btn-ghost btn-sm" aria-label="Copy link to this post">
+          <span id="share-toast" style="font-size:var(--text-xs);color:#39ff14;display:none;font-weight:700;text-shadow:0 0 8px rgba(57,255,20,0.6)" data-i18n="news.link_copied">Link copied!</span>
+          <button id="share-btn" class="btn btn-ghost btn-sm" aria-label="Copy link to this post" data-i18n="news.copy_link">
             <i class="ph ph-link" aria-hidden="true"></i>
             Copy link
           </button>
@@ -155,8 +155,8 @@
   </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=news-flags-20260529';
-    import { getLang } from '../assets/js/i18n.js';
+    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=catA-20260529';
+    import { getLang, t } from '../assets/js/i18n.js';
 
     function catClass(cat) {
       const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
@@ -183,7 +183,7 @@
       const el = document.getElementById('post-date-edited');
       if (!el) return;
       if (dateEdited) {
-        const prefix = (getLang() === 'pt') ? 'Atualizado em ' : 'Updated ';
+        const prefix = t('news.updated');
         el.textContent = prefix + formatDate(dateEdited);
         el.setAttribute('datetime', dateEdited);
         el.style.display = '';
@@ -258,7 +258,7 @@
 
       const label = document.createElement('div');
       label.className = 'post-toc-label';
-      label.textContent = 'Chapters';
+      label.textContent = t('news.chapters');
       sidebar.appendChild(label);
 
       // Mobile toggle button
@@ -266,7 +266,7 @@
       toggle.type = 'button';
       toggle.className = 'post-toc-toggle';
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.innerHTML = 'Chapters <i class="ph ph-list" aria-hidden="true"></i>';
+      toggle.innerHTML = t('news.chapters') + ' <i class="ph ph-list" aria-hidden="true"></i>';
       sidebar.appendChild(toggle);
 
       const list = document.createElement('ol');
@@ -566,7 +566,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.js?v=news-flags-20260529"></script>
+  <script type="module" src="../assets/js/main.js?v=catA-20260529"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>
