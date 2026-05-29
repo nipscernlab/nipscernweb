@@ -38,6 +38,7 @@
           </a>
           <span class="badge" id="post-category-badge"></span>
           <time id="post-date" class="news-date"></time>
+          <time id="post-date-edited" class="news-date news-date-edited" style="display:none"></time>
         </div>
         <h1 class="post-title" id="post-title"></h1>
         <p class="post-excerpt" id="post-excerpt"></p>
@@ -160,6 +161,21 @@
     function catClass(cat) {
       const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
       return m[cat] || 'badge-gray';
+    }
+
+    /** Show an "Updated on <date>" stamp when the post carries an edit date. */
+    function renderEditedDate(dateEdited) {
+      const el = document.getElementById('post-date-edited');
+      if (!el) return;
+      if (dateEdited) {
+        const prefix = (getLang() === 'pt') ? 'Atualizado em ' : 'Updated ';
+        el.textContent = prefix + formatDate(dateEdited);
+        el.setAttribute('datetime', dateEdited);
+        el.style.display = '';
+      } else {
+        el.textContent = '';
+        el.style.display = 'none';
+      }
     }
 
     function pickLang(featured) {
@@ -369,6 +385,7 @@
 
       document.getElementById('post-date').textContent = formatDate(post.date);
       document.getElementById('post-date').setAttribute('datetime', post.date);
+      renderEditedDate(post.date_edited);
       document.getElementById('post-title').textContent = post.title;
       document.getElementById('post-excerpt').textContent = post.excerpt;
       document.getElementById('post-header').style.display = 'block';
@@ -514,6 +531,7 @@
         document.getElementById('post-title').textContent   = tr.title || '';
         document.getElementById('post-excerpt').textContent = tr.subtitle || tr.excerpt || '';
         document.getElementById('page-title').textContent   = (tr.title || '') + ' — NIPSCERN';
+        renderEditedDate(featured.date_edited);
         const bodyEl = document.getElementById('post-body');
         // Remove any existing TOC layout wrapper before re-rendering
         const layout = document.querySelector('.post-featured-layout');
