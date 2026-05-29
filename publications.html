@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
-  <link rel="stylesheet" href="assets/css/main.css?v=author-combo-mobile-20260529">
+  <link rel="stylesheet" href="assets/css/main.css?v=lang-flags-20260529">
 </head>
 <body>
 
@@ -187,9 +187,9 @@
 </script>
 
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
-  <script type="module" src="assets/js/main.js"></script>
+  <script type="module" src="assets/js/main.js?v=lang-flags-20260529"></script>
   <script type="module">
-    import { initPublications } from './assets/js/publications.js?v=author-count-20260520';
+    import { initPublications } from './assets/js/publications.js?v=lang-flags-20260529';
     // Defer until after DOMContentLoaded so main.js has already run
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
