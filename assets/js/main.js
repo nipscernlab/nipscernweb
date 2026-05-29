@@ -252,6 +252,21 @@ function initFooter() {
   footer.innerHTML = buildFooter();
 }
 
+/**
+ * Populate any [data-content-lang] element with a small flag + language name,
+ * marking the language a page's (untranslated) body content is written in.
+ * Static — it reflects the content language, not the chosen UI language.
+ */
+function initContentLangBadges() {
+  document.querySelectorAll('[data-content-lang]').forEach(el => {
+    const lang = el.getAttribute('data-content-lang') || 'en';
+    if (!FLAG_SVGS[lang]) return;
+    const name = LANG_NAMES[lang] || lang;
+    el.innerHTML = `<span class="clang-flag" aria-hidden="true">${FLAG_SVGS[lang]}</span><span>${name}</span>`;
+    if (!el.getAttribute('title')) el.setAttribute('title', name);
+  });
+}
+
 // ============================================================
 // Intersection Observer — Entrance animations
 // ============================================================
@@ -500,6 +515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNav();
   initFooter();
   initBackToTop();
+  initContentLangBadges();
   await initI18n();
   initAnimations();
 
