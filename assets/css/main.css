@@ -2322,6 +2322,10 @@ h1, h2, h3, h4, h5, h6 {
   .stats-strip-inner { grid-template-columns: 1fr 1fr; }
   .hero-actions { flex-direction: column; }
   .pub-controls { flex-direction: column; }
+  /* In column layout the flex-basis (280px) would become a HEIGHT, making
+     the author filter a tall empty box. Reset it so each control is sized
+     by its content; full width comes from align-items: stretch. */
+  .pub-controls > * { flex: 0 0 auto; }
   .coordinator-card { padding: var(--sp-6); }
   .timeline::before { left: 60px; }
 }
