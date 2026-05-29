@@ -6,6 +6,7 @@
   <title>Page Not Found — NIPSCERN</title>
   <meta name="description" content="The page you were looking for could not be found on the NIPSCERN website.">
   <meta name="robots" content="noindex">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
 
   <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
 
@@ -66,30 +67,30 @@
 </head>
 <body>
 
-  <a href="#main" class="skip-link">Skip to content</a>
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
   <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
 
   <main id="main">
     <div class="error-page">
       <i class="ph ph-warning-circle error-icon" aria-hidden="true"></i>
       <div class="error-code" aria-label="Error 404">404</div>
-      <h1 class="error-title">Page not found</h1>
-      <p class="error-desc">
+      <h1 class="error-title" data-i18n="notfound.title">Page not found</h1>
+      <p class="error-desc" data-i18n="notfound.desc">
         The page you were looking for doesn't exist or has been moved.
         Please check the URL or navigate back to the home page.
       </p>
       <div class="error-actions">
         <a href="/" class="btn btn-primary">
           <i class="ph ph-house" aria-hidden="true"></i>
-          Back to Home
+          <span data-i18n="notfound.home">Back to Home</span>
         </a>
         <a href="/publications.html" class="btn btn-ghost">
           <i class="ph ph-book-open" aria-hidden="true"></i>
-          Publications
+          <span data-i18n="notfound.publications">Publications</span>
         </a>
         <a href="/projects/" class="btn btn-ghost">
           <i class="ph ph-code" aria-hidden="true"></i>
-          Projects
+          <span data-i18n="notfound.projects">Projects</span>
         </a>
       </div>
     </div>
