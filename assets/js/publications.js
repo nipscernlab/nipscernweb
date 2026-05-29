@@ -24,7 +24,8 @@ const TYPE_BADGE = {
 const AUTHOR_ALIASES = {
   'm. hufnagel':            'Mateus Hufnagel Maranha de Faria',
   'leandro r. manso':       'Leandro Rodrigues Manso Silva',
-  'afonso, c. a. a':        'Chrysthofer Arthur Amaro Afonso',
+  'afonso, c. a. a':        'Chrysthofer A. A. Afonso',
+  'chrysthofer arthur amaro afonso': 'Chrysthofer A. A. Afonso',
   'dabson ferreira':        'Dabson Ferreira dos Santos',
   'dabson f. dos santos':   'Dabson Ferreira dos Santos',
   'allec nunes':            'Allec Nunes Terrezo',
@@ -43,7 +44,7 @@ function cleanAuthorName(author) {
 async function loadPublications() {
   const depth = (window.location.pathname.match(/\//g) || []).length - 1;
   const prefix = depth > 1 ? '../'.repeat(depth - 1) : '';
-  const res = await fetch(prefix + 'data/publications.json?v=author-normalized-20260520-eder', { cache: 'no-store' });
+  const res = await fetch(prefix + 'data/publications.json?v=author-normalized-20260529-chrysthofer', { cache: 'no-store' });
   if (!res.ok) return [];
   const data = await res.json();
   // Filter out empty entries and sort by year descending, then by title
