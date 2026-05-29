@@ -230,11 +230,11 @@ function buildFooter() {
       <p data-i18n="footer.copyright">© 2025 NIPSCERN — Federal University of Juiz de Fora. All rights reserved.</p>
       <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--text-xs);color:var(--text-muted)">
-          <a href="${ROOT}credits" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Credits</a>
+          <a href="${ROOT}credits" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.credits">Credits</a>
           <span aria-hidden="true">·</span>
-          <a href="${ROOT}terms" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Terms</a>
+          <a href="${ROOT}terms" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.terms">Terms</a>
           <span aria-hidden="true">·</span>
-          <a href="${ROOT}privacy" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">Privacy</a>
+          <a href="${ROOT}privacy" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.privacy">Privacy</a>
         </div>
         <div class="footer-social">
           <a href="https://github.com/nipscernlab" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitHub">
@@ -345,10 +345,12 @@ export function newsLangFlag(post) {
   return `<span class="pub-lang-flag" role="img" title="${name}" aria-label="${name}">${FLAG_SVGS[lang] || ''}</span>`;
 }
 
-// Format date like "18 Nov 2024"
+// Format date like "18 Nov 2024", localised to the current UI language
+const DATE_LOCALES = { en: 'en-GB', pt: 'pt-BR', fr: 'fr-FR', no: 'nb-NO' };
 export function formatDate(isoDate) {
   const d = new Date(isoDate + 'T12:00:00Z');
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const locale = DATE_LOCALES[(typeof getLang === 'function' && getLang()) || 'en'] || 'en-GB';
+  return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // ============================================================
