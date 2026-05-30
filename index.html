@@ -641,6 +641,25 @@
 
       const workerUrl = 'https://goatcounter-proxy.nipscernlab.workers.dev';
 
+      function animateCount(target) {
+        const end = Math.max(0, Number(target) || 0);
+        const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1400;
+        const startTime = performance.now();
+
+        function tick(now) {
+          const elapsed = now - startTime;
+          const progress = duration ? Math.min(elapsed / duration, 1) : 1;
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.round(end * eased).toLocaleString();
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+
+        el.textContent = '0';
+        wrap.removeAttribute('hidden');
+        wrap.style.display = 'flex';
+        requestAnimationFrame(tick);
+      }
+
       fetch(workerUrl)
         .then(function (r) { 
           if (!r.ok) throw new Error("Erro na resposta do Worker: " + r.status);
@@ -653,17 +672,8 @@
           
           var count = data.total;
           
-          if (count > 0) { 
-            // 1. Escreve o número (ex: 151)
-            el.textContent = Number(count).toLocaleString(); 
-            
-            // 2. Remove o atributo hidden
-            wrap.removeAttribute('hidden'); 
-            
-            // 3. Força a exibição caso o CSS esteja escondendo
-            // (Use 'flex' se o seu layout usar flexbox para alinhar o ícone e o texto, ou 'block'/'inline-block')
-            wrap.style.display = 'flex'; 
-            
+          if (count > 0) {
+            animateCount(count);
             console.log("Contador atualizado e visível na tela!");
           }
         })
