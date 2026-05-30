@@ -226,7 +226,7 @@ function buildFooter() {
     </div>
 
     <div class="footer-bottom">
-      <p data-i18n="footer.copyright">© 2025 NIPSCERN — Federal University of Juiz de Fora. All rights reserved.</p>
+      <p data-i18n="footer.copyright">© 2026 NIPSCERN — Federal University of Juiz de Fora. All rights reserved.</p>
       <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--text-xs);color:var(--text-muted)">
           <a href="${ROOT}credits" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.credits">Credits</a>
@@ -351,11 +351,18 @@ export function newsResolvedLang(post) {
   return t[lang] ? lang : 'en';
 }
 
-/** Flag badge marking the language a news post is displayed in. */
+/** Flag badges marking every language available for a news post. */
 export function newsLangFlag(post) {
-  const lang = newsResolvedLang(post);
-  const name = LANG_NAMES[lang] || lang;
-  return `<span class="pub-lang-flag" role="img" title="${name}" aria-label="${name}">${FLAG_SVGS[lang] || ''}</span>`;
+  const translations = (post && post.translations) || {};
+  const langs = ['en', ...Object.keys(translations)]
+    .filter((lang, index, list) => FLAG_SVGS[lang] && list.indexOf(lang) === index);
+
+  return `<span class="news-lang-flags" aria-label="${langs.map(lang => LANG_NAMES[lang] || lang).join(', ')}">`
+    + langs.map(lang => {
+      const name = LANG_NAMES[lang] || lang;
+      return `<span class="pub-lang-flag" role="img" title="${name}" aria-label="${name}">${FLAG_SVGS[lang] || ''}</span>`;
+    }).join('')
+    + `</span>`;
 }
 
 // Format date like "18 Nov 2024", localised to the current UI language

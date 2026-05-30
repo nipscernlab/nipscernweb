@@ -940,14 +940,22 @@ h1, h2, h3, h4, h5, h6 {
 .pub-lang-flag {
   display: inline-flex;
   align-items: center;
-  margin-left: auto;
   line-height: 0;
   border-radius: 2px;
   overflow: hidden;
   box-shadow: 0 0 0 1px var(--border-mid);
   flex: none;
 }
+.pub-card-meta > .pub-lang-flag { margin-left: auto; }
 .pub-lang-flag img { height: 14px; width: 20px; display: block; object-fit: cover; }
+
+.news-lang-flags {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  flex: none;
+}
 
 /* "Content language" badge — marks pages whose body text is left untranslated
    (e.g. detailed English content). Populated by initContentLangBadges(). */
@@ -1359,7 +1367,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--sp-10);
 }
 
@@ -1367,10 +1375,13 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 92px;
+  height: 68px;
   opacity: 0.5;
   transition: opacity var(--t-base), transform var(--t-base);
   text-decoration: none;
   filter: grayscale(0.6) brightness(0.85);
+  flex: 0 0 auto;
 }
 .sponsor-logo:hover {
   opacity: 0.95;
@@ -1379,11 +1390,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sponsor-logo img {
-  width: 56px;
-  height: 56px;
+  width: 100%;
+  height: 100%;
   display: block;
+  object-fit: contain;
   border-radius: var(--r-md);
 }
+
+.sponsor-logo img[src*="fapemig"] { width: 78px; height: 78px; }
+.sponsor-logo img[src*="capes"] { width: 78px; height: 57px; }
+.sponsor-logo img[src*="cnpq"] { width: 100px; height: 46px; }
+.sponsor-logo img[src*="ufjf"] { width: 76px; height: 82px; }
+.sponsor-logo img[src*="cern"] { width: 70px; height: 70px; }
 
 /* ============================================================
    CGV Preview (3D Calorimeter)
@@ -2354,7 +2372,7 @@ h1, h2, h3, h4, h5, h6 {
   .lhc-stats-grid { grid-template-columns: 1fr; }
   .ecosystem-grid { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; }
-  .sponsors-logos { gap: var(--sp-6); }
+  .sponsors-logos { flex-wrap: wrap; gap: var(--sp-6); }
   .stats-strip-inner { grid-template-columns: 1fr 1fr; }
   .hero-actions { flex-direction: column; }
   .pub-controls { flex-direction: column; }
