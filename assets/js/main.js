@@ -5,6 +5,8 @@
 
 import { initI18n, getLang, setLanguage } from './i18n.js';
 
+import { newsPostUrl } from './content-links.js';
+
 // ============================================================
 // Navigation Template
 // ============================================================
@@ -405,7 +407,7 @@ async function initHomeLatest() {
     }
 
     const link = document.createElement('a');
-    link.href = rootPath('news/') + '#' + post.id;
+    link.href = rootPath(newsPostUrl(post, 'news/post'));
     link.className = 'news-card';
     link.style.height = '100%';
     link.appendChild(imgDiv);

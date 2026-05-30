@@ -115,6 +115,7 @@
   <script type="module">
     import { formatDate, newsLangFlag } from '../assets/js/main.js?v=catA-20260529';
     import { getLang, t } from '../assets/js/i18n.js';
+    import { newsPostUrl } from '../assets/js/content-links.js';
 
     async function loadNews() {
       const res = await fetch('../data/news.json');
@@ -156,7 +157,7 @@
       const byText     = t('news.by');
 
       article.innerHTML = `
-        <a href="post?id=${featured.id}" class="news-featured-link" aria-label="${tr.title || ''}">
+        <a href="${newsPostUrl(featured)}" class="news-featured-link" aria-label="${tr.title || ''}">
           <div class="news-featured-media">
             <span class="news-featured-ribbon"><i class="ph ph-star" aria-hidden="true"></i> ${ribbonText}</span>
             <img src="../${featured.image}" alt="" loading="eager"
@@ -199,7 +200,7 @@
 
       // Image section — wraps in <a> so clicking the image also navigates
       const imgDiv = document.createElement('a');
-      imgDiv.href = 'post?id=' + post.id;
+      imgDiv.href = newsPostUrl(post);
       imgDiv.className = 'news-card-image';
       imgDiv.tabIndex = -1;         // skip-tab: the Read more link already covers keyboard nav
       imgDiv.setAttribute('aria-hidden', 'true');
@@ -259,7 +260,7 @@
       excerpt.textContent = postText(post, 'excerpt');
 
       const readMore = document.createElement('a');
-      readMore.href = 'post?id=' + post.id;
+      readMore.href = newsPostUrl(post);
       readMore.className = 'news-read-more';
       readMore.setAttribute('data-i18n', 'news.read_more');
       readMore.textContent = t('news.read_more') + ' ';
