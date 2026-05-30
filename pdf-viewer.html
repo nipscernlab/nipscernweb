@@ -383,8 +383,13 @@
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+  /* ---------- Asset base path ---------- */
+  var depth = window.location.pathname.split('/').filter(function(s){ return s.length > 0; }).length - 1;
+  var base  = depth > 0 ? '../'.repeat(depth) : '';
+
   /* ---------- URL params ---------- */
   var P        = new URLSearchParams(window.location.search);
+  var pdfId    = P.get('id') || P.get('pub') || P.get('slug') || '';
   var pdfSrc   = P.get('src') || P.get('file') || '';
   var pTitle   = P.get('title')   || '';
   var pAuthors = P.get('authors') || '';
@@ -392,10 +397,6 @@
   var pYear    = P.get('year')    || '';
   var pDoi     = P.get('doi')     || '';
   var pBack    = P.get('back')    || document.referrer || '/';
-
-  /* ---------- Asset base path ---------- */
-  var depth = window.location.pathname.split('/').filter(function(s){ return s.length > 0; }).length - 1;
-  var base  = depth > 0 ? '../'.repeat(depth) : '';
 
   var tbHome = document.getElementById('tb-home');
   tbHome.href = base || '/';
@@ -411,6 +412,36 @@
   var pdfFilename  = pdfSrc ? (pdfSrc.split('/').pop() || 'document.pdf') : 'document.pdf';
   var curRenderTask = null;
   var pageObserver  = null;
+
+  function samePublication(pub, key) {
+    if (!pub || !key) return false;
+    return pub.id === key || pub.slug === key;
+  }
+
+  function applyPublication(pub) {
+    if (!pub) return false;
+    pdfSrc = pub.pdf || pdfSrc;
+    pTitle = pub.title || pTitle;
+    pAuthors = Array.isArray(pub.authors) ? pub.authors.join('; ') : (pub.authors || pAuthors);
+    pJournal = pub.journal || pJournal;
+    pYear = pub.year ? String(pub.year) : pYear;
+    pDoi = pub.doi || pDoi;
+    pdfFilename = pdfSrc ? (pdfSrc.split('/').pop() || 'document.pdf') : 'document.pdf';
+    return !!pdfSrc;
+  }
+
+  async function resolvePublication() {
+    if (!pdfId) return !!pdfSrc;
+    try {
+      var res = await fetch(base + 'data/publications.json', { cache: 'no-store' });
+      if (!res.ok) return !!pdfSrc;
+      var publications = await res.json();
+      return applyPublication(publications.find(function(pub) { return samePublication(pub, pdfId); }));
+    } catch (e) {
+      console.warn('[pdf] publication lookup failed:', e);
+      return !!pdfSrc;
+    }
+  }
 
   /* ---------- DOM refs ---------- */
   var viewer    = document.getElementById('viewer');
@@ -717,7 +748,8 @@
   });
 
   /* ---------- Main init ---------- */
-  function init() {
+  async function init() {
+    await resolvePublication();
     if (!pdfSrc) { showState('empty'); return; }
 
     showState('load');
@@ -772,7 +804,10 @@
   }
 
   /* Wait one frame so viewer.clientWidth is accurate */
-  requestAnimationFrame(function(){ init(); });
+  requestAnimationFrame(function(){ init().catch(function(err) {
+    console.error('[pdf] init error:', err);
+    showState('err');
+  }); });
 
 })();
 </script>

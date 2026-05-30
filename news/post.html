@@ -157,6 +157,7 @@
   <script type="module">
     import { formatDate, newsLangFlag } from '../assets/js/main.js?v=catA-20260529';
     import { getLang, t } from '../assets/js/i18n.js';
+    import { newsPostUrl } from '../assets/js/content-links.js';
 
     function catClass(cat) {
       const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
@@ -350,7 +351,7 @@
 
     async function loadPost() {
       const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
+      const id = params.get('id') || params.get('slug');
 
       document.getElementById('post-loading').style.display = 'block';
 
@@ -370,10 +371,10 @@
       document.getElementById('post-loading').style.display = 'none';
 
       let post;
-      if (featured && featured.id === id) {
+      if (featured && [featured.id, featured.slug].includes(id)) {
         post = adaptFeatured(featured);
       } else {
-        post = posts.find(p => p.id === id);
+        post = posts.find(p => p.id === id || p.slug === id);
       }
       if (!post) {
         document.getElementById('post-not-found').style.display = 'block';
@@ -390,7 +391,7 @@
       document.getElementById('page-desc').content = post.excerpt;
       document.getElementById('og-title').content = post.title;
       document.getElementById('og-desc').content = post.excerpt;
-      document.getElementById('og-url').content = 'https://nipscern.com/news/post?id=' + post.id;
+      document.getElementById('og-url').content = 'https://nipscern.com/' + newsPostUrl(post, 'news/post');
 
       // Render header
       const badge = document.getElementById('post-category-badge');
@@ -481,7 +482,7 @@
           const listEl = document.getElementById('post-related-list');
           relatedPosts.forEach(rp => {
             const a = document.createElement('a');
-            a.href = 'post?id=' + rp.id;
+            a.href = newsPostUrl(rp);
             a.style.cssText = 'display:flex;gap:var(--sp-3);align-items:center;padding:var(--sp-3) var(--sp-4);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-lg);text-decoration:none;transition:border-color 0.15s';
             a.onmouseover = () => { a.style.borderColor = 'var(--border-mid)'; };
             a.onmouseout  = () => { a.style.borderColor = 'var(--border-subtle)'; };
@@ -542,7 +543,8 @@
         if (!res.ok) return;
         const featured = await res.json();
         const params = new URLSearchParams(window.location.search);
-        if (featured.id !== params.get('id')) return;
+        const currentId = params.get('id') || params.get('slug');
+        if (![featured.id, featured.slug].includes(currentId)) return;
         const tr = pickLang(featured);
         document.getElementById('post-title').textContent   = tr.title || '';
         document.getElementById('post-excerpt').textContent = tr.subtitle || tr.excerpt || '';

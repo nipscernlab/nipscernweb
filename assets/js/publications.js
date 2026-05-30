@@ -5,6 +5,7 @@
 
 import { t } from './i18n.js';
 import { formatDate, pubLangFlag } from './main.js?v=lang-flags-20260529';
+import { publicationUrl } from './content-links.js';
 
 const TYPE_BADGE = {
   article:      'badge-blue',
@@ -63,14 +64,7 @@ function renderCard(pub) {
   const doi = pub.doi
     ? `<a href="https://doi.org/${pub.doi}" target="_blank" rel="noopener" class="text-brand" style="font-size:var(--text-xs);margin-top:4px;display:inline-block">${pub.doi}</a>`
     : '';
-  const pdfViewerUrl = pub.pdf
-    ? '/pdf-viewer?src=' + encodeURIComponent(pub.pdf)
-      + '&title=' + encodeURIComponent(pub.title)
-      + '&authors=' + encodeURIComponent(pub.authors.join('; '))
-      + '&journal=' + encodeURIComponent(pub.journal)
-      + '&year=' + encodeURIComponent(String(pub.year))
-      + (pub.doi ? '&doi=' + encodeURIComponent(pub.doi) : '')
-    : '';
+  const pdfViewerUrl = pub.pdf ? publicationUrl(pub) : '';
   const pdfBtn = pdfViewerUrl
     ? '<a href="' + pdfViewerUrl + '" class="btn btn-ghost btn-sm" data-i18n="publications.open_pdf"><i class="ph ph-file-pdf" aria-hidden="true"></i> Open PDF</a>'
     : '';
