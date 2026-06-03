@@ -11,13 +11,15 @@ import { newsPostUrl } from './content-links.js';
 // Navigation Template
 // ============================================================
 
+// `label` is the English default shown before i18n.json loads, so the raw
+// key (e.g. "nav.home") never flashes on screen. i18n localises it after.
 const NAV_LINKS = [
-  { key: 'nav.home',         href: '',           paths: ['/'] },
-  { key: 'nav.about',        href: 'about',      paths: ['/about', '/about.html'] },
-  { key: 'nav.cern',         href: 'cern',       paths: ['/cern', '/cern.html'] },
-  { key: 'nav.projects',     href: 'projects/',  paths: ['/projects/', '/projects/index.html', '/projects', '/projects/sapho', '/projects/sapho.html', '/projects/yanc', '/projects/yanc.html', '/projects/polaris', '/projects/polaris.html', '/projects/aurora', '/projects/aurora.html', '/projects/cgv', '/projects/cgv.html'] },
-  { key: 'nav.publications', href: 'publications.html', paths: ['/publications', '/publications/', '/publications.html'] },
-  { key: 'nav.news',         href: 'news/',      paths: ['/news/', '/news/index.html', '/news', '/news/post', '/news/post.html'] },
+  { key: 'nav.home',         label: 'Home',         href: '',           paths: ['/'] },
+  { key: 'nav.about',        label: 'About',        href: 'about',      paths: ['/about', '/about.html'] },
+  { key: 'nav.cern',         label: 'CERN',         href: 'cern',       paths: ['/cern', '/cern.html'] },
+  { key: 'nav.projects',     label: 'Projects',     href: 'projects/',  paths: ['/projects/', '/projects/index.html', '/projects', '/projects/sapho', '/projects/sapho.html', '/projects/yanc', '/projects/yanc.html', '/projects/polaris', '/projects/polaris.html', '/projects/aurora', '/projects/aurora.html', '/projects/cgv', '/projects/cgv.html'] },
+  { key: 'nav.publications', label: 'Publications', href: 'publications.html', paths: ['/publications', '/publications/', '/publications.html'] },
+  { key: 'nav.news',         label: 'News',         href: 'news/',      paths: ['/news/', '/news/index.html', '/news', '/news/post', '/news/post.html'] },
 ];
 
 /**
@@ -66,7 +68,7 @@ function buildNav() {
 
   const linksHtml = NAV_LINKS.map(link => {
     const href = ROOT + link.href;
-    return `<a href="${href}" class="nav-link${isActivePath(link) ? ' active' : ''}" data-i18n="${link.key}">${link.key}</a>`;
+    return `<a href="${href}" class="nav-link${isActivePath(link) ? ' active' : ''}" data-i18n="${link.key}">${link.label}</a>`;
   }).join('');
 
   const langBtns = ['en', 'pt', 'fr', 'no'].map(lang => `
@@ -78,7 +80,7 @@ function buildNav() {
   const mobileLinksHtml = NAV_LINKS.map(link => {
     const href = ROOT + link.href;
     const isActive = isActivePath(link);
-    return `<a href="${href}" class="nav-mobile-link${isActive ? ' active' : ''}" data-i18n="${link.key}">${link.key}</a>`;
+    return `<a href="${href}" class="nav-mobile-link${isActive ? ' active' : ''}" data-i18n="${link.key}">${link.label}</a>`;
   }).join('');
 
   return `
@@ -176,7 +178,7 @@ function initNav() {
 function buildFooter() {
   const links = NAV_LINKS.map(link => {
     const href = ROOT + link.href;
-    return `<li><a href="${href}" data-i18n="${link.key}">${link.key}</a></li>`;
+    return `<li><a href="${href}" data-i18n="${link.key}">${link.label}</a></li>`;
   }).join('');
 
   return `

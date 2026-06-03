@@ -9,7 +9,7 @@
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://nipscern.com/projects/polaris">
   <meta property="og:title" content="POLARIS — Cross-Platform IDE for SAPHO | NIPSCERN">
-  <meta property="og:description" content="Modern, lightweight IDE built with Tauri and Rust. The successor to AURORA, now supporting Linux and Windows.">
+  <meta property="og:description" content="Modern, lightweight IDE built with Tauri and Rust, for the SAPHO ecosystem on Linux and Windows.">
   <meta property="og:image" content="https://nipscern.com/assets/images/projects/polaris.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -98,7 +98,7 @@
           </h1>
           <p class="project-hero-fullname fade-up" data-i18n="projects.polaris.full">Cross-Platform Graphical IDE for SAPHO</p>
           <p class="project-hero-desc fade-up" data-i18n="projects.polaris.desc">
-            POLARIS is a modern, lightweight graphical development environment for the SAPHO ecosystem. Built on <strong>Tauri + Rust</strong> with a <strong>Monaco Editor</strong> frontend, it integrates the YANC compiler, PRISM RTL Viewer, and YAWT Wave Tracer into a single native application. It succeeds AURORA with cross-platform support and a dramatically smaller footprint.
+            POLARIS is a modern, lightweight graphical development environment for the SAPHO ecosystem. Built on <strong>Tauri + Rust</strong> with a <strong>Monaco Editor</strong> frontend, it integrates the YANC compiler, PRISM RTL Viewer, and YAWT Wave Tracer into a single native application. It runs natively on Linux and Windows with a small memory footprint.
           </p>
           <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links fade-up">
@@ -107,8 +107,8 @@
               <span data-i18n="projects.github">View on GitHub</span>
             </a>
             <a href="aurora" class="btn btn-ghost">
-              <i class="ph ph-arrow-clockwise" aria-hidden="true"></i>
-              Succeeded AURORA
+              <i class="ph ph-app-window" aria-hidden="true"></i>
+              Explore AURORA
             </a>
             <a href="./" class="btn btn-ghost">
               <i class="ph ph-arrow-left" aria-hidden="true"></i>
@@ -144,7 +144,7 @@
                 <div class="feature-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)"><i class="ph ph-package" aria-hidden="true"></i></div>
                 <div>
                   <div class="feature-text" style="font-weight:600">Tauri + Rust backend</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Native system calls with a WebView frontend. Starts in under one second. Memory footprint ~60 MB versus ~300 MB for Electron (AURORA).</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Native system calls with a WebView frontend. Starts in under one second, with a memory footprint around 60 MB.</div>
                 </div>
               </div>
               <div class="feature-item">
@@ -172,7 +172,7 @@
                 <div class="feature-icon" style="background:rgba(91,156,246,0.12);color:var(--brand)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
                 <div>
                   <div class="feature-text" style="font-weight:600">YAWT Wave Tracer</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Waveform viewer for simulation results. Replaces the external GTKWave dependency that AURORA required.</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Waveform viewer for simulation results, built directly into the IDE with no external GTKWave dependency.</div>
                 </div>
               </div>
               <div class="feature-item">
@@ -186,50 +186,8 @@
           </div>
 
           <div class="fade-up">
-            <h3 class="heading-sm" style="margin-bottom:var(--sp-5)">POLARIS vs. AURORA</h3>
-            <div class="comparison-table">
-              <div class="ct-header">
-                <div class="ct-cell" style="background:var(--bg-elevated);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:11px;color:var(--text-muted)">Feature</div>
-                <div class="ct-cell" style="background:rgba(147,51,234,0.1);color:var(--accent-polaris);font-weight:700;font-size:11px;text-align:center">POLARIS</div>
-                <div class="ct-cell" style="background:rgba(124,58,237,0.05);color:var(--accent-aurora);font-weight:700;font-size:11px;text-align:center">AURORA</div>
-              </div>
-              <div class="ct-row">
-                <div class="ct-label">Framework</div>
-                <div class="ct-val" style="color:var(--accent-polaris)">Tauri + Rust</div>
-                <div class="ct-val" style="color:var(--text-muted)">Electron</div>
-              </div>
-              <div class="ct-row">
-                <div class="ct-label">Platform</div>
-                <div class="ct-val" style="color:var(--accent-polaris)">Linux + Windows</div>
-                <div class="ct-val" style="color:var(--text-muted)">Windows only</div>
-              </div>
-              <div class="ct-row">
-                <div class="ct-label">Memory usage</div>
-                <div class="ct-val" style="color:var(--accent-polaris)">~60 MB</div>
-                <div class="ct-val" style="color:var(--text-muted)">~300 MB</div>
-              </div>
-              <div class="ct-row">
-                <div class="ct-label">Startup time</div>
-                <div class="ct-val" style="color:var(--accent-polaris)">&lt; 1 s</div>
-                <div class="ct-val" style="color:var(--text-muted)">3–5 s</div>
-              </div>
-              <div class="ct-row">
-                <div class="ct-label">Wave viewer</div>
-                <div class="ct-val" style="color:var(--accent-polaris)">YAWT (built-in)</div>
-                <div class="ct-val" style="color:var(--text-muted)">GTKWave (external)</div>
-              </div>
-              <div class="ct-row">
-                <div class="ct-label">Status</div>
-                <div class="ct-val">
-                  <span class="badge badge-green" style="font-size:11px">Active</span>
-                </div>
-                <div class="ct-val">
-                  <span class="badge badge-red" style="font-size:11px">Legacy</span>
-                </div>
-              </div>
-            </div>
-
-            <h3 class="heading-sm" style="margin-top:var(--sp-8);margin-bottom:var(--sp-4)">Typical Workflow</h3>
+            <!-- POLARIS vs AURORA comparison removed; AURORA is an active, first-class IDE -->
+            <h3 class="heading-sm" style="margin-bottom:var(--sp-4)">Typical Workflow</h3>
             <div>
               <div class="workflow-step">
                 <div class="ws-num">1</div>
