@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AURORA — Windows IDE for SAPHO | NIPSCERN</title>
-  <meta name="description" content="AURORA was a powerful Windows-only IDE built with Electron for the SAPHO ecosystem. Now succeeded by POLARIS. 25 releases — latest v4.27.10.">
+  <title>AURORA: The IDE for SAPHO | NIPSCERN</title>
+  <meta name="description" content="AURORA is the desktop IDE for the SAPHO platform. Describe a processor in a few lines of C±, then compile, simulate and inspect it in one window. Aurora Intelligence adds an AI assistant that drives the IDE through its own tools. SAPHO = AURORA + YANC.">
 
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://nipscern.com/projects/aurora">
-  <meta property="og:title" content="AURORA — Windows IDE for SAPHO | NIPSCERN">
-  <meta property="og:description" content="The original Electron-based IDE for SAPHO. Succeeded by POLARIS.">
-  <meta property="og:image" content="https://nipscern.com/assets/images/projects/aurora.jpg">
+  <meta property="og:title" content="AURORA: The IDE for SAPHO | NIPSCERN">
+  <meta property="og:description" content="Describe a processor in C±, then compile, simulate and inspect it in one window, with Aurora Intelligence, an AI that works through the IDE's own tools.">
+  <meta property="og:image" content="https://nipscern.com/assets/images/projects/aurora.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://nipscern.com/projects/aurora">
@@ -23,49 +23,165 @@
   <link rel="stylesheet" href="../assets/css/main.css">
 
   <style>
-    :root { --page-accent: var(--accent-aurora); }
+    :root {
+      --page-accent: var(--accent-aurora);
+      --aur: #7c3aed;
+      --aur-text: #c9b6ff;
+      --aur-line: rgba(124,58,237,0.28);
+      /* soft, light, rosy: pale lilac to pink to white */
+      --grad-soft: linear-gradient(105deg, #e7c9f6 0%, #f6bfe6 34%, #ffcbe0 66%, #fff3fa 100%);
+    }
 
-    /* ── Night sky + Aurora hero ── */
+    .grad-soft {
+      background: var(--grad-soft);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    /* ── Night sky + Aurora hero (kept verbatim) ── */
     .project-hero { position: relative; overflow: hidden; }
-
     .aurora-bg {
-      position: absolute; inset: 0; pointer-events: none; z-index: 0;
-      overflow: hidden;
-      /* Deep blue night sky — visible through the translucent aurora bands */
-      background: linear-gradient(180deg,
-        #010511 0%,
-        #020a1d 20%,
-        #031828 45%,
-        #062040 65%,
-        #0a2a55 80%,
-        #041930 100%
-      );
+      position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+      background: linear-gradient(180deg,#010511 0%,#020a1d 20%,#031828 45%,#062040 65%,#0a2a55 80%,#041930 100%);
     }
+    .aurora-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-    /* ── Aurora SVG ribbon ── */
-    .aurora-svg {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      pointer-events: none;
-    }
+    /* ─────────────────────────────────────────────────────────────
+       Editorial body: calm, typographic, content-first.
+       No gradient text, no glow bands, no decorative card grids.
+       ───────────────────────────────────────────────────────────── */
 
-    /* ── Release table ── */
-    .release-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--sp-4);
-      padding: var(--sp-3) var(--sp-4);
-      border-bottom: 1px solid var(--border-subtle);
-      font-size: var(--text-xs);
+    .sec-label {
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-muted);
+      display: flex; align-items: center; gap: 12px; margin-bottom: var(--sp-5);
     }
-    .release-row:last-child { border-bottom: none; }
-    .release-tag {
-      font-family: var(--font-mono);
-      font-weight: 600;
-      color: var(--text-primary);
+    .sec-label .n { font-weight: 700; background: var(--grad-soft); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .sec-label::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, var(--aur-line), transparent); }
+
+    .lede {
+      font-size: clamp(22px, 2.6vw, 32px); line-height: 1.4; font-weight: 500;
+      color: var(--text-primary); letter-spacing: -0.01em; margin: 0;
     }
-    .release-date { color: var(--text-muted); }
-    .release-note { color: var(--text-secondary); flex: 1; }
+    .lede .hl { background: var(--grad-soft); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    .prose p { font-size: var(--text-base); line-height: 1.78; color: var(--text-secondary); margin: 0; }
+    .prose p + p { margin-top: var(--sp-4); }
+    .prose strong { color: var(--text-primary); font-weight: 600; }
+    .prose code, .ic {
+      font-family: var(--font-mono); font-size: 0.86em; color: var(--aur-text);
+      background: var(--bg-elevated); padding: 1px 5px; border-radius: 4px;
+    }
+    .prose a { color: var(--aur-text); text-decoration: underline; text-underline-offset: 2px; }
+
+    /* split: prose + figure */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-10); align-items: center; }
+    .split.lead { grid-template-columns: 1.05fr 0.95fr; }
+    @media (max-width: 900px) { .split { grid-template-columns: 1fr; gap: var(--sp-8); } }
+
+    /* code card: shows the real directive header */
+    .code-card {
+      background: #0a0d16; border: 1px solid var(--border-subtle); border-radius: var(--r-lg);
+      overflow: hidden; box-shadow: 0 24px 60px -40px rgba(0,0,0,0.9);
+    }
+    .code-top { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .code-top .dots { display: flex; gap: 6px; }
+    .code-top .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2b3346; display: block; }
+    .code-top .fn { margin-left: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+    .code-body { margin: 0; padding: 16px 18px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.75; color: #c7d0e0; white-space: pre; }
+    .code-body .dir { color: var(--aur-text); }
+    .code-body .num { color: #f0b072; }
+    .code-body .cm  { color: #586079; }
+    .code-cap { margin-top: var(--sp-3); font-size: var(--text-xs); color: var(--text-muted); }
+
+    /* flat workflow steps */
+    .flow {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
+      background: var(--border-subtle); border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg); overflow: hidden;
+    }
+    .flow .st { background: var(--bg-card); padding: var(--sp-5) var(--sp-4); display: flex; flex-direction: column; gap: 5px; }
+    .flow .st .k { font-family: var(--font-mono); font-size: 11px; color: var(--aur); }
+    .flow .st .t { font-weight: 600; font-size: var(--text-sm); color: var(--text-primary); }
+    .flow .st .d { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    @media (max-width: 760px) { .flow { grid-template-columns: repeat(2, 1fr); } }
+
+    /* integrations: honest "works with" row */
+    .tools { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tool {
+      display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+      border: 1px solid var(--border-subtle); border-radius: 999px; background: var(--bg-card);
+      transition: border-color .18s ease;
+    }
+    .tool:hover { border-color: var(--aur-line); }
+    .tool img { height: 20px; width: 20px; object-fit: contain; }
+    .tool .fb { font-size: 16px; color: var(--text-muted); }
+    .tool .nm { font-size: var(--text-sm); color: var(--text-primary); font-weight: 600; }
+    .tool .role { font-size: 11px; color: var(--text-muted); }
+
+    /* screenshot figures */
+    .shot { margin: 0; }
+    .shot .frame {
+      position: relative; border: 1px solid var(--border-subtle); border-radius: var(--r-lg);
+      overflow: hidden; background: var(--bg-elevated); aspect-ratio: 16 / 10;
+    }
+    .shot .frame img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .shot.ok .frame img { display: block; }
+    .shot .ph { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); }
+    .shot.ok .ph { display: none; }
+    .shot .ph i { font-size: 30px; opacity: 0.6; }
+    .shot .ph span { font-size: var(--text-xs); font-family: var(--font-mono); }
+    .shot figcaption { margin-top: var(--sp-3); font-size: var(--text-xs); color: var(--text-muted); }
+    .shot.wide .frame { aspect-ratio: 16 / 9; }
+
+    /* Aurora Intelligence panel (restrained, no glow) */
+    .ai-panel { position: relative; overflow: hidden; background: linear-gradient(180deg, rgba(238,160,214,0.06), transparent 32%), var(--bg-card); border: 1px solid var(--aur-line); border-radius: var(--r-2xl); padding: var(--sp-10); }
+    .ai-panel::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--grad-soft); }
+    .ai-points { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-8); margin-top: var(--sp-9, 40px); }
+    @media (max-width: 760px) { .ai-points { grid-template-columns: 1fr; } }
+    .ai-point h4 { margin: 0 0 5px; font-size: var(--text-sm); font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    .ai-point h4 i { color: var(--aur-text); font-size: 16px; }
+    .ai-point p { margin: 0; font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.7; }
+
+    /* model chips */
+    .models { display: flex; flex-wrap: wrap; gap: 9px; }
+    .mc { display: flex; align-items: center; gap: 9px; padding: 8px 13px; border: 1px solid var(--border-subtle); border-radius: var(--r-md); background: var(--bg-elevated); }
+    .mc img, .mc .fb { height: 18px; width: 18px; object-fit: contain; }
+    .mc .fb { font-size: 15px; color: var(--text-muted); display: inline-flex; }
+    .mc b { font-size: var(--text-sm); color: var(--text-primary); font-weight: 600; }
+    .mc small { font-size: 11px; color: var(--text-muted); }
+    .mc .local { font-size: 9px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--aur-text); border: 1px solid var(--aur-line); border-radius: 4px; padding: 1px 5px; }
+
+    /* small caps subhead */
+    .ksub { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin: 0 0 var(--sp-3); }
+
+    .note { border-left: 2px solid var(--aur-line); padding: 2px 0 2px var(--sp-4); color: var(--text-secondary); font-size: var(--text-sm); line-height: 1.7; }
+
+    /* two-star AI mark + wavy link */
+    .ai-stars { width: 0.95em; height: 0.95em; vertical-align: -0.12em; margin-right: 0.35em; display: inline-block; }
+    .head-ico { width: 1em; height: 1em; object-fit: contain; vertical-align: -0.12em; margin-right: 0.4em; }
+    /* inline link: gradient text + animated wave underline on hover
+       (same effect as the site's .text-link / "Read more", custom gradient colour) */
+    .wlink {
+      position: relative;
+      background: var(--grad-soft);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      text-decoration: none;
+    }
+    .wlink::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 3px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='3' viewBox='0 0 20 3'%3E%3Cdefs%3E%3ClinearGradient id='wg' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23c9a8f5'/%3E%3Cstop offset='0.5' stop-color='%23f59ed0'/%3E%3Cstop offset='1' stop-color='%23ffc9e0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 1.5 Q5 0 10 1.5 Q15 3 20 1.5' fill='none' stroke='url(%23wg)' stroke-width='1.5'/%3E%3C/svg%3E");
+      background-repeat: repeat-x; background-size: 20px 3px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+    }
+    .wlink:hover::after { opacity: 1; animation: wave-move 0.6s linear infinite; }
+
+    /* SAPHO = AURORA + YANC, as an icon equation */
+    .eqx { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; flex-wrap: wrap; opacity: 0.5; }
+    .eqx-item { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); }
+    .eqx-item img { height: 14px; width: 14px; object-fit: contain; }
+    .eqx-item b { font-weight: 500; color: var(--text-secondary); }
+    .eqx > i { color: var(--text-muted); font-size: 10px; }
   </style>
 </head>
 <body>
@@ -75,11 +191,15 @@
 
   <main id="main">
 
+    <!-- ════════════════════════════════════════════════════════════
+         HERO: kept exactly as is (aurora borealis background).
+         Only text strings changed; data-i18n removed from fullname/desc
+         so the copy below is not overwritten by i18n.json.
+         ════════════════════════════════════════════════════════════ -->
     <header class="project-hero" style="background:var(--bg-0)" aria-labelledby="aurora-title">
       <div class="aurora-bg" aria-hidden="true">
         <svg class="aurora-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 520" preserveAspectRatio="xMidYMid slice">
           <defs>
-            <!-- Horizontal colour gradients for the ribbons -->
             <linearGradient id="ag1" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%"   stop-color="rgba(0,0,0,0)"/>
               <stop offset="6%"   stop-color="rgba(57,255,20,0.28)"/>
@@ -100,25 +220,16 @@
               <stop offset="86%"  stop-color="rgba(0,200,255,0.28)"/>
               <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
             </linearGradient>
-            <!-- Vertical fade for the hanging rays -->
             <linearGradient id="ag-rays" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%"   stop-color="rgba(57,255,20,0.30)"/>
               <stop offset="42%"  stop-color="rgba(0,229,255,0.12)"/>
               <stop offset="100%" stop-color="rgba(0,229,255,0)"/>
             </linearGradient>
-            <!-- Blur filters: tight on x, loose on y to keep ribbon narrow -->
-            <filter id="af1" x="-5%" y="-200%" width="110%" height="500%">
-              <feGaussianBlur stdDeviation="2 6"/>
-            </filter>
-            <filter id="af2" x="-5%" y="-150%" width="110%" height="400%">
-              <feGaussianBlur stdDeviation="4 9"/>
-            </filter>
-            <filter id="afr" x="-5%" y="-10%" width="110%" height="130%">
-              <feGaussianBlur stdDeviation="10 20"/>
-            </filter>
+            <filter id="af1" x="-5%" y="-200%" width="110%" height="500%"><feGaussianBlur stdDeviation="2 6"/></filter>
+            <filter id="af2" x="-5%" y="-150%" width="110%" height="400%"><feGaussianBlur stdDeviation="4 9"/></filter>
+            <filter id="afr" x="-5%" y="-10%" width="110%" height="130%"><feGaussianBlur stdDeviation="10 20"/></filter>
           </defs>
 
-          <!-- Rays hanging below ribbon 1 -->
           <path fill="url(#ag-rays)" filter="url(#afr)" opacity="0.72">
             <animate attributeName="d" dur="22s" repeatCount="indefinite"
               calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"
@@ -129,7 +240,6 @@
               "/>
           </path>
 
-          <!-- Main ribbon 1 — the primary aurora curtain -->
           <path fill="url(#ag1)" filter="url(#af1)" opacity="0.95">
             <animate attributeName="d" dur="22s" repeatCount="indefinite"
               calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"
@@ -140,7 +250,6 @@
               "/>
           </path>
 
-          <!-- Secondary ribbon 2 — fainter, lower -->
           <path fill="url(#ag2)" filter="url(#af2)" opacity="0.60">
             <animate attributeName="d" dur="30s" repeatCount="indefinite"
               calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"
@@ -159,25 +268,25 @@
         </div>
         <div class="project-hero-text">
           <div class="eyebrow fade-up" style="color:rgba(160,230,200,0.78)">
-            <i class="ph ph-archive" aria-hidden="true"></i>
-            Legacy Project · Part of SAPHO
+            <i class="ph ph-app-window" aria-hidden="true"></i>
+            The IDE for SAPHO
           </div>
           <h1 class="project-hero-name fade-up" id="aurora-title">
             <span style="color:#fff;text-shadow:0 0 28px rgba(57,255,20,0.65),0 0 60px rgba(0,229,255,0.35),0 0 3px rgba(255,255,255,0.9)">AURORA</span>
           </h1>
-          <p class="project-hero-fullname fade-up" style="color:rgba(205,235,255,0.90)" data-i18n="projects.aurora.full">Windows IDE for the SAPHO Ecosystem</p>
-          <p class="project-hero-desc fade-up" style="color:rgba(185,220,255,0.80)" data-i18n="projects.aurora.desc">
-            AURORA was a powerful, Windows-native IDE built with Electron for the SAPHO ecosystem. It supported CMM programming with Monaco Editor, Icarus Verilog simulation, GTKWave waveform visualisation, and the PRISM RTL Viewer. Over 25 releases (latest v4.27.10), AURORA served as the primary development environment before being succeeded by POLARIS.
+          <p class="project-hero-fullname fade-up" style="color:rgba(205,235,255,0.90)">The integrated development environment for SAPHO</p>
+          <p class="project-hero-desc fade-up" style="color:rgba(185,220,255,0.80)">
+            Describe a processor in a few lines of C±, then compile, simulate and inspect it without leaving the window. AURORA bundles the whole toolchain, plus Aurora Intelligence, an assistant that drives the IDE through its own tools.
           </p>
           <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links fade-up">
-            <a href="https://github.com/nipscernlab/aurora" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-aurora);border-color:var(--accent-aurora)">
+            <a href="https://github.com/nipscernlab/aurora/releases/latest" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-aurora);border-color:var(--accent-aurora)">
+              <i class="ph ph-download-simple" aria-hidden="true"></i>
+              Download for Windows
+            </a>
+            <a href="https://github.com/nipscernlab/aurora" target="_blank" rel="noopener" class="btn btn-ghost">
               <i class="ph ph-github-logo" aria-hidden="true"></i>
               <span data-i18n="projects.github">View on GitHub</span>
-            </a>
-            <a href="polaris" class="btn btn-ghost">
-              <i class="ph ph-arrow-right" aria-hidden="true"></i>
-              Succeeded by POLARIS
             </a>
             <a href="./" class="btn btn-ghost">
               <i class="ph ph-arrow-left" aria-hidden="true"></i>
@@ -188,129 +297,346 @@
       </div>
     </header>
 
-    <!-- Badge bar -->
+    <!-- ── Identity strip ── -->
     <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
       <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
-        <span class="badge badge-red"><i class="ph ph-app-windows-logo" aria-hidden="true"></i>&nbsp;Windows Only</span>
-        <span class="badge badge-red">Electron</span>
-        <span class="badge badge-gray">v4.27.10 — Final Release</span>
-        <span class="badge badge-gray">25 Releases</span>
-        <span class="badge badge-red">Legacy</span>
+        <span class="badge badge-green">Active development</span>
+        <span class="badge badge-gray">v6.3.2</span>
+        <span class="badge badge-gray">Electron · Monaco</span>
+        <span class="badge badge-gray">MIT</span>
+        <span class="badge badge-gray"><i class="ph ph-windows-logo" aria-hidden="true"></i>&nbsp;Windows 10 / 11</span>
+        <span class="eqx" role="img" aria-label="SAPHO equals AURORA plus YANC">
+          <span class="eqx-item"><img src="../assets/icons/sapho.svg" alt=""><b>SAPHO</b></span>
+          <i class="ph ph-equals" aria-hidden="true"></i>
+          <span class="eqx-item"><img src="../assets/icons/aurora.svg" alt=""><b>AURORA</b></span>
+          <i class="ph ph-plus" aria-hidden="true"></i>
+          <span class="eqx-item"><img src="../assets/icons/yanc.svg" alt=""><b>YANC</b></span>
+        </span>
       </div>
     </div>
 
+    <!-- ── The idea: the header IS the hardware ── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="sec-label fade-up"><span class="n">01</span> The idea</div>
+        <div class="split lead">
+          <div class="prose fade-up">
+            <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">A processor you <span class="grad-soft">write down</span></h2>
+            <p>
+              In SAPHO you don't wire up a processor by hand. You describe it. The first lines of a
+              C± file are not comments or setup; they are the hardware. <span class="ic">#NUBITS</span> sets the width of
+              the datapath. <span class="ic">#NBMANT</span> and <span class="ic">#NBEXPO</span> define the
+              floating-point format the silicon will use. <span class="ic">#NDSTAC</span> and
+              <span class="ic">#SDEPTH</span> size the stacks; <span class="ic">#NUIOIN</span> and
+              <span class="ic">#NUIOOU</span> set the I/O ports. Change a number, and you get a different processor.
+            </p>
+            <p style="margin-top:var(--sp-4)">
+              Below the header you write ordinary-looking code: <span class="ic">int</span>, <span class="ic">float</span>,
+              <span class="ic">if</span>, <span class="ic">while</span>, <span class="ic">switch</span>, plus the things a
+              signal-processing person reaches for, like a native <span class="ic">comp</span> complex type and built-ins
+              such as <span class="ic">sin</span>, <span class="ic">cos</span>, <span class="ic">sqrt</span>,
+              <span class="ic">atan</span> and an FFT. YANC turns it into assembly over a compact instruction set, and
+              that assembly into a synthesizable processor.
+            </p>
+          </div>
+
+          <div class="fade-up">
+            <div class="code-card">
+              <div class="code-top">
+                <span class="dots"><i></i><i></i><i></i></span>
+                <span class="fn">sqrt_newton.cmm</span>
+              </div>
+<pre class="code-body"><span class="dir">#PRNAME</span>  sqrt_newton
+<span class="dir">#NUBITS</span>  <span class="num">32</span>      <span class="cm">// datapath width (the silicon itself)</span>
+<span class="dir">#NBMANT</span>  <span class="num">23</span>      <span class="cm">// float: mantissa bits</span>
+<span class="dir">#NBEXPO</span>  <span class="num">8</span>       <span class="cm">// float: exponent bits</span>
+<span class="dir">#NDSTAC</span>  <span class="num">5</span>       <span class="cm">// data-stack depth</span>
+<span class="dir">#SDEPTH</span>  <span class="num">5</span>       <span class="cm">// call-stack depth</span>
+<span class="dir">#NUIOIN</span>  <span class="num">1</span>       <span class="cm">// input ports</span>
+<span class="dir">#NUIOOU</span>  <span class="num">1</span>       <span class="cm">// output ports</span></pre>
+            </div>
+            <p class="code-cap">The header is the processor's hardware spec. The body, plain C±, is the program it runs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── What AURORA is (relocated intro) ── -->
+    <section class="section" style="border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+      <div class="container container--narrow" style="text-align:center">
+        <p class="lede fade-up">
+          SAPHO is NIPSCERN's platform for building custom processors. <span class="hl">AURORA is how you use it</span>:
+          the desktop application where a processor goes from a page of code to a simulated, inspectable circuit, all in
+          one place, with nothing to install and no cloud in the loop.
+        </p>
+        <div class="prose fade-up" style="margin-top:var(--sp-6);max-width:60ch;margin-left:auto;margin-right:auto;text-align:left">
+          <p>
+            The platform comes in two halves. <strong>AURORA</strong> is the IDE you see and click: the editor, the file
+            tree, the terminals, the simulators, the RTL viewer. <strong>YANC</strong> is the compiler suite underneath
+            it (<span class="ic">cmmcomp</span>, <span class="ic">asmcomp</span>, <span class="ic">appcomp</span>). You
+            work in AURORA; YANC does the translating. Together they are SAPHO.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── One window, the whole loop ── -->
+    <section class="section">
+      <div class="container">
+        <div class="sec-label fade-up"><span class="n">02</span> One window, the whole loop</div>
+        <div class="prose fade-up" style="max-width:68ch">
+          <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">From source to a <span class="grad-soft">working circuit</span>, without leaving the app</h2>
+          <p>
+            The editor is <strong>Monaco</strong>, the engine behind VS Code, with C± highlighting and the compiler's
+            errors underlined inline. You can split it into panes that share the same file, so an edit in one shows up in
+            the others. One toolbar runs the whole chain, and each tool streams into its own terminal: you press a button
+            and watch C± become assembly, assembly become Verilog, Verilog get simulated, and the result drawn as a
+            circuit.
+          </p>
+        </div>
+
+        <figure class="shot wide fade-up" style="margin-top:var(--sp-7)">
+          <div class="frame">
+            <img src="../assets/images/projects/aurora-ide.png" alt="AURORA IDE: Monaco editor, project tree and compiler terminals in one window"
+                 onload="this.closest('.shot').classList.add('ok')">
+            <div class="ph"><i class="ph ph-image" aria-hidden="true"></i><span>screenshot: AURORA IDE</span></div>
+          </div>
+          <figcaption>The full AURORA window: editor, project tree, and the compiler terminals.</figcaption>
+        </figure>
+
+        <div class="flow fade-up" style="margin-top:var(--sp-8)">
+          <div class="st"><span class="k">01</span><span class="t">C± source</span><span class="d">you write <span class="ic" style="background:none;padding:0">.cmm</span></span></div>
+          <div class="st"><span class="k">02</span><span class="t">Assembly</span><span class="d">cmmcomp · asmcomp</span></div>
+          <div class="st"><span class="k">03</span><span class="t">Verilog</span><span class="d">synthesizable RTL</span></div>
+          <div class="st"><span class="k">04</span><span class="t">Simulate</span><span class="d">Icarus or Verilator</span></div>
+          <div class="st"><span class="k">05</span><span class="t">Waveform</span><span class="d">GTKWave</span></div>
+          <div class="st"><span class="k">06</span><span class="t">RTL view</span><span class="d">PRISM</span></div>
+        </div>
+
+        <div class="split" style="margin-top:var(--sp-8);align-items:start">
+          <div class="prose fade-up">
+            <p class="ksub">Two simulators, one toggle</p>
+            <p>
+              Simulation runs on <strong>Icarus Verilog</strong> or <strong>Verilator</strong>, switched from a toolbar
+              toggle, and Python cocotb testbenches are supported too. Whatever you pick,
+              the waveform opens in GTKWave showing exactly the signals you selected.
+            </p>
+            <p class="ksub" style="margin-top:var(--sp-6)">Nothing to install</p>
+            <p>
+              On first launch AURORA downloads the whole toolchain and the YANC compilers, then wires them into the app.
+              No manual setup, no fiddling with <span class="ic">PATH</span>. The simulators, synthesis, waveform viewer
+              and build cache are all bundled.
+            </p>
+          </div>
+
+          <figure class="shot fade-up">
+            <div class="frame">
+              <img src="../assets/images/projects/aurora-gtkwave.png" alt="GTKWave showing the simulated processor's signals over time"
+                   onload="this.closest('.shot').classList.add('ok')">
+              <div class="ph"><i class="ph ph-wave-sine" aria-hidden="true"></i><span>screenshot: GTKWave</span></div>
+            </div>
+            <figcaption>The simulation result in GTKWave, showing the signals you selected.</figcaption>
+          </figure>
+        </div>
+
+        <div class="split" style="margin-top:var(--sp-8);align-items:center">
+          <figure class="shot fade-up">
+            <div class="frame">
+              <img src="../assets/images/projects/aurora-polaris.png" alt="POLARIS, the NIPSCERN wave tracer, showing simulated signals"
+                   onload="this.closest('.shot').classList.add('ok')">
+              <div class="ph"><i class="ph ph-wave-triangle" aria-hidden="true"></i><span>screenshot: POLARIS Wave Tracer</span></div>
+            </div>
+            <figcaption>POLARIS, our own wave tracer, in development.</figcaption>
+          </figure>
+          <div class="prose fade-up">
+            <p class="ksub">In development: POLARIS, our Wave Tracer</p>
+            <p>
+              We are building our own waveform viewer to replace GTKWave. Its name is <a class="wlink" href="https://github.com/nipscernlab/polaris" target="_blank" rel="noopener">POLARIS</a>: the
+              POLARIS interface became our Wave Tracer. It reads the same simulation output and is meant to live inside
+              AURORA, so reading signals will not mean opening a separate program.
+            </p>
+          </div>
+        </div>
+
+        <!-- works-with row -->
+        <div class="fade-up" style="margin-top:var(--sp-8)">
+          <p class="ksub">Bundled toolchain</p>
+          <div class="tools">
+            <div class="tool"><img src="../assets/icons/yanc.svg" alt="" onerror="this.outerHTML='&lt;i class=&quot;ph ph-code-block fb&quot;&gt;&lt;/i&gt;'"><span class="nm">YANC</span><span class="role">compilers</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/Icarus_Verilog_logo.png" alt=""><span class="nm">Icarus Verilog</span><span class="role">simulation</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/Verilator_logo.png" alt=""><span class="nm">Verilator</span><span class="role">fast sim</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/gtkwave.svg" alt=""><span class="nm">GTKWave</span><span class="role">waveforms</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/yosys.svg" alt=""><span class="nm">Yosys</span><span class="role">synthesis</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/netlistsvg.svg" alt=""><span class="nm">netlistsvg</span><span class="role">RTL render</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/monaco.svg" alt=""><span class="nm">Monaco</span><span class="role">editor</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/electron.svg" alt=""><span class="nm">Electron</span><span class="role">runtime</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/python.svg" alt=""><span class="nm">Python · cocotb</span><span class="role">testbench</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/ccache.svg" alt=""><span class="nm">ccache</span><span class="role">build cache</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PRISM ── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="sec-label fade-up"><span class="n">03</span> PRISM</div>
+        <div class="split">
+          <figure class="shot fade-up" style="order:0">
+            <div class="frame">
+              <img src="../assets/images/projects/aurora-prism.png" alt="PRISM RTL viewer rendering a SAPHO processor netlist"
+                   onload="this.closest('.shot').classList.add('ok')">
+              <div class="ph"><i class="ph ph-graph" aria-hidden="true"></i><span>screenshot: PRISM RTL viewer</span></div>
+            </div>
+            <figcaption>PRISM draws the synthesized netlist as a schematic you can click through.</figcaption>
+          </figure>
+          <div class="prose fade-up">
+            <h2 class="heading-lg" style="margin-bottom:var(--sp-4)"><img class="head-ico" src="../assets/icons/aurora/aurora_prism.svg" alt="" aria-hidden="true">See the <span class="grad-soft">circuit</span> you described</h2>
+            <p>
+              After synthesis, <strong>PRISM</strong> takes the netlist that Yosys and
+              netlistsvg produce and renders it as an interactive schematic: the ALU, the stacks, the
+              instruction decoder, the I/O. Click a module to inspect its ports and follow the datapath. It closes the
+              loop between the few lines you wrote and the actual hardware they became.
+            </p>
+            <p class="note" style="margin-top:var(--sp-5)">
+              The same file tree can switch from the folder view to the post-synthesis module hierarchy, so you can
+              navigate the design the way the synthesizer sees it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         AURORA INTELLIGENCE: explained (no mock chat, no glow)
+         ════════════════════════════════════════════════════════════ -->
+    <section class="section">
+      <div class="container">
+        <div class="sec-label fade-up"><span class="n">04</span> Aurora Intelligence</div>
+        <div class="ai-panel fade-up">
+          <div class="split lead" style="align-items:start">
+            <div class="prose">
+              <h2 class="heading-lg" style="margin-bottom:var(--sp-4)"><svg class="ai-stars" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="aiStars" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e7c9f6"/><stop offset=".55" stop-color="#ffcbe0"/><stop offset="1" stop-color="#fff3fa"/></linearGradient></defs><g fill="url(#aiStars)"><path transform="translate(-1,1.6) scale(0.8)" d="M12 1.5 C12.5 6.9 17.1 11.5 22.5 12 C17.1 12.5 12.5 17.1 12 22.5 C11.5 17.1 6.9 12.5 1.5 12 C6.9 11.5 11.5 6.9 12 1.5 Z"/><path transform="translate(12.6,0.4) scale(0.42)" d="M12 1.5 C12.5 6.9 17.1 11.5 22.5 12 C17.1 12.5 12.5 17.1 12 22.5 C11.5 17.1 6.9 12.5 1.5 12 C6.9 11.5 11.5 6.9 12 1.5 Z"/></g></svg>An assistant that <span class="grad-soft">uses the IDE</span>, not a chat box beside it</h2>
+              <p>
+                <strong>Aurora Intelligence</strong> is built into AURORA and works through the IDE's own actions. When you
+                ask it to do something, it doesn't shell out to guesswork. It calls the same operations the buttons call:
+                read the project tree, open a file and jump to a line, analyse a processor's assembly, look up an opcode,
+                scaffold a new processor, run the compiler, choose which signals reach the waveform. Around
+                sixty-eight such tools in all.
+              </p>
+              <p style="margin-top:var(--sp-4)">
+                The line that matters runs between reading and writing. Anything that only <strong>reads</strong> happens
+                immediately. Anything that <strong>writes</strong> (editing a file, creating a processor, starting a
+                build) stops and shows you the exact change first, and waits. Every action is recorded.
+              </p>
+            </div>
+
+            <div>
+              <p class="ksub">A real example</p>
+              <p class="prose" style="font-size:var(--text-sm)">
+                Ask it to tighten a processor's hot loop. It reads the generated assembly with the same analyzer the IDE
+                uses, finds where pairs of instructions can collapse into their combined opcode, and writes the candidate
+                into a <span class="ic">_aurora_opt</span> sandbox, so your original is never touched. Then it
+                recompiles and reports the instruction count before and after. Each write pauses for your approval.
+              </p>
+              <p class="ksub" style="margin-top:var(--sp-6)">It actually knows SAPHO</p>
+              <p class="prose" style="font-size:var(--text-sm)">
+                The C± keywords, the hardware directives and the compiler's bilingual error catalogue are loaded straight
+                from the YANC source, so when a build fails, it reads the message the way the compiler meant it.
+              </p>
+            </div>
+          </div>
+
+          <p class="note" style="margin-top:var(--sp-9, 40px)">
+            Aurora Intelligence is the in-house AI of the NIPSCERN lab, in active development. You can follow its progress
+            <a class="wlink" href="https://github.com/nipscernlab/aurora-intelligence" target="_blank" rel="noopener">on GitHub</a>.
+          </p>
+
+          <div class="ai-points">
+            <div class="ai-point">
+              <h4><i class="ph ph-key" aria-hidden="true"></i> Your own model</h4>
+              <p>OpenAI, Anthropic Claude, Google Gemini, DeepSeek or Groq with an API key, or Ollama, running a model entirely on your machine, offline.</p>
+            </div>
+            <div class="ai-point">
+              <h4><i class="ph ph-terminal-window" aria-hidden="true"></i> Agentic mode</h4>
+              <p>Drive the Claude Code or Codex CLIs on a subscription, bridged to AURORA's tools through a local MCP server, so the agent compiles through the real pipeline.</p>
+            </div>
+            <div class="ai-point">
+              <h4><i class="ph ph-cursor-text" aria-hidden="true"></i> In context</h4>
+              <p>Answers stream in; file references are clickable and jump to the line; a magic-wand makes targeted edits right where your cursor is.</p>
+            </div>
+            <div class="ai-point">
+              <h4><i class="ph ph-shield-check" aria-hidden="true"></i> Asks before it writes</h4>
+              <p>Read tools run on their own; every write shows a confirmation card before it touches a file or runs a build, and lands in an audit log.</p>
+            </div>
+          </div>
+
+          <div style="margin-top:var(--sp-10);border-top:1px solid var(--border-subtle);padding-top:var(--sp-8)">
+            <p class="ksub">Models &amp; providers</p>
+            <div class="models">
+              <div class="mc"><img src="../assets/icons/aurora/ai_claude.svg" alt=""><b>Claude</b><small>Anthropic</small></div>
+              <div class="mc"><img src="../assets/icons/aurora/ai_chatgpt.svg" alt=""><b>ChatGPT</b><small>OpenAI</small></div>
+              <div class="mc"><img src="../assets/icons/aurora/ai_gemini.svg" alt=""><b>Gemini</b><small>Google</small></div>
+              <div class="mc"><img src="../assets/icons/aurora/ai_deepseek.svg" alt=""><b>DeepSeek</b></div>
+              <div class="mc"><img src="../assets/icons/aurora/ai_groq.svg" alt=""><b>Groq</b></div>
+              <div class="mc"><img src="../assets/icons/aurora/ai_ollama.svg" alt=""><b>Ollama</b><span class="local">Local</span></div>
+            </div>
+            <div class="models" style="margin-top:10px">
+              <div class="mc"><img src="../assets/icons/aurora/claude_code.svg" alt=""><b>Claude Code</b><small>agentic CLI</small></div>
+              <div class="mc"><img src="../assets/icons/aurora/ai_codex.svg" alt=""><b>Codex</b><small>agentic CLI</small></div>
+              <div class="mc"><img src="../assets/icons/aurora/mcp.svg" alt=""><b>MCP bridge</b><small>tools → CLI</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Where it's used ── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container container--narrow">
+        <div class="sec-label fade-up"><span class="n">05</span> Where it's used</div>
+        <div class="prose fade-up">
+          <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">From a classroom to the <span class="grad-soft">FPGA bench</span></h2>
+          <p>
+            AURORA is the reference environment for the <strong>DLP</strong> course (Programmable Logic Devices) at
+            UFJF, where every student designs, compiles and simulates a custom processor in it. Inside
+            NIPSCERN it's the fast loop for processor experiments: change the architecture, recompile, simulate, read the
+            RTL, and let Aurora Intelligence chase the assembly-level wins. When a design holds up, it goes from PRISM to
+            the FPGA boards in the lab.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Get it ── -->
     <section class="section">
       <div class="container container--narrow">
-
-        <!-- Legacy banner -->
-        <div class="legacy-banner fade-up">
-          <i class="ph ph-archive" aria-hidden="true"></i>
-          <div>
-            <div class="legacy-banner-title" data-i18n="projects.aurora.legacy">Legacy Project — succeeded by POLARIS</div>
-            <div class="legacy-banner-text">
-              AURORA is no longer actively developed. Version 4.27.10 is the final release and the repository is archived for historical reference. All new development happens in <a href="polaris" style="color:var(--accent-polaris)">POLARIS</a>, which runs on Linux and Windows with a fraction of the memory footprint.
+        <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-2xl);padding:var(--sp-10)">
+          <div class="split" style="align-items:center;gap:var(--sp-8)">
+            <div class="prose">
+              <h2 class="heading-md" style="margin-bottom:var(--sp-3)">Get AURORA</h2>
+              <p>
+                Everyone uses SAPHO the same way: through the one-click Windows installer. It bundles AURORA, the full
+                toolchain and the YANC compilers, and updates itself silently. There is nothing else to set up.
+              </p>
+              <p class="note" style="margin-top:var(--sp-4)">
+                Curious how it all works? Clone the repo, run <span class="ic">npm install</span> and
+                <span class="ic">npm start</span>, and poke around AURORA itself. If you want some fun, you should give it a try!
+              </p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+              <a href="https://github.com/nipscernlab/aurora/releases/latest" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-aurora);border-color:var(--accent-aurora);justify-content:center">
+                <i class="ph ph-windows-logo" aria-hidden="true"></i> Download for Windows
+              </a>
+              <a href="https://github.com/nipscernlab/aurora" target="_blank" rel="noopener" class="btn btn-ghost" style="justify-content:center">
+                <i class="ph ph-github-logo" aria-hidden="true"></i> Build from source
+              </a>
+              <a href="sapho" class="btn btn-ghost" style="justify-content:center">
+                <i class="ph ph-cpu" aria-hidden="true"></i> About SAPHO
+              </a>
             </div>
           </div>
         </div>
-
-        <!-- Features -->
-        <div class="fade-up" style="margin-top:var(--sp-8)">
-          <div class="accent-line" style="background:var(--accent-aurora)" aria-hidden="true"></div>
-          <h2 class="heading-lg" data-i18n="projects.aurora.features.title">What AURORA Provided</h2>
-          <p class="body-sm" style="margin-top:var(--sp-3);color:var(--text-secondary)">
-            During its active development lifecycle (approximately 2021–2023), AURORA was the reference IDE for SAPHO and was used by students in the DLP discipline at UFJF. It consolidated the entire toolchain into a single Windows installer.
-          </p>
-          <div class="feature-list" style="margin-top:var(--sp-6)">
-            <div class="feature-item">
-              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-file-code" aria-hidden="true"></i></div>
-              <div>
-                <div class="feature-text" style="font-weight:600">CMM Programming Environment</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Monaco Editor with CMM syntax highlighting, bracket matching, and compiler error underlines.</div>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-terminal" aria-hidden="true"></i></div>
-              <div>
-                <div class="feature-text" style="font-weight:600">YANC Compiler Integration</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">cmmcomp and asmcomp invoked from the UI. Build output displayed in an embedded terminal panel.</div>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-play-circle" aria-hidden="true"></i></div>
-              <div>
-                <div class="feature-text" style="font-weight:600">Icarus Verilog Simulation</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Bundled Icarus Verilog for simulation; AURORA piped the compiled .v testbench directly to iverilog and captured the resulting VCD file.</div>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
-              <div>
-                <div class="feature-text" style="font-weight:600">GTKWave Waveform Viewer</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">GTKWave launched as an embedded subprocess. Students could inspect digital signal timing without leaving the application.</div>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:rgba(212,160,23,0.12);color:var(--accent-sapho)"><i class="ph ph-graph" aria-hidden="true"></i></div>
-              <div>
-                <div class="feature-text" style="font-weight:600">PRISM RTL Viewer</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Rendered the synthesised netlist as an interactive schematic. The same PRISM engine was later ported to POLARIS.</div>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-git-commit" aria-hidden="true"></i></div>
-              <div>
-                <div class="feature-text" style="font-weight:600">25 Releases Over Two Years</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Continuous updates from v1.0 through v4.27.10 responding to student and researcher feedback.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Release history -->
-        <div class="fade-up" style="margin-top:var(--sp-8)">
-          <h3 class="heading-sm" style="margin-bottom:var(--sp-4)">Notable Releases</h3>
-          <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);overflow:hidden">
-            <div class="release-row" style="background:var(--bg-elevated);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted)">
-              <span>Version</span>
-              <span class="release-note">Notes</span>
-              <span>Date</span>
-            </div>
-            <div class="release-row">
-              <span class="release-tag">v4.27.10</span>
-              <span class="release-note">Final release — PRISM stability improvements, legacy installer</span>
-              <span class="release-date">2023</span>
-            </div>
-            <div class="release-row">
-              <span class="release-tag">v4.0.0</span>
-              <span class="release-note">Major rewrite — PRISM RTL Viewer integrated natively</span>
-              <span class="release-date">2022</span>
-            </div>
-            <div class="release-row">
-              <span class="release-tag">v3.0.0</span>
-              <span class="release-note">Monaco Editor upgrade, embedded GTKWave subprocess</span>
-              <span class="release-date">2022</span>
-            </div>
-            <div class="release-row">
-              <span class="release-tag">v2.0.0</span>
-              <span class="release-note">Icarus Verilog bundled; automatic testbench simulation pipeline</span>
-              <span class="release-date">2021</span>
-            </div>
-            <div class="release-row">
-              <span class="release-tag">v1.0.0</span>
-              <span class="release-note">Initial release — Monaco Editor + YANC compiler integration</span>
-              <span class="release-date">2021</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Migration CTA -->
-        <div class="info-box fade-up" style="margin-top:var(--sp-8)">
-          <i class="ph ph-info" aria-hidden="true"></i>
-          <p>
-            Starting a new SAPHO project? Use <strong><a href="polaris" style="color:var(--accent-polaris)">POLARIS</a></strong> instead. It runs on both Linux and Windows, starts in under one second, uses ~60 MB of memory (vs ~300 MB for AURORA), and ships with YAWT as a built-in wave tracer — eliminating the external GTKWave dependency.
-          </p>
-        </div>
-
       </div>
     </section>
 
@@ -348,7 +674,6 @@
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // Freeze SVG aurora animations if reduced-motion is preferred
     if (reduced) {
       document.querySelectorAll('.aurora-svg animate').forEach(function(a) {
         var vals = a.getAttribute('values');
