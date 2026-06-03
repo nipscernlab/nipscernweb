@@ -76,7 +76,24 @@
     /* split: prose + figure */
     .split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-10); align-items: center; }
     .split.lead { grid-template-columns: 1.05fr 0.95fr; }
-    @media (max-width: 900px) { .split { grid-template-columns: 1fr; gap: var(--sp-8); } }
+    /* Tablet/mobile: every split (including .split.lead, whose two classes
+       outrank a bare .split in the media query) collapses to one column, so
+       the prose comes first and the figure / code panel stacks after it. */
+    @media (max-width: 900px) {
+      .split,
+      .split.lead { grid-template-columns: 1fr; gap: var(--sp-7); align-items: stretch; }
+    }
+
+    /* Phone tuning — same content, tighter rhythm */
+    @media (max-width: 600px) {
+      .ai-panel { padding: var(--sp-6) var(--sp-5); }
+      .ai-points { gap: var(--sp-6); margin-top: var(--sp-7); }
+      .code-body { font-size: 12px; padding: 14px; }
+      .lede { font-size: 20px; line-height: 1.5; }
+      .eqx { margin-left: 0; }
+      .tool { padding: 8px 12px; gap: 8px; }
+      .shot.wide .frame { aspect-ratio: 16 / 10; }
+    }
 
     /* code card: shows the real directive header */
     .code-card {
