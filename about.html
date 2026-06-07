@@ -96,11 +96,8 @@
           <h2 class="heading-lg" id="coordinator-title" data-i18n="about.coordinator.title">Laboratory Coordinator</h2>
         </div>
 
-        <div class="fade-up" style="position:relative">
-          <div class="coordinator-card" id="coordinator-card">
-            <!-- Populated dynamically from data/team.json -->
-          </div>
-          <span class="content-lang-badge" data-content-lang="en" style="position:absolute;top:var(--sp-6);right:var(--sp-6);background:var(--bg-elevated)"></span>
+        <div class="coordinator-card fade-up" id="coordinator-card">
+          <!-- Populated dynamically from data/team.json -->
         </div>
       </div>
     </section>
@@ -357,6 +354,7 @@
               ? `<img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover">`
               : `<i class="ph ph-user" aria-hidden="true"></i>`}
           </div>
+          <span class="content-lang-badge" data-content-lang="en" title="English" style="margin-top:var(--sp-4)"><span class="clang-flag" aria-hidden="true"><img class="flag" src="assets/icons/flag-for-united-kingdom.svg" alt="" loading="lazy" decoding="async" aria-hidden="true" title="English"></span><span>English</span></span>
         </div>
         <div>
           <h3 class="coordinator-name">${member.title ? member.title + ' ' : ''}${member.name}</h3>
