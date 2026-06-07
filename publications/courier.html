@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CERN Courier — NIPSCERN</title>
-  <meta name="description" content="CERN Courier digital editions — the international journal of high energy physics, from January/February 2013 to January/February 2026. Curated by NIPSCERN.">
+  <meta name="description" content="CERN Courier digital editions — the international journal of high energy physics, from January/February 2013 to May/June 2026. Curated by NIPSCERN.">
 
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://nipscern.com/publications/courier">
@@ -160,7 +160,7 @@
         </div>
         <h1 class="display-lg fade-up" id="courier-title">CERN Courier</h1>
         <p class="body-lg fade-up" style="max-width:600px;margin-top:var(--sp-5)">
-          The international journal of high energy physics — digital editions from January/February 2013 to January/February 2026, curated by NIPSCERN.
+          The international journal of high energy physics — digital editions from January/February 2013 to May/June 2026, curated by NIPSCERN.
         </p>
         <div class="fade-up" style="margin-top:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
         <div class="fade-up" style="margin-top:var(--sp-6)">
@@ -279,7 +279,7 @@
         var months = year <= 2018 ? MONTHS_MONTHLY : MONTHS_BIMONTHLY;
         for (var i = 0; i < months.length; i++) {
           var entry = months[i];
-          if (year === 2026 && entry.mon !== '01') break;
+          if (year === 2026 && !['01', '03', '05'].includes(entry.mon)) break;
           issues.push(Object.assign({ year: year }, entry));
         }
       }

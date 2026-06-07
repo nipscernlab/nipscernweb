@@ -461,15 +461,15 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: var(--sp-1);
-  padding: var(--sp-1) var(--sp-2);
+  padding: 3px 6px;
   background: var(--border-subtle);
   border: 1px solid var(--border-mid);
   border-radius: var(--r-full);
 }
 
 .lang-btn {
-  width: 28px;
-  height: 20px;
+  width: 24px;
+  height: 17px;
   border-radius: 2px;
   overflow: hidden;
   opacity: 0.5;
@@ -489,8 +489,8 @@ h1, h2, h3, h4, h5, h6 {
 .lang-btn.active::after {
   content: '';
   position: absolute;
-  inset: -2px;
-  border: 1.5px solid var(--brand);
+  inset: -1.5px;
+  border: 1px solid var(--brand);
   border-radius: 3px;
 }
 
@@ -2333,21 +2333,48 @@ h1, h2, h3, h4, h5, h6 {
   }
   /* Give hamburger icon more breathing room */
   .nav-inner {
-    padding-right: var(--sp-4);
+    gap: var(--sp-2);
+    padding-left: var(--sp-3);
+    padding-right: var(--sp-3);
+  }
+  .nav-logo {
+    gap: var(--sp-2);
+    min-width: 0;
+    flex-shrink: 1;
+  }
+  .nav-logo-mark {
+    width: 24px;
+    height: 24px;
+  }
+  .nav-logo-text {
+    font-size: var(--text-sm);
+    letter-spacing: 0.03em;
   }
   .nav-right {
-    gap: var(--sp-2);
+    gap: var(--sp-1);
     flex-shrink: 0;
     min-width: 0;
   }
+  .nav-cgv-link { padding: 2px; }
+  .nav-cgv-icon {
+    width: 20px;
+    height: 20px;
+  }
   .nav-hamburger {
-    min-width: 44px;
-    min-height: 44px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     flex-shrink: 0;
   }
   .lang-switcher {
     flex-shrink: 1;
     overflow: hidden;
+    padding: 2px 4px;
+  }
+  .lang-btn {
+    width: 22px;
+    height: 16px;
   }
   .grid-3 { grid-template-columns: 1fr 1fr; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
