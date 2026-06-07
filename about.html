@@ -301,7 +301,7 @@
 
   <!-- Team loader -->
   <script type="module">
-    import { initI18n, t } from './assets/js/i18n.js';
+    import { initI18n, t, setLanguage, getLang } from './assets/js/i18n.js';
 
     const ROLE_LABEL_KEYS = {
       coordinator: 'about.team.roles.coordinator',
@@ -362,7 +362,7 @@
           <div class="coordinator-role-badge" style="margin-bottom:var(--sp-4)">
             <span class="badge role-coordinator" data-i18n="about.team.roles.coordinator">Coordinator</span>
           </div>
-          <p class="coordinator-bio">${member.bio}</p>
+          <p class="coordinator-bio" data-i18n="about.coordinator.bio">${member.bio}</p>
           <div class="team-links" style="margin-top:var(--sp-4);margin-bottom:var(--sp-6)">
             ${member.lattes ? `<a href="${member.lattes}" target="_blank" rel="noopener" class="team-link">${LATTES_ICON} Lattes</a>` : ''}
             ${member.github ? `<a href="${member.github}" target="_blank" rel="noopener" class="team-link"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a>` : ''}
@@ -422,6 +422,9 @@
           setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; }, i * 60 + 200);
         });
       }
+
+      // Re-apply translations to the dynamically injected cards (coordinator bio, role badges)
+      setLanguage(getLang());
     });
   </script>
 
