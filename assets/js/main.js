@@ -122,7 +122,7 @@ function buildNav() {
         ${mobileLinksHtml}
       </nav>
       <div class="nav-mobile-cgv" style="border-top:1px solid var(--border-subtle);padding-top:var(--sp-8)">
-        <a href="nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-mobile-cgv-link">
+        <a href="https://nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-mobile-cgv-link">
           <img src="${ROOT}assets/icons/icon_cgv.svg" alt="CGVWEB" class="nav-cgv-icon">
           <span>CGVWEB</span>
         </a>
