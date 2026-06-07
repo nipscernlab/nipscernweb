@@ -266,7 +266,10 @@
       if (year <= 2018) {
         return 'https://cerncourier.com/wp-content/uploads/2019/04/CERNCourier' + year + entry.pdfMon + '-digitaledition.pdf';
       }
-      return 'https://cerncourier.com/wp-content/uploads/' + year + '/' + entry.mon + '/CERNCourier' + year + entry.pdfMon + '-digitaledition.pdf';
+      var uploadMon = entry.mon;
+      if (year === 2026 && entry.pdfMon === 'MarApr') uploadMon = '05';
+      if (year === 2026 && entry.pdfMon === 'MayJun') uploadMon = '06';
+      return 'https://cerncourier.com/wp-content/uploads/' + year + '/' + uploadMon + '/CERNCourier' + year + entry.pdfMon + '-digitaledition.pdf';
     }
 
     function coverPath(year, entry) {
