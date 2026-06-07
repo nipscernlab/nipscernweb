@@ -382,7 +382,10 @@
       return `
         <article class="team-card" aria-labelledby="member-${member.id}">
           <div style="display:flex;gap:var(--sp-4);align-items:flex-start">
-            ${avatarHTML(member, 64)}
+            <div style="display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);flex-shrink:0">
+              ${avatarHTML(member, 64)}
+              <span class="content-lang-badge" data-content-lang="en" title="English"><span class="clang-flag" aria-hidden="true"><img class="flag" src="assets/icons/flag-for-united-kingdom.svg" alt="" loading="lazy" decoding="async" aria-hidden="true" title="English"></span><span>English</span></span>
+            </div>
             <div style="flex:1">
               <div class="team-name" id="member-${member.id}">${member.title ? member.title + ' ' : ''}${member.name}</div>
               <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">
