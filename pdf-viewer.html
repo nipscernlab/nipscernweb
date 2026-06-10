@@ -661,22 +661,59 @@
   }
 
   /* ---------- Zoom ---------- */
-  var STEPS = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0, 4.0];
+  var STEPS    = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0, 4.0];
+  var ZOOM_MIN = STEPS[0], ZOOM_MAX = STEPS[STEPS.length - 1];
+  var zoomBusy = false;
+  var zoomQueue = null;   // {scale, x, y} requested while a render was in flight
 
-  function zoomIn() {
-    var next = STEPS.find(function(s){ return s > scale + 0.01; });
-    if (next !== undefined) { scale = next; refreshZoomUI(); rerender().catch(console.warn); }
+  function clampScale(s)   { return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, s)); }
+  function nextStepUp(s)   { return STEPS.find(function(x){ return x > s + 0.01; }); }
+  function nextStepDown(s) { var p = null; STEPS.forEach(function(x){ if (x < s - 0.01) p = x; }); return p; }
+
+  /* The scale the viewer is heading toward, including any queued zoom step. */
+  function pendingScale() { return zoomQueue ? zoomQueue.scale : scale; }
+
+  /* Apply a new zoom scale while keeping the content point under (focalX, focalY)
+     — given in viewport client coords — stationary. Without a focal point the
+     viewport centre is used. Re-rendering rebuilds the pages (resetting scroll),
+     so the scroll offset is recomputed and restored afterwards. Zoom requests
+     that arrive mid-render are coalesced and applied once the render finishes,
+     so rapid Ctrl+wheel ticks accumulate instead of being dropped. */
+  async function applyScale(newScale, focalX, focalY) {
+    if (!pdfDoc) return;
+    newScale = clampScale(newScale);
+    if (zoomBusy) { zoomQueue = { scale: newScale, x: focalX, y: focalY }; return; }
+    if (Math.abs(newScale - scale) < 0.001) return;
+
+    var rect = viewer.getBoundingClientRect();
+    var offX = (focalX == null ? rect.width  / 2 : focalX - rect.left);
+    var offY = (focalY == null ? rect.height / 2 : focalY - rect.top);
+    var rx = (viewer.scrollLeft + offX) / (viewer.scrollWidth  || 1);
+    var ry = (viewer.scrollTop  + offY) / (viewer.scrollHeight || 1);
+
+    zoomBusy = true;
+    scale = newScale;
+    refreshZoomUI();
+    try { await rerender(); } finally { zoomBusy = false; }
+
+    viewer.scrollLeft = rx * viewer.scrollWidth  - offX;
+    viewer.scrollTop  = ry * viewer.scrollHeight - offY;
+
+    if (zoomQueue) {
+      var q = zoomQueue; zoomQueue = null;
+      applyScale(q.scale, q.x, q.y).catch(console.warn);
+    }
   }
-  function zoomOut() {
-    var prev = null;
-    STEPS.forEach(function(s){ if (s < scale - 0.01) prev = s; });
-    if (prev !== null) { scale = prev; refreshZoomUI(); rerender().catch(console.warn); }
-  }
+
+  function zoomIn()  { var n = nextStepUp(pendingScale());   if (n !== undefined) applyScale(n).catch(console.warn); }
+  function zoomOut() { var p = nextStepDown(pendingScale()); if (p !== null)      applyScale(p).catch(console.warn); }
+
   async function fitWidth() {
     if (!pdfDoc) return;
     var page = await pdfDoc.getPage(curPage);
     var vp   = page.getViewport({ scale: 1 });
-    scale    = Math.max(0.25, Math.min(4.0, (viewer.clientWidth - 48) / vp.width));
+    var target = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, (viewer.clientWidth - 48) / vp.width));
+    scale = target;
     refreshZoomUI();
     rerender().catch(console.warn);
   }
@@ -784,9 +821,28 @@
   document.getElementById('btn-dl').addEventListener('click',    function(){ downloadPDF().catch(console.warn); });
   document.getElementById('btn-print').addEventListener('click', function(){ printPDF().catch(console.warn); });
 
+  /* Ctrl + wheel (and trackpad pinch, which also reports ctrlKey) zooms the PDF
+     instead of the browser. passive:false is required so preventDefault() can
+     cancel the browser's native page zoom. */
+  viewer.addEventListener('wheel', function(e) {
+    if (!e.ctrlKey || !pdfDoc) return;
+    e.preventDefault();
+    var target = e.deltaY < 0 ? nextStepUp(pendingScale()) : nextStepDown(pendingScale());
+    if (target == null) return;
+    applyScale(target, e.clientX, e.clientY).catch(console.warn);
+  }, { passive: false });
+
   /* Keyboard shortcuts */
   document.addEventListener('keydown', function(e) {
     if (e.target === pageInput || !pdfDoc) return;
+    /* Ctrl/Cmd +/-/0 zooms the PDF, not the browser */
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=' || e.key === '-' || e.key === '0')) {
+      e.preventDefault();
+      if (e.key === '0') fitWidth();
+      else if (e.key === '-') zoomOut();
+      else zoomIn();
+      return;
+    }
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(curPage + 1);
     if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(curPage - 1);
     if (e.ctrlKey && e.key === 'Home') goTo(1);
