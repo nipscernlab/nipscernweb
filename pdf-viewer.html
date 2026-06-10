@@ -159,11 +159,46 @@
       display: flex; flex-direction: column; align-items: center; gap: 16px;
       width: 100%; min-height: 100%;
     }
-    .pdf-canvas {
-      display: block; background: #fff;
+    .pdf-page {
+      position: relative;
+      background: #fff;
       box-shadow: 0 4px 32px rgba(0,0,0,0.55);
-      max-width: calc(100vw - 32px);
     }
+    .pdf-canvas {
+      display: block;
+    }
+
+    /* ===== TEXT LAYER (selectable / copyable text) ===== */
+    .textLayer {
+      position: absolute;
+      text-align: initial;
+      inset: 0;
+      overflow: hidden;
+      line-height: 1;
+      -webkit-text-size-adjust: none;
+      -moz-text-size-adjust: none;
+      text-size-adjust: none;
+      forced-color-adjust: none;
+      transform-origin: 0 0;
+      z-index: 2;
+    }
+    .textLayer span,
+    .textLayer br {
+      color: transparent;
+      position: absolute;
+      white-space: pre;
+      cursor: text;
+      transform-origin: 0% 0%;
+    }
+    .textLayer span.markedContent { top: 0; height: 0; }
+    .textLayer ::selection   { background: rgba(91,156,246,0.35); }
+    .textLayer ::-moz-selection { background: rgba(91,156,246,0.35); }
+    .textLayer br::selection { background: transparent; }
+    .textLayer .endOfContent {
+      display: block; position: absolute; inset: 100% 0 0;
+      z-index: -1; cursor: default; user-select: none;
+    }
+    .textLayer .endOfContent.active { top: 0; }
 
     /* ===== OVERLAY STATES ===== */
     .ov {
@@ -410,7 +445,6 @@
   var scale        = 1.0;
   var continuous   = true;
   var pdfFilename  = pdfSrc ? (pdfSrc.split('/').pop() || 'document.pdf') : 'document.pdf';
-  var curRenderTask = null;
   var pageObserver  = null;
 
   function samePublication(pub, key) {
@@ -524,31 +558,65 @@
     while (el.firstChild) { el.removeChild(el.firstChild); }
   }
 
+  /* ---------- Build one page (canvas + selectable text layer) ---------- */
+  /* The canvas is drawn at device-pixel resolution for sharpness, while the
+     text layer is positioned in CSS pixels (scale, no DPR) and overlaid on top
+     so the underlying PDF text can be selected and copied. The wrapper is
+     attached to the DOM *before* rendering the text layer, because PDF.js reads
+     the `--scale-factor` CSS variable via getComputedStyle(container). */
+  async function buildPage(n) {
+    var page     = await pdfDoc.getPage(n);
+    var DPR      = window.devicePixelRatio || 1;
+    var cssVp    = page.getViewport({ scale: scale });
+    var renderVp = page.getViewport({ scale: scale * DPR });
+    var cw = Math.floor(cssVp.width), ch = Math.floor(cssVp.height);
+
+    var wrap = document.createElement('div');
+    wrap.className       = 'pdf-page';
+    wrap.dataset.pageNum = String(n);
+    wrap.style.width     = cw + 'px';
+    wrap.style.height    = ch + 'px';
+
+    var canvas = document.createElement('canvas');
+    canvas.className    = 'pdf-canvas';
+    canvas.width        = Math.floor(renderVp.width);
+    canvas.height       = Math.floor(renderVp.height);
+    canvas.style.width  = cw + 'px';
+    canvas.style.height = ch + 'px';
+    wrap.appendChild(canvas);
+
+    var textDiv = document.createElement('div');
+    textDiv.className = 'textLayer';
+    textDiv.style.setProperty('--scale-factor', String(scale));
+    wrap.appendChild(textDiv);
+
+    pagesWrap.appendChild(wrap);
+
+    try {
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: renderVp }).promise;
+    } catch(e) {
+      if (e.name !== 'RenderingCancelledException') console.warn('[pdf] render p' + n, e);
+    }
+
+    try {
+      var textContent = await page.getTextContent();
+      await pdfjsLib.renderTextLayer({
+        textContentSource: textContent,
+        container: textDiv,
+        viewport: cssVp,
+      }).promise;
+    } catch(e) {
+      if (e.name !== 'RenderingCancelledException') console.warn('[pdf] text layer p' + n, e);
+    }
+
+    return wrap;
+  }
+
   /* ---------- Render single page ---------- */
   async function renderPage(n) {
     if (!pdfDoc) return;
-    if (curRenderTask) { try { curRenderTask.cancel(); } catch(_){} curRenderTask = null; }
     clearWrap(pagesWrap);
-
-    var page   = await pdfDoc.getPage(n);
-    var DPR    = window.devicePixelRatio || 1;
-    var vp     = page.getViewport({ scale: scale * DPR });
-    var canvas = document.createElement('canvas');
-    canvas.className    = 'pdf-canvas';
-    canvas.width        = vp.width;
-    canvas.height       = vp.height;
-    canvas.style.width  = Math.round(vp.width  / DPR) + 'px';
-    canvas.style.height = Math.round(vp.height / DPR) + 'px';
-    pagesWrap.appendChild(canvas);
-
-    var task = page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
-    curRenderTask = task;
-    try {
-      await task.promise;
-    } catch(e) {
-      if (e.name !== 'RenderingCancelledException') console.warn('[pdf] render error:', e);
-    }
-    curRenderTask = null;
+    await buildPage(n);
     curPage = n;
     refreshPageUI();
   }
@@ -559,27 +627,12 @@
     if (pageObserver) { pageObserver.disconnect(); pageObserver = null; }
     clearWrap(pagesWrap);
 
-    var DPR = window.devicePixelRatio || 1;
     for (var i = 1; i <= totalPages; i++) {
-      var page   = await pdfDoc.getPage(i);
-      var vp     = page.getViewport({ scale: scale * DPR });
-      var canvas = document.createElement('canvas');
-      canvas.className       = 'pdf-canvas';
-      canvas.dataset.pageNum = String(i);
-      canvas.width           = vp.width;
-      canvas.height          = vp.height;
-      canvas.style.width     = Math.round(vp.width  / DPR) + 'px';
-      canvas.style.height    = Math.round(vp.height / DPR) + 'px';
-      pagesWrap.appendChild(canvas);
-      try {
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-      } catch(e) {
-        if (e.name !== 'RenderingCancelledException') console.warn('[pdf] render p' + i, e);
-      }
+      await buildPage(i);
     }
 
     /* Track visible page while scrolling */
-    var canvases = pagesWrap.querySelectorAll('.pdf-canvas');
+    var pages = pagesWrap.querySelectorAll('.pdf-page');
     pageObserver = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
         if (entry.isIntersecting) {
@@ -588,7 +641,7 @@
         }
       });
     }, { root: viewer, threshold: 0.4 });
-    canvases.forEach(function(c) { pageObserver.observe(c); });
+    pages.forEach(function(p) { pageObserver.observe(p); });
   }
 
   async function rerender() {
