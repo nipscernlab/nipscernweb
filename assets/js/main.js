@@ -230,6 +230,9 @@ function buildFooter() {
     <div class="footer-bottom">
       <p data-i18n="footer.copyright">© 2026 NIPSCERN — Federal University of Juiz de Fora. All rights reserved.</p>
       <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
+        <a href="${ROOT}qa" class="btn btn-ghost btn-sm" data-i18n-aria="qa.hero.label" aria-label="Questions and Answers">
+          <i class="ph ph-chats-circle" aria-hidden="true"></i> <span data-i18n="footer.qa">Q&amp;A</span>
+        </a>
         <div style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--text-xs);color:var(--text-muted)">
           <a href="${ROOT}credits" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.credits">Credits</a>
           <span aria-hidden="true">·</span>

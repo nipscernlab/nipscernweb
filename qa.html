@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <title>Q&amp;A — NIPSCERN, CERN and ATLAS questions answered</title>
+  <meta name="description" content="What is CERN? Where is the LHC? What is the ATLAS experiment? Did CERN open a portal? Answers from NIPSCERN, plus everything about SAPHO, AURORA, YANC, CGVWeb and POLARIS.">
+
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://www.nipscern.com/qa">
+  <meta property="og:title"       content="Q&amp;A — NIPSCERN">
+  <meta property="og:description" content="The big questions about CERN, the LHC, the ATLAS experiment and the NIPSCERN projects: answered by the lab.">
+  <meta property="og:image"       content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/qa">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="assets/css/main.css">
+
+  <style>
+    .qa-group { margin-bottom: var(--sp-12); }
+    .qa-item {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg);
+      background: var(--bg-1);
+      margin-bottom: var(--sp-3);
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .qa-item[open] { border-color: var(--border-mid); background: var(--bg-card); }
+    .qa-item summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      padding: var(--sp-5) var(--sp-6);
+      font-weight: 600;
+      color: var(--text-primary, inherit);
+    }
+    .qa-item summary::-webkit-details-marker { display: none; }
+    .qa-item summary i {
+      flex-shrink: 0;
+      color: var(--brand);
+      transition: transform 0.2s;
+    }
+    .qa-item[open] summary i { transform: rotate(45deg); }
+    .qa-answer {
+      padding: 0 var(--sp-6) var(--sp-6);
+      line-height: 1.7;
+      color: var(--text-secondary, inherit);
+    }
+    .qa-answer a { color: var(--brand); }
+  </style>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is NIPSCERN?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "NIPSCERN (Núcleo de Instrumentação e Processamento de Sinais) is a research and development laboratory at the Federal University of Juiz de Fora (UFJF), Brazil. The lab designs electronic instrumentation, signal processing methods and processors for high energy physics, working in direct collaboration with the ATLAS experiment at CERN. Meet the team and mission."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does a Brazilian laboratory collaborate with CERN?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "NIPSCERN contributes to the operation and calibration of the TileCal hadronic calorimeter of the ATLAS detector, develops digital signal reconstruction methods used in event triggering, and builds software such as CGVWeb, which runs on the main wall of the ATLAS Control Room in Geneva. Members of the lab work both at UFJF and on site at CERN; the full story is on our CERN & ATLAS page."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can I join NIPSCERN or propose a partnership?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We are hiring: the lab looks for researchers in logic, philosophy, software engineering, the engineering disciplines, programming and design. Companies and institutions interested in building on our work are welcome: our license is open to partnerships. Write to contact@nipscern.com or meet us through the About page."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is SAPHO?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "SAPHO is a scalable hardware architecture and toolchain for creating processors: you describe an algorithm in a few lines of C±, and SAPHO generates a soft-core processor tailored to run exactly that algorithm on an FPGA. The platform is the sum of its parts (SAPHO = AURORA + YANC) and includes POLARIS, YAWT and PRISM."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is AURORA?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AURORA is the official desktop IDE of the SAPHO platform: write the algorithm, compile, simulate and inspect the generated processor in a single window. Aurora Intelligence adds an AI assistant that operates the IDE through its own tools."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is YANC?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "YANC is the compiler toolchain powering the SAPHO ecosystem, including cmmcomp (the C± compiler) and asmcomp (the assembly compiler). It is written in C with Flex, Bison and GCC."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is CGVWeb?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CGVWeb renders real collision events from the ATLAS calorimeters in 3D, in any browser, with no installation. Built on Rust/WebAssembly and Three.js, it runs on the main wall of the ATLAS Control Room at CERN. Open the live application or read the technical documentation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is POLARIS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "POLARIS is a modern, cross-platform graphical IDE for the SAPHO ecosystem, built with Tauri and Rust. It integrates the Monaco editor, the PRISM RTL viewer and the YAWT wave tracer."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is CERN and what does the name mean?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CERN is the world's largest particle physics laboratory. The name comes from the French Conseil Européen pour la Recherche Nucléaire, the provisional council created in 1952 to plan the laboratory; the organisation it founded kept the acronym. Our CERN & ATLAS page tells the story in depth."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is CERN located?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CERN sits on the border between Switzerland and France, just outside Geneva, with its main campus in Meyrin. Its accelerators run underground across both countries, including the ring where the team works with the ATLAS experiment."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When was CERN founded, and by whom?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CERN was founded on 29 September 1954 by twelve European countries rebuilding scientific cooperation after the war. Today it counts more than twenty member states, and scientists from every continent, including Brazil, take part in its experiments."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the ATLAS experiment?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ATLAS is the largest general-purpose particle detector at the Large Hadron Collider: 46 metres long, 25 metres tall, about 7,000 tonnes, sitting 100 metres underground. In 2012, ATLAS and CMS announced the discovery of the Higgs boson. NIPSCERN contributes to its TileCal calorimeter; see how."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is the LHC, and how does it work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Large Hadron Collider is a 27-kilometre ring about 100 metres under the Franco-Swiss border. Superconducting magnets steer two beams of protons travelling near the speed of light into head-on collisions, up to 40 million times per second, recreating conditions close to those of the early universe. Detectors like ATLAS record what comes out."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which countries and institutions take part in ATLAS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The ATLAS collaboration gathers thousands of scientists from roughly 180 institutions in around 40 countries. Brazil is among them, and UFJF, through NIPSCERN, is one of the participating institutions. Our contributions are detailed on the CERN & ATLAS page."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Did CERN open a portal or split a singularity?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The LHC collides protons, something cosmic rays do in Earth's atmosphere constantly and at even higher energies, and no portal, dimension or singularity is involved. What the collisions actually produce is far more interesting: precise measurements of the particles and forces that make up our universe. See what really happens inside ATLAS."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the 17 particles of the Standard Model?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Standard Model describes matter with 17 fundamental particles: six quarks, six leptons (including the electron and the neutrinos), four force-carrying bosons (photon, gluon, W and Z) and the Higgs boson, confirmed at CERN in 2012. There is a full diagram on our CERN & ATLAS page."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the CERN Courier?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The CERN Courier is the international journal of high energy physics, published since 1959. NIPSCERN curates a digital collection of editions from 2013 to today, alongside our own scientific publications."
+      }
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <!-- ======================================================
+         PAGE HERO
+         ====================================================== -->
+    <header class="page-hero" aria-labelledby="qa-title">
+      <div class="page-hero-inner">
+        <div class="eyebrow fade-up">
+          <i class="ph ph-chats-circle" aria-hidden="true"></i>
+          <span data-i18n="qa.hero.label">Questions &amp; Answers</span>
+        </div>
+        <h1 class="display-lg fade-up" id="qa-title" data-i18n="qa.hero.title">
+          The Big Questions, Answered
+        </h1>
+        <p class="body-lg fade-up" style="max-width:640px;margin-top:var(--sp-5)" data-i18n="qa.hero.subtitle">
+          What people ask about CERN, the ATLAS experiment and the NIPSCERN projects, answered plainly by the lab that lives this work every day.
+        </p>
+      </div>
+    </header>
+
+    <!-- ======================================================
+         THE LABORATORY
+         ====================================================== -->
+    <section class="section" aria-labelledby="qa-lab-title">
+      <div class="container container--narrow">
+        <div class="qa-group fade-up">
+          <div class="accent-line" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="qa-lab-title" data-i18n="qa.cat_lab" style="margin-bottom:var(--sp-6)">The Laboratory</h2>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q1">What is NIPSCERN?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a1">NIPSCERN (Núcleo de Instrumentação e Processamento de Sinais) is a research and development laboratory at the Federal University of Juiz de Fora (UFJF), Brazil. The lab designs electronic instrumentation, signal processing methods and processors for high energy physics, working in direct collaboration with the <a href="cern">ATLAS experiment at CERN</a>. Meet the <a href="about">team and mission</a>.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q2">How does a Brazilian laboratory collaborate with CERN?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a2">NIPSCERN contributes to the operation and calibration of the TileCal hadronic calorimeter of the ATLAS detector, develops digital signal reconstruction methods used in event triggering, and builds software such as <a href="projects/cgv">CGVWeb</a>, which runs on the main wall of the ATLAS Control Room in Geneva. Members of the lab work both at UFJF and on site at CERN; the full story is on our <a href="cern">CERN &amp; ATLAS page</a>.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q3">How can I join NIPSCERN or propose a partnership?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a3">We are hiring: the lab looks for researchers in logic, philosophy, software engineering, the engineering disciplines, programming and design. Companies and institutions interested in building on our work are welcome: our <a href="https://github.com/nipscernlab/nipscernweb/blob/main/LICENSE.md" target="_blank" rel="noopener">license</a> is open to partnerships. Write to contact@nipscern.com or meet us through the <a href="about">About page</a>.</div>
+          </details>
+        </div>
+
+        <!-- ======================================================
+             THE PROJECTS
+             ====================================================== -->
+        <div class="qa-group fade-up">
+          <div class="accent-line" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="qa-projects-title" data-i18n="qa.cat_projects" style="margin-bottom:var(--sp-6)">Our Projects</h2>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q4">What is SAPHO?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a4"><a href="projects/sapho">SAPHO</a> is a scalable hardware architecture and toolchain for creating processors: you describe an algorithm in a few lines of C±, and SAPHO generates a soft-core processor tailored to run exactly that algorithm on an FPGA. The platform is the sum of its parts (SAPHO = <a href="projects/aurora">AURORA</a> + <a href="projects/yanc">YANC</a>) and includes POLARIS, YAWT and PRISM.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q5">What is AURORA?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a5"><a href="projects/aurora">AURORA</a> is the official desktop IDE of the SAPHO platform: write the algorithm, compile, simulate and inspect the generated processor in a single window. Aurora Intelligence adds an AI assistant that operates the IDE through its own tools.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q6">What is YANC?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a6"><a href="projects/yanc">YANC</a> is the compiler toolchain powering the SAPHO ecosystem, including cmmcomp (the C± compiler) and asmcomp (the assembly compiler). It is written in C with Flex, Bison and GCC.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q7">What is CGVWeb?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a7"><a href="projects/cgv">CGVWeb</a> renders real collision events from the ATLAS calorimeters in 3D, in any browser, with no installation. Built on Rust/WebAssembly and Three.js, it runs on the main wall of the ATLAS Control Room at CERN. <a href="projects/cgvweb/">Open the live application</a> or read the <a href="library/cgvweb/twiki/">technical documentation</a>.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q8">What is POLARIS?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a8"><a href="projects/polaris">POLARIS</a> is a modern, cross-platform graphical IDE for the SAPHO ecosystem, built with Tauri and Rust. It integrates the Monaco editor, the PRISM RTL viewer and the YAWT wave tracer.</div>
+          </details>
+        </div>
+
+        <!-- ======================================================
+             CERN & ATLAS
+             ====================================================== -->
+        <div class="qa-group fade-up">
+          <div class="accent-line" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="qa-cern-title" data-i18n="qa.cat_cern" style="margin-bottom:var(--sp-6)">CERN &amp; ATLAS</h2>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q9">What is CERN and what does the name mean?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a9">CERN is the world's largest particle physics laboratory. The name comes from the French <em>Conseil Européen pour la Recherche Nucléaire</em>, the provisional council created in 1952 to plan the laboratory; the organisation it founded kept the acronym. Our <a href="cern">CERN &amp; ATLAS page</a> tells the story in depth.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q10">Where is CERN located?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a10">CERN sits on the border between Switzerland and France, just outside Geneva, with its main campus in Meyrin. Its accelerators run underground across both countries, including the ring where <a href="cern">the team works with the ATLAS experiment</a>.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q11">When was CERN founded, and by whom?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a11">CERN was founded on 29 September 1954 by twelve European countries rebuilding scientific cooperation after the war. Today it counts more than twenty member states, and scientists from every continent, including Brazil, take part in its experiments.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q12">What is the ATLAS experiment?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a12">ATLAS is the largest general-purpose particle detector at the Large Hadron Collider: 46 metres long, 25 metres tall, about 7,000 tonnes, sitting 100 metres underground. In 2012, ATLAS and CMS announced the discovery of the Higgs boson. NIPSCERN contributes to its TileCal calorimeter; see <a href="cern">how</a>.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q13">Where is the LHC, and how does it work?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a13">The Large Hadron Collider is a 27-kilometre ring about 100 metres under the Franco-Swiss border. Superconducting magnets steer two beams of protons travelling near the speed of light into head-on collisions, up to 40 million times per second, recreating conditions close to those of the early universe. Detectors like <a href="cern">ATLAS</a> record what comes out.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q14">Which countries and institutions take part in ATLAS?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a14">The ATLAS collaboration gathers thousands of scientists from roughly 180 institutions in around 40 countries. Brazil is among them, and UFJF, through NIPSCERN, is one of the participating institutions. Our contributions are detailed on the <a href="cern">CERN &amp; ATLAS page</a>.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q15">Did CERN open a portal or split a singularity?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a15">No. The LHC collides protons, something cosmic rays do in Earth's atmosphere constantly and at even higher energies, and no portal, dimension or singularity is involved. What the collisions actually produce is far more interesting: precise measurements of the particles and forces that make up our universe. See <a href="cern">what really happens inside ATLAS</a>.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q16">What are the 17 particles of the Standard Model?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a16">The Standard Model describes matter with 17 fundamental particles: six quarks, six leptons (including the electron and the neutrinos), four force-carrying bosons (photon, gluon, W and Z) and the Higgs boson, confirmed at CERN in 2012. There is a full diagram on our <a href="cern">CERN &amp; ATLAS page</a>.</div>
+          </details>
+
+          <details class="qa-item">
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q17">What is the CERN Courier?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a17">The CERN Courier is the international journal of high energy physics, published since 1959. NIPSCERN curates a <a href="publications/courier">digital collection of editions</a> from 2013 to today, alongside our own <a href="publications">scientific publications</a>.</div>
+          </details>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>
+  /* VLibras carregado depois do load para nao bloquear a renderizacao */
+  window.addEventListener('load', function () {
+    var s = document.createElement('script');
+    s.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+    s.onload = function () { new VLibras.Widget('https://vlibras.gov.br/app'); };
+    document.body.appendChild(s);
+  });
+  </script>
+
+  <script type="module" src="assets/js/main.js"></script>
+  <script src="assets/js/analytics.js" defer></script>
+</body>
+</html>
