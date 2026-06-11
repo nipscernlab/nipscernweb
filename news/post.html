@@ -363,6 +363,8 @@
       });
     }
 
+    let _currentPost = null;
+
     async function loadPost() {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id') || params.get('slug');
@@ -400,11 +402,16 @@
         document.body.classList.add('post-featured');
       }
 
+      // Resolve translations for regular (non-featured) posts
+      _currentPost = post;
+      const _lang = getLang() || 'en';
+      const _tr = post._featured ? {} : (post.translations && post.translations[_lang]) || {};
+
       // Update meta
-      document.getElementById('page-title').textContent = post.title + ' — NIPSCERN';
-      document.getElementById('page-desc').content = post.excerpt;
-      document.getElementById('og-title').content = post.title;
-      document.getElementById('og-desc').content = post.excerpt;
+      document.getElementById('page-title').textContent = (_tr.title || post.title) + ' — NIPSCERN';
+      document.getElementById('page-desc').content = _tr.excerpt || post.excerpt;
+      document.getElementById('og-title').content = _tr.title || post.title;
+      document.getElementById('og-desc').content = _tr.excerpt || post.excerpt;
       document.getElementById('og-url').content = 'https://www.nipscern.com/' + newsPostUrl(post, 'news/post');
 
       // Render header
@@ -417,8 +424,8 @@
       document.getElementById('post-date').setAttribute('datetime', post.date);
       renderEditedDate(post.date_edited);
       renderLangFlag(post);
-      document.getElementById('post-title').textContent = post.title;
-      document.getElementById('post-excerpt').textContent = post.excerpt;
+      document.getElementById('post-title').textContent = _tr.title || post.title;
+      document.getElementById('post-excerpt').textContent = _tr.excerpt || post.excerpt;
       document.getElementById('post-header').style.display = 'block';
 
       // Author byline (featured stories carry an explicit author)
@@ -453,7 +460,8 @@
         bodyEl.innerHTML = post.content_html;
         initLightbox(bodyEl);
       } else {
-        const paragraphs = (post.content || '').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+        const rawContent = _tr.content || post.content || '';
+        const paragraphs = rawContent.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
         bodyEl.innerHTML = paragraphs;
       }
       bodyEl.style.display = 'block';
@@ -551,7 +559,24 @@
 
     // If the user changes language while reading the featured story, re-render
     document.addEventListener('langchange', async () => {
-      if (!document.body.classList.contains('post-featured')) return;
+      // Regular (non-featured) posts: swap title, excerpt and body on language change
+      if (!document.body.classList.contains('post-featured')) {
+        if (!_currentPost) return;
+        const lang = getLang() || 'en';
+        const tr = (_currentPost.translations && _currentPost.translations[lang]) || {};
+        document.getElementById('post-title').textContent   = tr.title   || _currentPost.title;
+        document.getElementById('post-excerpt').textContent = tr.excerpt || _currentPost.excerpt;
+        document.getElementById('page-title').textContent   = (tr.title || _currentPost.title) + ' — NIPSCERN';
+        const rawContent = tr.content || _currentPost.content || '';
+        if (rawContent) {
+          const bodyEl = document.getElementById('post-body');
+          bodyEl.innerHTML = rawContent.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+          if (_currentPost.tags && _currentPost.tags.length) {
+            bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${_currentPost.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
+          }
+        }
+        return;
+      }
       try {
         const res = await fetch('../data/news-featured.json');
         if (!res.ok) return;
