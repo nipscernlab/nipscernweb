@@ -564,7 +564,7 @@
      so the underlying PDF text can be selected and copied. The wrapper is
      attached to the DOM *before* rendering the text layer, because PDF.js reads
      the `--scale-factor` CSS variable via getComputedStyle(container). */
-  async function buildPage(n) {
+  async function buildPage(n, container) {
     var page     = await pdfDoc.getPage(n);
     var DPR      = window.devicePixelRatio || 1;
     var cssVp    = page.getViewport({ scale: scale });
@@ -574,6 +574,8 @@
     var wrap = document.createElement('div');
     wrap.className       = 'pdf-page';
     wrap.dataset.pageNum = String(n);
+    wrap.dataset.cssW    = String(cw);
+    wrap.dataset.cssH    = String(ch);
     wrap.style.width     = cw + 'px';
     wrap.style.height    = ch + 'px';
 
@@ -590,7 +592,7 @@
     textDiv.style.setProperty('--scale-factor', String(scale));
     wrap.appendChild(textDiv);
 
-    pagesWrap.appendChild(wrap);
+    (container || pagesWrap).appendChild(wrap);
 
     try {
       await page.render({ canvasContext: canvas.getContext('2d'), viewport: renderVp }).promise;
@@ -612,26 +614,10 @@
     return wrap;
   }
 
-  /* ---------- Render single page ---------- */
-  async function renderPage(n) {
-    if (!pdfDoc) return;
-    clearWrap(pagesWrap);
-    await buildPage(n);
-    curPage = n;
-    refreshPageUI();
-  }
-
-  /* ---------- Render all pages (continuous mode) ---------- */
-  async function renderAllPages() {
-    if (!pdfDoc) return;
+  /* ---------- Visible-page tracking (continuous mode) ---------- */
+  function wireObserver() {
     if (pageObserver) { pageObserver.disconnect(); pageObserver = null; }
-    clearWrap(pagesWrap);
-
-    for (var i = 1; i <= totalPages; i++) {
-      await buildPage(i);
-    }
-
-    /* Track visible page while scrolling */
+    if (!continuous) return;
     var pages = pagesWrap.querySelectorAll('.pdf-page');
     pageObserver = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
@@ -644,8 +630,16 @@
     pages.forEach(function(p) { pageObserver.observe(p); });
   }
 
-  async function rerender() {
-    if (continuous) { await renderAllPages(); } else { await renderPage(curPage); }
+  /* ---------- Render all pages (first paint) ---------- */
+  async function renderAllPages() {
+    if (!pdfDoc) return;
+    if (pageObserver) { pageObserver.disconnect(); pageObserver = null; }
+    clearWrap(pagesWrap);
+    for (var i = 1; i <= totalPages; i++) {
+      await buildPage(i);
+    }
+    renderedScale = scale;
+    wireObserver();
   }
 
   /* ---------- Navigate ---------- */
@@ -656,66 +650,108 @@
       if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' });
       curPage = n; refreshPageUI();
     } else {
-      await renderPage(n);
+      curPage = n; refreshPageUI();
+      await rerenderCrisp();
     }
   }
 
   /* ---------- Zoom ---------- */
   var STEPS    = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0, 4.0];
   var ZOOM_MIN = STEPS[0], ZOOM_MAX = STEPS[STEPS.length - 1];
-  var zoomBusy = false;
-  var zoomQueue = null;   // {scale, x, y} requested while a render was in flight
+  var renderedScale = 1.0;  // escala em que as paginas do DOM foram de fato renderizadas
+  var renderGen     = 0;    // invalida re-renderizacoes que ficaram obsoletas
+  var hqTimer       = null;
 
   function clampScale(s)   { return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, s)); }
   function nextStepUp(s)   { return STEPS.find(function(x){ return x > s + 0.01; }); }
   function nextStepDown(s) { var p = null; STEPS.forEach(function(x){ if (x < s - 0.01) p = x; }); return p; }
 
-  /* The scale the viewer is heading toward, including any queued zoom step. */
-  function pendingScale() { return zoomQueue ? zoomQueue.scale : scale; }
-
-  /* Apply a new zoom scale while keeping the content point under (focalX, focalY)
-     — given in viewport client coords — stationary. Without a focal point the
-     viewport centre is used. Re-rendering rebuilds the pages (resetting scroll),
-     so the scroll offset is recomputed and restored afterwards. Zoom requests
-     that arrive mid-render are coalesced and applied once the render finishes,
-     so rapid Ctrl+wheel ticks accumulate instead of being dropped. */
-  async function applyScale(newScale, focalX, focalY) {
-    if (!pdfDoc) return;
-    newScale = clampScale(newScale);
-    if (zoomBusy) { zoomQueue = { scale: newScale, x: focalX, y: focalY }; return; }
-    if (Math.abs(newScale - scale) < 0.001) return;
-
-    var rect = viewer.getBoundingClientRect();
-    var offX = (focalX == null ? rect.width  / 2 : focalX - rect.left);
-    var offY = (focalY == null ? rect.height / 2 : focalY - rect.top);
-    var rx = (viewer.scrollLeft + offX) / (viewer.scrollWidth  || 1);
-    var ry = (viewer.scrollTop  + offY) / (viewer.scrollHeight || 1);
-
-    zoomBusy = true;
-    scale = newScale;
-    refreshZoomUI();
-    try { await rerender(); } finally { zoomBusy = false; }
-
-    viewer.scrollLeft = rx * viewer.scrollWidth  - offX;
-    viewer.scrollTop  = ry * viewer.scrollHeight - offY;
-
-    if (zoomQueue) {
-      var q = zoomQueue; zoomQueue = null;
-      applyScale(q.scale, q.x, q.y).catch(console.warn);
+  /* Zoom visual instantaneo: as paginas ja renderizadas sao apenas
+     redimensionadas via CSS (o bitmap escala junto), entao o conteudo
+     nunca sai da tela durante o gesto. A nitidez plena volta no
+     re-render agendado para quando o zoom termina. */
+  function applyVisualScale() {
+    var k = scale / renderedScale;
+    var pages = pagesWrap.querySelectorAll('.pdf-page');
+    for (var i = 0; i < pages.length; i++) {
+      var w  = pages[i];
+      var cw = parseFloat(w.dataset.cssW) * k;
+      var ch = parseFloat(w.dataset.cssH) * k;
+      w.style.width  = cw + 'px';
+      w.style.height = ch + 'px';
+      var c = w.querySelector('.pdf-canvas');
+      if (c) { c.style.width = cw + 'px'; c.style.height = ch + 'px'; }
+      var t = w.querySelector('.textLayer');
+      if (t) {
+        t.style.transformOrigin = '0 0';
+        t.style.transform = (Math.abs(k - 1) < 0.001) ? '' : 'scale(' + k + ')';
+      }
     }
   }
 
-  function zoomIn()  { var n = nextStepUp(pendingScale());   if (n !== undefined) applyScale(n).catch(console.warn); }
-  function zoomOut() { var p = nextStepDown(pendingScale()); if (p !== null)      applyScale(p).catch(console.warn); }
+  /* Re-render de alta qualidade sem nunca apagar a tela: as paginas novas
+     nascem num container oculto e substituem as antigas numa unica troca,
+     com o scroll preservado (as dimensoes ja batem, porque o zoom visual
+     usa a mesma escala-alvo). */
+  async function rerenderCrisp() {
+    if (!pdfDoc) return;
+    var gen = ++renderGen;
+    var staging = document.createElement('div');
+    staging.style.cssText = 'position:absolute;left:-100000px;top:0;visibility:hidden;';
+    viewer.appendChild(staging);
+    try {
+      var first = continuous ? 1 : curPage;
+      var last  = continuous ? totalPages : curPage;
+      for (var i = first; i <= last; i++) {
+        if (gen !== renderGen) return;
+        await buildPage(i, staging);
+      }
+      if (gen !== renderGen) return;
+      var sl = viewer.scrollLeft, st = viewer.scrollTop;
+      clearWrap(pagesWrap);
+      while (staging.firstChild) { pagesWrap.appendChild(staging.firstChild); }
+      renderedScale = scale;
+      viewer.scrollLeft = sl;
+      viewer.scrollTop  = st;
+      wireObserver();
+    } finally {
+      staging.remove();
+    }
+  }
+
+  async function rerender() { await rerenderCrisp(); }
+
+  function scheduleCrisp() {
+    clearTimeout(hqTimer);
+    hqTimer = setTimeout(function(){ rerenderCrisp().catch(console.warn); }, 280);
+  }
+
+  /* Zoom suave e continuo: aplica o alvo imediatamente via CSS, mantendo o
+     ponto sob (focalX, focalY) parado, e agenda a renderizacao nitida. */
+  function setZoom(target, focalX, focalY) {
+    if (!pdfDoc) return;
+    target = clampScale(target);
+    if (Math.abs(target - scale) < 0.0005) return;
+    var rect  = viewer.getBoundingClientRect();
+    var offX  = (focalX == null ? rect.width  / 2 : focalX - rect.left);
+    var offY  = (focalY == null ? rect.height / 2 : focalY - rect.top);
+    var ratio = target / scale;
+    scale = target;
+    applyVisualScale();
+    viewer.scrollLeft = (viewer.scrollLeft + offX) * ratio - offX;
+    viewer.scrollTop  = (viewer.scrollTop  + offY) * ratio - offY;
+    refreshZoomUI();
+    scheduleCrisp();
+  }
+
+  function zoomIn()  { var n = nextStepUp(scale);   if (n !== undefined) setZoom(n); }
+  function zoomOut() { var p = nextStepDown(scale); if (p !== null)      setZoom(p); }
 
   async function fitWidth() {
     if (!pdfDoc) return;
     var page = await pdfDoc.getPage(curPage);
     var vp   = page.getViewport({ scale: 1 });
-    var target = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, (viewer.clientWidth - 48) / vp.width));
-    scale = target;
-    refreshZoomUI();
-    rerender().catch(console.warn);
+    setZoom((viewer.clientWidth - 48) / vp.width);
   }
 
   /* ---------- Back ---------- */
@@ -827,9 +863,11 @@
   viewer.addEventListener('wheel', function(e) {
     if (!e.ctrlKey || !pdfDoc) return;
     e.preventDefault();
-    var target = e.deltaY < 0 ? nextStepUp(pendingScale()) : nextStepDown(pendingScale());
-    if (target == null) return;
-    applyScale(target, e.clientX, e.clientY).catch(console.warn);
+    /* Zoom suave, proporcional ao delta: um clique de roda de mouse
+       (deltaY ~ ±100) da ~16%; o pinch de trackpad gera deltas pequenos
+       e continuos. deltaMode 1 = Firefox reportando em linhas. */
+    var dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+    setZoom(scale * Math.exp(-dy * 0.0015), e.clientX, e.clientY);
   }, { passive: false });
 
   /* Keyboard shortcuts */

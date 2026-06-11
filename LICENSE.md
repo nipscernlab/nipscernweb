@@ -79,8 +79,13 @@ término.
 
 ## 8. Contato
 
-Parcerias, autorizações e dúvidas: **nipscern.com** (página de contato) ou
-diretamente com os membros do Laboratório listados no site.
+Parcerias, autorizações e dúvidas:
+
+- **contact@nipscern.com**
+- **chrysthofer.afonso@cern.ch**
+- **lucianomaf@cern.ch**
+
+Ou pela página de contato em **nipscern.com**.
 
 ---
 
@@ -163,5 +168,10 @@ termination.
 
 ## 8. Contact
 
-Partnerships, authorizations and questions: **nipscern.com** (contact page)
-or directly with the Laboratory members listed on the site.
+Partnerships, authorizations and questions:
+
+- **contact@nipscern.com**
+- **chrysthofer.afonso@cern.ch**
+- **lucianomaf@cern.ch**
+
+Or through the contact page at **nipscern.com**.
