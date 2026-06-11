@@ -73,8 +73,11 @@
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://gc.zgo.at">
 
-  <!-- Preload LCP image (latest news — update when news changes) -->
-  <link rel="preload" as="image" href="assets/images/news/ponte-sao-paulo.webp" type="image/webp" fetchpriority="high">
+  <!-- Preload LCP image — responsive: 400w mobile, 840w desktop (update when news changes) -->
+  <link rel="preload" as="image"
+    imagesrcset="assets/images/news/ponte-sao-paulo-400.webp 400w, assets/images/news/ponte-sao-paulo.webp 840w"
+    imagesizes="(max-width:640px) 400px, 840px"
+    fetchpriority="high">
 
   <!-- Critical CSS (above-the-fold hero styles inlined to avoid render-blocking) -->
   <style>
@@ -570,10 +573,9 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
     var W, H, stars = [], shooting = null, shootTimer = 0;
     var NUM_STARS = 130;
 
-    function resize() {
-      var hero = canvas.parentElement.parentElement;
-      W = canvas.width  = hero.offsetWidth  || window.innerWidth;
-      H = canvas.height = hero.offsetHeight || window.innerHeight;
+    function setDimensions(w, h) {
+      W = canvas.width  = w || window.innerWidth;
+      H = canvas.height = h || window.innerHeight;
       stars = [];
       for (var i = 0; i < NUM_STARS; i++) {
         stars.push({
@@ -585,6 +587,18 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           phase: Math.random() * Math.PI * 2
         });
       }
+    }
+
+    var _hero = canvas.parentElement.parentElement;
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(function(entries) {
+        var r = entries[0].contentRect;
+        setDimensions(Math.round(r.width), Math.round(r.height));
+      }).observe(_hero);
+    } else {
+      function resize() { setDimensions(_hero.offsetWidth, _hero.offsetHeight); }
+      window.addEventListener('resize', resize);
+      resize();
     }
 
     function newShooter() {
@@ -652,8 +666,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       requestAnimationFrame(frame);
     }
 
-    window.addEventListener('resize', resize);
-    requestAnimationFrame(function() { resize(); requestAnimationFrame(frame); });
+    setDimensions(window.innerWidth, window.innerHeight);
+    requestAnimationFrame(frame);
   })();
   </script>
 
