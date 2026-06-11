@@ -24,7 +24,6 @@
   <link rel="canonical" href="https://www.nipscern.com/">
 
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" >
   <meta name="keywords" lang="en" content="sapho, cern, Scalable Architecture Processor for Hardware Optimization" />
   <meta name="keywords" lang="pt" content="sapho, cern, Processador de Arquitetura Escalável para Otimização de Hardware" />
   <meta name="keywords" lang="fr" content="sapho, cern, Processeur d'Architecture Évolutive pour l'Optimisation du Matériel" />
@@ -72,6 +71,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preload" href="assets/css/main.css" as="style">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
 
@@ -143,7 +143,7 @@
           </a>
         </div>
         <!-- Discrete view counter — loaded asynchronously from GoatCounter -->
-        <div class="hero-viewcount" id="hero-viewcount" aria-label="Page views" hidden>
+        <div class="hero-viewcount" id="hero-viewcount" aria-label="Page views" style="visibility:hidden;opacity:0;transition:opacity 0.4s ease">
           <i class="ph ph-eye" aria-hidden="true"></i>
           <span id="view-count">—</span>
           <span data-i18n="home.hero.views">visitors</span>
@@ -482,19 +482,28 @@
         <p class="sponsors-label" id="sponsors-label" data-i18n="home.sponsors.title">Supported By</p>
         <div class="sponsors-logos fade-up">
           <a href="https://fapemig.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="FAPEMIG">
-            <img src="assets/images/sponsors/fapemig.png" alt="FAPEMIG" width="56" height="56">
+            <picture>
+              <source srcset="assets/images/sponsors/fapemig.webp" type="image/webp">
+              <img src="assets/images/sponsors/fapemig.png" alt="FAPEMIG" width="56" height="56" loading="lazy" decoding="async">
+            </picture>
           </a>
           <a href="https://capes.gov.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CAPES">
-            <img src="assets/images/sponsors/capes.png" alt="CAPES" width="56" height="56">
+            <picture>
+              <source srcset="assets/images/sponsors/capes.webp" type="image/webp">
+              <img src="assets/images/sponsors/capes.png" alt="CAPES" width="56" height="56" loading="lazy" decoding="async">
+            </picture>
           </a>
           <a href="https://cnpq.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CNPq">
-            <img src="assets/images/sponsors/cnpq.svg" alt="CNPq" width="56" height="56">
+            <img src="assets/images/sponsors/cnpq.svg" alt="CNPq" width="56" height="56" loading="lazy" decoding="async">
           </a>
           <a href="https://ufjf.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="UFJF">
-            <img src="assets/images/sponsors/ufjf.png" alt="UFJF" width="56" height="56">
+            <picture>
+              <source srcset="assets/images/sponsors/ufjf.webp" type="image/webp">
+              <img src="assets/images/sponsors/ufjf.png" alt="UFJF" width="56" height="56" loading="lazy" decoding="async">
+            </picture>
           </a>
           <a href="https://cern.ch" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CERN">
-            <img src="assets/images/sponsors/cern.svg" alt="CERN" width="56" height="56">
+            <img src="assets/images/sponsors/cern.svg" alt="CERN" width="56" height="56" loading="lazy" decoding="async">
           </a>
         </div>
       </div>
@@ -598,9 +607,8 @@
       requestAnimationFrame(frame);
     }
 
-    resize();
     window.addEventListener('resize', resize);
-    requestAnimationFrame(frame);
+    requestAnimationFrame(function() { resize(); requestAnimationFrame(frame); });
   })();
   </script>
 
@@ -624,7 +632,7 @@
   <script type="module" src="assets/js/main.js"></script>
 
 <script>
-  (function () {
+  window.addEventListener('load', function () {
     var el   = document.getElementById('view-count');
     var wrap = document.getElementById('hero-viewcount');
     if (!el || !wrap) return;
@@ -634,8 +642,8 @@
       var duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1400;
       var start    = performance.now();
       el.textContent = '0';
-      wrap.removeAttribute('hidden');
-      wrap.style.display = 'flex';
+      wrap.style.visibility = 'visible';
+      wrap.style.opacity = '1';
       function tick(now) {
         var p    = duration ? Math.min((now - start) / duration, 1) : 1;
         var ease = 1 - Math.pow(1 - p, 3);
@@ -649,7 +657,7 @@
       .then(function (r) { if (!r.ok) throw r.status; return r.json(); })
       .then(function (data) { if (data && data.total > 0) animateCount(data.total); })
       .catch(function () {});
-  })();
+  });
   </script>
   <script src="assets/js/analytics.js" defer></script>
 </body>
