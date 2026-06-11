@@ -396,10 +396,13 @@ async function initHomeLatest() {
     imgDiv.className = 'news-card-image';
     if (post.image) {
       const imgPath = rootPath(post.image);
-      const webpPath = imgPath.replace(/\.(jpe?g|png)$/i, '.webp');
+      const webpBase = imgPath.replace(/\.(jpe?g|png)$/i, '').replace(/\.webp$/, '');
       const picture = document.createElement('picture');
       const source = document.createElement('source');
-      source.srcset = webpPath;
+      const w400 = webpBase + '-400.webp';
+      const w840 = webpBase + '.webp';
+      source.srcset = `${w400} 400w, ${w840} 840w`;
+      source.sizes = '(max-width:640px) 400px, 840px';
       source.type = 'image/webp';
       picture.appendChild(source);
       const img = document.createElement('img');
