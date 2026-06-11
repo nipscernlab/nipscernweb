@@ -658,58 +658,32 @@
   <script type="module" src="assets/js/main.js"></script>
 
 <script>
-    // Garante que o script só rode depois que todo o HTML estiver na tela
-    document.addEventListener("DOMContentLoaded", function() {
-      const el = document.getElementById('view-count');
-      const wrap = document.getElementById('hero-viewcount');
-      
-      if (!el || !wrap) {
-        console.warn("Aviso: Elementos do contador (view-count ou hero-viewcount) não foram encontrados no HTML.");
-        return;
+  (function () {
+    var el   = document.getElementById('view-count');
+    var wrap = document.getElementById('hero-viewcount');
+    if (!el || !wrap) return;
+
+    function animateCount(target) {
+      var end      = Math.max(0, Number(target) || 0);
+      var duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1400;
+      var start    = performance.now();
+      el.textContent = '0';
+      wrap.removeAttribute('hidden');
+      wrap.style.display = 'flex';
+      function tick(now) {
+        var p    = duration ? Math.min((now - start) / duration, 1) : 1;
+        var ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(end * ease).toLocaleString();
+        if (p < 1) requestAnimationFrame(tick);
       }
+      requestAnimationFrame(tick);
+    }
 
-      const workerUrl = 'https://goatcounter-proxy.nipscernlab.workers.dev';
-
-      function animateCount(target) {
-        const end = Math.max(0, Number(target) || 0);
-        const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1400;
-        const startTime = performance.now();
-
-        function tick(now) {
-          const elapsed = now - startTime;
-          const progress = duration ? Math.min(elapsed / duration, 1) : 1;
-          const eased = 1 - Math.pow(1 - progress, 3);
-          el.textContent = Math.round(end * eased).toLocaleString();
-          if (progress < 1) requestAnimationFrame(tick);
-        }
-
-        el.textContent = '0';
-        wrap.removeAttribute('hidden');
-        wrap.style.display = 'flex';
-        requestAnimationFrame(tick);
-      }
-
-      fetch(workerUrl)
-        .then(function (r) { 
-          if (!r.ok) throw new Error("Erro na resposta do Worker: " + r.status);
-          return r.json(); 
-        })
-        .then(function (data) {
-          console.log("Sucesso! Dados recebidos do GoatCounter:", data);
-          
-          if (!data || data.total === undefined) return;
-          
-          var count = data.total;
-          
-          if (count > 0) {
-            animateCount(count);
-            console.log("Contador atualizado e visível na tela!");
-          }
-        })
-        .catch(function (err) {
-          console.error("Erro ao processar o contador:", err);
-        });
-    });
+    fetch('https://goatcounter-proxy.nipscernlab.workers.dev')
+      .then(function (r) { if (!r.ok) throw r.status; return r.json(); })
+      .then(function (data) { if (data && data.total > 0) animateCount(data.total); })
+      .catch(function () {});
+  })();
   </script>
   <script src="assets/js/analytics.js" defer></script>
 </body>
