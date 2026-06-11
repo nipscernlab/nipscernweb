@@ -12,13 +12,13 @@
   <meta property="og:url"         content="https://www.nipscern.com/">
   <meta property="og:title"       content="NIPSCERN — Research & Development Laboratory">
   <meta property="og:description" content="Research and Development Laboratory at UFJF, Brazil — working at the frontier of high energy physics and scientific computing in collaboration with CERN.">
-  <meta property="og:image"       content="https://www.nipscern.com/assets/images/og-home.jpg">
+  <meta property="og:image"       content="https://www.nipscern.com/assets/images/og-default.png">
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="NIPSCERN — Research & Development Laboratory">
   <meta name="twitter:description" content="Research and Development Laboratory at UFJF, Brazil — in collaboration with CERN, Geneva.">
-  <meta name="twitter:image"       content="https://www.nipscern.com/assets/images/og-home.jpg">
+  <meta name="twitter:image"       content="https://www.nipscern.com/assets/images/og-default.png">
 
   <!-- Canonical -->
   <link rel="canonical" href="https://www.nipscern.com/">
@@ -36,7 +36,6 @@
   <meta name="description" lang="no" content="NIPSCERN, et forskningslaboratorium ved UFJF i samarbeid med CERN, bidrar til ATLAS-eksperimentet, og utvikler avanserte prosessorer og optimaliseringsmetoder for å flytte grensene for observerbar vitenskap. Utforsk våre banebrytende verktøy som AURA IDE, SAPHO og ALICE for banebrytende forskning innen maskinvare og signalbehandling.">        
   <meta property="og:title" content="NIPSCERN - Research and Innovation | NIPSCERN Lab" />
   <meta property="og:description" content="NIPSCERN, a research lab at UFJF in collaboration with CERN, contributes to the ATLAS experiment, developing advanced processors and optimization methods to push the boundaries of observable science. Learn more now!" />
-  <meta property="og:image" content="/assets/icons/icon_home_nipscern.svg" />
   <meta property="og:url" content="https://www.nipscern.com" />
   <meta property="og:type" content="website" />
   <script>
@@ -53,7 +52,11 @@
   </script>
 
   <!-- Favicon -->
-  <link rel="icon" href="assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
 
   <!-- Three.js importmap (must come before any module scripts) -->
   <script type="importmap">
@@ -68,9 +71,12 @@
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
 
   <!-- CSS -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="assets/css/main.css">
 
   <!-- Schema.org Organization -->
@@ -218,7 +224,7 @@
         <div class="cgv-canvas-wrapper fade-up" id="cgv-canvas-wrapper" role="img" aria-label="Interactive 3D ATLAS calorimeter event display">
           <iframe
             id="cgv-iframe"
-            src="projects/cgvweb/nipscern/index.html"
+            data-src="projects/cgvweb/nipscern/index.html"
             loading="lazy"
             title="ATLAS Calorimeter 3D Preview"
             style="width:100%;height:100%;border:0;display:block;background:#05070f"
@@ -507,8 +513,15 @@
     </div>
   </div>
   <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
-  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+  <script>
+  /* VLibras carregado depois do load para nao bloquear a renderizacao */
+  window.addEventListener('load', function () {
+    var s = document.createElement('script');
+    s.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+    s.onload = function () { new VLibras.Widget('https://vlibras.gov.br/app'); };
+    document.body.appendChild(s);
+  });
+  </script><script>
 (function(){
   var obs = new MutationObserver(function(){
     var panel = document.querySelector('[vw-plugin-wrapper]');
@@ -626,6 +639,22 @@
   </script>
 
   <!-- Main module -->
+  <script>
+  /* O preview 3D do CGV (iframe pesado) so carrega quando o usuario
+     se aproxima da secao, em vez de competir com o carregamento inicial */
+  (function () {
+    var f = document.getElementById('cgv-iframe');
+    if (!f) return;
+    function load() { if (!f.src) f.src = f.dataset.src; }
+    if (!('IntersectionObserver' in window)) { load(); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { load(); io.disconnect(); }
+      });
+    }, { rootMargin: '300px' });
+    io.observe(f);
+  })();
+  </script>
   <script type="module" src="assets/js/main.js"></script>
 
 <script>

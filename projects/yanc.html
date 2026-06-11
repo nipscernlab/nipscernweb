@@ -10,16 +10,23 @@
   <meta property="og:url"   content="https://www.nipscern.com/projects/yanc">
   <meta property="og:title" content="YANC — Yet Another Compiler | NIPSCERN">
   <meta property="og:description" content="The compiler toolchain powering the SAPHO hardware design ecosystem.">
-  <meta property="og:image" content="https://www.nipscern.com/assets/images/projects/yanc.jpg">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://www.nipscern.com/projects/yanc">
 
-  <link rel="icon" href="../assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="../assets/css/main.css">
 
   <style>
@@ -351,8 +358,15 @@
     <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
   </div>
   <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
-  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-  <script>new VLibras.Widget('https://vlibras.gov.br/app');</script><script>
+  <script>
+  /* VLibras carregado depois do load para nao bloquear a renderizacao */
+  window.addEventListener('load', function () {
+    var s = document.createElement('script');
+    s.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+    s.onload = function () { new VLibras.Widget('https://vlibras.gov.br/app'); };
+    document.body.appendChild(s);
+  });
+  </script><script>
 (function(){
   var obs = new MutationObserver(function(){
     var panel = document.querySelector('[vw-plugin-wrapper]');
