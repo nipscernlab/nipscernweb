@@ -1,18 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Binários pesados via Git LFS (vale para arquivos novos a partir daqui)
-*.mp4 filter=lfs diff=lfs merge=lfs -text
-*.glb filter=lfs diff=lfs merge=lfs -text
-*.zip filter=lfs diff=lfs merge=lfs -text
-*.pdf filter=lfs diff=lfs merge=lfs -text
-
-# Exceção: assets servidos diretamente pelo site (PDFs de publicações e mídias)
-# precisam ser blobs comuns — o host estático não expande ponteiros Git LFS,
-# e todos os assets pré-existentes já são blobs comuns. Sem isto, o PDF/vídeo
-# servido vira um ponteiro de ~130 bytes e o link "não aponta para o arquivo".
-publications/articles/*.pdf -filter -diff -merge -text
-assets/**/*.pdf -filter -diff -merge -text
-assets/**/*.mp4 -filter -diff -merge -text
-projects/**/*.glb -filter -diff -merge -text
-assets/**/*.glb -filter -diff -merge -text
+# Git LFS foi aposentado: arquivos pesados vivem no repositorio
+# nipscern-assets (servido em cdn.nipscern.com), e o CI deste repo
+# bloqueia qualquer arquivo acima de 2 MB (.github/workflows/size-guard.yml).

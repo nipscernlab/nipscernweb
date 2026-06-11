@@ -1,0 +1,20 @@
+name: Guarda de tamanho
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bloqueia arquivos acima de 2 MB
+        run: |
+          big=$(find . -path ./.git -prune -o -type f -size +2M -print)
+          if [ -n "$big" ]; then
+            echo "::error::Arquivos acima de 2 MB nao entram neste repo."
+            echo "Otimize com tools/optimize-media.ps1 e/ou envie para o"
+            echo "repositorio nipscern-assets (cdn.nipscern.com):"
+            echo "$big"
+            exit 1
+          fi
+          echo "Todos os arquivos estao dentro do limite."
