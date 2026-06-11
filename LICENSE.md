@@ -93,7 +93,7 @@ Ou pela página de contato em **nipscern.com**.
 
 **Version 1.0, June 2026**
 
-Copyright (c) 2026 NIPSCERN, Signal Processing and Instrumentation Center,
+Copyright (c) 2026 NIPSCERN, Center for Instrumentation and Signal Processing,
 Federal University of Juiz de Fora (UFJF), Brazil.
 
 *This is a convenience translation. The Portuguese text above prevails.*
