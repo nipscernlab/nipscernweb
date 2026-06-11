@@ -1,4 +1,64 @@
 [
+  {
+    "id": "pub-2026-inscit-hls-lar-trigger",
+    "title": "The High-Level Synthesis-Based Firmware Upgrade for the Digital Trigger Back-end System of the ATLAS Liquid Argon Calorimeter",
+    "authors": ["Melissa S. Aguiar", "Dabson F. Santos", "Marcos V. S. Oliveira", "Luciano Manhães de Andrade Filho"],
+    "journal": "10th International Symposium on Instrumentation Systems, Circuits, and Transducers — INSCIT 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "The trigger and data acquisition systems of the LHC experiments rely on reconfigurable architectures based on FPGA (Field Programmable Gate Arrays) to accommodate design updates and increasing of the detectors complexity. However, this flexibility comes at the cost of longer development and validation cycles, particularly for large real-time systems operating under strict latency and throughput constraints. This work presents the HLS-based firmware redesign of the back-end system from the ATLAS Liquid Argon Calorimeter, where the introduction of a parallel switch matrix on REMAP block significantly simplifies the architecture and reduces the use of firmware resources. The proposed methodology allows systematic design exploration without modifying the source code, shortens verification time, and provides a more efficient workflow for creating and maintaining large-scale FPGA firmware in modern trigger systems.",
+    "tags": ["HLS", "FPGA", "ATLAS", "LAr", "Calorimeter", "Trigger", "LATOME", "REMAP", "INSCIT"],
+    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-hls-firmware-lar-trigger.pdf"
+  },
+  {
+    "id": "pub-2026-inscit-deconvolution-pseudoinverse",
+    "title": "A Deconvolutional Technique Based on Pseudoinverse for Online Energy Reconstruction",
+    "authors": ["Melissa S. Aguiar", "Eder B. Kapisch", "Ualison R. F. Dias", "Huacheng Cai", "Denis O. Damazio", "Marcos V. S. Oliveira", "Luciano Manhães de Andrade Filho"],
+    "journal": "10th International Symposium on Instrumentation Systems, Circuits, and Transducers — INSCIT 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "Modern High-Energy Physics (HEP) experiments face significant challenges in data processing due to high-luminosity environments where the overlapping of signals, known as pile-up, degrades detector resolution. Traditionally, the Optimal Filter (OF) algorithm is employed for amplitude estimation. However, its performance is limited in high-occupancy scenarios because the filter weights must be specifically recalculated for different pile-up levels to maintain accuracy. This paper proposes an alternative online energy reconstruction technique based on deconvolutional filtering using the Moore-Penrose pseudoinverse. By treating the signal reconstruction as an inverse problem, the proposed method relies solely on the knowledge of the system's impulse response to effectively separate overlapping pulses across varying pile-up conditions. Unlike the OF approach, which typically requires an additional peak detection stage combined with a phase filter, the deconvolution output directly provides the energy values at the precise time of the collision. The approach was validated using the Lorenzetti Showers framework, simulating Liquid Argon (LArg) calorimeter responses under severe multi-hit conditions. Results demonstrate that the deconvolution method significantly reduces the Root Mean Square Error (RMSE) from approximately 200 MeV in the conventional OF to values between 50 and 100 MeV, representing a reduction of up to 62.5% in reconstruction error. Also, it maintains high detection efficiency compared to the conventional OF. The proposed architecture is suitable for low-latency implementation in Field Programmable Gate Arrays (FPGAs), offering a streamlined and robust solution for real-time trigger systems.",
+    "tags": ["Deconvolution", "Calorimetry", "HEP", "Energy reconstruction", "Pile-up", "FPGA", "Lorenzetti", "Pseudoinverse", "INSCIT"],
+    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-deconvolution-pseudoinverse-energy-reconstruction.pdf"
+  },
+  {
+    "id": "pub-2026-inscit-pzc-wiener",
+    "title": "Mitigating Baseline Shift in High Event-Rate Systems via Pole-Zero Cancellation and Wiener Filtering",
+    "authors": ["Leandro da G. Ribeiro", "Ualison R. F. Dias", "Thiago C. A. Paschoalin", "Tiago M. Quirino", "Luciano Manhães de Andrade Filho"],
+    "journal": "10th International Symposium on Instrumentation Systems, Circuits, and Transducers — INSCIT 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "Energy reconstruction in high-energy calorimetry systems is strongly affected by signal conditioning, especially under high event-rate conditions. Shaping stages introduce long-duration components in the pulse response, leading to baseline shifts and degraded estimation performance. This work investigates the use of Pole-Zero Cancellation (PZC) as a pre-processing stage combined with Wiener filtering for amplitude estimation. The performance of the Wiener filter alone is compared with the PZC + Wiener approach. The PZC stage compensates for the exponential component introduced by the readout chain, stabilizing the baseline prior to reconstruction. Results show that, while both approaches perform similarly under low-occupancy conditions, the Wiener filter alone degrades significantly in high-occupancy scenarios due to systematic bias. The proposed PZC + Wiener approach reduces reconstruction error and improves robustness in environments with significant signal overlap.",
+    "tags": ["Wiener filter", "Pole-Zero Cancellation", "Energy reconstruction", "Baseline shift", "Calorimetry", "DSP", "Lorenzetti", "INSCIT"],
+    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-pzc-wiener-baseline-shift.pdf"
+  },
+  {
+    "id": "pub-2026-inscit-digital-shaper-fpga",
+    "title": "Digital Implementation of a Signal Conditioning Stage on FPGA for Pulse Simulation in Nuclear Instrumentation",
+    "authors": ["Fábio C. Luna", "Thiago C. A. Paschoalin", "Tiago M. Quirino", "Luciano Manhães de Andrade Filho"],
+    "journal": "10th International Symposium on Instrumentation Systems, Circuits, and Transducers — INSCIT 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "In nuclear instrumentation, accurate pulse processing is essential for extracting meaningful information from detector signals. However, developing and validating processing techniques directly on experimental setups is often impractical due to high costs, restricted access, and radiation exposure constraints. Real-time pulse simulators provide a controlled alternative for evaluating signal reconstruction algorithms. A critical component of such simulators is the signal conditioning stage (shaper), whose long-tail impulse response must be faithfully reproduced to capture pile-up and baseline shift effects. While FIR filters are commonly used for digital pulse shaping, they cannot efficiently represent slowly decaying responses, requiring an impractical number of coefficients. This work proposes an IIR-based digital shaper implemented on FPGA, obtained by discretizing the analog transfer function using the Impulse Invariant Method and decomposing it into parallel first- and second-order sections described with fixed-point arithmetic. Validation against an ideal reference confirmed minimal quantization error, and the implementation successfully reproduced the long-tail behavior and baseline shift characteristic of the analog circuit. The resource utilization remained below one percent on the target device, indicating that the proposed shaper can be integrated with other signal reconstruction modules without compromising the FPGA capacity available for additional processing stages.",
+    "tags": ["IIR filter", "FPGA", "Shaper", "Nuclear instrumentation", "Signal conditioning", "Fixed-point", "Pulse simulation", "INSCIT"],
+    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-digital-shaper-fpga-nuclear-instrumentation.pdf"
+  },
+  {
+    "id": "pub-2026-inscit-lorenzetti-continuous",
+    "title": "Continuous Front-End Signal Flow Simulation in Nuclear Instrumentation Using the Lorenzetti Framework",
+    "authors": ["Nelson Cevidanes N. de Assis", "Guilherme Barroso Morett", "Tiago Aparecido Teixeira", "Luciano Manhães de Andrade Filho", "Bernardo Sotto Maior Peralva", "Gustavo Barbosa Libotte"],
+    "journal": "10th International Symposium on Instrumentation Systems, Circuits, and Transducers — INSCIT 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "Particle detector simulators, such as the Lorenzetti framework, are essential tools for studying and designing new acquisition architectures for nuclear instrumentation. Generally, these simulators encompass the entire readout chain, from pulse digitization to sample storage. Although well-established, this event-driven simulation philosophy presents limitations when studying first-level (L1) trigger algorithms, which operate heavily on continuous data streams. Currently, it is not possible to use standard simulators to effectively analyze this type of real-time processing. To bridge this gap, this work proposes a reinterpretation of Minimum Bias simulation data, transforming it into a continuous sequence of collisions. The proposed method enables the generation of continuous data in a free-running regime, providing a robust framework for the design, testing, and development of real-time calorimetry data processing systems, specifically targeting low-level trigger algorithms within the Lorenzetti environment.",
+    "tags": ["Lorenzetti", "High-Luminosity LHC", "Calorimetry", "Pile-up simulation", "Free-running readout", "Low-level trigger", "INSCIT"],
+    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-continuous-signal-flow-lorenzetti.pdf"
+  },
 {
     "id": "pub-2002-ieee-state machine",
     "title": "An Image Acquisition System Based on State Machine and Sampling ADCs",
