@@ -505,40 +505,6 @@
   <!-- Footer (injected by main.js) -->
   <footer id="footer" role="contentinfo"></footer>
 
-  <!-- VLibras — Brazilian Sign Language Widget -->
-  <div vw class="enabled">
-    <div vw-access-button class="active"></div>
-    <div vw-plugin-wrapper>
-      <div class="vw-plugin-top-wrapper"></div>
-    </div>
-  </div>
-  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
-  <script>
-  /* VLibras carregado depois do load para nao bloquear a renderizacao */
-  window.addEventListener('load', function () {
-    var s = document.createElement('script');
-    s.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
-    s.onload = function () { new VLibras.Widget('https://vlibras.gov.br/app'); };
-    document.body.appendChild(s);
-  });
-  </script><script>
-(function(){
-  var obs = new MutationObserver(function(){
-    var panel = document.querySelector('[vw-plugin-wrapper]');
-    if (panel && panel.innerHTML.trim().length > 10) {
-      panel.style.display = 'none';
-      obs.disconnect();
-      var btn = document.querySelector('[vw-access-button]');
-      if (btn) btn.addEventListener('click', function(){
-        panel.style.display = panel.style.display === 'none' ? '' : 'none';
-      }, { once: false });
-    }
-  });
-  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
-  setTimeout(function(){ obs.disconnect(); }, 8000);
-})();
-</script>
-
 <!-- Starry sky -->
   <script>
   (function(){
