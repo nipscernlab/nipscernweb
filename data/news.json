@@ -9,14 +9,28 @@
       "pt": {
         "title": "NIPSCERN tem 5 artigos aceitos no INSCIT 2026",
         "excerpt": "O 10º Simpósio Internacional de Sistemas de Instrumentação, Circuitos e Transdutores aceitou cinco trabalhos do grupo NIPSCERN, abrangendo síntese de alto nível em FPGA para o trigger do ATLAS, reconstrução de energia por deconvolução com pseudoinversa, cancelamento polo-zero com filtro de Wiener, conformador digital IIR em FPGA e simulação contínua de sinais com o framework Lorenzetti.",
-        "content": "O NIPSCERN tem o prazer de anunciar que cinco artigos do grupo foram aceitos para apresentação no 10º Simpósio Internacional de Sistemas de Instrumentação, Circuitos e Transdutores (INSCIT 2026), que ocorrerá no evento CHIP in Sampa, de 24 a 28 de agosto de 2026, em São Paulo, SP.\n\nParabéns, Melissa S. Aguiar e Dabson F. Santos! O trabalho de vocês sobre o redesign do firmware do back-end do trigger do Calorímetro de Argônio Líquido do ATLAS por Síntese de Alto Nível (HLS) foi aceito. Em parceria com Marcos V. S. Oliveira (BNL) e Luciano M. A. Filho, o artigo apresenta uma nova arquitetura de matriz de chaveamento paralelo no bloco REMAP, reduzindo a utilização da FPGA de 69% para 64% e habilitando ciclos de desenvolvimento mais rápidos e exploração sistemática do espaço de projeto sem alteração do código RTL legado.\n\nParabéns, Melissa S. Aguiar, Eder B. Kapisch e Ualison R. F. Dias! O artigo de vocês sobre reconstrução de energia online por técnica de deconvolução baseada na pseudoinversa de Moore-Penrose foi aceito. Desenvolvido em parceria com Huacheng Cai e Denis O. Damazio (CERN/BNL) e Luciano M. A. Filho, o método reduz o erro de reconstrução em até 62,5% em comparação com o Filtro Ótimo convencional e apresenta recuperação natural de sinais impulsivos, com arquitetura adequada para implementação em FPGA em sistemas de trigger em tempo real.\n\nParabéns, Leandro da G. Ribeiro, Thiago C. A. Paschoalin e Tiago M. Quirino! O trabalho de vocês sobre cancelamento polo-zero combinado com filtragem de Wiener para estabilização de linha de base em condições de alta taxa de eventos foi aceito. Supervisionado por Luciano M. A. Filho e desenvolvido em colaboração com Ualison R. F. Dias, o estudo demonstra redução do RMSE de aproximadamente 120 para 9,5 counts ADC em cenários de alta ocupação — resultado relevante para sistemas de calorimetria em física de altas energias.\n\nParabéns, Fábio C. Luna! Sua implementação digital de um estágio de condicionamento de sinal em FPGA para simulação de pulsos em instrumentação nuclear foi aceita. Realizado em colaboração com Thiago C. A. Paschoalin, Tiago M. Quirino e Luciano M. A. Filho, o trabalho aplica o Método das Invariantes ao Impulso para discretizar a função de transferência analógica do conformador de cauda longa, decompondo-a em seções paralelas de primeira e segunda ordem com aritmética de ponto fixo — reproduzindo o comportamento esperado com menos de 1% dos recursos da placa Xilinx KCU105.\n\nParabéns, Nelson Cevidanes N. de Assis e Tiago Aparecido Teixeira! O artigo de vocês sobre simulação contínua de fluxo de sinais de front-end em instrumentação nuclear usando o framework Lorenzetti foi aceito. Em colaboração com Guilherme Barroso Morett, Gustavo Barbosa Libotte, Bernardo Sotto Maior Peralva (UERJ) e Luciano M. A. Filho, o trabalho reinterpreta dados de Minimum Bias como um fluxo contínuo de colisões modelado por processo de Poisson, viabilizando o estudo de algoritmos de trigger de primeiro nível em fluxos de dados realistas e ininterruptos — funcionalidade ainda não disponível em simuladores orientados a eventos.\n\nParabenizamos todos os autores, colaboradores e co-orientadores envolvidos neste conjunto notável de contribuições. A diversidade desses trabalhos — do firmware de trigger do ATLAS a ferramentas abertas de simulação — reflete o compromisso contínuo do NIPSCERN com o avanço da instrumentação, do processamento de sinais e dos sistemas de tempo real para física de altas energias."
+        "content": "O NIPSCERN tem o prazer de anunciar que cinco artigos do grupo foram aceitos para apresentação no 10º Simpósio Internacional de Sistemas de Instrumentação, Circuitos e Transdutores (INSCIT 2026). Os trabalhos aceitos refletem a abrangência da pesquisa desenvolvida por estudantes e colaboradores nas áreas de instrumentação, processamento de sinais e sistemas de tempo real para física de altas energias.\n\n<img src=\"../assets/images/news/inscit-2026/banner.png\" alt=\"CHIP in Sampa 2026, São Paulo, 24-28 de agosto\" style=\"width:100%;max-height:360px;object-fit:cover;border-radius:12px;display:block\">\n\nO primeiro artigo, de Melissa S. Aguiar, Dabson F. Santos, Marcos V. S. Oliveira e Luciano M. A. Filho, apresenta o redesign do firmware do back-end do trigger do Calorímetro de Argônio Líquido do ATLAS por Síntese de Alto Nível (HLS). Ao substituir a arquitetura serial em VHDL legado por uma matriz de chaveamento paralelo, o novo design reduz a complexidade lógica e corta a utilização da FPGA de 69% para 64%, viabilizando ciclos de desenvolvimento mais rápidos e exploração sistemática do espaço de projeto.\n\nO segundo artigo, de Melissa S. Aguiar, Eder B. Kapisch, Ualison R. F. Dias, Huacheng Cai, Denis O. Damazio, Marcos V. S. Oliveira e Luciano M. A. Filho, propõe uma técnica de reconstrução de energia online em modo livre baseada na pseudoinversa de Moore-Penrose. O método reduz o erro de reconstrução com pile-up em até 62,5% em comparação com o Filtro Ótimo convencional, provendo naturalmente recuperação de sinais impulsivos e um design independente do pile-up, adequado para implementação em FPGA.\n\nO terceiro artigo, de Leandro da G. Ribeiro, Ualison R. F. Dias, Thiago C. A. Paschoalin, Tiago M. Quirino e Luciano M. A. Filho, investiga a combinação do Cancelamento Polo-Zero (PZC) como etapa de pré-processamento com a filtragem de Wiener para reconstrução de energia em calorimetria. A etapa PZC compensa a cauda exponencial de longa duração introduzida pelo circuito conformador, estabilizando a linha de base e reduzindo drasticamente o viés sistemático em condições de alta taxa de eventos.\n\nO quarto artigo, de Fábio C. Luna, Thiago C. A. Paschoalin, Tiago M. Quirino e Luciano M. A. Filho, apresenta um estágio de condicionamento de sinal digital baseado em filtro IIR implementado em FPGA para simulação de pulsos em instrumentação nuclear. Ao discretizar a função de transferência analógica pelo Método das Invariantes ao Impulso e decompô-la em seções paralelas de primeira e segunda ordem com aritmética de ponto fixo, o design reproduz fielmente a resposta do conformador de cauda longa usando menos de 1% dos recursos da FPGA.\n\nO quinto artigo, de Nelson Cevidanes N. de Assis, Guilherme Barroso Morett, Tiago Aparecido Teixeira, Luciano M. A. Filho, Bernardo Sotto Maior Peralva e Gustavo Barbosa Libotte, estende o framework Lorenzetti com simulação contínua de fluxo de sinais. Ao reinterpretar dados de Minimum Bias como um fluxo contínuo de colisões modelado por um processo de Poisson, o trabalho viabiliza o estudo de algoritmos de trigger de primeiro nível em fluxos de dados realistas e ininterruptos, funcionalidade ainda não disponível em simuladores convencionais orientados a eventos.\n\nParabenizamos Melissa S. Aguiar, Dabson F. Santos, Eder B. Kapisch, Ualison R. F. Dias, Leandro da G. Ribeiro, Thiago C. A. Paschoalin, Tiago M. Quirino, Fábio C. Luna, Nelson Cevidanes N. de Assis e Tiago Aparecido Teixeira, junto a todos os coautores e colaboradores, por este conjunto notável de contribuições. Esses cinco trabalhos refletem a profundidade e a diversidade da pesquisa no NIPSCERN, do firmware de trigger do ATLAS em operação no CERN a frameworks abertos de simulação para a próxima geração de detectores em física de altas energias."
       }
     },
     "excerpt": "The 10th International Symposium on Instrumentation Systems, Circuits, and Transducers (INSCIT 2026) accepted five papers from the NIPSCERN group, spanning HLS-based FPGA firmware for the ATLAS LAr trigger, deconvolutional energy reconstruction via pseudoinverse, pole-zero cancellation with Wiener filtering, an IIR digital shaper on FPGA, and continuous signal simulation using the Lorenzetti framework.",
-    "content": "NIPSCERN is proud to announce that five papers from our group have been accepted for presentation at the 10th International Symposium on Instrumentation Systems, Circuits, and Transducers (INSCIT 2026), taking place at CHIP in Sampa, August 24–28, 2026, in São Paulo, SP.\n\nCongratulations, Melissa S. Aguiar and Dabson F. Santos! Your work on the High-Level Synthesis-based firmware redesign of the ATLAS Liquid Argon Calorimeter digital trigger back-end has been accepted. Co-authored with Marcos V. S. Oliveira (BNL) and Luciano M. A. Filho, the paper introduces a parallel switch matrix architecture for the REMAP block, reducing FPGA utilisation from 69% to 64% while enabling faster development cycles and systematic design-space exploration without modifying the legacy RTL code.\n\nCongratulations, Melissa S. Aguiar, Eder B. Kapisch, and Ualison R. F. Dias! Your paper on a deconvolutional online energy reconstruction technique based on the Moore-Penrose pseudoinverse has been accepted. Developed in collaboration with Huacheng Cai and Denis O. Damazio (CERN/BNL) and Luciano M. A. Filho, the method reduces pile-up reconstruction error by up to 62.5% compared to the conventional Optimal Filter and is naturally suited for low-latency FPGA implementation in real-time trigger systems.\n\nCongratulations, Leandro da G. Ribeiro, Thiago C. A. Paschoalin, and Tiago M. Quirino! Your investigation of Pole-Zero Cancellation combined with Wiener filtering for baseline stabilisation under high event-rate conditions has been accepted. Supervised by Luciano M. A. Filho and carried out in collaboration with Ualison R. F. Dias, the work demonstrates RMSE reductions from approximately 120 to 9.5 ADC counts in high-occupancy scenarios — a significant improvement for calorimetry systems in high-energy physics.\n\nCongratulations, Fábio C. Luna! Your digital implementation of a signal conditioning stage on FPGA for pulse simulation in nuclear instrumentation has been accepted. In collaboration with Thiago C. A. Paschoalin, Tiago M. Quirino, and Luciano M. A. Filho, the design applies the Impulse Invariant Method to discretise the analogue transfer function and decomposes it into parallel first- and second-order sections with fixed-point arithmetic, faithfully reproducing the long-tail shaper response using less than 1% of the resources on the Xilinx KCU105 board.\n\nCongratulations, Nelson Cevidanes N. de Assis and Tiago Aparecido Teixeira! Your work on continuous front-end signal flow simulation in nuclear instrumentation using the Lorenzetti framework has been accepted. In collaboration with Guilherme Barroso Morett, Gustavo Barbosa Libotte, Bernardo Sotto Maior Peralva (UERJ), and Luciano M. A. Filho, the paper reinterprets Minimum Bias data as a free-running collision stream driven by a Poisson model, enabling the study of first-level trigger algorithms on realistic, uninterrupted data streams — a capability not previously available in event-driven simulators.\n\nWe extend our congratulations to all authors, collaborators, and co-supervisors involved in this remarkable set of contributions. The breadth of these works — from ATLAS trigger firmware deployed at CERN to open-framework simulation tools — exemplifies the depth and diversity of research carried out at NIPSCERN.",
-    "image": "assets/images/news/inscit-2026/banner.png",
-    "tags": ["INSCIT", "FPGA", "HLS", "ATLAS", "LAr", "Energy reconstruction", "Pile-up", "Lorenzetti", "Nuclear instrumentation", "Signal processing"],
-    "related_ids": ["2026-cgvweb-atlas-control-room", "2025-atlas-breakthrough-prize"],
+    "content": "NIPSCERN is proud to announce that five papers from our group have been accepted for presentation at the 10th International Symposium on Instrumentation Systems, Circuits, and Transducers (INSCIT 2026). The accepted works reflect the breadth of research carried out by students and collaborators across instrumentation, signal processing, and real-time systems for high-energy physics.\n\n<img src=\"../assets/images/news/inscit-2026/banner.png\" alt=\"CHIP in Sampa 2026, São Paulo, August 24-28\" style=\"width:100%;max-height:360px;object-fit:cover;border-radius:12px;display:block\">\n\nThe first paper, by Melissa S. Aguiar, Dabson F. Santos, Marcos V. S. Oliveira, and Luciano M. A. Filho, presents the HLS-based firmware redesign of the ATLAS Liquid Argon Calorimeter digital trigger back-end. By replacing the legacy VHDL serial architecture with a parallel switch matrix implemented through High-Level Synthesis, the new design reduces logic complexity and cuts FPGA utilisation from 69% to 64%, while enabling faster development cycles and systematic design exploration.\n\nThe second paper, by Melissa S. Aguiar, Eder B. Kapisch, Ualison R. F. Dias, Huacheng Cai, Denis O. Damazio, Marcos V. S. Oliveira, and Luciano M. A. Filho, proposes a free-running online energy reconstruction technique based on the Moore-Penrose pseudoinverse. The method reduces pile-up reconstruction error by up to 62.5% compared to the conventional Optimal Filter, while naturally providing impulsive signal recovery and a pile-up independent design suitable for FPGA implementation.\n\nThe third paper, by Leandro da G. Ribeiro, Ualison R. F. Dias, Thiago C. A. Paschoalin, Tiago M. Quirino, and Luciano M. A. Filho, investigates the combination of Pole-Zero Cancellation (PZC) as a pre-processing stage with Wiener filtering for calorimeter energy reconstruction. The PZC stage compensates for the long-duration exponential tail introduced by the shaping circuit, stabilising the signal baseline and dramatically reducing systematic bias under high event-rate conditions.\n\nThe fourth paper, by Fábio C. Luna, Thiago C. A. Paschoalin, Tiago M. Quirino, and Luciano M. A. Filho, presents a digital IIR-based signal conditioning stage implemented on FPGA for nuclear instrumentation pulse simulation. By discretising the analogue transfer function via the Impulse Invariant Method and decomposing it into parallel first- and second-order sections with fixed-point arithmetic, the design faithfully reproduces the long-tail shaper response using less than 1% of the target FPGA resources.\n\nThe fifth paper, by Nelson Cevidanes N. de Assis, Guilherme Barroso Morett, Tiago Aparecido Teixeira, Luciano M. A. Filho, Bernardo Sotto Maior Peralva, and Gustavo Barbosa Libotte, extends the Lorenzetti framework with continuous signal flow simulation. By reinterpreting Minimum Bias data as a free-running collision stream driven by a Poisson model, the work enables the study of first-level trigger algorithms on realistic, uninterrupted data streams -- a capability not previously available in standard event-driven simulators.\n\nWe congratulate Melissa S. Aguiar, Dabson F. Santos, Eder B. Kapisch, Ualison R. F. Dias, Leandro da G. Ribeiro, Thiago C. A. Paschoalin, Tiago M. Quirino, Fábio C. Luna, Nelson Cevidanes N. de Assis, and Tiago Aparecido Teixeira, along with all co-authors and collaborators, on this outstanding set of contributions. These five papers reflect the depth and scope of work at NIPSCERN, from ATLAS trigger firmware operating at CERN to open simulation frameworks built for the next generation of high-energy physics detectors.",
+    "image": "assets/images/news/ponte-sao-paulo.jpg",
+    "tags": [
+      "INSCIT",
+      "FPGA",
+      "HLS",
+      "ATLAS",
+      "LAr",
+      "Energy reconstruction",
+      "Pile-up",
+      "Lorenzetti",
+      "Nuclear instrumentation",
+      "Signal processing"
+    ],
+    "related_ids": [
+      "2026-cgvweb-atlas-control-room",
+      "2025-atlas-breakthrough-prize"
+    ],
     "awards": []
   },
   {
@@ -35,8 +49,23 @@
     "excerpt": "Five months. Two clocks. Two hundred thousand calorimeter cells rebuilt in a browser. After successful Run 3 testing, CGVWeb has been approved to be the official ATLAS event display once Run 4 begins.",
     "content": "Five months after a graduate-school class at UFJF planted the idea, CGVWeb is running on the main wall of the ATLAS Control Room at CERN. After Run 3 tests that succeeded on every front, the LAr group, the calorimeter coordinators, and the ATLAS executive board approved CGVWeb as the official ATLAS calorimeter event display for Run 4. Built by Prof. Dr. Luciano Manhães de Andrade Filho and the NIPSCERN undergraduate Chrysthofer Arthur Amaro Afonso — with the LAr layer measurements provided by Mateus A. Carvalho and Roberta L. Leonardo — the tool reconstructs roughly 200,000 calorimeter cells, cell by cell, at 60+ fps in a browser tab, using Three.js, WebGPU, Rust and WebAssembly. Read the full feature for the complete story, from the first WebGL2 prototype to the deployment inside Point 1.",
     "image": "assets/images/news/cgv/low_res_atlas_control_room_with_cgv_big_screen.jpg",
-    "tags": ["CGVWeb", "ATLAS", "CERN", "Calorimeter", "Control Room", "Three.js", "WebAssembly", "Run 4", "CBA 2026", "Approved"],
-    "related_ids": ["2025-atlas-breakthrough-prize", "2025-inct-cern-brasil", "2025-semic-fractal-video"],
+    "tags": [
+      "CGVWeb",
+      "ATLAS",
+      "CERN",
+      "Calorimeter",
+      "Control Room",
+      "Three.js",
+      "WebAssembly",
+      "Run 4",
+      "CBA 2026",
+      "Approved"
+    ],
+    "related_ids": [
+      "2025-atlas-breakthrough-prize",
+      "2025-inct-cern-brasil",
+      "2025-semic-fractal-video"
+    ],
     "awards": []
   },
   {
@@ -48,10 +77,23 @@
     "excerpt": "The ATLAS Collaboration at CERN has been awarded the 2025 Breakthrough Prize in Fundamental Physics — the world's largest science prize. NIPSCERN's own Luciano Manhães de Andrade Filho is among the honoured members.",
     "content": "The Breakthrough Prize Foundation has awarded the 2025 Breakthrough Prize in Fundamental Physics to the ATLAS Collaboration at CERN. Widely regarded as the most valuable prize in science, the Breakthrough Prize recognises transformative contributions to fundamental research.\n\nThe ATLAS Collaboration — comprising more than 5,900 physicists from 181 institutions across 42 countries — was recognised for decades of discoveries at the Large Hadron Collider, including the 2012 discovery of the Higgs boson, precision measurements of the Standard Model, and searches for physics beyond it.\n\nWe are profoundly proud to announce that NIPSCERN's Dr. Luciano Manhães de Andrade Filho, coordinator of our laboratory and a long-standing ATLAS member, is among the collaboration members sharing this honour. His contributions span calorimeter instrumentation, the TileCal data readout system, and the development of event display tools — including the CaloGeoView and CGV-WEB software that allow physicists worldwide to visualise ATLAS collision data.\n\nThis recognition affirms the global impact of the collaborative effort to which NIPSCERN has contributed for over a decade through its partnerships with CERN, FAPEMIG, CNPq, CAPES, and UFJF.\n\nThe Breakthrough Prize ceremony takes place in November 2025 at the NASA Ames Research Center in Silicon Valley.",
     "image": "assets/images/news/breakthrough-prize-2025.webp",
-    "tags": ["Breakthrough Prize", "ATLAS", "CERN", "Award", "Luciano"],
-    "related_ids": ["2025-semic-fractal-video", "2025-inct-cern-brasil"],
+    "tags": [
+      "Breakthrough Prize",
+      "ATLAS",
+      "CERN",
+      "Award",
+      "Luciano"
+    ],
+    "related_ids": [
+      "2025-semic-fractal-video",
+      "2025-inct-cern-brasil"
+    ],
     "awards": [
-      { "title": "Breakthrough Prize in Fundamental Physics 2025", "body": "ATLAS Collaboration / Breakthrough Prize Foundation", "year": 2025 }
+      {
+        "title": "Breakthrough Prize in Fundamental Physics 2025",
+        "body": "ATLAS Collaboration / Breakthrough Prize Foundation",
+        "year": 2025
+      }
     ]
   },
   {
@@ -64,10 +106,23 @@
     "content": "We are delighted to celebrate another achievement from within the NIPSCERN community. Chrysthofer, an undergraduate student at UFJF affiliated with NIPSCERN, received a distinguished prize at SEMIC 2025 — Seminário de Computação, hosted at ENMC (Encontro Nacional de Modelagem Computacional).\n\nHis awarded work presents a fully functional implementation of the Mandelbrot set fractal on an FPGA, rendered in real time without a CPU. The programming was performed entirely using NIPSCERN's SAPHO toolchain — demonstrating in a striking way the practical reach of our hardware architecture and compiler ecosystem.\n\nThe accompanying video showcases the vivid fractal geometry emerging on screen as the FPGA computes each pixel row by row, driven by CMM programs compiled with YANC and loaded onto hardware synthesised through the SAPHO environment. The video resonated deeply with the scientific computing and FPGA communities, accumulating over 4,000 views, more than 1,000 likes, and 500 comments.\n\nThis work sits at the intersection of scientific computing, hardware design, and mathematical visualisation — three pillars of research at NIPSCERN. We congratulate Chrysthofer on this well-deserved recognition and look forward to seeing more of his work.\n\nNote: NIPSCERN's Dr. Luciano Manhães de Andrade Filho was also recently awarded the 2025 Breakthrough Prize in Fundamental Physics as a member of the ATLAS Collaboration at CERN — a year of exceptional recognition for the laboratory.",
     "image": "assets/images/news/semic-2025-fractal.jpg",
     "video": "https://www.youtube.com/watch?v=gYWpNuHMmJA",
-    "tags": ["SEMIC", "SAPHO", "FPGA", "Fractal", "Mandelbrot", "Award"],
-    "related_ids": ["2025-atlas-breakthrough-prize"],
+    "tags": [
+      "SEMIC",
+      "SAPHO",
+      "FPGA",
+      "Fractal",
+      "Mandelbrot",
+      "Award"
+    ],
+    "related_ids": [
+      "2025-atlas-breakthrough-prize"
+    ],
     "awards": [
-      { "title": "Prize at SEMIC 2025 — Fractal Generation on FPGA", "body": "SEMIC / ENMC 2025", "year": 2025 }
+      {
+        "title": "Prize at SEMIC 2025 — Fractal Generation on FPGA",
+        "body": "SEMIC / ENMC 2025",
+        "year": 2025
+      }
     ]
   },
   {
@@ -79,8 +134,17 @@
     "excerpt": "Luciano Manhães de Andrade Filho, Chrysthofer Arthur Amaro Afonso, and other NIPSCERN collaborators were approved as members of the INCT CERN-Brasil — Brazil's National Institute of Science and Technology for High Energy Physics at CERN.",
     "content": "We are proud to announce a major milestone for NIPSCERN: in May 2025, our laboratory coordinator Prof. Dr. Luciano Manhães de Andrade Filho and undergraduate researcher Chrysthofer Arthur Amaro Afonso, along with other collaborators from our group, were formally approved as members of the INCT CERN-Brasil.\n\nThe INCT CERN-Brasil — Instituto Nacional de Ciência e Tecnologia para Física de Altas Energias com o CERN — is a Brazilian National Institute of Science and Technology established to coordinate and strengthen Brazil's scientific collaboration with CERN, the European Organization for Nuclear Research in Geneva, Switzerland. The INCT was approved by CNPQ in December 2022 and received its first funding in June 2023, bringing together researchers from across Brazil who contribute to CERN experiments including ATLAS, CMS, ALICE, and LHCb.\n\nMembership in the INCT CERN-Brasil represents formal recognition of NIPSCERN's sustained scientific contributions to high energy physics, calorimeter instrumentation, and the ATLAS TileCal detector. It also strengthens our connections with the broader Brazilian physics community and opens new avenues for collaborative research and student exchange between UFJF and partner institutions.\n\nThis approval reinforces NIPSCERN's position as a leading Brazilian laboratory in the field of experimental particle physics and scientific computing, and underscores the impact of more than a decade of research at the frontier of modern science.",
     "image": "assets/images/news/cbpf-2025.jpg",
-    "tags": ["INCT", "CERN-Brasil", "Milestone", "Luciano", "Chrysthofer", "CNPq"],
-    "related_ids": ["2025-atlas-breakthrough-prize"],
+    "tags": [
+      "INCT",
+      "CERN-Brasil",
+      "Milestone",
+      "Luciano",
+      "Chrysthofer",
+      "CNPq"
+    ],
+    "related_ids": [
+      "2025-atlas-breakthrough-prize"
+    ],
     "awards": []
   }
 ]
