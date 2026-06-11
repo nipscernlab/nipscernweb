@@ -395,17 +395,27 @@ async function initHomeLatest() {
     const imgDiv = document.createElement('div');
     imgDiv.className = 'news-card-image';
     if (post.image) {
+      const imgPath = rootPath(post.image);
+      const webpPath = imgPath.replace(/\.(jpe?g|png)$/i, '.webp');
+      const picture = document.createElement('picture');
+      const source = document.createElement('source');
+      source.srcset = webpPath;
+      source.type = 'image/webp';
+      picture.appendChild(source);
       const img = document.createElement('img');
-      img.src = rootPath(post.image);
+      img.src = imgPath;
       img.alt = '';
-      img.loading = 'lazy';
+      img.fetchPriority = 'high';
+      img.decoding = 'async';
       img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+      picture.style.cssText = 'width:100%;height:100%;display:block';
       const icon = document.createElement('i');
       icon.className = 'ph ph-newspaper';
       icon.setAttribute('aria-hidden', 'true');
       icon.style.display = 'none';
-      img.onerror = () => { img.style.display = 'none'; icon.style.display = ''; };
-      imgDiv.appendChild(img);
+      img.onerror = () => { picture.style.display = 'none'; icon.style.display = ''; };
+      picture.appendChild(img);
+      imgDiv.appendChild(picture);
       imgDiv.appendChild(icon);
     } else {
       const icon = document.createElement('i');
