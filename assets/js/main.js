@@ -122,7 +122,7 @@ function buildNav() {
         ${mobileLinksHtml}
       </nav>
       <div class="nav-mobile-cgv" style="border-top:1px solid var(--border-subtle);padding-top:var(--sp-8)">
-        <a href="https://nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-mobile-cgv-link">
+        <a href="https://www.nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-mobile-cgv-link">
           <img src="${ROOT}assets/icons/icon_cgv.svg" alt="CGVWEB" class="nav-cgv-icon">
           <span>CGVWEB</span>
         </a>
@@ -218,7 +218,7 @@ function buildFooter() {
         <div class="footer-nav-title" data-i18n="footer.follow_title">Follow</div>
         <ul class="footer-nav-list">
           <li><a href="https://github.com/nipscernlab" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a></li>
-          <li><a href="https://nipscern.com" target="_blank" rel="noopener">nipscern.com</a></li>
+          <li><a href="https://www.nipscern.com" target="_blank" rel="noopener">nipscern.com</a></li>
           <li><a href="https://lattes.cnpq.br/5454168673866452" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px">
             <img src="${ROOT}assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px" aria-hidden="true"> Luciano — Lattes
           </a></li>
