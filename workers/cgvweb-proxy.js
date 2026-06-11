@@ -1,25 +1,37 @@
 /**
- * Proxy reverso que mantém nipscern.com/projects/cgvweb intacto (link
- * consolidado no CERN) servindo o conteúdo do deploy do cgv-web.
+ * Proxy reverso que mantém as URLs canônicas do CGVWeb no site
+ * (consolidadas no CERN) servindo o conteúdo do GitHub Pages do
+ * repositório nipscernlab/cgv-web.
  *
- * Registrar no painel Cloudflare com a rota: nipscern.com/projects/cgvweb*
- * Ajustar UPSTREAM para o domínio do projeto no Cloudflare Pages.
+ *   nipscern.com/projects/cgvweb/...      -> github.io/cgv-web/...
+ *   nipscern.com/library/cgvweb/twiki/... -> github.io/cgv-web/twiki/...
+ *
+ * Rotas a registrar no painel (e variantes www.):
+ *   nipscern.com/projects/cgvweb*
+ *   nipscern.com/library/cgvweb/twiki*
  */
-const UPSTREAM = 'https://cgv-web.pages.dev';
-const PREFIX = '/projects/cgvweb';
+const UPSTREAM = 'https://nipscernlab.github.io/cgv-web';
+const PREFIXES = [
+  { from: '/projects/cgvweb', to: '' },
+  { from: '/library/cgvweb/twiki', to: '/twiki' },
+];
 
 export default {
   async fetch(request) {
     const url = new URL(request.url);
+    const rule = PREFIXES.find((p) => url.pathname.startsWith(p.from));
+    if (!rule) {
+      return fetch(request);
+    }
 
     // Sem a barra final os caminhos relativos do app resolveriam fora do
     // prefixo, então normalizamos antes de servir.
-    if (url.pathname === PREFIX) {
-      return Response.redirect(url.origin + PREFIX + '/' + url.search, 301);
+    if (url.pathname === rule.from) {
+      return Response.redirect(url.origin + rule.from + '/' + url.search, 301);
     }
 
-    const path = url.pathname.slice(PREFIX.length) || '/';
-    const upstream = new URL(path + url.search, UPSTREAM);
+    const rest = url.pathname.slice(rule.from.length);
+    const upstream = UPSTREAM + rule.to + rest + url.search;
 
     return fetch(upstream, {
       method: request.method,
