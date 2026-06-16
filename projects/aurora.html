@@ -83,6 +83,13 @@
     /* split: prose + figure */
     .split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-10); align-items: center; }
     .split.lead { grid-template-columns: 1.05fr 0.95fr; }
+    /* Grid items must be allowed to shrink below their content's intrinsic
+       width. Otherwise the non-wrapping <pre> code panel forces its column
+       (and, once collapsed to one column on mobile, the prose sharing that
+       column) wider than the viewport, and body{overflow-x:hidden} clips the
+       text instead of scrolling. With min-width:0 the column tracks the
+       container and the <pre>'s own overflow-x:auto scrolls it. */
+    .split > * { min-width: 0; }
     /* Tablet/mobile: every split (including .split.lead, whose two classes
        outrank a bare .split in the media query) collapses to one column, so
        the prose comes first and the figure / code panel stacks after it. */
