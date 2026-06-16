@@ -174,7 +174,7 @@
         <a href="${newsPostUrl(featured)}" class="news-featured-link" aria-label="${tr.title || ''}">
           <div class="news-featured-media">
             <span class="news-featured-ribbon"><i class="ph ph-star" aria-hidden="true"></i> ${ribbonText}</span>
-            <img src="../${featured.image}" alt="" loading="eager"
+            <img src="${assetUrl(featured.image)}" alt="" loading="eager"
                  onerror="this.style.display='none';
                           var ic=document.createElement('i');
                           ic.className='ph ph-newspaper';
@@ -204,6 +204,11 @@
       return m[cat] || 'badge-gray';
     }
 
+    // Resolve a news image: absolute URLs (CDN) pass through; repo-relative paths get the ../ prefix
+    function assetUrl(p) {
+      return /^(https?:)?\/\//.test(p) ? p : '../' + p;
+    }
+
     function makeNewsCard(post, opts) {
       opts = opts || {};
       const article = document.createElement('article');
@@ -220,7 +225,7 @@
       imgDiv.setAttribute('aria-hidden', 'true');
       if (post.image) {
         const img = document.createElement('img');
-        img.src = '../' + post.image;
+        img.src = assetUrl(post.image);
         img.alt = '';
         img.loading = 'lazy';
         img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';

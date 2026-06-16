@@ -443,7 +443,8 @@
       if (post.image) {
         const coverEl = document.getElementById('post-cover');
         const img = document.createElement('img');
-        img.src = '../' + post.image;
+        // Absolute URLs (CDN) pass through; repo-relative paths get the ../ prefix
+        img.src = /^(https?:)?\/\//.test(post.image) ? post.image : '../' + post.image;
         img.alt = post.title;
         img.style.cssText = 'width:100%;max-height:460px;object-fit:cover;display:block;border-radius:var(--r-xl)';
         img.loading = 'eager';

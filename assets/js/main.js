@@ -292,8 +292,10 @@ function initAnimations() {
 // ============================================================
 // Load team, news, publications dynamically (home page)
 // ============================================================
-/** Resolve a root-relative path using the module's known location */
+/** Resolve a root-relative path using the module's known location.
+ *  Absolute URLs (CDN assets, e.g. cdn.nipscern.com) pass through untouched. */
 function rootPath(rel) {
+  if (/^(https?:)?\/\//.test(rel)) return rel;
   return ROOT + rel;
 }
 
