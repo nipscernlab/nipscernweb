@@ -442,13 +442,49 @@
       // Cover image — overlaps post-header so the dark bg bleeds ~15% behind the image top
       if (post.image) {
         const coverEl = document.getElementById('post-cover');
-        const img = document.createElement('img');
         // Absolute URLs (CDN) pass through; repo-relative paths get the ../ prefix
-        img.src = /^(https?:)?\/\//.test(post.image) ? post.image : '../' + post.image;
-        img.alt = post.title;
-        img.style.cssText = 'width:100%;max-height:460px;object-fit:cover;display:block;border-radius:var(--r-xl)';
-        img.loading = 'eager';
-        coverEl.appendChild(img);
+        const coverSrc = /^(https?:)?\/\//.test(post.image) ? post.image : '../' + post.image;
+        const people = Array.isArray(post.people)
+          ? post.people.filter(p => p && (typeof p === 'string' || p.name))
+          : [];
+        if (people.length) {
+          // Annotated group photo: the cover is shown uncropped (so the hotspots
+          // stay aligned) with one focusable dot per person. The name appears on
+          // hover (desktop) or tap/focus (mobile). See .people-photo in main.css.
+          const wrap = document.createElement('div');
+          wrap.className = 'people-photo';
+          const img = document.createElement('img');
+          img.src = coverSrc;
+          img.alt = post.title;
+          img.loading = 'eager';
+          wrap.appendChild(img);
+          people.forEach(p => {
+            const name = typeof p === 'string' ? p : (p.name || '');
+            const tag = document.createElement('button');
+            tag.type = 'button';
+            tag.className = 'people-tag';
+            tag.style.left = ((typeof p === 'object' && p.x != null) ? p.x : 50) + '%';
+            tag.style.top  = ((typeof p === 'object' && p.y != null) ? p.y : 50) + '%';
+            tag.setAttribute('aria-label', name);
+            const dot = document.createElement('span');
+            dot.className = 'people-tag-dot';
+            dot.setAttribute('aria-hidden', 'true');
+            const label = document.createElement('span');
+            label.className = 'people-tag-label';
+            label.textContent = name;
+            tag.appendChild(dot);
+            tag.appendChild(label);
+            wrap.appendChild(tag);
+          });
+          coverEl.appendChild(wrap);
+        } else {
+          const img = document.createElement('img');
+          img.src = coverSrc;
+          img.alt = post.title;
+          img.style.cssText = 'width:100%;max-height:460px;object-fit:cover;display:block;border-radius:var(--r-xl)';
+          img.loading = 'eager';
+          coverEl.appendChild(img);
+        }
         coverEl.style.display = 'block';
         document.getElementById('post-header').classList.add('has-cover');
       }

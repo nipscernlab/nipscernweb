@@ -1061,6 +1061,59 @@ h1, h2, h3, h4, h5, h6 {
 }
 .news-card-ribbon .ph { font-size: 11px; }
 
+/* People-tagged cover photo — news posts that carry a `people` array get one
+   focusable dot per person over an uncropped cover. The name shows on hover
+   (desktop) or on tap/focus (mobile). Falls back to a plain cover otherwise. */
+.people-photo { position: relative; display: block; line-height: 0; }
+.people-photo > img { width: 100%; height: auto; display: block; border-radius: var(--r-xl); }
+.people-tag {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 24px; height: 24px;
+  margin: 0; padding: 0;
+  border: 0; background: transparent;
+  cursor: pointer; z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+}
+.people-tag-dot {
+  display: block; width: 100%; height: 100%;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.40);
+  border: 2px solid rgba(255,255,255,0.92);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.30), 0 2px 7px rgba(0,0,0,0.45);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.people-tag:hover .people-tag-dot,
+.people-tag:focus .people-tag-dot { transform: scale(1.18); background: rgba(255,255,255,0.88); }
+.people-tag:focus { outline: none; }
+.people-tag:focus-visible .people-tag-dot {
+  box-shadow: 0 0 0 3px var(--brand), 0 2px 7px rgba(0,0,0,0.45);
+}
+.people-tag-label {
+  position: absolute; bottom: calc(100% + 9px); left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: rgba(12,14,22,0.94); color: #fff;
+  font-family: var(--font-sans);
+  font-size: 13px; font-weight: 600; line-height: 1.2;
+  white-space: nowrap;
+  padding: 5px 10px; border-radius: 7px;
+  border: 1px solid var(--border-mid);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 3;
+}
+.people-tag-label::after {
+  content: ''; position: absolute; top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: rgba(12,14,22,0.94);
+}
+.people-tag:hover .people-tag-label,
+.people-tag:focus .people-tag-label { opacity: 1; transform: translateX(-50%) translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .people-tag-dot, .people-tag-label { transition: none; }
+}
+
 .news-card-body { padding: var(--sp-5); flex: 1; display: flex; flex-direction: column; gap: var(--sp-3); }
 .news-card-meta { display: flex; align-items: center; gap: var(--sp-3); }
 .news-date { font-size: var(--text-xs); color: var(--text-muted); }

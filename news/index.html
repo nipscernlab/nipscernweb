@@ -333,7 +333,7 @@
       if (!feed || !posts) return;
       feed.replaceChildren();
       posts.forEach((post, i) => {
-        const card = makeNewsCard(post, { featured: featuredId && post.id === featuredId });
+        const card = makeNewsCard(post, { featured: post.featured === true || (featuredId && post.id === featuredId) });
         feed.appendChild(card);
         setTimeout(() => card.classList.add('visible'), i * 100 + 200);
       });
