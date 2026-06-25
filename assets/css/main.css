@@ -1120,6 +1120,32 @@ h1, h2, h3, h4, h5, h6 {
 @media (prefers-reduced-motion: reduce) {
   .people-tag-dot, .people-tag-label { transition: none; }
 }
+/* On narrow screens the cover spans nearly the full width, so a name tag whose
+   dot sits near the left/right edge would have its centred label clipped by the
+   screen. Keep the dot exactly where it is and anchor only the label inward:
+   left-edge dots open their label to the right, right-edge dots to the left.
+   The .people-tag--edge-* classes are set in news/post.html from each dot's x%. */
+@media (max-width: 768px) {
+  .people-tag--edge-left .people-tag-label {
+    left: 50%; right: auto;
+    transform: translateX(-12px) translateY(-5px);
+  }
+  .people-tag--edge-left:hover .people-tag-label,
+  .people-tag--edge-left:focus .people-tag-label {
+    transform: translateX(-12px) translateY(0);
+  }
+  .people-tag--edge-left .people-tag-label::after { left: 7px; right: auto; transform: none; }
+
+  .people-tag--edge-right .people-tag-label {
+    left: auto; right: 50%;
+    transform: translateX(12px) translateY(-5px);
+  }
+  .people-tag--edge-right:hover .people-tag-label,
+  .people-tag--edge-right:focus .people-tag-label {
+    transform: translateX(12px) translateY(0);
+  }
+  .people-tag--edge-right .people-tag-label::after { left: auto; right: 7px; transform: none; }
+}
 
 .news-card-body { padding: var(--sp-5); flex: 1; display: flex; flex-direction: column; gap: var(--sp-3); }
 .news-card-meta { display: flex; align-items: center; gap: var(--sp-3); }
