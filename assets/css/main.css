@@ -1095,8 +1095,10 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 0 3px var(--brand), 0 2px 7px rgba(0,0,0,0.45);
 }
 .people-tag-label {
-  position: absolute; bottom: calc(100% + 9px); left: 50%;
-  transform: translateX(-50%) translateY(5px);
+  /* Below the dot: the face is above the dot, so this never covers it. The gap
+     keeps the hover cursor clear of the label. */
+  position: absolute; top: calc(100% + 10px); left: 50%;
+  transform: translateX(-50%) translateY(-5px);
   background: rgba(12,14,22,0.94); color: #fff;
   font-family: var(--font-sans);
   font-size: 13px; font-weight: 600; line-height: 1.2;
@@ -1109,9 +1111,9 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 3;
 }
 .people-tag-label::after {
-  content: ''; position: absolute; top: 100%; left: 50%;
+  content: ''; position: absolute; bottom: 100%; left: 50%;
   transform: translateX(-50%);
-  border: 5px solid transparent; border-top-color: rgba(12,14,22,0.94);
+  border: 5px solid transparent; border-bottom-color: rgba(12,14,22,0.94);
 }
 .people-tag:hover .people-tag-label,
 .people-tag:focus .people-tag-label { opacity: 1; transform: translateX(-50%) translateY(0); }
