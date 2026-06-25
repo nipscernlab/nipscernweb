@@ -459,7 +459,11 @@
           img.loading = 'eager';
           wrap.appendChild(img);
           people.forEach(p => {
-            const name = typeof p === 'string' ? p : (p.name || '');
+            // A tag name may be a plain string (people) or a per-language object
+            // (e.g. the bilingual food-table tag): { pt: '…', en: '…' }.
+            const name = (p && typeof p.name === 'object')
+              ? (p.name[getLang() || 'en'] || p.name.en || p.name.pt || Object.values(p.name)[0] || '')
+              : (typeof p === 'string' ? p : (p.name || ''));
             const tag = document.createElement('button');
             tag.type = 'button';
             tag.className = 'people-tag';
@@ -611,6 +615,18 @@
           if (_currentPost.tags && _currentPost.tags.length) {
             bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${_currentPost.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
           }
+        }
+        // Refresh people-tag labels (e.g. the bilingual food-table tag) for the new language
+        if (Array.isArray(_currentPost.people)) {
+          const labels = document.querySelectorAll('#post-cover .people-tag-label');
+          const tags   = document.querySelectorAll('#post-cover .people-tag');
+          _currentPost.people.forEach((p, i) => {
+            const nm = (p && typeof p.name === 'object')
+              ? (p.name[lang] || p.name.en || p.name.pt || Object.values(p.name)[0] || '')
+              : (typeof p === 'string' ? p : (p.name || ''));
+            if (labels[i]) labels[i].textContent = nm;
+            if (tags[i]) tags[i].setAttribute('aria-label', nm);
+          });
         }
         return;
       }
