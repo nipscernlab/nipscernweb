@@ -464,11 +464,18 @@
             const name = (p && typeof p.name === 'object')
               ? (p.name[getLang() || 'en'] || p.name.en || p.name.pt || Object.values(p.name)[0] || '')
               : (typeof p === 'string' ? p : (p.name || ''));
+            const px = (typeof p === 'object' && p.x != null) ? p.x : 50;
+            const py = (typeof p === 'object' && p.y != null) ? p.y : 50;
             const tag = document.createElement('button');
             tag.type = 'button';
             tag.className = 'people-tag';
-            tag.style.left = ((typeof p === 'object' && p.x != null) ? p.x : 50) + '%';
-            tag.style.top  = ((typeof p === 'object' && p.y != null) ? p.y : 50) + '%';
+            // Dots near the left/right edge would have their centred label clipped
+            // by the screen on mobile — flag them so the CSS anchors the label
+            // inward (the dot itself stays put). See .people-tag--edge-* in main.css.
+            if (px <= 25) tag.classList.add('people-tag--edge-left');
+            else if (px >= 75) tag.classList.add('people-tag--edge-right');
+            tag.style.left = px + '%';
+            tag.style.top  = py + '%';
             tag.setAttribute('aria-label', name);
             const dot = document.createElement('span');
             dot.className = 'people-tag-dot';
