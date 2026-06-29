@@ -48,10 +48,10 @@ async function loadPublications() {
   const res = await fetch(prefix + 'data/publications.json?v=author-normalized-20260529-chrysthofer', { cache: 'no-store' });
   if (!res.ok) return [];
   const data = await res.json();
-  // Filter out empty entries and sort by year descending, then by title
-  return data
-    .filter(p => p.title && p.title.trim() !== '')
-    .sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
+  // Keep the manual order defined in the JSON file (top of the array shows first).
+  // Drop only empty entries. Sorting is applied in render() solely when a
+  // filter or search is active, so it overrides the manual order on demand.
+  return data.filter(p => p.title && p.title.trim() !== '');
 }
 
 function renderCard(pub) {
@@ -246,6 +246,14 @@ export async function initPublications() {
       }
       return true;
     });
+
+    // Any active filter or search overrides the manual order with a
+    // year-descending, title-ascending sort. With nothing active, the
+    // manual order from publications.json is preserved untouched.
+    const anyFilter = !!(currentType || currentYear || currentAuthor || tokens.length);
+    if (anyFilter) {
+      filtered.sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
+    }
 
     // Update result count
     const countEl = document.getElementById('pub-result-count');
