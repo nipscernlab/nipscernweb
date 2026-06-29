@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
-  <link rel="stylesheet" href="assets/css/main.css?v=catA-20260629">
+  <link rel="stylesheet" href="assets/css/main.css?v=catA-20260629b">
 </head>
 <body>
 
@@ -143,9 +143,9 @@
             </div>
             <h2 class="heading-lg" style="margin-bottom:var(--sp-3)">CERN Courier</h2>
             <p class="body-base" style="max-width:540px;color:var(--text-secondary);line-height:1.7;margin-bottom:var(--sp-6)">
-              Digital editions from 2013 to 2026 — curated and archived by NIPS-CERN. Covering accelerator physics, detector technology, particle theory, and life at CERN.
+              Digital editions from 2013 to 2026, curated and archived by NIPS-CERN. Covering accelerator physics, detector technology, particle theory, and life at CERN.
             </p>
-            <div style="display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center">
+            <div class="courier-banner-actions">
               <a href="publications/courier" class="btn btn-primary btn-lg">
                 <i class="ph ph-newspaper" aria-hidden="true"></i>
                 Browse All Editions
@@ -200,9 +200,9 @@
 </script>
 
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
-  <script type="module" src="assets/js/main.js?v=catA-20260629"></script>
+  <script type="module" src="assets/js/main.js?v=catA-20260629b"></script>
   <script type="module">
-    import { initPublications } from './assets/js/publications.js?v=catA-20260629';
+    import { initPublications } from './assets/js/publications.js?v=catA-20260629b';
     // Defer until after DOMContentLoaded so main.js has already run
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
