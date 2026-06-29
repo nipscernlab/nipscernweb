@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=catA-20260629c">
+  <link rel="stylesheet" href="../assets/css/main.css?v=catA-20260629d">
 </head>
 <body>
 
@@ -55,13 +55,13 @@
     <section class="section">
       <div class="container">
 
-        <!-- View switcher: list (default) / cards / grid -->
+        <!-- View switcher: cards (default) / list / grid -->
         <div class="news-toolbar">
           <div class="news-view-toggle" role="group" aria-label="News layout" data-i18n-aria="news.view_group">
-            <button type="button" class="news-view-btn is-active" data-view="list" aria-pressed="true" aria-label="List view" data-i18n-aria="news.view_list" title="List view" data-i18n-title="news.view_list">
+            <button type="button" class="news-view-btn" data-view="list" aria-pressed="false" aria-label="List view" data-i18n-aria="news.view_list" title="List view" data-i18n-title="news.view_list">
               <i class="ph ph-rows" aria-hidden="true"></i>
             </button>
-            <button type="button" class="news-view-btn" data-view="cards" aria-pressed="false" aria-label="Card view" data-i18n-aria="news.view_cards" title="Card view" data-i18n-title="news.view_cards">
+            <button type="button" class="news-view-btn is-active" data-view="cards" aria-pressed="true" aria-label="Card view" data-i18n-aria="news.view_cards" title="Card view" data-i18n-title="news.view_cards">
               <i class="ph ph-cards" aria-hidden="true"></i>
             </button>
             <button type="button" class="news-view-btn" data-view="grid" aria-pressed="false" aria-label="Grid view" data-i18n-aria="news.view_grid" title="Grid view" data-i18n-title="news.view_grid">
@@ -70,7 +70,7 @@
           </div>
         </div>
 
-        <div class="news-layout">
+        <div class="news-layout view-cards">
 
           <!-- Main feed -->
           <div id="news-feed" class="news-feed" role="list" aria-label="News feed" aria-live="polite">
@@ -143,7 +143,7 @@
 </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=catA-20260629c';
+    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=catA-20260629d';
     import { getLang, t } from '../assets/js/i18n.js';
     import { newsPostUrl } from '../assets/js/content-links.js';
 
@@ -420,14 +420,14 @@
           try { localStorage.setItem(KEY, view); } catch (_) {}
           apply(view, true);
         });
-        let saved = 'list';
-        try { saved = localStorage.getItem(KEY) || 'list'; } catch (_) {}
+        let saved = 'cards';
+        try { saved = localStorage.getItem(KEY) || 'cards'; } catch (_) {}
         apply(saved, false);
       })();
     });
   </script>
 
-  <script type="module" src="../assets/js/main.js?v=catA-20260629c"></script>
+  <script type="module" src="../assets/js/main.js?v=catA-20260629d"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>
