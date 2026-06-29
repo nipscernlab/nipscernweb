@@ -82,8 +82,9 @@ function renderItem(pub, { showYear } = {}) {
   const pdfBtn = pdfViewerUrl
     ? `<a href="${pdfViewerUrl}" class="pub-open" aria-label="${t('publications.open_pdf')}: ${pub.title}"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>${t('publications.open_pdf')}</span></a>`
     : '';
+  const venue = (pub.journal && String(pub.journal).trim()) ? `<span class="pub-venue">${pub.journal}</span>` : '';
   const meta = [showYear ? pub.year : null, typeLabel].filter(Boolean).join(' · ');
-  const source = `<span class="pub-venue">${pub.journal}</span>${meta ? ' · ' + meta : ''}`;
+  const source = [venue, meta].filter(Boolean).join(' · ');
 
   return `
     <li class="pub-item fade-up" role="listitem">
