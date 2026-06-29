@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="assets/css/main.css?v=catA-20260629i">
+  <link rel="stylesheet" href="assets/css/main.css?v=catA-20260629m">
 </head>
 <body>
 
@@ -127,13 +127,8 @@
           </p>
         </div>
 
-        <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_team.svg -->
-        <figure style="text-align:center;margin:0 auto var(--sp-8);max-width:280px;opacity:0.6" aria-hidden="true">
-          <img src="assets/images/undraw/undraw_team.svg" alt="" width="280" height="175" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
-        </figure>
-
-        <div class="grid grid-auto stagger-children" id="team-grid">
-          <!-- Populated by about-page script below -->
+        <div id="team-mount" class="team-mount">
+          <!-- Floating bubble field (or static grid fallback) built by the team script below -->
         </div>
       </div>
     </section>
@@ -326,6 +321,8 @@
 
   <!-- Team loader -->
   <script type="module">
+    import { t } from './assets/js/i18n.js';
+
     const ROLE_LABEL_KEYS = {
       coordinator: 'about.team.roles.coordinator',
       researcher:  'about.team.roles.researcher',
@@ -426,31 +423,268 @@
       `;
     }
 
+    function roleLabel(role) {
+      const key = ROLE_LABEL_KEYS[role];
+      const tx = key ? t(key) : '';
+      return (tx && tx !== key) ? tx : (role || '');
+    }
+
+    function avatarImg(member) {
+      return member.photo
+        ? `<img src="${member.photo}" alt="" loading="lazy">`
+        : `<span class="bubble-initials" aria-hidden="true">${(member.name || '?').trim().charAt(0)}</span>`;
+    }
+
+    // Rich content for the floating bio card (reused on hover, tap and keyboard)
+    function bubbleCardHTML(member) {
+      const badges = member.tags
+        ? member.tags.map(tg => `<span class="badge ${tg.class}">${tg.label}</span>`).join('')
+        : `<span class="badge ${roleClass(member.role)}">${roleLabel(member.role)}</span>`;
+      const areas = (member.areas || []).map(a => `<span class="team-area-tag">${a}</span>`).join('');
+      const links = [
+        member.lattes ? `<a href="${member.lattes}" target="_blank" rel="noopener" class="team-link">${LATTES_ICON} Lattes</a>` : '',
+        member.github ? `<a href="${member.github}" target="_blank" rel="noopener" class="team-link"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a>` : '',
+        member.linkedin ? `<a href="${member.linkedin}" target="_blank" rel="noopener" class="team-link"><i class="ph ph-linkedin-logo" aria-hidden="true"></i> LinkedIn</a>` : '',
+      ].join('');
+      return `
+        <div class="bubble-card-head">
+          <div class="bubble-card-avatar">${avatarImg(member)}</div>
+          <div class="bubble-card-id">
+            <p class="bubble-card-name">${member.title ? member.title + ' ' : ''}${member.name}</p>
+            <div class="bubble-card-badges">${badges}</div>
+          </div>
+        </div>
+        ${member.bio ? `<p class="bubble-card-bio">${member.bio}</p>` : ''}
+        ${areas ? `<div class="bubble-card-areas">${areas}</div>` : ''}
+        ${links.trim() ? `<div class="team-links bubble-card-links">${links}</div>` : ''}
+      `;
+    }
+
+    // Static fallback for reduced motion / small screens: the classic card grid
+    function renderGridFallback(mount, members) {
+      mount.className = 'grid grid-auto stagger-children';
+      mount.innerHTML = members.map(renderTeamCard).join('');
+      mount.querySelectorAll('.team-card').forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(16px)';
+        el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; }, i * 50 + 150);
+      });
+    }
+
+    // Team NETWORK: avatar nodes with PERMANENT links (a fixed edge set built
+    // once from nearest neighbours). The graph floats gently via light springs;
+    // the cursor does NOT push nodes — it only highlights nearby links. Borderless
+    // nodes, invisible field boundaries, so the network feels embedded in the page.
+    function initField(mount, members) {
+      const field = document.createElement('div');
+      field.className = 'team-field';
+      field.setAttribute('aria-label', 'Lab members network — hover or focus a photo to read the bio');
+      mount.appendChild(field);
+
+      const canvas = document.createElement('canvas');
+      canvas.className = 'team-net';
+      canvas.setAttribute('aria-hidden', 'true');
+      field.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+
+      const card = document.createElement('div');
+      card.className = 'bubble-card';
+      card.id = 'team-bubble-tip';
+      card.hidden = true;
+      field.appendChild(card);
+
+      const rnd = (a, b) => a + Math.random() * (b - a);
+      const NEAR = 150, REST = 200, GLOW = 260, EDGES = [], dots = [];
+      let tick = 0;
+      // Shuffle so each reload places members in different spots, sizes and neighbours
+      const list = members.slice();
+      for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = list[i]; list[i] = list[j]; list[j] = t; }
+      const bubbles = list.map(m => {
+        const r = Math.round(rnd(30, 44));
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'bubble';
+        btn.style.width = btn.style.height = (r * 2) + 'px';
+        btn.setAttribute('aria-label', (m.title ? m.title + ' ' : '') + m.name + (m.role ? ', ' + roleLabel(m.role) : ''));
+        btn.innerHTML = '<span class="bubble-photo">' + avatarImg(m) + '</span>';
+        field.appendChild(btn);
+        return { el: btn, m, r, x: 0, y: 0, vx: 0, vy: 0, wob: rnd(0, 6.283), paused: false, active: false };
+      });
+
+      let W = 0, H = 0, mx = null, my = null, raf = 0, running = false, dpr = 1;
+      let activeB = null, pinned = false, hideTimer = 0;
+
+      const measure = () => { const rc = field.getBoundingClientRect(); W = rc.width; H = rc.height; };
+      const buildDots = () => {
+        dots.length = 0;
+        const gap = 26, cx = W / 2, cy = H / 2, maxR = Math.hypot(W / 2, H / 2) || 1;
+        for (let x = gap / 2; x < W; x += gap) for (let y = gap / 2; y < H; y += gap) {
+          let v = 1 - Math.hypot(x - cx, y - cy) / maxR; v = Math.max(0, Math.min(1, v * 1.7));
+          dots.push({ x: x, y: y, vig: v });
+        }
+      };
+      const sizeCanvas = () => {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        buildDots();
+      };
+      const draw = b => { b.el.style.transform = 'translate(' + (b.x - b.r) + 'px,' + (b.y - b.r) + 'px)'; };
+      const clampPos = b => { b.x = Math.max(b.r, Math.min(b.x, W - b.r)); b.y = Math.max(b.r, Math.min(b.y, H - b.r)); };
+
+      // Permanent edge set: each node linked to its two nearest neighbours (deduped).
+      function buildEdges() {
+        EDGES.length = 0;
+        const seen = new Set();
+        for (let i = 0; i < bubbles.length; i++) {
+          const order = bubbles.map((b, j) => ({ j, d: Math.hypot(b.x - bubbles[i].x, b.y - bubbles[i].y) }))
+            .filter(o => o.j !== i).sort((p, q) => p.d - q.d);
+          for (let k = 0; k < Math.min(2, order.length); k++) {
+            const lo = Math.min(i, order[k].j), hi = Math.max(i, order[k].j), key = lo + '-' + hi;
+            if (!seen.has(key)) { seen.add(key); EDGES.push([lo, hi]); }
+          }
+        }
+      }
+
+      function physics() {
+        // light springs keep linked nodes near a rest distance (coherent graph)
+        for (const e of EDGES) {
+          const a = bubbles[e[0]], b = bubbles[e[1]];
+          let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01;
+          const f = (d - REST) * 0.0008, ux = dx / d, uy = dy / d;
+          if (!a.paused) { a.vx += ux * f; a.vy += uy * f; }
+          if (!b.paused) { b.vx -= ux * f; b.vy -= uy * f; }
+        }
+        for (const b of bubbles) {
+          if (b.paused) continue;
+          b.vx += Math.cos(tick * 0.009 + b.wob) * 0.012; b.vy += Math.sin(tick * 0.009 + b.wob * 1.7) * 0.012;
+          b.vx *= 0.9; b.vy *= 0.9;
+          const sp = Math.hypot(b.vx, b.vy); if (sp > 0.4) { b.vx = b.vx / sp * 0.4; b.vy = b.vy / sp * 0.4; }
+          b.x += b.vx; b.y += b.vy;
+          if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx) * 0.4; } else if (b.x > W - b.r) { b.x = W - b.r; b.vx = -Math.abs(b.vx) * 0.4; }
+          if (b.y < b.r) { b.y = b.r; b.vy = Math.abs(b.vy) * 0.4; } else if (b.y > H - b.r) { b.y = H - b.r; b.vy = -Math.abs(b.vy) * 0.4; }
+        }
+        // spread every node apart so the network fills the field (no clumping)
+        for (let i = 0; i < bubbles.length; i++) for (let j = i + 1; j < bubbles.length; j++) {
+          const a = bubbles[i], b = bubbles[j];
+          let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01, min = a.r + b.r + 120;
+          if (d < min) { const push = (min - d) * 0.2, ux = dx / d, uy = dy / d; if (!a.paused) { a.x -= ux * push; a.y -= uy * push; } if (!b.paused) { b.x += ux * push; b.y += uy * push; } }
+        }
+      }
+
+      function drawDots() {
+        for (const p of dots) {
+          let al = p.vig * 0.06;
+          if (mx != null) { const d = Math.hypot(p.x - mx, p.y - my); if (d < GLOW) al += (1 - d / GLOW) * 0.6 * p.vig; }
+          if (al <= 0.004) continue;
+          ctx.fillStyle = 'rgba(124,181,255,' + al.toFixed(3) + ')';
+          ctx.beginPath(); ctx.arc(p.x, p.y, 1.4, 0, 6.283); ctx.fill();
+        }
+      }
+      function drawNet() {
+        for (const e of EDGES) {
+          const a = bubbles[e[0]], b = bubbles[e[1]];
+          const hot = (a === activeB || b === activeB) ||
+            (mx != null && (Math.hypot(a.x - mx, a.y - my) < NEAR || Math.hypot(b.x - mx, b.y - my) < NEAR));
+          ctx.strokeStyle = hot ? 'rgba(124,181,255,0.7)' : 'rgba(124,181,255,0.14)';
+          ctx.lineWidth = hot ? 1.6 : 1;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+      function render() { ctx.clearRect(0, 0, W, H); drawDots(); drawNet(); }
+
+      function step() { tick++; physics(); for (const b of bubbles) if (!b.paused) draw(b); render(); raf = requestAnimationFrame(step); }
+      const start = () => { if (!running) { running = true; raf = requestAnimationFrame(step); } };
+      const stop = () => { running = false; cancelAnimationFrame(raf); };
+
+      function position(b) {
+        const cw = card.offsetWidth, ch = card.offsetHeight;
+        let cx = b.x + b.r + 14; if (cx + cw > W) cx = b.x - b.r - 14 - cw;
+        cx = Math.max(8, Math.min(cx, Math.max(8, W - cw - 8)));
+        let cy = b.y - ch / 2; cy = Math.max(8, Math.min(cy, Math.max(8, H - ch - 8)));
+        card.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
+      }
+      function show(b, pin) {
+        clearTimeout(hideTimer);
+        if (activeB && activeB !== b) { activeB.paused = false; activeB.active = false; activeB.el.classList.remove('is-active'); activeB.el.removeAttribute('aria-describedby'); }
+        activeB = b; b.paused = true; b.active = true; b.el.classList.add('is-active');
+        card.innerHTML = bubbleCardHTML(b.m);
+        card.hidden = false;
+        b.el.setAttribute('aria-describedby', card.id);
+        position(b);
+        pinned = !!pin;
+        if (pin) { const f = card.querySelector('a, button'); if (f) f.focus(); }
+      }
+      function hide() {
+        clearTimeout(hideTimer);
+        if (activeB) {
+          if (card.contains(document.activeElement)) activeB.el.focus();
+          activeB.paused = false; activeB.active = false; activeB.el.classList.remove('is-active'); activeB.el.removeAttribute('aria-describedby');
+        }
+        activeB = null; pinned = false; card.hidden = true;
+      }
+      const scheduleHide = () => { clearTimeout(hideTimer); hideTimer = setTimeout(() => { if (!pinned) hide(); }, 160); };
+
+      // initial layout: random, spread with separation, then freeze the edge set
+      measure(); sizeCanvas();
+      bubbles.forEach(b => { b.x = rnd(b.r, Math.max(b.r, W - b.r)); b.y = rnd(b.r, Math.max(b.r, H - b.r)); });
+      for (let it = 0; it < 120; it++) {
+        for (let i = 0; i < bubbles.length; i++) for (let j = i + 1; j < bubbles.length; j++) {
+          const a = bubbles[i], b = bubbles[j];
+          let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01, min = a.r + b.r + 120;
+          if (d < min) { const p = (min - d) / 2, ux = dx / d, uy = dy / d; a.x -= ux * p; a.y -= uy * p; b.x += ux * p; b.y += uy * p; }
+        }
+        bubbles.forEach(clampPos);
+      }
+      buildEdges();
+      bubbles.forEach(draw); render();
+
+      // cursor only highlights (no repulsion)
+      field.addEventListener('mousemove', e => { const rc = field.getBoundingClientRect(); mx = e.clientX - rc.left; my = e.clientY - rc.top; });
+      field.addEventListener('mouseleave', () => { mx = my = null; });
+      bubbles.forEach(b => {
+        b.el.addEventListener('mouseenter', () => { if (!pinned) show(b, false); });
+        b.el.addEventListener('mouseleave', () => { if (!pinned) scheduleHide(); });
+        b.el.addEventListener('focus', () => { if (!pinned) show(b, false); });
+        b.el.addEventListener('blur', () => { if (!pinned) scheduleHide(); });
+        b.el.addEventListener('click', () => { show(b, true); });
+      });
+      card.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+      card.addEventListener('mouseleave', () => { if (!pinned) scheduleHide(); });
+      field.addEventListener('keydown', e => { if (e.key === 'Escape' && activeB) { const b = activeB; hide(); b.el.focus(); } });
+      document.addEventListener('click', e => { if (pinned && !field.contains(e.target)) hide(); });
+
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(es => { es.forEach(en => en.isIntersecting ? start() : stop()); }, { threshold: 0.02 }).observe(field);
+      } else { start(); }
+      let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { measure(); sizeCanvas(); bubbles.forEach(b => { clampPos(b); draw(b); }); render(); if (activeB) position(activeB); }, 150); });
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const team = await loadTeam();
-      if (!team) return;
+      if (!team || !team.length) return;
 
-      // Coordinator card
       const coordinator = team.find(m => m.role === 'coordinator');
       const coordCard = document.getElementById('coordinator-card');
       if (coordinator && coordCard) coordCard.innerHTML = renderCoordinator(coordinator);
 
-      // Team grid (non-coordinators)
-      const grid = document.getElementById('team-grid');
-      if (grid) {
-        grid.innerHTML = team.map(renderTeamCard).join('');
-        document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: document.documentElement.lang } }));
-        grid.querySelectorAll('.team-card').forEach((el, i) => {
-          el.style.opacity = '0';
-          el.style.transform = 'translateY(16px)';
-          el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-          setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; }, i * 60 + 200);
-        });
+      const members = team.filter(m => m.role !== 'coordinator');
+      const mount = document.getElementById('team-mount');
+      if (mount && members.length) {
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const small = matchMedia('(max-width: 768px)').matches;
+        if (reduce || small) renderGridFallback(mount, members);
+        else initField(mount, members);
       }
+
+      // Localise the coordinator badge (and any fallback-grid badges)
+      document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: document.documentElement.lang } }));
     });
   </script>
 
-  <script type="module" src="assets/js/main.js?v=catA-20260629i"></script>
+  <script type="module" src="assets/js/main.js?v=catA-20260629m"></script>
 
   <script src="assets/js/analytics.js" defer></script>
 </body>
