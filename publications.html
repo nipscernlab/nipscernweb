@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
-  <title>Publications — NIPS-CERN</title>
+  <title>Publications | NIPS-CERN</title>
   <meta name="description" content="Scientific articles, conference papers, dissertations, and undergraduate theses from the NIPS-CERN laboratory at UFJF, Brazil.">
 
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://www.nipscern.com/publications">
-  <meta property="og:title" content="Publications — NIPS-CERN">
+  <meta property="og:title" content="Publications | NIPS-CERN">
   <meta property="og:description" content="Scientific output from NIPS-CERN — peer-reviewed articles, conference papers, theses, and dissertations.">
   <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
 
@@ -24,10 +24,11 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
-  <link rel="stylesheet" href="assets/css/main.css?v=catA-20260629f">
+  <link rel="stylesheet" href="assets/css/main.css?v=catA-20260629i">
 </head>
 <body>
 
@@ -38,24 +39,32 @@
 
     <header class="page-hero" aria-labelledby="pub-title">
       <div class="page-hero-inner">
-        <div class="eyebrow fade-up">
-          <i class="ph ph-book-open" aria-hidden="true"></i>
-          Research Output
+        <div class="page-hero-grid">
+          <div class="page-hero-text">
+            <div class="eyebrow fade-up">
+              <i class="ph ph-book-open" aria-hidden="true"></i>
+              Research Output
+            </div>
+            <h1 class="display-lg fade-up" id="pub-title" data-i18n="publications.title">Publications</h1>
+            <p class="body-lg fade-up" data-i18n="publications.subtitle">
+              Scientific articles, conference papers, dissertations, and undergraduate theses from NIPS-CERN.
+            </p>
+          </div>
+          <figure class="page-hero-accent" aria-hidden="true">
+            <img src="assets/images/undraw/undraw_reading.svg" alt="" width="260" height="165" loading="lazy" onerror="this.parentElement.style.display='none'">
+          </figure>
         </div>
-        <h1 class="display-lg fade-up" id="pub-title" data-i18n="publications.title">Publications</h1>
-        <p class="body-lg fade-up" style="max-width:560px;margin-top:var(--sp-5)" data-i18n="publications.subtitle">
-          Scientific articles, conference papers, dissertations, and undergraduate theses from NIPS-CERN.
-        </p>
       </div>
     </header>
 
     <section class="section">
       <div class="container">
 
-        <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_reading.svg -->
-        <figure style="text-align:center;margin:0 auto var(--sp-8);max-width:260px;opacity:0.65" aria-hidden="true">
-          <img src="assets/images/undraw/undraw_reading.svg" alt="" width="260" height="165" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
-        </figure>
+        <!-- Overview stats — populated by publications.js -->
+        <div id="pub-stats" class="pub-stats fade-up" aria-hidden="true"></div>
+
+        <!-- Featured strip — populated by publications.js, hidden while filtering -->
+        <div id="pub-featured" class="pub-featured fade-up" aria-label="Featured publications" hidden></div>
 
         <!-- Controls -->
         <div class="pub-controls fade-up" role="search" aria-label="Search and filter publications">
@@ -104,6 +113,12 @@
 
           <select id="pub-filter-year" class="select-filter" aria-label="Filter by year" data-i18n-aria="publications.filter_year">
             <option value="" data-i18n="publications.all_years">All years</option>
+          </select>
+
+          <select id="pub-sort" class="select-filter" aria-label="Sort publications" data-i18n-aria="publications.sort">
+            <option value="year" data-i18n="publications.sort_year">By year</option>
+            <option value="recent" data-i18n="publications.sort_recent">Most recent</option>
+            <option value="featured" data-i18n="publications.sort_featured">Featured</option>
           </select>
         </div>
 
@@ -200,9 +215,9 @@
 </script>
 
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
-  <script type="module" src="assets/js/main.js?v=catA-20260629f"></script>
+  <script type="module" src="assets/js/main.js?v=catA-20260629i"></script>
   <script type="module">
-    import { initPublications } from './assets/js/publications.js?v=catA-20260629f';
+    import { initPublications } from './assets/js/publications.js?v=catA-20260629i';
     // Defer until after DOMContentLoaded so main.js has already run
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
