@@ -1,5 +1,5 @@
 /* ============================================================
-   NIPSCERN — Main CSS Design System
+   NIPS-CERN — Main CSS Design System
    ============================================================ */
 
 /* ---- Google Fonts ---- */
@@ -2163,6 +2163,98 @@ h1, h2, h3, h4, h5, h6 {
   grid-template-columns: 1fr 320px;
   gap: var(--sp-12);
   align-items: start;
+}
+
+/* News view switcher — discrete segmented control (list / cards / grid).
+   Matches the site active-state convention (brand-dim bg + brand text). */
+.news-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--sp-6);
+}
+.news-view-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+}
+.news-view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--r-full);
+  font-size: 17px;
+  cursor: pointer;
+  transition: color var(--t-base), background var(--t-base);
+}
+.news-view-btn:hover { color: var(--text-primary); }
+.news-view-btn.is-active { background: var(--brand-dim); color: var(--brand); }
+.news-view-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Card view — drop the sidebar, lay the feed out as a comfortable 2-up grid. */
+.news-layout.view-cards { grid-template-columns: 1fr; }
+.news-layout.view-cards .news-sidebar { display: none; }
+.news-layout.view-cards .news-feed {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-6);
+}
+.news-layout.view-cards .news-card { margin: 0; }
+
+/* Grid view — drop the sidebar, lay the feed out as a compact 4-up grid. */
+.news-layout.view-grid { grid-template-columns: 1fr; }
+.news-layout.view-grid .news-sidebar { display: none; }
+.news-layout.view-grid .news-feed {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-5);
+}
+.news-layout.view-grid .news-card { margin: 0; }
+.news-layout.view-grid .news-title { font-size: var(--text-sm); }
+.news-layout.view-grid .news-excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Collapse the multi-column views as the viewport narrows. */
+@media (max-width: 1100px) {
+  .news-layout.view-grid .news-feed { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 820px) {
+  .news-layout.view-grid .news-feed { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .news-layout.view-cards .news-feed { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .news-layout.view-grid .news-feed { grid-template-columns: 1fr; }
+}
+
+/* Card entrance, replayed whenever the view (list / cards / grid) changes. */
+@keyframes news-rearrange {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+.news-feed.is-arranging > .news-card {
+  animation: news-rearrange 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.news-feed.is-arranging > .news-card:nth-child(2) { animation-delay: 0.04s; }
+.news-feed.is-arranging > .news-card:nth-child(3) { animation-delay: 0.08s; }
+.news-feed.is-arranging > .news-card:nth-child(4) { animation-delay: 0.12s; }
+.news-feed.is-arranging > .news-card:nth-child(5) { animation-delay: 0.16s; }
+.news-feed.is-arranging > .news-card:nth-child(6) { animation-delay: 0.20s; }
+.news-feed.is-arranging > .news-card:nth-child(n+7) { animation-delay: 0.24s; }
+@media (prefers-reduced-motion: reduce) {
+  .news-feed.is-arranging > .news-card { animation: none; }
 }
 
 .news-sidebar {

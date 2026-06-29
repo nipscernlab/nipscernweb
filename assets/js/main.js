@@ -1,5 +1,5 @@
 /**
- * NIPSCERN — Main JS Module
+ * NIPS-CERN — Main JS Module
  * Navigation, footer injection, animations, shared utilities
  */
 
@@ -85,8 +85,8 @@ function buildNav() {
 
   return `
     <div class="nav-inner">
-      <a href="${ROOT}" class="nav-logo" aria-label="NIPSCERN Home">
-        <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPSCERN Logo" class="nav-logo-mark">
+      <a href="${ROOT}" class="nav-logo" aria-label="NIPS-CERN Home">
+        <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPS-CERN Logo" class="nav-logo-mark">
         <span class="nav-logo-text">NIPS${atomIcon}CERN</span>
       </a>
 
@@ -111,7 +111,7 @@ function buildNav() {
     <div class="nav-mobile" id="nav-mobile" role="dialog" aria-modal="true" aria-label="Navigation menu">
       <div class="nav-mobile-header">
         <a href="${ROOT}" class="nav-logo">
-          <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPSCERN Logo" class="nav-logo-mark">
+          <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPS-CERN Logo" class="nav-logo-mark">
           <span class="nav-logo-text">NIPS${atomIcon}CERN</span>
         </a>
         <button id="nav-mobile-close" aria-label="Close menu" style="width:40px;height:40px;border-radius:8px;background:var(--border-subtle);border:1px solid var(--border-mid);display:flex;align-items:center;justify-content:center;color:var(--text-secondary)">
@@ -185,7 +185,7 @@ function buildFooter() {
     <div class="footer-inner">
       <div class="footer-brand">
         <div class="footer-logo">
-          <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPSCERN Logo" class="nav-logo-mark">
+          <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPS-CERN Logo" class="nav-logo-mark">
           <span style="font-size:var(--text-base);font-weight:700;letter-spacing:0.06em">NIPS${atomIcon}CERN</span>
         </div>
         <p class="footer-tagline" data-i18n="footer.tagline">Research and Development Laboratory at UFJF, Brazil — in collaboration with CERN, Geneva.</p>
@@ -201,7 +201,7 @@ function buildFooter() {
         <ul class="footer-nav-list">
           <li><a href="mailto:luciano.andrade@ufjf.br">luciano.andrade@ufjf.br</a></li>
           <li style="line-height:1.5;color:var(--text-muted);font-size:var(--text-xs)">
-            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">NIPSCERN / PPEE Lab</strong>
+            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">NIPS-CERN / PPEE Lab</strong>
             Depto. de Engenharia Elétrica<br>
             UFJF — R. José Lourenço Kelmer, s/n<br>
             Juiz de Fora, MG 36036-900 — Brasil
@@ -228,7 +228,7 @@ function buildFooter() {
     </div>
 
     <div class="footer-bottom">
-      <p data-i18n="footer.copyright">© 2026 NIPSCERN — Federal University of Juiz de Fora. All rights reserved.</p>
+      <p data-i18n="footer.copyright">© 2026 NIPS-CERN — Federal University of Juiz de Fora. All rights reserved.</p>
       <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
         <a href="${ROOT}qa" class="btn btn-ghost btn-sm" data-i18n-aria="qa.hero.label" aria-label="Questions and Answers">
           <i class="ph ph-chats-circle" aria-hidden="true"></i> <span data-i18n="footer.qa">Q&amp;A</span>

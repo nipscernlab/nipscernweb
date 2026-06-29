@@ -1,5 +1,5 @@
 /**
- * NIPSCERN — GoatCounter analytics loader
+ * NIPS-CERN — GoatCounter analytics loader
  * Loaded as a classic script from every page in the site.
  *
  * Behavior:

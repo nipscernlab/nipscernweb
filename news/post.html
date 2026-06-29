@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">News — NIPSCERN</title>
-  <meta name="description" id="page-desc" content="News post from NIPSCERN.">
+  <title id="page-title">News — NIPS-CERN</title>
+  <meta name="description" id="page-desc" content="News post from NIPS-CERN.">
 
   <meta property="og:type"  content="article">
   <meta property="og:url"   id="og-url" content="https://www.nipscern.com/news/post">
-  <meta property="og:title" id="og-title" content="News — NIPSCERN">
-  <meta property="og:description" id="og-desc" content="News post from NIPSCERN.">
+  <meta property="og:title" id="og-title" content="News — NIPS-CERN">
+  <meta property="og:description" id="og-desc" content="News post from NIPS-CERN.">
   <meta property="og:image" id="og-image" content="https://www.nipscern.com/assets/images/og-news.jpg">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -408,7 +408,7 @@
       const _tr = post._featured ? {} : (post.translations && post.translations[_lang]) || {};
 
       // Update meta
-      document.getElementById('page-title').textContent = (_tr.title || post.title) + ' — NIPSCERN';
+      document.getElementById('page-title').textContent = (_tr.title || post.title) + ' — NIPS-CERN';
       document.getElementById('page-desc').content = _tr.excerpt || post.excerpt;
       document.getElementById('og-title').content = _tr.title || post.title;
       document.getElementById('og-desc').content = _tr.excerpt || post.excerpt;
@@ -614,7 +614,7 @@
         const tr = (_currentPost.translations && _currentPost.translations[lang]) || {};
         document.getElementById('post-title').textContent   = tr.title   || _currentPost.title;
         document.getElementById('post-excerpt').textContent = tr.excerpt || _currentPost.excerpt;
-        document.getElementById('page-title').textContent   = (tr.title || _currentPost.title) + ' — NIPSCERN';
+        document.getElementById('page-title').textContent   = (tr.title || _currentPost.title) + ' — NIPS-CERN';
         const rawContent = tr.content || _currentPost.content || '';
         if (rawContent) {
           const bodyEl = document.getElementById('post-body');
@@ -647,7 +647,7 @@
         const tr = pickLang(featured);
         document.getElementById('post-title').textContent   = tr.title || '';
         document.getElementById('post-excerpt').textContent = tr.subtitle || tr.excerpt || '';
-        document.getElementById('page-title').textContent   = (tr.title || '') + ' — NIPSCERN';
+        document.getElementById('page-title').textContent   = (tr.title || '') + ' — NIPS-CERN';
         renderEditedDate(featured.date_edited);
         renderLangFlag(featured);
         const bodyEl = document.getElementById('post-body');
