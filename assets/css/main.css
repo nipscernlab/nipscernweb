@@ -2115,6 +2115,12 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0;
 }
 .courier-banner-body { min-width: 0; }
+.courier-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  align-items: center;
+}
 .courier-banner-stat {
   text-align: center;
   flex-shrink: 0;
@@ -2137,21 +2143,27 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
 }
 @media (max-width: 768px) {
+  /* Drop the 3-column grid entirely; stack as plain blocks so nothing can
+     force the card wider than the viewport. */
   .courier-banner {
-    grid-template-columns: 1fr;
-    gap: var(--sp-5);
+    display: block;
     padding: var(--sp-7);
   }
   .courier-banner-icon { display: none; }
+  .courier-banner-body { min-width: 0; }
+  .courier-banner-body .eyebrow { display: flex; flex-wrap: wrap; }
+  .courier-banner-actions { flex-direction: column; align-items: stretch; }
+  .courier-banner-actions .btn { width: 100%; justify-content: center; }
   .courier-banner-stat {
     border-left: none;
     border-top: 1px solid var(--border-subtle);
-    padding-left: 0;
-    padding-top: var(--sp-5);
+    padding: var(--sp-5) 0 0;
+    margin-top: var(--sp-5);
     display: flex;
     align-items: center;
     gap: var(--sp-3);
   }
+  .courier-stat-label { white-space: normal; }
   .courier-stat-number { font-size: 2rem; }
 }
 

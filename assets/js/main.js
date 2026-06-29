@@ -193,13 +193,14 @@ function buildFooter() {
 
       <div>
         <div class="footer-nav-title" data-i18n="footer.nav_title">Navigation</div>
-        <ul class="footer-nav-list">${links}</ul>
+        <ul class="footer-nav-list">${links}<li><a href="${ROOT}publications/courier">CERN Courier</a></li></ul>
       </div>
 
       <div>
         <div class="footer-nav-title" data-i18n="footer.contact_title">Contact</div>
         <ul class="footer-nav-list">
           <li><a href="mailto:luciano.andrade@ufjf.br">luciano.andrade@ufjf.br</a></li>
+          <li><a href="mailto:chrysthofer.afonso@cern.ch">chrysthofer.afonso@cern.ch</a></li>
           <li style="line-height:1.5;color:var(--text-muted);font-size:var(--text-xs)">
             <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">NIPS-CERN / PPEE Lab</strong>
             Depto. de Engenharia Elétrica<br>
