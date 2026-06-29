@@ -1,10 +1,13 @@
 /**
  * NIPS-CERN — Publications page JS
- * Handles loading, rendering, search, filter by type/year/author, sort by date
+ * Loading, rendering, search, filter by type/year/author, and three view
+ * modes: grouped by year (default), most recent (flat), and the manual
+ * "featured" order defined in publications.json. The abstract is collapsed
+ * by default and revealed per item with a toggle.
  */
 
 import { t } from './i18n.js';
-import { formatDate, pubLangFlag } from './main.js?v=lang-flags-20260529';
+import { pubLangFlag } from './main.js?v=lang-flags-20260529';
 import { publicationUrl } from './content-links.js';
 
 const TYPE_BADGE = {
@@ -18,6 +21,8 @@ const TYPE_BADGE = {
   'undergraduate thesis': 'badge-amber',
   'doctoral thesis': 'badge-purple',
 };
+
+const THESIS_TYPES = ["master's thesis", 'undergraduate thesis', 'doctoral thesis', 'tcc', 'dissertation'];
 
 // Same author written in different ways across publications.
 // Maps each variant to a single canonical name used in the filter list,
@@ -42,54 +47,133 @@ function cleanAuthorName(author) {
   return AUTHOR_ALIASES[cleaned.toLowerCase()] || cleaned;
 }
 
+// Authors come from the JSON with stray leading/trailing spaces in a few
+// entries; normalise the spacing without rewriting the names. Every author
+// and co-author is shown, no truncation.
+function formatAuthors(authors) {
+  return authors.map(a => String(a).trim()).filter(Boolean).join(', ');
+}
+
 async function loadPublications() {
   const depth = (window.location.pathname.match(/\//g) || []).length - 1;
   const prefix = depth > 1 ? '../'.repeat(depth - 1) : '';
   const res = await fetch(prefix + 'data/publications.json?v=author-normalized-20260529-chrysthofer', { cache: 'no-store' });
   if (!res.ok) return [];
   const data = await res.json();
-  // Keep the manual order defined in the JSON file (top of the array shows first).
-  // Drop only empty entries. Sorting is applied in render() solely when a
-  // filter or search is active, so it overrides the manual order on demand.
+  // Keep the manual order defined in the JSON file (top of the array shows
+  // first). This order is used by the "Featured" sort mode and to pick the
+  // featured strip when no explicit `featured` flag is set. Drop empty entries.
   return data.filter(p => p.title && p.title.trim() !== '');
 }
 
-function renderCard(pub) {
-  const typeClass = TYPE_BADGE[pub.type] || 'badge-gray';
-  const typeKey = `publications.types.${pub.type}`;
-  const tags = pub.tags
-    .filter(tag => tag && tag.trim())
-    .map(tag => `<span class="pub-tag">${tag}</span>`)
-    .join('');
+const SORT_DEFAULT = 'year';
+
+/**
+ * One publication as a row. The title and the Open PDF action carry the
+ * weight; the source line (authors, journal, year, type) is muted, and the
+ * abstract is tucked behind a toggle that expands with a height animation.
+ */
+function renderItem(pub, { showYear } = {}) {
+  const typeLabel = t(`publications.types.${pub.type}`);
   const doi = pub.doi
-    ? `<a href="https://doi.org/${pub.doi}" target="_blank" rel="noopener" class="text-brand" style="font-size:var(--text-xs);margin-top:4px;display:inline-block">${pub.doi}</a>`
+    ? `<a href="https://doi.org/${pub.doi}" target="_blank" rel="noopener" class="pub-item-doi">${pub.doi}</a>`
     : '';
   const pdfViewerUrl = pub.pdf ? publicationUrl(pub) : '';
   const pdfBtn = pdfViewerUrl
-    ? '<a href="' + pdfViewerUrl + '" class="btn btn-ghost btn-sm" data-i18n="publications.open_pdf"><i class="ph ph-file-pdf" aria-hidden="true"></i> Open PDF</a>'
+    ? `<a href="${pdfViewerUrl}" class="pub-open" aria-label="${t('publications.open_pdf')}: ${pub.title}"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>${t('publications.open_pdf')}</span></a>`
     : '';
+  const meta = [showYear ? pub.year : null, typeLabel].filter(Boolean).join(' · ');
+  const source = `<span class="pub-venue">${pub.journal}</span>${meta ? ' · ' + meta : ''}`;
 
   return `
-    <article class="pub-card fade-up" role="article" aria-labelledby="pub-${pub.id}-title">
-      <div class="pub-card-body">
-        <div class="pub-card-meta">
-          <span class="badge ${typeClass}" data-i18n="${typeKey}">${pub.type}</span>
-          <span class="news-date">${pub.year}</span>
-          ${pubLangFlag(pub.title, pub.abstract)}
+    <li class="pub-item fade-up" role="listitem">
+      <div class="pub-item-row">
+        <h3 class="pub-item-title" id="pub-${pub.id}-title">${pub.title}</h3>
+        <div class="pub-item-aside">
+          <span class="pub-item-flag">${pubLangFlag(pub.title, pub.abstract)}</span>
+          ${pdfBtn}
         </div>
-        <h2 class="pub-title" id="pub-${pub.id}-title">${pub.title}</h2>
-        <p class="pub-authors"><span data-i18n="publications.authors">Authors</span>: ${pub.authors.join(', ')}</p>
-        <p class="pub-journal">${pub.journal}</p>
-        ${doi}
-        <p class="pub-abstract">
-          <strong style="font-size:var(--text-xs);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:6px" data-i18n="publications.abstract">Abstract</strong>
-          ${pub.abstract}
-        </p>
-        ${tags ? `<div class="pub-tags">${tags}</div>` : ''}
       </div>
-      <div class="pub-card-footer">${pdfBtn}</div>
-    </article>
+      <p class="pub-item-authors">${formatAuthors(pub.authors)}</p>
+      <p class="pub-item-source">${source}</p>
+      <button class="pub-abstract-toggle" type="button" aria-expanded="false" aria-controls="pub-${pub.id}-abs">
+        <i class="ph ph-caret-right pub-abstract-caret" aria-hidden="true"></i>
+        <span class="pub-abstract-toggle-label">${t('publications.read_abstract')}</span>
+      </button>
+      <div class="pub-abstract-panel" id="pub-${pub.id}-abs">
+        <div class="pub-abstract-inner">
+          <p class="pub-item-abstract">${pub.abstract}</p>
+          ${doi}
+        </div>
+      </div>
+    </li>
   `;
+}
+
+/** Flat list (used by "Most recent" and "Featured" sorts). */
+function renderFlat(list, showYear) {
+  return `<ol class="pub-flat" role="list">${list.map(p => renderItem(p, { showYear })).join('')}</ol>`;
+}
+
+/** Grouped by year, descending, with a header and count per year. */
+function renderGrouped(list) {
+  const byYear = new Map();
+  list.forEach(p => {
+    if (!byYear.has(p.year)) byYear.set(p.year, []);
+    byYear.get(p.year).push(p);
+  });
+  const years = [...byYear.keys()].sort((a, b) => b - a);
+  return years.map(y => {
+    const items = byYear.get(y);
+    return `
+      <section class="pub-year-group">
+        <header class="pub-year-head">
+          <h2 class="pub-year-label">${y}</h2>
+          <span class="pub-year-count">${items.length}</span>
+        </header>
+        <ol class="pub-year-items" role="list">${items.map(p => renderItem(p, { showYear: false })).join('')}</ol>
+      </section>
+    `;
+  }).join('');
+}
+
+/** A featured publication, rendered as a clickable highlight card. */
+function renderFeaturedCard(pub) {
+  const typeClass = TYPE_BADGE[pub.type] || 'badge-gray';
+  const typeLabel = t(`publications.types.${pub.type}`);
+  const href = pub.pdf ? publicationUrl(pub) : '#';
+  return `
+    <a class="pub-feat-card" href="${href}">
+      <div class="pub-feat-meta">
+        <span class="badge ${typeClass}">${typeLabel}</span>
+        <span class="pub-feat-year">${pub.year}</span>
+      </div>
+      <h3 class="pub-feat-title">${pub.title}</h3>
+      <p class="pub-feat-journal">${pub.journal}</p>
+      <span class="pub-feat-cta"><i class="ph ph-file-pdf" aria-hidden="true"></i> ${t('publications.open_pdf')}</span>
+    </a>
+  `;
+}
+
+/** Static overview chips: total, year range, and counts by family of type. */
+function renderStats(pubs) {
+  const total = pubs.length;
+  if (!total) return '';
+  const years = pubs.map(p => Number(p.year)).filter(Boolean);
+  const min = Math.min(...years);
+  const max = Math.max(...years);
+  const journal = pubs.filter(p => p.type === 'journal' || p.type === 'article').length;
+  const conference = pubs.filter(p => p.type === 'conference').length;
+  const theses = pubs.filter(p => THESIS_TYPES.includes(p.type)).length;
+
+  const chip = (n, label) => `<span class="pub-stat"><strong>${n}</strong> ${label}</span>`;
+  return [
+    chip(total, t('publications.count').replace('{n}', '').trim()),
+    `<span class="pub-stat"><strong>${min}</strong>–<strong>${max}</strong></span>`,
+    chip(journal, t('publications.types.journal')),
+    chip(conference, t('publications.types.conference')),
+    chip(theses, t('publications.theses')),
+  ].join('');
 }
 
 export async function initPublications() {
@@ -97,6 +181,9 @@ export async function initPublications() {
   const searchEl    = document.getElementById('pub-search');
   const typeEl      = document.getElementById('pub-filter-type');
   const yearEl      = document.getElementById('pub-filter-year');
+  const sortEl      = document.getElementById('pub-sort');
+  const statsEl     = document.getElementById('pub-stats');
+  const featuredEl  = document.getElementById('pub-featured');
   const authorCombo = document.getElementById('pub-author-combo');
   const authorInput = document.getElementById('pub-author-input');
   const authorList  = document.getElementById('pub-author-list');
@@ -106,6 +193,11 @@ export async function initPublications() {
   if (!listEl) return;
 
   const publications = await loadPublications();
+
+  // Featured strip: explicit `featured` flags if present, otherwise the first
+  // three of the manual order (which the editor curates at the top of the JSON).
+  const flagged = publications.filter(p => p.featured);
+  const featList = (flagged.length ? flagged : publications.slice(0, 3)).slice(0, 3);
 
   // Populate year filter
   if (yearEl) {
@@ -122,6 +214,7 @@ export async function initPublications() {
   let currentType   = '';
   let currentYear   = '';
   let currentAuthor = '';
+  let currentSort   = sortEl ? (sortEl.value || SORT_DEFAULT) : SORT_DEFAULT;
 
   // Searchable author filter (combobox)
   if (authorInput && authorList) {
@@ -232,6 +325,56 @@ export async function initPublications() {
     });
   }
 
+  // Collapse a single abstract toggle to its closed state
+  function collapseAbstract(btn) {
+    btn.setAttribute('aria-expanded', 'false');
+    btn.classList.remove('is-open');
+    const panel = btn.nextElementSibling;
+    if (panel && panel.classList.contains('pub-abstract-panel')) panel.classList.remove('is-open');
+    const label = btn.querySelector('.pub-abstract-toggle-label');
+    if (label) label.textContent = t('publications.read_abstract');
+  }
+
+  // Expand/collapse an abstract (event delegation — survives re-renders).
+  // Accordion: opening one abstract closes whichever was open.
+  listEl.addEventListener('click', e => {
+    const btn = e.target.closest('.pub-abstract-toggle');
+    if (!btn) return;
+    const panel = btn.nextElementSibling;
+    if (!panel || !panel.classList.contains('pub-abstract-panel')) return;
+    const open = btn.getAttribute('aria-expanded') === 'true';
+
+    if (!open) {
+      listEl.querySelectorAll('.pub-abstract-toggle.is-open').forEach(other => {
+        if (other !== btn) collapseAbstract(other);
+      });
+    }
+
+    btn.setAttribute('aria-expanded', String(!open));
+    btn.classList.toggle('is-open', !open);
+    panel.classList.toggle('is-open', !open);
+    const label = btn.querySelector('.pub-abstract-toggle-label');
+    if (label) label.textContent = open ? t('publications.read_abstract') : t('publications.hide_abstract');
+  });
+
+  function renderFeatured(active) {
+    if (!featuredEl) return;
+    // Hide the showcase while the visitor is searching or filtering
+    if (active || featList.length === 0) {
+      featuredEl.hidden = true;
+      featuredEl.innerHTML = '';
+      return;
+    }
+    featuredEl.hidden = false;
+    featuredEl.innerHTML = `
+      <div class="pub-featured-head">
+        <i class="ph ph-star" aria-hidden="true"></i>
+        <span>${t('publications.featured_heading')}</span>
+      </div>
+      <div class="pub-featured-grid">${featList.map(renderFeaturedCard).join('')}</div>
+    `;
+  }
+
   function render() {
     const query = currentSearch.toLowerCase().trim();
     const tokens = query ? query.split(/\s+/) : [];
@@ -247,13 +390,8 @@ export async function initPublications() {
       return true;
     });
 
-    // Any active filter or search overrides the manual order with a
-    // year-descending, title-ascending sort. With nothing active, the
-    // manual order from publications.json is preserved untouched.
     const anyFilter = !!(currentType || currentYear || currentAuthor || tokens.length);
-    if (anyFilter) {
-      filtered.sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
-    }
+    renderFeatured(anyFilter);
 
     // Update result count
     const countEl = document.getElementById('pub-result-count');
@@ -266,26 +404,40 @@ export async function initPublications() {
     if (filtered.length === 0) {
       listEl.innerHTML = '';
       if (noResultsEl) noResultsEl.style.display = 'block';
-    } else {
-      if (noResultsEl) noResultsEl.style.display = 'none';
-      listEl.innerHTML = filtered.map(renderCard).join('');
-
-      // Trigger entrance animations
-      listEl.querySelectorAll('.fade-up').forEach((el, i) => {
-        setTimeout(() => el.classList.add('visible'), i * 60);
-      });
+      return;
     }
+    if (noResultsEl) noResultsEl.style.display = 'none';
+
+    if (currentSort === 'recent') {
+      const ordered = filtered.slice().sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
+      listEl.innerHTML = renderFlat(ordered, true);
+    } else if (currentSort === 'featured') {
+      // `filtered` preserves the manual JSON order
+      listEl.innerHTML = renderFlat(filtered, true);
+    } else {
+      listEl.innerHTML = renderGrouped(filtered);
+    }
+
+    // Entrance animation, with a capped stagger so long lists don't crawl
+    listEl.querySelectorAll('.fade-up').forEach((el, i) => {
+      setTimeout(() => el.classList.add('visible'), Math.min(i, 16) * 40);
+    });
   }
 
-  // Re-render when the UI language changes so the result count localises
-  document.addEventListener('langchange', render);
+  // Re-render when the UI language changes so labels and the count localise
+  document.addEventListener('langchange', () => {
+    if (statsEl) statsEl.innerHTML = renderStats(publications);
+    render();
+  });
 
   // Search
   searchEl?.addEventListener('input', e => { currentSearch = e.target.value; render(); });
 
-  // Type/Year selects
+  // Type / Year / Sort selects
   typeEl?.addEventListener('change', e => { currentType = e.target.value; render(); });
   yearEl?.addEventListener('change', e => { currentYear = e.target.value; render(); });
+  sortEl?.addEventListener('change', e => { currentSort = e.target.value; render(); });
 
+  if (statsEl) statsEl.innerHTML = renderStats(publications);
   render();
 }
