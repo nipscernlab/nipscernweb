@@ -947,8 +947,8 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   cursor: pointer;
   will-change: transform;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.45);
-  transition: box-shadow var(--t-fast), filter var(--t-fast);
+  box-shadow: 0 0 0 0 rgba(124,181,255,0), 0 4px 14px rgba(0,0,0,0.45);
+  transition: box-shadow 0.15s ease;
 }
 .bubble .bubble-photo { display: block; width: 100%; height: 100%; }
 .bubble .bubble-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -966,8 +966,7 @@ h1, h2, h3, h4, h5, h6 {
 .bubble:hover,
 .bubble:focus-visible,
 .bubble.is-active {
-  box-shadow: 0 0 22px 3px rgba(91,156,246,0.45), 0 12px 32px rgba(0,0,0,0.55);
-  filter: brightness(1.06);
+  box-shadow: 0 0 0 3px #7cb5ff, 0 10px 26px rgba(0,0,0,0.5);
   z-index: 5;
   outline: none;
 }
