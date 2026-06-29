@@ -2210,6 +2210,10 @@ h1, h2, h3, h4, h5, h6 {
 .news-view-btn:hover { color: var(--text-primary); }
 .news-view-btn.is-active { background: var(--brand-dim); color: var(--brand); }
 .news-view-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+/* Hide the layout toggle on phones in portrait; keep it on phones in landscape. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .news-toolbar { display: none; }
+}
 
 /* Card view — drop the sidebar, lay the feed out as a comfortable 2-up grid. */
 .news-layout.view-cards { grid-template-columns: 1fr; }
