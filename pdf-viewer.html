@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Viewer — NIPSCERN</title>
+  <title>PDF Viewer — NIPS-CERN</title>
   <link rel="icon" href="/favicon.ico" sizes="48x48">
   <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
@@ -289,8 +289,8 @@
 <!-- ===== TOOLBAR ===== -->
 <div id="toolbar" role="toolbar" aria-label="PDF viewer controls">
 
-  <a href="./" class="tb-brand" id="tb-home" aria-label="Back to NIPSCERN">
-    <img src="assets/icons/icon_home_nipscern.svg" alt="NIPSCERN Logo">
+  <a href="./" class="tb-brand" id="tb-home" aria-label="Back to NIPS-CERN">
+    <img src="assets/icons/icon_home_nipscern.svg" alt="NIPS-CERN Logo">
     <span>NIPS<span class="pdf-atom" aria-hidden="true"></span>CERN</span>
   </a>
 
@@ -910,7 +910,7 @@
     populateInfo();
 
     var displayTitle = pTitle || pdfFilename;
-    document.title       = displayTitle + ' — NIPSCERN PDF Viewer';
+    document.title       = displayTitle + ' — NIPS-CERN PDF Viewer';
     docTitle.textContent = displayTitle;
 
     var resolvedUrl = new URL(pdfSrc, window.location.href).href;
@@ -931,7 +931,7 @@
             var t = meta.info.Title.trim();
             docTitle.textContent = t;
             setInfoVal('i-title', t);
-            document.title = t + ' — NIPSCERN PDF Viewer';
+            document.title = t + ' — NIPS-CERN PDF Viewer';
           }
           if (meta.info.Author && !pAuthors) setInfoVal('i-authors', meta.info.Author);
         }

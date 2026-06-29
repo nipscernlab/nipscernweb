@@ -1,5 +1,5 @@
 /**
- * NIPSCERN — Publications page JS
+ * NIPS-CERN — Publications page JS
  * Handles loading, rendering, search, filter by type/year/author, sort by date
  */
 

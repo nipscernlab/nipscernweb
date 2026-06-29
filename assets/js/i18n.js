@@ -1,5 +1,5 @@
 /**
- * NIPSCERN i18n — Internationalisation Module
+ * NIPS-CERN i18n — Internationalisation Module
  * Supports: en, pt, fr, no
  */
 
