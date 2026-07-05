@@ -1,0 +1,35 @@
+name: Guarda de cache-busting
+
+# Garante que o token ?v= de main.css / main.js em todas as paginas HTML esteja
+# sincronizado com o conteudo atual desses arquivos. O hook .githooks/pre-commit
+# faz esse bump automaticamente; este guard e a rede de seguranca para quando o
+# hook nao roda (clone sem `git config core.hooksPath`, ou commit --no-verify).
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Token ?v= bate com o hash do conteudo
+        run: |
+          ver=$( { git cat-file blob HEAD:assets/css/main.css; \
+                   git cat-file blob HEAD:assets/js/main.js; } \
+                 | git hash-object --stdin | cut -c1-10 )
+          echo "Hash esperado do conteudo: $ver"
+          bad=""
+          for f in $(git ls-files '*.html'); do
+            for t in $(grep -oE 'main\.(css|js)\?v=[A-Za-z0-9._-]+' "$f" \
+                        | sed -E 's/.*\?v=//' | sort -u); do
+              [ "$t" != "$ver" ] && bad="${bad}\n  ${f}: ?v=${t}"
+            done
+          done
+          if [ -n "$bad" ]; then
+            echo "::error::Token de cache desatualizado. Rode o commit com o hook"
+            echo "ativo (git config core.hooksPath .githooks) para bumpar main.css/js."
+            echo "Esperado ?v=${ver} nas paginas abaixo:"
+            printf "%b\n" "$bad"
+            exit 1
+          fi
+          echo "Todos os tokens ?v= batem com $ver."
