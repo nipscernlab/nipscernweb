@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=dc5e4f42d6">
+  <link rel="stylesheet" href="../assets/css/main.css?v=6993630a68">
 </head>
 <body>
 
@@ -90,6 +90,13 @@
 
           <!-- Sidebar -->
           <aside class="news-sidebar" aria-label="Recent awards">
+            <div class="sidebar-widget" id="mostloved-widget" style="display:none">
+              <div class="sidebar-widget-title" data-i18n="news.most_loved">Most loved</div>
+              <div id="sidebar-mostloved">
+                <!-- Populated by script from heart counts -->
+              </div>
+            </div>
+
             <div class="sidebar-widget">
               <div class="sidebar-widget-title" data-i18n="news.sidebar_awards">Recent Awards</div>
               <div id="sidebar-awards">
@@ -150,9 +157,10 @@
 </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=dc5e4f42d6';
+    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=6993630a68';
     import { getLang, t } from '../assets/js/i18n.js';
-    import { newsPostUrl } from '../assets/js/content-links.js';
+    import { newsPostUrl, newsKey } from '../assets/js/content-links.js';
+    import { fetchAllCounts, tallyElement, heartSvg } from '../assets/js/hearts.js?v=6993630a68';
 
     async function loadNews() {
       const res = await fetch('../data/news.json');
@@ -238,6 +246,7 @@
       article.className = 'news-card fade-up' + (opts.featured ? ' news-card--featured' : '');
       article.setAttribute('role', 'listitem');
       article.id = post.id;
+      article.dataset.slug = newsKey(post);
       article.setAttribute('aria-labelledby', 'post-title-' + post.id);
 
       // Image section — wraps in <a> so clicking the image also navigates
@@ -362,6 +371,53 @@
       });
     }
 
+    // Heart counts (feature is optional — degrades silently if the Worker is down).
+    let _heartCounts = {};
+
+    // Read-only tally on each card, injected into the card meta when count > 0.
+    function applyHeartCounts() {
+      document.querySelectorAll('#news-feed .news-card').forEach(card => {
+        card.querySelectorAll('.news-heart').forEach(e => e.remove());
+        const n = _heartCounts[card.dataset.slug] || 0;
+        if (n > 0) {
+          const meta = card.querySelector('.news-card-meta');
+          if (meta) meta.appendChild(tallyElement(n));
+        }
+      });
+    }
+
+    // "Most loved" sidebar ranking (top 5). The main feed keeps its editorial order.
+    function renderMostLoved(posts) {
+      const widget = document.getElementById('mostloved-widget');
+      const list = document.getElementById('sidebar-mostloved');
+      if (!widget || !list) return;
+      const top = posts
+        .map(p => ({ p, n: _heartCounts[newsKey(p)] || 0 }))
+        .filter(x => x.n > 0)
+        .sort((a, b) => b.n - a.n)
+        .slice(0, 5);
+      list.replaceChildren();
+      if (!top.length) { widget.style.display = 'none'; return; }
+      top.forEach(({ p, n }) => {
+        const a = document.createElement('a');
+        a.href = newsPostUrl(p);
+        a.className = 'mostloved-item';
+        const count = document.createElement('span');
+        count.className = 'mostloved-count';
+        count.appendChild(heartSvg());
+        const num = document.createElement('span');
+        num.textContent = String(n);
+        count.appendChild(num);
+        const title = document.createElement('span');
+        title.className = 'mostloved-title';
+        title.textContent = postText(p, 'title');
+        a.appendChild(count);
+        a.appendChild(title);
+        list.appendChild(a);
+      });
+      widget.style.display = '';
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const [posts, featured] = await Promise.all([loadNews(), loadFeatured()]);
       const sidebarAwards = document.getElementById('sidebar-awards');
@@ -374,9 +430,19 @@
       const featuredId = featured ? featured.id : null;
       renderFeed(posts, featuredId);
 
+      // Hearts: fetch once and enhance without blocking the feed. Degrades
+      // silently to no tallies / hidden widget if the Worker is unavailable.
+      fetchAllCounts().then(counts => {
+        _heartCounts = counts || {};
+        applyHeartCounts();
+        renderMostLoved(posts);
+      });
+
       // Re-render the feed on language change so the ribbon copy swaps too.
       document.addEventListener('langchange', () => {
         renderFeed(posts, featuredId);
+        applyHeartCounts();
+        renderMostLoved(posts);
       });
 
       if (sidebarAwards) {
@@ -434,7 +500,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.js?v=dc5e4f42d6"></script>
+  <script type="module" src="../assets/js/main.js?v=6993630a68"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>

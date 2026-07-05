@@ -2793,7 +2793,35 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
-.news-heart i { color: #ff4d6d; font-size: 1.1em; }
+.news-heart .heart-ico { width: 0.95em; height: 0.95em; fill: #ff4d6d; stroke: #ff4d6d; }
+
+/* Sidebar widget: "Most loved" ranking */
+.mostloved-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0;
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.mostloved-item:last-child { border-bottom: 0; }
+.mostloved-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: #ff4d6d;
+  font-variant-numeric: tabular-nums;
+}
+.mostloved-count .heart-ico { width: 0.9em; height: 0.9em; fill: #ff4d6d; stroke: #ff4d6d; }
+.mostloved-title {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.mostloved-item:hover .mostloved-title { color: var(--text-primary); }
 
 @media (prefers-reduced-motion: reduce) {
   .heart-btn.pop .heart-ico,

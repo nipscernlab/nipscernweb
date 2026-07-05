@@ -22,7 +22,7 @@ let warned = false;
 // avoids depending on Phosphor's fill weight, which the site does not load.
 const HEART_PATH =
   'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z';
-function heartSvg(extraClass) {
+export function heartSvg(extraClass) {
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('viewBox', '0 0 24 24');
@@ -61,6 +61,18 @@ export async function fetchAllCounts() {
     const data = await res.json();
     return data.counts || {};
   } catch (_) { return {}; }
+}
+
+/** A small read-only heart tally (filled heart + number) for news cards. */
+export function tallyElement(count) {
+  const el = document.createElement('span');
+  el.className = 'news-heart';
+  el.appendChild(heartSvg());
+  const n = document.createElement('span');
+  n.className = 'news-heart-n';
+  n.textContent = String(count);
+  el.appendChild(n);
+  return el;
 }
 
 async function fetchOne(slug) {
