@@ -509,7 +509,7 @@
         initLightbox(bodyEl);
       } else {
         const rawContent = _tr.content || post.content || '';
-        const paragraphs = rawContent.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+        const paragraphs = rawContent.split('\n\n').map(p => p.trim().startsWith('<') ? p.trim() : `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
         bodyEl.innerHTML = paragraphs;
       }
       bodyEl.style.display = 'block';
@@ -618,7 +618,7 @@
         const rawContent = tr.content || _currentPost.content || '';
         if (rawContent) {
           const bodyEl = document.getElementById('post-body');
-          bodyEl.innerHTML = rawContent.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+          bodyEl.innerHTML = rawContent.split('\n\n').map(p => p.trim().startsWith('<') ? p.trim() : `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
           if (_currentPost.tags && _currentPost.tags.length) {
             bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${_currentPost.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
           }
