@@ -75,6 +75,9 @@
     <!-- Post body (and TOC injected alongside it for featured posts) -->
     <div class="post-body" id="post-body" style="display:none"></div>
 
+    <!-- Appreciation / heart control (populated by hearts.js) -->
+    <div class="post-hearts" id="post-hearts" style="display:none"></div>
+
     <!-- Related articles (populated by JS) -->
     <div id="post-related" style="display:none;border-top:1px solid var(--border-subtle);padding:var(--sp-8) var(--container-pad)">
       <div style="max-width:720px;margin:0 auto">
@@ -172,6 +175,7 @@
     import { formatDate, newsLangFlag } from '../assets/js/main.js?v=catA-20260629i';
     import { getLang, t } from '../assets/js/i18n.js';
     import { newsPostUrl } from '../assets/js/content-links.js';
+    import { mountPostHeart } from '../assets/js/hearts.js';
 
     function catClass(cat) {
       const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
@@ -513,6 +517,14 @@
         bodyEl.innerHTML = paragraphs;
       }
       bodyEl.style.display = 'block';
+
+      // Appreciation heart — interactive, with click feedback (see hearts.js).
+      const heartsEl = document.getElementById('post-hearts');
+      if (heartsEl) {
+        heartsEl.replaceChildren();
+        mountPostHeart(heartsEl, post);
+        heartsEl.style.display = 'block';
+      }
 
       // Embedded video (YouTube). insertAdjacentHTML appends without
       // re-parsing existing children, so anything we touch afterwards keeps
