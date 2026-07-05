@@ -3059,43 +3059,30 @@ h1, h2, h3, h4, h5, h6 {
 .cern-tl-desc a,
 .release-note a {
   color: var(--brand);
-  position: relative;
   text-decoration: none;
-}
-
-.text-link::after,
-.info-box a::after,
-.legacy-banner-text a::after,
-.cern-prose a::after,
-.cern-nipscern-note a::after,
-.post-body a::after,
-.coordinator-bio a::after,
-.cern-tl-desc a::after,
-.release-note a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 3px;
+  padding-bottom: 2px;
+  /* The wave is painted on the link itself (not an absolute ::after) so it
+     follows every wrapped line fragment. box-decoration-break: clone makes
+     each line render its own complete wave. Hidden at rest via zero height. */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='3' viewBox='0 0 20 3'%3E%3Cpath d='M0 1.5 Q5 0 10 1.5 Q15 3 20 1.5' fill='none' stroke='%235b9cf6' stroke-width='1.5'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
-  background-size: 20px 3px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
+  background-position: left bottom;
+  background-size: 20px 0;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 0.2s ease;
 }
 
-.text-link:hover::after,
-.info-box a:hover::after,
-.legacy-banner-text a:hover::after,
-.cern-prose a:hover::after,
-.cern-nipscern-note a:hover::after,
-.post-body a:hover::after,
-.coordinator-bio a:hover::after,
-.cern-tl-desc a:hover::after,
-.release-note a:hover::after {
-  opacity: 1;
+.text-link:hover,
+.info-box a:hover,
+.legacy-banner-text a:hover,
+.cern-prose a:hover,
+.cern-nipscern-note a:hover,
+.post-body a:hover,
+.coordinator-bio a:hover,
+.cern-tl-desc a:hover,
+.release-note a:hover {
+  background-size: 20px 3px;
   animation: wave-move 0.6s linear infinite;
 }
 
