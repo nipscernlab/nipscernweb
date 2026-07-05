@@ -2670,6 +2670,25 @@ h1, h2, h3, h4, h5, h6 {
 .post-body a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
 .post-body a:hover { color: #7cb5ff; }
 
+/* Inline figures inside regular (non-featured) posts */
+.post-body .story-figure { margin: var(--sp-10) 0; }
+.post-body .story-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-1);
+}
+.post-body .story-figure figcaption {
+  padding: var(--sp-3) 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+}
+
 /* ============================================================
    Page-specific: Project Pages
    ============================================================ */
