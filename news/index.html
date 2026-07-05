@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=6993630a68">
+  <link rel="stylesheet" href="../assets/css/main.css?v=aad7b3d7ad">
 </head>
 <body>
 
@@ -73,6 +73,9 @@
             </button>
             <button type="button" class="news-view-btn" data-view="grid" aria-pressed="false" aria-label="Grid view" data-i18n-aria="news.view_grid" title="Grid view" data-i18n-title="news.view_grid">
               <i class="ph ph-grid-four" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="news-view-btn news-view-btn--loved" data-view="loved" aria-pressed="false" aria-label="Most loved" data-i18n-aria="news.most_loved" title="Most loved" data-i18n-title="news.most_loved">
+              <i class="ph ph-heart" aria-hidden="true"></i>
             </button>
           </div>
         </div>
@@ -157,10 +160,10 @@
 </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=6993630a68';
+    import { formatDate, newsLangFlag } from '../assets/js/main.js?v=aad7b3d7ad';
     import { getLang, t } from '../assets/js/i18n.js';
     import { newsPostUrl, newsKey } from '../assets/js/content-links.js';
-    import { fetchAllCounts, tallyElement, heartSvg } from '../assets/js/hearts.js?v=6993630a68';
+    import { fetchAllCounts, tallyElement, heartSvg } from '../assets/js/hearts.js?v=aad7b3d7ad';
 
     async function loadNews() {
       const res = await fetch('../data/news.json');
@@ -373,6 +376,23 @@
 
     // Heart counts (feature is optional — degrades silently if the Worker is down).
     let _heartCounts = {};
+    let _posts = [];
+    let _featuredId = null;
+    let _view = 'cards';
+
+    // Feed order for the current view: editorial by default, most-loved first
+    // when the heart view is active.
+    function feedOrder() {
+      if (_view === 'loved') {
+        return [..._posts].sort((a, b) =>
+          (_heartCounts[newsKey(b)] || 0) - (_heartCounts[newsKey(a)] || 0));
+      }
+      return _posts;
+    }
+    function rerenderFeed() {
+      renderFeed(feedOrder(), _featuredId);
+      applyHeartCounts();
+    }
 
     // Read-only tally on each card, injected into the card meta when count > 0.
     function applyHeartCounts() {
@@ -427,7 +447,9 @@
       const slot = document.getElementById('news-featured-slot');
       if (slot) slot.style.display = 'none';
 
-      const featuredId = featured ? featured.id : null;
+      _posts = posts;
+      _featuredId = featured ? featured.id : null;
+      const featuredId = _featuredId;
       renderFeed(posts, featuredId);
 
       // Hearts: fetch once and enhance without blocking the feed. Degrades
@@ -436,12 +458,12 @@
         _heartCounts = counts || {};
         applyHeartCounts();
         renderMostLoved(posts);
+        if (_view === 'loved') rerenderFeed(); // now sort with real counts
       });
 
       // Re-render the feed on language change so the ribbon copy swaps too.
       document.addEventListener('langchange', () => {
-        renderFeed(posts, featuredId);
-        applyHeartCounts();
+        rerenderFeed();
         renderMostLoved(posts);
       });
 
@@ -458,27 +480,37 @@
         }
       }
 
-      // News view switcher — list (default) / cards / grid, persisted across visits.
+      // News view switcher — list / cards / grid / loved, persisted across visits.
+      // "loved" reuses the cards layout but reorders the feed most-loved first.
       (function initViewSwitcher() {
         const layout = document.querySelector('.news-layout');
         const toggle = document.querySelector('.news-view-toggle');
         const feed = document.getElementById('news-feed');
         if (!layout || !toggle) return;
         const KEY = 'nipscern_news_view';
-        const VALID = ['list', 'cards', 'grid'];
+        const VALID = ['list', 'cards', 'grid', 'loved'];
         const buttons = toggle.querySelectorAll('.news-view-btn');
         let arrTimer;
+        let curOrder = 'editorial';
         function apply(view, animate) {
           if (!VALID.includes(view)) view = 'list';
+          _view = view;
+          // The heart view borrows the cards grid; only the ordering differs.
+          const layoutView = view === 'loved' ? 'cards' : view;
           layout.classList.remove('view-cards', 'view-grid');
-          if (view !== 'list') layout.classList.add('view-' + view);
+          if (layoutView !== 'list') layout.classList.add('view-' + layoutView);
           buttons.forEach(btn => {
             const on = btn.dataset.view === view;
             btn.classList.toggle('is-active', on);
             btn.setAttribute('aria-pressed', on ? 'true' : 'false');
           });
-          // Replay the card entrance animation each time the layout changes.
-          if (animate && feed) {
+          // When the sort order changes (loved <-> editorial), rebuild the feed;
+          // otherwise just replay the layout reflow animation.
+          const order = view === 'loved' ? 'loved' : 'editorial';
+          if (order !== curOrder) {
+            curOrder = order;
+            rerenderFeed();
+          } else if (animate && feed) {
             feed.classList.remove('is-arranging');
             void feed.offsetWidth; // force reflow so the animation restarts
             feed.classList.add('is-arranging');
@@ -500,7 +532,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.js?v=6993630a68"></script>
+  <script type="module" src="../assets/js/main.js?v=aad7b3d7ad"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>
