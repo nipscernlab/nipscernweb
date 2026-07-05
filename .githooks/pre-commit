@@ -1,0 +1,34 @@
+#!/bin/sh
+# Auto cache-busting for main.css / main.js.
+#
+# When either asset is part of this commit, recompute the ?v= token from a hash
+# of the two files' content and rewrite it across every tracked HTML page, then
+# re-stage them. This guarantees a CSS/JS edit always reaches production, since
+# the URL changes whenever the content does. No manual bump to remember.
+#
+# Enable once per clone:  git config core.hooksPath .githooks
+# Skip on a given commit: git commit --no-verify
+
+set -e
+
+# Only act when main.css or main.js is staged in this commit.
+changed=$(git diff --cached --name-only | grep -E '^assets/(css/main\.css|js/main\.js)$' || true)
+[ -z "$changed" ] && exit 0
+
+# Version = short hash of the staged content of both files (order fixed).
+ver=$( { git cat-file blob :assets/css/main.css; git cat-file blob :assets/js/main.js; } \
+        | git hash-object --stdin | cut -c1-10 )
+
+# Rewrite the token on every main.css / main.js reference in tracked HTML.
+changed_html=""
+for f in $(git ls-files '*.html'); do
+  if grep -qE 'main\.(css|js)\?v=' "$f"; then
+    sed -i -E "s#(main\.(css|js)\?v=)[A-Za-z0-9._-]+#\1${ver}#g" "$f"
+    git add "$f"
+    changed_html="${changed_html} ${f}"
+  fi
+done
+
+if [ -n "$changed_html" ]; then
+  echo "pre-commit: bumped asset cache version to '${ver}' in:${changed_html}"
+fi

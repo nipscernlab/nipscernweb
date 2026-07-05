@@ -1,6 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+# Shell hooks must stay LF: a CRLF shebang breaks execution on Unix shells.
+.githooks/pre-commit text eol=lf
+*.sh text eol=lf
+
 # Git LFS foi aposentado: arquivos pesados vivem no repositorio
 # nipscern-assets (servido em cdn.nipscern.com), e o CI deste repo
 # bloqueia qualquer arquivo acima de 2 MB (.github/workflows/size-guard.yml).
