@@ -40,6 +40,10 @@ const AUTHOR_ALIASES = {
   'j.s. graulichc':         'J. S. Graulich',
   'j. s. graulichc':        'J. S. Graulich',
   'mariana de souza oliveira': 'Mariana de Oliveira Resende',
+  'thiago c. a. paschoalin':   'Thiago Campos Acácio Paschoalin',
+  'tiago m. quirino':          'Tiago Motta Quirino',
+  'fabio cardani luna':        'Fábio Cardani Luna',
+  'fábio c. luna':             'Fábio Cardani Luna',
 };
 
 function cleanAuthorName(author) {
