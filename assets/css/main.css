@@ -1164,22 +1164,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .share-toast[hidden] { display: none; }
 
-/* "Download images" toggle + grid (images served by the /share/ Worker). */
-.share-download-toggle {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  transition: color var(--t-fast);
-}
-.share-download-toggle:hover { color: var(--brand); }
-.share-download-toggle[aria-expanded="true"] { color: var(--brand); }
+/* "Download images" grid (images hosted on cdn.nipscern.com/share). The toggle
+   is now a circular icon button in the social row (.share-social.share-download). */
+.share-social.share-download[aria-expanded="true"] { color: #fff; background: var(--brand); border-color: var(--brand); }
 
 .share-downloads {
   flex-basis: 100%;
