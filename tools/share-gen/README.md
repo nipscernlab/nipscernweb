@@ -50,6 +50,19 @@ a seção "Baixar imagens" da notícia passa a servir os formatos a partir do CD
   `https://www.nipscern.com/news/<slug>` (a página de OG).
 - A grade "Baixar imagens" aponta para `cdn.nipscern.com/share/<slug>/<formato>-<lang>.jpg`.
 
+## Cache do CDN (IMPORTANTE ao atualizar imagens)
+
+O Cloudflare cacheia as imagens do CDN por **1 ano** (`max-age=31536000`). Se você
+regerar e subir imagens com o mesmo nome, o CDN continua servindo a versão antiga.
+Por isso as URLs levam um cache-buster `?v=N`:
+
+- `IMG_VER` em `src/main.rs` (usado no `og:image` das páginas de OG)
+- `CDN_VER` em `news/post.html` (usado nas miniaturas/downloads)
+
+**Ao regerar imagens: incremente os dois (mantenha iguais)**, regere as páginas de
+OG (`cargo run`) e commite. Alternativa: purgar o cache do Cloudflare para
+`cdn.nipscern.com/share/*` no painel (aí não precisa bumpar o `?v`).
+
 ## Notas
 
 - **Sem custo**: tudo roda localmente; hospedagem é GitHub Pages + o CDN que já existe.

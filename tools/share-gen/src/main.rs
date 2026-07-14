@@ -23,6 +23,10 @@ use serde_json::Value;
 
 const SITE: &str = "https://www.nipscern.com";
 const CDN: &str = "https://cdn.nipscern.com/share";
+// Cache-buster: the CDN (Cloudflare) caches images for a year, so bump this on
+// every image regeneration to force fresh delivery. MUST match CDN_VER in
+// news/post.html. See tools/share-gen/README.md.
+const IMG_VER: &str = "3";
 const BRAND: &str = "#7cb5ff";
 const BRAND_DEEP: &str = "#5b9cf6";
 
@@ -378,7 +382,7 @@ fn og_page(slug: &str, title: &str, desc: &str) -> String {
     let t = xml_escape(&format!("{} — NIPS-CERN", title));
     let d = xml_escape(&desc.chars().take(300).collect::<String>());
     let url = format!("{SITE}/news/{slug}");
-    let img = format!("{CDN}/{slug}/og-en.jpg");
+    let img = format!("{CDN}/{slug}/og-en.jpg?v={IMG_VER}");
     let spa = format!("/news/post?id={slug}");
     format!(
         r##"<!DOCTYPE html>
