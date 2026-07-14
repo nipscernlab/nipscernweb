@@ -1164,6 +1164,74 @@ h1, h2, h3, h4, h5, h6 {
 }
 .share-toast[hidden] { display: none; }
 
+/* "Download images" toggle + grid (images served by the /share/ Worker). */
+.share-download-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: color var(--t-fast);
+}
+.share-download-toggle:hover { color: var(--brand); }
+.share-download-toggle[aria-expanded="true"] { color: var(--brand); }
+
+.share-downloads {
+  flex-basis: 100%;
+  width: 100%;
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border-subtle);
+}
+.share-downloads[hidden] { display: none; }
+.share-dl-hint { font-size: var(--text-xs); color: var(--text-muted); margin: 0 0 var(--sp-4); }
+.share-dl-tabs { display: inline-flex; gap: 4px; margin-bottom: var(--sp-4); background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--r-full); padding: 3px; }
+.share-dl-tab {
+  border: none; background: none; cursor: pointer;
+  padding: 4px 14px; border-radius: var(--r-full);
+  font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.04em;
+  color: var(--text-muted); transition: background var(--t-fast), color var(--t-fast);
+}
+.share-dl-tab.is-active { background: var(--brand); color: #fff; }
+
+.share-dl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-4);
+}
+.share-dl-card { margin: 0; }
+.share-dl-card.is-missing { display: none !important; }
+.share-dl-thumb {
+  position: relative;
+  display: block;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  transition: border-color var(--t-fast), transform var(--t-fast);
+}
+.share-dl-thumb:hover { border-color: var(--brand-mid); transform: translateY(-2px); }
+.share-dl-thumb img { width: 100%; height: auto; display: block; min-height: 60px; }
+.share-dl-badge {
+  position: absolute;
+  right: 8px; bottom: 8px;
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-full);
+  background: rgba(7, 10, 18, 0.72);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-mid);
+  color: #fff; font-size: 15px;
+  transition: background var(--t-fast);
+}
+.share-dl-thumb:hover .share-dl-badge { background: var(--brand); border-color: var(--brand); }
+.share-dl-card figcaption { font-size: 11px; color: var(--text-muted); margin-top: 6px; text-align: center; }
+
 /* Home "Latest From the Lab": the news card carries a 16:9 cover, so its row is
    tall. The publication card has no image and used to leave a large void at the
    bottom. Make it a flex column that fills the shared row height and anchor the
