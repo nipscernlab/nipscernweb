@@ -28,6 +28,10 @@ const BRAND_DEEP: &str = "#5b9cf6";
 
 const DM_TTF: &[u8] = include_bytes!("../fonts/DMSerifDisplay-Regular.ttf");
 const INTER_TTF: &[u8] = include_bytes!("../fonts/Inter-Regular.ttf");
+const MONO_TTF: &[u8] = include_bytes!("../fonts/JetBrainsMono.ttf");
+
+// 2× supersampling: render at double size, then downscale — crisp text & mesh.
+const SS: u32 = 2;
 
 struct Format {
     key: &'static str,
@@ -45,15 +49,6 @@ const FORMATS: &[Format] = &[
     Format { key: "rawstory",  w: 1080, h: 1920, text: false },
 ];
 
-fn category_color(cat: &str) -> &'static str {
-    match cat {
-        "milestone" => "#a78bfa",
-        "award" => "#fbbf24",
-        "event" => "#34d399",
-        "publication" => "#60a5fa",
-        _ => BRAND,
-    }
-}
 
 fn xml_escape(s: &str) -> String {
     s.replace('&', "&amp;")
@@ -179,41 +174,77 @@ fn wrap_title(text: &str, max_width: f32, font_size: f32, max_lines: usize) -> V
     lines
 }
 
+/// NIPS⚛CERN wordmark in the site's serif, with the site's own atom glyph
+/// (assets/icons/atom.svg) between the words, plus the domain below.
 fn brandmark(x: f32, y: f32, scale: f32) -> String {
-    let fs = (38.0 * scale).round();
-    let dom_fs = (20.0 * scale).round();
-    let atom = fs * 0.42;
-    let gap = fs * 0.30;
-    let nips_w = fs * 0.62 * 4.0;
-    let ax = x + nips_w + gap;
-    let ay = y - fs * 0.34;
-    let sw = (atom * 0.09_f32).max(2.0);
+    let fs = (34.0 * scale).round();      // monospace wordmark size
+    let ls = 1.0 * scale;                 // letter-spacing
+    let dom_fs = (16.0 * scale).round();
+    // JetBrains Mono is monospace (~0.6em advance/char). "NIPS" = 4 glyphs.
+    let nips_w = fs * 0.6 * 4.0 + ls * 4.0;
+    let d = fs * 0.92;                    // atom diameter
+    let gap = fs * 0.22;
+    let acx = x + nips_w + gap + d / 2.0; // atom centre x
+    let acy = y - fs * 0.33;              // atom centre y (visual middle of caps)
+    let cern_x = acx + d / 2.0 + gap;
+    let s = d / 256.0;                    // atom.svg is a 256×256 canvas
+    let dy = y + dom_fs * 2.0;
     format!(
         r##"<g>
-  <text x="{x}" y="{y}" font-family="Inter" font-weight="700" font-size="{fs}" fill="#ffffff" letter-spacing="0.5">NIPS</text>
-  <g transform="translate({ax},{ay})">
-    <circle cx="0" cy="0" r="{r}" fill="{BRAND}"/>
-    <g fill="none" stroke="{BRAND}" stroke-width="{sw}">
-      <ellipse cx="0" cy="0" rx="{rx}" ry="{ry}"/>
-      <ellipse cx="0" cy="0" rx="{rx}" ry="{ry}" transform="rotate(60)"/>
-      <ellipse cx="0" cy="0" rx="{rx}" ry="{ry}" transform="rotate(120)"/>
-    </g>
+  <text x="{x}" y="{y}" font-family="JetBrains Mono" font-weight="700" font-size="{fs}" fill="#ffffff" letter-spacing="{ls}">NIPS</text>
+  <g transform="translate({acx},{acy}) scale({s}) translate(-128,-128)" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="128" cy="128" rx="44.13" ry="116.33" transform="translate(-53.02 128) rotate(-45)" fill="none" stroke="{BRAND}" stroke-width="18"/>
+    <ellipse cx="128" cy="128" rx="116.33" ry="44.13" transform="translate(-53.02 128) rotate(-45)" fill="none" stroke="{BRAND}" stroke-width="18"/>
+    <circle cx="128" cy="128" r="16" fill="{BRAND}"/>
   </g>
-  <text x="{cx}" y="{y}" font-family="Inter" font-weight="700" font-size="{fs}" fill="#ffffff" letter-spacing="0.5">CERN</text>
-  <text x="{x}" y="{dy}" font-family="Inter" font-weight="500" font-size="{dom_fs}" fill="{BRAND}" letter-spacing="1">nipscern.com</text>
+  <text x="{cern_x}" y="{y}" font-family="JetBrains Mono" font-weight="700" font-size="{fs}" fill="#ffffff" letter-spacing="{ls}">CERN</text>
+  <text x="{x}" y="{dy}" font-family="Inter" font-weight="600" font-size="{dom_fs}" fill="{BRAND}" letter-spacing="1.2">nipscern.com</text>
 </g>"##,
-        r = atom * 0.16,
-        rx = atom * 0.5,
-        ry = atom * 0.2,
-        cx = ax + atom * 0.7,
-        dy = y + dom_fs * 1.7,
     )
 }
 
+/// A neon-blue honeycomb of single-line hexagons over the lower region, with a
+/// soft opacity fade at the top and bottom so it blends into the dark scrim
+/// (no hard edges). Pointy-top hexagons in a proper honeycomb — shared edges
+/// overlap, so it reads as one continuous mesh, not doubled outlines.
+fn hex_mesh(w: f32, h: f32, top: f32, r: f32, sw: f32) -> String {
+    const NEON: &str = "#3ad2ff";
+    let s = 0.866_025_4 * r; // √3/2 · r  (half-width)
+    let dx = 2.0 * s;
+    let dy = 1.5 * r;
+    let rows = ((h - top) / dy).ceil() as i32 + 2;
+    let cols = (w / dx).ceil() as i32 + 2;
+    let mut out = format!(
+        r##"<g fill="none" stroke="{NEON}" stroke-width="{sw}" stroke-linejoin="round">"##
+    );
+    for row in 0..rows {
+        let cy = top + row as f32 * dy;
+        let x_off = if row % 2 == 1 { s } else { 0.0 };
+        // Fade: peak in the middle band, transparent toward the bright image
+        // (top) and toward the darkest bottom.
+        let frac = ((cy - top) / (h - top)).clamp(0.0, 1.0);
+        let fade_in = (frac / 0.30).clamp(0.0, 1.0);
+        let fade_out = ((1.0 - frac) / 0.28).clamp(0.0, 1.0);
+        let op = 0.20 * fade_in.min(fade_out);
+        if op <= 0.02 {
+            continue;
+        }
+        for col in -1..cols {
+            let cx = x_off + col as f32 * dx;
+            out.push_str(&format!(
+                r##"<path d="M{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1} Z" stroke-opacity="{:.3}"/>"##,
+                cx, cy - r, cx + s, cy - r / 2.0, cx + s, cy + r / 2.0,
+                cx, cy + r, cx - s, cy + r / 2.0, cx - s, cy - r / 2.0, op,
+            ));
+        }
+    }
+    out.push_str("</g>");
+    out
+}
+
 /// Build the share SVG for one format. `cover_uri` is a JPEG/PNG data URI or None.
-fn build_share_svg(format: &Format, title: &str, category: &str, date: &str, cover_uri: &Option<String>) -> String {
+fn build_share_svg(format: &Format, title: &str, _category: &str, date: &str, cover_uri: &Option<String>) -> String {
     let (w, h) = (format.w as f32, format.h as f32);
-    let accent = category_color(category);
 
     let cover = match cover_uri {
         Some(uri) => format!(
@@ -234,7 +265,7 @@ fn build_share_svg(format: &Format, title: &str, category: &str, date: &str, cov
 
     let scale = w / 1200.0;
     let pad = (64.0 * scale).round();
-    let title_fs = ((if format.key == "og" { 66.0 } else { 82.0 }) * scale).round();
+    let title_fs = ((if format.key == "og" { 55.0 } else { 68.0 }) * scale).round();
     let line_h = (title_fs * 1.14).round();
     let max_lines = if format.key == "og" { 4 } else if format.key == "story" { 6 } else { 5 };
     let lines = wrap_title(title, w - pad * 2.0, title_fs, max_lines);
@@ -248,24 +279,20 @@ fn build_share_svg(format: &Format, title: &str, category: &str, date: &str, cov
         .map(|(i, ln)| format!(r##"<tspan x="{pad}" y="{}">{}</tspan>"##, title_top + i as f32 * line_h, xml_escape(ln)))
         .collect();
 
-    let badge_fs = (24.0 * scale).round();
-    let badge_text = category.to_uppercase();
-    let badge_pad_x = (18.0 * scale).round();
-    let badge_pad_y = (10.0 * scale).round();
-    let badge_w = (badge_text.chars().count() as f32 * badge_fs * 0.62).round() + badge_pad_x * 2.0;
-    let badge_h = (badge_fs * 1.7).round();
-    let badge_y = pad;
-    let date_fs = (22.0 * scale).round();
-    let stroke = (1.5 * scale).max(1.0);
+    let date_fs = (24.0 * scale).round();
     let rule_w = (70.0 * scale).round();
     let rule_h = (5.0 * scale).round().max(3.0);
+    // Decorative neon hexagonal mesh behind the title (tech feel, faded edges).
+    let mesh_top = (h * 0.30).round();
+    let mesh_r = 22.0 * scale;
+    let mesh_sw = (1.3 * scale).max(0.9);
+    // Date, top-left (no badge), bright.
     let date_svg = if date.is_empty() {
         String::new()
     } else {
         format!(
-            r##"<text x="{}" y="{}" font-family="Inter" font-weight="500" font-size="{date_fs}" fill="#c9d4e6" letter-spacing="0.5">{}</text>"##,
-            pad + badge_w + (18.0 * scale).round(),
-            badge_y + badge_h - badge_pad_y - (2.0 * scale).round(),
+            r##"<text x="{pad}" y="{}" font-family="Inter" font-weight="600" font-size="{date_fs}" fill="#eef4ff" letter-spacing="0.6">{}</text>"##,
+            (pad + date_fs * 0.9).round(),
             xml_escape(date),
         )
     };
@@ -283,17 +310,14 @@ fn build_share_svg(format: &Format, title: &str, category: &str, date: &str, cov
 </defs>
 {cover}
 <rect x="0" y="0" width="{w}" height="{h}" fill="url(#scrim)"/>
-<rect x="{pad}" y="{badge_y}" rx="{brx}" ry="{brx}" width="{badge_w}" height="{badge_h}" fill="{accent}" fill-opacity="0.18" stroke="{accent}" stroke-opacity="0.55" stroke-width="{stroke}"/>
-<text x="{btx}" y="{bty}" font-family="Inter" font-weight="700" font-size="{badge_fs}" fill="{accent}" letter-spacing="1.5">{badge_text}</text>
+{mesh}
 {date_svg}
 <rect x="{pad}" y="{rule_y}" width="{rule_w}" height="{rule_h}" rx="2" fill="{BRAND_DEEP}"/>
 <text font-family="DM Serif Display" font-weight="400" font-size="{title_fs}" fill="#ffffff">{tspans}</text>
 {brand}
 </svg>"##,
-        brx = badge_h / 2.0,
-        btx = pad + badge_pad_x,
-        bty = badge_y + badge_h - badge_pad_y - (2.0 * scale).round(),
         rule_y = title_top - (title_fs * 0.9).round(),
+        mesh = hex_mesh(w, h, mesh_top, mesh_r, mesh_sw),
         brand = brandmark(pad, brand_y, scale),
     )
 }
@@ -307,27 +331,44 @@ fn fetch_cover(url: &str) -> Option<Vec<u8>> {
     Some(bytes)
 }
 
+/// Load a cover from an absolute URL (fetch) or a repo-relative path (read the
+/// file locally). Some posts store `assets/images/news/…` rather than a CDN URL.
+fn load_cover(cover: &str, repo: &Path) -> Option<Vec<u8>> {
+    if cover.is_empty() {
+        return None;
+    }
+    if cover.starts_with("http://") || cover.starts_with("https://") {
+        fetch_cover(cover)
+    } else {
+        fs::read(repo.join(cover.trim_start_matches('/'))).ok()
+    }
+}
+
 /// Decode a cover (WebP/JPEG/PNG), cover-crop to the box, return a JPEG data URI.
 fn cover_data_uri(bytes: &[u8], w: u32, h: u32) -> Option<String> {
     let img = image::load_from_memory(bytes).ok()?;
     let filled = img.resize_to_fill(w, h, FilterType::Lanczos3);
     let mut jpg = Vec::new();
-    JpegEncoder::new_with_quality(&mut jpg, 88).encode_image(&filled).ok()?;
+    JpegEncoder::new_with_quality(&mut jpg, 92).encode_image(&filled).ok()?;
     Some(format!("data:image/jpeg;base64,{}", base64::engine::general_purpose::STANDARD.encode(&jpg)))
 }
 
+/// Render the SVG at SS× and downscale with Lanczos3 → crisp text/mesh, then
+/// encode a high-quality JPEG.
 fn render_jpeg(svg: &str, w: u32, h: u32, opt: &usvg::Options) -> Result<Vec<u8>, Box<dyn Error>> {
     let tree = usvg::Tree::from_str(svg, opt)?;
-    let mut pixmap = tiny_skia::Pixmap::new(w, h).ok_or("pixmap alloc")?;
+    let (pw, ph) = (w * SS, h * SS);
+    let mut pixmap = tiny_skia::Pixmap::new(pw, ph).ok_or("pixmap alloc")?;
     pixmap.fill(tiny_skia::Color::from_rgba8(7, 10, 18, 255));
-    resvg::render(&tree, tiny_skia::Transform::identity(), &mut pixmap.as_mut());
-    let mut rgb = Vec::with_capacity((w * h * 3) as usize);
+    resvg::render(&tree, tiny_skia::Transform::from_scale(SS as f32, SS as f32), &mut pixmap.as_mut());
+    let mut rgb = Vec::with_capacity((pw * ph * 3) as usize);
     for px in pixmap.data().chunks_exact(4) {
         rgb.extend_from_slice(&px[..3]);
     }
-    let rgb_img = image::RgbImage::from_raw(w, h, rgb).ok_or("rgb build")?;
+    let big = image::RgbImage::from_raw(pw, ph, rgb).ok_or("rgb build")?;
+    let small = image::DynamicImage::ImageRgb8(big).resize_exact(w, h, FilterType::Lanczos3);
     let mut out = Vec::new();
-    JpegEncoder::new_with_quality(&mut out, 82).encode_image(&rgb_img)?;
+    JpegEncoder::new_with_quality(&mut out, 94).encode_image(&small)?;
     Ok(out)
 }
 
@@ -352,12 +393,18 @@ fn og_page(slug: &str, title: &str, desc: &str) -> String {
 <meta property="og:title" content="{t}">
 <meta property="og:description" content="{d}">
 <meta property="og:image" content="{img}">
+<meta property="og:image:secure_url" content="{img}">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{t}">
+<meta property="og:site_name" content="NIPS-CERN">
+<meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{t}">
 <meta name="twitter:description" content="{d}">
 <meta name="twitter:image" content="{img}">
 <link rel="canonical" href="{url}">
-<meta http-equiv="refresh" content="0; url={spa}">
 <script>location.replace('{spa}' + location.hash);</script>
 </head>
 <body style="background:#070a12;color:#c9d4e6;font-family:system-ui,sans-serif;padding:2rem">
@@ -370,7 +417,7 @@ fn og_page(slug: &str, title: &str, desc: &str) -> String {
 
 // ---- driver ----
 
-fn process_post(post: &Value, opt: &usvg::Options, dist: &Path, news_dir: &Path) -> Result<(), Box<dyn Error>> {
+fn process_post(post: &Value, opt: &usvg::Options, dist: &Path, news_dir: &Path, repo: &Path) -> Result<(), Box<dyn Error>> {
     let slug = slug_of(post);
     if slug.is_empty() {
         return Ok(());
@@ -383,13 +430,16 @@ fn process_post(post: &Value, opt: &usvg::Options, dist: &Path, news_dir: &Path)
     let out_dir = dist.join("share").join(&slug);
     fs::create_dir_all(&out_dir)?;
 
-    // Decode the cover once per size.
-    let cover_bytes = if cover_url.is_empty() { None } else { fetch_cover(cover_url) };
+    // Decode the cover once per size (absolute URL → fetch; relative → local file).
+    let cover_bytes = load_cover(cover_url, repo);
+    if cover_bytes.is_none() && !cover_url.is_empty() {
+        println!("  ! capa não carregou: {cover_url}");
+    }
 
     for f in FORMATS {
         let uri = cover_bytes
             .as_ref()
-            .and_then(|b| cover_data_uri(b, f.w, f.h));
+            .and_then(|b| cover_data_uri(b, f.w * SS, f.h * SS));
         let variants: Vec<String> = if f.text { langs.clone() } else { vec!["_".to_string()] };
         for lang in &variants {
             let title = if f.text { title_for(post, lang) } else { String::new() };
@@ -420,6 +470,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut opt = usvg::Options::default();
     opt.fontdb_mut().load_font_data(DM_TTF.to_vec());
     opt.fontdb_mut().load_font_data(INTER_TTF.to_vec());
+    opt.fontdb_mut().load_font_data(MONO_TTF.to_vec());
 
     // Which posts? default: all in news.json (+ featured). Or slugs from argv.
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -437,7 +488,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         if !args.is_empty() && !args.iter().any(|a| a == &slug || Some(a.as_str()) == post.get("id").and_then(Value::as_str)) {
             continue;
         }
-        process_post(post, &opt, &dist, &news_dir)?;
+        process_post(post, &opt, &dist, &news_dir, &repo)?;
         count += 1;
     }
 

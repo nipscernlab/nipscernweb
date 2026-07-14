@@ -414,7 +414,7 @@
 
       // Brand deep links. On mobile these open the installed app directly.
       const socials = [
-        { cls: 'share-wa', icon: 'wa', key: 'news.share_wa', href: `https://wa.me/?text=${enc(title + ' — ' + url)}` },
+        { cls: 'share-wa', icon: 'wa', key: 'news.share_wa', href: `https://wa.me/?text=${enc(title + ': ' + url)}` },
         { cls: 'share-x',  icon: 'x',  key: 'news.share_x',  href: `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}` },
         { cls: 'share-tg', icon: 'tg', key: 'news.share_tg', href: `https://t.me/share/url?url=${enc(url)}&text=${enc(title)}` },
         { cls: 'share-li', icon: 'li', key: 'news.share_li', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
@@ -428,10 +428,10 @@
         <div class="share-social-row">
           ${socialsHtml}
           <button type="button" class="share-social share-copy" aria-label="${t('news.copy_link')}" data-i18n-aria="news.copy_link"><i class="ph ph-link" aria-hidden="true"></i></button>
+          <button type="button" class="share-social share-download" aria-expanded="false" aria-label="${t('news.share_download')}" data-i18n-aria="news.share_download"><i class="ph ph-images" aria-hidden="true"></i></button>
           <button type="button" class="share-social share-native" aria-label="${t('news.share_native')}" data-i18n-aria="news.share_native" hidden><i class="ph ph-share-network" aria-hidden="true"></i></button>
         </div>
         <button type="button" class="share-caption-btn" data-i18n="news.share_caption">${t('news.share_caption')}</button>
-        <button type="button" class="share-download-toggle" aria-expanded="false" data-i18n="news.share_download"><i class="ph ph-download-simple" aria-hidden="true"></i> ${t('news.share_download')}</button>
         <span class="share-toast" role="status" aria-live="polite" hidden></span>`;
 
       const toast = container.querySelector('.share-toast');
@@ -450,9 +450,10 @@
         copyText(caption).then(() => showToast(t('news.caption_copied')));
       });
 
-      // Native Web Share — mobile only (opens the OS sheet: Instagram, etc.).
+      // Native Web Share — touch devices only (opens the OS sheet: Instagram,
+      // etc.). Hidden on desktop so it isn't confused with "copy link".
       const nativeBtn = container.querySelector('.share-native');
-      if (navigator.share) {
+      if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
         nativeBtn.hidden = false;
         nativeBtn.addEventListener('click', () => {
           navigator.share({ title, text: title, url }).catch(() => { /* user cancelled */ });
@@ -482,7 +483,7 @@
       dlEl.className = 'share-downloads';
       dlEl.hidden = true;
       footerRow.appendChild(dlEl);
-      const toggle = container.querySelector('.share-download-toggle');
+      const toggle = container.querySelector('.share-download');
       let built = false;
       const activeLang = () => (dlLangs.includes(getLang && getLang()) ? getLang() : 'en');
 
