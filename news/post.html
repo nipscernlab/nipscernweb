@@ -464,7 +464,7 @@
       // CDN_VER busts Cloudflare's 1-year image cache — bump on every image
       // regeneration to match IMG_VER in tools/share-gen/src/main.rs.
       const CDN_SHARE = 'https://cdn.nipscern.com/share';
-      const CDN_VER = '4';
+      const CDN_VER = '5';
       const trans = post.translations || {};
       const dlLangs = Array.from(new Set(['en', ...Object.keys(trans)]))
         .filter(l => l === 'en' ? true : (trans[l] && (trans[l].title || trans[l].subtitle)));

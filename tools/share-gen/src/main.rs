@@ -26,7 +26,7 @@ const CDN: &str = "https://cdn.nipscern.com/share";
 // Cache-buster: the CDN (Cloudflare) caches images for a year, so bump this on
 // every image regeneration to force fresh delivery. MUST match CDN_VER in
 // news/post.html. See tools/share-gen/README.md.
-const IMG_VER: &str = "4";
+const IMG_VER: &str = "5";
 const BRAND: &str = "#7cb5ff";
 const BRAND_DEEP: &str = "#5b9cf6";
 
