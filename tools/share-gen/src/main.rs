@@ -26,7 +26,7 @@ const CDN: &str = "https://cdn.nipscern.com/share";
 // Cache-buster: the CDN (Cloudflare) caches images for a year, so bump this on
 // every image regeneration to force fresh delivery. MUST match CDN_VER in
 // news/post.html. See tools/share-gen/README.md.
-const IMG_VER: &str = "3";
+const IMG_VER: &str = "4";
 const BRAND: &str = "#7cb5ff";
 const BRAND_DEEP: &str = "#5b9cf6";
 
@@ -34,8 +34,9 @@ const DM_TTF: &[u8] = include_bytes!("../fonts/DMSerifDisplay-Regular.ttf");
 const INTER_TTF: &[u8] = include_bytes!("../fonts/Inter-Regular.ttf");
 const MONO_TTF: &[u8] = include_bytes!("../fonts/JetBrainsMono.ttf");
 
-// 2× supersampling: render at double size, then downscale — crisp text & mesh.
-const SS: u32 = 2;
+// 3× supersampling: render at triple size, then Lanczos-downscale — maximum
+// text/line crispness at the cost of render time (local, one-off: worth it).
+const SS: u32 = 3;
 
 struct Format {
     key: &'static str,
@@ -207,28 +208,36 @@ fn brandmark(x: f32, y: f32, scale: f32) -> String {
     )
 }
 
-/// A neon-blue honeycomb of single-line hexagons over the lower region, with a
-/// soft opacity fade at the top and bottom so it blends into the dark scrim
-/// (no hard edges). Pointy-top hexagons in a proper honeycomb — shared edges
-/// overlap, so it reads as one continuous mesh, not doubled outlines.
-fn hex_mesh(w: f32, h: f32, top: f32, r: f32, sw: f32) -> String {
+/// A neon-blue honeycomb of single-line hexagons confined to the band between
+/// `top` and `bottom` (the top of the title block), with a soft opacity fade
+/// at both ends so it blends into the dark scrim — it must never run over the
+/// title. Pointy-top hexagons in a proper honeycomb — shared edges overlap,
+/// so it reads as one continuous mesh, not doubled outlines.
+fn hex_mesh(w: f32, top: f32, bottom: f32, r: f32, sw: f32) -> String {
     const NEON: &str = "#3ad2ff";
     let s = 0.866_025_4 * r; // √3/2 · r  (half-width)
     let dx = 2.0 * s;
     let dy = 1.5 * r;
-    let rows = ((h - top) / dy).ceil() as i32 + 2;
+    let span = bottom - top;
+    if span < dy * 2.0 {
+        return String::new();
+    }
+    let rows = (span / dy).ceil() as i32;
     let cols = (w / dx).ceil() as i32 + 2;
     let mut out = format!(
         r##"<g fill="none" stroke="{NEON}" stroke-width="{sw}" stroke-linejoin="round">"##
     );
     for row in 0..rows {
         let cy = top + row as f32 * dy;
+        if cy + r > bottom {
+            break;
+        }
         let x_off = if row % 2 == 1 { s } else { 0.0 };
-        // Fade: peak in the middle band, transparent toward the bright image
-        // (top) and toward the darkest bottom.
-        let frac = ((cy - top) / (h - top)).clamp(0.0, 1.0);
-        let fade_in = (frac / 0.30).clamp(0.0, 1.0);
-        let fade_out = ((1.0 - frac) / 0.28).clamp(0.0, 1.0);
+        // Fade: peak in the middle of the band, transparent toward the bright
+        // image (top) and toward the title zone (bottom).
+        let frac = ((cy - top) / span).clamp(0.0, 1.0);
+        let fade_in = (frac / 0.35).clamp(0.0, 1.0);
+        let fade_out = ((1.0 - frac) / 0.35).clamp(0.0, 1.0);
         let op = 0.20 * fade_in.min(fade_out);
         if op <= 0.02 {
             continue;
@@ -242,6 +251,77 @@ fn hex_mesh(w: f32, h: f32, top: f32, r: f32, sw: f32) -> String {
             ));
         }
     }
+    out.push_str("</g>");
+    out
+}
+
+/// Point on a quadratic Bézier at parameter t.
+fn qbez(p0: (f32, f32), c: (f32, f32), p1: (f32, f32), t: f32) -> (f32, f32) {
+    let u = 1.0 - t;
+    (
+        u * u * p0.0 + 2.0 * u * t * c.0 + t * t * p1.0,
+        u * u * p0.1 + 2.0 * u * t * c.1 + t * t * p1.1,
+    )
+}
+
+/// The signature background of every NIPS-CERN news card: an "event display".
+/// A soft brand-blue glow rises from the lower-left corner (where the title
+/// sits) and a fan of thin, magnetically-bent particle tracks sweeps from
+/// off-canvas bottom-left across the title zone, each fading in and out along
+/// its own length, with a few bright hit-points where the "detector" saw them.
+/// Geometry is anchored to the title zone (`zone_top`) so it composes the same
+/// way on every format, and it is deterministic — the same quiet signature on
+/// every post rather than a new gimmick each time.
+fn event_layer(w: f32, h: f32, zone_top: f32, scale: f32) -> String {
+    const NEON: &str = "#3ad2ff";
+    let zh = (h - zone_top).max(1.0);
+    let sw = (1.5 * scale).max(1.0);
+    let p0 = (-0.08 * w, h + 0.08 * zh);
+    // (control point, end point, stroke gradient, stroke opacity, spark ts)
+    let tracks: [((f32, f32), (f32, f32), &str, f32, &[f32]); 5] = [
+        ((0.38 * w, zone_top + 0.14 * zh), (1.06 * w, zone_top + 0.02 * zh), "trkA", 0.30, &[0.58]),
+        ((0.44 * w, zone_top + 0.36 * zh), (1.06 * w, zone_top + 0.28 * zh), "trkB", 0.24, &[0.40, 0.70]),
+        ((0.50 * w, zone_top + 0.60 * zh), (1.06 * w, zone_top + 0.58 * zh), "trkA", 0.18, &[0.74]),
+        ((0.34 * w, zone_top + 0.52 * zh), (0.92 * w, h + 0.08 * zh), "trkB", 0.14, &[]),
+        ((0.56 * w, zone_top + 0.86 * zh), (1.06 * w, zone_top + 0.90 * zh), "trkA", 0.12, &[]),
+    ];
+    let glow_r = zh * 1.6;
+    let mut out = format!(
+        r##"<radialGradient id="glow" gradientUnits="userSpaceOnUse" cx="{gx:.1}" cy="{h}" r="{glow_r:.1}">
+<stop offset="0" stop-color="#2f6fe0" stop-opacity="0.34"/>
+<stop offset="0.55" stop-color="#2f6fe0" stop-opacity="0.10"/>
+<stop offset="1" stop-color="#2f6fe0" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="trkA" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="{BRAND}" stop-opacity="0"/>
+<stop offset="0.45" stop-color="{BRAND}" stop-opacity="1"/>
+<stop offset="1" stop-color="{BRAND}" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="trkB" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="{NEON}" stop-opacity="0"/>
+<stop offset="0.45" stop-color="{NEON}" stop-opacity="1"/>
+<stop offset="1" stop-color="{NEON}" stop-opacity="0"/>
+</linearGradient>
+<rect x="0" y="0" width="{w}" height="{h}" fill="url(#glow)"/>
+<g fill="none" stroke-width="{sw:.2}" stroke-linecap="round">"##,
+        gx = 0.10 * w,
+    );
+    let mut sparks = String::new();
+    for (c, p1, grad, op, ts) in &tracks {
+        out.push_str(&format!(
+            r##"<path d="M{:.1},{:.1} Q{:.1},{:.1} {:.1},{:.1}" stroke="url(#{grad})" stroke-opacity="{op}"/>"##,
+            p0.0, p0.1, c.0, c.1, p1.0, p1.1,
+        ));
+        for t in *ts {
+            let (sx, sy) = qbez(p0, *c, *p1, *t);
+            sparks.push_str(&format!(
+                r##"<circle cx="{sx:.1}" cy="{sy:.1}" r="{:.1}" fill="{NEON}" fill-opacity="0.10"/><circle cx="{sx:.1}" cy="{sy:.1}" r="{:.1}" fill="{NEON}" fill-opacity="0.45"/>"##,
+                7.0 * scale,
+                2.4 * scale,
+            ));
+        }
+    }
+    out.push_str(&sparks);
     out.push_str("</g>");
     out
 }
@@ -269,7 +349,7 @@ fn build_share_svg(format: &Format, title: &str, _category: &str, date: &str, co
 
     let scale = w / 1200.0;
     let pad = (64.0 * scale).round();
-    let title_fs = ((if format.key == "og" { 55.0 } else { 68.0 }) * scale).round();
+    let title_fs = ((if format.key == "og" { 60.0 } else { 76.0 }) * scale).round();
     let line_h = (title_fs * 1.14).round();
     let max_lines = if format.key == "og" { 4 } else if format.key == "story" { 6 } else { 5 };
     let lines = wrap_title(title, w - pad * 2.0, title_fs, max_lines);
@@ -286,8 +366,11 @@ fn build_share_svg(format: &Format, title: &str, _category: &str, date: &str, co
     let date_fs = (24.0 * scale).round();
     let rule_w = (70.0 * scale).round();
     let rule_h = (5.0 * scale).round().max(3.0);
-    // Decorative neon hexagonal mesh behind the title (tech feel, faded edges).
-    let mesh_top = (h * 0.30).round();
+    // Decorative neon hexagonal mesh: a band over the photo that fades out
+    // BEFORE the accent rule / title — it must never sit behind the text.
+    let rule_y = title_top - (title_fs * 0.9).round();
+    let mesh_top = (h * 0.28).round();
+    let mesh_bottom = (rule_y - 14.0 * scale).round();
     let mesh_r = 22.0 * scale;
     let mesh_sw = (1.3 * scale).max(0.9);
     // Date, top-left (no badge), bright.
@@ -314,14 +397,23 @@ fn build_share_svg(format: &Format, title: &str, _category: &str, date: &str, co
 </defs>
 {cover}
 <rect x="0" y="0" width="{w}" height="{h}" fill="url(#scrim)"/>
+<linearGradient id="titleShade" gradientUnits="userSpaceOnUse" x1="0" y1="{shade_top}" x2="0" y2="{h}">
+<stop offset="0" stop-color="#05070d" stop-opacity="0"/>
+<stop offset="0.38" stop-color="#05070d" stop-opacity="0.62"/>
+<stop offset="1" stop-color="#05070d" stop-opacity="0.92"/>
+</linearGradient>
+<rect x="0" y="{shade_top}" width="{w}" height="{shade_h}" fill="url(#titleShade)"/>
+{event}
 {mesh}
 {date_svg}
 <rect x="{pad}" y="{rule_y}" width="{rule_w}" height="{rule_h}" rx="2" fill="{BRAND_DEEP}"/>
 <text font-family="DM Serif Display" font-weight="400" font-size="{title_fs}" fill="#ffffff">{tspans}</text>
 {brand}
 </svg>"##,
-        rule_y = title_top - (title_fs * 0.9).round(),
-        mesh = hex_mesh(w, h, mesh_top, mesh_r, mesh_sw),
+        shade_top = (rule_y - 170.0 * scale).round(),
+        shade_h = h - (rule_y - 170.0 * scale).round(),
+        event = event_layer(w, h, rule_y, scale),
+        mesh = hex_mesh(w, mesh_top, mesh_bottom, mesh_r, mesh_sw),
         brand = brandmark(pad, brand_y, scale),
     )
 }
@@ -353,7 +445,7 @@ fn cover_data_uri(bytes: &[u8], w: u32, h: u32) -> Option<String> {
     let img = image::load_from_memory(bytes).ok()?;
     let filled = img.resize_to_fill(w, h, FilterType::Lanczos3);
     let mut jpg = Vec::new();
-    JpegEncoder::new_with_quality(&mut jpg, 92).encode_image(&filled).ok()?;
+    JpegEncoder::new_with_quality(&mut jpg, 97).encode_image(&filled).ok()?;
     Some(format!("data:image/jpeg;base64,{}", base64::engine::general_purpose::STANDARD.encode(&jpg)))
 }
 
@@ -372,7 +464,7 @@ fn render_jpeg(svg: &str, w: u32, h: u32, opt: &usvg::Options) -> Result<Vec<u8>
     let big = image::RgbImage::from_raw(pw, ph, rgb).ok_or("rgb build")?;
     let small = image::DynamicImage::ImageRgb8(big).resize_exact(w, h, FilterType::Lanczos3);
     let mut out = Vec::new();
-    JpegEncoder::new_with_quality(&mut out, 94).encode_image(&small)?;
+    JpegEncoder::new_with_quality(&mut out, 96).encode_image(&small)?;
     Ok(out)
 }
 
