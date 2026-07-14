@@ -461,7 +461,10 @@
       }
 
       // -- Download-images section (images hosted on cdn.nipscern.com/share) --
+      // CDN_VER busts Cloudflare's 1-year image cache — bump on every image
+      // regeneration to match IMG_VER in tools/share-gen/src/main.rs.
       const CDN_SHARE = 'https://cdn.nipscern.com/share';
+      const CDN_VER = '3';
       const trans = post.translations || {};
       const dlLangs = Array.from(new Set(['en', ...Object.keys(trans)]))
         .filter(l => l === 'en' ? true : (trans[l] && (trans[l].title || trans[l].subtitle)));
@@ -489,7 +492,7 @@
 
       function card(fmt, lang) {
         const name = fmt.text ? `${fmt.key}-${lang}` : fmt.key;
-        const href = `${CDN_SHARE}/${encodeURIComponent(slug)}/${name}.jpg`;
+        const href = `${CDN_SHARE}/${encodeURIComponent(slug)}/${name}.jpg?v=${CDN_VER}`;
         const cap = fmt.label + (fmt.text ? ` · ${lang.toUpperCase()}` : '');
         return `<figure class="share-dl-card" data-lang="${fmt.text ? lang : 'raw'}">
           <a class="share-dl-thumb" href="${href}" download="nipscern-${slug}-${name}.jpg" target="_blank" rel="noopener" aria-label="${cap}">
