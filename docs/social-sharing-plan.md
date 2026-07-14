@@ -1,7 +1,7 @@
 # Compartilhamento de notícias nas redes — estudo e plano
 
-Status: Fases 1–4 implementadas em 2026-07-14 (sistema completo, pronto para
-deploy do Worker). Fase 5 (auto-post) adiada. Data do estudo: 2026-07-14.
+Status: Fases 1–4 implementadas em 2026-07-14, versão 100% grátis (Rust local +
+CDN, sem servidor/Worker pago). Fase 5 (auto-post) adiada. Estudo: 2026-07-14.
 
 Objetivo: em cada notícia, permitir que qualquer visitante compartilhe a notícia
 nas redes com imagens prontas e bonitas, feitas pelo laboratório, e que o
@@ -244,31 +244,33 @@ Implementado na Fase 4 (`news/post.html` + `assets/css/main.css` + `data/i18n.js
 - Botão "Copiar legenda pro LinkedIn" (título + resumo + link, prontos para colar).
 - Tudo localizado (en/pt/fr/no) e reconstruído ao trocar de idioma.
 
-### Implementação completa (2026-07-14) — Fases 1 a 4
+### Implementação completa (2026-07-14) — Fases 1 a 4, 100% grátis (Opção B)
 
-Infra confirmada: **Cloudflare com proxy laranja ligado** → Opção A.
+Mudança de rumo: a primeira versão usava um **Cloudflare Worker** gerando imagem
+sob demanda — mas isso exige **Workers Paid** (a geração é CPU-bound). O cliente
+não quer pagar, então trocamos por **build-time local em Rust + CDN** (Opção B),
+sem servidor e sem custo. O Worker foi removido.
 
-Decisão técnica sobre o gerador: o plano falava em "crate Rust". Na prática usamos
-**resvg via `@resvg/resvg-wasm`** — é o mesmo motor resvg, mas o build WASM/JS que
-roda de forma confiável no Cloudflare Worker e que dá para validar localmente. As
-capas são `.webp` (o resvg não decodifica webp), então decodificamos com
-`@jsquash/webp` e re-codificamos PNG antes de embutir.
+Gerador: `tools/share-gen/` — crate Rust com **resvg** (render nativo), `image`
+(decodifica as capas `.webp` e encoda JPEG), rodando no PC com `cargo run`. O
+mesmo template SVG das Fases anteriores (og/square/portrait/story com título
+pt/en + capas cruas, marca NIPS⚛CERN, acentos do site, fontes OFL embutidas).
 
-Entregue (tudo validado renderizando notícias reais em headless):
+Entregue (validado renderizando notícias reais):
 
-- **Fase 1 — gerador**: template SVG único (`worker/share/src/template.js`) com os
-  formatos og/square/portrait/story (título pt/en) + variantes cruas, marca
-  NIPS⚛CERN e acentos do site. Fontes OFL embutidas. Preview local em
-  `worker/share/preview.mjs` (saída em `tools/share-out/`).
-- **Fase 2 — entrega**: Worker `worker/share/` serve `/share/<slug>/<formato>[-lang].png`
-  sob demanda, cacheado no edge; aceita `?w=` para miniaturas.
-- **Fase 3 — Open Graph por post**: o Worker injeta `og:*`, `twitter:*` e `canonical`
-  por slug em `/news/post` (HTMLRewriter), buscando o `/news/post.html` no origin.
-- **Fase 4 — cliente**: painel de compartilhamento (feito antes) + seção "Baixar
-  imagens" com abas pt/en e grade de miniaturas por formato, apontando para o Worker.
+- **Fase 1 — gerador (Rust)**: `tools/share-gen/src/main.rs`. `cargo run` produz
+  os 11 formatos por notícia em `dist/share/<slug>/*.jpg`.
+- **Fase 2 — entrega (CDN)**: as imagens vão para `cdn.nipscern.com/share/<slug>/…`
+  (mesmo CDN das capas, grátis). Sem servidor, sem edge compute.
+- **Fase 3 — Open Graph por post (estático)**: o gerador cria `news/<slug>.html`
+  com as tags OG certas (imagem no CDN) e redireciona humanos pro SPA. Crawlers
+  leem o OG; o link compartilhado vira `https://www.nipscern.com/news/<slug>`.
+- **Fase 4 — cliente**: painel de compartilhamento + seção "Baixar imagens"
+  (abas pt/en, grade por formato) apontando para o CDN; o compartilhar usa a
+  URL `/news/<slug>`.
 
-Falta só **você**: configurar o deploy do Worker (Workers Paid + rotas). Passo a
-passo em `worker/share/README.md`. Assim que as rotas subirem, a seção de download
-e os previews de link ficam ativos automaticamente.
+Fluxo do cliente ao publicar/editar notícia (passo a passo em
+`tools/share-gen/README.md`): `cargo run` → subir `dist/share/*` no CDN →
+commitar os `news/<slug>.html`. Tudo grátis, tudo no computador do usuário.
 
 Fase 5 (auto-post nas contas do lab) segue adiada, conforme decisão.

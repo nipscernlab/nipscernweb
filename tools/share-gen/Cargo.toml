@@ -1,0 +1,19 @@
+[package]
+name = "share-gen"
+version = "1.0.0"
+edition = "2021"
+description = "Local, free generator of NIPS-CERN social share images (resvg) + per-post Open Graph pages. Runs on your computer with `cargo run`."
+
+[[bin]]
+name = "share-gen"
+path = "src/main.rs"
+
+[dependencies]
+resvg = "0.44"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+serde_json = "1"
+ureq = "2"
+base64 = "0.22"
+
+[profile.release]
+opt-level = 3
