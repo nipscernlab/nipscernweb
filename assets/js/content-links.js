@@ -8,7 +8,7 @@ export function publicationKey(pub) {
 
 export function publicationUrl(pub) {
   const key = publicationKey(pub);
-  return key ? '/pdf-viewer?id=' + encodeURIComponent(key) : '';
+  return key ? '/pdf-viewer.html?id=' + encodeURIComponent(key) : '';
 }
 
 export function newsKey(post) {
@@ -17,6 +17,6 @@ export function newsKey(post) {
 
 export function newsPostUrl(post, prefix) {
   const key = newsKey(post);
-  const base = prefix || 'post';
+  const base = prefix || 'post.html';
   return key ? base + '?id=' + encodeURIComponent(key) : base;
 }
