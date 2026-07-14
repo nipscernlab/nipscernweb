@@ -16,9 +16,12 @@ Para cada notícia (de `data/news.json` e `data/news-featured.json`):
   humanos pro SPA (`/news/post?id=<slug>`) e entrega o preview certo pros crawlers
   do LinkedIn/WhatsApp/X. → **commitar no repo**.
 
-O mesmo template SVG (fundo = capa recortada + gradiente, badge da categoria,
-data, título em DM Serif Display, marca NIPS⚛CERN) alimenta todos os formatos.
-As capas `.webp` são decodificadas nativamente (crate `image`).
+O mesmo template SVG alimenta todos os formatos: capa recortada + scrim escuro,
+data, faixa de colmeia neon que termina no topo do título, e atrás do título o
+"event display" da casa — brilho azul profundo subindo do canto e trajetórias
+curvas de partículas com pontos de hit. Título em DM Serif Display, marca
+NIPS⚛CERN. As capas `.webp` são decodificadas nativamente (crate `image`).
+Render em 3× com downscale Lanczos (texto nítido), JPEG em qualidade alta.
 
 ## Rodar
 
