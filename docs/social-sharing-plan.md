@@ -1,7 +1,7 @@
 # Compartilhamento de notícias nas redes — estudo e plano
 
-Status: em implementação. Fase 4 (painel de compartilhamento) concluída em
-2026-07-14. Data do estudo: 2026-07-14.
+Status: Fases 1–4 implementadas em 2026-07-14 (sistema completo, pronto para
+deploy do Worker). Fase 5 (auto-post) adiada. Data do estudo: 2026-07-14.
 
 Objetivo: em cada notícia, permitir que qualquer visitante compartilhe a notícia
 nas redes com imagens prontas e bonitas, feitas pelo laboratório, e que o
@@ -244,13 +244,31 @@ Implementado na Fase 4 (`news/post.html` + `assets/css/main.css` + `data/i18n.js
 - Botão "Copiar legenda pro LinkedIn" (título + resumo + link, prontos para colar).
 - Tudo localizado (en/pt/fr/no) e reconstruído ao trocar de idioma.
 
-Próximos passos (em ordem):
+### Implementação completa (2026-07-14) — Fases 1 a 4
 
-1. Confirmar a infra (item bloqueante) para escolher Opção A ou B.
-2. Fase 1 — gerador de imagens em Rust (resvg). Precisa dos assets: logo(s) do
-   lab e fontes TTF (DM Serif Display, Inter) para embutir.
-3. Fase 3 — Open Graph por post (Worker ou HTML estático), pré-requisito para o
-   unfurl bonito do link.
-4. Fase 2 — entrega das imagens (Worker sob demanda ou build + CDN).
-5. Ampliar o painel da Fase 4 com a seção "Baixar imagens" (grade de miniaturas
-   por idioma/formato) assim que o gerador existir.
+Infra confirmada: **Cloudflare com proxy laranja ligado** → Opção A.
+
+Decisão técnica sobre o gerador: o plano falava em "crate Rust". Na prática usamos
+**resvg via `@resvg/resvg-wasm`** — é o mesmo motor resvg, mas o build WASM/JS que
+roda de forma confiável no Cloudflare Worker e que dá para validar localmente. As
+capas são `.webp` (o resvg não decodifica webp), então decodificamos com
+`@jsquash/webp` e re-codificamos PNG antes de embutir.
+
+Entregue (tudo validado renderizando notícias reais em headless):
+
+- **Fase 1 — gerador**: template SVG único (`worker/share/src/template.js`) com os
+  formatos og/square/portrait/story (título pt/en) + variantes cruas, marca
+  NIPS⚛CERN e acentos do site. Fontes OFL embutidas. Preview local em
+  `worker/share/preview.mjs` (saída em `tools/share-out/`).
+- **Fase 2 — entrega**: Worker `worker/share/` serve `/share/<slug>/<formato>[-lang].png`
+  sob demanda, cacheado no edge; aceita `?w=` para miniaturas.
+- **Fase 3 — Open Graph por post**: o Worker injeta `og:*`, `twitter:*` e `canonical`
+  por slug em `/news/post` (HTMLRewriter), buscando o `/news/post.html` no origin.
+- **Fase 4 — cliente**: painel de compartilhamento (feito antes) + seção "Baixar
+  imagens" com abas pt/en e grade de miniaturas por formato, apontando para o Worker.
+
+Falta só **você**: configurar o deploy do Worker (Workers Paid + rotas). Passo a
+passo em `worker/share/README.md`. Assim que as rotas subirem, a seção de download
+e os previews de link ficam ativos automaticamente.
+
+Fase 5 (auto-post nas contas do lab) segue adiada, conforme decisão.

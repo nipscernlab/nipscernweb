@@ -427,6 +427,7 @@
           <button type="button" class="share-social share-native" aria-label="${t('news.share_native')}" data-i18n-aria="news.share_native" hidden><i class="ph ph-share-network" aria-hidden="true"></i></button>
         </div>
         <button type="button" class="share-caption-btn" data-i18n="news.share_caption">${t('news.share_caption')}</button>
+        <button type="button" class="share-download-toggle" aria-expanded="false" data-i18n="news.share_download"><i class="ph ph-download-simple" aria-hidden="true"></i> ${t('news.share_download')}</button>
         <span class="share-toast" role="status" aria-live="polite" hidden></span>`;
 
       const toast = container.querySelector('.share-toast');
@@ -453,6 +454,73 @@
           navigator.share({ title, text: title, url }).catch(() => { /* user cancelled */ });
         });
       }
+
+      // -- Download-images section (served by the /share/ Worker) -------------
+      const slug = post.slug || post.id;
+      const trans = post.translations || {};
+      const dlLangs = Array.from(new Set(['en', ...Object.keys(trans)]))
+        .filter(l => l === 'en' ? true : (trans[l] && (trans[l].title || trans[l].subtitle)));
+      // format key → {aspect label, with-text?}. Mirrors worker/share FORMATS.
+      const DL_FORMATS = [
+        { key: 'og',        label: 'Link · 1.91:1',  text: true  },
+        { key: 'square',    label: 'Feed · 1:1',     text: true  },
+        { key: 'portrait',  label: 'Portrait · 4:5', text: true  },
+        { key: 'story',     label: 'Story · 9:16',   text: true  },
+        { key: 'raw',       label: 'Cover · 1.91:1', text: false },
+        { key: 'rawsquare', label: 'Cover · 1:1',    text: false },
+        { key: 'rawstory',  label: 'Cover · 9:16',   text: false },
+      ];
+      // The grid lives as a full-width sibling of the button panel (so it can
+      // span the whole footer, not just the right-aligned button cluster).
+      const footerRow = container.parentElement;
+      footerRow.querySelectorAll('.share-downloads').forEach(n => n.remove());
+      const dlEl = document.createElement('div');
+      dlEl.className = 'share-downloads';
+      dlEl.hidden = true;
+      footerRow.appendChild(dlEl);
+      const toggle = container.querySelector('.share-download-toggle');
+      let built = false;
+      const activeLang = () => (dlLangs.includes(getLang && getLang()) ? getLang() : 'en');
+
+      function card(fmt, lang) {
+        const name = fmt.text ? `${fmt.key}-${lang}` : fmt.key;
+        const href = `/share/${encodeURIComponent(slug)}/${name}.png`;
+        const cap = fmt.label + (fmt.text ? ` · ${lang.toUpperCase()}` : '');
+        return `<figure class="share-dl-card" data-lang="${fmt.text ? lang : 'raw'}">
+          <a class="share-dl-thumb" href="${href}" download="nipscern-${slug}-${name}.png" target="_blank" rel="noopener" aria-label="${cap}">
+            <img loading="lazy" src="${href}?w=360" alt="" onerror="this.closest('.share-dl-card').classList.add('is-missing')">
+            <span class="share-dl-badge"><i class="ph ph-download-simple" aria-hidden="true"></i></span>
+          </a>
+          <figcaption>${cap}</figcaption>
+        </figure>`;
+      }
+
+      function buildDownloads() {
+        const tabs = dlLangs.length > 1
+          ? `<div class="share-dl-tabs" role="tablist">${dlLangs.map(l =>
+              `<button type="button" class="share-dl-tab${l === activeLang() ? ' is-active' : ''}" data-lang="${l}">${l.toUpperCase()}</button>`).join('')}</div>`
+          : '';
+        const cards = DL_FORMATS.map(f => f.text ? dlLangs.map(l => card(f, l)).join('') : card(f)).join('');
+        dlEl.innerHTML = `<p class="share-dl-hint" data-i18n="news.dl_hint">${t('news.dl_hint')}</p>${tabs}<div class="share-dl-grid">${cards}</div>`;
+        applyLangFilter(activeLang());
+        dlEl.querySelectorAll('.share-dl-tab').forEach(btn => btn.addEventListener('click', () => {
+          dlEl.querySelectorAll('.share-dl-tab').forEach(b => b.classList.toggle('is-active', b === btn));
+          applyLangFilter(btn.dataset.lang);
+        }));
+      }
+      function applyLangFilter(lang) {
+        dlEl.querySelectorAll('.share-dl-card').forEach(c => {
+          const dl = c.getAttribute('data-lang');
+          c.style.display = (dl === 'raw' || dl === lang) ? '' : 'none';
+        });
+      }
+
+      toggle.addEventListener('click', () => {
+        const open = dlEl.hasAttribute('hidden');
+        if (open && !built) { buildDownloads(); built = true; }
+        if (open) dlEl.removeAttribute('hidden'); else dlEl.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
     }
 
     let _currentPost = null;

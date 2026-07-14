@@ -1,0 +1,33 @@
+# nipscern.com share Worker — on-demand social images + per-post Open Graph.
+# See README.md for the full deploy walkthrough.
+name = "nipscern-share"
+main = "src/index.js"
+compatibility_date = "2024-11-06"
+
+# Bundle .wasm as WebAssembly modules and .ttf fonts as binary Data imports.
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+
+[[rules]]
+type = "Data"
+globs = ["**/*.ttf"]
+
+# Optional: where the worker reads the site + its data from. Leave unset in
+# production (the worker runs on the zone, so same-origin is correct). For
+# `wrangler dev` against a local server, run:
+#   wrangler dev --var ORIGIN:http://127.0.0.1:8099
+# [vars]
+# ORIGIN = ""
+
+# Routes — the worker must sit in front of these paths on the zone. Enable them
+# once the account/zone is wired up (dashboard → Workers Routes, or uncomment):
+# routes = [
+#   { pattern = "nipscern.com/share/*",      zone_name = "nipscern.com" },
+#   { pattern = "www.nipscern.com/share/*",  zone_name = "nipscern.com" },
+#   { pattern = "nipscern.com/news/post",     zone_name = "nipscern.com" },
+#   { pattern = "www.nipscern.com/news/post", zone_name = "nipscern.com" },
+# ]
+# NOTE: route ONLY the extensionless /news/post (not /news/post.html). The
+# worker fetches /news/post.html from origin for OG injection; keeping that path
+# unrouted guarantees the subrequest never re-enters the worker.
