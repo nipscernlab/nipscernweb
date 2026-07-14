@@ -42,7 +42,7 @@
       align-items: center;
       gap: var(--sp-6);
       flex-wrap: wrap;
-      margin: var(--sp-8) 0 0;
+      margin: 0;
     }
     .lhc-status-dot {
       width: 12px;
@@ -58,6 +58,19 @@
     .lhc-status-sub   { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
     .lhc-status-divider { width: 1px; height: 40px; background: var(--border-mid); flex-shrink: 0; }
     @media (max-width: 640px) { .lhc-status-divider { display: none; } .lhc-status-banner { gap: var(--sp-4); } }
+
+    /* Live indicator — pulsing dot + "LIVE" text next to the status label */
+    .lhc-live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #10b981; }
+    .lhc-live-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 0 rgba(16,185,129,0.5); animation: lhc-live-pulse 1.8s infinite; }
+    @keyframes lhc-live-pulse { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); } 70% { box-shadow: 0 0 0 6px rgba(16,185,129,0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); } }
+    /* Ticking countdown uses tabular figures so the digits don't jitter. */
+    .lhc-countdown { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    /* LS3 progress bar — spans the full banner width on its own row. */
+    .lhc-progress-row { width: 100%; }
+    .lhc-progress-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-4); margin-bottom: 6px; }
+    .lhc-progress { width: 100%; height: 6px; border-radius: 999px; background: var(--border-subtle); overflow: hidden; }
+    .lhc-progress-bar { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #5b9cf6, #88bdff); transition: width 0.8s ease; }
+    .lhc-updated { font-size: var(--text-xs); color: var(--text-muted); }
 
     /* Editorial / minimal overrides for the CERN page */
     .cern-section { padding: var(--sp-16) var(--container-pad); border-top: 1px solid var(--border-subtle); }
@@ -228,13 +241,13 @@
     <!-- ======================================================
          LHC STATUS BANNER
          ====================================================== -->
-    <div style="background:var(--bg-0);padding:0 var(--container-pad) var(--sp-4)">
+    <div style="background:var(--bg-0);padding:var(--sp-8) var(--container-pad) var(--sp-4)">
       <div style="max-width:var(--container-max);margin:0 auto">
         <div class="lhc-status-banner fade-up" id="lhc-status-banner" aria-label="LHC operational status">
           <div style="display:flex;align-items:center;gap:var(--sp-3)">
             <div class="lhc-status-dot shutdown" id="lhc-dot"></div>
             <div>
-              <div class="lhc-status-label">LHC Status</div>
+              <div class="lhc-status-label" style="display:flex;align-items:center;gap:var(--sp-2)">LHC Status <span class="lhc-live-badge" aria-hidden="true">Live</span></div>
               <div class="lhc-status-value" id="lhc-status-value">Loading…</div>
               <div class="lhc-status-sub" id="lhc-status-sub"></div>
             </div>
@@ -255,23 +268,33 @@
           <div>
             <div class="lhc-status-label">Next Milestone</div>
             <div class="lhc-status-value" id="lhc-next">—</div>
-            <div class="lhc-status-sub" id="lhc-next-sub"></div>
+            <div class="lhc-status-sub lhc-countdown" id="lhc-next-sub"></div>
           </div>
           <div style="margin-left:auto;display:flex;flex-direction:column;gap:var(--sp-2)">
             <div class="lhc-status-label" style="margin-bottom:4px">Live CERN Dashboards</div>
             <div class="lhc-live-links">
-              <a href="https://mcmstv.web.cern.ch/lhc_status" target="_blank" rel="noopener" class="lhc-live-link" aria-label="LHC Machine Status">
+              <a href="https://op-webtools.web.cern.ch/vistar/vistars.php?usr=LHC1" target="_blank" rel="noopener" class="lhc-live-link" aria-label="LHC Page 1 — live machine status">
                 <i class="ph ph-gauge" aria-hidden="true"></i>
-                LHC Status
+                LHC Page 1
               </a>
-              <a href="https://mcmstv.web.cern.ch/" target="_blank" rel="noopener" class="lhc-live-link" aria-label="CERN CMS Live Dashboards">
-                <i class="ph ph-monitor-play" aria-hidden="true"></i>
-                CMS / DAQ
-              </a>
-              <a href="https://op-webtools.web.cern.ch/vistar/" target="_blank" rel="noopener" class="lhc-live-link" aria-label="CERN Vistar Operational Displays">
+              <a href="https://op-webtools.web.cern.ch/vistar/vistars.php" target="_blank" rel="noopener" class="lhc-live-link" aria-label="CERN Vistar operational displays">
                 <i class="ph ph-browsers" aria-hidden="true"></i>
-                Vistar
+                Vistars
               </a>
+              <a href="https://home.cern/news/series/lhc-run-4" target="_blank" rel="noopener" class="lhc-live-link" aria-label="CERN news about the LHC and HL-LHC">
+                <i class="ph ph-newspaper" aria-hidden="true"></i>
+                CERN News
+              </a>
+            </div>
+          </div>
+          <!-- LS3 progress + last-updated stamp (full-width row) -->
+          <div class="lhc-progress-row">
+            <div class="lhc-progress-head">
+              <span class="lhc-status-label" id="lhc-progress-label">Long Shutdown 3 progress</span>
+              <span class="lhc-updated" id="lhc-updated"></span>
+            </div>
+            <div class="lhc-progress" role="progressbar" aria-labelledby="lhc-progress-label" aria-valuemin="0" aria-valuemax="100" id="lhc-progress" aria-valuenow="0">
+              <div class="lhc-progress-bar" id="lhc-progress-bar"></div>
             </div>
           </div>
         </div>
@@ -967,90 +990,105 @@
 
   <script type="module" src="assets/js/main.js?v=f7bc2f44f7"></script>
 
-  <!-- LHC Status widget (schedule-based, no external API required) -->
+  <!--
+    LHC Status widget — schedule-driven, no external API (a static site can't
+    poll CERN's operational network, and there is no public JSON feed). The
+    dates below are CERN's officially announced accelerator schedule; the panel
+    stays accurate on its own and the countdown/progress tick live off the
+    visitor's clock. Sources (verified 2026-07):
+      • home.cern/updated-schedule-cerns-accelerators — Run 3 extended to Jul 2026,
+        LS3 starts Jul 2026, Run 4 (HL-LHC) start-up Jun 2030.
+      • Live machine state: LHC Page 1 (op-webtools vistars), linked in the panel.
+  -->
   <script>
     (function () {
-      // Known LHC schedule milestones
-      // Source: CERN publicly announced schedule
+      // key milestones. `energy` is the centre-of-mass collision energy.
       const SCHEDULE = [
-        { start: new Date('2010-03-30'), end: new Date('2013-02-14'), run: 'Run 1', energy: '7–8 TeV', state: 'past' },
-        { start: new Date('2013-02-14'), end: new Date('2015-04-05'), run: 'Long Shutdown 1 (LS1)', energy: '—', state: 'past' },
-        { start: new Date('2015-04-05'), end: new Date('2018-12-03'), run: 'Run 2', energy: '13 TeV', state: 'past' },
-        { start: new Date('2018-12-03'), end: new Date('2022-04-22'), run: 'Long Shutdown 2 (LS2)', energy: '—', state: 'past' },
-        { start: new Date('2022-04-22'), end: new Date('2025-11-28'), run: 'Run 3', energy: '13.6 TeV', state: 'past' },
-        { start: new Date('2025-11-28'), end: new Date('2029-03-01'), run: 'Long Shutdown 3 (LS3)', energy: '—', state: 'shutdown' },
-        { start: new Date('2029-03-01'), end: new Date('2033-12-31'), run: 'Run 4 (HL-LHC)', energy: '13.6 TeV (target)', state: 'future' },
+        { start: new Date('2010-03-30T00:00:00Z'), end: new Date('2013-02-14T00:00:00Z'), run: 'Run 1',                 energy: '7–8 TeV',        state: 'past' },
+        { start: new Date('2013-02-14T00:00:00Z'), end: new Date('2015-04-05T00:00:00Z'), run: 'Long Shutdown 1 (LS1)', energy: '—',              state: 'past' },
+        { start: new Date('2015-04-05T00:00:00Z'), end: new Date('2018-12-03T00:00:00Z'), run: 'Run 2',                 energy: '13 TeV',         state: 'past' },
+        { start: new Date('2018-12-03T00:00:00Z'), end: new Date('2022-07-05T00:00:00Z'), run: 'Long Shutdown 2 (LS2)', energy: '—',              state: 'past' },
+        { start: new Date('2022-07-05T00:00:00Z'), end: new Date('2026-07-01T00:00:00Z'), run: 'Run 3',                 energy: '13.6 TeV',       state: 'past' },
+        { start: new Date('2026-07-01T00:00:00Z'), end: new Date('2030-06-01T00:00:00Z'), run: 'Long Shutdown 3 (LS3)', energy: '—',              state: 'shutdown' },
+        { start: new Date('2030-06-01T00:00:00Z'), end: new Date('2034-12-31T00:00:00Z'), run: 'Run 4 (HL-LHC)',        energy: '14 TeV (design)', state: 'future' },
       ];
+      const MS_DAY = 86400000;
 
-      function getLHCStatus() {
-        const now = new Date();
-        for (const phase of SCHEDULE) {
-          if (now >= phase.start && now < phase.end) return phase;
-        }
-        // After all known schedule
-        return { run: 'HL-LHC Era', energy: '13.6+ TeV', state: 'run' };
+      function currentPhase(now) {
+        for (const p of SCHEDULE) { if (now >= p.start && now < p.end) return p; }
+        return SCHEDULE[SCHEDULE.length - 1];
       }
+      function nextPhase(current) {
+        const i = SCHEDULE.indexOf(current);
+        return (i >= 0 && i + 1 < SCHEDULE.length) ? SCHEDULE[i + 1] : null;
+      }
+      function pad(n) { return String(n).padStart(2, '0'); }
 
-      function nextMilestone(current) {
-        const idx = SCHEDULE.indexOf(current);
-        if (idx >= 0 && idx + 1 < SCHEDULE.length) {
-          const next = SCHEDULE[idx + 1];
-          const diff = next.start - new Date();
-          const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-          return { label: next.run, days: days > 0 ? `in ~${days.toLocaleString()} days` : 'imminent' };
-        }
-        return null;
-      }
+      const el = (id) => document.getElementById(id);
 
       document.addEventListener('DOMContentLoaded', () => {
-        const phase = getLHCStatus();
-        const dot = document.getElementById('lhc-dot');
-        const statusVal = document.getElementById('lhc-status-value');
-        const statusSub = document.getElementById('lhc-status-sub');
-        const phaseEl  = document.getElementById('lhc-phase');
-        const phaseSub = document.getElementById('lhc-phase-sub');
-        const energyEl = document.getElementById('lhc-energy');
-        const energySub = document.getElementById('lhc-energy-sub');
-        const nextEl   = document.getElementById('lhc-next');
-        const nextSub  = document.getElementById('lhc-next-sub');
+        const phase = currentPhase(new Date());
+        const next  = nextPhase(phase);
+        const isShutdown = /shutdown/i.test(phase.run);
+        const isRun      = phase.state === 'run' || (!isShutdown && phase.state !== 'future');
 
-        if (!phase) return;
-
-        // Dot colour
+        // Status dot + label
+        const dot = el('lhc-dot');
         if (dot) {
-          dot.className = 'lhc-status-dot';
-          if (phase.state === 'run')      { dot.classList.add('run');      }
-          if (phase.state === 'shutdown') { dot.classList.add('shutdown'); }
-          if (phase.state === 'past')     { dot.classList.add('stop');     }
-          if (phase.state === 'future')   { dot.classList.add('stop');     }
+          dot.className = 'lhc-status-dot ' + (isShutdown ? 'shutdown' : (isRun ? 'run' : 'stop'));
         }
+        if (el('lhc-status-value')) el('lhc-status-value').textContent = isShutdown ? 'Long Shutdown' : 'Operational';
+        if (el('lhc-status-sub'))   el('lhc-status-sub').textContent   = isShutdown
+          ? 'Beams off — HL-LHC upgrade underway'
+          : 'Beams circulating — collecting data';
 
-        const isShutdown = phase.run.toLowerCase().includes('shutdown');
-        if (statusVal) statusVal.textContent = isShutdown ? 'Long Shutdown' : 'Operational';
-        if (statusSub) statusSub.textContent = isShutdown
-          ? 'LHC offline — upgrade works underway'
-          : 'LHC collecting collision data';
+        // Current phase
+        if (el('lhc-phase'))     el('lhc-phase').textContent     = phase.run;
+        if (el('lhc-phase-sub')) el('lhc-phase-sub').textContent =
+          phase.start.getUTCFullYear() + '–' + phase.end.getUTCFullYear();
 
-        if (phaseEl)  phaseEl.textContent  = phase.run;
-        if (phaseSub) {
-          const start = phase.start.getFullYear();
-          const end   = phase.end.getFullYear();
-          phaseSub.textContent = `${start}–${end}`;
-        }
-
-        if (energyEl)  energyEl.textContent  = phase.energy === '—' ? '—' : phase.energy;
-        if (energySub) energySub.textContent  = phase.energy === '—'
-          ? 'No collisions during shutdown'
+        // Collision energy
+        if (el('lhc-energy'))     el('lhc-energy').textContent     = phase.energy;
+        if (el('lhc-energy-sub')) el('lhc-energy-sub').textContent = isShutdown
+          ? 'Resumes at 14 TeV in Run 4'
           : 'Centre-of-mass energy';
 
-        const next = nextMilestone(phase);
-        if (next && nextEl) {
-          nextEl.textContent = next.label;
-          if (nextSub) nextSub.textContent = next.days;
-        } else if (nextEl) {
-          nextEl.textContent = 'HL-LHC Era';
-          if (nextSub) nextSub.textContent = 'ongoing';
+        // Next milestone
+        if (el('lhc-next')) el('lhc-next').textContent = next ? next.run : 'HL-LHC era';
+
+        // Progress row label reflects the current shutdown/run name
+        if (el('lhc-progress-label')) el('lhc-progress-label').textContent = phase.run + ' progress';
+
+        // Live countdown + progress — ticks every second off the visitor's clock.
+        function tick() {
+          const now = new Date();
+          // Countdown to the next milestone's start
+          if (next && el('lhc-next-sub')) {
+            const diff = next.start - now;
+            if (diff > 0) {
+              const d = Math.floor(diff / MS_DAY);
+              const h = Math.floor((diff % MS_DAY) / 3600000);
+              const m = Math.floor((diff % 3600000) / 60000);
+              const s = Math.floor((diff % 60000) / 1000);
+              el('lhc-next-sub').textContent = d.toLocaleString() + 'd ' + pad(h) + ':' + pad(m) + ':' + pad(s);
+            } else {
+              el('lhc-next-sub').textContent = 'starting now';
+            }
+          }
+          // Progress through the current phase
+          const span = phase.end - phase.start;
+          const pct = Math.max(0, Math.min(100, ((now - phase.start) / span) * 100));
+          const bar = el('lhc-progress-bar');
+          const wrap = el('lhc-progress');
+          if (bar) bar.style.width = pct.toFixed(1) + '%';
+          if (wrap) wrap.setAttribute('aria-valuenow', pct.toFixed(0));
+          if (el('lhc-updated')) {
+            el('lhc-updated').textContent = pct.toFixed(1) + '% complete · updated '
+              + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+          }
         }
+        tick();
+        setInterval(tick, 1000);
       });
     })();
   </script>
