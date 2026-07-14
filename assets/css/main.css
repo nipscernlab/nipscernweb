@@ -1098,6 +1098,15 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(0,0,0,0.1);
 }
 
+/* Home "Latest From the Lab": the news card carries a 16:9 cover, so its row is
+   tall. The publication card has no image and used to leave a large void at the
+   bottom. Make it a flex column that fills the shared row height and anchor the
+   "Read more" CTA to the bottom edge, mirroring the news card's balance. */
+#latest-pub-card .pub-card { display: flex; flex-direction: column; }
+#latest-pub-card .pub-card-body { flex: 1; display: flex; flex-direction: column; }
+#latest-pub-card .pub-abstract { margin-bottom: var(--sp-4); }
+#latest-pub-card .news-read-more { margin-top: auto; }
+
 /* News cards */
 .news-card {
   background: var(--bg-card);
