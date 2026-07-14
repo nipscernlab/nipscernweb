@@ -93,13 +93,10 @@
           <i class="ph ph-arrow-left" aria-hidden="true"></i>
           Back to News
         </a>
-        <div style="display:flex;align-items:center;gap:var(--sp-2)">
-          <span id="share-toast" style="font-size:var(--text-xs);color:#39ff14;display:none;font-weight:700;text-shadow:0 0 8px rgba(57,255,20,0.6)" data-i18n="news.link_copied">Link copied!</span>
-          <button id="share-btn" class="btn btn-ghost btn-sm" aria-label="Copy link to this post" data-i18n="news.copy_link">
-            <i class="ph ph-link" aria-hidden="true"></i>
-            Copy link
-          </button>
-        </div>
+        <!-- Generic share panel — deep links open the visitor's own apps
+             (WhatsApp/X/Telegram/LinkedIn), plus copy-link, native Web Share
+             on mobile and a ready-made LinkedIn caption. Populated by JS. -->
+        <div id="post-share" class="share-panel"></div>
       </div>
     </div>
 
@@ -367,6 +364,87 @@
       });
     }
 
+    /** Copy text to clipboard with a legacy fallback. Returns a Promise. */
+    function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+      return new Promise((resolve) => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+        document.body.removeChild(ta);
+        resolve();
+      });
+    }
+
+    /**
+     * Build the share panel for the current post. Deep links open the visitor's
+     * own apps (WhatsApp/X/Telegram/LinkedIn) — no lab account involved. The
+     * shared URL is always the canonical production URL of the post, and every
+     * share text carries that link. Title/excerpt are read from the live DOM so
+     * the panel stays correct across language changes; call again to rebuild.
+     */
+    function buildSharePanel(post) {
+      const container = document.getElementById('post-share');
+      if (!container || !post) return;
+
+      const url     = 'https://www.nipscern.com/' + newsPostUrl(post, 'news/post');
+      const title   = (document.getElementById('post-title')?.textContent || post.title || '').trim();
+      const excerpt = (document.getElementById('post-excerpt')?.textContent || post.excerpt || '').trim();
+      const enc     = encodeURIComponent;
+      const caption = [title, excerpt, url].filter(Boolean).join('\n\n');
+
+      // Brand deep links. On mobile these open the installed app directly.
+      const socials = [
+        { cls: 'share-wa', icon: 'ph-whatsapp-logo', key: 'news.share_wa', href: `https://wa.me/?text=${enc(title + ' — ' + url)}` },
+        { cls: 'share-x',  icon: 'ph-x-logo',        key: 'news.share_x',  href: `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}` },
+        { cls: 'share-tg', icon: 'ph-telegram-logo', key: 'news.share_tg', href: `https://t.me/share/url?url=${enc(url)}&text=${enc(title)}` },
+        { cls: 'share-li', icon: 'ph-linkedin-logo', key: 'news.share_li', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
+      ];
+      const socialsHtml = socials.map(s =>
+        `<a class="share-social ${s.cls}" href="${s.href}" target="_blank" rel="noopener noreferrer" aria-label="${t(s.key)}" data-i18n-aria="${s.key}"><i class="ph ${s.icon}" aria-hidden="true"></i></a>`
+      ).join('');
+
+      container.innerHTML = `
+        <span class="share-panel-label" data-i18n="news.share">${t('news.share')}</span>
+        <div class="share-social-row">
+          ${socialsHtml}
+          <button type="button" class="share-social share-copy" aria-label="${t('news.copy_link')}" data-i18n-aria="news.copy_link"><i class="ph ph-link" aria-hidden="true"></i></button>
+          <button type="button" class="share-social share-native" aria-label="${t('news.share_native')}" data-i18n-aria="news.share_native" hidden><i class="ph ph-share-network" aria-hidden="true"></i></button>
+        </div>
+        <button type="button" class="share-caption-btn" data-i18n="news.share_caption">${t('news.share_caption')}</button>
+        <span class="share-toast" role="status" aria-live="polite" hidden></span>`;
+
+      const toast = container.querySelector('.share-toast');
+      let toastTimer;
+      const showToast = (msg) => {
+        toast.textContent = msg;
+        toast.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.hidden = true; }, 2500);
+      };
+
+      container.querySelector('.share-copy').addEventListener('click', () => {
+        copyText(url).then(() => showToast(t('news.link_copied')));
+      });
+      container.querySelector('.share-caption-btn').addEventListener('click', () => {
+        copyText(caption).then(() => showToast(t('news.caption_copied')));
+      });
+
+      // Native Web Share — mobile only (opens the OS sheet: Instagram, etc.).
+      const nativeBtn = container.querySelector('.share-native');
+      if (navigator.share) {
+        nativeBtn.hidden = false;
+        nativeBtn.addEventListener('click', () => {
+          navigator.share({ title, text: title, url }).catch(() => { /* user cancelled */ });
+        });
+      }
+    }
+
     let _currentPost = null;
 
     async function loadPost() {
@@ -589,30 +667,8 @@
 
       document.getElementById('post-footer').style.display = 'block';
 
-      // Share button — copy link to clipboard
-      const shareBtn = document.getElementById('share-btn');
-      const shareToast = document.getElementById('share-toast');
-      if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
-          const url = window.location.href;
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).then(() => showToast());
-          } else {
-            const ta = document.createElement('textarea');
-            ta.value = url;
-            ta.style.cssText = 'position:fixed;opacity:0';
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            showToast();
-          }
-        });
-        function showToast() {
-          shareToast.style.display = 'inline';
-          setTimeout(() => { shareToast.style.display = 'none'; }, 2500);
-        }
-      }
+      // Generic share panel (deep links + copy + native Web Share + LinkedIn caption)
+      buildSharePanel(post);
     }
 
     document.addEventListener('DOMContentLoaded', loadPost);
@@ -647,6 +703,7 @@
             if (tags[i]) tags[i].setAttribute('aria-label', nm);
           });
         }
+        buildSharePanel(_currentPost);
         return;
       }
       try {
@@ -662,6 +719,7 @@
         document.getElementById('page-title').textContent   = (tr.title || '') + ' — NIPS-CERN';
         renderEditedDate(featured.date_edited);
         renderLangFlag(featured);
+        buildSharePanel(_currentPost);
         const bodyEl = document.getElementById('post-body');
         // Remove any existing TOC layout wrapper before re-rendering
         const layout = document.querySelector('.post-featured-layout');
