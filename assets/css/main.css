@@ -1098,6 +1098,72 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(0,0,0,0.1);
 }
 
+/* News-post share panel — generic deep links (visitor shares with their own
+   accounts), copy-link, native Web Share and a ready-made LinkedIn caption. */
+.share-panel {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.share-panel-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.share-social-row { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.share-social {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-mid);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+}
+.share-social:hover {
+  color: #fff;
+  border-color: var(--brand-mid);
+  background: var(--brand);
+  transform: translateY(-2px);
+}
+/* Brand-tinted hovers so each network is recognisable. */
+.share-social.share-wa:hover { background: #25D366; border-color: #25D366; }
+.share-social.share-tg:hover { background: #229ED9; border-color: #229ED9; }
+.share-social.share-x:hover  { background: #000;     border-color: #333;     }
+.share-social.share-li:hover { background: #0A66C2; border-color: #0A66C2; }
+.share-social:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.share-caption-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color var(--t-fast);
+}
+.share-caption-btn:hover { color: var(--brand-light, #88bdff); text-decoration: underline; }
+.share-toast {
+  font-size: var(--text-xs);
+  color: #39ff14;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+}
+.share-toast[hidden] { display: none; }
+
 /* Home "Latest From the Lab": the news card carries a 16:9 cover, so its row is
    tall. The publication card has no image and used to leave a large void at the
    bottom. Make it a flex column that fills the shared row height and anchor the
