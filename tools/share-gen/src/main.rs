@@ -26,7 +26,7 @@ const CDN: &str = "https://cdn.nipscern.com/share";
 // Cache-buster: the CDN (Cloudflare) caches images for a year, so bump this on
 // every image regeneration to force fresh delivery. MUST match CDN_VER in
 // news/post.html. See tools/share-gen/README.md.
-const IMG_VER: &str = "5";
+const IMG_VER: &str = "6";
 const BRAND: &str = "#7cb5ff";
 const BRAND_DEEP: &str = "#5b9cf6";
 
@@ -208,122 +208,90 @@ fn brandmark(x: f32, y: f32, scale: f32) -> String {
     )
 }
 
-/// A neon-blue honeycomb of single-line hexagons confined to the band between
-/// `top` and `bottom` (the top of the title block), with a soft opacity fade
-/// at both ends so it blends into the dark scrim — it must never run over the
-/// title. Pointy-top hexagons in a proper honeycomb — shared edges overlap,
-/// so it reads as one continuous mesh, not doubled outlines.
-fn hex_mesh(w: f32, top: f32, bottom: f32, r: f32, sw: f32) -> String {
-    const NEON: &str = "#3ad2ff";
-    let s = 0.866_025_4 * r; // √3/2 · r  (half-width)
-    let dx = 2.0 * s;
-    let dy = 1.5 * r;
-    let span = bottom - top;
-    if span < dy * 2.0 {
-        return String::new();
-    }
-    let rows = (span / dy).ceil() as i32;
-    let cols = (w / dx).ceil() as i32 + 2;
-    let mut out = format!(
-        r##"<g fill="none" stroke="{NEON}" stroke-width="{sw}" stroke-linejoin="round">"##
-    );
-    for row in 0..rows {
-        let cy = top + row as f32 * dy;
-        if cy + r > bottom {
-            break;
-        }
-        let x_off = if row % 2 == 1 { s } else { 0.0 };
-        // Fade: peak in the middle of the band, transparent toward the bright
-        // image (top) and toward the title zone (bottom).
-        let frac = ((cy - top) / span).clamp(0.0, 1.0);
-        let fade_in = (frac / 0.35).clamp(0.0, 1.0);
-        let fade_out = ((1.0 - frac) / 0.35).clamp(0.0, 1.0);
-        let op = 0.20 * fade_in.min(fade_out);
-        if op <= 0.02 {
-            continue;
-        }
-        for col in -1..cols {
-            let cx = x_off + col as f32 * dx;
-            out.push_str(&format!(
-                r##"<path d="M{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1} L{:.1},{:.1} Z" stroke-opacity="{:.3}"/>"##,
-                cx, cy - r, cx + s, cy - r / 2.0, cx + s, cy + r / 2.0,
-                cx, cy + r, cx - s, cy + r / 2.0, cx - s, cy - r / 2.0, op,
-            ));
-        }
-    }
-    out.push_str("</g>");
-    out
-}
-
-/// Point on a quadratic Bézier at parameter t.
-fn qbez(p0: (f32, f32), c: (f32, f32), p1: (f32, f32), t: f32) -> (f32, f32) {
-    let u = 1.0 - t;
-    (
-        u * u * p0.0 + 2.0 * u * t * c.0 + t * t * p1.0,
-        u * u * p0.1 + 2.0 * u * t * c.1 + t * t * p1.1,
-    )
-}
-
-/// The signature background of every NIPS-CERN news card: an "event display".
-/// A soft brand-blue glow rises from the lower-left corner (where the title
-/// sits) and a fan of thin, magnetically-bent particle tracks sweeps from
-/// off-canvas bottom-left across the title zone, each fading in and out along
-/// its own length, with a few bright hit-points where the "detector" saw them.
-/// Geometry is anchored to the title zone (`zone_top`) so it composes the same
-/// way on every format, and it is deterministic — the same quiet signature on
-/// every post rather than a new gimmick each time.
-fn event_layer(w: f32, h: f32, zone_top: f32, scale: f32) -> String {
-    const NEON: &str = "#3ad2ff";
+/// Soft brand-blue glow rising from the lower-left corner of the title zone.
+/// Shared by every background variant — it gives the dark scrim depth without
+/// competing with the photo or the text.
+fn glow_layer(w: f32, h: f32, zone_top: f32) -> String {
     let zh = (h - zone_top).max(1.0);
-    let sw = (1.5 * scale).max(1.0);
-    let p0 = (-0.08 * w, h + 0.08 * zh);
-    // (control point, end point, stroke gradient, stroke opacity, spark ts)
-    let tracks: [((f32, f32), (f32, f32), &str, f32, &[f32]); 5] = [
-        ((0.38 * w, zone_top + 0.14 * zh), (1.06 * w, zone_top + 0.02 * zh), "trkA", 0.30, &[0.58]),
-        ((0.44 * w, zone_top + 0.36 * zh), (1.06 * w, zone_top + 0.28 * zh), "trkB", 0.24, &[0.40, 0.70]),
-        ((0.50 * w, zone_top + 0.60 * zh), (1.06 * w, zone_top + 0.58 * zh), "trkA", 0.18, &[0.74]),
-        ((0.34 * w, zone_top + 0.52 * zh), (0.92 * w, h + 0.08 * zh), "trkB", 0.14, &[]),
-        ((0.56 * w, zone_top + 0.86 * zh), (1.06 * w, zone_top + 0.90 * zh), "trkA", 0.12, &[]),
-    ];
-    let glow_r = zh * 1.6;
-    let mut out = format!(
-        r##"<radialGradient id="glow" gradientUnits="userSpaceOnUse" cx="{gx:.1}" cy="{h}" r="{glow_r:.1}">
+    format!(
+        r##"<radialGradient id="glow" gradientUnits="userSpaceOnUse" cx="{gx:.1}" cy="{h}" r="{gr:.1}">
 <stop offset="0" stop-color="#2f6fe0" stop-opacity="0.34"/>
 <stop offset="0.55" stop-color="#2f6fe0" stop-opacity="0.10"/>
 <stop offset="1" stop-color="#2f6fe0" stop-opacity="0"/>
 </radialGradient>
-<linearGradient id="trkA" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="{BRAND}" stop-opacity="0"/>
-<stop offset="0.45" stop-color="{BRAND}" stop-opacity="1"/>
-<stop offset="1" stop-color="{BRAND}" stop-opacity="0"/>
-</linearGradient>
-<linearGradient id="trkB" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="{NEON}" stop-opacity="0"/>
-<stop offset="0.45" stop-color="{NEON}" stop-opacity="1"/>
-<stop offset="1" stop-color="{NEON}" stop-opacity="0"/>
-</linearGradient>
-<rect x="0" y="0" width="{w}" height="{h}" fill="url(#glow)"/>
-<g fill="none" stroke-width="{sw:.2}" stroke-linecap="round">"##,
+<rect x="0" y="0" width="{w}" height="{h}" fill="url(#glow)"/>"##,
         gx = 0.10 * w,
-    );
-    let mut sparks = String::new();
-    for (c, p1, grad, op, ts) in &tracks {
-        out.push_str(&format!(
-            r##"<path d="M{:.1},{:.1} Q{:.1},{:.1} {:.1},{:.1}" stroke="url(#{grad})" stroke-opacity="{op}"/>"##,
-            p0.0, p0.1, c.0, c.1, p1.0, p1.1,
-        ));
-        for t in *ts {
-            let (sx, sy) = qbez(p0, *c, *p1, *t);
-            sparks.push_str(&format!(
-                r##"<circle cx="{sx:.1}" cy="{sy:.1}" r="{:.1}" fill="{NEON}" fill-opacity="0.10"/><circle cx="{sx:.1}" cy="{sy:.1}" r="{:.1}" fill="{NEON}" fill-opacity="0.45"/>"##,
-                7.0 * scale,
-                2.4 * scale,
+        gr = zh * 1.6,
+    )
+}
+
+/// The signature background of every NIPS-CERN news card: the lab's hand-made
+/// PCB artwork ("Circuit Primary", 1440×560, traces flowing left→right with
+/// ring pads), recolored in two golds, rotated 180° so the traces point LEFT
+/// (entering from the right edge), faded out toward the pad tips and anchored
+/// to the bottom-right of the title zone. Gold over the deep-blue fade.
+fn circuit_layer(w: f32, h: f32, zone_top: f32, _scale: f32) -> String {
+    const GOLD: &str = "#f0c14b"; // primary tone (was cyan in the artwork)
+    const GOLD_DIM: &str = "#c1912f"; // secondary tone (was steel blue)
+    // Trace paths + ring-pad centres, verbatim from circuit-primary.svg
+    // (pads were donut shapes there; a stroked circle r=9.4/sw=6.25 is the
+    // same ring: outer radius 12.5, hole 6.25).
+    const TRACES_A: [&str; 3] = [
+        "M75 275L125 275L175 275L225 275M-25 275L25 275L75 275L125 325",
+        "M-25 325L25 325",
+        "M75 175L125 175M175 125L225 125L275 125M425 225L475 275L525 275L575 275M-25 175L25 175L75 175L125 125L175 125L225 175L275 225L325 225L375 225L425 225L475 225L525 225L575 225",
+    ];
+    const PADS_A: [(f32, f32); 7] = [
+        (125.0, 325.0), (225.0, 275.0),
+        (25.0, 325.0),
+        (575.0, 225.0), (125.0, 175.0), (275.0, 125.0), (575.0, 275.0),
+    ];
+    const TRACES_B: [&str; 1] = [
+        "M125 225L175 175M-25 225L25 225L75 225L125 225L175 225L225 225L275 275",
+    ];
+    const PADS_B: [(f32, f32); 2] = [(275.0, 275.0), (175.0, 175.0)];
+
+    let zh = (h - zone_top).max(1.0);
+    let s = (zh * 1.18) / 560.0;
+    let x_off = w - 1440.0 * s; // anchored bottom-right
+    let y_off = h - 560.0 * s;
+
+    let group = |traces: &[&str], pads: &[(f32, f32)], color: &str| -> String {
+        let mut g = format!(
+            r##"<g fill="none" stroke="{color}" stroke-width="8.33" stroke-linecap="round" stroke-linejoin="round">"##
+        );
+        for t in traces {
+            g.push_str(&format!(r##"<path d="{t}"/>"##));
+        }
+        for (cx, cy) in pads {
+            g.push_str(&format!(
+                r##"<circle cx="{cx}" cy="{cy}" r="9.4" stroke-width="6.25"/>"##
             ));
         }
-    }
-    out.push_str(&sparks);
-    out.push_str("</g>");
-    out
+        g.push_str("</g>");
+        g
+    };
+
+    format!(
+        r##"{glow}
+<linearGradient id="circFadeGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="{w}" y2="0">
+<stop offset="0.04" stop-color="#000000"/>
+<stop offset="0.32" stop-color="#8a8a8a"/>
+<stop offset="0.62" stop-color="#ffffff"/>
+</linearGradient>
+<mask id="circFade" maskUnits="userSpaceOnUse" x="0" y="0" width="{w}" height="{h}">
+<rect x="0" y="0" width="{w}" height="{h}" fill="url(#circFadeGrad)"/>
+</mask>
+<g opacity="0.32" mask="url(#circFade)">
+<g transform="translate({x_off:.1},{y_off:.1}) scale({s:.4}) rotate(180,720,280)">
+{ga}
+{gb}
+</g>
+</g>"##,
+        glow = glow_layer(w, h, zone_top),
+        ga = group(&TRACES_A, &PADS_A, GOLD),
+        gb = group(&TRACES_B, &PADS_B, GOLD_DIM),
+    )
 }
 
 /// Build the share SVG for one format. `cover_uri` is a JPEG/PNG data URI or None.
@@ -366,13 +334,10 @@ fn build_share_svg(format: &Format, title: &str, _category: &str, date: &str, co
     let date_fs = (24.0 * scale).round();
     let rule_w = (70.0 * scale).round();
     let rule_h = (5.0 * scale).round().max(3.0);
-    // Decorative neon hexagonal mesh: a band over the photo that fades out
-    // BEFORE the accent rule / title — it must never sit behind the text.
+    // Signature background behind the title: golden PCB traces over the
+    // deep-blue fade.
     let rule_y = title_top - (title_fs * 0.9).round();
-    let mesh_top = (h * 0.28).round();
-    let mesh_bottom = (rule_y - 14.0 * scale).round();
-    let mesh_r = 22.0 * scale;
-    let mesh_sw = (1.3 * scale).max(0.9);
+    let decor = circuit_layer(w, h, rule_y, scale);
     // Date, top-left (no badge), bright.
     let date_svg = if date.is_empty() {
         String::new()
@@ -390,21 +355,20 @@ fn build_share_svg(format: &Format, title: &str, _category: &str, date: &str, co
 <radialGradient id="bgFallback" cx="50%" cy="38%" r="80%">
 <stop offset="0%" stop-color="#12203a"/><stop offset="100%" stop-color="#070a12"/></radialGradient>
 <linearGradient id="scrim" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0%" stop-color="#05070d" stop-opacity="0.55"/>
-<stop offset="42%" stop-color="#05070d" stop-opacity="0.15"/>
-<stop offset="72%" stop-color="#05070d" stop-opacity="0.72"/>
-<stop offset="100%" stop-color="#05070d" stop-opacity="0.95"/></linearGradient>
+<stop offset="0%" stop-color="#081226" stop-opacity="0.55"/>
+<stop offset="42%" stop-color="#081226" stop-opacity="0.15"/>
+<stop offset="72%" stop-color="#0a1a38" stop-opacity="0.74"/>
+<stop offset="100%" stop-color="#0a1a38" stop-opacity="0.96"/></linearGradient>
 </defs>
 {cover}
 <rect x="0" y="0" width="{w}" height="{h}" fill="url(#scrim)"/>
 <linearGradient id="titleShade" gradientUnits="userSpaceOnUse" x1="0" y1="{shade_top}" x2="0" y2="{h}">
-<stop offset="0" stop-color="#05070d" stop-opacity="0"/>
-<stop offset="0.38" stop-color="#05070d" stop-opacity="0.62"/>
-<stop offset="1" stop-color="#05070d" stop-opacity="0.92"/>
+<stop offset="0" stop-color="#0a1a38" stop-opacity="0"/>
+<stop offset="0.38" stop-color="#0a1a38" stop-opacity="0.62"/>
+<stop offset="1" stop-color="#0a1a38" stop-opacity="0.94"/>
 </linearGradient>
 <rect x="0" y="{shade_top}" width="{w}" height="{shade_h}" fill="url(#titleShade)"/>
 {event}
-{mesh}
 {date_svg}
 <rect x="{pad}" y="{rule_y}" width="{rule_w}" height="{rule_h}" rx="2" fill="{BRAND_DEEP}"/>
 <text font-family="DM Serif Display" font-weight="400" font-size="{title_fs}" fill="#ffffff">{tspans}</text>
@@ -412,8 +376,7 @@ fn build_share_svg(format: &Format, title: &str, _category: &str, date: &str, co
 </svg>"##,
         shade_top = (rule_y - 170.0 * scale).round(),
         shade_h = h - (rule_y - 170.0 * scale).round(),
-        event = event_layer(w, h, rule_y, scale),
-        mesh = hex_mesh(w, mesh_top, mesh_bottom, mesh_r, mesh_sw),
+        event = decor,
         brand = brandmark(pad, brand_y, scale),
     )
 }
