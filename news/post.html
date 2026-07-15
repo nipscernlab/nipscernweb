@@ -464,19 +464,19 @@
       // CDN_VER busts Cloudflare's 1-year image cache — bump on every image
       // regeneration to match IMG_VER in tools/share-gen/src/main.rs.
       const CDN_SHARE = 'https://cdn.nipscern.com/share';
-      const CDN_VER = '7';
+      const CDN_VER = '8';
       const trans = post.translations || {};
       const dlLangs = Array.from(new Set(['en', ...Object.keys(trans)]))
         .filter(l => l === 'en' ? true : (trans[l] && (trans[l].title || trans[l].subtitle)));
       // format key → {aspect label, with-text?}. Mirrors tools/share-gen FORMATS.
       const DL_FORMATS = [
-        { key: 'og',        label: 'Link · 1.91:1',  text: true  },
-        { key: 'square',    label: 'Feed · 1:1',     text: true  },
-        { key: 'portrait',  label: 'Portrait · 4:5', text: true  },
-        { key: 'story',     label: 'Story · 9:16',   text: true  },
-        { key: 'raw',       label: 'Cover · 1.91:1', text: false },
-        { key: 'rawsquare', label: 'Cover · 1:1',    text: false },
-        { key: 'rawstory',  label: 'Cover · 9:16',   text: false },
+        { key: 'og',       label: 'Link · 1.91:1',  text: true  },
+        { key: 'portrait', label: 'Feed · 4:5',     text: true  },
+        { key: 'grid',     label: 'Grid · 3:4',     text: true  },
+        { key: 'story',    label: 'Story · 9:16',   text: true  },
+        { key: 'raw',      label: 'Cover · 1.91:1', text: false },
+        { key: 'rawgrid',  label: 'Cover · 3:4',    text: false },
+        { key: 'rawstory', label: 'Cover · 9:16',   text: false },
       ];
       // The grid lives as a full-width sibling of the button panel (so it can
       // span the whole footer, not just the right-aligned button cluster).

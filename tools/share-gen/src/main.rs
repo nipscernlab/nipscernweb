@@ -26,7 +26,7 @@ const CDN: &str = "https://cdn.nipscern.com/share";
 // Cache-buster: the CDN (Cloudflare) caches images for a year, so bump this on
 // every image regeneration to force fresh delivery. MUST match CDN_VER in
 // news/post.html. See tools/share-gen/README.md.
-const IMG_VER: &str = "7";
+const IMG_VER: &str = "8";
 const BRAND: &str = "#7cb5ff";
 const BRAND_DEEP: &str = "#5b9cf6";
 
@@ -44,14 +44,22 @@ struct Format {
     h: u32,
     text: bool,
 }
+// Sizes verified against 2026 platform guidance (Buffer/Metricool/Hootsuite/OG):
+//   og   1200x630  1.91:1  — Open Graph / LinkedIn / X / WhatsApp (630 is the
+//                            current cross-platform standard, ahead of old 627).
+//   port 1080x1350 4:5     — Instagram feed default (most feed presence).
+//   grid 1080x1440 3:4     — 2026 Instagram grid ratio: no crop in the profile
+//                            grid AND the feed (replaced the deprioritised 1:1).
+//   story 1080x1920 9:16   — Stories/Reels (title+brand kept in the safe band,
+//                            see build_share_svg).
 const FORMATS: &[Format] = &[
-    Format { key: "og",        w: 1200, h: 630,  text: true },
-    Format { key: "square",    w: 1080, h: 1080, text: true },
-    Format { key: "portrait",  w: 1080, h: 1350, text: true },
-    Format { key: "story",     w: 1080, h: 1920, text: true },
-    Format { key: "raw",       w: 1200, h: 630,  text: false },
-    Format { key: "rawsquare", w: 1080, h: 1080, text: false },
-    Format { key: "rawstory",  w: 1080, h: 1920, text: false },
+    Format { key: "og",       w: 1200, h: 630,  text: true },
+    Format { key: "portrait", w: 1080, h: 1350, text: true },
+    Format { key: "grid",     w: 1080, h: 1440, text: true },
+    Format { key: "story",    w: 1080, h: 1920, text: true },
+    Format { key: "raw",      w: 1200, h: 630,  text: false },
+    Format { key: "rawgrid",  w: 1080, h: 1440, text: false },
+    Format { key: "rawstory", w: 1080, h: 1920, text: false },
 ];
 
 
@@ -340,7 +348,12 @@ fn build_share_svg(format: &Format, title: &str, _category: &str, date: &str, co
     let max_lines = if format.key == "og" { 4 } else if format.key == "story" { 6 } else { 5 };
     let lines = wrap_title(title, w - pad * 2.0, title_fs, max_lines);
 
-    let brand_y = h - pad;
+    // Instagram Stories overlay UI on the bottom (~reply bar / reactions) and
+    // top (~profile row), so title + brandmark must sit inside the central safe
+    // band or they get hidden. Feed formats (og/portrait/grid) show the whole
+    // image, so they keep the bottom-anchored layout with no inset.
+    let bottom_safe = if format.key == "story" { (300.0 * scale).round() } else { 0.0 };
+    let brand_y = h - pad - bottom_safe;
     let title_bottom = brand_y - (96.0 * scale).round();
     let title_top = title_bottom - (lines.len().saturating_sub(1) as f32) * line_h;
     let tspans: String = lines

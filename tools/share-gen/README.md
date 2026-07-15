@@ -9,8 +9,9 @@ imagens de compartilhamento de cada notícia e as páginas de Open Graph por pos
 Para cada notícia (de `data/news.json` e `data/news-featured.json`):
 
 - **Imagens** em `dist/share/<slug>/` — JPEG, todos os formatos:
-  `og`, `square`, `portrait`, `story` (com título em `pt`/`en`) e `raw`,
-  `rawsquare`, `rawstory` (capa limpa, sem texto). → **subir para o CDN**.
+  `og` (1200×630), `portrait` (1080×1350, 4:5), `grid` (1080×1440, 3:4 — grade
+  do Instagram 2026), `story` (1080×1920, 9:16) com título em `pt`/`en`, e `raw`,
+  `rawgrid`, `rawstory` (capa limpa, sem texto). → **subir para o CDN**.
 - **Página de OG** em `../../news/<slug>.html` — HTML mínimo com as tags
   `og:*`/`twitter:*`/`canonical` corretas (imagem apontando pro CDN). Redireciona
   humanos pro SPA (`/news/post?id=<slug>`) e entrega o preview certo pros crawlers
