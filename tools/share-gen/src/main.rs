@@ -26,7 +26,7 @@ const CDN: &str = "https://cdn.nipscern.com/share";
 // Cache-buster: the CDN (Cloudflare) caches images for a year, so bump this on
 // every image regeneration to force fresh delivery. MUST match CDN_VER in
 // news/post.html. See tools/share-gen/README.md.
-const IMG_VER: &str = "6";
+const IMG_VER: &str = "7";
 const BRAND: &str = "#7cb5ff";
 const BRAND_DEEP: &str = "#5b9cf6";
 
@@ -80,13 +80,31 @@ fn s<'a>(post: &'a Value, key: &str) -> &'a str {
 
 fn title_for(post: &Value, lang: &str) -> String {
     if is_featured(post) {
+        // Featured posts may live in news-featured.json (titles only under
+        // translations, empty top-level) OR be a regular news.json post with
+        // featured:true (English title at top level, no translations.en).
+        // Priority: requested language → top-level → en → pt. Never let a
+        // missing translations.en.title silently fall through to Portuguese.
         let tr = &post["translations"];
-        for l in [lang, "en", "pt"] {
-            if let Some(t) = tr.get(l).and_then(|x| x.get("title")).and_then(Value::as_str) {
-                return t.to_string();
+        let tr_title = |l: &str| {
+            tr.get(l)
+                .and_then(|x| x.get("title"))
+                .and_then(Value::as_str)
+                .filter(|t| !t.is_empty())
+                .map(str::to_string)
+        };
+        if let Some(t) = tr_title(lang) {
+            return t;
+        }
+        if !s(post, "title").is_empty() {
+            return s(post, "title").to_string();
+        }
+        for l in ["en", "pt"] {
+            if let Some(t) = tr_title(l) {
+                return t;
             }
         }
-        return s(post, "title").to_string();
+        return String::new();
     }
     if lang == "en" {
         return s(post, "title").to_string();
