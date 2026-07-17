@@ -1468,9 +1468,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes foil-shimmer {
-  /* Bright blade sweeps back and forth across the title */
+  /* Soft luminous band drifts across the title */
   0%   { background-position: -100% center; }
   100% { background-position: 100% center; }
+}
+
+/* Ambient halo breathes gently, out of phase with the sweep so the glow
+   never reads as a hard-edged shape. */
+@keyframes foil-halo {
+  0%, 100% { filter: drop-shadow(0 0 18px rgba(120,177,255,0.16)) drop-shadow(0 0 3px rgba(255,255,255,0.10)); }
+  50%      { filter: drop-shadow(0 0 30px rgba(150,197,255,0.26)) drop-shadow(0 0 5px rgba(255,255,255,0.16)); }
+}
+
+/* The atom sits at the centre and reads as the light source, so its halo is
+   tighter and brighter than the title's. */
+@keyframes foil-halo-atom {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(120,177,255,0.35)) drop-shadow(0 0 4px rgba(255,255,255,0.22)); }
+  50%      { filter: drop-shadow(0 0 20px rgba(150,197,255,0.50)) drop-shadow(0 0 7px rgba(255,255,255,0.34)); }
 }
 
 .hero-title {
@@ -1481,32 +1495,40 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
   margin-bottom: var(--sp-6);
   /*
-   * Foil shimmer: deep blue base → mid-blue → icy blue → blinding white
-   * peak → icy blue → mid-blue → deep blue. Alternates direction.
-   * Inspired by light reflecting off a polished metallic surface.
+   * Foil shimmer: deep-blue base ramping through mid & icy blue into a soft
+   * white core, then back down. The ramp is intentionally long and multi-step
+   * so the leading/trailing edge of the highlight reads as a diffuse glow
+   * rather than a solid line. A separate breathing halo adds the ambient light.
    */
   background: linear-gradient(
-    90deg,
-    #1a4a8a 0%,      /* deep blue anchor */
-    #3a72c8 15%,
-    #5b9cf6 30%,     /* brand blue */
-    #5b9cf6 40%,
-    #88bdff 46%,     /* brightening */
-    #c2dcff 50%,     /* icy pre-peak */
-    #ffffff 52%,     /* blinding white — hot core */
-    #c2dcff 54%,     /* icy post-peak */
-    #88bdff 58%,
-    #5b9cf6 65%,     /* brand blue */
-    #5b9cf6 75%,
-    #3a72c8 88%,
-    #1a4a8a 100%     /* deep blue anchor */
+    100deg,
+    #16407d 0%,       /* deep blue anchor */
+    #224f8d 9%,
+    #3466b4 17%,
+    #4a86dd 27%,
+    #5b9cf6 35%,      /* brand blue */
+    #79b1ff 42%,      /* diffuse rise ... */
+    #a6ccff 46.5%,
+    #d9ebff 49%,
+    #ffffff 51%,      /* soft white core */
+    #ffffff 53%,
+    #d9ebff 55%,
+    #a6ccff 57.5%,    /* ... diffuse fall */
+    #79b1ff 62%,
+    #5b9cf6 69%,      /* brand blue */
+    #4a86dd 77%,
+    #3466b4 85%,
+    #224f8d 92%,
+    #16407d 100%      /* deep blue anchor */
   );
   background-size: 300% 100%;
   background-position: -100% center;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: foil-shimmer 6s ease-in-out infinite alternate-reverse;
+  animation:
+    foil-shimmer 7s ease-in-out infinite alternate-reverse,
+    foil-halo 5s ease-in-out infinite;
 }
 
 /* Atom icon inside hero title — uses mask-image so the shimmer gradient shows through,
@@ -1518,7 +1540,7 @@ h1, h2, h3, h4, h5, h6 {
   vertical-align: middle;
   position: relative;
   top: -0.10em;
-  opacity: 0.9;
+  opacity: 1;
   margin: 0 0.1em;
   /* Mask clips to the atom SVG shape */
   -webkit-mask-image: url('../icons/atom.svg');
@@ -1529,19 +1551,22 @@ h1, h2, h3, h4, h5, h6 {
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
   mask-position: center;
-  /* Same gradient as .hero-title but WITHOUT background-clip:text
+  /* Same diffuse gradient as .hero-title but WITHOUT background-clip:text
      (the mask handles the clipping instead) */
   background: linear-gradient(
-    90deg,
-    #1a4a8a 0%, #3a72c8 15%, #5b9cf6 30%, #5b9cf6 40%,
-    #88bdff 46%, #c2dcff 50%, #ffffff 52%, #c2dcff 54%,
-    #88bdff 58%, #5b9cf6 65%, #5b9cf6 75%, #3a72c8 88%, #1a4a8a 100%
+    100deg,
+    #16407d 0%, #224f8d 9%, #3466b4 17%, #4a86dd 27%, #5b9cf6 35%,
+    #79b1ff 42%, #a6ccff 46.5%, #d9ebff 49%, #ffffff 51%, #ffffff 53%,
+    #d9ebff 55%, #a6ccff 57.5%, #79b1ff 62%, #5b9cf6 69%, #4a86dd 77%,
+    #3466b4 85%, #224f8d 92%, #16407d 100%
   );
   background-size: 300% 100%;
   -webkit-background-clip: border-box;
   background-clip: border-box;
   -webkit-text-fill-color: initial;
-  animation: foil-shimmer 6s ease-in-out infinite alternate-reverse;
+  animation:
+    foil-shimmer 7s ease-in-out infinite alternate-reverse,
+    foil-halo-atom 5s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
