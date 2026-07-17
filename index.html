@@ -103,8 +103,10 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
 #hero-stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .hero-content{position:relative;z-index:1;width:100%;max-width:var(--container-max);margin:0 auto;padding:80px var(--container-pad);text-align:center}
 @keyframes foil-shimmer{0%{background-position:-100% center}100%{background-position:100% center}}
-.hero-title{font-family:var(--font-serif);font-size:clamp(4rem,12vw,9rem);line-height:1;letter-spacing:-.04em;font-weight:400;margin-bottom:24px;background:linear-gradient(90deg,#1a4a8a 0%,#3a72c8 15%,#5b9cf6 30%,#5b9cf6 40%,#88bdff 46%,#c2dcff 50%,#fff 52%,#c2dcff 54%,#88bdff 58%,#5b9cf6 65%,#5b9cf6 75%,#3a72c8 88%,#1a4a8a 100%);background-size:300% 100%;background-position:-100% center;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:foil-shimmer 6s ease-in-out infinite alternate-reverse}
-.hero-atom{width:.30em;height:.30em;display:inline-block;vertical-align:middle;position:relative;top:-.10em;opacity:.9;margin:0 .1em;-webkit-mask-image:url('assets/icons/atom.svg');mask-image:url('assets/icons/atom.svg');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;background:linear-gradient(90deg,#1a4a8a 0%,#3a72c8 15%,#5b9cf6 30%,#5b9cf6 40%,#88bdff 46%,#c2dcff 50%,#fff 52%,#c2dcff 54%,#88bdff 58%,#5b9cf6 65%,#5b9cf6 75%,#3a72c8 88%,#1a4a8a 100%);background-size:300% 100%;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:initial;animation:foil-shimmer 6s ease-in-out infinite alternate-reverse}
+@keyframes foil-halo{0%,100%{filter:drop-shadow(0 0 18px rgba(120,177,255,.16)) drop-shadow(0 0 3px rgba(255,255,255,.10))}50%{filter:drop-shadow(0 0 30px rgba(150,197,255,.26)) drop-shadow(0 0 5px rgba(255,255,255,.16))}}
+@keyframes foil-halo-atom{0%,100%{filter:drop-shadow(0 0 10px rgba(120,177,255,.35)) drop-shadow(0 0 4px rgba(255,255,255,.22))}50%{filter:drop-shadow(0 0 20px rgba(150,197,255,.50)) drop-shadow(0 0 7px rgba(255,255,255,.34))}}
+.hero-title{font-family:var(--font-serif);font-size:clamp(4rem,12vw,9rem);line-height:1;letter-spacing:-.04em;font-weight:400;margin-bottom:24px;background:linear-gradient(100deg,#16407d 0%,#224f8d 9%,#3466b4 17%,#4a86dd 27%,#5b9cf6 35%,#79b1ff 42%,#a6ccff 46.5%,#d9ebff 49%,#fff 51%,#fff 53%,#d9ebff 55%,#a6ccff 57.5%,#79b1ff 62%,#5b9cf6 69%,#4a86dd 77%,#3466b4 85%,#224f8d 92%,#16407d 100%);background-size:300% 100%;background-position:-100% center;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:foil-shimmer 7s ease-in-out infinite alternate-reverse,foil-halo 5s ease-in-out infinite}
+.hero-atom{width:.30em;height:.30em;display:inline-block;vertical-align:middle;position:relative;top:-.10em;opacity:1;margin:0 .1em;-webkit-mask-image:url('assets/icons/atom.svg');mask-image:url('assets/icons/atom.svg');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;background:linear-gradient(100deg,#16407d 0%,#224f8d 9%,#3466b4 17%,#4a86dd 27%,#5b9cf6 35%,#79b1ff 42%,#a6ccff 46.5%,#d9ebff 49%,#fff 51%,#fff 53%,#d9ebff 55%,#a6ccff 57.5%,#79b1ff 62%,#5b9cf6 69%,#4a86dd 77%,#3466b4 85%,#224f8d 92%,#16407d 100%);background-size:300% 100%;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:initial;animation:foil-shimmer 7s ease-in-out infinite alternate-reverse,foil-halo-atom 5s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.hero-title{animation:none;background:none;-webkit-text-fill-color:var(--text-primary);color:var(--text-primary)}.hero-atom{background:var(--text-primary)}}
 .hero-subtitle{font-size:clamp(var(--text-base),2vw,var(--text-lg));color:var(--text-secondary);line-height:1.7;max-width:640px;margin:0 auto 40px}
 .hero-actions{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
@@ -121,8 +123,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=70b9b4f73e" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=70b9b4f73e"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=3bdaaffe20" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=3bdaaffe20"></noscript>
 
   <!-- Google Fonts (async) -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -689,7 +691,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
     io.observe(f);
   })();
   </script>
-  <script type="module" src="assets/js/main.js?v=70b9b4f73e"></script>
+  <script type="module" src="assets/js/main.js?v=3bdaaffe20"></script>
 
 <script>
   window.addEventListener('load', function () {
