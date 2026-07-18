@@ -402,23 +402,6 @@
       const enc     = encodeURIComponent;
       const caption = [title, excerpt, url].filter(Boolean).join('\n\n');
 
-      // Instagram caption: PT title + excerpt + "link in bio" + hashtags from the
-      // post's tags. URLs aren't clickable on Instagram, so we drop the raw URL
-      // (kept in the generic caption above for LinkedIn/WhatsApp unfurls). Language
-      // is forced to PT (the account posts in Portuguese; see site/instagram.md in
-      // the gestao repo). EN is added by hand only on flagship posts.
-      const toHashtag = (tag) => {
-        const s = (tag || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
-          .replace(/[^A-Za-z0-9 ]/g, ' ').trim();
-        if (!s) return '';
-        return '#' + s.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
-      };
-      const igTr      = (post.translations && post.translations.pt) || {};
-      const igTitle   = (igTr.title || title || '').trim();
-      const igExcerpt = (igTr.excerpt || excerpt || '').trim();
-      const igTags    = (post.tags || []).map(toHashtag).filter(Boolean).join(' ');
-      const igCaption = [igTitle, igExcerpt, '🔗 Link na bio', igTags].filter(Boolean).join('\n\n');
-
       // Official brand marks (Simple Icons, CC0) drawn on a 24×24 grid — crisp
       // and correctly shaped, unlike the generic icon-font logos.
       const BRAND_SVG = {
@@ -449,8 +432,6 @@
           <button type="button" class="share-social share-native" aria-label="${t('news.share_native')}" data-i18n-aria="news.share_native" hidden><i class="ph ph-share-network" aria-hidden="true"></i></button>
         </div>
         <button type="button" class="share-caption-btn" data-i18n="news.share_caption">${t('news.share_caption')}</button>
-        <span class="share-caption-sep" aria-hidden="true" style="color:var(--text-muted);margin:0 6px">·</span>
-        <button type="button" class="share-caption-btn share-caption-ig-btn" data-i18n="news.share_caption_ig">${t('news.share_caption_ig')}</button>
         <span class="share-toast" role="status" aria-live="polite" hidden></span>`;
 
       const toast = container.querySelector('.share-toast');
@@ -467,9 +448,6 @@
       });
       container.querySelector('.share-caption-btn').addEventListener('click', () => {
         copyText(caption).then(() => showToast(t('news.caption_copied')));
-      });
-      container.querySelector('.share-caption-ig-btn').addEventListener('click', () => {
-        copyText(igCaption).then(() => showToast(t('news.caption_copied')));
       });
 
       // Native Web Share — touch devices only (opens the OS sheet: Instagram,
