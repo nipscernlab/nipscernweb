@@ -238,12 +238,12 @@
         "name": "SAPHO",
         "full": "Scalable-Architecture Processor for Hardware Optimization",
         "short": "Complete toolchain for processor creation and hardware–software co-design.",
-        "desc": "SAPHO is a complete hardware architecture and toolchain designed for processor creation, experimentation, and hardware–software co-design. It bundles together the YANC compiler toolchain, the POLARIS IDE, the YAWT Wave Tracer for signal analysis, and the PRISM RTL Viewer for processor circuit visualisation.",
+        "desc": "SAPHO is a complete hardware architecture and toolchain designed for processor creation, experimentation, and hardware–software co-design. It bundles together the YANC compiler toolchain, the AURORA IDE, the Surfer waveform viewer, and the PRISM RTL Viewer for processor circuit visualisation.",
         "features": {
           "title": "What SAPHO Includes",
           "yanc": "YANC compiler toolchain (CMM + assembly)",
-          "polaris": "POLARIS cross-platform IDE",
-          "yawt": "YAWT Wave Tracer for signal analysis",
+          "polaris": "AURORA desktop IDE",
+          "yawt": "Surfer waveform viewer",
           "prism": "PRISM RTL Viewer for processor visualisation",
           "platforms": "Windows and Linux support"
         }
@@ -261,11 +261,17 @@
           "integration": "Fully integrated into the SAPHO ecosystem"
         }
       },
+      "hits": {
+        "name": "HITS",
+        "full": "Hardware Impulse Train Synthesizer",
+        "short": "Real-time FPGA simulator of the ATLAS Tile Calorimeter readout.",
+        "desc": "HITS is a real-time FPGA simulator of the ATLAS Tile Calorimeter readout. It runs at 40 MHz on a Terasic DE10-Nano and rebuilds the front-end signal chain in synthesizable Verilog: pseudo-random hits following the LHC bunch-train structure, energy amplitudes drawn from measured distributions, electronic noise, analog shaping and an embedded pole-zero cancellation. It lets the group validate online energy-reconstruction without access to the experiment."
+      },
       "polaris": {
         "name": "POLARIS",
         "full": "Cross-Platform Graphical IDE for SAPHO",
         "short": "Modern, lightweight IDE built with Tauri and Rust for the SAPHO ecosystem.",
-        "desc": "POLARIS is a modern, cross-platform graphical development environment built with Tauri and Rust. It integrates Monaco Editor for code editing, the PRISM RTL Viewer, and the YAWT Wave Tracer, serving as the primary visual interface for SAPHO-based processor development. It is the lightweight, modular successor to AURORA.",
+        "desc": "POLARIS was a cross-platform graphical IDE for the SAPHO ecosystem, built with Tauri and Rust, with Monaco Editor, the PRISM RTL viewer and the YAWT wave tracer. It is archived; AURORA is the current IDE for SAPHO.",
         "features": {
           "title": "Key Features",
           "tauri": "Built with Tauri + Rust — lightweight and fast",
@@ -279,12 +285,12 @@
         "name": "AURORA",
         "full": "The IDE for SAPHO",
         "short": "The desktop IDE for SAPHO: write C±, compile, simulate and inspect, with AI-powered Aurora Intelligence.",
-        "desc": "AURORA is the desktop IDE for the SAPHO platform. You describe a processor in C±, then compile, simulate and inspect it without leaving the window: Monaco editor, Icarus Verilog and Verilator simulation, GTKWave, and the PRISM RTL viewer. Aurora Intelligence adds an AI assistant that drives the IDE through its own tools.",
+        "desc": "AURORA is the desktop IDE for the SAPHO platform. You describe a processor in C±, then compile, simulate and inspect it without leaving the window: Monaco editor, Icarus Verilog and Verilator simulation, Surfer, and the PRISM RTL viewer. Aurora Intelligence adds an AI assistant that drives the IDE through its own tools.",
         "features": {
           "title": "AURORA Features",
           "cmm": "CMM programming environment",
           "verilog": "Icarus Verilog simulation integration",
-          "gtkwave": "GTKWave waveform visualisation",
+          "gtkwave": "Surfer waveform visualisation",
           "prism": "PRISM RTL Viewer",
           "releases": "Active development, latest v6.3.2"
         },
@@ -394,7 +400,8 @@
       "credits": "Credits",
       "terms": "Terms",
       "privacy": "Privacy",
-      "qa": "Q&A"
+      "qa": "Q&A",
+      "archived": "Archived Projects"
     },
     "legal": {
       "eyebrow": "Legal",
@@ -430,7 +437,7 @@
         "s2_title": "2. Use of Content",
         "s2_body": "<p>Unless otherwise noted, the text, images, diagrams, and other materials on this website are the intellectual property of NIPS-CERN or their respective authors. You are welcome to:</p><ul><li>Read and access all content for personal or academic purposes.</li><li>Share links to any page on this website.</li><li>Cite NIPS-CERN content in academic works, provided you include a proper citation and link.</li></ul><p>You may not reproduce, republish, or redistribute substantial portions of this website's content for commercial purposes without prior written permission.</p>",
         "s3_title": "3. Open Source Projects",
-        "s3_body": "<p>Software projects developed by NIPS-CERN (SAPHO, YANC, POLARIS, AURORA, CGV) are made available under their respective open source licenses, which are stated in each project's GitHub repository. The terms on this page govern the <em>website</em> only, not the software itself.</p>",
+        "s3_body": "<p>Software projects developed by NIPS-CERN (SAPHO, YANC, AURORA, HITS, CGV) are made available under their respective open source licenses, which are stated in each project's GitHub repository. The terms on this page govern the <em>website</em> only, not the software itself.</p>",
         "s4_title": "4. Third-Party Links and Content",
         "s4_body": "<p>This website contains links to external resources, including GitHub repositories, CERN publications, and the CERN Courier digital archive. NIPS-CERN is not responsible for the content, availability, or privacy practices of external websites. Links are provided for informational purposes only.</p><p>CERN Courier digital editions are copyright © CERN and are linked here with informational intent. No copies of the PDFs are hosted by NIPS-CERN.</p>",
         "s5_title": "5. Accuracy and Availability",
@@ -466,8 +473,8 @@
       "gfonts_desc": "Font hosting service used to serve Inter, DM Serif Display, and JetBrains Mono via CDN.",
       "sapho_desc": "Simple Architecture for Processor Hardware and Organisation — FPGA processor design platform used for teaching digital logic at UFJF.",
       "yanc_desc": "Yet Another NIPS-CERN Compiler — CMM-to-assembly and assembly-to-machine-code compiler for the SAPHO architecture.",
-      "polaris_desc": "Lightweight IDE for the SAPHO ecosystem. Runs on Linux and Windows; includes YAWT wave tracer and PRISM RTL viewer.",
-      "aurora_desc": "Former Windows-only Electron IDE for SAPHO (v1.0–v4.27.10, 2021–2023). Archived. Succeeded by POLARIS.",
+      "hits_desc": "Real-time FPGA simulator of the ATLAS Tile Calorimeter readout, running on a DE10-Nano board.",
+      "aurora_desc": "The desktop IDE for SAPHO: write C±, then compile, simulate and inspect in one window, with the Aurora Intelligence assistant.",
       "cgv_desc": "Interactive 3D visualisation of the ATLAS calorimeter system (TileCal, LAr barrel, HEC endcaps) built with Three.js and Vite.",
       "note": "All third-party trademarks and logos (CERN, ATLAS, UFJF, etc.) are the property of their respective owners and are used here solely for identification and informational purposes. This is a non-commercial academic research website."
     },
@@ -505,15 +512,15 @@
       "q3": "How can I join NIPS-CERN or propose a partnership?",
       "a3": "We are hiring: the lab looks for researchers in logic, philosophy, software engineering, the engineering disciplines, programming and design. Companies and institutions interested in building on our work are welcome: our <a href=\"https://github.com/nipscernlab/nipscernweb/blob/main/LICENSE.md\" target=\"_blank\" rel=\"noopener\">license</a> is open to partnerships. Write to contact@nipscern.com or meet us through the <a href=\"about.html\">About page</a>.",
       "q4": "What is SAPHO?",
-      "a4": "<a href=\"projects/sapho\">SAPHO</a> is a scalable hardware architecture and toolchain for creating processors: you describe an algorithm in a few lines of C±, and SAPHO generates a soft-core processor tailored to run exactly that algorithm on an FPGA. The platform is the sum of its parts (SAPHO = <a href=\"projects/aurora\">AURORA</a> + <a href=\"projects/yanc\">YANC</a>) and includes POLARIS, YAWT and PRISM.",
+      "a4": "<a href=\"projects/sapho\">SAPHO</a> is a scalable hardware architecture and toolchain for creating processors: you describe an algorithm in a few lines of C±, and SAPHO generates a soft-core processor tailored to run exactly that algorithm on an FPGA. The platform is the sum of its parts (SAPHO = <a href=\"projects/aurora\">AURORA</a> + <a href=\"projects/yanc\">YANC</a>) and includes Surfer and PRISM.",
       "q5": "What is AURORA?",
       "a5": "<a href=\"projects/aurora\">AURORA</a> is the official desktop IDE of the SAPHO platform: write the algorithm, compile, simulate and inspect the generated processor in a single window. Aurora Intelligence adds an AI assistant that operates the IDE through its own tools.",
       "q6": "What is YANC?",
       "a6": "<a href=\"projects/yanc\">YANC</a> is the compiler toolchain powering the SAPHO ecosystem, including cmmcomp (the C± compiler) and asmcomp (the assembly compiler). It is written in C with Flex, Bison and GCC.",
       "q7": "What is CGVWeb?",
       "a7": "<a href=\"projects/cgv\">CGVWeb</a> renders real collision events from the ATLAS calorimeters in 3D, in any browser, with no installation. Built on Rust/WebAssembly and Three.js, it runs on the main wall of the ATLAS Control Room at CERN. <a href=\"projects/cgvweb/\">Open the live application</a> or read the <a href=\"library/cgvweb/twiki/\">technical documentation</a>.",
-      "q8": "What is POLARIS?",
-      "a8": "<a href=\"projects/polaris\">POLARIS</a> is a modern, cross-platform graphical IDE for the SAPHO ecosystem, built with Tauri and Rust. It integrates the Monaco editor, the PRISM RTL viewer and the YAWT wave tracer.",
+      "q8": "What is HITS?",
+      "a8": "<a href=\"projects/hits\">HITS</a> is a real-time FPGA simulator of the ATLAS Tile Calorimeter readout. It runs at 40 MHz on a DE10-Nano and reproduces the front-end signal chain in synthesizable Verilog, so online energy-reconstruction can be validated without the experiment.",
       "q9": "What is CERN and what does the name mean?",
       "a9": "CERN is the world's largest particle physics laboratory. The name comes from the French <em>Conseil Européen pour la Recherche Nucléaire</em>, the provisional council created in 1952 to plan the laboratory; the organisation it founded kept the acronym. Our <a href=\"cern.html\">CERN &amp; ATLAS page</a> tells the story in depth.",
       "q10": "Where is CERN located?",
@@ -773,12 +780,12 @@
         "name": "SAPHO",
         "full": "Scalable-Architecture Processor for Hardware Optimization",
         "short": "Conjunto completo de ferramentas para criação de processadores e co-design hardware–software.",
-        "desc": "O SAPHO é um conjunto completo de arquitetura de hardware e ferramentas projetado para criação de processadores, experimentação e co-design hardware–software. Ele agrega o compilador YANC, a IDE POLARIS, o YAWT Wave Tracer para análise de sinais e o PRISM RTL Viewer para visualização de circuitos de processadores.",
+        "desc": "O SAPHO é um conjunto completo de arquitetura de hardware e ferramentas projetado para criação de processadores, experimentação e co-design hardware–software. Ele agrega o compilador YANC, a IDE AURORA, o visualizador de formas de onda Surfer e o PRISM RTL Viewer para visualização de circuitos de processadores.",
         "features": {
           "title": "O que o SAPHO Inclui",
           "yanc": "Compilador YANC (CMM + assembly)",
-          "polaris": "POLARIS IDE multiplataforma",
-          "yawt": "YAWT Wave Tracer para análise de sinais",
+          "polaris": "AURORA IDE de desktop",
+          "yawt": "Visualizador de formas de onda Surfer",
           "prism": "PRISM RTL Viewer para visualização de processadores",
           "platforms": "Suporte a Windows e Linux"
         }
@@ -796,11 +803,17 @@
           "integration": "Totalmente integrado ao ecossistema SAPHO"
         }
       },
+      "hits": {
+        "name": "HITS",
+        "full": "Sintetizador de Trem de Pulsos em Hardware",
+        "short": "Simulador FPGA em tempo real da leitura do calorímetro de telhas do ATLAS.",
+        "desc": "O HITS é um simulador FPGA em tempo real da leitura do calorímetro de telhas (Tile Calorimeter) do ATLAS. Roda a 40 MHz em uma Terasic DE10-Nano e reconstrói a cadeia de sinal do front-end em Verilog sintetizável: hits pseudoaleatórios seguindo a estrutura de trem de bunches do LHC, amplitudes de energia sorteadas de distribuições medidas, ruído eletrônico, conformação analógica e um cancelamento polo-zero embarcado. Permite ao grupo validar a reconstrução de energia online sem acesso ao experimento."
+      },
       "polaris": {
         "name": "POLARIS",
         "full": "IDE Gráfica Multiplataforma para o SAPHO",
         "short": "IDE moderna e leve construída com Tauri e Rust para o ecossistema SAPHO.",
-        "desc": "O POLARIS é um ambiente de desenvolvimento gráfico multiplataforma moderno construído com Tauri e Rust. Integra o Monaco Editor para edição de código, o PRISM RTL Viewer e o YAWT Wave Tracer, servindo como a interface visual principal para desenvolvimento de processadores baseados em SAPHO.",
+        "desc": "O POLARIS foi uma IDE gráfica multiplataforma para o ecossistema SAPHO, construída com Tauri e Rust, com Monaco Editor, o PRISM RTL Viewer e o YAWT Wave Tracer. Está arquivado; a IDE atual do SAPHO é o AURORA.",
         "features": {
           "title": "Características Principais",
           "tauri": "Construído com Tauri + Rust — leve e rápido",
@@ -814,12 +827,12 @@
         "name": "AURORA",
         "full": "A IDE do SAPHO",
         "short": "A IDE de desktop do SAPHO: escreva C±, compile, simule e inspecione, com o Aurora Intelligence com IA.",
-        "desc": "O AURORA é a IDE de desktop da plataforma SAPHO. Você descreve um processador em C± e então compila, simula e inspeciona sem sair da janela: editor Monaco, simulação com Icarus Verilog e Verilator, GTKWave e o visualizador de RTL PRISM. O Aurora Intelligence acrescenta um assistente de IA que opera a IDE pelas próprias ferramentas dela.",
+        "desc": "O AURORA é a IDE de desktop da plataforma SAPHO. Você descreve um processador em C± e então compila, simula e inspeciona sem sair da janela: editor Monaco, simulação com Icarus Verilog e Verilator, Surfer e o visualizador de RTL PRISM. O Aurora Intelligence acrescenta um assistente de IA que opera a IDE pelas próprias ferramentas dela.",
         "features": {
           "title": "Recursos do AURORA",
           "cmm": "Ambiente de programação CMM",
           "verilog": "Integração com simulação Icarus Verilog",
-          "gtkwave": "Visualização de formas de onda GTKWave",
+          "gtkwave": "Visualização de formas de onda Surfer",
           "prism": "PRISM RTL Viewer",
           "releases": "Em desenvolvimento ativo, última v6.3.2"
         },
@@ -929,7 +942,8 @@
       "credits": "Créditos",
       "terms": "Termos",
       "privacy": "Privacidade",
-      "qa": "Q&A"
+      "qa": "Q&A",
+      "archived": "Projetos Arquivados"
     },
     "legal": {
       "eyebrow": "Jurídico",
@@ -965,7 +979,7 @@
         "s2_title": "2. Uso do Conteúdo",
         "s2_body": "<p>Salvo indicação em contrário, os textos, imagens, diagramas e demais materiais deste site são propriedade intelectual do NIPS-CERN ou de seus respectivos autores. Você está autorizado a:</p><ul><li>Ler e acessar todo o conteúdo para fins pessoais ou acadêmicos.</li><li>Compartilhar links para qualquer página deste site.</li><li>Citar conteúdo do NIPS-CERN em trabalhos acadêmicos, desde que inclua a citação e o link adequados.</li></ul><p>Você não pode reproduzir, republicar ou redistribuir partes substanciais do conteúdo deste site para fins comerciais sem autorização prévia por escrito.</p>",
         "s3_title": "3. Projetos de Código Aberto",
-        "s3_body": "<p>Os projetos de software desenvolvidos pelo NIPS-CERN (SAPHO, YANC, POLARIS, AURORA, CGV) são disponibilizados sob suas respectivas licenças de código aberto, indicadas no repositório GitHub de cada projeto. Os termos desta página regem apenas o <em>site</em>, não o software em si.</p>",
+        "s3_body": "<p>Os projetos de software desenvolvidos pelo NIPS-CERN (SAPHO, YANC, AURORA, HITS, CGV) são disponibilizados sob suas respectivas licenças de código aberto, indicadas no repositório GitHub de cada projeto. Os termos desta página regem apenas o <em>site</em>, não o software em si.</p>",
         "s4_title": "4. Links e Conteúdo de Terceiros",
         "s4_body": "<p>Este site contém links para recursos externos, incluindo repositórios do GitHub, publicações do CERN e o arquivo digital do CERN Courier. O NIPS-CERN não é responsável pelo conteúdo, pela disponibilidade ou pelas práticas de privacidade de sites externos. Os links são fornecidos apenas para fins informativos.</p><p>As edições digitais do CERN Courier são protegidas por direitos autorais © CERN e estão vinculadas aqui com intenção informativa. Nenhuma cópia dos PDFs é hospedada pelo NIPS-CERN.</p>",
         "s5_title": "5. Precisão e Disponibilidade",
@@ -1001,8 +1015,8 @@
       "gfonts_desc": "Serviço de hospedagem de fontes usado para servir Inter, DM Serif Display e JetBrains Mono via CDN.",
       "sapho_desc": "Simple Architecture for Processor Hardware and Organisation — plataforma de design de processadores em FPGA usada para o ensino de lógica digital na UFJF.",
       "yanc_desc": "Yet Another NIPS-CERN Compiler — compilador de CMM para assembly e de assembly para código de máquina da arquitetura SAPHO.",
-      "polaris_desc": "IDE leve para o ecossistema SAPHO. Roda em Linux e Windows; inclui o wave tracer YAWT e o visualizador RTL PRISM.",
-      "aurora_desc": "Antiga IDE em Electron exclusiva para Windows do SAPHO (v1.0–v4.27.10, 2021–2023). Arquivada. Sucedida pelo POLARIS.",
+      "hits_desc": "Simulador FPGA em tempo real da leitura do calorímetro de telhas do ATLAS, rodando numa placa DE10-Nano.",
+      "aurora_desc": "A IDE de desktop do SAPHO: escreva C±, compile, simule e inspecione numa só janela, com o assistente Aurora Intelligence.",
       "cgv_desc": "Visualização 3D interativa do sistema de calorímetros do ATLAS (TileCal, barril do LAr, tampas do HEC), construída com Three.js e Vite.",
       "note": "Todas as marcas e logotipos de terceiros (CERN, ATLAS, UFJF, etc.) são propriedade de seus respectivos donos e são usados aqui apenas para fins de identificação e informação. Este é um site acadêmico de pesquisa, sem fins comerciais."
     },
@@ -1040,15 +1054,15 @@
       "q3": "Como posso entrar no NIPS-CERN ou propor uma parceria?",
       "a3": "Estamos contratando: o laboratório busca pesquisadores em lógica, filosofia, engenharia de software, engenharias, programação e design. Empresas e instituições interessadas em construir sobre o nosso trabalho são bem-vindas: nossa <a href=\"https://github.com/nipscernlab/nipscernweb/blob/main/LICENSE.md\" target=\"_blank\" rel=\"noopener\">licença</a> é aberta a parcerias. Escreva para contact@nipscern.com ou nos conheça pela <a href=\"about.html\">página Sobre</a>.",
       "q4": "O que é o SAPHO?",
-      "a4": "O <a href=\"projects/sapho\">SAPHO</a> é uma arquitetura de hardware escalável e um conjunto de ferramentas para criar processadores: você descreve um algoritmo em poucas linhas de C±, e o SAPHO gera um processador soft-core feito sob medida para rodar exatamente aquele algoritmo numa FPGA. A plataforma é a soma das partes (SAPHO = <a href=\"projects/aurora\">AURORA</a> + <a href=\"projects/yanc\">YANC</a>) e inclui POLARIS, YAWT e PRISM.",
+      "a4": "O <a href=\"projects/sapho\">SAPHO</a> é uma arquitetura de hardware escalável e um conjunto de ferramentas para criar processadores: você descreve um algoritmo em poucas linhas de C±, e o SAPHO gera um processador soft-core feito sob medida para rodar exatamente aquele algoritmo numa FPGA. A plataforma é a soma das partes (SAPHO = <a href=\"projects/aurora\">AURORA</a> + <a href=\"projects/yanc\">YANC</a>) e inclui Surfer e PRISM.",
       "q5": "O que é a AURORA?",
       "a5": "O <a href=\"projects/aurora\">AURORA</a> é a IDE oficial de desktop da plataforma SAPHO: escreva o algoritmo, compile, simule e inspecione o processador gerado numa única janela. O Aurora Intelligence adiciona um assistente de IA que opera a IDE pelas próprias ferramentas dela.",
       "q6": "O que é o YANC?",
       "a6": "O <a href=\"projects/yanc\">YANC</a> é o conjunto de compiladores que move o ecossistema SAPHO, incluindo o cmmcomp (compilador de C±) e o asmcomp (compilador de assembly). É escrito em C com Flex, Bison e GCC.",
       "q7": "O que é o CGVWeb?",
       "a7": "O <a href=\"projects/cgv\">CGVWeb</a> renderiza eventos reais de colisão dos calorímetros do ATLAS em 3D, em qualquer navegador, sem instalar nada. Construído com Rust/WebAssembly e Three.js, ele roda no telão da Sala de Controle do ATLAS no CERN. <a href=\"projects/cgvweb/\">Abra a aplicação ao vivo</a> ou leia a <a href=\"library/cgvweb/twiki/\">documentação técnica</a>.",
-      "q8": "O que é o POLARIS?",
-      "a8": "O <a href=\"projects/polaris\">POLARIS</a> é uma IDE gráfica moderna e multiplataforma para o ecossistema SAPHO, construída com Tauri e Rust. Integra o editor Monaco, o visualizador de RTL PRISM e o tracer de ondas YAWT.",
+      "q8": "O que é o HITS?",
+      "a8": "O <a href=\"projects/hits\">HITS</a> é um simulador FPGA em tempo real da leitura do calorímetro de telhas do ATLAS. Roda a 40 MHz numa DE10-Nano e reproduz a cadeia de sinal do front-end em Verilog sintetizável, permitindo validar a reconstrução de energia online sem o experimento.",
       "q9": "O que é o CERN e o que significa o nome?",
       "a9": "O CERN é o maior laboratório de física de partículas do mundo. O nome vem do francês <em>Conseil Européen pour la Recherche Nucléaire</em>, o conselho provisório criado em 1952 para planejar o laboratório; a organização que ele fundou manteve a sigla. Nossa <a href=\"cern.html\">página CERN & ATLAS</a> conta a história em profundidade.",
       "q10": "Onde fica o CERN?",
@@ -1312,8 +1326,8 @@
         "features": {
           "title": "Ce que SAPHO Inclut",
           "yanc": "Chaîne de compilation YANC (CMM + assembleur)",
-          "polaris": "IDE multiplateforme POLARIS",
-          "yawt": "YAWT Wave Tracer pour l'analyse de signaux",
+          "polaris": "IDE de bureau AURORA",
+          "yawt": "Visualiseur de formes d'onde Surfer",
           "prism": "PRISM RTL Viewer pour la visualisation de processeurs",
           "platforms": "Support Windows et Linux"
         }
@@ -1331,11 +1345,17 @@
           "integration": "Entièrement intégré à l'écosystème SAPHO"
         }
       },
+      "hits": {
+        "name": "HITS",
+        "full": "Synthétiseur Matériel de Train d'Impulsions",
+        "short": "Simulateur FPGA en temps réel de la lecture du calorimètre à tuiles d'ATLAS.",
+        "desc": "HITS est un simulateur FPGA en temps réel de la lecture du calorimètre à tuiles (Tile Calorimeter) d'ATLAS. Il fonctionne à 40 MHz sur une Terasic DE10-Nano et reconstruit la chaîne de signal du front-end en Verilog synthétisable : hits pseudo-aléatoires suivant la structure des trains de paquets du LHC, amplitudes d'énergie tirées de distributions mesurées, bruit électronique, mise en forme analogique et une annulation pôle-zéro embarquée. Il permet au groupe de valider la reconstruction d'énergie en ligne sans accès à l'expérience."
+      },
       "polaris": {
         "name": "POLARIS",
         "full": "IDE Graphique Multiplateforme pour SAPHO",
         "short": "IDE moderne et léger construit avec Tauri et Rust.",
-        "desc": "POLARIS est un environnement de développement graphique multiplateforme construit avec Tauri et Rust.",
+        "desc": "POLARIS était un IDE graphique multiplateforme pour l'écosystème SAPHO, construit avec Tauri et Rust. Il est archivé ; AURORA est l'IDE actuel de SAPHO.",
         "features": {
           "title": "Caractéristiques Principales",
           "tauri": "Construit avec Tauri + Rust — léger et rapide",
@@ -1349,12 +1369,12 @@
         "name": "AURORA",
         "full": "L'IDE pour SAPHO",
         "short": "L'IDE de bureau pour SAPHO : écrire du C±, compiler, simuler et inspecter, avec Aurora Intelligence dopé à l'IA.",
-        "desc": "AURORA est l'IDE de bureau de la plateforme SAPHO. Vous décrivez un processeur en C±, puis vous le compilez, le simulez et l'inspectez sans quitter la fenêtre : éditeur Monaco, simulation Icarus Verilog et Verilator, GTKWave et le visualiseur RTL PRISM. Aurora Intelligence ajoute un assistant IA qui pilote l'IDE via ses propres outils.",
+        "desc": "AURORA est l'IDE de bureau de la plateforme SAPHO. Vous décrivez un processeur en C±, puis vous le compilez, le simulez et l'inspectez sans quitter la fenêtre : éditeur Monaco, simulation Icarus Verilog et Verilator, Surfer et le visualiseur RTL PRISM. Aurora Intelligence ajoute un assistant IA qui pilote l'IDE via ses propres outils.",
         "features": {
           "title": "Fonctionnalités d'AURORA",
           "cmm": "Environnement de programmation CMM",
           "verilog": "Intégration de simulation Icarus Verilog",
-          "gtkwave": "Visualisation de formes d'onde GTKWave",
+          "gtkwave": "Visualisation de formes d'onde Surfer",
           "prism": "PRISM RTL Viewer",
           "releases": "Développement actif, dernière v6.3.2"
         },
@@ -1464,7 +1484,8 @@
       "credits": "Crédits",
       "terms": "Conditions",
       "privacy": "Confidentialité",
-      "qa": "Q&A"
+      "qa": "Q&A",
+      "archived": "Projets archivés"
     },
     "legal": {
       "eyebrow": "Mentions légales",
@@ -1500,7 +1521,7 @@
         "s2_title": "2. Utilisation du Contenu",
         "s2_body": "<p>Sauf indication contraire, les textes, images, diagrammes et autres documents de ce site sont la propriété intellectuelle de NIPS-CERN ou de leurs auteurs respectifs. Vous êtes autorisé à :</p><ul><li>Lire et consulter tout le contenu à des fins personnelles ou académiques.</li><li>Partager des liens vers n'importe quelle page de ce site.</li><li>Citer le contenu de NIPS-CERN dans des travaux académiques, à condition d'inclure une citation et un lien appropriés.</li></ul><p>Vous ne pouvez pas reproduire, republier ou redistribuer des portions substantielles du contenu de ce site à des fins commerciales sans autorisation écrite préalable.</p>",
         "s3_title": "3. Projets Open Source",
-        "s3_body": "<p>Les projets logiciels développés par NIPS-CERN (SAPHO, YANC, POLARIS, AURORA, CGV) sont mis à disposition sous leurs licences open source respectives, indiquées dans le dépôt GitHub de chaque projet. Les conditions de cette page régissent uniquement le <em>site web</em>, et non le logiciel lui-même.</p>",
+        "s3_body": "<p>Les projets logiciels développés par NIPS-CERN (SAPHO, YANC, AURORA, HITS, CGV) sont mis à disposition sous leurs licences open source respectives, indiquées dans le dépôt GitHub de chaque projet. Les conditions de cette page régissent uniquement le <em>site web</em>, et non le logiciel lui-même.</p>",
         "s4_title": "4. Liens et Contenus Tiers",
         "s4_body": "<p>Ce site contient des liens vers des ressources externes, notamment des dépôts GitHub, des publications du CERN et les archives numériques du CERN Courier. NIPS-CERN n'est pas responsable du contenu, de la disponibilité ou des pratiques de confidentialité des sites externes. Les liens sont fournis à titre informatif uniquement.</p><p>Les éditions numériques du CERN Courier sont protégées par le droit d'auteur © CERN et sont liées ici à titre informatif. Aucune copie des PDF n'est hébergée par NIPS-CERN.</p>",
         "s5_title": "5. Exactitude et Disponibilité",
@@ -1536,8 +1557,8 @@
       "gfonts_desc": "Service d'hébergement de polices utilisé pour servir Inter, DM Serif Display et JetBrains Mono via CDN.",
       "sapho_desc": "Simple Architecture for Processor Hardware and Organisation — plateforme de conception de processeurs FPGA utilisée pour l'enseignement de la logique numérique à l'UFJF.",
       "yanc_desc": "Yet Another NIPS-CERN Compiler — compilateur du CMM vers l'assembleur et de l'assembleur vers le code machine pour l'architecture SAPHO.",
-      "polaris_desc": "IDE léger pour l'écosystème SAPHO. Fonctionne sous Linux et Windows ; inclut le wave tracer YAWT et le visualiseur RTL PRISM.",
-      "aurora_desc": "Ancien IDE Electron exclusif à Windows pour SAPHO (v1.0–v4.27.10, 2021–2023). Archivé. Remplacé par POLARIS.",
+      "hits_desc": "Simulateur FPGA en temps réel de la lecture du calorimètre à tuiles d'ATLAS, sur une carte DE10-Nano.",
+      "aurora_desc": "L'IDE de bureau pour SAPHO : écrivez du C±, puis compilez, simulez et inspectez dans une seule fenêtre, avec l'assistant Aurora Intelligence.",
       "cgv_desc": "Visualisation 3D interactive du système de calorimètres d'ATLAS (TileCal, tonneau du LAr, bouchons du HEC), construite avec Three.js et Vite.",
       "note": "Toutes les marques et logos de tiers (CERN, ATLAS, UFJF, etc.) sont la propriété de leurs détenteurs respectifs et sont utilisés ici uniquement à des fins d'identification et d'information. Ceci est un site académique de recherche, à but non commercial."
     },
@@ -1575,15 +1596,15 @@
       "q3": "Comment rejoindre le NIPS-CERN ou proposer un partenariat ?",
       "a3": "Nous recrutons : le laboratoire recherche des chercheurs en logique, philosophie, génie logiciel, ingénierie, programmation et design. Les entreprises et institutions souhaitant bâtir sur notre travail sont les bienvenues : notre <a href=\"https://github.com/nipscernlab/nipscernweb/blob/main/LICENSE.md\" target=\"_blank\" rel=\"noopener\">licence</a> est ouverte aux partenariats. Écrivez à contact@nipscern.com ou rencontrez-nous via la <a href=\"about.html\">page À propos</a>.",
       "q4": "Qu'est-ce que SAPHO ?",
-      "a4": "<a href=\"projects/sapho\">SAPHO</a> est une architecture matérielle évolutive et une chaîne d'outils pour créer des processeurs : décrivez un algorithme en quelques lignes de C±, et SAPHO génère un processeur soft-core taillé pour exécuter exactement cet algorithme sur FPGA. La plateforme est la somme de ses parties (SAPHO = <a href=\"projects/aurora\">AURORA</a> + <a href=\"projects/yanc\">YANC</a>) et inclut POLARIS, YAWT et PRISM.",
+      "a4": "<a href=\"projects/sapho\">SAPHO</a> est une architecture matérielle évolutive et une chaîne d'outils pour créer des processeurs : décrivez un algorithme en quelques lignes de C±, et SAPHO génère un processeur soft-core taillé pour exécuter exactement cet algorithme sur FPGA. La plateforme est la somme de ses parties (SAPHO = <a href=\"projects/aurora\">AURORA</a> + <a href=\"projects/yanc\">YANC</a>) et inclut Surfer et PRISM.",
       "q5": "Qu'est-ce qu'AURORA ?",
       "a5": "<a href=\"projects/aurora\">AURORA</a> est l'IDE de bureau officiel de la plateforme SAPHO : écrivez l'algorithme, compilez, simulez et inspectez le processeur généré dans une seule fenêtre. Aurora Intelligence ajoute un assistant d'IA qui pilote l'IDE avec ses propres outils.",
       "q6": "Qu'est-ce que YANC ?",
       "a6": "<a href=\"projects/yanc\">YANC</a> est la chaîne de compilation qui anime l'écosystème SAPHO, avec cmmcomp (compilateur C±) et asmcomp (compilateur d'assembleur). Elle est écrite en C avec Flex, Bison et GCC.",
       "q7": "Qu'est-ce que CGVWeb ?",
       "a7": "<a href=\"projects/cgv\">CGVWeb</a> affiche en 3D, dans n'importe quel navigateur et sans installation, de vrais événements de collision des calorimètres d'ATLAS. Construit avec Rust/WebAssembly et Three.js, il tourne sur le grand écran de la salle de contrôle d'ATLAS au CERN. <a href=\"projects/cgvweb/\">Ouvrez l'application</a> ou lisez la <a href=\"library/cgvweb/twiki/\">documentation technique</a>.",
-      "q8": "Qu'est-ce que POLARIS ?",
-      "a8": "<a href=\"projects/polaris\">POLARIS</a> est un IDE graphique moderne et multiplateforme pour l'écosystème SAPHO, construit avec Tauri et Rust. Il intègre l'éditeur Monaco, le visualiseur RTL PRISM et le traceur d'ondes YAWT.",
+      "q8": "Qu'est-ce que HITS ?",
+      "a8": "<a href=\"projects/hits\">HITS</a> est un simulateur FPGA en temps réel de la lecture du calorimètre à tuiles d'ATLAS. Il fonctionne à 40 MHz sur une DE10-Nano et reproduit la chaîne de signal du front-end en Verilog synthétisable, pour valider la reconstruction d'énergie en ligne sans l'expérience.",
       "q9": "Qu'est-ce que le CERN et que signifie son nom ?",
       "a9": "Le CERN est le plus grand laboratoire de physique des particules au monde. Le nom vient du <em>Conseil Européen pour la Recherche Nucléaire</em>, l'organe provisoire créé en 1952 pour planifier le laboratoire ; l'organisation qu'il a fondée a gardé le sigle. Notre <a href=\"cern.html\">page CERN & ATLAS</a> raconte l'histoire en profondeur.",
       "q10": "Où se trouve le CERN ?",
@@ -1847,8 +1868,8 @@
         "features": {
           "title": "Hva SAPHO Inkluderer",
           "yanc": "YANC kompilatorverktøykjede (CMM + assembly)",
-          "polaris": "POLARIS kryssplattform-IDE",
-          "yawt": "YAWT Wave Tracer for signalanalyse",
+          "polaris": "AURORA skrivebords-IDE",
+          "yawt": "Surfer bølgeformvisning",
           "prism": "PRISM RTL Viewer for prosessorvisualisering",
           "platforms": "Windows og Linux støtte"
         }
@@ -1866,11 +1887,17 @@
           "integration": "Fullt integrert i SAPHO-økosystemet"
         }
       },
+      "hits": {
+        "name": "HITS",
+        "full": "Maskinvare-impulstogsyntetisator",
+        "short": "Sanntids FPGA-simulator av ATLAS Tile Calorimeter-avlesningen.",
+        "desc": "HITS er en sanntids FPGA-simulator av avlesningen til ATLAS Tile Calorimeter. Den kjører på 40 MHz på en Terasic DE10-Nano og gjenskaper front-end-signalkjeden i syntetiserbar Verilog: pseudo-tilfeldige treff som følger LHC-ens bunch-tog-struktur, energiamplituder trukket fra målte fordelinger, elektronisk støy, analog forming og en innebygd pol-null-kansellering. Den lar gruppen validere online energirekonstruksjon uten tilgang til eksperimentet."
+      },
       "polaris": {
         "name": "POLARIS",
         "full": "Kryssplattform Grafisk IDE for SAPHO",
         "short": "Moderne, lettvekts IDE bygget med Tauri og Rust.",
-        "desc": "POLARIS er et moderne, kryssplattform grafisk utviklingsmiljø bygget med Tauri og Rust.",
+        "desc": "POLARIS var et kryssplattform grafisk IDE for SAPHO-økosystemet, bygget med Tauri og Rust. Det er arkivert; AURORA er den nåværende IDE-en for SAPHO.",
         "features": {
           "title": "Nøkkelfunksjoner",
           "tauri": "Bygget med Tauri + Rust — lettvekts og rask",
@@ -1884,12 +1911,12 @@
         "name": "AURORA",
         "full": "IDE-en for SAPHO",
         "short": "Desktop-IDE-en for SAPHO: skriv C±, kompiler, simuler og inspiser, med AI-drevet Aurora Intelligence.",
-        "desc": "AURORA er desktop-IDE-en for SAPHO-plattformen. Du beskriver en prosessor i C±, og kompilerer, simulerer og inspiserer den uten å forlate vinduet: Monaco-editor, Icarus Verilog- og Verilator-simulering, GTKWave og PRISM RTL-viseren. Aurora Intelligence legger til en AI-assistent som styrer IDE-en gjennom dens egne verktøy.",
+        "desc": "AURORA er desktop-IDE-en for SAPHO-plattformen. Du beskriver en prosessor i C±, og kompilerer, simulerer og inspiserer den uten å forlate vinduet: Monaco-editor, Icarus Verilog- og Verilator-simulering, Surfer og PRISM RTL-viseren. Aurora Intelligence legger til en AI-assistent som styrer IDE-en gjennom dens egne verktøy.",
         "features": {
           "title": "AURORA Funksjoner",
           "cmm": "CMM programmeringsmiljø",
           "verilog": "Icarus Verilog simuleringsintegrasjon",
-          "gtkwave": "GTKWave bølgeformvisualisering",
+          "gtkwave": "Surfer bølgeformvisualisering",
           "prism": "PRISM RTL Viewer",
           "releases": "Aktiv utvikling, siste v6.3.2"
         },
@@ -1999,7 +2026,8 @@
       "credits": "Krediteringer",
       "terms": "Vilkår",
       "privacy": "Personvern",
-      "qa": "Q&A"
+      "qa": "Q&A",
+      "archived": "Arkiverte prosjekter"
     },
     "legal": {
       "eyebrow": "Juridisk",
@@ -2035,7 +2063,7 @@
         "s2_title": "2. Bruk av Innhold",
         "s2_body": "<p>Med mindre annet er angitt, er teksten, bildene, diagrammene og annet materiale på dette nettstedet åndsverk tilhørende NIPS-CERN eller deres respektive opphavspersoner. Du er velkommen til å:</p><ul><li>Lese og få tilgang til alt innhold for personlige eller akademiske formål.</li><li>Dele lenker til en hvilken som helst side på dette nettstedet.</li><li>Sitere NIPS-CERN-innhold i akademiske arbeider, forutsatt at du inkluderer korrekt sitering og lenke.</li></ul><p>Du kan ikke reprodusere, publisere på nytt eller videredistribuere vesentlige deler av dette nettstedets innhold for kommersielle formål uten skriftlig forhåndstillatelse.</p>",
         "s3_title": "3. Åpen Kildekode-prosjekter",
-        "s3_body": "<p>Programvareprosjekter utviklet av NIPS-CERN (SAPHO, YANC, POLARIS, AURORA, CGV) gjøres tilgjengelig under sine respektive åpen kildekode-lisenser, som er angitt i hvert prosjekts GitHub-repositorium. Vilkårene på denne siden gjelder kun <em>nettstedet</em>, ikke selve programvaren.</p>",
+        "s3_body": "<p>Programvareprosjekter utviklet av NIPS-CERN (SAPHO, YANC, AURORA, HITS, CGV) gjøres tilgjengelig under sine respektive åpen kildekode-lisenser, som er angitt i hvert prosjekts GitHub-repositorium. Vilkårene på denne siden gjelder kun <em>nettstedet</em>, ikke selve programvaren.</p>",
         "s4_title": "4. Tredjepartslenker og -innhold",
         "s4_body": "<p>Dette nettstedet inneholder lenker til eksterne ressurser, inkludert GitHub-repositorier, CERN-publikasjoner og det digitale arkivet til CERN Courier. NIPS-CERN er ikke ansvarlig for innholdet, tilgjengeligheten eller personvernpraksisen til eksterne nettsteder. Lenkene er kun ment for informasjonsformål.</p><p>De digitale utgavene av CERN Courier er opphavsrettsbeskyttet © CERN og er lenket her med informativt formål. Ingen kopier av PDF-ene hostes av NIPS-CERN.</p>",
         "s5_title": "5. Nøyaktighet og Tilgjengelighet",
@@ -2071,8 +2099,8 @@
       "gfonts_desc": "Skrifttypehostingtjeneste brukt til å levere Inter, DM Serif Display og JetBrains Mono via CDN.",
       "sapho_desc": "Simple Architecture for Processor Hardware and Organisation — FPGA-prosessordesignplattform brukt til å undervise i digital logikk ved UFJF.",
       "yanc_desc": "Yet Another NIPS-CERN Compiler — kompilator fra CMM til assembly og fra assembly til maskinkode for SAPHO-arkitekturen.",
-      "polaris_desc": "Lettvekts IDE for SAPHO-økosystemet. Kjører på Linux og Windows; inkluderer YAWT wave tracer og PRISM RTL-viser.",
-      "aurora_desc": "Tidligere Windows-eksklusiv Electron-IDE for SAPHO (v1.0–v4.27.10, 2021–2023). Arkivert. Etterfulgt av POLARIS.",
+      "hits_desc": "Sanntids FPGA-simulator av ATLAS Tile Calorimeter-avlesningen, på et DE10-Nano-kort.",
+      "aurora_desc": "Skrivebords-IDE-en for SAPHO: skriv C±, deretter kompiler, simuler og inspiser i ett vindu, med Aurora Intelligence-assistenten.",
       "cgv_desc": "Interaktiv 3D-visualisering av ATLAS-kalorimetersystemet (TileCal, LAr-tønne, HEC-endehetter), bygget med Three.js og Vite.",
       "note": "Alle tredjeparts varemerker og logoer (CERN, ATLAS, UFJF, osv.) tilhører sine respektive eiere og brukes her utelukkende for identifikasjons- og informasjonsformål. Dette er et ikke-kommersielt akademisk forskningsnettsted."
     },
@@ -2110,15 +2138,15 @@
       "q3": "Hvordan kan jeg bli med i NIPS-CERN eller foreslå et samarbeid?",
       "a3": "Vi ansetter: laboratoriet søker forskere innen logikk, filosofi, programvareutvikling, ingeniørfag, programmering og design. Bedrifter og institusjoner som vil bygge på arbeidet vårt er velkomne: <a href=\"https://github.com/nipscernlab/nipscernweb/blob/main/LICENSE.md\" target=\"_blank\" rel=\"noopener\">lisensen</a> vår er åpen for samarbeid. Skriv til contact@nipscern.com eller møt oss via <a href=\"about.html\">Om oss-siden</a>.",
       "q4": "Hva er SAPHO?",
-      "a4": "<a href=\"projects/sapho\">SAPHO</a> er en skalerbar maskinvarearkitektur og verktøykjede for å lage prosessorer: beskriv en algoritme i noen få linjer C±, og SAPHO genererer en soft-core-prosessor skreddersydd for å kjøre akkurat den algoritmen på en FPGA. Plattformen er summen av delene (SAPHO = <a href=\"projects/aurora\">AURORA</a> + <a href=\"projects/yanc\">YANC</a>) og inkluderer POLARIS, YAWT og PRISM.",
+      "a4": "<a href=\"projects/sapho\">SAPHO</a> er en skalerbar maskinvarearkitektur og verktøykjede for å lage prosessorer: beskriv en algoritme i noen få linjer C±, og SAPHO genererer en soft-core-prosessor skreddersydd for å kjøre akkurat den algoritmen på en FPGA. Plattformen er summen av delene (SAPHO = <a href=\"projects/aurora\">AURORA</a> + <a href=\"projects/yanc\">YANC</a>) og inkluderer Surfer og PRISM.",
       "q5": "Hva er AURORA?",
       "a5": "<a href=\"projects/aurora\">AURORA</a> er den offisielle skrivebords-IDE-en for SAPHO-plattformen: skriv algoritmen, kompiler, simuler og inspiser den genererte prosessoren i ett vindu. Aurora Intelligence legger til en KI-assistent som styrer IDE-en gjennom dens egne verktøy.",
       "q6": "Hva er YANC?",
       "a6": "<a href=\"projects/yanc\">YANC</a> er kompilatorverktøykjeden bak SAPHO-økosystemet, med cmmcomp (C±-kompilatoren) og asmcomp (assembly-kompilatoren). Den er skrevet i C med Flex, Bison og GCC.",
       "q7": "Hva er CGVWeb?",
       "a7": "<a href=\"projects/cgv\">CGVWeb</a> viser ekte kollisjonshendelser fra ATLAS-kalorimetrene i 3D, i hvilken som helst nettleser, uten installasjon. Bygget med Rust/WebAssembly og Three.js, og kjører på storskjermen i ATLAS-kontrollrommet ved CERN. <a href=\"projects/cgvweb/\">Åpne applikasjonen</a> eller les den <a href=\"library/cgvweb/twiki/\">tekniske dokumentasjonen</a>.",
-      "q8": "Hva er POLARIS?",
-      "a8": "<a href=\"projects/polaris\">POLARIS</a> er en moderne grafisk IDE for SAPHO-økosystemet, på tvers av plattformer, bygget med Tauri og Rust. Den integrerer Monaco-editoren, RTL-viseren PRISM og bølgesporeren YAWT.",
+      "q8": "Hva er HITS?",
+      "a8": "<a href=\"projects/hits\">HITS</a> er en sanntids FPGA-simulator av ATLAS Tile Calorimeter-avlesningen. Den kjører på 40 MHz på en DE10-Nano og gjenskaper front-end-signalkjeden i syntetiserbar Verilog, slik at online energirekonstruksjon kan valideres uten eksperimentet.",
       "q9": "Hva er CERN, og hva betyr navnet?",
       "a9": "CERN er verdens største partikkelfysikklaboratorium. Navnet kommer fra det franske <em>Conseil Européen pour la Recherche Nucléaire</em>, det midlertidige rådet opprettet i 1952 for å planlegge laboratoriet; organisasjonen det grunnla beholdt forkortelsen. Vår <a href=\"cern.html\">CERN & ATLAS-side</a> forteller historien i dybden.",
       "q10": "Hvor ligger CERN?",

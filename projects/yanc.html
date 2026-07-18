@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=3bdaaffe20">
+  <link rel="stylesheet" href="../assets/css/main.css?v=fd26a8e1ef">
 
   <style>
     :root { --page-accent: var(--accent-yanc); --page-accent-dim: rgba(0,180,166,0.12); }
@@ -195,7 +195,7 @@
             <div class="accent-line" style="background:var(--accent-yanc)" aria-hidden="true"></div>
             <h2 class="heading-lg">Compilation Pipeline</h2>
             <p class="body-sm" style="margin-top:var(--sp-3);color:var(--text-secondary)">
-              YANC implements a classical two-stage compiler architecture. Source CMM code enters cmmcomp, where Flex tokenises the input and Bison parses the grammar into an AST. Code generation produces SAPHO assembly, which asmcomp then assembles into a binary hex file ready for FPGA loading or YAWT simulation.
+              YANC implements a classical two-stage compiler architecture. Source CMM code enters cmmcomp, where Flex tokenises the input and Bison parses the grammar into an AST. Code generation produces SAPHO assembly, which asmcomp then assembles into a binary hex file ready for FPGA loading or simulation.
             </p>
             <div class="pipeline-flow" style="margin-top:var(--sp-6)">
               <div class="pipeline-node">
@@ -234,7 +234,7 @@
                 <div class="step-badge" style="background:rgba(0,180,166,0.25)">5</div>
                 <div>
                   <div class="pipeline-node-title" style="color:var(--accent-yanc)">SAPHO Processor</div>
-                  <div class="pipeline-node-sub">Machine code → FPGA execution or YAWT simulation</div>
+                  <div class="pipeline-node-sub">Machine code → FPGA execution or simulation</div>
                 </div>
               </div>
             </div>
@@ -298,7 +298,7 @@
             </div>
             <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--sp-2)">SAPHO Integration</h3>
             <p style="font-size:var(--text-sm);color:var(--text-secondary)">
-              YANC is the compilation engine called by SAPHO when a student clicks <em>Compile</em>. POLARIS bundles YANC binaries natively; AURORA relied on the same pipeline. The entire build is triggered from within the IDE with a single keystroke.
+              YANC is the compilation engine called by SAPHO when a student clicks <em>Compile</em>. AURORA bundles YANC binaries natively, so the entire build is triggered from within the IDE with a single keystroke.
             </p>
           </div>
 
@@ -383,7 +383,7 @@
   setTimeout(function(){ obs.disconnect(); }, 8000);
 })();
 </script>
-  <script type="module" src="../assets/js/main.js?v=3bdaaffe20"></script>
+  <script type="module" src="../assets/js/main.js?v=fd26a8e1ef"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>

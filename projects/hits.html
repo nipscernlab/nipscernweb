@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HITS: Hardware Impulse Train Synthesizer | NIPS-CERN</title>
+  <meta name="description" content="HITS is a real-time FPGA simulator of ATLAS Tile Calorimeter readout pulses, running at 40 MHz on a Terasic DE10-Nano. Hit generation, measured energy amplitudes, electronic noise, analog shaping and pole-zero cancellation, all synthesizable Verilog. Built at NIPS-CERN / UFJF.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/projects/hits">
+  <meta property="og:title" content="HITS: Hardware Impulse Train Synthesizer | NIPS-CERN">
+  <meta property="og:description" content="A real-time FPGA simulator of the ATLAS Tile Calorimeter readout, running at 40 MHz on a DE10-Nano. It reproduces the front-end signal chain so online energy-reconstruction can be validated without the experiment.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/projects/hits">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="../assets/css/main.css?v=fd26a8e1ef">
+
+  <style>
+    :root { --page-accent: var(--accent-hits); }
+
+    /* Hero emblem */
+    .hits-emblem {
+      width: 148px; height: 148px; flex-shrink: 0;
+      filter: drop-shadow(0 0 40px rgba(255,109,0,0.20));
+    }
+    @media (max-width: 640px) { .hits-emblem { width: 108px; height: 108px; } }
+
+    /* Pulse-train figure */
+    .pulsefig {
+      background: linear-gradient(180deg, rgba(255,109,0,0.04), transparent 70%), var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-xl);
+      padding: var(--sp-5) var(--sp-5) var(--sp-4);
+    }
+    .pulsefig svg { display: block; width: 100%; height: auto; }
+    .pulsefig figcaption {
+      font-size: var(--text-xs); color: var(--text-muted);
+      margin-top: var(--sp-3); line-height: 1.6;
+    }
+
+    /* Signal chain */
+    .chain { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-3); }
+    @media (max-width: 900px) { .chain { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .chain { grid-template-columns: 1fr; } }
+    .stage {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg);
+      padding: var(--sp-4);
+    }
+    .stage .k {
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em;
+      color: var(--accent-hits); display: flex; align-items: center; gap: 8px;
+      margin-bottom: var(--sp-2);
+    }
+    .stage .k b {
+      width: 22px; height: 22px; border-radius: var(--r-full);
+      background: rgba(255,109,0,0.12); color: var(--accent-hits);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 11px;
+    }
+    .stage h3 { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); margin: 0 0 6px; }
+    .stage p { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; margin: 0; }
+    .stage .mods {
+      margin-top: var(--sp-3); font-family: var(--font-mono); font-size: 10.5px;
+      color: var(--text-secondary); line-height: 1.7; word-break: break-word;
+    }
+    .chain-note {
+      margin-top: var(--sp-4);
+      display: flex; align-items: flex-start; gap: var(--sp-3);
+      background: var(--bg-0); border: 1px dashed var(--border-mid);
+      border-radius: var(--r-lg); padding: var(--sp-4);
+    }
+    .chain-note i { color: var(--accent-hits); font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .chain-note .t { font-size: var(--text-xs); color: var(--text-secondary); line-height: 1.65; }
+    .chain-note code { font-family: var(--font-mono); font-size: 0.92em; color: var(--text-primary); }
+
+    /* Spec strip */
+    .specs { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-3); }
+    @media (max-width: 680px) { .specs { grid-template-columns: repeat(2, 1fr); } }
+    .spec {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg); padding: var(--sp-4);
+    }
+    .spec .v { font-family: var(--font-serif); font-size: var(--text-2xl); color: var(--text-primary); line-height: 1; }
+    .spec .l { font-size: var(--text-xs); color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
+
+    /* Terminal block */
+    .term {
+      background: #0a0d16; border: 1px solid var(--border-subtle); border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+    .term-top { display: flex; align-items: center; gap: 8px; padding: 9px 13px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .term-top .dots { display: flex; gap: 6px; }
+    .term-top .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2b3346; display: block; }
+    .term-top .fn { margin-left: 4px; font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); }
+    .term pre {
+      margin: 0; padding: var(--sp-4) var(--sp-5); overflow-x: auto;
+      font-family: var(--font-mono); font-size: 12.5px; line-height: 1.75; color: #c7d0e0; white-space: pre;
+    }
+    .term .c { color: #586079; }
+    .term .p { color: var(--accent-hits); }
+
+    /* Publications */
+    .publist { display: flex; flex-direction: column; gap: var(--sp-3); }
+    .pub {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg); padding: var(--sp-4) var(--sp-5);
+    }
+    .pub .ti { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); line-height: 1.5; }
+    .pub .au { font-size: var(--text-xs); color: var(--text-secondary); margin-top: 5px; line-height: 1.55; }
+    .pub .ve { font-size: var(--text-xs); color: var(--text-muted); margin-top: 4px; font-family: var(--font-mono); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="project-hero" style="background: radial-gradient(ellipse 65% 55% at 10% 35%, rgba(255,109,0,0.09) 0%, transparent 70%), var(--bg-0)" aria-labelledby="hits-title">
+      <div class="project-hero-inner">
+        <img class="hits-emblem" src="../assets/icons/hits-badge.svg" alt="HITS emblem: an ATLAS collision under the Southern Cross" width="148" height="148" onerror="this.style.display='none'">
+        <div class="project-hero-text">
+          <div class="eyebrow fade-up">
+            <i class="ph ph-pulse" aria-hidden="true"></i>
+            FPGA Simulator · ATLAS Tile Calorimeter
+          </div>
+          <h1 class="project-hero-name fade-up" id="hits-title">
+            <span style="color:var(--accent-hits)">HITS</span>
+          </h1>
+          <p class="project-hero-fullname fade-up" data-i18n="projects.hits.full">Hardware Impulse Train Synthesizer</p>
+          <p class="project-hero-desc fade-up" data-i18n="projects.hits.desc">
+            HITS is a real-time FPGA simulator of the ATLAS Tile Calorimeter readout. It runs at 40 MHz on a Terasic DE10-Nano and rebuilds the front-end signal chain in synthesizable Verilog: pseudo-random hits following the LHC bunch-train structure, energy amplitudes drawn from measured distributions, electronic noise, analog shaping and an embedded pole-zero cancellation. It lets the group validate online energy-reconstruction without access to the experiment.
+          </p>
+          <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
+          <div class="project-links fade-up">
+            <a href="https://github.com/nipscernlab/hits" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-hits);border-color:var(--accent-hits)">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              <span data-i18n="projects.github">View on GitHub</span>
+            </a>
+            <a href="cgv" class="btn btn-ghost">
+              <i class="ph ph-cube" aria-hidden="true"></i>
+              Explore CGV
+            </a>
+            <a href="./" class="btn btn-ghost">
+              <i class="ph ph-arrow-left" aria-hidden="true"></i>
+              All Projects
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Badge bar -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);border-top:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
+      <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+        <span class="badge badge-orange"><i class="ph ph-cpu" aria-hidden="true"></i>&nbsp;FPGA</span>
+        <span class="badge badge-orange">Verilog</span>
+        <span class="badge badge-orange">DE10-Nano · Cyclone V SoC</span>
+        <span class="badge badge-blue">ATLAS TileCal</span>
+        <span class="badge badge-gray">Open Source</span>
+        <span class="badge badge-green">Active</span>
+      </div>
+    </div>
+
+    <!-- What it is + pulse figure -->
+    <section class="section">
+      <div class="container">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:center">
+          <div class="fade-up">
+            <div class="accent-line" style="background:var(--accent-hits)" aria-hidden="true"></div>
+            <h2 class="heading-lg">A calorimeter readout, rebuilt in silicon</h2>
+            <p class="body-base" style="color:var(--text-secondary);margin-top:var(--sp-4);line-height:1.75">
+              The real detector delivers one digitized sample every 25 nanoseconds, in step with the LHC bunch crossings. HITS produces that same stream on an FPGA: a hit either lands in a given crossing or it does not, and when it does, the pulse carries an energy drawn from the measured minimum-bias distribution, buried in electronic noise and shaped by the front-end electronics.
+            </p>
+            <p class="body-base" style="color:var(--text-secondary);margin-top:var(--sp-4);line-height:1.75">
+              Because occupancy and pedestal can be changed at runtime from the board's ARM processor, the same hardware can stand in for quiet and busy beam conditions. That makes it a bench for testing energy-estimation and filtering algorithms long before they ever see real data.
+            </p>
+          </div>
+          <figure class="pulsefig fade-up">
+            <svg viewBox="0 0 900 150" role="img" aria-label="A simulated pulse train: shaped calorimeter pulses of varying amplitude across successive bunch crossings, with a quiet abort gap.">
+              <style>
+                /* var() resolves here because a <style> block is real CSS; it does not in bare presentation attributes */
+                .hb-base  { stroke: var(--border-mid); stroke-width: 1; }
+                .hb-tick  { stroke: var(--border-subtle); stroke-width: 1; }
+                .hb-pulse { fill: none; stroke: var(--accent-hits); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+                .hb-gap   { stroke: var(--text-muted); stroke-width: 2; stroke-dasharray: 3 4; }
+                .hb-label { fill: var(--text-muted); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; }
+              </style>
+              <defs>
+                <path id="hpulse" d="M0,112 C7,112 10,92 15,58 C18,34 21,26 25,26 C31,26 37,60 44,86 C51,104 58,111 66,112" fill="none"/>
+              </defs>
+              <!-- baseline / pedestal -->
+              <line class="hb-base" x1="0" y1="112" x2="900" y2="112"/>
+              <!-- bunch-crossing ticks -->
+              <g class="hb-tick">
+                <line x1="60"  y1="118" x2="60"  y2="126"/><line x1="150" y1="118" x2="150" y2="126"/>
+                <line x1="240" y1="118" x2="240" y2="126"/><line x1="330" y1="118" x2="330" y2="126"/>
+                <line x1="420" y1="118" x2="420" y2="126"/><line x1="510" y1="118" x2="510" y2="126"/>
+                <line x1="600" y1="118" x2="600" y2="126"/><line x1="690" y1="118" x2="690" y2="126"/>
+                <line x1="780" y1="118" x2="780" y2="126"/><line x1="840" y1="118" x2="840" y2="126"/>
+              </g>
+              <!-- pulses (height = energy amplitude); the flat run near the middle is a quiet bunch-train section -->
+              <g class="hb-pulse">
+                <use href="#hpulse" transform="translate(40,112) scale(1,0.62) translate(0,-112)"/>
+                <use href="#hpulse" transform="translate(128,112) scale(1,1.06) translate(0,-112)"/>
+                <use href="#hpulse" transform="translate(216,112) scale(1,0.44) translate(0,-112)"/>
+                <use href="#hpulse" transform="translate(300,112) scale(1,0.82) translate(0,-112)"/>
+                <use href="#hpulse" transform="translate(392,112) scale(1,1.18) translate(0,-112)"/>
+                <use href="#hpulse" transform="translate(560,112) scale(1,0.52) translate(0,-112)"/>
+                <use href="#hpulse" transform="translate(650,112) scale(1,0.94) translate(0,-112)"/>
+                <use href="#hpulse" transform="translate(742,112) scale(1,0.70) translate(0,-112)"/>
+                <use href="#hpulse" transform="translate(820,112) scale(1,1.02) translate(0,-112)"/>
+              </g>
+              <!-- gap marker -->
+              <text class="hb-label" x="515" y="34" text-anchor="middle">abort gap</text>
+              <line class="hb-gap" x1="470" y1="112" x2="558" y2="112"/>
+            </svg>
+            <figcaption>Synthesized pulse train. Each pulse sits on a bunch crossing; its height is the energy amplitude drawn per hit, and the flat stretch is a quiet section of the LHC bunch train. This is the shape HITS writes out sample by sample.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- Signal chain -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="fade-up" style="max-width:640px">
+          <div class="accent-line" style="background:var(--accent-hits)" aria-hidden="true"></div>
+          <h2 class="heading-lg">The signal chain</h2>
+          <p class="body-base" style="color:var(--text-secondary);margin-top:var(--sp-4)">
+            The synthesizable core chains four blocks, one sample per clock cycle, ending at the digitized ADC value. Every block is plain Verilog with its lookup memories in <code style="font-family:var(--font-mono);font-size:0.9em">.mif</code> files.
+          </p>
+        </div>
+
+        <div class="chain fade-up" style="margin-top:var(--sp-8)">
+          <div class="stage">
+            <div class="k"><b>1</b> RANDOMNESS</div>
+            <h3>Random number generation</h3>
+            <p>A bank of seven LFSRs with a selector produces uncorrelated pseudo-random streams that feed every stochastic step downstream.</p>
+            <div class="mods">rand_LFSR · select_rand · random_number_generator</div>
+          </div>
+          <div class="stage">
+            <div class="k"><b>2</b> HITS</div>
+            <h3>Hit generation</h3>
+            <p>A Bernoulli draw decides, per bunch crossing, whether a hit occurs. It is gated by the LHC bunch-train mask and the programmable occupancy.</p>
+            <div class="mods">Hits_Bunch_train · hits_positions · bunch_train_mask</div>
+          </div>
+          <div class="stage">
+            <div class="k"><b>3</b> ENERGY</div>
+            <h3>Amplitude and noise</h3>
+            <p>Inverse-CDF lookup, split across several memories, draws energy amplitudes from a measured distribution and adds Gaussian electronic noise.</p>
+            <div class="mods">energy_* + A13_PART*.mif · noise_* + NOISE_PART*.mif</div>
+          </div>
+          <div class="stage">
+            <div class="k"><b>4</b> SHAPING</div>
+            <h3>Shaping and digitization</h3>
+            <p>An IIR model of the front-end shaper, then pedestal offset and clipping to the ADC range. The output <code style="font-family:var(--font-mono);font-size:0.92em">shaper_clip</code> is the readout sample.</p>
+            <div class="mods">shaper_fenics · iir_order1 · iir_order2 · clip_shaper</div>
+          </div>
+        </div>
+
+        <div class="chain-note fade-up">
+          <i class="ph ph-git-branch" aria-hidden="true"></i>
+          <div class="t">
+            Pole-zero cancellation (<code>pzc_ped_track.v</code>) is not part of the simulator. It is a downstream reconstruction stage, validated against the synthesized pulse train and composed with the core by the <code>FPGA_Simulator_v1_PZC.v</code> test wrapper. The board top wires that wrapper to the ARM processor through Qsys.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Specs -->
+    <section class="section">
+      <div class="container">
+        <div class="specs fade-up">
+          <div class="spec"><div class="v">40 MHz</div><div class="l">One sample every 25 ns, matching the LHC bunch-crossing clock</div></div>
+          <div class="spec"><div class="v">7 LFSRs</div><div class="l">Uncorrelated pseudo-random streams behind every draw</div></div>
+          <div class="spec"><div class="v">Runtime</div><div class="l">Occupancy and pedestal set live from the ARM processor</div></div>
+          <div class="spec"><div class="v">Bit-exact</div><div class="l">A frozen golden VCD guards every change to the RTL</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+          <div class="fade-up">
+            <div class="accent-line" style="background:var(--accent-hits)" aria-hidden="true"></div>
+            <h2 class="heading-lg">What is inside</h2>
+            <div class="feature-list" style="margin-top:var(--sp-6)">
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(255,109,0,0.12);color:var(--accent-hits)"><i class="ph ph-sliders" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">Runtime occupancy and pedestal</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Change beam conditions on the fly from the embedded HPS with <code style="font-family:var(--font-mono)">./change_occupancy</code> over SSH. The effect is visible live in SignalTap.</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(255,109,0,0.12);color:var(--accent-hits)"><i class="ph ph-database" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">Multi-memory inverse-CDF sampling</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Energy and noise are sampled by looking up a measured distribution split across several on-chip memories, the approach published by the group for FPGA random generators.</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(255,109,0,0.12);color:var(--accent-hits)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">FENICS shaper as an IIR filter</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">The analog front-end pulse shape is reproduced by first and second-order IIR sections, then offset by the pedestal and clipped to the ADC range.</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(255,109,0,0.12);color:var(--accent-hits)"><i class="ph ph-repeat" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">Bit-exact regression</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">A frozen golden VCD and <code style="font-family:var(--font-mono)">compare_vcd.py</code> catch any unintended change. Deliberate changes regenerate the baseline in the same commit.</div>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(255,109,0,0.12);color:var(--accent-hits)"><i class="ph ph-desktop-tower" aria-hidden="true"></i></div>
+                <div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">Runs with or without the board</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">The core is dependency-free Verilog, so it runs in open-source simulators as well as on the DE10-Nano. Same RTL, same output.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fade-up">
+            <h3 class="heading-sm" style="margin-bottom:var(--sp-4)">Run the simulation</h3>
+            <div class="term">
+              <div class="term-top"><span class="dots"><i></i><i></i><i></i></span><span class="fn">projects/aurora</span></div>
+<pre><span class="c"># plain Verilog, no board required</span>
+<span class="p">$</span> cd projects/aurora
+<span class="p">$</span> iverilog -s sim_pulsos_tb -o tb.vvp \
+      ../../rtl/*.v ../../rtl_test/*.v sim_pulsos_tb.v
+<span class="p">$</span> vvp tb.vvp              <span class="c"># writes sim_pulsos_tb.vcd</span>
+
+<span class="c"># regression: exit 0 means bit-for-bit identical</span>
+<span class="p">$</span> python ../../verification/compare_vcd.py \
+      sim_pulsos_tb.vcd</pre>
+            </div>
+            <p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--sp-3);line-height:1.65">
+              Or open <code style="font-family:var(--font-mono)">projects/aurora/sim_pulsos.spf</code> in <a href="aurora" style="color:var(--accent-hits);text-decoration:underline;text-underline-offset:2px">AURORA</a> and press the wave button. The testbench drives three full LHC orbits with an occupancy step halfway through, from Icarus Verilog straight into GTKWave.
+            </p>
+
+            <h3 class="heading-sm" style="margin:var(--sp-8) 0 var(--sp-4)">On the DE10-Nano</h3>
+            <div class="feature-item" style="align-items:center">
+              <div class="feature-icon" style="background:rgba(255,109,0,0.12);color:var(--accent-hits)"><i class="ph ph-cpu" aria-hidden="true"></i></div>
+              <div style="font-size:var(--text-xs);color:var(--text-secondary);line-height:1.65">
+                Flash the prebuilt Linux SD-card image, set the MSEL switches to ON and power on: Linux boots and programs the FPGA for you. SSH in, run the occupancy menu, and watch the internal signals live in SignalTap.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screenshots -->
+    <section class="section" style="border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <h2 class="heading-md fade-up" style="margin-bottom:var(--sp-6)">See it running</h2>
+        <div class="grid grid-2 fade-up" style="gap:var(--sp-4)">
+          <figure style="margin:0">
+            <div style="aspect-ratio:16/9;background:var(--bg-card);border:1px solid var(--border-mid);border-radius:var(--r-xl);display:flex;align-items:center;justify-content:center;color:var(--text-muted);overflow:hidden">
+              <img src="../assets/images/projects/hits-gtkwave.png" alt="GTKWave showing the simulated HITS pulse train" style="width:100%;height:100%;object-fit:cover;display:none" onload="this.style.display='block';this.nextElementSibling.style.display='none'">
+              <div style="text-align:center;padding:var(--sp-4)">
+                <i class="ph ph-wave-sine" style="font-size:40px" aria-hidden="true"></i>
+                <p style="font-size:var(--text-xs);margin-top:8px">GTKWave: the pulse train over three LHC orbits<br><code style="font-family:var(--font-mono)">assets/images/projects/hits-gtkwave.png</code></p>
+              </div>
+            </div>
+            <figcaption style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--sp-2)">Simulation output, straight from the testbench.</figcaption>
+          </figure>
+          <figure style="margin:0">
+            <div style="aspect-ratio:16/9;background:var(--bg-card);border:1px solid var(--border-mid);border-radius:var(--r-xl);display:flex;align-items:center;justify-content:center;color:var(--text-muted);overflow:hidden">
+              <img src="../assets/images/projects/hits-signaltap.png" alt="SignalTap capture on the DE10-Nano board" style="width:100%;height:100%;object-fit:cover;display:none" onload="this.style.display='block';this.nextElementSibling.style.display='none'">
+              <div style="text-align:center;padding:var(--sp-4)">
+                <i class="ph ph-chart-line" style="font-size:40px" aria-hidden="true"></i>
+                <p style="font-size:var(--text-xs);margin-top:8px">SignalTap: live capture as occupancy changes<br><code style="font-family:var(--font-mono)">assets/images/projects/hits-signaltap.png</code></p>
+              </div>
+            </div>
+            <figcaption style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--sp-2)">The same signals, on real hardware.</figcaption>
+          </figure>
+        </div>
+        <p class="fade-up" style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--sp-4)">
+          Have a capture to add? Drop a PNG at the path shown and it replaces the placeholder automatically.
+        </p>
+      </div>
+    </section>
+
+    <!-- Publications -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+          <div class="fade-up">
+            <div class="accent-line" style="background:var(--accent-hits)" aria-hidden="true"></div>
+            <h2 class="heading-lg">Published work</h2>
+            <p class="body-base" style="color:var(--text-secondary);margin-top:var(--sp-4);line-height:1.75">
+              HITS grew out of the NIPS-CERN line on digital signal processing for the ATLAS Tile Calorimeter. The random generator, the signal-conditioning stage and the full simulator have each been described in peer-reviewed venues.
+            </p>
+            <a href="../publications" class="btn btn-ghost" style="margin-top:var(--sp-5)">
+              <i class="ph ph-books" aria-hidden="true"></i>
+              All publications
+            </a>
+          </div>
+          <div class="publist fade-up">
+            <div class="pub">
+              <div class="ti">Multi-Memory Approach for Random Number Generators in FPGA</div>
+              <div class="au">T. Paschoalin, L. Quirino, L. Andrade Filho</div>
+              <div class="ve">Applied Sciences 16(5) 2537 · 2026</div>
+            </div>
+            <div class="pub">
+              <div class="ti">Digital Implementation of a Signal Conditioning Stage on FPGA for Pulse Simulation in Nuclear Instrumentation</div>
+              <div class="au">F. Luna, T. Paschoalin, L. Quirino, L. Andrade Filho</div>
+              <div class="ve">10th INSCIT · 2026</div>
+            </div>
+            <div class="pub">
+              <div class="ti">Uncorrelated Pseudo-Random Generator for FPGA</div>
+              <div class="au">T. Paschoalin, A. Dias, M. Aguiar, V. Santos, L. Quirino, L. Andrade Filho</div>
+              <div class="ve">38th SBCCI · 2025</div>
+            </div>
+            <div class="pub">
+              <div class="ti">Real-time FPGA-based simulator for the Tile Calorimeter readout system in the ATLAS experiment</div>
+              <div class="au">F. Luna, A. Dias, G. Lisboa, T. Paschoalin, L. Quirino, L. Andrade Filho</div>
+              <div class="ve">XXVII ENEMC · 2024</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section" style="border-top:1px solid var(--border-subtle)">
+      <div class="container container--narrow" style="text-align:center">
+        <div class="fade-up">
+          <div class="accent-line" style="background:var(--accent-hits);margin:0 auto var(--sp-4)" aria-hidden="true"></div>
+          <h2 class="heading-lg">Get HITS</h2>
+          <p class="body-base" style="color:var(--text-secondary);margin:var(--sp-3) 0 var(--sp-6)">
+            Clone the repository to simulate on your machine, or download the SD-card image to bring up the DE10-Nano. Everything is on GitHub under the NIPS-CERN License.
+          </p>
+          <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
+            <a href="https://github.com/nipscernlab/hits" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-hits);border-color:var(--accent-hits)">
+              <i class="ph ph-github-logo" aria-hidden="true"></i>
+              View on GitHub
+            </a>
+            <a href="https://github.com/nipscernlab/hits/releases" target="_blank" rel="noopener" class="btn btn-ghost">
+              <i class="ph ph-download" aria-hidden="true"></i>
+              SD-card image
+            </a>
+            <a href="./" class="btn btn-ghost">
+              <i class="ph ph-squares-four" aria-hidden="true"></i>
+              All Projects
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script>
+  /* VLibras carregado depois do load para nao bloquear a renderizacao */
+  window.addEventListener('load', function () {
+    var s = document.createElement('script');
+    s.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+    s.onload = function () { new VLibras.Widget('https://vlibras.gov.br/app'); };
+    document.body.appendChild(s);
+  });
+  </script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+  <script type="module" src="../assets/js/main.js?v=fd26a8e1ef"></script>
+  <script src="../assets/js/analytics.js" defer></script>
+</body>
+</html>

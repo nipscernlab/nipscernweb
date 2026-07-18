@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>POLARIS | Cross-Platform IDE for SAPHO | NIPS-CERN</title>
-  <meta name="description" content="POLARIS is a modern, cross-platform graphical IDE built with Tauri and Rust for the SAPHO ecosystem. Features Monaco Editor, PRISM RTL Viewer, and YAWT Wave Tracer integration.">
+  <title>POLARIS (Archived) | Cross-Platform IDE for SAPHO | NIPS-CERN</title>
+  <meta name="description" content="POLARIS is an archived NIPS-CERN project: a cross-platform IDE for the SAPHO ecosystem built with Tauri and Rust, with Monaco Editor, the PRISM RTL viewer and the YAWT wave tracer. Its role has since passed to AURORA.">
 
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://www.nipscern.com/projects/polaris">
-  <meta property="og:title" content="POLARIS | Cross-Platform IDE for SAPHO | NIPS-CERN">
-  <meta property="og:description" content="Modern, lightweight IDE built with Tauri and Rust, for the SAPHO ecosystem on Linux and Windows.">
+  <meta property="og:title" content="POLARIS (Archived) | Cross-Platform IDE for SAPHO | NIPS-CERN">
+  <meta property="og:description" content="An archived cross-platform IDE for the SAPHO ecosystem, built with Tauri and Rust. Its role has since passed to AURORA, the current IDE for SAPHO.">
   <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=3bdaaffe20">
+  <link rel="stylesheet" href="../assets/css/main.css?v=fd26a8e1ef">
 
   <style>
     :root { --page-accent: var(--accent-polaris); }
@@ -97,15 +97,15 @@
         </div>
         <div class="project-hero-text">
           <div class="eyebrow fade-up">
-            <i class="ph ph-desktop" aria-hidden="true"></i>
-            Cross-Platform IDE · Part of SAPHO
+            <i class="ph ph-archive" aria-hidden="true"></i>
+            Archived Project · SAPHO ecosystem
           </div>
           <h1 class="project-hero-name fade-up" id="polaris-title">
             <span style="color:var(--accent-polaris)">POLARIS</span>
           </h1>
           <p class="project-hero-fullname fade-up" data-i18n="projects.polaris.full">Cross-Platform Graphical IDE for SAPHO</p>
-          <p class="project-hero-desc fade-up" data-i18n="projects.polaris.desc">
-            POLARIS is a modern, lightweight graphical development environment for the SAPHO ecosystem. Built on <strong>Tauri + Rust</strong> with a <strong>Monaco Editor</strong> frontend, it integrates the YANC compiler, PRISM RTL Viewer, and YAWT Wave Tracer into a single native application. It runs natively on Linux and Windows with a small memory footprint.
+          <p class="project-hero-desc fade-up">
+            POLARIS was a lightweight, cross-platform IDE for the SAPHO ecosystem, built on Tauri and Rust with a Monaco Editor frontend. It brought the YANC compiler, the PRISM RTL viewer and the YAWT wave tracer together in one native application for Linux and Windows. It is no longer in active development; its role has since passed to AURORA, the current IDE for SAPHO.
           </p>
           <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links fade-up">
@@ -117,14 +117,24 @@
               <i class="ph ph-app-window" aria-hidden="true"></i>
               Explore AURORA
             </a>
-            <a href="./" class="btn btn-ghost">
+            <a href="archived" class="btn btn-ghost">
               <i class="ph ph-arrow-left" aria-hidden="true"></i>
-              All Projects
+              Archived Projects
             </a>
           </div>
         </div>
       </div>
     </header>
+
+    <!-- Archived notice -->
+    <div style="background:rgba(147,51,234,0.06);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
+      <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:flex-start;gap:var(--sp-3)">
+        <i class="ph ph-archive" aria-hidden="true" style="color:var(--accent-polaris);font-size:20px;flex-shrink:0;margin-top:1px"></i>
+        <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.6;margin:0">
+          This project is archived and no longer maintained. The code and its releases stay on GitHub for reference. For the SAPHO ecosystem today, see <a href="aurora" style="color:var(--accent-polaris);text-decoration:underline;text-underline-offset:2px">AURORA</a>, and browse the rest of the shelf in <a href="archived" style="color:var(--accent-polaris);text-decoration:underline;text-underline-offset:2px">Archived Projects</a>.
+        </p>
+      </div>
+    </div>
 
     <!-- Badge bar -->
     <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
@@ -134,7 +144,7 @@
         <span class="badge badge-cyan">Tauri + Rust</span>
         <span class="badge badge-cyan">Monaco Editor</span>
         <span class="badge badge-gray">Open Source</span>
-        <span class="badge badge-green">Active</span>
+        <span class="badge badge-gray"><i class="ph ph-archive" aria-hidden="true"></i>&nbsp;Archived</span>
       </div>
     </div>
 
@@ -259,27 +269,58 @@
       </div>
     </section>
 
+    <!-- Who worked on it -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="fade-up" style="max-width:640px">
+          <div class="accent-line" style="background:var(--accent-polaris)" aria-hidden="true"></div>
+          <h2 class="heading-lg">Who worked on it</h2>
+          <p class="body-base" style="color:var(--text-secondary);margin-top:var(--sp-4)">
+            POLARIS was built by undergraduate researchers at NIPS-CERN, under the coordination of Prof. Luciano Manhães de Andrade Filho.
+          </p>
+        </div>
+        <div class="grid grid-2" style="gap:var(--sp-4);margin-top:var(--sp-6);max-width:720px">
+          <div class="feature-item">
+            <div class="feature-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)"><i class="ph ph-user" aria-hidden="true"></i></div>
+            <div>
+              <div class="feature-text" style="font-weight:600;color:var(--text-primary)">Chrysthofer Afonso</div>
+              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Application and integration with the SAPHO toolchain.</div>
+              <a href="https://github.com/Chrysthofer" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">GitHub</a>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)"><i class="ph ph-user" aria-hidden="true"></i></div>
+            <div>
+              <div class="feature-text" style="font-weight:600;color:var(--text-primary)">Gabriel de Aquino Torres</div>
+              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Graphical interface and the YAWT wave tracer.</div>
+              <a href="https://github.com/GorilaJedi" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA -->
     <section class="section" style="border-top:1px solid var(--border-subtle)">
       <div class="container container--narrow" style="text-align:center">
         <div class="fade-up">
           <div class="accent-line" style="background:var(--accent-polaris);margin:0 auto var(--sp-4)" aria-hidden="true"></div>
-          <h2 class="heading-lg">Get POLARIS</h2>
+          <h2 class="heading-lg">POLARIS on GitHub</h2>
           <p class="body-base" style="color:var(--text-secondary);margin:var(--sp-3) 0 var(--sp-6)">
-            Download pre-built binaries for Linux and Windows from the GitHub Releases page, or build from source with <code>cargo tauri build</code>.
+            POLARIS is archived, but the source and its last releases stay online. You can still read the code, clone it, or build from source with <code>cargo tauri build</code>.
           </p>
           <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
-            <a href="https://github.com/nipscernlab/polaris/releases" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-polaris);border-color:var(--accent-polaris)">
-              <i class="ph ph-download" aria-hidden="true"></i>
-              Download Releases
-            </a>
-            <a href="https://github.com/nipscernlab/polaris" target="_blank" rel="noopener" class="btn btn-ghost">
+            <a href="https://github.com/nipscernlab/polaris" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-polaris);border-color:var(--accent-polaris)">
               <i class="ph ph-github-logo" aria-hidden="true"></i>
               View on GitHub
             </a>
-            <a href="sapho" class="btn btn-ghost">
-              <i class="ph ph-cpu" aria-hidden="true"></i>
-              Back to SAPHO
+            <a href="https://github.com/nipscernlab/polaris/releases" target="_blank" rel="noopener" class="btn btn-ghost">
+              <i class="ph ph-download" aria-hidden="true"></i>
+              Last releases
+            </a>
+            <a href="archived" class="btn btn-ghost">
+              <i class="ph ph-archive" aria-hidden="true"></i>
+              Archived Projects
             </a>
           </div>
         </div>
@@ -320,7 +361,7 @@
   setTimeout(function(){ obs.disconnect(); }, 8000);
 })();
 </script>
-  <script type="module" src="../assets/js/main.js?v=3bdaaffe20"></script>
+  <script type="module" src="../assets/js/main.js?v=fd26a8e1ef"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>

@@ -17,7 +17,7 @@ const NAV_LINKS = [
   { key: 'nav.home',         label: 'Home',         href: '',           paths: ['/'] },
   { key: 'nav.about',        label: 'About',        href: 'about.html', paths: ['/about', '/about.html'] },
   { key: 'nav.cern',         label: 'CERN',         href: 'cern.html',  paths: ['/cern', '/cern.html'] },
-  { key: 'nav.projects',     label: 'Projects',     href: 'projects/',  paths: ['/projects/', '/projects/index.html', '/projects', '/projects/sapho', '/projects/sapho.html', '/projects/yanc', '/projects/yanc.html', '/projects/polaris', '/projects/polaris.html', '/projects/aurora', '/projects/aurora.html', '/projects/cgv', '/projects/cgv.html'] },
+  { key: 'nav.projects',     label: 'Projects',     href: 'projects/',  paths: ['/projects/', '/projects/index.html', '/projects', '/projects/sapho', '/projects/sapho.html', '/projects/yanc', '/projects/yanc.html', '/projects/hits', '/projects/hits.html', '/projects/polaris', '/projects/polaris.html', '/projects/aurora', '/projects/aurora.html', '/projects/cgv', '/projects/cgv.html', '/projects/archived', '/projects/archived.html'] },
   { key: 'nav.publications', label: 'Publications', href: 'publications.html', paths: ['/publications', '/publications/', '/publications.html'] },
   { key: 'nav.news',         label: 'News',         href: 'news/',      paths: ['/news/', '/news/index.html', '/news', '/news/post', '/news/post.html'] },
 ];
@@ -219,6 +219,7 @@ function buildFooter() {
         <div class="footer-nav-title" data-i18n="footer.follow_title">Follow</div>
         <ul class="footer-nav-list">
           <li><a href="https://github.com/nipscernlab" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a></li>
+          <li><a href="https://gitlab.com/nips-cern" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-gitlab-logo" aria-hidden="true"></i> GitLab</a></li>
           <li><a href="https://www.nipscern.com" target="_blank" rel="noopener">nipscern.com</a></li>
           <li><a href="https://lattes.cnpq.br/5454168673866452" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px">
             <img src="${ROOT}assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px" aria-hidden="true"> Luciano — Lattes
@@ -234,6 +235,9 @@ function buildFooter() {
         <a href="${ROOT}qa.html" class="btn btn-ghost btn-sm" data-i18n-aria="qa.hero.label" aria-label="Questions and Answers">
           <i class="ph ph-chats-circle" aria-hidden="true"></i> <span data-i18n="footer.qa">Q&amp;A</span>
         </a>
+        <a href="${ROOT}projects/archived" class="btn btn-ghost btn-sm" aria-label="Archived Projects">
+          <i class="ph ph-archive" aria-hidden="true"></i> <span data-i18n="footer.archived">Archived Projects</span>
+        </a>
         <div style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--text-xs);color:var(--text-muted)">
           <a href="${ROOT}credits.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.credits">Credits</a>
           <span aria-hidden="true">·</span>
@@ -244,6 +248,9 @@ function buildFooter() {
         <div class="footer-social">
           <a href="https://github.com/nipscernlab" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitHub">
             <i class="ph ph-github-logo" aria-hidden="true" style="font-size:18px"></i>
+          </a>
+          <a href="https://gitlab.com/nips-cern" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitLab">
+            <i class="ph ph-gitlab-logo" aria-hidden="true" style="font-size:18px"></i>
           </a>
         </div>
       </div>
