@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SAPHO | Scalable-Architecture Processor for Hardware Optimization | NIPS-CERN</title>
-  <meta name="description" content="SAPHO is a scalable hardware architecture and toolchain for processor creation, experimentation, and hardware–software co-design. Includes YANC, POLARIS, YAWT, and PRISM. Developed at NIPS-CERN/UFJF.">
+  <meta name="description" content="SAPHO is a scalable hardware architecture and toolchain for processor creation, experimentation, and hardware–software co-design. Includes YANC, AURORA, Surfer, and PRISM. Developed at NIPS-CERN/UFJF.">
 
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://www.nipscern.com/projects/sapho">
@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=3bdaaffe20">
+  <link rel="stylesheet" href="../assets/css/main.css?v=fd26a8e1ef">
 
   <style>
     :root { --page-accent: var(--accent-sapho); --page-accent-dim: rgba(212,160,23,0.12); }
@@ -99,7 +99,7 @@
             <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
             <h2 class="heading-lg" data-i18n="projects.sapho.features.title">What SAPHO Includes</h2>
             <p class="body-base" style="margin-top:var(--sp-4)">
-              SAPHO provides an end-to-end environment for processor design: from writing high-level CMM code to compiling, simulating, and visualising the resulting hardware. It bundles four major components — YANC, POLARIS, YAWT, and PRISM — into a single cohesive installer.
+              SAPHO provides an end-to-end environment for processor design: from writing high-level CMM code to compiling, simulating, and visualising the resulting hardware. It bundles four major components — YANC, AURORA, Surfer, and PRISM — into a single cohesive installer.
             </p>
             <p class="body-base" style="margin-top:var(--sp-4)">
               The architecture is designed around a custom processor model that students and researchers can modify freely. SAPHO runs identically on Windows and Linux, and the entire compilation pipeline — from source to machine code — executes without any cloud dependency.
@@ -114,17 +114,17 @@
                 </div>
               </div>
               <div class="feature-item">
-                <div class="feature-icon" style="background:rgba(147,51,234,0.12);color:var(--accent-polaris)"><i class="ph ph-desktop" aria-hidden="true"></i></div>
+                <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-app-window" aria-hidden="true"></i></div>
                 <div>
-                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">POLARIS IDE</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Cross-platform graphical interface with Monaco Editor, Tauri + Rust</div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">AURORA IDE</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Desktop IDE with Monaco Editor, simulation and the PRISM viewer in one window</div>
                 </div>
               </div>
               <div class="feature-item">
                 <div class="feature-icon" style="background:rgba(91,156,246,0.12);color:var(--brand)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
                 <div>
-                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">YAWT Wave Tracer</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Signal timeline analysis and waveform inspection</div>
+                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">Surfer</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Waveform viewing and signal-timeline analysis, open from the IDE</div>
                 </div>
               </div>
               <div class="feature-item">
@@ -146,15 +146,15 @@
                 <div class="eco-card-name">YANC</div>
                 <div class="eco-card-desc">CMM + ASM compiler</div>
               </a>
-              <a href="polaris" class="eco-card" style="--project-accent:var(--accent-polaris)">
-                <div style="font-size:24px;color:var(--accent-polaris);margin-bottom:var(--sp-2)"><i class="ph ph-desktop" aria-hidden="true"></i></div>
-                <div class="eco-card-name">POLARIS</div>
-                <div class="eco-card-desc">Cross-platform IDE</div>
+              <a href="aurora" class="eco-card" style="--project-accent:var(--accent-aurora)">
+                <div style="font-size:24px;color:var(--accent-aurora);margin-bottom:var(--sp-2)"><i class="ph ph-app-window" aria-hidden="true"></i></div>
+                <div class="eco-card-name">AURORA</div>
+                <div class="eco-card-desc">Desktop IDE</div>
               </a>
               <div class="eco-card">
                 <div style="font-size:24px;color:var(--brand);margin-bottom:var(--sp-2)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
-                <div class="eco-card-name">YAWT</div>
-                <div class="eco-card-desc">Wave Tracer</div>
+                <div class="eco-card-name">Surfer</div>
+                <div class="eco-card-desc">Waveform viewer</div>
               </div>
               <div class="eco-card">
                 <div style="font-size:24px;color:var(--accent-sapho);margin-bottom:var(--sp-2)"><i class="ph ph-graph" aria-hidden="true"></i></div>
@@ -213,7 +213,7 @@
                 </div>
                 <div>
                   <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Write CMM Programs</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Design custom processor instruction sets and write programs in the CMM high-level language using POLARIS IDE</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Design custom processor instruction sets and write programs in the CMM high-level language using AURORA IDE</div>
                 </div>
               </div>
               <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
@@ -231,7 +231,7 @@
                 </div>
                 <div>
                   <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Simulate &amp; Analyse</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Verify signal behaviour with YAWT Wave Tracer and visualise datapath structure in PRISM</div>
+                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Verify signal behaviour with Surfer and visualise datapath structure in PRISM</div>
                 </div>
               </div>
               <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
@@ -255,7 +255,7 @@
       <div class="container">
         <div class="section-header fade-up">
           <h2 class="heading-lg">Technical Architecture</h2>
-          <p class="body-base" style="max-width:640px;margin-top:var(--sp-4)">SAPHO's design separates compilation, simulation, and visualisation into dedicated components, each independently usable yet tightly integrated through the POLARIS IDE.</p>
+          <p class="body-base" style="max-width:640px;margin-top:var(--sp-4)">SAPHO's design separates compilation, simulation, and visualisation into dedicated components, each independently usable yet tightly integrated through the AURORA IDE.</p>
         </div>
 
         <div class="grid grid-2" style="gap:var(--sp-6)">
@@ -276,16 +276,16 @@
 
           <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
             <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
-              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(147,51,234,0.12);color:var(--accent-polaris);display:flex;align-items:center;justify-content:center;font-size:20px">
-                <i class="ph ph-desktop" aria-hidden="true"></i>
+              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(124,58,237,0.12);color:var(--accent-aurora);display:flex;align-items:center;justify-content:center;font-size:20px">
+                <i class="ph ph-app-window" aria-hidden="true"></i>
               </div>
               <div>
-                <div style="font-weight:700;color:var(--text-primary)">POLARIS IDE</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted)">Tauri + Rust · Monaco Editor · API-driven</div>
+                <div style="font-weight:700;color:var(--text-primary)">AURORA IDE</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Electron · Monaco Editor · Aurora Intelligence</div>
               </div>
             </div>
             <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
-              POLARIS is a lightweight native application built with Tauri and Rust. It embeds Monaco Editor (the engine behind VS Code) for code editing, and exposes a flexible API-driven system for integrating new tools and workflows.
+              AURORA is the desktop IDE for SAPHO. It embeds Monaco Editor (the engine behind VS Code) for code, runs Icarus Verilog and Verilator simulations, and brings compilation, waveform inspection and the PRISM RTL viewer into one window. Aurora Intelligence adds an AI assistant that drives the IDE through its own tools.
             </p>
           </div>
 
@@ -295,12 +295,12 @@
                 <i class="ph ph-wave-sine" aria-hidden="true"></i>
               </div>
               <div>
-                <div style="font-weight:700;color:var(--text-primary)">YAWT Wave Tracer</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted)">Signal analysis &amp; simulation output</div>
+                <div style="font-weight:700;color:var(--text-primary)">Surfer</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">Waveform viewer · a fork we maintain</div>
               </div>
             </div>
             <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
-              YAWT provides interactive inspection of simulation outputs — showing signal timelines, register states, and data flows over clock cycles. Fully integrated into POLARIS, it allows live analysis without switching tools.
+              Surfer is a fast, open-source waveform viewer. The group maintains a fork of it wired into AURORA, so inspecting signal timelines, register states, and data flows over clock cycles happens without switching tools.
             </p>
           </div>
 
@@ -331,7 +331,7 @@
           </div>
           <h2 class="heading-md" style="margin-bottom:var(--sp-4)">Download SAPHO</h2>
           <p class="body-base" style="max-width:480px;margin:0 auto var(--sp-6)">
-            Download the latest SAPHO installer for Windows or Linux from the official GitHub Releases page. The installer bundles YANC, POLARIS, YAWT, and PRISM into a single setup.
+            Download the latest SAPHO installer for Windows or Linux from the official GitHub Releases page. The installer bundles YANC, AURORA, Surfer, and PRISM into a single setup.
           </p>
           <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
             <a href="https://github.com/nipscernlab/sapho/releases" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
@@ -381,7 +381,7 @@
   setTimeout(function(){ obs.disconnect(); }, 8000);
 })();
 </script>
-  <script type="module" src="../assets/js/main.js?v=3bdaaffe20"></script>
+  <script type="module" src="../assets/js/main.js?v=fd26a8e1ef"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Projects | NIPS-CERN</title>
-  <meta name="description" content="Explore NIPS-CERN's software and hardware projects: SAPHO, YANC, POLARIS, AURORA, CGV-WEB — tools for processor design, scientific computing, and calorimeter visualisation.">
+  <meta name="description" content="Explore NIPS-CERN's software and hardware projects: SAPHO, YANC, HITS, AURORA and CGV-WEB. Tools for processor design, FPGA simulation, scientific computing and calorimeter visualisation.">
 
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://www.nipscern.com/projects/">
@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=3bdaaffe20">
+  <link rel="stylesheet" href="../assets/css/main.css?v=fd26a8e1ef">
 </head>
 <body>
 
@@ -110,26 +110,26 @@
             </div>
           </a>
 
-          <!-- POLARIS -->
-          <a href="polaris" class="project-card" style="--project-accent:var(--accent-polaris)" aria-label="POLARIS — Cross-Platform IDE for SAPHO">
-            <i class="ph ph-monitor project-card-bg-icon" aria-hidden="true"></i>
+          <!-- HITS -->
+          <a href="hits" class="project-card" style="--project-accent:var(--accent-hits)" aria-label="HITS — Hardware Impulse Train Synthesizer, an FPGA simulator of the ATLAS Tile Calorimeter readout">
+            <i class="ph ph-pulse project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
-              <div class="project-icon"><i class="ph ph-monitor" aria-hidden="true"></i></div>
+              <div class="project-icon"><i class="ph ph-pulse" aria-hidden="true"></i></div>
               <div>
-                <div class="project-card-title">POLARIS</div>
-                <div class="project-card-full-name" data-i18n="projects.polaris.full">Cross-Platform Graphical IDE for SAPHO</div>
+                <div class="project-card-title">HITS</div>
+                <div class="project-card-full-name" data-i18n="projects.hits.full">Hardware Impulse Train Synthesizer</div>
               </div>
             </div>
             <div class="project-card-body">
-              <p class="project-card-desc" data-i18n="projects.polaris.short">Modern, lightweight IDE built with Tauri and Rust.</p>
+              <p class="project-card-desc" data-i18n="projects.hits.short">Real-time FPGA simulator of the ATLAS Tile Calorimeter readout.</p>
               <div style="margin-top:var(--sp-4);display:flex;flex-wrap:wrap;gap:var(--sp-1)">
-                <span class="badge" style="background:color-mix(in srgb,var(--accent-polaris) 15%,transparent);color:var(--accent-polaris)">Tauri</span>
-                <span class="badge" style="background:color-mix(in srgb,var(--accent-polaris) 15%,transparent);color:var(--accent-polaris)">Rust</span>
-                <span class="badge" style="background:color-mix(in srgb,var(--accent-polaris) 15%,transparent);color:var(--accent-polaris)">Monaco</span>
+                <span class="badge" style="background:color-mix(in srgb,var(--accent-hits) 15%,transparent);color:var(--accent-hits)">FPGA</span>
+                <span class="badge" style="background:color-mix(in srgb,var(--accent-hits) 15%,transparent);color:var(--accent-hits)">Verilog</span>
+                <span class="badge" style="background:color-mix(in srgb,var(--accent-hits) 15%,transparent);color:var(--accent-hits)">DE10-Nano</span>
               </div>
             </div>
             <div class="project-card-footer">
-              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();window.open('https://github.com/nipscernlab/polaris','_blank','noopener')" aria-label="POLARIS on GitHub">
+              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();window.open('https://github.com/nipscernlab/hits','_blank','noopener')" aria-label="HITS on GitHub">
                 <i class="ph ph-github-logo" aria-hidden="true"></i> GitHub
               </button>
             </div>
@@ -209,6 +209,45 @@
             </div>
           </a>
 
+          <!-- GitLab -->
+          <a href="https://gitlab.com/nips-cern" target="_blank" rel="noopener" class="project-card" style="--project-accent:#fc6d26;--project-accent-dim:rgba(252,109,38,0.08)" aria-label="NIPS-CERN on GitLab — including the Surfer fork for AURORA">
+            <i class="ph ph-gitlab-logo project-card-bg-icon" aria-hidden="true"></i>
+            <div class="project-card-header">
+              <div class="project-icon" style="color:#fc6d26;background:rgba(252,109,38,0.1)"><i class="ph ph-gitlab-logo" aria-hidden="true"></i></div>
+              <div>
+                <div class="project-card-title">GitLab</div>
+                <div class="project-card-full-name">NIPS-CERN on GitLab</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc">Selected NIPS-CERN work on GitLab, including the Surfer fork we maintain for AURORA.</p>
+            </div>
+            <div class="project-card-footer">
+              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();window.open('https://gitlab.com/nips-cern/surfer-aurora','_blank','noopener')" aria-label="surfer-aurora on GitLab">
+                <i class="ph ph-gitlab-logo" aria-hidden="true"></i> surfer-aurora
+              </button>
+            </div>
+          </a>
+
+          <!-- Archived Projects -->
+          <a href="archived" class="project-card" style="--project-accent:#94a3b8;--project-accent-dim:rgba(148,163,184,0.08)" aria-label="Archived Projects — retired NIPS-CERN projects, kept on record">
+            <i class="ph ph-archive project-card-bg-icon" aria-hidden="true"></i>
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--text-secondary);background:rgba(148,163,184,0.1)"><i class="ph ph-archive" aria-hidden="true"></i></div>
+              <div>
+                <div class="project-card-title">Archived</div>
+                <div class="project-card-full-name">Retired projects, kept on record</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc">Projects the group no longer develops, preserved with their story and the people who built them.</p>
+            </div>
+            <div class="project-card-footer">
+              <span class="badge badge-gray">POLARIS</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
         </div>
       </div>
     </section>
@@ -247,7 +286,7 @@
   setTimeout(function(){ obs.disconnect(); }, 8000);
 })();
 </script>
-  <script type="module" src="../assets/js/main.js?v=3bdaaffe20"></script>
+  <script type="module" src="../assets/js/main.js?v=fd26a8e1ef"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>

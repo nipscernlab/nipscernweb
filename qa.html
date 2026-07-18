@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
   <title>Q&amp;A | NIPS-CERN, CERN and ATLAS questions answered</title>
-  <meta name="description" content="What is CERN? Where is the LHC? What is the ATLAS experiment? Did CERN open a portal? Answers from NIPS-CERN, plus everything about SAPHO, AURORA, YANC, CGVWeb and POLARIS.">
+  <meta name="description" content="What is CERN? Where is the LHC? What is the ATLAS experiment? Did CERN open a portal? Answers from NIPS-CERN, plus everything about SAPHO, AURORA, YANC, HITS and CGVWeb.">
 
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://www.nipscern.com/qa">
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="assets/css/main.css?v=3bdaaffe20">
+  <link rel="stylesheet" href="assets/css/main.css?v=fd26a8e1ef">
 
   <style>
     .qa-group { margin-bottom: var(--sp-12); }
@@ -100,7 +100,7 @@
       "name": "What is SAPHO?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "SAPHO is a scalable hardware architecture and toolchain for creating processors: you describe an algorithm in a few lines of C±, and SAPHO generates a soft-core processor tailored to run exactly that algorithm on an FPGA. The platform is the sum of its parts (SAPHO = AURORA + YANC) and includes POLARIS, YAWT and PRISM."
+        "text": "SAPHO is a scalable hardware architecture and toolchain for creating processors: you describe an algorithm in a few lines of C±, and SAPHO generates a soft-core processor tailored to run exactly that algorithm on an FPGA. The platform is the sum of its parts (SAPHO = AURORA + YANC) and includes Surfer and PRISM."
       }
     },
     {
@@ -129,10 +129,10 @@
     },
     {
       "@type": "Question",
-      "name": "What is POLARIS?",
+      "name": "What is HITS?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "POLARIS is a modern, cross-platform graphical IDE for the SAPHO ecosystem, built with Tauri and Rust. It integrates the Monaco editor, the PRISM RTL viewer and the YAWT wave tracer."
+        "text": "HITS is a real-time FPGA simulator of the ATLAS Tile Calorimeter readout. It runs at 40 MHz on a DE10-Nano and reproduces the front-end signal chain in synthesizable Verilog, so online energy-reconstruction can be validated without the experiment."
       }
     },
     {
@@ -277,7 +277,7 @@
 
           <details class="qa-item">
             <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q4">What is SAPHO?</span></summary>
-            <div class="qa-answer" data-i18n-html="qa.a4"><a href="projects/sapho">SAPHO</a> is a scalable hardware architecture and toolchain for creating processors: you describe an algorithm in a few lines of C±, and SAPHO generates a soft-core processor tailored to run exactly that algorithm on an FPGA. The platform is the sum of its parts (SAPHO = <a href="projects/aurora">AURORA</a> + <a href="projects/yanc">YANC</a>) and includes POLARIS, YAWT and PRISM.</div>
+            <div class="qa-answer" data-i18n-html="qa.a4"><a href="projects/sapho">SAPHO</a> is a scalable hardware architecture and toolchain for creating processors: you describe an algorithm in a few lines of C±, and SAPHO generates a soft-core processor tailored to run exactly that algorithm on an FPGA. The platform is the sum of its parts (SAPHO = <a href="projects/aurora">AURORA</a> + <a href="projects/yanc">YANC</a>) and includes Surfer and PRISM.</div>
           </details>
 
           <details class="qa-item">
@@ -296,8 +296,8 @@
           </details>
 
           <details class="qa-item">
-            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q8">What is POLARIS?</span></summary>
-            <div class="qa-answer" data-i18n-html="qa.a8"><a href="projects/polaris">POLARIS</a> is a modern, cross-platform graphical IDE for the SAPHO ecosystem, built with Tauri and Rust. It integrates the Monaco editor, the PRISM RTL viewer and the YAWT wave tracer.</div>
+            <summary><i class="ph ph-plus" aria-hidden="true"></i><span data-i18n="qa.q8">What is HITS?</span></summary>
+            <div class="qa-answer" data-i18n-html="qa.a8"><a href="projects/hits">HITS</a> is a real-time FPGA simulator of the ATLAS Tile Calorimeter readout. It runs at 40 MHz on a DE10-Nano and reproduces the front-end signal chain in synthesizable Verilog, so online energy-reconstruction can be validated without the experiment.</div>
           </details>
         </div>
 
@@ -374,7 +374,7 @@
   });
   </script>
 
-  <script type="module" src="assets/js/main.js?v=3bdaaffe20"></script>
+  <script type="module" src="assets/js/main.js?v=fd26a8e1ef"></script>
   <script src="assets/js/analytics.js" defer></script>
 </body>
 </html>

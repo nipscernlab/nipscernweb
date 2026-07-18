@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=3bdaaffe20">
+  <link rel="stylesheet" href="../assets/css/main.css?v=fd26a8e1ef">
 
   <style>
     :root {
@@ -447,7 +447,7 @@
           <div class="st"><span class="k">02</span><span class="t">Assembly</span><span class="d">cmmcomp · asmcomp</span></div>
           <div class="st"><span class="k">03</span><span class="t">Verilog</span><span class="d">synthesizable RTL</span></div>
           <div class="st"><span class="k">04</span><span class="t">Simulate</span><span class="d">Icarus or Verilator</span></div>
-          <div class="st"><span class="k">05</span><span class="t">Waveform</span><span class="d">GTKWave</span></div>
+          <div class="st"><span class="k">05</span><span class="t">Waveform</span><span class="d">Surfer</span></div>
           <div class="st"><span class="k">06</span><span class="t">RTL view</span><span class="d">PRISM</span></div>
         </div>
 
@@ -457,7 +457,7 @@
             <p>
               Simulation runs on <strong>Icarus Verilog</strong> or <strong>Verilator</strong>, switched from a toolbar
               toggle, and Python cocotb testbenches are supported too. Whatever you pick,
-              the waveform opens in GTKWave showing exactly the signals you selected.
+              the waveform opens in Surfer showing exactly the signals you selected.
             </p>
             <p class="ksub" style="margin-top:var(--sp-6)">Nothing to install</p>
             <p>
@@ -469,29 +469,23 @@
 
           <figure class="shot fade-up">
             <div class="frame">
-              <img src="../assets/images/projects/aurora-gtkwave.png" alt="GTKWave showing the simulated processor's signals over time"
+              <img src="../assets/images/projects/aurora-surfer.png" alt="Surfer showing a simulated SAPHO processor's signals over time, with the C± and assembly instruction tracks below"
                    onload="this.closest('.shot').classList.add('ok')">
-              <div class="ph"><i class="ph ph-wave-sine" aria-hidden="true"></i><span>screenshot: GTKWave</span></div>
+              <div class="ph"><i class="ph ph-wave-sine" aria-hidden="true"></i><span>screenshot: Surfer</span></div>
             </div>
-            <figcaption>The simulation result in GTKWave, showing the signals you selected.</figcaption>
+            <figcaption>A simulation opened in Surfer, with the signals you selected lined up against the C± and assembly that produced them.</figcaption>
           </figure>
         </div>
 
-        <div class="split" style="margin-top:var(--sp-8);align-items:center">
-          <figure class="shot fade-up">
-            <div class="frame">
-              <img src="../assets/images/projects/aurora-polaris.png" alt="POLARIS, the NIPS-CERN wave tracer, showing simulated signals"
-                   onload="this.closest('.shot').classList.add('ok')">
-              <div class="ph"><i class="ph ph-wave-triangle" aria-hidden="true"></i><span>screenshot: POLARIS Wave Tracer</span></div>
-            </div>
-            <figcaption>POLARIS, our own wave tracer, in development.</figcaption>
-          </figure>
-          <div class="prose fade-up">
-            <p class="ksub">In development: POLARIS, our Wave Tracer</p>
-            <p>
-              We are building our own waveform viewer to replace GTKWave. Its name is <a class="wlink" href="https://github.com/nipscernlab/polaris" target="_blank" rel="noopener">POLARIS</a>: the
-              POLARIS interface became our Wave Tracer. It reads the same simulation output and is meant to live inside
-              AURORA, so reading signals will not mean opening a separate program.
+        <div class="fade-up" style="margin-top:var(--sp-8);display:flex;gap:var(--sp-5);align-items:center;border:1px solid var(--border-subtle);border-radius:var(--r-lg);background:var(--bg-elevated);padding:var(--sp-5) var(--sp-6)">
+          <img src="../assets/icons/aurora/surfer.svg" alt="Surfer logo" style="width:56px;height:56px;flex-shrink:0" loading="lazy">
+          <div class="prose">
+            <p class="ksub" style="margin-bottom:6px">A fork of Surfer, inside AURORA</p>
+            <p style="margin:0">
+              Waveforms open in <a class="wlink" href="https://gitlab.com/nips-cern/surfer-aurora" target="_blank" rel="noopener">Surfer</a>,
+              a fast, open-source viewer. We are developing our own fork of it, wired directly into AURORA, so reading
+              signals stays part of the IDE rather than a separate program. It lines the waveforms up with the C± and
+              assembly that produced them.
             </p>
           </div>
         </div>
@@ -503,7 +497,7 @@
             <div class="tool"><img src="../assets/icons/yanc.svg" alt="" onerror="this.outerHTML='&lt;i class=&quot;ph ph-code-block fb&quot;&gt;&lt;/i&gt;'"><span class="nm">YANC</span><span class="role">compilers</span></div>
             <div class="tool"><img src="../assets/icons/aurora/Icarus_Verilog_logo.png" alt=""><span class="nm">Icarus Verilog</span><span class="role">simulation</span></div>
             <div class="tool"><img src="../assets/icons/aurora/Verilator_logo.png" alt=""><span class="nm">Verilator</span><span class="role">fast sim</span></div>
-            <div class="tool"><img src="../assets/icons/aurora/gtkwave.svg" alt=""><span class="nm">GTKWave</span><span class="role">waveforms</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/surfer.svg" alt=""><span class="nm">Surfer</span><span class="role">waveforms</span></div>
             <div class="tool"><img src="../assets/icons/aurora/yosys.svg" alt=""><span class="nm">Yosys</span><span class="role">synthesis</span></div>
             <div class="tool"><img src="../assets/icons/aurora/netlistsvg.svg" alt=""><span class="nm">netlistsvg</span><span class="role">RTL render</span></div>
             <div class="tool"><img src="../assets/icons/aurora/monaco.svg" alt=""><span class="nm">Monaco</span><span class="role">editor</span></div>
@@ -793,7 +787,7 @@
     requestAnimationFrame(frame);
   })();
   </script>
-  <script type="module" src="../assets/js/main.js?v=3bdaaffe20"></script>
+  <script type="module" src="../assets/js/main.js?v=fd26a8e1ef"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>

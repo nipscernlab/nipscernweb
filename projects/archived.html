@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archived Projects | NIPS-CERN</title>
+  <meta name="description" content="Projects the NIPS-CERN group has retired from active development, kept on record. Each page tells what the project was, what it did, and who worked on it.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/projects/archived">
+  <meta property="og:title" content="Archived Projects | NIPS-CERN">
+  <meta property="og:description" content="Projects the NIPS-CERN group has retired from active development, kept on record for the people who built them.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/projects/archived">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="../assets/css/main.css?v=fd26a8e1ef">
+
+  <style>
+    /* Archived cards read a shade quieter than the live grid */
+    .arch-card { filter: saturate(0.9); }
+    .arch-card:hover { filter: saturate(1); }
+    .arch-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .arch-status i { color: var(--accent-polaris); }
+    .arch-meta {
+      display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4);
+      font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--sp-3);
+    }
+    .arch-meta b { color: var(--text-secondary); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="page-hero" aria-labelledby="archived-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-grid">
+          <div class="page-hero-text">
+            <div class="eyebrow fade-up">
+              <i class="ph ph-archive" aria-hidden="true"></i>
+              <span>Archived</span>
+            </div>
+            <h1 class="display-lg fade-up" id="archived-title">Archived Projects</h1>
+            <p class="body-lg fade-up">
+              Work the group has stepped back from, kept here on record. A project moves to this shelf when it is no longer developed, usually because a newer tool took over what it did. Each one still has its page, its repository and the names of the people who built it.
+            </p>
+            <div class="fade-up" style="margin-top:var(--sp-5)">
+              <a href="./" class="btn btn-ghost">
+                <i class="ph ph-arrow-left" aria-hidden="true"></i>
+                Back to active projects
+              </a>
+            </div>
+          </div>
+          <figure class="page-hero-accent" aria-hidden="true">
+            <img src="../assets/images/undraw/undraw_open_source.svg" alt="" width="260" height="165" loading="lazy" onerror="this.parentElement.style.display='none'">
+          </figure>
+        </div>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="container">
+        <div class="grid grid-auto-lg stagger-children">
+
+          <!-- POLARIS -->
+          <a href="polaris" class="project-card arch-card" style="--project-accent:var(--accent-polaris)" aria-label="POLARIS — archived cross-platform IDE for SAPHO">
+            <i class="ph ph-desktop project-card-bg-icon" aria-hidden="true"></i>
+            <div class="project-card-header">
+              <div class="project-icon" style="color:var(--accent-polaris);background:rgba(147,51,234,0.12)"><i class="ph ph-desktop" aria-hidden="true"></i></div>
+              <div>
+                <div class="project-card-title">POLARIS</div>
+                <div class="project-card-full-name">Cross-Platform Graphical IDE for SAPHO</div>
+              </div>
+            </div>
+            <div class="project-card-body">
+              <p class="project-card-desc">A Tauri and Rust IDE for the SAPHO ecosystem, with Monaco Editor and the PRISM RTL viewer. Its role passed to AURORA, the group's active IDE.</p>
+              <div class="arch-meta">
+                <span><b>Status</b> Archived · 2026</span>
+                <span><b>Built with</b> Tauri · Rust · Monaco</span>
+              </div>
+            </div>
+            <div class="project-card-footer">
+              <span class="arch-status"><i class="ph ph-archive" aria-hidden="true"></i> Read the record</span>
+              <i class="ph ph-arrow-right" aria-hidden="true" style="color:var(--text-muted)"></i>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+  </div>
+  <script>(function(){var p=HTMLAudioElement.prototype.play;HTMLAudioElement.prototype.play=function(){return Promise.resolve();};setTimeout(function(){HTMLAudioElement.prototype.play=p;},3000);})();</script>
+  <script>
+  /* VLibras carregado depois do load para nao bloquear a renderizacao */
+  window.addEventListener('load', function () {
+    var s = document.createElement('script');
+    s.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+    s.onload = function () { new VLibras.Widget('https://vlibras.gov.br/app'); };
+    document.body.appendChild(s);
+  });
+  </script><script>
+(function(){
+  var obs = new MutationObserver(function(){
+    var panel = document.querySelector('[vw-plugin-wrapper]');
+    if (panel && panel.innerHTML.trim().length > 10) {
+      panel.style.display = 'none';
+      obs.disconnect();
+      var btn = document.querySelector('[vw-access-button]');
+      if (btn) btn.addEventListener('click', function(){
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+      }, { once: false });
+    }
+  });
+  obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  setTimeout(function(){ obs.disconnect(); }, 8000);
+})();
+</script>
+  <script type="module" src="../assets/js/main.js?v=fd26a8e1ef"></script>
+  <script src="../assets/js/analytics.js" defer></script>
+</body>
+</html>
