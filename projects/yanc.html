@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YANC | Yet Another Compiler | NIPS-CERN</title>
-  <meta name="description" content="YANC is the compiler toolchain powering the SAPHO ecosystem — including cmmcomp (CMM compiler) and asmcomp (assembly compiler). Written in C with Flex, Bison, and GCC.">
+  <title>YANC: The Compilers of SAPHO | NIPS-CERN</title>
+  <meta name="description" content="YANC (Yet Another Compiler) is the compiler suite under SAPHO. Write a program in C± or C++ and YANC carries it down to a synthesizable processor: assembly, Verilog core, memory images, testbench. Six binaries, two languages, one core.">
 
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://www.nipscern.com/projects/yanc">
-  <meta property="og:title" content="YANC | Yet Another Compiler | NIPS-CERN">
-  <meta property="og:description" content="The compiler toolchain powering the SAPHO hardware design ecosystem.">
+  <meta property="og:title" content="YANC: The Compilers of SAPHO | NIPS-CERN">
+  <meta property="og:description" content="Write a program in C± or C++ and YANC carries it down to a synthesizable processor: assembly, Verilog core, memory images, testbench. Two languages, one core.">
   <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -30,103 +30,252 @@
   <link rel="stylesheet" href="../assets/css/main.css?v=fd26a8e1ef">
 
   <style>
-    :root { --page-accent: var(--accent-yanc); --page-accent-dim: rgba(0,180,166,0.12); }
+    :root {
+      --page-accent: var(--accent-yanc);
+      --ync: #00b4a6;                 /* accent-yanc */
+      --ync-ice: #22d3ee;             /* the icon's cyan */
+      --ync-text: #7fe7dc;
+      --ync-line: rgba(0,180,166,0.30);
+      /* machine teal: cold, metallic, precise */
+      --grad-machine: linear-gradient(105deg, #5eead4 0%, #2dd4bf 38%, #22d3ee 72%, #a5f3fc 100%);
+    }
 
-    .pipeline-flow {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
+    .grad-machine {
+      background: var(--grad-machine);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    .pipeline-node {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--sp-4);
-      padding: var(--sp-4) var(--sp-5);
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--r-xl);
+
+    /* ── Hero: the instruction stream ── */
+    .project-hero { position: relative; overflow: hidden; }
+    .ync-bg {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 60% at 12% 40%, rgba(0,180,166,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 45% at 88% 70%, rgba(34,211,238,0.06) 0%, transparent 70%),
+        var(--bg-0);
+    }
+    /* drifting rows of real SAPHO mnemonics; the machine murmurs underneath */
+    .op-stream {
+      position: absolute; left: 0; right: 0; white-space: nowrap;
+      font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.35em;
+      color: rgba(94,234,212,0.07); user-select: none;
+    }
+    .op-stream span { display: inline-block; padding-right: 0.35em; animation: op-drift linear infinite; }
+    .op-stream.r1 { top: 14%; } .op-stream.r1 span { animation-duration: 210s; }
+    .op-stream.r2 { top: 50%; } .op-stream.r2 span { animation-duration: 280s; animation-direction: reverse; color: rgba(34,211,238,0.055); }
+    .op-stream.r3 { top: 84%; } .op-stream.r3 span { animation-duration: 240s; }
+    @keyframes op-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .op-stream span { animation: none; } }
+
+    /* hero emblem: the three chevrons */
+    .ync-emblem {
+      width: 132px; height: 132px; flex-shrink: 0;
+      filter: drop-shadow(0 0 34px rgba(34,211,238,0.28));
+    }
+    @media (max-width: 640px) { .ync-emblem { width: 96px; height: 96px; } }
+
+    /* the descent strip: what the three chevrons mean */
+    .descent {
+      display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      border: 1px solid var(--border-subtle); border-radius: 999px;
+      padding: 8px 16px; background: rgba(10,13,22,0.55);
+    }
+    .descent b { font-weight: 500; color: var(--text-secondary); }
+    .descent i.chv { font-style: normal; color: var(--ync-ice); font-weight: 700; }
+    .descent i.chv.c1 { opacity: 0.34; } .descent i.chv.c2 { opacity: 0.64; }
+
+    /* ── Section furniture ── */
+    .sec-label {
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-muted);
+      display: flex; align-items: center; gap: 12px; margin-bottom: var(--sp-5);
+    }
+    .sec-label .n { font-weight: 700; background: var(--grad-machine); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .sec-label::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, var(--ync-line), transparent); }
+
+    .lede {
+      font-size: clamp(22px, 2.6vw, 32px); line-height: 1.4; font-weight: 500;
+      color: var(--text-primary); letter-spacing: -0.01em; margin: 0;
+    }
+    .lede .hl { background: var(--grad-machine); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    .prose p { font-size: var(--text-base); line-height: 1.78; color: var(--text-secondary); margin: 0; }
+    .prose p + p { margin-top: var(--sp-4); }
+    .prose strong { color: var(--text-primary); font-weight: 600; }
+    .prose code, .ic {
+      font-family: var(--font-mono); font-size: 0.86em; color: var(--ync-text);
+      background: var(--bg-elevated); padding: 1px 5px; border-radius: 4px;
+    }
+    .ksub { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin: 0 0 var(--sp-3); }
+    .note { border-left: 2px solid var(--ync-line); padding: 2px 0 2px var(--sp-4); color: var(--text-secondary); font-size: var(--text-sm); line-height: 1.7; }
+
+    /* inline link: gradient text + animated wave underline on hover */
+    .wlink {
       position: relative;
+      background: var(--grad-machine);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      text-decoration: none !important;
     }
-    .pipeline-arrow {
-      display: flex;
-      justify-content: flex-start;
-      padding-left: var(--sp-6);
-      padding-top: 2px;
-      padding-bottom: 2px;
+    .wlink::after {
+      content: '';
+      position: absolute; left: 0; right: 0; bottom: -3px; height: 3px;
+      background-image: var(--ync-wave, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='3' viewBox='0 0 20 3'%3E%3Cpath d='M0 1.5 Q5 0 10 1.5 Q15 3 20 1.5' fill='none' stroke='%2322d3ee' stroke-width='1.5'/%3E%3C/svg%3E"));
+      background-repeat: repeat-x; background-size: 20px 3px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
     }
-    .pipeline-arrow i { color: var(--border-mid); }
-    .step-badge {
-      width: 28px;
-      height: 28px;
-      border-radius: var(--r-full);
-      background: rgba(0,180,166,0.15);
-      color: var(--accent-yanc);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      flex-shrink: 0;
+    .wlink:nth-of-type(2n) { --ync-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='3' viewBox='0 0 20 3'%3E%3Cpath d='M0 1.5 Q5 0 10 1.5 Q15 3 20 1.5' fill='none' stroke='%232dd4bf' stroke-width='1.5'/%3E%3C/svg%3E"); }
+    .wlink:hover::after { opacity: 1; animation: wave-move 0.6s linear infinite; }
+
+    /* split layout */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-10); align-items: center; }
+    .split.lead { grid-template-columns: 1.05fr 0.95fr; }
+    .split > * { min-width: 0; }
+    @media (max-width: 900px) {
+      .split, .split.lead { grid-template-columns: 1fr; gap: var(--sp-7); align-items: stretch; }
     }
-    .pipeline-node-title {
-      font-weight: 600;
-      color: var(--text-primary);
-      font-size: var(--text-sm);
-      margin-bottom: 2px;
+
+    /* code cards */
+    .code-card {
+      background: #0a0d16; border: 1px solid var(--border-subtle); border-radius: var(--r-lg);
+      overflow: hidden; box-shadow: 0 24px 60px -40px rgba(0,0,0,0.9);
     }
-    .pipeline-node-sub {
-      font-size: var(--text-xs);
-      color: var(--text-muted);
-      font-family: var(--font-mono);
+    .code-top { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .code-top .dots { display: flex; gap: 6px; }
+    .code-top .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2b3346; display: block; }
+    .code-top .fn { margin-left: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+    .code-top .lang {
+      margin-left: auto; font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; color: var(--ync-text); border: 1px solid var(--ync-line);
+      border-radius: 4px; padding: 1px 6px;
     }
-    .tool-row {
-      display: flex;
-      align-items: center;
-      gap: var(--sp-3);
-      padding: var(--sp-3) var(--sp-4);
+    .code-body { margin: 0; padding: 16px 18px; overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; color: #c7d0e0; white-space: pre; }
+    .code-body .dir { color: var(--ync-text); }
+    .code-body .kw  { color: #7dd3fc; }
+    .code-body .typ { color: #5eead4; }
+    .code-body .num { color: #f0b072; }
+    .code-body .cm  { color: #586079; }
+    .code-body .brk { color: #a5f3fc; font-weight: 500; }
+    .code-cap { margin-top: var(--sp-3); font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
+
+    /* two languages, one core: the convergence */
+    .converge { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+    @media (max-width: 900px) { .converge { grid-template-columns: 1fr; } }
+    .merge-rail { display: flex; justify-content: center; margin-top: var(--sp-7); }
+    .merge-chip {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-family: var(--font-mono); font-size: 12.5px; color: var(--text-secondary);
+      border: 1px solid var(--ync-line); border-radius: 999px; padding: 7px 16px;
       background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--r-lg);
     }
-    .tool-row + .tool-row { margin-top: var(--sp-2); }
-    .tool-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: var(--r-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
+    .merge-chip b { color: var(--ync-text); font-weight: 600; }
+
+    /* pipeline: the line map */
+    .pipemap {
+      margin: 0; background: #0a0d16; border: 1px solid var(--border-subtle);
+      border-radius: var(--r-lg); padding: var(--sp-5) var(--sp-4) var(--sp-4);
+      box-shadow: 0 24px 60px -40px rgba(0,0,0,0.9);
     }
-    .tool-name {
-      font-family: var(--font-mono);
-      font-size: var(--text-sm);
-      font-weight: 600;
-      color: var(--text-primary);
+    .pm-scroll { overflow-x: auto; }
+    .pm-scroll svg { min-width: 980px; width: 100%; height: auto; display: block; }
+    .pipemap figcaption { margin-top: var(--sp-4); padding: 0 var(--sp-2); font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
+    .pm text { font-family: var(--font-mono); text-anchor: middle; }
+    .pm .l  { fill: #c7d0e0; font-size: 12.5px; font-weight: 500; }
+    .pm .s  { fill: #586079; font-size: 10.5px; }
+    .pm .f  { fill: #7fe7dc; font-size: 11.5px; }
+    .pm .z  { fill: #9fb0c8; font-size: 12.5px; }
+    .pm .zt { fill: #586079; font-size: 10px; letter-spacing: 0.14em; }
+    .pm .lg { fill: #586079; font-size: 10.5px; text-anchor: start; }
+
+    /* companion tools (real icons) */
+    .tools { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tool {
+      display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+      border: 1px solid var(--border-subtle); border-radius: 999px; background: var(--bg-card);
+      transition: border-color .18s ease;
     }
-    .tool-desc {
-      font-size: var(--text-xs);
-      color: var(--text-muted);
+    .tool:hover { border-color: var(--ync-line); }
+    .tool img { height: 20px; width: 20px; object-fit: contain; }
+    .tool .nm { font-size: var(--text-sm); color: var(--text-primary); font-weight: 600; }
+    .tool .role { font-size: 11px; color: var(--text-muted); }
+
+    /* Dirac panel */
+    .dirac-panel {
+      position: relative; overflow: hidden;
+      background: linear-gradient(180deg, rgba(34,211,238,0.05), transparent 36%), #0a0d16;
+      border: 1px solid var(--ync-line); border-radius: var(--r-2xl);
+      padding: var(--sp-10);
     }
-    .cmm-snippet {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-subtle);
-      border-left: 3px solid var(--accent-yanc);
-      border-radius: var(--r-lg);
-      padding: var(--sp-4) var(--sp-5);
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      overflow-x: auto;
-      white-space: pre;
+    .dirac-panel::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--grad-machine); }
+    .dirac-mark {
+      position: absolute; right: -20px; bottom: -60px; font-family: var(--font-serif);
+      font-size: 220px; line-height: 1; color: rgba(94,234,212,0.045); pointer-events: none; user-select: none;
     }
-    .cmm-kw { color: #a78bfa; }
-    .cmm-type { color: #34d399; }
-    .cmm-comment { color: var(--text-muted); font-style: italic; }
-    .cmm-num { color: #fb923c; }
+    .dirac-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--sp-9); align-items: center; }
+    @media (max-width: 900px) { .dirac-grid { grid-template-columns: 1fr; } }
+    .dirac-code {
+      margin: 0; font-family: var(--font-mono); font-size: 15px; line-height: 2.15;
+      color: #c7d0e0; white-space: pre; overflow-x: auto;
+    }
+    .dirac-code .brk { color: #a5f3fc; }
+    .dirac-code .op  { color: var(--ync-text); font-weight: 600; }
+    .dirac-gloss { display: flex; flex-direction: column; gap: var(--sp-4); }
+    .dg { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; }
+    .dg code { font-family: var(--font-mono); font-size: 13px; color: #a5f3fc; white-space: nowrap; }
+    .dg span { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.6; }
+    @media (max-width: 600px) {
+      .dirac-panel { padding: var(--sp-6) var(--sp-5); }
+      .dirac-code { font-size: 13px; }
+      .dirac-mark { font-size: 140px; }
+    }
+
+    /* screenshot figures */
+    .shot { margin: 0; }
+    .shot .frame {
+      position: relative; border: 1px solid var(--border-subtle); border-radius: var(--r-lg);
+      overflow: hidden; background: var(--bg-elevated); aspect-ratio: 16 / 9;
+    }
+    .shot .frame img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .shot.ok .frame img { display: block; }
+    .shot .ph { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); }
+    .shot.ok .ph { display: none; }
+    .shot .ph i { font-size: 30px; opacity: 0.6; }
+    .shot .ph span { font-size: var(--text-xs); font-family: var(--font-mono); }
+    .shot figcaption { margin-top: var(--sp-3); font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
+
+    /* the ledger: measured numbers, no card confetti */
+    .ledger { border-top: 1px solid var(--border-mid); }
+    .ledger .row {
+      display: grid; grid-template-columns: 170px 1fr; gap: var(--sp-6);
+      padding: var(--sp-5) 0; border-bottom: 1px solid var(--border-subtle); align-items: baseline;
+    }
+    .ledger .val { font-family: var(--font-mono); font-size: clamp(20px, 2.2vw, 26px); font-weight: 500; background: var(--grad-machine); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
+    .ledger .what { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.65; }
+    @media (max-width: 600px) { .ledger .row { grid-template-columns: 1fr; gap: 4px; } }
+
+    /* terminal */
+    .term { background: #0a0d16; border: 1px solid var(--border-subtle); border-radius: var(--r-lg); overflow: hidden; }
+    .term-top { display: flex; align-items: center; gap: 8px; padding: 9px 13px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .term-top .dots { display: flex; gap: 6px; }
+    .term-top .dots i { width: 10px; height: 10px; border-radius: 50%; background: #2b3346; display: block; }
+    .term-top .fn { margin-left: 4px; font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); }
+    .term pre { margin: 0; padding: var(--sp-4) var(--sp-5); overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.8; color: #c7d0e0; white-space: pre; }
+    .term .c { color: #586079; }
+    .term .p { color: var(--ync-text); }
+
+    /* SAPHO equation (shared with aurora.html) */
+    .eqx { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; flex-wrap: wrap; opacity: 0.5; }
+    .eqx-item { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); }
+    .eqx-item img { height: 14px; width: 14px; object-fit: contain; }
+    .eqx-item b { font-weight: 500; color: var(--text-secondary); }
+    .eqx > i { color: var(--text-muted); font-size: 10px; }
+
+    @media (max-width: 600px) {
+      .code-body { font-size: 11.5px; padding: 13px; }
+      .lede { font-size: 20px; line-height: 1.5; }
+      .descent { font-size: 11px; padding: 7px 12px; }
+    }
   </style>
 </head>
 <body>
@@ -136,32 +285,45 @@
 
   <main id="main">
 
-    <header class="project-hero" style="background: radial-gradient(ellipse 70% 50% at 0% 50%, rgba(0,180,166,0.07) 0%, transparent 70%), var(--bg-0)" aria-labelledby="yanc-title">
-      <div class="project-hero-inner">
-        <div class="project-hero-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)">
-          <i class="ph ph-code-block" aria-hidden="true"></i>
-        </div>
+    <!-- ════════════════════════════════════════════════════════════
+         HERO: the instruction stream
+         ════════════════════════════════════════════════════════════ -->
+    <header class="project-hero" aria-labelledby="yanc-title">
+      <div class="ync-bg" aria-hidden="true">
+        <div class="op-stream r1"><span>LOD SET PSH POP INN OUT JMP JIZ CAL RET ADD MLT DIV MOD F_ADD F_MLT F_DIV I2F F2I F_ROT NRM PST XPO F_SCL LDI STI ILI ISI &nbsp; LOD SET PSH POP INN OUT JMP JIZ CAL RET ADD MLT DIV MOD F_ADD F_MLT F_DIV I2F F2I F_ROT NRM PST XPO F_SCL LDI STI ILI ISI &nbsp;</span></div>
+        <div class="op-stream r2"><span>#PRNAME #NUBITS #NBMANT #NBEXPO #NDSTAC #SDEPTH #NUIOIN #NUIOOU #NUGAIN #FFTSIZ &nbsp; #PRNAME #NUBITS #NBMANT #NBEXPO #NDSTAC #SDEPTH #NUIOIN #NUIOOU #NUGAIN #FFTSIZ &nbsp;</span></div>
+        <div class="op-stream r3"><span>cmmcomp cppcomp asmcomp cpppp appcomp iverilog vvp verilator surfer &nbsp; cmmcomp cppcomp asmcomp cpppp appcomp iverilog vvp verilator surfer &nbsp;</span></div>
+      </div>
+      <div class="project-hero-inner" style="position:relative;z-index:1">
+        <img class="ync-emblem" src="../assets/icons/yanc.svg" alt="YANC emblem: three chevrons pointing forward" width="132" height="132">
         <div class="project-hero-text">
-          <div class="eyebrow fade-up">
-            <i class="ph ph-terminal" aria-hidden="true"></i>
-            Compiler Toolchain · Part of SAPHO
+          <div class="eyebrow fade-up" style="color:var(--ync-text)">
+            <i class="ph ph-code-block" aria-hidden="true"></i>
+            The compilers of SAPHO
           </div>
           <h1 class="project-hero-name fade-up" id="yanc-title">
-            <span style="color:var(--accent-yanc)">YANC</span>
+            <span class="grad-machine">YANC</span>
           </h1>
-          <p class="project-hero-fullname fade-up" data-i18n="projects.yanc.full">Yet Another Compiler</p>
-          <p class="project-hero-desc fade-up" data-i18n="projects.yanc.desc">
-            YANC is the compilation backbone of the SAPHO ecosystem. It transforms high-level CMM processor descriptions into binary executables through a two-stage pipeline: <strong>cmmcomp</strong> (CMM → Assembly) and <strong>asmcomp</strong> (Assembly → Machine Code), plus the <strong>APP</strong> auxiliary pre-processor. Written in C using Flex, Bison, and GCC.
+          <p class="project-hero-fullname fade-up">Yet Another Compiler</p>
+          <p class="project-hero-desc fade-up">
+            Write a program in C± or C++, and YANC carries it down, stage by stage, to a processor:
+            the assembly, the synthesizable Verilog core, the memory images, the testbench. AURORA drives it
+            with buttons. A shell script drives it just as well.
           </p>
+          <div class="fade-up" style="margin:var(--sp-2) 0 var(--sp-5)">
+            <span class="descent" role="img" aria-label="Three descents: source to assembly to silicon">
+              <b>source</b> <i class="chv c1">»</i> <b>assembly</b> <i class="chv c2">»</i> <b>silicon</b> <i class="chv">»</i>
+            </span>
+          </div>
           <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links fade-up">
-            <a href="https://github.com/nipscernlab/yanc" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-yanc);border-color:var(--accent-yanc)">
+            <a href="https://github.com/nipscernlab/yanc/releases/latest" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--ync);border-color:var(--ync)">
+              <i class="ph ph-download-simple" aria-hidden="true"></i>
+              Download v5.2
+            </a>
+            <a href="https://github.com/nipscernlab/yanc" target="_blank" rel="noopener" class="btn btn-ghost">
               <i class="ph ph-github-logo" aria-hidden="true"></i>
               <span data-i18n="projects.github">View on GitHub</span>
-            </a>
-            <a href="sapho" class="btn btn-ghost">
-              <i class="ph ph-cpu" aria-hidden="true"></i>
-              Part of SAPHO
             </a>
             <a href="./" class="btn btn-ghost">
               <i class="ph ph-arrow-left" aria-hidden="true"></i>
@@ -172,178 +334,454 @@
       </div>
     </header>
 
-    <!-- Badge bar -->
-    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
+    <!-- ── Identity strip ── -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);border-top:1px solid var(--border-subtle);padding:var(--sp-4) var(--container-pad)">
       <div style="max-width:var(--container-max);margin:0 auto;display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
-        <span class="badge badge-purple">C Language</span>
-        <span class="badge badge-purple">Flex</span>
-        <span class="badge badge-purple">Bison</span>
-        <span class="badge badge-purple">GCC</span>
-        <span class="badge badge-gray">Linux · Windows</span>
-        <span class="badge badge-green">Open Source</span>
-        <span class="badge badge-green">Active</span>
+        <span class="badge badge-green">Active development</span>
+        <span class="badge badge-gray">v5.2</span>
+        <span class="badge badge-gray">C · Flex · Bison</span>
+        <span class="badge badge-gray">MIT</span>
+        <span class="badge badge-gray"><i class="ph ph-windows-logo" aria-hidden="true"></i>&nbsp;Windows&nbsp;·&nbsp;<i class="ph ph-linux-logo" aria-hidden="true"></i>&nbsp;Linux</span>
+        <span class="eqx" role="img" aria-label="SAPHO equals AURORA plus YANC">
+          <span class="eqx-item"><img src="../assets/icons/sapho.svg" alt=""><b>SAPHO</b></span>
+          <i class="ph ph-equals" aria-hidden="true"></i>
+          <span class="eqx-item"><img src="../assets/icons/aurora.svg" alt=""><b>AURORA</b></span>
+          <i class="ph ph-plus" aria-hidden="true"></i>
+          <span class="eqx-item"><img src="../assets/icons/yanc.svg" alt=""><b>YANC</b></span>
+        </span>
       </div>
     </div>
 
-    <!-- Pipeline + Tools -->
-    <section class="section">
-      <div class="container">
-        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
-
-          <!-- Left: compilation pipeline -->
-          <div class="fade-up">
-            <div class="accent-line" style="background:var(--accent-yanc)" aria-hidden="true"></div>
-            <h2 class="heading-lg">Compilation Pipeline</h2>
-            <p class="body-sm" style="margin-top:var(--sp-3);color:var(--text-secondary)">
-              YANC implements a classical two-stage compiler architecture. Source CMM code enters cmmcomp, where Flex tokenises the input and Bison parses the grammar into an AST. Code generation produces SAPHO assembly, which asmcomp then assembles into a binary hex file ready for FPGA loading or simulation.
-            </p>
-            <div class="pipeline-flow" style="margin-top:var(--sp-6)">
-              <div class="pipeline-node">
-                <div class="step-badge">1</div>
-                <div>
-                  <div class="pipeline-node-title">CMM Source</div>
-                  <div class="pipeline-node-sub">.cmm — processor description in C-like syntax</div>
-                </div>
-              </div>
-              <div class="pipeline-arrow"><i class="ph ph-arrow-down" aria-hidden="true"></i></div>
-              <div class="pipeline-node">
-                <div class="step-badge">2</div>
-                <div>
-                  <div class="pipeline-node-title">APP — Pre-Processor</div>
-                  <div class="pipeline-node-sub">Macro expansion, include directives, constant folding</div>
-                </div>
-              </div>
-              <div class="pipeline-arrow"><i class="ph ph-arrow-down" aria-hidden="true"></i></div>
-              <div class="pipeline-node">
-                <div class="step-badge">3</div>
-                <div>
-                  <div class="pipeline-node-title">cmmcomp — Frontend</div>
-                  <div class="pipeline-node-sub">Flex lexer + Bison parser → SAPHO Assembly (.asm)</div>
-                </div>
-              </div>
-              <div class="pipeline-arrow"><i class="ph ph-arrow-down" aria-hidden="true"></i></div>
-              <div class="pipeline-node">
-                <div class="step-badge">4</div>
-                <div>
-                  <div class="pipeline-node-title">asmcomp — Backend</div>
-                  <div class="pipeline-node-sub">Two-pass assembler → Binary / Hex (.hex, .mif)</div>
-                </div>
-              </div>
-              <div class="pipeline-arrow"><i class="ph ph-arrow-down" aria-hidden="true"></i></div>
-              <div class="pipeline-node" style="border-color:rgba(0,180,166,0.4)">
-                <div class="step-badge" style="background:rgba(0,180,166,0.25)">5</div>
-                <div>
-                  <div class="pipeline-node-title" style="color:var(--accent-yanc)">SAPHO Processor</div>
-                  <div class="pipeline-node-sub">Machine code → FPGA execution or simulation</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: toolchain components -->
-          <div class="fade-up">
-            <h3 class="heading-sm" style="margin-bottom:var(--sp-5)">Toolchain Components</h3>
-            <div>
-              <div class="tool-row">
-                <div class="tool-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-file-code" aria-hidden="true"></i></div>
-                <div>
-                  <div class="tool-name">cmmcomp</div>
-                  <div class="tool-desc">CMM high-level language compiler. Flex lexer + Bison LALR(1) parser. Emits SAPHO assembly with symbol table and error diagnostics.</div>
-                </div>
-              </div>
-              <div class="tool-row">
-                <div class="tool-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-binary" aria-hidden="true"></i></div>
-                <div>
-                  <div class="tool-name">asmcomp</div>
-                  <div class="tool-desc">Two-pass assembler for SAPHO instruction set. Resolves labels, encodes opcodes, outputs Intel HEX and Altera MIF formats.</div>
-                </div>
-              </div>
-              <div class="tool-row">
-                <div class="tool-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-funnel" aria-hidden="true"></i></div>
-                <div>
-                  <div class="tool-name">APP</div>
-                  <div class="tool-desc">Auxiliary Pre-Processor. Handles <code>#define</code>, <code>#include</code>, and constant-folding before cmmcomp ingests the source.</div>
-                </div>
-              </div>
-            </div>
-
-            <h3 class="heading-sm" style="margin-top:var(--sp-8);margin-bottom:var(--sp-5)">CMM Language Sample</h3>
-            <div class="cmm-snippet"><span class="cmm-comment">// Fibonacci — SAPHO CMM</span>
-<span class="cmm-kw">processor</span> Fib {
-  <span class="cmm-kw">const</span> <span class="cmm-type">int</span> N = <span class="cmm-num">10</span>;
-  <span class="cmm-type">int</span> a = <span class="cmm-num">0</span>, b = <span class="cmm-num">1</span>, c;
-  <span class="cmm-type">int</span> i = <span class="cmm-num">0</span>;
-
-  <span class="cmm-kw">while</span> (i &lt; N) {
-    c = a + b;
-    a = b; b = c; i++;
-  }
-  <span class="cmm-comment">// result in register r0</span>
-  <span class="cmm-kw">output</span>(a);
-}</div>
-          </div>
-
+    <!-- ── 01: The name ── -->
+    <section class="section" style="background:var(--bg-0)">
+      <div class="container container--narrow">
+        <div class="sec-label fade-up"><span class="n">» 01</span> The name</div>
+        <p class="lede fade-up">
+          The name is a joke from the compiler tradition. <span class="hl">The job is not.</span>
+        </p>
+        <div class="prose fade-up" style="margin-top:var(--sp-6)">
+          <p>
+            In 1975, Bell Labs named its parser generator <em>yacc</em>: Yet Another Compiler-Compiler. Naming a
+            serious tool as if it were one more of the same is an old habit of people who build compilers, and
+            YANC, Yet Another Compiler, stands in that lineage on purpose. What it does is less usual. Most compilers
+            translate a program into instructions for a processor that already exists. YANC reads your program and
+            emits the processor itself: a SAPHO core in synthesizable Verilog, shaped around that one algorithm, with
+            its program and data memories and a testbench ready to run.
+          </p>
+          <p>
+            The suite is five small binaries written in C, with lexers generated by Flex and parsers by Bison, built by
+            GCC on Windows and Linux, plus two helpers that format waveforms for viewing. Its error messages come in two languages, Portuguese first and English on a flag,
+            because the lab that wrote it teaches in Portuguese and publishes in English. Every one of the hundred-plus
+            test programs in the repository ships with a frozen <span class="ic">golden.asm</span> and golden simulation
+            output, so a change to any compiler has to reproduce the whole suite, byte for byte, before it lands.
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- Integration + Build info -->
+    <!-- ── 02: Two languages, one core ── -->
+    <section class="section" style="border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="sec-label fade-up"><span class="n">» 02</span> Two languages, one core</div>
+        <div class="prose fade-up" style="max-width:68ch">
+          <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">Start from <span class="grad-machine">C±</span> or from <span class="grad-machine">C++</span>. Arrive at the same processor.</h2>
+          <p>
+            C± (read it <em>C plus minus</em>) is the house language: a compact subset of C extended for signal
+            processing and physics. Its first lines are hardware, not code. <span class="ic">#NUBITS</span> picks the
+            width of the datapath, <span class="ic">#NBMANT</span> and <span class="ic">#NBEXPO</span> define the
+            floating-point format, and from there down you write ordinary loops and functions, with a native
+            <span class="ic">comp</span> complex type, literals like <span class="ic">0.7071 + 0.7071i</span>, and
+            built-ins from <span class="ic">sqrt</span> to an FFT whose bit-reversed read has its own syntax,
+            <span class="ic">data[j)</span>.
+          </p>
+          <p>
+            C++ is the second front-end, and it is not a toy. <span class="ic">cppcomp</span> compiles a real subset,
+            structs by value, destructors on early return, function pointers, <span class="ic">std::array</span>,
+            lambdas as global initializers, through the same road: a <span class="ic">#pragma yanc</span> names the
+            processor, and the output is the same assembly the C± compiler emits. Both languages meet in one backend
+            and one core. Processor creation in C++ is now rolling into the platform as a first-class flow.
+          </p>
+        </div>
+
+        <div class="converge" style="margin-top:var(--sp-8)">
+          <div class="fade-up">
+            <div class="code-card">
+              <div class="code-top">
+                <span class="dots"><i></i><i></i><i></i></span>
+                <span class="fn">Sqrt.cmm</span>
+                <span class="lang">C±</span>
+              </div>
+<pre class="code-body"><span class="dir">#PRNAME</span> Sqrt
+<span class="dir">#NUBITS</span> <span class="num">32</span>
+<span class="dir">#NBMANT</span> <span class="num">23</span>
+<span class="dir">#NBEXPO</span> <span class="num">8</span>
+<span class="dir">#NDSTAC</span> <span class="num">5</span>
+<span class="dir">#SDEPTH</span> <span class="num">5</span>
+
+<span class="typ">float</span> <span class="kw">my_sqrt</span>(<span class="typ">float</span> num)
+{
+    <span class="kw">if</span> (num == <span class="num">0.0</span>) <span class="kw">return</span> <span class="num">0.0</span>;
+
+    <span class="typ">int</span> v = (((num &lt;&lt; <span class="num">1</span>) &gt;&gt;&gt; <span class="num">24</span>) + <span class="num">22</span>) &gt;&gt;&gt; <span class="num">1</span>;  <span class="cm">// get the exponent</span>
+        v = ((((v-<span class="num">22</span>) &lt;&lt; <span class="num">23</span>) + (<span class="num">1</span> &lt;&lt; <span class="num">22</span>)) &lt;&lt; <span class="num">1</span>) &gt;&gt; <span class="num">1</span>;
+
+    <span class="typ">float</span> x; <span class="kw">copy</span>(v,x);
+
+    x = <span class="num">0.5</span> * (x+num/x);   <span class="cm">// four Newton steps</span>
+    x = <span class="num">0.5</span> * (x+num/x);
+    x = <span class="num">0.5</span> * (x+num/x);
+    x = <span class="num">0.5</span> * (x+num/x);
+
+    <span class="kw">return</span> x;
+}</pre>
+            </div>
+            <p class="code-cap">From the test suite, trimmed. The header is the hardware; the body is a square root by
+            Newton's method, seeded by a bit-trick on the float's exponent.</p>
+          </div>
+
+          <div class="fade-up">
+            <div class="code-card">
+              <div class="code-top">
+                <span class="dots"><i></i><i></i><i></i></span>
+                <span class="fn">test61.cpp</span>
+                <span class="lang">C++</span>
+              </div>
+<pre class="code-body"><span class="dir">#pragma</span> yanc prname test61
+<span class="dir">#include</span> <span class="num">&lt;array&gt;</span>
+
+<span class="kw">constexpr</span> <span class="typ">int</span> M_PULSE = <span class="num">15</span>;
+<span class="kw">constexpr</span> <span class="typ">int</span> C_PEAK  = <span class="num">5</span>;
+
+<span class="cm">// a lambda builds the pulse shape at compile time</span>
+<span class="kw">const</span> std::<span class="typ">array</span>&lt;<span class="typ">float</span>, M_PULSE&gt; TRIANGLE_INIT = []() {
+    std::<span class="typ">array</span>&lt;<span class="typ">float</span>, M_PULSE&gt; h = {};
+    <span class="kw">constexpr</span> <span class="typ">float</span> base[<span class="num">5</span>] = { <span class="num">0.25f</span>, <span class="num">0.5f</span>, <span class="num">1.0f</span>, <span class="num">0.5f</span>, <span class="num">0.25f</span> };
+    <span class="kw">for</span> (<span class="typ">int</span> k = <span class="num">0</span>; k &lt; <span class="num">5</span>; ++k) {
+        <span class="typ">int</span> idx = C_PEAK + (k - <span class="num">2</span>);
+        <span class="kw">if</span> (idx &gt;= <span class="num">0</span> &amp;&amp; idx &lt; M_PULSE) h[idx] = base[k];
+    }
+    <span class="kw">return</span> h;
+}();
+
+<span class="typ">void</span> <span class="kw">main</span>(<span class="typ">void</span>) {
+    <span class="kw">for</span> (<span class="typ">int</span> k = <span class="num">0</span>; k &lt; M_PULSE; k = k + <span class="num">1</span>)
+        <span class="kw">out</span>(<span class="num">0</span>, (<span class="typ">int</span>)(TRIANGLE_INIT[k] * <span class="num">1000.0f</span>));
+}</pre>
+            </div>
+            <p class="code-cap">Also from the test suite, trimmed. Modern C++ shaping a triangular pulse, the kind of
+            waveform a calorimeter front-end sees, compiled to the same SAPHO assembly.</p>
+          </div>
+        </div>
+
+        <div class="merge-rail fade-up">
+          <span class="merge-chip"><i class="ph ph-git-merge" aria-hidden="true" style="color:var(--ync-text)"></i> one assembly <b>·</b> one backend <b>·</b> one processor</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 03: The pipeline ── -->
     <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
       <div class="container">
-        <div class="grid grid-3 fade-up" style="gap:var(--sp-6)">
+        <div class="sec-label fade-up"><span class="n">» 03</span> The pipeline</div>
+        <div class="prose fade-up" style="max-width:68ch">
+          <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">Five binaries, <span class="grad-machine">one descent</span></h2>
+          <p>
+            Each stage is a separate program with one job, in the old Unix way. The front-ends translate your language
+            into SAPHO assembly. <span class="ic">appcomp</span> makes a first pass over that assembly and resolves
+            every variable and label to an address. <span class="ic">asmcomp</span> then writes the hardware: the
+            processor, its memories, its testbench. From there it is simulation and reading waves.
+          </p>
+        </div>
 
-          <div class="bg-card" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
-            <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(0,180,166,0.12);color:var(--accent-yanc);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:var(--sp-4)">
-              <i class="ph ph-plug" aria-hidden="true"></i>
-            </div>
-            <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--sp-2)">SAPHO Integration</h3>
-            <p style="font-size:var(--text-sm);color:var(--text-secondary)">
-              YANC is the compilation engine called by SAPHO when a student clicks <em>Compile</em>. AURORA bundles YANC binaries natively, so the entire build is triggered from within the IDE with a single keystroke.
-            </p>
+        <figure class="pipemap fade-up" style="margin-top:var(--sp-7)">
+          <div class="pm-scroll">
+            <svg class="pm" viewBox="0 0 1160 386" xmlns="http://www.w3.org/2000/svg" role="img"
+                 aria-label="Line map of the YANC pipeline: a C± line and a C++ line converge into one assembly, pass through appcomp and asmcomp, fan out into the Verilog core, memory images and testbench, and continue to simulation and the waveform viewer. A dotted rail carries the trace metadata from the front-ends straight to the viewer.">
+              <defs>
+                <linearGradient id="pm-grad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#22d3ee"/>
+                </linearGradient>
+                <marker id="pm-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#7fe7dc"/>
+                </marker>
+                <marker id="pm-arr-m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0,0 L10,5 L0,10 z" fill="rgba(127,231,220,0.55)"/>
+                </marker>
+                <marker id="pm-arr-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#586079"/>
+                </marker>
+              </defs>
+
+              <!-- trace-metadata rail (dotted): front-ends to the viewer -->
+              <text class="s" x="620" y="30">trace metadata: cmm_log.txt · pc_*_mem.txt</text>
+              <g stroke="rgba(127,231,220,0.5)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round" fill="none">
+                <path d="M 250 88 V 40"/>
+                <path d="M 352 218 V 110"/>
+                <path d="M 352 90 V 40"/>
+                <path d="M 250 40 H 1132 V 196" marker-end="url(#pm-arr-m)"/>
+              </g>
+
+              <!-- source pills -->
+              <g fill="#10141f" stroke="#263042">
+                <rect x="46" y="87"  width="64" height="26" rx="13"/>
+                <rect x="46" y="217" width="64" height="26" rx="13"/>
+              </g>
+              <text class="f" x="78" y="104.5">.cmm</text>
+              <text class="f" x="78" y="234.5">.cpp</text>
+
+              <!-- the two language lines -->
+              <path d="M 110 100 H 468 C 505 100 518 150 555 150" fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round"/>
+              <path d="M 110 230 H 468 C 505 230 518 150 555 150" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>
+              <!-- merged assembly line -->
+              <path d="M 555 150 H 800" fill="none" stroke="url(#pm-grad)" stroke-width="3.5" stroke-linecap="round"/>
+              <!-- fan into artifacts -->
+              <g fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
+                <path d="M 800 150 C 828 150 836 96 862 96"/>
+                <path d="M 800 150 H 862"/>
+                <path d="M 800 150 C 828 150 836 204 862 204"/>
+              </g>
+
+              <!-- stations -->
+              <g fill="#0a0d16" stroke-width="2.5">
+                <circle cx="250" cy="100" r="7" stroke="#2dd4bf"/>
+                <circle cx="230" cy="230" r="7" stroke="#22d3ee"/>
+                <circle cx="352" cy="230" r="7" stroke="#22d3ee"/>
+                <circle cx="555" cy="150" r="5.5" stroke="#7fe7dc"/>
+                <circle cx="655" cy="150" r="7" stroke="#7fe7dc"/>
+                <circle cx="760" cy="150" r="7" stroke="#7fe7dc"/>
+              </g>
+              <text class="l" x="250" y="127">cmmcomp</text>
+              <text class="s" x="250" y="141">C± → assembly</text>
+              <text class="l" x="230" y="257">cpppp</text>
+              <text class="s" x="230" y="271">preprocess</text>
+              <text class="l" x="352" y="257">cppcomp</text>
+              <text class="s" x="352" y="271">C++ → assembly</text>
+              <text class="f" x="555" y="176">proc.asm</text>
+              <text class="l" x="655" y="127">appcomp</text>
+              <text class="s" x="655" y="174">resolves every address</text>
+              <text class="l" x="760" y="127">asmcomp</text>
+              <text class="s" x="760" y="174">writes the hardware</text>
+
+              <!-- artifact yard -->
+              <g fill="#10141f" stroke="#263042">
+                <rect x="862" y="84"  width="60" height="24" rx="6"/>
+                <rect x="862" y="138" width="54" height="24" rx="6"/>
+                <rect x="862" y="192" width="82" height="24" rx="6"/>
+              </g>
+              <text class="f" x="892" y="100">proc.v</text>
+              <text class="f" x="889" y="154">*.mif</text>
+              <text class="f" x="903" y="208">proc_tb.v</text>
+              <line x1="960" y1="96" x2="960" y2="204" stroke="#263042" stroke-width="2"/>
+              <path d="M 960 150 H 1000" fill="none" stroke="#7fe7dc" stroke-width="1.8" marker-end="url(#pm-arr)"/>
+
+              <!-- after YANC -->
+              <rect x="1006" y="56" width="138" height="252" rx="12" fill="none" stroke="rgba(94,234,212,0.25)" stroke-dasharray="5 5"/>
+              <text class="zt" x="1075" y="82">AFTER YANC</text>
+              <text class="z" x="1075" y="130">simulate</text>
+              <text class="s" x="1075" y="146">Icarus · Verilator</text>
+              <path d="M 1075 158 V 184" fill="none" stroke="#586079" stroke-width="1.5" marker-end="url(#pm-arr-g)"/>
+              <text class="s" x="1090" y="174" text-anchor="start">vcd</text>
+              <text class="z" x="1075" y="210">watch</text>
+              <text class="s" x="1075" y="226">Surfer · GTKWave</text>
+
+              <!-- legend -->
+              <g stroke-linecap="round" fill="none">
+                <path d="M 46 362 H 78"  stroke="#2dd4bf" stroke-width="3"/>
+                <path d="M 130 362 H 162" stroke="#22d3ee" stroke-width="3"/>
+                <path d="M 232 362 H 264" stroke="url(#pm-grad)" stroke-width="3.5"/>
+                <path d="M 424 362 H 456" stroke="rgba(127,231,220,0.5)" stroke-width="1.6" stroke-dasharray="2 5"/>
+              </g>
+              <text class="lg" x="86"  y="366">C±</text>
+              <text class="lg" x="170" y="366">C++</text>
+              <text class="lg" x="272" y="366">assembly onward</text>
+              <text class="lg" x="464" y="366">trace metadata</text>
+            </svg>
           </div>
+          <figcaption>
+            The whole descent, drawn as it runs. The dotted rail is the part most toolchains do not have: the
+            front-ends write <span class="ic" style="background:none;padding:0">cmm_log.txt</span> and
+            <span class="ic" style="background:none;padding:0">pc_*_mem.txt</span> alongside the assembly, and the
+            waveform viewer reads them to show your source code executing, line by line.
+          </figcaption>
+        </figure>
 
-          <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
-            <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(0,180,166,0.12);color:var(--accent-yanc);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:var(--sp-4)">
-              <i class="ph ph-wrench" aria-hidden="true"></i>
-            </div>
-            <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--sp-2)">Build Dependencies</h3>
-            <p style="font-size:var(--text-sm);color:var(--text-secondary)">
-              YANC is self-contained: <strong>Flex</strong> generates the lexer C source, <strong>Bison</strong> generates the parser, and <strong>GCC</strong> compiles the resulting C files. No external runtime or library dependencies are required. A standard <code>make</code> invocation builds all three tools.
-            </p>
+        <div class="fade-up" style="margin-top:var(--sp-7)">
+          <p class="ksub">After YANC: simulate and watch</p>
+          <div class="tools">
+            <div class="tool"><img src="../assets/icons/aurora/Icarus_Verilog_logo.png" alt="" loading="lazy"><span class="nm">Icarus Verilog</span><span class="role">simulation</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/Verilator_logo.png" alt="" loading="lazy"><span class="nm">Verilator</span><span class="role">fast simulation</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/surfer.svg" alt="" loading="lazy"><span class="nm">Surfer</span><span class="role">waveforms</span></div>
+            <div class="tool"><img src="../assets/icons/aurora/gtkwave.svg" alt="" loading="lazy"><span class="nm">GTKWave</span><span class="role">waveforms</span></div>
           </div>
-
-          <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
-            <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:var(--sp-4)">
-              <i class="ph ph-graduation-cap" aria-hidden="true"></i>
-            </div>
-            <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--sp-2)">Teaching Use</h3>
-            <p style="font-size:var(--text-sm);color:var(--text-secondary)">
-              YANC is taught as part of the <strong>Digital Logic Processors (DLP)</strong> discipline at UFJF. Students learn compiler theory by reading cmmcomp's Flex and Bison sources, tracing AST construction, and extending the grammar with new operators for course assignments.
-            </p>
-          </div>
-
         </div>
       </div>
     </section>
 
-    <!-- CTA -->
+    <!-- ── 04: Dirac notation ── -->
+    <section class="section">
+      <div class="container">
+        <div class="sec-label fade-up"><span class="n">» 04</span> Native physics</div>
+        <div class="dirac-panel fade-up">
+          <div class="dirac-mark" aria-hidden="true">⟨|⟩</div>
+          <div class="dirac-grid">
+            <div>
+              <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">A language that writes <span class="grad-machine">⟨bra|ket⟩</span></h2>
+              <div class="prose">
+                <p>
+                  C± reserves the <span class="ic">#</span> operator for Dirac assignment. Matrices and vectors move in
+                  the bra-ket notation physics already writes on paper, after Dirac's 1958 formulation, and the compiler
+                  turns each line into the exact sequence of multiply-accumulates it means. These lines are from the
+                  test suite, verbatim:
+                </p>
+              </div>
+              <pre class="dirac-code" style="margin-top:var(--sp-6)">A <span class="op">#</span> 1.0<span class="brk">|I|</span>;
+a <span class="op">#</span> <span class="brk">|0⟩</span>;
+a <span class="op">#</span> <span class="brk">|B|a⟩</span>;
+a <span class="op">#</span> 2.0<span class="brk">|b⟩</span>;
+A <span class="op">#</span> <span class="brk">|a⟩⟨b|</span>;
+a <span class="op">#</span> 0.001<span class="brk">|in(0)⟩</span>;</pre>
+            </div>
+            <div class="dirac-gloss">
+              <div class="dg"><code>A # 1.0|I|</code><span>initialize A as the identity matrix</span></div>
+              <div class="dg"><code>a # |0⟩</code><span>zero the vector</span></div>
+              <div class="dg"><code>a # |B|a⟩</code><span>matrix times vector: a = B·a</span></div>
+              <div class="dg"><code>a # 2.0|b⟩</code><span>scale a vector: a = 2b</span></div>
+              <div class="dg"><code>A # |a⟩⟨b|</code><span>outer product: A = a·bᵀ</span></div>
+              <div class="dg"><code>a # 0.001|in(0)⟩</code><span>read an input port into a vector, scaled</span></div>
+              <p class="note" style="margin-top:var(--sp-2)">
+                Not a demo syntax. The declaration forms carry a real recursive-least-squares filter in the
+                <span class="ic">proc_rls</span> test, the kind of adaptive filter the lab puts on FPGAs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 05: Source-level waves ── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container">
+        <div class="sec-label fade-up"><span class="n">» 05</span> Watch it run</div>
+        <div class="split lead">
+          <div class="prose fade-up">
+            <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">The waveform knows <span class="grad-machine">your source code</span></h2>
+            <p>
+              Because the compilers emit a table mapping every program-counter value back to the C± line that produced
+              it, and every variable to its data-memory address, the waveform is not a wall of buses. Alongside the
+              clock you see the source line currently executing, the assembly opcode under it, and each of your
+              variables as a proper signal, updating as the processor writes it. Debugging feels like stepping through
+              code, except the thing stepping is hardware.
+            </p>
+            <p>
+              All of that visibility lives behind a simulation-only flag, <span class="ic">YANC_SIM_VIS</span>. Turn it
+              off, or synthesize for real, and it costs zero gates.
+            </p>
+            <p class="note" style="margin-top:var(--sp-5)">
+              AURORA opens these traces in
+              <a class="wlink" href="https://gitlab.com/nips-cern/surfer-aurora" target="_blank" rel="noopener">Surfer</a>
+              or in
+              <a class="wlink" href="https://github.com/nipscernlab/gtkwave-nipscern/releases" target="_blank" rel="noopener">GTKWave</a>;
+              the lab maintains a fork of each, and today the two are equals in ease of use. The captures on this
+              page come from Surfer.
+            </p>
+          </div>
+          <figure class="shot fade-up">
+            <div class="frame" style="aspect-ratio:2560/1368">
+              <img src="../assets/images/projects/yanc-surfer-source.png"
+                   alt="Surfer showing a SAPHO FFT processor running: clock, I/O outputs, the assembly opcode track and the exact C± line executing"
+                   onload="this.closest('.shot').classList.add('ok')">
+              <div class="ph"><i class="ph ph-wave-sine" aria-hidden="true"></i><span>screenshot: source-level trace in Surfer</span></div>
+            </div>
+            <figcaption>The FFT test in Surfer. Under the clock and the outputs, the Instructions group carries the two
+            tracks the metadata makes possible: the opcode (<span class="ic" style="background:none;padding:0">LOD</span>,
+            <span class="ic" style="background:none;padding:0">F_MLT</span>, <span class="ic" style="background:none;padding:0">F2I</span>,
+            <span class="ic" style="background:none;padding:0">OUT</span>) and the C± line executing, here
+            <span class="ic" style="background:none;padding:0">fout(1,1000.0*imag(data[1)));</span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 06: Hardware that fits ── -->
     <section class="section" style="border-top:1px solid var(--border-subtle)">
-      <div class="container container--narrow" style="text-align:center">
-        <div class="fade-up">
-          <div class="accent-line" style="background:var(--accent-yanc);margin:0 auto var(--sp-4)" aria-hidden="true"></div>
-          <h2 class="heading-lg">Explore YANC on GitHub</h2>
-          <p class="body-base" style="color:var(--text-secondary);margin:var(--sp-3) 0 var(--sp-6)">
-            The full YANC source — Flex grammars, Bison parser rules, and Makefile — is publicly available. Issues and pull requests are welcome.
+      <div class="container container--narrow">
+        <div class="sec-label fade-up"><span class="n">» 06</span> Hardware that fits</div>
+        <div class="prose fade-up">
+          <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">Nothing you don't use <span class="grad-machine">gets built</span></h2>
+          <p>
+            The SAPHO instruction set is parameterized by the compiler. If your program never divides, the divider is
+            never synthesized; if it never touches floating point, there is no floating-point unit. Word width is yours
+            to choose, and shaving three bits off a mantissa is a real decision with a real payoff in logic. This is
+            the compiler's half of SAPHO's thesis, and it has numbers behind it, measured on the
+            <a class="wlink" href="../publications">ATLAS Tile Calorimeter work</a> that YANC was born to serve.
           </p>
-          <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
-            <a href="https://github.com/nipscernlab/yanc" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-yanc);border-color:var(--accent-yanc)">
-              <i class="ph ph-github-logo" aria-hidden="true"></i>
-              nipscernlab/yanc
-            </a>
-            <a href="sapho" class="btn btn-ghost">
-              <i class="ph ph-cpu" aria-hidden="true"></i>
-              Back to SAPHO
-            </a>
+        </div>
+
+        <div class="ledger fade-up" style="margin-top:var(--sp-7)">
+          <div class="row">
+            <span class="val">140 → 26</span>
+            <span class="what">processors needed for online energy reconstruction, when the multi-core array scales
+            from 320 MHz toward modern clock rates. Fewer cores, same physics.</span>
+          </div>
+          <div class="row">
+            <span class="val">−65%</span>
+            <span class="what">logic elements at the scaled operating point, for the same reconstruction task.</span>
+          </div>
+          <div class="row">
+            <span class="val">32 → 29 bits</span>
+            <span class="what">one word-width decision in the same study: three bits off the datapath, 6% of the logic
+            back, no loss in the result.</span>
+          </div>
+          <div class="row">
+            <span class="val">+2 instructions</span>
+            <span class="what">the <span class="ic">@</span> (PSET) and <span class="ic">/&gt;</span> (NORM) operators
+            entered the ISA from that paper, cutting branches and simplifying fixed-gain division. The language grows
+            where the physics pushes it.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Get it ── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+      <div class="container container--narrow">
+        <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-2xl);padding:var(--sp-10)">
+          <div class="split" style="align-items:center;gap:var(--sp-8)">
+            <div class="prose">
+              <h2 class="heading-md" style="margin-bottom:var(--sp-3)">Get YANC</h2>
+              <p>
+                If you use <a class="wlink" href="aurora">AURORA</a>, you already have it: the IDE downloads the
+                compilers on first launch and keeps them current. Standalone, grab the binaries from the
+                <a class="wlink" href="https://github.com/nipscernlab/yanc/releases/latest" target="_blank" rel="noopener">latest release</a>,
+                Windows zip or Linux tarball, and drive the whole descent from one script.
+              </p>
+              <div class="term" style="margin-top:var(--sp-5)">
+                <div class="term-top"><span class="dots"><i></i><i></i><i></i></span><span class="fn">shell</span></div>
+<pre><span class="c"># once: fetch toolchain deps</span>
+<span class="p">$</span> Scripts/setup.sh
+
+<span class="c"># the whole descent, one command (bundled example: an order-8 FFT)</span>
+<span class="p">$</span> Scripts/single_proc.sh
+<span class="p">$</span> Scripts/single_proc.sh --sim verilator
+
+<span class="c"># the C++ flavor</span>
+<span class="p">$</span> Scripts/single_proc_cpp.sh</pre>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
+              <a href="https://github.com/nipscernlab/yanc/releases/latest" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--ync);border-color:var(--ync);justify-content:center">
+                <i class="ph ph-download-simple" aria-hidden="true"></i> Download v5.2
+              </a>
+              <a href="https://github.com/nipscernlab/yanc" target="_blank" rel="noopener" class="btn btn-ghost" style="justify-content:center">
+                <i class="ph ph-github-logo" aria-hidden="true"></i> Source on GitHub
+              </a>
+              <a href="sapho" class="btn btn-ghost" style="justify-content:center">
+                <i class="ph ph-cpu" aria-hidden="true"></i> About SAPHO
+              </a>
+              <a href="aurora" class="btn btn-ghost" style="justify-content:center">
+                <i class="ph ph-app-window" aria-hidden="true"></i> AURORA, the IDE
+              </a>
+            </div>
           </div>
         </div>
       </div>
