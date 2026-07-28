@@ -1157,6 +1157,16 @@ h1, h2, h3, h4, h5, h6 {
   transition: color var(--t-fast);
 }
 .share-caption-btn:hover { color: var(--brand-light, #88bdff); text-decoration: underline; }
+/* Separator between the two "copy caption" buttons: a drawn dot rather than a
+   "·" glyph, whose size and baseline shift with the font. The panel is a flex
+   row, so its gap already spaces the dot — flex:none keeps it from stretching. */
+.share-caption-sep {
+  flex: none;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
 .share-toast {
   font-size: var(--text-xs);
   color: #39ff14;
