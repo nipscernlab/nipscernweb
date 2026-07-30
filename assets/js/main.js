@@ -542,20 +542,68 @@ function initBackToTop() {
 }
 
 // ============================================================
+// Grid overlay — design-system verification aid
+// Mirrors the 12-column guide used in the Figma file so a layout can be checked
+// against it directly in the browser. Off by default; append ?grid to any URL
+// or press Alt+G. The preference survives navigation within the session.
+// ============================================================
+function initGridOverlay() {
+  const overlay = document.createElement('div');
+  overlay.className = 'grid-overlay';
+  overlay.setAttribute('aria-hidden', 'true');
+
+  const inner = document.createElement('div');
+  inner.className = 'grid-overlay-inner';
+  const cols = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--grid-cols'), 10) || 12;
+  for (let i = 0; i < cols; i++) inner.appendChild(document.createElement('i'));
+
+  overlay.appendChild(inner);
+  document.body.appendChild(overlay);
+
+  const apply = (on) => {
+    document.body.classList.toggle('show-grid', on);
+    try { sessionStorage.setItem('nipscern_grid', on ? '1' : '0'); } catch (e) {}
+  };
+
+  let on = false;
+  try { on = sessionStorage.getItem('nipscern_grid') === '1'; } catch (e) {}
+  if (new URLSearchParams(location.search).has('grid')) on = true;
+  apply(on);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey && (e.key === 'g' || e.key === 'G')) {
+      e.preventDefault();
+      apply(!document.body.classList.contains('show-grid'));
+    }
+  });
+}
+
+// ============================================================
 // Init
 // ============================================================
-document.addEventListener('DOMContentLoaded', async () => {
-  initNav();
-  initFooter();
-  initBackToTop();
-  initContentLangBadges();
-  await initI18n();
-  initAnimations();
+// A page can end up with more than one instance of this module: the browser
+// keys module identity on the full URL, so importing it as "main.js?v=<other>"
+// (publications.js does) loads a second copy alongside the page's own
+// <script src="main.js?v=...">. Each copy would otherwise append its own
+// back-to-top button and grid overlay. The flag lives on window, which the
+// copies do share, so only the first one bootstraps.
+if (!window.__nipscernBooted) {
+  window.__nipscernBooted = true;
 
-  // Page-specific: home page dynamic content
-  if (document.getElementById('latest-news-card') || document.getElementById('latest-pub-card')) {
-    await initHomeLatest();
-    // Re-apply translations to newly injected elements
-    setLanguage(getLang());
-  }
-});
+  document.addEventListener('DOMContentLoaded', async () => {
+    initNav();
+    initFooter();
+    initBackToTop();
+    initGridOverlay();
+    initContentLangBadges();
+    await initI18n();
+    initAnimations();
+
+    // Page-specific: home page dynamic content
+    if (document.getElementById('latest-news-card') || document.getElementById('latest-pub-card')) {
+      await initHomeLatest();
+      // Re-apply translations to newly injected elements
+      setLanguage(getLang());
+    }
+  });
+}
