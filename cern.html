@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="assets/css/main.css?v=fd26a8e1ef">
+  <link rel="stylesheet" href="assets/css/main.css?v=c258e88117">
 
   <style>
     /* LHC Status banner */
@@ -73,7 +73,7 @@
     .lhc-updated { font-size: var(--text-xs); color: var(--text-muted); }
 
     /* Editorial / minimal overrides for the CERN page */
-    .cern-section { padding: var(--sp-16) var(--container-pad); border-top: 1px solid var(--border-subtle); }
+    .cern-section { padding: var(--sp-16) 0; border-top: 1px solid var(--border-subtle); }
     .cern-section:first-of-type { border-top: none; }
 
     .cern-prose { max-width: 720px; }
@@ -162,7 +162,8 @@
     .cern-media-placeholder i { font-size: 40px; opacity: 0.4; }
     .cern-media-placeholder span { opacity: 0.5; font-family: var(--font-mono); }
 
-    .cern-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-12); align-items: start; max-width: var(--container-max); margin: 0 auto; }
+    /* Pure grid — horizontal rails always come from an enclosing .container */
+    .cern-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-12); align-items: start; }
     @media (max-width: 900px) { .cern-layout { grid-template-columns: 1fr; } }
 
     .cern-subsystem { border-top: 1px solid var(--border-subtle); padding-top: var(--sp-6); margin-top: var(--sp-6); }
@@ -241,8 +242,8 @@
     <!-- ======================================================
          LHC STATUS BANNER
          ====================================================== -->
-    <div style="background:var(--bg-0);padding:var(--sp-8) var(--container-pad) var(--sp-4)">
-      <div style="max-width:var(--container-max);margin:0 auto">
+    <div style="background:var(--bg-0);padding:var(--sp-8) 0 var(--sp-4)">
+      <div class="container">
         <div class="lhc-status-banner fade-up" id="lhc-status-banner" aria-label="LHC operational status">
           <div style="display:flex;align-items:center;gap:var(--sp-3)">
             <div class="lhc-status-dot shutdown" id="lhc-dot"></div>
@@ -302,8 +303,8 @@
     </div>
 
     <!-- MEDIA — ATLAS overview image/video placeholder -->
-    <div style="background:var(--bg-0);padding:0 var(--container-pad) var(--sp-12)">
-      <div style="max-width:var(--container-max);margin:0 auto">
+    <div style="background:var(--bg-0);padding:0 0 var(--sp-12)">
+      <div class="container">
         <img src="assets/images/cern/atlas-cutaway.webp"
              alt="ATLAS detector cutaway — all subsystems from inner tracking to muon spectrometer"
              loading="lazy" class="fade-up"
@@ -315,7 +316,7 @@
          WHAT IS CERN
          ====================================================== -->
     <section class="cern-section" aria-labelledby="whatiscern-title">
-      <div class="cern-layout">
+      <div class="container cern-layout">
         <div class="cern-prose fade-up">
           <div class="accent-line" aria-hidden="true"></div>
           <h2 id="whatiscern-title" data-i18n="cern.what_is_cern.title">What is CERN?</h2>
@@ -373,7 +374,7 @@
          THE LHC
          ====================================================== -->
     <section class="cern-section" aria-labelledby="lhc-title">
-      <div style="max-width:var(--container-max);margin:0 auto">
+      <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
             <i class="ph ph-circles-three" aria-hidden="true"></i>
@@ -430,7 +431,7 @@
          THE FOUR EXPERIMENTS
          ====================================================== -->
     <section class="cern-section" aria-labelledby="experiments-title">
-      <div style="max-width:var(--container-max);margin:0 auto">
+      <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
             <i class="ph ph-chart-scatter" aria-hidden="true"></i>
@@ -478,7 +479,7 @@
          INSIDE ATLAS
          ====================================================== -->
     <section class="cern-section" aria-labelledby="atlas-title">
-      <div class="cern-layout">
+      <div class="container cern-layout">
         <div class="cern-prose fade-up">
           <div class="accent-line" aria-hidden="true"></div>
           <h2 id="atlas-title" data-i18n="cern.atlas.title">Inside the ATLAS Detector</h2>
@@ -539,7 +540,7 @@
          TRIGGER & DATA ACQUISITION
          ====================================================== -->
     <section class="cern-section" aria-labelledby="trigger-title">
-      <div class="cern-layout">
+      <div class="container cern-layout">
         <div class="cern-prose fade-up">
           <div class="accent-line" aria-hidden="true"></div>
           <h2 id="trigger-title" data-i18n="cern.trigger.title">Trigger &amp; Data Acquisition</h2>
@@ -581,7 +582,7 @@
          NIPS-CERN CONTRIBUTION
          ====================================================== -->
     <section class="cern-section" aria-labelledby="nipscern-contrib-title">
-      <div style="max-width:var(--container-max);margin:0 auto">
+      <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
             <i class="ph ph-star-four" aria-hidden="true"></i>
@@ -640,7 +641,7 @@
          KEY ACHIEVEMENTS TIMELINE
          ====================================================== -->
     <section class="cern-section" aria-labelledby="achievements-title">
-      <div style="max-width:var(--container-max);margin:0 auto">
+      <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
             <i class="ph ph-trophy" aria-hidden="true"></i>
@@ -721,7 +722,7 @@
          FUTURE CIRCULAR COLLIDER (FCC)
          ====================================================== -->
     <section class="cern-section" aria-labelledby="fcc-title">
-      <div style="max-width:var(--container-max);margin:0 auto">
+      <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
             <i class="ph ph-circles-three" aria-hidden="true"></i>
@@ -862,7 +863,7 @@
          EXTERNAL RESOURCES
          ====================================================== -->
     <section class="cern-section" aria-labelledby="links-title">
-      <div style="max-width:var(--container-max);margin:0 auto">
+      <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
             <i class="ph ph-link" aria-hidden="true"></i>
@@ -988,7 +989,7 @@
 })();
 </script>
 
-  <script type="module" src="assets/js/main.js?v=fd26a8e1ef"></script>
+  <script type="module" src="assets/js/main.js?v=c258e88117"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
