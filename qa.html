@@ -360,20 +360,6 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <div vw class="enabled">
-    <div vw-access-button class="active"></div>
-    <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
-  </div>
-  <script>
-  /* VLibras carregado depois do load para nao bloquear a renderizacao */
-  window.addEventListener('load', function () {
-    var s = document.createElement('script');
-    s.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
-    s.onload = function () { new VLibras.Widget('https://vlibras.gov.br/app'); };
-    document.body.appendChild(s);
-  });
-  </script>
-
   <script type="module" src="assets/js/main.js?v=c258e88117"></script>
   <script src="assets/js/analytics.js" defer></script>
 </body>
