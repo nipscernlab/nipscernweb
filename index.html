@@ -102,6 +102,16 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
 .hero-bg::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:700px;height:700px;border-radius:50%;background:radial-gradient(ellipse 30% 30% at 50% 50%,rgba(91,156,246,.14) 0%,transparent 60%),radial-gradient(ellipse 65% 55% at 50% 50%,rgba(91,156,246,.04) 0%,transparent 80%)}
 #hero-stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .hero-content{position:relative;z-index:1;width:100%;max-width:var(--container-max);margin:0 auto;padding:80px var(--container-pad);text-align:center}
+/* RECRUIT-BANNER: faixa temporaria de IC. Remover junto com o bloco no HTML. */
+.hero-recruit{display:inline-flex;align-items:center;gap:9px;margin-bottom:28px;padding:9px 18px;border-radius:999px;border:1px solid rgba(91,156,246,.38);background:rgba(91,156,246,.10);color:var(--text-secondary);font-size:var(--text-sm);line-height:1.35;text-decoration:none;transition:background .25s ease,border-color .25s ease,transform .25s ease}
+.hero-recruit:hover{background:rgba(91,156,246,.19);border-color:rgba(91,156,246,.62);transform:translateY(-1px)}
+.hero-recruit strong{color:#79b1ff;font-weight:600;white-space:nowrap}
+.hero-recruit i{font-size:15px;color:#79b1ff;flex-shrink:0}
+@media(max-width:640px){.hero-recruit{flex-direction:column;gap:6px;margin-bottom:22px;padding:14px 20px;border-radius:16px;font-size:13px;text-align:center;max-width:min(92vw,340px)}
+.hero-recruit>span{display:block}
+.hero-recruit strong{display:inline-flex;align-items:center;gap:6px;margin-top:2px}
+.hero-recruit .ph-arrow-right{display:none}
+.hero-recruit strong::after{content:'\2192';font-weight:400}}
 @keyframes foil-shimmer{0%{background-position:-100% center}100%{background-position:100% center}}
 @keyframes foil-halo{0%,100%{filter:drop-shadow(0 0 18px rgba(120,177,255,.16)) drop-shadow(0 0 3px rgba(255,255,255,.10))}50%{filter:drop-shadow(0 0 30px rgba(150,197,255,.26)) drop-shadow(0 0 5px rgba(255,255,255,.16))}}
 @keyframes foil-halo-atom{0%,100%{filter:drop-shadow(0 0 10px rgba(120,177,255,.35)) drop-shadow(0 0 4px rgba(255,255,255,.22))}50%{filter:drop-shadow(0 0 20px rgba(150,197,255,.50)) drop-shadow(0 0 7px rgba(255,255,255,.34))}}
@@ -179,6 +189,13 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
         <canvas id="hero-stars"></canvas>
       </div>
       <div class="hero-content">
+        <!-- RECRUIT-BANNER: faixa temporaria de recrutamento de IC. Remover apos 28/08/2026. -->
+        <a class="hero-recruit" href="https://docs.google.com/forms/d/e/1FAIpQLSeqSGVJgTFfXdOrdoWYK6uH0Jvvujd9RmhW5ANzOjLQfwk4DQ/viewform" target="_blank" rel="noopener">
+          <i class="ph ph-megaphone" aria-hidden="true"></i>
+          <span data-i18n="home.recruit.text">Vagas de iniciação científica abertas. Inscrições até 28 de agosto.</span>
+          <strong data-i18n="home.recruit.cta">Inscreva-se</strong>
+          <i class="ph ph-arrow-right" aria-hidden="true"></i>
+        </a>
         <h1 class="hero-title" id="hero-title">NIPS<span class="hero-atom" aria-hidden="true"></span>CERN</h1>
         <p class="hero-subtitle" data-i18n="home.hero.subtitle">
           Research and Development Laboratory at UFJF, Brazil — working at the frontier of high energy physics, scientific computing, and advanced hardware systems in collaboration with CERN, Geneva.
