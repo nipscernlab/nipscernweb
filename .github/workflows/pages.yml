@@ -1,0 +1,60 @@
+name: Publicacao no GitHub Pages
+
+# Substitui o build "legacy" do Pages (o pages-build-deployment que o GitHub
+# gerava sozinho a partir de Settings -> Pages -> Deploy from a branch).
+#
+# INERTE ATE ALGUEM TROCAR A CONFIGURACAO: enquanto Settings -> Pages -> Source
+# estiver em "Deploy from a branch", quem publica continua sendo o build legacy
+# e este workflow falha no passo de deploy. Depois de trocar Source para
+# "GitHub Actions", este arquivo passa a ser o unico caminho de publicacao.
+#
+# Por que existe: em 06/08/2026 o caminho legacy parou de publicar. O artefato
+# era construido normalmente, o deployment era aceito, e ficava em
+# deployment_queued ate o proprio action desistir. O mesmo commit (a045661)
+# publicara sem erro no dia anterior, com a arvore identica, e a pagina de
+# status do GitHub nao acusava incidente.
+
+on:
+  push:
+    branches: [main]
+  # Permite republicar sem precisar de um commit novo — util quando a falha
+  # esta na fila do Pages e nao no conteudo.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# cancel-in-progress fica FALSE de proposito. Dois pushes em poucos minutos
+# fizeram o segundo cancelar o deploy do primeiro em 06/08; com a fila do Pages
+# lenta, cancelar o que ja esta rodando so atrasa mais.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/configure-pages@v6
+
+      # O site e estatico e tem .nojekyll na raiz: nao ha build, so empacotar a
+      # arvore como ela esta — o mesmo que o legacy fazia com source path "/".
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          # 30 min em vez dos 10 do padrao. O artefato passa de 130 MB (as capas
+          # da CERN Courier em assets/images/magazine sao ~80% disso) e a falha
+          # observada foi exatamente o timeout padrao estourando com o
+          # deployment ainda em fila, nao um erro de conteudo.
+          timeout: 1800000
