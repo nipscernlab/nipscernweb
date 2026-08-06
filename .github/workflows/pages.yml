@@ -14,11 +14,19 @@ name: Publicacao no GitHub Pages
 # publicara sem erro no dia anterior, com a arvore identica, e a pagina de
 # status do GitHub nao acusava incidente.
 
+# SO MANUAL, de proposito. Enquanto Settings -> Pages -> Source estiver em
+# "Deploy from a branch", quem publica e o builder legacy, e um gatilho de push
+# aqui faria cada commit criar DOIS deployments concorrentes para o mesmo site:
+# o do legacy e o deste workflow, que o backend nem processa porque o
+# build_type e "legacy". Alem de nunca funcionar, isso consome em dobro o limite
+# flexivel de 10 builds/hora do Pages e mantem a fila travada.
+#
+# Depois de trocar o Source para "GitHub Actions", troque este bloco por:
+#   on:
+#     push:
+#       branches: [main]
+#     workflow_dispatch:
 on:
-  push:
-    branches: [main]
-  # Permite republicar sem precisar de um commit novo — util quando a falha
-  # esta na fila do Pages e nao no conteudo.
   workflow_dispatch:
 
 permissions:
