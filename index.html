@@ -82,7 +82,7 @@
 
   <!-- Critical CSS (above-the-fold hero styles inlined to avoid render-blocking) -->
   <style>
-:root{--bg-0:#070a12;--bg-1:#0b0f1c;--bg-card:#131826;--bg-elevated:#1a2035;--border-subtle:rgba(255,255,255,.06);--border-mid:rgba(255,255,255,.10);--border-strong:rgba(255,255,255,.18);--text-primary:#e4e8f2;--text-secondary:#8b95ad;--text-muted:#7a86a6;--text-inverse:#0b0f1c;--brand:#5b9cf6;--brand-dim:rgba(91,156,246,.12);--brand-mid:rgba(91,156,246,.25);--font-sans:'Inter',system-ui,-apple-system,sans-serif;--font-serif:'DM Serif Display',Georgia,serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--text-xs:.70rem;--text-sm:.8125rem;--text-base:1rem;--text-lg:1.125rem;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-20:80px;--r-md:8px;--r-lg:12px;--r-full:9999px;--t-fast:120ms ease;--t-base:220ms ease;--container-max:1280px;--container-pad:clamp(1.25rem,5vw,2.5rem);--nav-h:68px}
+:root{--bg-0:#070a12;--bg-1:#0b0f1c;--bg-card:#131826;--bg-elevated:#1a2035;--border-subtle:rgba(255,255,255,.06);--border-mid:rgba(255,255,255,.10);--border-strong:rgba(255,255,255,.18);--text-primary:#e4e8f2;--text-secondary:#8b95ad;--text-muted:#7a86a6;--text-inverse:#0b0f1c;--brand:#5b9cf6;--brand-dim:rgba(91,156,246,.12);--brand-mid:rgba(91,156,246,.25);--font-sans:'Inter',system-ui,-apple-system,sans-serif;--font-serif:'DM Serif Display',Georgia,serif;--font-mono:'JetBrains Mono','Fira Code',monospace;--text-xs:.70rem;--text-sm:.8125rem;--text-base:1rem;--text-lg:1.125rem;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-20:80px;--r-md:8px;--r-lg:12px;--r-full:9999px;--t-fast:120ms ease;--t-base:220ms ease;--container-max:1320px;--container-pad:clamp(1.25rem,5vw,2.5rem);--nav-h:68px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;-webkit-text-size-adjust:100%;max-width:100vw;overflow-x:hidden}
 body{font-family:var(--font-sans);background:var(--bg-1);color:var(--text-primary);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
@@ -124,17 +124,20 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
 .hero-viewcount i{font-size:13px;opacity:.7}.hero-viewcount #view-count{color:var(--text-secondary);font-weight:500}
 @media(max-width:640px){
   .hero-content{padding-left:12px;padding-right:12px}
-  .hero-title{font-size:clamp(4.5rem,24vw,7rem);line-height:.95;margin-bottom:18px}
-  .hero-title .hero-atom{display:block;width:.5em;height:.5em;margin:.04em auto;top:0}
-  .hero-subtitle{font-size:var(--text-sm);line-height:1.55;margin-bottom:28px}
+  /* Keep these three in sync with the @media (max-width:640px) block in
+     main.css — the stylesheet loads after this inline copy and wins the
+     cascade, so a value that only lives here never takes effect. */
+  .hero-title{font-size:clamp(5rem,26vw,8rem);line-height:.92;margin-bottom:20px}
+  .hero-title .hero-atom{display:block;width:.42em;height:.42em;margin:.02em auto;top:0}
+  .hero-subtitle{font-size:.75rem;line-height:1.5;max-width:34ch;margin-bottom:26px}
   .hero-actions{flex-direction:column}
   .hero-actions .btn{padding:11px 22px;font-size:var(--text-sm)}
 }
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=c258e88117" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=c258e88117"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=bca147dc8e" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=bca147dc8e"></noscript>
 
   <!-- Google Fonts (async) -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -728,7 +731,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
     io.observe(f);
   })();
   </script>
-  <script type="module" src="assets/js/main.js?v=c258e88117"></script>
+  <script type="module" src="assets/js/main.js?v=bca147dc8e"></script>
 
 <script>
   window.addEventListener('load', function () {
