@@ -3293,7 +3293,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 640px) {
-  .hero-title { font-size: clamp(3rem, 15vw, 5rem); }
+  /* Phone hero: the wordmark carries the page, so it takes the room and the
+     subtitle steps back. The atom breaks onto its own line (NIPS / atom /
+     CERN) — at this size the three-part lockup no longer fits one line.
+     index.html inlines a copy of these rules as critical CSS; change both. */
+  .hero-title { font-size: clamp(5rem, 26vw, 8rem); line-height: 0.92; margin-bottom: var(--sp-5); }
+  .hero-title .hero-atom { display: block; width: 0.42em; height: 0.42em; margin: 0.02em auto; top: 0; }
+  .hero-subtitle { font-size: 0.75rem; line-height: 1.5; max-width: 34ch; margin-bottom: var(--sp-6); }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .section { padding-top: var(--sp-12); padding-bottom: var(--sp-12); }
   .cgv-canvas-wrapper { height: 400px; }
