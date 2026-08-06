@@ -50,11 +50,12 @@ jobs:
         with:
           path: .
 
+      # Nao adiante passar `timeout` aqui: 600000 ms (10 min) e teto rigido da
+      # action, nao apenas o padrao. Passar 1800000 so produz
+      #   "timeout value is greater than the allowed maximum
+      #    - timeout set to the maximum of 600000 milliseconds"
+      # e o deploy morre aos 10 min do mesmo jeito. Se a fila do Pages nao andar
+      # dentro desse limite, o caminho e reduzir o artefato (as capas da CERN
+      # Courier em assets/images/magazine sao ~80% dos 136 MB) ou abrir chamado.
       - id: deployment
         uses: actions/deploy-pages@v5
-        with:
-          # 30 min em vez dos 10 do padrao. O artefato passa de 130 MB (as capas
-          # da CERN Courier em assets/images/magazine sao ~80% disso) e a falha
-          # observada foi exatamente o timeout padrao estourando com o
-          # deployment ainda em fila, nao um erro de conteudo.
-          timeout: 1800000
