@@ -17,6 +17,26 @@ Para cada notícia (de `data/news.json` e `data/news-featured.json`):
   humanos pro SPA (`/news/post?id=<slug>`) e entrega o preview certo pros crawlers
   do LinkedIn/WhatsApp/X. → **commitar no repo**.
 
+## Capa vertical opcional (`image_vertical`)
+
+A capa (`image`) é recortada pelo centro para caber em cada formato. Numa arte
+deitada isso funciona no `og`, mas nos formatos em pé (4:5, 3:4 e principalmente
+9:16) sobra só uma tira central estreita e o resto se perde. Quando a arte não
+sobrevive a esse corte, coloque no post um segundo campo:
+
+```json
+"image": "assets/images/news/exemplo.webp",
+"image_vertical": "assets/images/news/exemplo-vertical.webp"
+```
+
+O gerador usa `image_vertical` em todo formato mais alto que largo
+(`portrait`, `grid`, `story`, `rawgrid`, `rawstory`) e mantém `image` nos
+deitados (`og`, `raw`). Sem o campo, tudo continua saindo da capa única.
+
+Desenhe a vertical em 9:16 e deixe o conteúdo na faixa central-superior: os
+cortes 4:5 e 3:4 aparam topo e base, e nos formatos com texto o título ocupa a
+parte de baixo.
+
 O mesmo template SVG alimenta todos os formatos: capa recortada + fade azul
 escuro, data, título em DM Serif Display, marca NIPS⚛CERN, e a assinatura da
 casa atrás do título — o circuito impresso do lab (`circuit-primary.svg`,

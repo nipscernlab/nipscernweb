@@ -26,7 +26,7 @@ const CDN: &str = "https://cdn.nipscern.com/share";
 // Cache-buster: the CDN (Cloudflare) caches images for a year, so bump this on
 // every image regeneration to force fresh delivery. MUST match CDN_VER in
 // news/post.html. See tools/share-gen/README.md.
-const IMG_VER: &str = "10";
+const IMG_VER: &str = "11";
 const BRAND: &str = "#7cb5ff";
 const BRAND_DEEP: &str = "#5b9cf6";
 
@@ -526,10 +526,22 @@ fn process_post(post: &Value, opt: &usvg::Options, dist: &Path, news_dir: &Path,
         println!("  ! capa não carregou: {cover_url}");
     }
 
+    // Optional second cover for the portrait formats (4:5, 3:4, 9:16). Landscape
+    // artwork centre-cropped to 9:16 keeps only a narrow central strip and loses
+    // everything else, so a post may ship a purpose-drawn portrait cover in
+    // `image_vertical`. Falls back to the main cover when absent.
+    let cover_v_url = s(post, "image_vertical");
+    let cover_v_bytes = load_cover(cover_v_url, repo);
+    if cover_v_bytes.is_none() && !cover_v_url.is_empty() {
+        println!("  ! capa vertical não carregou: {cover_v_url}");
+    }
+    if cover_v_bytes.is_some() {
+        println!("  · capa vertical: {cover_v_url}");
+    }
+
     for f in FORMATS {
-        let uri = cover_bytes
-            .as_ref()
-            .and_then(|b| cover_data_uri(b, f.w * SS, f.h * SS));
+        let src = if f.h > f.w { cover_v_bytes.as_ref().or(cover_bytes.as_ref()) } else { cover_bytes.as_ref() };
+        let uri = src.and_then(|b| cover_data_uri(b, f.w * SS, f.h * SS));
         let variants: Vec<String> = if f.text { langs.clone() } else { vec!["_".to_string()] };
         for lang in &variants {
             let title = if f.text { title_for(post, lang) } else { String::new() };
