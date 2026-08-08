@@ -18,14 +18,52 @@ import { publicationUrl, newsPostUrl } from './content-links.js';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* Run `fn` only while `el` is on screen. Returns a stop handle. */
-function whileVisible(el, start, stop) {
-  if (!('IntersectionObserver' in window)) { start(); return; }
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => (e.isIntersecting ? start() : stop()));
-  }, { rootMargin: '120px' });
-  io.observe(el);
-  return () => io.disconnect();
+/* ------------------------------------------------------------------
+   The projects grid, as one thing that can be stopped
+   ------------------------------------------------------------------
+   Five media of three different kinds run in that grid: three videos, a CSS
+   animation and a canvas. One control governs all of them.
+
+   Every one of them resumes rather than restarts. A video keeps its
+   currentTime; the falling instruction set is held with animation-play-state,
+   which freezes a CSS animation where it stands instead of removing it and
+   snapping the track back to the top; and the pulse train accumulates its own
+   elapsed time, because it is drawn from a clock and a paused clock that
+   carries on ticking would jump the trace forward when it came back.
+
+   While the grid is stopped, hovering a card runs that card alone. It is the
+   same rule as before, and off screen still means stopped whatever the button
+   says: a medium runs when it is visible, and when either the grid is playing
+   or the pointer is on it. */
+const cardAnims = [];
+let gridPaused = false;
+
+function syncAnim(a) {
+  const should = a.visible && (!gridPaused || a.hovered);
+  if (should === a.on) return;
+  a.on = should;
+  if (should) a.play(); else a.hold();
+}
+
+function registerCardAnim(el, play, hold) {
+  const card = el.closest ? el.closest('.pc-card') : null;
+  const a = { card, play, hold, visible: false, hovered: false, on: false };
+  cardAnims.push(a);
+  if (card) {
+    card.addEventListener('pointerenter', () => { a.hovered = true; syncAnim(a); });
+    card.addEventListener('pointerleave', () => { a.hovered = false; syncAnim(a); });
+  }
+  return a;
+}
+
+/* Visibility and the button are two inputs to the same decision, so the media
+   in this grid go through here rather than through whileVisible. */
+function whileVisibleCard(el, play, hold) {
+  const a = registerCardAnim(el, play, hold);
+  if (!('IntersectionObserver' in window)) { a.visible = true; syncAnim(a); return; }
+  new IntersectionObserver((entries) => {
+    entries.forEach((e) => { a.visible = e.isIntersecting; syncAnim(a); });
+  }, { rootMargin: '120px' }).observe(el);
 }
 
 /* ------------------------------------------------------------------
@@ -230,7 +268,9 @@ function yancCascade(host) {
       </div>`;
   }).join('');
 
-  whileVisible(host,
+  /* is-running now switches animation-play-state rather than the animation
+     itself, so the column holds where it stands and carries on from there. */
+  whileVisibleCard(host,
     () => host.classList.add('is-running'),
     () => host.classList.remove('is-running'));
 }
@@ -246,7 +286,12 @@ function yancCascade(host) {
    ------------------------------------------------------------------ */
 function hitsPulse(canvas) {
   const ctx = canvas.getContext('2d');
-  let raf = 0, running = false, w = 0, h = 0, dpr = 1, t0 = 0;
+  let raf = 0, running = false, w = 0, h = 0, dpr = 1;
+  /* Its own elapsed time, accumulated frame by frame, rather than the distance
+     from a start stamp. Wall-clock time carries on while the trace is held, and
+     reading it on the way back would skip the panel forward by however long the
+     reader was elsewhere. */
+  let elapsed = 0, lastTs = 0;
 
   /* The shaper is the one published in Luna, Paschoalin, Quirino and Andrade
      Filho, "Digital Implementation of a Signal Conditioning Stage on FPGA for
@@ -365,8 +410,10 @@ function hitsPulse(canvas) {
   };
 
   const draw = (ts) => {
-    if (!t0) t0 = ts;
-    const el = (ts - t0) / 1000;
+    if (!lastTs) lastTs = ts;
+    elapsed += Math.min((ts - lastTs) / 1000, 0.05);
+    lastTs = ts;
+    const el = elapsed;
     ctx.clearRect(0, 0, w, h);
 
     /* The pedestal sits low and the gain is set for the sum, not for one pulse:
@@ -486,13 +533,13 @@ function hitsPulse(canvas) {
     raf = requestAnimationFrame(draw);
   };
 
-  const start = () => { if (!running) { running = true; resize(); raf = requestAnimationFrame(draw); } };
+  const start = () => { if (!running) { running = true; lastTs = 0; resize(); raf = requestAnimationFrame(draw); } };
   const stop = () => { running = false; cancelAnimationFrame(raf); };
 
   resize();
   addEventListener('resize', resize);
   if (REDUCED) { requestAnimationFrame((ts) => { draw(ts); stop(); }); return; }
-  whileVisible(canvas, start, stop);
+  whileVisibleCard(canvas, start, stop);
 }
 
 /* ------------------------------------------------------------------
@@ -531,7 +578,7 @@ function videoLoop(video) {
     video.load();
   };
 
-  whileVisible(video,
+  whileVisibleCard(video,
     () => { arm(); const p = video.play(); if (p) p.catch(() => {}); },
     () => video.pause());
 }
@@ -740,8 +787,32 @@ function revealFailsafe() {
   }, 2000);
 }
 
+/* The control. Always starts playing: a page that opens frozen looks broken,
+   and the reader has no way of knowing it was a choice. */
+function projectsPauseButton() {
+  const btn = document.getElementById('pc-pause');
+  if (!btn) return;
+  const label = () => {
+    const key = gridPaused ? 'home.projects.play' : 'home.projects.pause';
+    const src = document.querySelector('[data-i18n="' + key + '"]');
+    const txt = (src && src.textContent.trim()) || (gridPaused ? 'Play' : 'Pause');
+    btn.querySelector('.pc-pause-t').textContent = txt;
+    btn.querySelector('i').className = gridPaused ? 'ph ph-play' : 'ph ph-pause';
+    btn.setAttribute('aria-pressed', gridPaused ? 'true' : 'false');
+    btn.classList.toggle('is-paused', gridPaused);
+  };
+  btn.addEventListener('click', () => {
+    gridPaused = !gridPaused;
+    cardAnims.forEach(syncAnim);
+    label();
+  });
+  document.addEventListener('langchange', () => setTimeout(label, 0));
+  label();
+}
+
 function init() {
   revealFailsafe();
+  projectsPauseButton();
   fromTheLab();
   choreograph();
 
