@@ -68,6 +68,23 @@ async function loadTranslations(lang) {
   }
 }
 
+/* The request goes out here, as this module is evaluated, instead of waiting
+   for DOMContentLoaded inside initI18n. Nothing on the page is revealed until
+   the words are in, so that wait was a blank screen at the start of every
+   navigation, and it cost a round trip that had nothing to wait for: the
+   language is already known, the head read it out of localStorage before the
+   body was parsed.
+
+   Failure here is not silent. loadTranslations already falls back to the whole
+   file and writes the reason to the console; this only starts it earlier. */
+const earlyLang = (() => {
+  try { return detectLanguage(); } catch (e) {
+    console.warn('[i18n] could not detect a language early:', e);
+    return DEFAULT_LANG;
+  }
+})();
+const earlyLoad = loadTranslations(earlyLang);
+
 /** Deep-get a key like "nav.home" from a nested object */
 function getKey(obj, path) {
   return path.split('.').reduce((acc, k) => (acc && acc[k] !== undefined ? acc[k] : null), obj);
@@ -177,6 +194,10 @@ export function getLang() {
 export async function initI18n() {
   /* Detect first, then fetch. The other order downloaded a language before
      knowing which one was wanted. */
+  /* Awaited rather than re-fetched: the request is already in flight from module
+     evaluation, and calling loadTranslations again while it is still open would
+     start a second one, because the cache it checks is only filled at the end. */
+  await earlyLoad;
   const lang = detectLanguage();
   await loadTranslations(lang);
   await setLanguage(lang);
