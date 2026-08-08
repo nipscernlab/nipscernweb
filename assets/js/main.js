@@ -68,7 +68,7 @@ function buildNav() {
 
   const linksHtml = NAV_LINKS.map(link => {
     const href = ROOT + link.href;
-    return `<a href="${href}" class="nav-link${isActivePath(link) ? ' active' : ''}" data-i18n="${link.key}">${link.label}</a>`;
+    return `<a href="${href}" class="nav-link${isActivePath(link) ? ' active glass-btn' : ''}" data-i18n="${link.key}">${link.label}</a>`;
   }).join('');
 
   const langBtns = ['en', 'pt', 'fr', 'no'].map(lang => `
@@ -80,7 +80,7 @@ function buildNav() {
   const mobileLinksHtml = NAV_LINKS.map(link => {
     const href = ROOT + link.href;
     const isActive = isActivePath(link);
-    return `<a href="${href}" class="nav-mobile-link${isActive ? ' active' : ''}" data-i18n="${link.key}">${link.label}</a>`;
+    return `<a href="${href}" class="nav-mobile-link${isActive ? ' active glass-btn' : ''}" data-i18n="${link.key}">${link.label}</a>`;
   }).join('');
 
   return `
@@ -95,7 +95,7 @@ function buildNav() {
       </nav>
 
       <div class="nav-right">
-        <div class="lang-switcher" role="group" aria-label="Language selector">
+        <div class="lang-switcher glass" role="group" aria-label="Language selector">
           ${langBtns}
         </div>
         <a href="/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-cgv-link" aria-label="CGVWEB Project" title="CGVWEB">
@@ -128,7 +128,7 @@ function buildNav() {
         </a>
       </div>
       <div class="nav-mobile-lang" style="border-top:1px solid var(--border-subtle);padding-top:var(--sp-8)">
-        <div class="lang-switcher" style="justify-content:flex-start">
+        <div class="lang-switcher glass" style="justify-content:flex-start">
           ${langBtns}
         </div>
       </div>
@@ -616,6 +616,7 @@ async function initHomeLatest() {
 function initBackToTop() {
   const btn = document.createElement('button');
   btn.id = 'back-to-top';
+  btn.classList.add('glass-btn');
   btn.setAttribute('aria-label', 'Back to top');
   btn.innerHTML = '<i class="ph ph-arrow-up" aria-hidden="true"></i>';
   document.body.appendChild(btn);
