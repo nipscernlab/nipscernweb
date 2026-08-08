@@ -1,15 +1,15 @@
 <p align="center">
   <img src="https://github.com/nipscernlab/nipscernweb/blob/main/assets/icons/nipscernweb.svg"
-       alt="NIPSCERN Icon"
+       alt="NIPS-CERN Icon"
        width="160">
   <img src="https://github.com/nipscernlab/nipscernweb/blob/main/assets/icons/nipscernv2.svg"
-       alt="NIPSCERN Icon"
+       alt="NIPS-CERN Icon"
        width="160">
 </p>
 
 # NIPSCERNWEB
 
-**NIPSCERNWEB** is the official web repository of the **NIPSCERN Laboratory**, containing all assets and source files used to build and deliver **nipscern.com**.
+**NIPSCERNWEB** is the official web repository of the **NIPS-CERN Laboratory**, containing all assets and source files used to build and deliver **nipscern.com**.
 
 This repository hosts the complete website stack, including:
 
@@ -44,19 +44,19 @@ Our mission is **high-level scientific outreach**, providing accurate, accessibl
 
 ## Contributing
 
-Only NIPSCERN organization members have write access. External contributions
+Only NIPS-CERN organization members have write access. External contributions
 are welcome via pull request and are reviewed by the members before merging.
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## We are hiring
 
-NIPSCERN is looking for researchers in **logic, philosophy, software
+NIPS-CERN is looking for researchers in **logic, philosophy, software
 engineering, engineering disciplines, programming and design**. Reach out
 through [nipscern.com](https://nipscern.com).
 
 ## License
 
-This repository is licensed under the **NIPSCERN License 1.0**
+This repository is licensed under the **NIPS-CERN License 1.0**
 ([LICENSE.md](LICENSE.md)): free to read, study, use and modify, including
 inside companies; **commercial exploitation requires prior written
 authorization** from the Laboratory. We are open to partnerships, talk to us.

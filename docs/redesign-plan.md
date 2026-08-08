@@ -339,7 +339,7 @@ nativamente nos quatro idiomas.
 
 Registrada em 2026-08-07, a pedido do cliente. Ainda por fazer.
 
-O repositório usa a Licença NIPSCERN 1.0 (`LICENSE.md`, bilíngue): livre para
+O repositório usa a Licença NIPS-CERN 1.0 (`LICENSE.md`, bilíngue): livre para
 ler, estudar, usar e modificar, inclusive dentro de empresas; exploração
 comercial exige autorização prévia por escrito do laboratório.
 
@@ -353,7 +353,7 @@ O que precisa ser resolvido:
   (mídia do CERN, publicações dos próprios autores, fontes OFL, ícones MIT).
   Provavelmente pedem licenças diferentes.
 - O YANC é MIT, segundo a página do projeto. Verificar se convive com a Licença
-  NIPSCERN 1.0 e qual vale para qual parte.
+  NIPS-CERN 1.0 e qual vale para qual parte.
 - Decidir a licença do conteúdo do blog quando ele existir (seção 9).
 - `credits.html` é onde a atribuição de terceiros vive, e a regra combinada é
   que toda dependência entra lá no momento em que é adotada.

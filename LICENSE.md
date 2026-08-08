@@ -1,8 +1,8 @@
-# Licença NIPSCERN
+# Licença NIPS-CERN
 
 **Versão 1.0, junho de 2026**
 
-Copyright (c) 2026 NIPSCERN, Núcleo de Instrumentação e Processamento de Sinais,
+Copyright (c) 2026 NIPS-CERN, Núcleo de Instrumentação e Processamento de Sinais,
 Universidade Federal de Juiz de Fora (UFJF), Brasil.
 
 *An English translation is provided below. In case of divergence, the
@@ -14,7 +14,7 @@ Portuguese text prevails.*
 imagens, dados e demais materiais de autoria do Laboratório, no todo ou em
 parte, em sua forma original ou modificada.
 
-**Laboratório**: o NIPSCERN, detentor dos direitos sobre a Obra.
+**Laboratório**: o NIPS-CERN, detentor dos direitos sobre a Obra.
 
 **Exploração comercial**: vender a Obra, licenciá-la mediante pagamento,
 oferecê-la como produto ou serviço pago, ou monetizá-la diretamente, em forma
@@ -37,7 +37,7 @@ e. **propor melhorias** ao Laboratório, na forma da seção 4.
 ## 3. O que exige autorização prévia
 
 A **Exploração comercial da Obra exige autorização prévia e por escrito do
-Laboratório**. O NIPSCERN é aberto a parcerias e tem interesse em conversar
+Laboratório**. O NIPS-CERN é aberto a parcerias e tem interesse em conversar
 com pessoas e organizações que queiram construir algo sobre seu trabalho:
 basta entrar em contato antes.
 
@@ -59,7 +59,7 @@ histórico do repositório.
 ## 5. Marcas e conteúdo de terceiros
 
 Esta licença não concede direitos sobre o nome, a marca ou os logotipos do
-NIPSCERN ou da UFJF.
+NIPS-CERN ou da UFJF.
 
 Materiais de terceiros presentes na Obra (por exemplo, mídia do CERN e
 publicações cuja titularidade pertence a seus autores) permanecem sob suas
@@ -89,11 +89,11 @@ Ou pela página de contato em **nipscern.com**.
 
 ---
 
-# NIPSCERN License (English translation)
+# NIPS-CERN License (English translation)
 
 **Version 1.0, June 2026**
 
-Copyright (c) 2026 NIPSCERN, Center for Instrumentation and Signal Processing,
+Copyright (c) 2026 NIPS-CERN, Center for Instrumentation and Signal Processing,
 Federal University of Juiz de Fora (UFJF), Brazil.
 
 *This is a convenience translation. The Portuguese text above prevails.*
@@ -104,7 +104,7 @@ Federal University of Juiz de Fora (UFJF), Brazil.
 images, data and other materials authored by the Laboratory, in whole or in
 part, in original or modified form.
 
-**Laboratory**: NIPSCERN, holder of the rights over the Work.
+**Laboratory**: NIPS-CERN, holder of the rights over the Work.
 
 **Commercial exploitation**: selling the Work, licensing it for a fee,
 offering it as a paid product or service, or directly monetizing it, in
@@ -126,7 +126,7 @@ e. **propose improvements** to the Laboratory, as per section 4.
 ## 3. What requires prior authorization
 
 **Commercial exploitation of the Work requires prior written authorization
-from the Laboratory.** NIPSCERN is open to partnerships and interested in
+from the Laboratory.** NIPS-CERN is open to partnerships and interested in
 talking to people and organizations who want to build on its work: just get
 in touch first.
 
@@ -147,7 +147,7 @@ the repository history.
 
 ## 5. Trademarks and third-party content
 
-This license grants no rights over the NIPSCERN or UFJF names, brands or
+This license grants no rights over the NIPS-CERN or UFJF names, brands or
 logos.
 
 Third-party materials present in the Work (for example, CERN media and
