@@ -2884,12 +2884,15 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
     /* Behind the content, in the same layer as the seam fade above it. */
     z-index: -1;
     transform: translateY(-50%);
-    width: min(280px, calc((100vw - 1000px) / 2));
+    /* Wide enough to run behind the publications card: the margin left over
+       beside the 960 of cards, and 260 more that the card covers. What shows of
+       that extension is the part above and below the card, and that is the
+       point: the card reads as sitting on a plate rather than next to a strip. */
+    width: min(600px, calc((100vw - 1000px) / 2 + 260px));
     height: clamp(560px, 92%, 940px);
     /* Black, not the page colour. The recording is on a black stage, measured
-       at Y=16 in limited range, which is video black exactly; matching it is
-       what lets the panel be taller than the footage without a visible band
-       where one ends and the other begins. */
+       at Y=16 in limited range, which is video black exactly, so the panel can
+       be larger than the footage with no visible edge where one ends. */
     background: #000;
     border: 1px solid var(--border-subtle);
     border-right: 0;
@@ -2898,17 +2901,25 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   }
   .cube-rail video {
     display: block;
-    width: 100%;
-    height: 100%;
-    /* contain, not cover: cover filled the panel by scaling the footage until
-       it overflowed, which cut the cube down both sides. The panel is taller
-       than the footage now and the black above and below is the same black. */
-    object-fit: contain;
-    /* Thicker fog on the way out. It starts giving way a third of the way
+    position: absolute;
+    right: 0;
+    /* On the floor. Centred in the panel, the cube had its lit floor running
+       across the middle, which read as the bottom edge of a rectangle pasted
+       into the page rather than as a floor. Sat on the bottom it is a floor,
+       and all the height that was split above and below is now above, where
+       there is nothing but black for it to blend into. */
+    bottom: 0;
+    /* Its own width, not the panel's. The panel is wide because it runs behind
+       the card; the cube would have grown with it and gone behind the card with
+       it. It reaches about a hundred pixels past the card edge, so the cube is
+       partly covered rather than mostly missing. */
+    width: min(430px, calc((100vw - 1000px) / 2 + 130px));
+    height: auto;
+    /* Thicker fog on the way out: it starts giving way a fifth of the way
        across and is gone before the edge, so the panel does not end, it
        disperses. */
-    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 18%, rgba(0,0,0,0.45) 55%, transparent 82%);
-    mask-image: linear-gradient(to right, #000 0%, #000 18%, rgba(0,0,0,0.45) 55%, transparent 82%);
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 22%, rgba(0,0,0,0.45) 58%, transparent 86%);
+    mask-image: linear-gradient(to right, #000 0%, #000 22%, rgba(0,0,0,0.45) 58%, transparent 86%);
   }
 }
 
