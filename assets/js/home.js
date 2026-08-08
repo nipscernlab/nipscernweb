@@ -98,14 +98,24 @@ function choreograph() {
   const stars = document.getElementById('hero-stars');
   if (stars) {
     gsap.to(stars, {
-      yPercent: 18,
+      yPercent: 14,
       ease: 'none',
       scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.5, invalidateOnRefresh: true },
     });
   }
 
   /* Inside a clipping frame a percentage is the right unit: it is a share of
-     the medium's own height, and whatever leaves the frame is cut off. */
+     the medium's own height, and whatever leaves the frame is cut off.
+
+     The trap in that unit is that it is a share of the element, not of the
+     frame. A medium hung at 118% of its frame and drifted by 14 travels 16.5%
+     of the frame while having only 9% of headroom to do it in, and then the far
+     edge goes empty, which is the one thing this effect must never do. Both
+     numbers below are set against the headroom their CSS gives them:
+
+       the sky        22% of headroom, travels 20.2%
+       the poster     16% of headroom, travels 13.2%
+       card media      7% of headroom, travels  6.8% */
   const driftInFrame = (el, pct, sc) => {
     if (!el) return;
     gsap.fromTo(el, { yPercent: pct }, {
@@ -118,7 +128,7 @@ function choreograph() {
   /* The calorimeter poster inside its stage. The oldest parallax there is, and
      the one that reads best on a full-width band. The image is oversized in CSS
      so the movement never pulls an empty edge into view. */
-  driftInFrame(document.querySelector('.cgv-poster'), 14, '.cgv-stage');
+  driftInFrame(document.querySelector('.cgv-poster'), 10, '.cgv-stage');
 
   /* The artwork inside each project card. What travels is the medium; the card
      and every word on it stay put. */
