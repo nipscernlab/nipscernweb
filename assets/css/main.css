@@ -438,12 +438,35 @@ input, textarea, select { font-family: inherit; }
               0 4px 16px rgba(0, 0, 0, 0.30);
   transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
 }
+/* The surface itself has to move under the pointer, not just its outline. The
+   wash comes up, the edge opens, the whole thing lifts a pixel and the drop
+   deepens under it: four things saying the same thing, which is what makes a
+   control feel pressed-able rather than merely outlined. */
 .glass-btn:hover {
   transform: translateY(-1px);
   border-color: var(--glass-edge-hover, rgba(255, 255, 255, 0.22));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24),
-              inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+  background:
+    linear-gradient(148deg,
+      rgba(255, 255, 255, 0.175) 0%,
+      rgba(255, 255, 255, 0.062) 46%,
+      rgba(255, 255, 255, 0.098) 100%),
+    var(--glass-tint, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.055),
               0 8px 24px rgba(0, 0, 0, 0.38);
+}
+.glass-btn:active { transform: translateY(0); }
+
+/* A pane that is also a link answers the same way. */
+a.glass:hover,
+button.glass:hover {
+  border-color: var(--glass-edge-hover, rgba(255, 255, 255, 0.20));
+  background:
+    linear-gradient(148deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.055) 42%,
+      rgba(255, 255, 255, 0.085) 100%),
+    var(--glass-tint, transparent);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass-btn {
@@ -3017,8 +3040,8 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
      meaning it. One box for all five, and every mark scaled to fit inside it,
      because left to their own sizes a 251px square and a wide vector read as
      one supporter mattering more than another. */
-  opacity: 0.82;
-  filter: grayscale(0.25);
+  opacity: 0.66;
+  filter: grayscale(0.45);
   transition: opacity var(--t-base), filter var(--t-base), transform var(--t-base);
 }
 /* <picture> is inline and has no size of its own, so a percentage height on the
@@ -3027,7 +3050,14 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    before the image can fill one. */
 .sup-mark picture { display: block; width: 100%; height: 100%; }
 .sup-mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.sup-item:hover .sup-mark { opacity: 1; filter: none; transform: scale(1.06); }
+/* The light is the mark itself coming up, not something added behind it. It
+   rests further down so the distance it travels is longer, and at the top it is
+   simply the artwork at full strength with nothing taken off it. */
+.sup-item:hover .sup-mark {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.06);
+}
 
 @media (max-width: 720px) {
   .supporters-bar { gap: var(--sp-3) var(--sp-5); padding: var(--sp-5); }
@@ -3059,7 +3089,13 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    and nothing is lost on the screens that do not get it. */
 .cube-rail { display: none; }
 
-@media (min-width: 1260px) {
+/* 1120 rather than 1260. The old figure came from a rule that no longer
+   applies: the panel had to fit beside the 960 of cards without touching them,
+   and it now runs behind them on purpose. What is left to protect is the strip
+   that shows to the right of the cards, which is (100vw - 960) / 2, so at 1120
+   there are 80px of it. That is thin, and it is a bleed off the edge of the
+   window rather than a picture, so thin is what it is for. */
+@media (min-width: 1120px) {
   .cube-rail {
     display: block;
     position: absolute;
@@ -5014,6 +5050,91 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 
 /* The figures under the footer tagline. Small, in the monospace the site keeps
    for measured things, and wrapping rather than scrolling. */
+/* The copyright names a licence, and the licence is a page on this site now,
+   read out of the file itself. A line that names a document and does not go
+   to it is a dead end in the one place a reader is most likely to want one. */
+.footer-copy {
+  /* Same wave the About cards use on their call to action, in grey, because
+     down here it marks a link and not an accent. A straight underline would
+     have been the fourth different way this site says the same thing. */
+  --_wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='3' viewBox='0 0 20 3'%3E%3Cpath d='M0 1.5 Q5 0 10 1.5 Q15 3 20 1.5' fill='none' stroke='%239aa4b8' stroke-width='1.5'/%3E%3C/svg%3E");
+  position: relative;
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--t-fast);
+}
+.footer-copy::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 3px;
+  background-image: var(--_wave);
+  background-repeat: repeat-x;
+  background-size: 20px 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.footer-copy:hover { color: var(--text-secondary); }
+.footer-copy:hover::after { opacity: 0.75; animation: wave-move 0.6s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .footer-copy:hover::after { animation: none; }
+}
+
+/* The nudge under the hero
+   ------------------------------------------------------------------
+   Small, quiet, and gone the moment it has been understood. It sits under
+   the visitor count with nothing but a chevron in it, and the whole of its
+   job is to say that the page continues. It is a real link, so pressing it
+   does what pointing at it suggests. */
+.scroll-hint {
+  --glass-edge: rgba(255, 255, 255, 0.09);
+  --glass-edge-hover: rgba(255, 255, 255, 0.20);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-top: var(--sp-6);
+  border-radius: 50%;
+  color: var(--text-muted);
+  opacity: 0.55;
+  transition: opacity var(--t-base), color var(--t-fast),
+              border-color var(--t-base), background var(--t-base), transform var(--t-base);
+}
+.scroll-hint:hover { opacity: 1; color: var(--text-primary); }
+.scroll-hint i { font-size: 15px; }
+
+/* There is no caret-down in the generated sprite. icons.css is built from the
+   Phosphor files the site actually asks for, and asking for one that was never
+   downloaded draws an empty box, which is what this was. The caret that is
+   there, turned a quarter: a caret is symmetric about that axis, so the turn is
+   exact rather than a stand-in.
+
+   The rotation has to be inside the keyframes as well. transform is one
+   property, and a bob written without it would have thrown the turn away for
+   the length of the animation. */
+@keyframes hint-bob {
+  0%, 100% { transform: rotate(90deg) translateX(0); }
+  50%      { transform: rotate(90deg) translateX(3px); }
+}
+.scroll-hint i {
+  transform: rotate(90deg);
+  animation: hint-bob 2.6s ease-in-out infinite;
+}
+.scroll-hint:hover i { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint i { animation: none; }
+}
+
+/* The non-GSAP path: past the first stretch of scroll it is not needed and
+   not there. GSAP scrubs the same thing to the scroll position when it is
+   available, which is the version with the drift in it. */
+.has-scrolled .scroll-hint { opacity: 0; pointer-events: none; }
+
 .footer-figures {
   display: flex;
   flex-wrap: wrap;
@@ -5153,9 +5274,9 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   z-index: -1;
 }
 .info-hl-card:hover {
-  border-color: var(--border-mid);
   transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22),
+              0 18px 44px rgba(0, 0, 0, 0.42);
 }
 .info-hl-card:hover::before { opacity: 1; }
 

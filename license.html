@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <title>Licence | NIPS-CERN</title>
+  <meta name="description" content="The NIPS-CERN Licence, in full. The page reads the LICENSE.md file in the repository, so there is one copy of the text and it cannot drift.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/license">
+  <meta property="og:title" content="Licence | NIPS-CERN">
+  <meta property="og:description" content="The NIPS-CERN Licence, in full.">
+
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://www.nipscern.com/license">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/icons.css">
+  <link rel="stylesheet" href="assets/css/main.css">
+
+  <style>
+    .legal-body {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: var(--sp-12) var(--container-pad);
+    }
+    /* The licence opens with its own title in the file. The page already has a
+       heading, so that one is set as a line of reference rather than a second
+       title competing with the first. */
+    .legal-body .lic-h1 {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: var(--sp-8);
+    }
+    .legal-body h2 {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: var(--sp-10);
+      margin-bottom: var(--sp-3);
+    }
+    .legal-body p {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: var(--sp-4);
+    }
+    .legal-body ul {
+      list-style: disc;
+      padding-left: var(--sp-6);
+      margin-bottom: var(--sp-4);
+    }
+    .legal-body li {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: var(--sp-2);
+    }
+    .legal-updated {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-bottom: var(--sp-8);
+    }
+    .lic-source {
+      margin-top: var(--sp-12);
+      padding-top: var(--sp-5);
+      border-top: 1px solid var(--border-subtle);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="page-hero page-hero--legal" aria-labelledby="license-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-grid">
+          <div class="page-hero-text">
+            <div class="eyebrow fade-up">
+              <i class="ph ph-file-text" aria-hidden="true"></i>
+              <span data-i18n="legal.eyebrow">Legal</span>
+            </div>
+            <h1 class="display-md fade-up" id="license-title" data-i18n="license.title">Licence</h1>
+            <p class="body-base fade-up" data-i18n="license.subtitle">
+              What you may do with this site and with the work behind it, and the one thing we ask you to tell us before you do it.
+            </p>
+          </div>
+          <figure class="page-hero-accent" aria-hidden="true">
+            <img src="assets/images/undraw/undraw_book-writer_ri5u.svg" alt="" width="220" height="140" loading="lazy" onerror="this.parentElement.style.display='none'">
+          </figure>
+        </div>
+      </div>
+    </header>
+
+    <div class="legal-body">
+      <!-- Filled from LICENSE.md at the root of the repository, which is the
+           file CI checks against LICENSE-BASE.md. There is one copy of this
+           text and this page is not it. -->
+      <div id="lic-body" aria-busy="true">
+        <p>Loading the licence…</p>
+      </div>
+
+      <p class="lic-source" data-i18n-html="license.source">
+        This page shows <code>LICENSE.md</code> from the repository, as it stands there. If the two ever differ, the file is the licence.
+      </p>
+    </div>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="assets/js/main.js"></script>
+  <script type="module" src="assets/js/license.js"></script>
+  <script src="assets/js/analytics.js" defer></script>
+</body>
+</html>
