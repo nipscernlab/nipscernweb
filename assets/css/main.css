@@ -319,7 +319,7 @@ input, textarea, select { font-family: inherit; }
 .page-hero-inner,
 .project-hero-inner,
 .stats-strip-inner,
-.sponsors-inner,
+.supporters-inner,
 .grid-overlay-inner {
   width: 100%;
   max-width: var(--container-max);
@@ -327,6 +327,79 @@ input, textarea, select { font-family: inherit; }
   margin-right: auto;
   padding-left: var(--container-pad);
   padding-right: var(--container-pad);
+}
+
+/* Where one band of the page meets the next
+   ------------------------------------------------------------------
+   The page is a stack of full-width bands and each one declared a flat
+   background. Two flat colours meeting on a single row of pixels is a line
+   drawn across the screen, and the eye finds that line before it finds the
+   heading under it, so every section arrived ruled off from the one before.
+
+   A band now carries the colour above it as a fade over its own top: the
+   change happens across --seam-h instead of across one pixel, and the hairline
+   that used to mark it is no longer needed. Set --seam-from to the colour the
+   band above ends on.
+
+   z-index -1 inside the band's own stacking context puts the fade over the
+   band's background and under everything in it, which is why isolation is
+   here: without it the -1 would go looking for a stacking context further up
+   and land behind the page. */
+.seam { position: relative; isolation: isolate; }
+.seam::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--seam-h, 200px);
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--seam-from, transparent), transparent);
+  pointer-events: none;
+}
+
+/* Glass
+   ------------------------------------------------------------------
+   A pane that takes its colour from what is behind it: a wash of white at three
+   and a half per cent, the background blurred and pushed a little in saturation,
+   and a hairline that is brighter along the top than anywhere else, which is
+   what makes a flat rectangle read as something with thickness.
+
+   It needs something behind it to be worth anything. Over a flat fill it is a
+   slightly lighter box and nothing more, so the places it is used here all sit
+   on a gradient, on the star field, or on moving video.
+
+   backdrop-filter is expensive: this belongs on bubbles and plates, not on
+   something that repeats dozens of times down a page or moves while it is on
+   screen. Where the browser cannot do it, the wash is raised instead, which is
+   dimmer than the real thing but still reads as a raised surface. */
+.glass {
+  /* Lit from the top left. A flat tint is what a pane of glass is not: the
+     gradient is the whole difference between a lighter box and a surface with
+     an angle to it. */
+  background: linear-gradient(148deg,
+      rgba(255, 255, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.035) 42%,
+      rgba(255, 255, 255, 0.055) 100%);
+  /* brightness is what does the work on a dark page. Blur alone has almost
+     nothing to blur over a near-black background, so the pane would sit at the
+     same weight as the page and read as a border and nothing else. Lifting the
+     backdrop a quarter is what separates it. */
+  backdrop-filter: blur(22px) saturate(190%) brightness(1.28);
+  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.28);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: var(--r-2xl);
+  /* The bright line along the top is the edge catching the light, and the
+     faint one along the bottom is it coming back through the far side. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.17),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.045),
+              0 12px 38px rgba(0, 0, 0, 0.40);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: linear-gradient(148deg,
+        rgba(255, 255, 255, 0.13) 0%,
+        rgba(255, 255, 255, 0.06) 42%,
+        rgba(255, 255, 255, 0.08) 100%);
+  }
 }
 
 .container--narrow { max-width: 860px; }
@@ -734,9 +807,23 @@ h1, h2, h3, h4, h5, h6 {
 /* ============================================================
    Footer
    ============================================================ */
+/* The last colour change on any page, and it was still a step. --page-end lets
+   a page whose final section is dark say so; every other page ends on the body
+   colour, which is the default. */
 #footer {
   background: var(--bg-0);
-  border-top: 1px solid var(--border-subtle);
+  position: relative;
+  isolation: isolate;
+  --seam-from: var(--page-end, var(--bg-1));
+}
+#footer::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--seam-h, 200px);
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--seam-from), transparent);
+  pointer-events: none;
 }
 
 .footer-inner {
@@ -2374,20 +2461,30 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 /* ============================================================
    Stats Strip
    ============================================================ */
+/* The figures sit in a band that darkens towards its middle and comes back to
+   the page colour at both edges, so it has a shape without being ruled off at
+   the top and the bottom. It is the only band on the page that is framed on
+   both sides, which is why it is written as a gradient rather than given the
+   .seam treatment. */
 .stats-strip {
-  background: var(--bg-0);
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
+  background: linear-gradient(to bottom, var(--bg-1), var(--bg-0) 38%, var(--bg-0) 62%, var(--bg-1));
   padding: var(--sp-12) 0;
 }
 
-.stats-strip-inner {
+/* .stats-strip-inner is a rail and nothing else; the pane is inside it. */
+.stats-card {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--sp-8);
+  padding: var(--sp-8) var(--sp-4);
 }
 
-.stat-item { text-align: center; }
+.stat-item {
+  text-align: center;
+  padding: 0 var(--sp-4);
+}
+/* Hairlines rather than gaps: inside one pane the figures are divided, not
+   separated. */
+.stat-item + .stat-item { border-left: 1px solid rgba(255, 255, 255, 0.075); }
 .stat-number {
   font-family: var(--font-serif);
   font-size: var(--text-4xl);
@@ -2670,46 +2767,157 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 /* ============================================================
    Sponsors Strip
    ============================================================ */
-.sponsors-strip {
-  padding: var(--sp-12) 0;
-  border-top: 1px solid var(--border-subtle);
+/* Supported by
+   ------------------------------------------------------------------
+   Three agencies that pay for the work and two institutions the group is
+   inside, told apart, because those are not the same relationship and a single
+   row of logos said they were. */
+.supporters { padding: var(--sp-14) 0; --seam-from: var(--bg-1); }
+
+/* One bar, on one line: the label, the three agencies, a divider, the two
+   institutions. The divider is the whole of what used to be two headed groups,
+   and it is enough, because the names are on the marks themselves. */
+.supporters-bar {
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--sp-4) var(--sp-7);
+  padding: var(--sp-5) var(--sp-8);
 }
 
-.sponsors-label {
+/* Above the pane, not inside it. It says what the pane is; a caption does not
+   belong in the frame with the thing it captions. */
+.supporters-label {
   text-align: center;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  margin-bottom: var(--sp-5);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: var(--sp-8);
 }
 
-.sponsors-logos {
+.sup-list {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  list-style: none;
+}
+
+.sup-div {
+  width: 1px;
+  align-self: stretch;
+  min-height: 34px;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.sup-item { display: block; text-decoration: none; }
+
+.sup-mark {
+  /* Five marks drawn to five different briefs: a crest, a wordmark, a wide
+     signature, a roundel. Put through one box they came out at five different
+     optical weights, so each carries the height that makes it read like the
+     others rather than the height that makes it measure like them. */
+  width: var(--mark-w, 108px);
+  height: var(--mark-h, 38px);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: nowrap;
-  gap: var(--sp-10);
+  /* Present, not decorative. The old strip sat at half opacity under a grey
+     filter, which is how a page acknowledges a supporter without quite
+     meaning it. One box for all five, and every mark scaled to fit inside it,
+     because left to their own sizes a 251px square and a wide vector read as
+     one supporter mattering more than another. */
+  opacity: 0.82;
+  filter: grayscale(0.25);
+  transition: opacity var(--t-base), filter var(--t-base), transform var(--t-base);
+}
+/* <picture> is inline and has no size of its own, so a percentage height on the
+   img inside it resolved to auto and three of the five marks came out at their
+   full intrinsic size, straight through the bar. The wrapper has to be a box
+   before the image can fill one. */
+.sup-mark picture { display: block; width: 100%; height: 100%; }
+.sup-mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.sup-item:hover .sup-mark { opacity: 1; filter: none; transform: scale(1.06); }
+
+@media (max-width: 720px) {
+  .supporters-bar { gap: var(--sp-3) var(--sp-5); padding: var(--sp-5); }
+  .sup-list { flex-wrap: wrap; justify-content: center; gap: var(--sp-4); }
+  .sup-div { display: none; }
+  .sup-mark { width: 84px; height: 32px; }
 }
 
-.sponsor-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 92px;
-  height: 68px;
-  opacity: 0.5;
-  transition: opacity var(--t-base), transform var(--t-base);
-  text-decoration: none;
-  filter: grayscale(0.6) brightness(0.85);
-  flex: 0 0 auto;
+/* Backgrounds that used to be written into the markup. They are here because a
+   band's colour and the seam it fades from are one decision, and the seam is
+   here. */
+.info-highlights {
+  background: var(--bg-1);
+  padding-top: var(--sp-32);
+  padding-bottom: var(--sp-32);
 }
-.sponsor-logo:hover {
-  opacity: 0.95;
-  filter: grayscale(0) brightness(1.1);
-  transform: scale(1.08);
+#projects-section { background: var(--bg-0); }
+
+/* The refracting cube, out of the right-hand edge
+   ------------------------------------------------------------------
+   A tall panel flush with the edge of the window: framed and rounded on the
+   left, square and open on the right, because on that side there is nothing to
+   frame it against. The video thins out as it runs towards the edge, which is
+   what keeps the cut from reading as a cut.
+
+   The width is whatever is left once the card grid has taken its 960 and a gap:
+   at 1260px of window that is 130px of panel, and below that there is nothing
+   left to give, so it is not drawn. It is decoration, it is marked aria-hidden,
+   and nothing is lost on the screens that do not get it. */
+.cube-rail { display: none; }
+
+@media (min-width: 1260px) {
+  .cube-rail {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    /* Behind the content, in the same layer as the seam fade above it. */
+    z-index: -1;
+    transform: translateY(-50%);
+    width: min(280px, calc((100vw - 1000px) / 2));
+    height: clamp(560px, 92%, 940px);
+    /* Black, not the page colour. The recording is on a black stage, measured
+       at Y=16 in limited range, which is video black exactly; matching it is
+       what lets the panel be taller than the footage without a visible band
+       where one ends and the other begins. */
+    background: #000;
+    border: 1px solid var(--border-subtle);
+    border-right: 0;
+    border-radius: var(--r-2xl) 0 0 var(--r-2xl);
+    overflow: hidden;
+  }
+  .cube-rail video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* contain, not cover: cover filled the panel by scaling the footage until
+       it overflowed, which cut the cube down both sides. The panel is taller
+       than the footage now and the black above and below is the same black. */
+    object-fit: contain;
+    /* Thicker fog on the way out. It starts giving way a third of the way
+       across and is gone before the edge, so the panel does not end, it
+       disperses. */
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 18%, rgba(0,0,0,0.45) 55%, transparent 82%);
+    mask-image: linear-gradient(to right, #000 0%, #000 18%, rgba(0,0,0,0.45) 55%, transparent 82%);
+  }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  /* The poster still says what the panel is. */
+  .cube-rail video { display: block; }
+}
+
+
 
 .sponsor-logo img {
   width: 100%;
@@ -2730,7 +2938,6 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    ============================================================ */
 .cgv-section {
   background: var(--bg-0);
-  border-top: 1px solid var(--border-subtle);
   /* Room underneath again. That comment used to say the stage ran to the edge
      of the section, which was true while it was full bleed; now that it sits
      inside the rails as a rounded box, ending flush against the next section
@@ -4441,7 +4648,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   /* Stack like .page-hero-grid does: text first, visual below it. */
   .project-hero-inner { flex-direction: column; align-items: stretch; gap: var(--sp-8); }
   .project-hero-icon { width: 120px; height: 120px; font-size: 56px; }
-  .stats-strip-inner { grid-template-columns: repeat(2, 1fr); }
+  .stats-card { grid-template-columns: repeat(2, 1fr); row-gap: var(--sp-7); }
   .footer-inner { grid-template-columns: 1fr 1fr; }
 }
 
@@ -4469,8 +4676,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   .lhc-stats-grid { grid-template-columns: 1fr; }
   .ecosystem-grid { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; }
-  .sponsors-logos { flex-wrap: wrap; gap: var(--sp-6); }
-  .stats-strip-inner { grid-template-columns: 1fr 1fr; }
+  .stats-card { grid-template-columns: 1fr 1fr; row-gap: var(--sp-6); }
   .hero-actions { flex-direction: column; }
   .pub-controls { flex-direction: column; }
   /* In column layout the flex-basis (280px) would become a HEIGHT, making

@@ -300,6 +300,74 @@ function initContentLangBadges() {
 }
 
 // ============================================================
+// Supported by
+// ============================================================
+// Five marks in a row at half opacity, greyed out, with nothing said about any
+// of them. It was the one part of the page that could have belonged to any
+// laboratory anywhere, and it was carrying the names of the three agencies that
+// pay for the work and the two institutions the group is inside.
+//
+// So they are named, and they are sorted: money is not the same relationship as
+// premises, and putting CERN in a row of funding agencies says something untrue
+// about both. The logos come up out of the grey, because a supporter shown at
+// half strength is a supporter half acknowledged.
+//
+// Generated rather than written into each page: it goes wherever a page puts
+// <div id="supporters"></div>, and there is one copy of it to correct.
+const SUPPORTERS = [
+  {
+    kind: 'funding',
+    of: [
+      { acr: 'FAPEMIG', href: 'https://fapemig.br', img: 'fapemig', ext: 'png', webp: true, h: 48, w: 96 },
+      { acr: 'CAPES',   href: 'https://capes.gov.br', img: 'capes', ext: 'png', webp: true, h: 42, w: 92 },
+      { acr: 'CNPq',    href: 'https://cnpq.br', img: 'cnpq', ext: 'svg', webp: false, h: 34, w: 116 },
+    ],
+  },
+  {
+    kind: 'institutions',
+    of: [
+      { acr: 'UFJF', href: 'https://ufjf.br', img: 'ufjf', ext: 'png', webp: true, lab: 'NIPS', h: 52, w: 86 },
+      { acr: 'CERN', href: 'https://cern.ch', img: 'cern', ext: 'svg', webp: false, lab: 'Route Salam', h: 40, w: 74 },
+    ],
+  },
+];
+
+function supporterMark(s) {
+  const base = `${ROOT}assets/images/sponsors/${s.img}`;
+  const img = `<img src="${base}.${s.ext}" alt="" width="56" height="56" loading="lazy" decoding="async">`;
+  return s.webp
+    ? `<picture><source srcset="${base}.webp" type="image/webp">${img}</picture>`
+    : img;
+}
+
+function initSupporters() {
+  const host = document.getElementById('supporters');
+  if (!host) return;
+
+  const list = (g) => `
+      <ul class="sup-list" data-i18n-aria="supporters.${g.kind}">${g.of.map(s => `
+        <li>
+          <a class="sup-item" href="${s.href}" target="_blank" rel="noopener"
+             data-i18n-title="supporters.n_${s.acr.toLowerCase()}"
+             data-i18n-aria="supporters.n_${s.acr.toLowerCase()}" aria-label="${s.acr}">
+            <span class="sup-mark" style="--mark-h:${s.h}px;--mark-w:${s.w}px">${supporterMark(s)}</span>
+          </a>
+        </li>`).join('')}
+      </ul>`;
+
+  host.className = 'supporters seam';
+  host.innerHTML = `
+    <div class="supporters-inner">
+      <p class="supporters-label" data-i18n="supporters.title">Supported by</p>
+      <div class="supporters-bar glass">
+        ${list(SUPPORTERS[0])}
+        <span class="sup-div" aria-hidden="true"></span>
+        ${list(SUPPORTERS[1])}
+      </div>
+    </div>`;
+}
+
+// ============================================================
 // Intersection Observer — Entrance animations
 // ============================================================
 function initAnimations() {
@@ -641,6 +709,7 @@ if (!window.__nipscernBooted) {
   document.addEventListener('DOMContentLoaded', async () => {
     initNav();
     initFooter();
+    initSupporters();
     initBackToTop();
     initGridOverlay();
     initContentLangBadges();

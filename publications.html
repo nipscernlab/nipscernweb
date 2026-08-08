@@ -28,9 +28,9 @@
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/icons.css?v=b7a2ea3da8">
-  <link rel="stylesheet" href="assets/css/main.css?v=85f2ea6d6e">
+  <link rel="stylesheet" href="assets/css/main.css?v=b250ad0e4e">
 </head>
-<body>
+<body style="--page-end:var(--bg-0)">
 
   <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
   <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
@@ -145,7 +145,7 @@
     </section>
 
     <!-- CERN Courier featured banner -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle);padding-bottom:var(--sp-20)">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-1);padding-bottom:var(--sp-20)">
       <div class="container">
         <div class="courier-banner fade-up" role="region" aria-label="CERN Courier">
           <div class="courier-banner-icon" aria-hidden="true">
@@ -179,12 +179,14 @@
       </div>
     </section>
 
+
+    <div id="supporters"></div>
   </main>
 
   <footer id="footer" role="contentinfo"></footer>
 
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
-  <script type="module" src="assets/js/main.js?v=85f2ea6d6e"></script>
+  <script type="module" src="assets/js/main.js?v=b250ad0e4e"></script>
   <script type="module">
     import { initPublications } from './assets/js/publications.js?v=catA-20260710';
     // Defer until after DOMContentLoaded so main.js has already run
