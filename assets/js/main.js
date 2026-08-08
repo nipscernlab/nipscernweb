@@ -213,13 +213,20 @@ function buildFooter() {
           <li><a href="mailto:luciano.andrade@ufjf.br">luciano.andrade@ufjf.br</a></li>
           <li><a href="mailto:chrysthofer.afonso@cern.ch">chrysthofer.afonso@cern.ch</a></li>
           <li style="line-height:1.5;color:var(--text-muted);font-size:var(--text-xs)">
-            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">NIPS, UFJF</strong>
+            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">
+              <img src="${ROOT}assets/icons/flag-for-brazil.svg" alt="" class="footer-flag" aria-hidden="true"> NIPS, UFJF
+            </strong>
             Depto. de Engenharia Elétrica, PPEE<br>
             R. José Lourenço Kelmer, s/n<br>
             Juiz de Fora, MG 36036-900, Brasil
           </li>
           <li style="line-height:1.5;color:var(--text-muted);font-size:var(--text-xs);margin-top:var(--sp-3)">
-            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">Route Salam, CERN</strong>
+            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">
+              <svg class="footer-flag" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="m0 0h32v32h-32z" fill="#f00"/>
+                <path d="m13 6h6v7h7v6h-7v7h-6v-7h-7v-6h7z" fill="#fff"/>
+              </svg> Route Salam, CERN
+            </strong>
             Espl. des Particules 1<br>
             CH-1211 Genève 23, Suisse
           </li>

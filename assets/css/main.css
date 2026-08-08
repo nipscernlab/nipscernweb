@@ -4593,6 +4593,18 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   animation: wave-move 0.6s linear infinite;
 }
 
+/* A flag on each address, sized to the line rather than to a grid: 0.85em tall,
+   so it sits inside the text it belongs to instead of standing beside it. Small
+   enough to be read as punctuation and not as an icon. */
+.footer-flag {
+  height: 0.85em;
+  width: auto;
+  display: inline-block;
+  vertical-align: -0.06em;
+  border-radius: 1.5px;
+  margin-right: 2px;
+}
+
 /* The figures under the footer tagline. Small, in the monospace the site keeps
    for measured things, and wrapping rather than scrolling. */
 .footer-figures {
@@ -4610,6 +4622,53 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   font-weight: 500;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Page transitions
+   ------------------------------------------------------------
+   Cross-document view transitions. Two lines of CSS and no script: the browser
+   holds the old page while the new one parses, then animates between the two.
+   It is the thing that makes a set of separate documents feel like one surface,
+   and it is why a static multi-page site can move the way an application does
+   without becoming one.
+
+   Everything below degrades to a plain navigation where it is not supported,
+   which costs nothing: the pages are ordinary links either way.
+   ============================================================ */
+@view-transition { navigation: auto; }
+
+/* Not a straight cross-fade. The outgoing page leaves faster than the incoming
+   one arrives, and the new one lifts a few pixels as it comes: the eye reads
+   that as one page replacing another rather than as two pages briefly sharing
+   the screen. Short, because a transition anyone has time to watch is too long. */
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(9px); } }
+
+::view-transition-old(root) {
+  animation: vt-out 120ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(root) {
+  animation: vt-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* The navigation and the announcement strip are the same on every page, so they
+   are lifted out of the page snapshot and given no animation of their own. They
+   then sit still while the page changes underneath them, which is the whole
+   point: what persists should look like it persisted. */
+#nav { view-transition-name: site-nav; }
+.top-banner { view-transition-name: site-banner; }
+::view-transition-group(site-nav),
+::view-transition-group(site-banner) { animation-duration: 0s; }
+::view-transition-old(site-nav),
+::view-transition-new(site-nav),
+::view-transition-old(site-banner),
+::view-transition-new(site-banner) { animation: none; mix-blend-mode: normal; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* The transition itself goes, not just its movement. Someone who asked for
+     less motion did not ask for a shorter version of it. */
+  @view-transition { navigation: none; }
 }
 
 /* ============================================================
