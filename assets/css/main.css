@@ -2848,22 +2848,16 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 
 /* Full bleed. On the home the viewer is the point of the section, so it gets
    the width of the window rather than a box inside the rails. */
-/* Inset, not full bleed. A canvas takes the wheel the moment the cursor crosses
-   it, so a viewer that runs edge to edge and nearly the height of the window
-   leaves nowhere to stand: you scroll, the detector turns, the page does not.
-   Rails on both sides and a shorter box give the page back a margin to be
-   scrolled by, and the viewer reads as an instrument set into the page rather
-   than as a band the page happens to pass through. */
+/* Full bleed. On the home the viewer is the point of the section, so it gets
+   the width of the window rather than a box inside the rails. */
 .cgv-stage {
   position: relative;
   width: 100%;
-  max-width: var(--container-max);
-  margin: 0 auto;
-  height: clamp(320px, 56vh, 620px);
+  height: clamp(360px, 68vh, 760px);
   background: #05070f;
   overflow: hidden;
-  border: 1px solid var(--border-mid);
-  border-radius: var(--r-2xl);
+  border-top: 1px solid var(--border-mid);
+  border-bottom: 1px solid var(--border-mid);
 }
 /* The poster is a real recorded event. It stays underneath permanently; the
    live viewer paints over it once the Worker answers, and if it never does
