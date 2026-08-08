@@ -1,9 +1,9 @@
 # Política de Segurança / Security Policy
 
-Encontrou uma vulnerabilidade no site ou em algum projeto do NIPSCERN?
+Encontrou uma vulnerabilidade no site ou em algum projeto do NIPS-CERN?
 Reporte de forma privada, sem abrir issue pública:
 
-Found a vulnerability in the website or in a NIPSCERN project?
+Found a vulnerability in the website or in a NIPS-CERN project?
 Report it privately, without opening a public issue:
 
 - **Email**: luciano.andrade@ufjf.br

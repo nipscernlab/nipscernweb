@@ -4,12 +4,12 @@
 
 ## Como funciona
 
-O site **nipscern.com** é mantido pelo Laboratório NIPSCERN (UFJF). Somente
+O site **nipscern.com** é mantido pelo Laboratório NIPS-CERN (UFJF). Somente
 membros da organização têm acesso de escrita; contribuições externas são
 bem-vindas via **pull request** e passam por revisão e aprovação dos membros
 antes de entrar no projeto.
 
-Ao contribuir, você concorda com a seção 4 da [Licença NIPSCERN](LICENSE.md).
+Ao contribuir, você concorda com a seção 4 da [Licença NIPS-CERN](LICENSE.md).
 
 ## Regras práticas
 
@@ -27,19 +27,19 @@ Ao contribuir, você concorda com a seção 4 da [Licença NIPSCERN](LICENSE.md)
 
 ## Estamos contratando
 
-O NIPSCERN busca pesquisadores em lógica, filosofia, engenharia de software,
+O NIPS-CERN busca pesquisadores em lógica, filosofia, engenharia de software,
 engenharias, programação e design. Entre em contato pelo site.
 
 ---
 
 ## How it works
 
-The **nipscern.com** website is maintained by the NIPSCERN Laboratory (UFJF).
+The **nipscern.com** website is maintained by the NIPS-CERN Laboratory (UFJF).
 Only organization members have write access; external contributions are
 welcome via **pull request** and go through member review and approval before
 entering the project.
 
-By contributing, you agree to section 4 of the [NIPSCERN License](LICENSE.md).
+By contributing, you agree to section 4 of the [NIPS-CERN License](LICENSE.md).
 
 ## Practical rules
 
@@ -56,6 +56,6 @@ By contributing, you agree to section 4 of the [NIPSCERN License](LICENSE.md).
 
 ## We are hiring
 
-NIPSCERN is looking for researchers in logic, philosophy, software
+NIPS-CERN is looking for researchers in logic, philosophy, software
 engineering, engineering disciplines, programming and design. Reach out
 through the website.

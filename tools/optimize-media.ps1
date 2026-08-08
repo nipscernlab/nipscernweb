@@ -1,5 +1,5 @@
 <#
-Ferramentas de otimizacao de midia do NIPSCERN.
+Ferramentas de otimizacao de midia do NIPS-CERN.
 
 Usado na migracao para o cdn.nipscern.com e tambem no dia a dia, para
 preparar qualquer arquivo novo antes de subir ao repo nipscern-assets.
