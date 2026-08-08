@@ -2425,11 +2425,15 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    Two lane headings under one section heading is a level more than the rest of
    the page uses, which is why these are small and set in mono: they label, and
    they stay out of the display type's way. */
+/* Wraps rather than overflows. The way out is set in nowrap and the longest of
+   the four is "Todas as publicações", so on a narrow lane it drops under the
+   label instead of pushing past the edge. */
 .lane-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--sp-4);
+  gap: var(--sp-3) var(--sp-4);
   padding-bottom: var(--sp-3);
   margin-bottom: var(--sp-6);
   border-bottom: 1px solid var(--border-mid);
@@ -2561,9 +2565,12 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 
 /* The two stories that follow the lead. Date and headline on one row, so they
    read as the rest of the column rather than as three competing cards. */
+/* The date column is sized for the numeric form, which is ten characters in every
+   language this site speaks. Wide enough that nothing has to be cut, narrow
+   enough that the headline still starts near the left. */
 .ln-item {
   display: grid;
-  grid-template-columns: 108px minmax(0, 1fr);
+  grid-template-columns: 92px minmax(0, 1fr);
   align-items: baseline;
   gap: var(--sp-4);
   padding: var(--sp-4) 0;
@@ -2572,13 +2579,16 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   text-decoration: none;
 }
 .ln-lead + .ln-item { margin-top: var(--sp-6); }
+/* No nowrap. It was what turned a column too narrow for the Portuguese into a
+   date printed over the headline: forbidden to wrap, the text simply left its
+   track. Allowed to wrap, the worst a surprise can do is take a second line. */
 .ln-item-date {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   color: var(--text-muted);
-  white-space: nowrap;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
 }
 .ln-item-title {
   font-size: var(--text-base);
