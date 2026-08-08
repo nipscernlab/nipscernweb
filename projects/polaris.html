@@ -21,13 +21,13 @@
   <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="../assets/css/main.css?v=b7a2ea3da8">
+  <!-- Self-hosted typefaces. Preloaded because the @font-face rules live
+       in main.css, which on some pages loads asynchronously; without this
+       the fetch could not start until that stylesheet parsed. -->
+  <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../assets/css/icons.css?v=b7a2ea3da8">
+  <link rel="stylesheet" href="../assets/css/main.css?v=47449f365b">
 
   <style>
     :root { --page-accent: var(--accent-polaris); }
@@ -331,7 +331,7 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.js?v=b7a2ea3da8"></script>
+  <script type="module" src="../assets/js/main.js?v=47449f365b"></script>
   <script src="../assets/js/analytics.js" defer></script>
 </body>
 </html>

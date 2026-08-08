@@ -21,13 +21,13 @@
   <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"></noscript>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="assets/css/main.css?v=b7a2ea3da8">
+  <!-- Self-hosted typefaces. Preloaded because the @font-face rules live
+       in main.css, which on some pages loads asynchronously; without this
+       the fetch could not start until that stylesheet parsed. -->
+  <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/icons.css?v=b7a2ea3da8">
+  <link rel="stylesheet" href="assets/css/main.css?v=47449f365b">
 </head>
 <body>
 
@@ -41,7 +41,7 @@
         <div class="page-hero-grid">
           <div class="page-hero-text">
             <div class="eyebrow fade-up">
-              <i class="ph ph-open-source-logo" aria-hidden="true"></i>
+              <i class="ph ph-git-fork" aria-hidden="true"></i>
               <span data-i18n="credits.eyebrow">Acknowledgements</span>
             </div>
             <h1 class="display-md fade-up" id="credits-title" data-i18n="credits.title">Open Source Credits</h1>
@@ -95,7 +95,7 @@
                 <span class="badge badge-gray">v2.1.1</span>
               </div>
               <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.phosphor_desc">
-                Flexible icon family used throughout the interface for navigation, badges, and decorative elements.
+                Icon family behind every glyph in the interface. Self-hosted as CSS masks over the current text colour, so only the icons this site uses are shipped.
               </div>
               <a href="https://phosphoricons.com" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">phosphoricons.com</a>
             </div>
@@ -117,13 +117,13 @@
             </div>
             <div style="flex:1">
               <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
-                <span class="feature-text" style="font-weight:600">Inter</span>
+                <span class="feature-text" style="font-weight:600">Geist</span>
                 <span class="badge badge-blue">SIL OFL 1.1</span>
               </div>
-              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.inter_desc">
-                Primary sans-serif typeface. Designed by Rasmus Andersson for high legibility on screens.
+              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.geist_desc">
+                Primary sans-serif, carrying body text and interface. A contemporary grotesque, kept quiet so it does not compete with the display face. By Vercel.
               </div>
-              <a href="https://rsms.me/inter/" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">rsms.me/inter</a>
+              <a href="https://vercel.com/font" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">vercel.com/font</a>
             </div>
           </div>
 
@@ -133,13 +133,13 @@
             </div>
             <div style="flex:1">
               <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
-                <span class="feature-text" style="font-weight:600">DM Serif Display</span>
+                <span class="feature-text" style="font-weight:600">Bodoni Moda</span>
                 <span class="badge badge-blue">SIL OFL 1.1</span>
               </div>
-              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.dmserif_desc">
-                Display serif font used for hero headings and large typographic accents.
+              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.bodoni_desc">
+                Display serif behind every heading. A didone, with the extreme stroke contrast the style is known for, and an optical size axis that keeps the hairlines fine at large sizes and solid at small ones. By Indestructible Type.
               </div>
-              <a href="https://fonts.google.com/specimen/DM+Serif+Display" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">Google Fonts — DM Serif Display</a>
+              <a href="https://github.com/indestructible-type/Bodoni" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">github.com/indestructible-type/Bodoni</a>
             </div>
           </div>
 
@@ -149,13 +149,13 @@
             </div>
             <div style="flex:1">
               <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
-                <span class="feature-text" style="font-weight:600">JetBrains Mono</span>
+                <span class="feature-text" style="font-weight:600">IBM Plex Mono</span>
                 <span class="badge badge-blue">SIL OFL 1.1</span>
               </div>
-              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.jetbrains_desc">
-                Monospace typeface used for version tags, code snippets, and technical labels.
+              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.plexmono_desc">
+                Monospace typeface used for version tags, code, figures and technical labels.
               </div>
-              <a href="https://www.jetbrains.com/lp/mono/" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">jetbrains.com/lp/mono</a>
+              <a href="https://www.ibm.com/plex/" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">ibm.com/plex</a>
             </div>
           </div>
 
@@ -185,37 +185,7 @@
             </div>
           </div>
 
-          <div class="feature-item">
-            <div class="feature-icon" style="background:rgba(91,156,246,0.12);color:var(--brand)">
-              <i class="ph ph-package" aria-hidden="true"></i>
-            </div>
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
-                <span class="feature-text" style="font-weight:600">unpkg CDN</span>
-                <span class="badge badge-gray">MIT License</span>
-              </div>
-              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.unpkg_desc">
-                Content delivery network for npm packages. Used to serve Three.js and Phosphor Icons without a build step.
-              </div>
-              <a href="https://unpkg.com" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">unpkg.com</a>
-            </div>
-          </div>
 
-          <div class="feature-item">
-            <div class="feature-icon" style="background:rgba(91,156,246,0.12);color:var(--brand)">
-              <i class="ph ph-text-aa" aria-hidden="true"></i>
-            </div>
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
-                <span class="feature-text" style="font-weight:600">Google Fonts</span>
-                <span class="badge badge-gray">Apache 2.0 / SIL OFL</span>
-              </div>
-              <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px" data-i18n="credits.gfonts_desc">
-                Font hosting service used to serve Inter, DM Serif Display, and JetBrains Mono via CDN.
-              </div>
-              <a href="https://fonts.google.com" target="_blank" rel="noopener" class="text-link" style="font-size:var(--text-xs)">fonts.google.com</a>
-            </div>
-          </div>
 
         </div>
 
@@ -246,7 +216,7 @@
 
           <div class="feature-item">
             <div class="feature-icon" style="background:rgba(139,92,246,0.12);color:var(--accent-yanc)">
-              <i class="ph ph-compiler" aria-hidden="true"></i>
+              <i class="ph ph-code-block" aria-hidden="true"></i>
             </div>
             <div style="flex:1">
               <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
@@ -317,7 +287,7 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.js?v=b7a2ea3da8"></script>
+  <script type="module" src="assets/js/main.js?v=47449f365b"></script>
   <script src="assets/js/analytics.js" defer></script>
 </body>
 </html>
