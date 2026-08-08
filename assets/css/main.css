@@ -2736,6 +2736,28 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 }
 .cgv-header .body-lg { max-width: 60ch; margin: var(--sp-4) auto 0; }
 
+/* The mark, the name and the way through to the project page, on one line under
+   the lede. The eyebrow above names the subject; this names the instrument. */
+.cgv-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+  padding: 8px 16px 8px 10px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  text-align: left;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+.cgv-credit:hover { border-color: var(--border-strong); background: rgba(255,255,255,0.02); }
+.cgv-credit img { flex: none; border-radius: var(--r-md); }
+.cgv-credit > span { display: flex; flex-direction: column; line-height: 1.3; }
+.cgv-credit b { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+.cgv-credit > span > span { font-size: 11.5px; }
+.cgv-credit > i { font-size: 14px; color: var(--accent-cgv); transition: transform var(--t-base); }
+.cgv-credit:hover > i { transform: translateX(3px); color: #6ea8e8; }
+
 /* The spec plate.
    ------------------------------------------------------------
    The four figures used to be a wrapping flex row of value-then-word pairs, so
@@ -4569,6 +4591,25 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 .release-note a:hover {
   background-size: 20px 3px;
   animation: wave-move 0.6s linear infinite;
+}
+
+/* The figures under the footer tagline. Small, in the monospace the site keeps
+   for measured things, and wrapping rather than scrolling. */
+.footer-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  margin-top: var(--sp-4);
+  list-style: none;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.footer-figures li { display: inline-flex; align-items: baseline; gap: 5px; }
+.footer-figures b {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ============================================================

@@ -189,6 +189,17 @@ function buildFooter() {
           <span style="font-size:var(--text-base);font-weight:700;letter-spacing:0.06em">NIPS${atomIcon}CERN</span>
         </div>
         <p class="footer-tagline" data-i18n="footer.tagline">Two laboratories: NIPS, at UFJF, in Brazil, and Route Salam, at CERN, in Switzerland.</p>
+
+        <!-- The figures are read off data/publications.json and data/team.json,
+             the same ones the strip on the home counts up to. They are here
+             because the footer said where the laboratories are and nothing at
+             all about what has come out of them. -->
+        <ul class="footer-figures">
+          <li><b>147</b> <span data-i18n="footer.f_pubs">publications</span></li>
+          <li><b>2001</b><span aria-hidden="true">–</span><b>2026</b> <span data-i18n="footer.f_years">on record</span></li>
+          <li><b>32</b> <span data-i18n="footer.f_theses">theses supervised</span></li>
+          <li><b>18</b> <span data-i18n="footer.f_people">people</span></li>
+        </ul>
       </div>
 
       <div>
@@ -202,15 +213,15 @@ function buildFooter() {
           <li><a href="mailto:luciano.andrade@ufjf.br">luciano.andrade@ufjf.br</a></li>
           <li><a href="mailto:chrysthofer.afonso@cern.ch">chrysthofer.afonso@cern.ch</a></li>
           <li style="line-height:1.5;color:var(--text-muted);font-size:var(--text-xs)">
-            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">NIPS-CERN / PPEE Lab</strong>
-            Depto. de Engenharia Elétrica<br>
-            UFJF — R. José Lourenço Kelmer, s/n<br>
-            Juiz de Fora, MG 36036-900 — Brasil
+            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">NIPS, UFJF</strong>
+            Depto. de Engenharia Elétrica, PPEE<br>
+            R. José Lourenço Kelmer, s/n<br>
+            Juiz de Fora, MG 36036-900, Brasil
           </li>
           <li style="line-height:1.5;color:var(--text-muted);font-size:var(--text-xs);margin-top:var(--sp-3)">
-            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">CERN</strong>
+            <strong style="color:var(--text-secondary);display:block;margin-bottom:2px">Route Salam, CERN</strong>
             Espl. des Particules 1<br>
-            CH-1211 Genève 23 — Suisse
+            CH-1211 Genève 23, Suisse
           </li>
         </ul>
       </div>
@@ -222,15 +233,15 @@ function buildFooter() {
           <li><a href="https://gitlab.com/nips-cern" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-gitlab-logo" aria-hidden="true"></i> GitLab</a></li>
           <li><a href="https://www.nipscern.com" target="_blank" rel="noopener">nipscern.com</a></li>
           <li><a href="https://lattes.cnpq.br/5454168673866452" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px">
-            <img src="${ROOT}assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px" aria-hidden="true"> Luciano — Lattes
+            <img src="${ROOT}assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px" aria-hidden="true"> Luciano no Lattes
           </a></li>
-          <li><a href="https://github.com/Chrysthofer" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-github-logo" aria-hidden="true"></i> Chrysthofer — GitHub</a></li>
+          <li><a href="https://github.com/Chrysthofer" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-github-logo" aria-hidden="true"></i> Chrysthofer no GitHub</a></li>
         </ul>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p data-i18n="footer.copyright">© 2026 NIPS-CERN — Federal University of Juiz de Fora. All rights reserved.</p>
+      <p data-i18n="footer.copyright">© 2026 NIPS-CERN. Under the NIPS-CERN Licence 1.1.</p>
       <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
         <a href="${ROOT}qa.html" class="btn btn-ghost btn-sm" data-i18n-aria="qa.hero.label" aria-label="Questions and Answers">
           <i class="ph ph-chats-circle" aria-hidden="true"></i> <span data-i18n="footer.qa">Q&amp;A</span>
@@ -244,6 +255,8 @@ function buildFooter() {
           <a href="${ROOT}terms.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.terms">Terms</a>
           <span aria-hidden="true">·</span>
           <a href="${ROOT}privacy.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.privacy">Privacy</a>
+          <span aria-hidden="true">·</span>
+          <a href="https://github.com/nipscernlab/nipscernweb/blob/main/LICENSE.md" target="_blank" rel="noopener" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.licence">Licence</a>
         </div>
         <div class="footer-social">
           <a href="https://github.com/nipscernlab" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitHub">

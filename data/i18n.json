@@ -31,6 +31,7 @@
         "l_docs": "Documentation",
         "l_story": "The day it went up in the ATLAS control room",
         "l_papers": "The papers behind it",
+        "built": "Built at the laboratory. See how it is made",
         "cells_label": "active cells",
         "loading": "Initialising calorimeter geometry…",
         "f_cells": "cells",
@@ -264,7 +265,7 @@
       "sapho": {
         "name": "SAPHO",
         "full": "Scalable-Architecture Processor for Hardware Optimization",
-        "short": "Complete toolchain for processor creation and hardware–software co-design.",
+        "short": "Design a processor, compile for it, simulate it, put it on an FPGA. One toolchain for the whole path.",
         "desc": "SAPHO is a complete hardware architecture and toolchain designed for processor creation, experimentation, and hardware–software co-design. It bundles together the YANC compiler toolchain, the AURORA IDE, the Surfer waveform viewer, and the PRISM RTL Viewer for processor circuit visualisation.",
         "features": {
           "title": "What SAPHO Includes",
@@ -278,7 +279,7 @@
       "yanc": {
         "name": "YANC",
         "full": "Yet Another Compiler",
-        "short": "The compiler toolchain powering the SAPHO ecosystem.",
+        "short": "Takes C± or C++ down to assembly, to synthesizable Verilog, to memory images and a testbench.",
         "desc": "YANC is the compilation backbone of SAPHO, bridging high-level processor description languages and low-level execution. It comprises cmmcomp — the CMM language compiler — and asmcomp — the assembly compiler — along with auxiliary tools for the full compilation pipeline.",
         "features": {
           "title": "Toolchain Components",
@@ -291,7 +292,7 @@
       "hits": {
         "name": "HITS",
         "full": "Hardware Impulse Train Synthesizer",
-        "short": "Real-time FPGA simulator of the ATLAS Tile Calorimeter readout.",
+        "short": "Reproduces the ATLAS Tile Calorimeter readout in real time, on an FPGA, at the detector clock.",
         "desc": "HITS is a real-time FPGA simulator of the ATLAS Tile Calorimeter readout. It runs at 40 MHz on a Terasic DE10-Nano and rebuilds the front-end signal chain in synthesizable Verilog: pseudo-random hits following the LHC bunch-train structure, energy amplitudes drawn from measured distributions, electronic noise, analog shaping and an embedded pole-zero cancellation. It lets the group validate online energy-reconstruction without access to the experiment."
       },
       "polaris": {
@@ -311,7 +312,7 @@
       "aurora": {
         "name": "AURORA",
         "full": "The IDE for SAPHO",
-        "short": "The desktop IDE for SAPHO: write C±, compile, simulate and inspect, with AI-powered Aurora Intelligence.",
+        "short": "The desktop environment where SAPHO is used: write, build, simulate and read waveforms in one place.",
         "desc": "AURORA is the desktop IDE for the SAPHO platform. You describe a processor in C±, then compile, simulate and inspect it without leaving the window: Monaco editor, Icarus Verilog and Verilator simulation, Surfer, and the PRISM RTL viewer. Aurora Intelligence adds an AI assistant that drives the IDE through its own tools.",
         "features": {
           "title": "AURORA Features",
@@ -326,7 +327,7 @@
       "cgv": {
         "name": "CGV-WEB",
         "full": "Calorimeter Geometry Viewer Web",
-        "short": "3D calorimeter event visualisation, accessible worldwide.",
+        "short": "The calorimeter event display for ATLAS, running in a browser. 186,000 cells at interactive rates.",
         "desc": "CGV-WEB is the online evolution of CaloGeoView, a tool originally developed as part of the PhD thesis of Dr. Luciano Manhães de Andrade Filho. It renders CERN calorimeter events in 3D, colour-coding each detector cell by energy deposit, giving physicists a powerful visual tool for understanding collision data.",
         "features": {
           "title": "Technical Stack",
@@ -423,13 +424,18 @@
       "nav_title": "Navigation",
       "contact_title": "Contact",
       "follow_title": "Follow",
-      "copyright": "© 2026 NIPS-CERN — Federal University of Juiz de Fora. All rights reserved.",
-      "address": "UFJF Campus, Juiz de Fora, MG — Brazil",
+      "copyright": "© 2026 NIPS-CERN. Under the NIPS-CERN Licence 1.1.",
+      "address": "UFJF Campus, Juiz de Fora, MG, Brazil",
       "credits": "Credits",
       "terms": "Terms",
       "privacy": "Privacy",
       "qa": "Q&A",
-      "archived": "Archived Projects"
+      "archived": "Archived Projects",
+      "f_pubs": "publications",
+      "f_years": "on record",
+      "f_theses": "theses supervised",
+      "f_people": "people",
+      "licence": "Licence"
     },
     "legal": {
       "eyebrow": "Legal",
@@ -604,6 +610,7 @@
         "l_docs": "Documentação",
         "l_story": "O dia em que ele subiu na tela da sala de controle do ATLAS",
         "l_papers": "Os artigos por trás dele",
+        "built": "Feito aqui no laboratório. Veja como",
         "cells_label": "células ativas",
         "loading": "Inicializando geometria do calorímetro…",
         "f_cells": "células",
@@ -837,7 +844,7 @@
       "sapho": {
         "name": "SAPHO",
         "full": "Scalable-Architecture Processor for Hardware Optimization",
-        "short": "Conjunto completo de ferramentas para criação de processadores e co-design hardware–software.",
+        "short": "Projete um processador, compile para ele, simule e ponha numa FPGA. Uma cadeia de ferramentas só para o caminho inteiro.",
         "desc": "O SAPHO é um conjunto completo de arquitetura de hardware e ferramentas projetado para criação de processadores, experimentação e co-design hardware–software. Ele agrega o compilador YANC, a IDE AURORA, o visualizador de formas de onda Surfer e o PRISM RTL Viewer para visualização de circuitos de processadores.",
         "features": {
           "title": "O que o SAPHO Inclui",
@@ -851,7 +858,7 @@
       "yanc": {
         "name": "YANC",
         "full": "Yet Another Compiler",
-        "short": "A cadeia de compiladores que alimenta o ecossistema SAPHO.",
+        "short": "Leva C± ou C++ até o assembly, até o Verilog sintetizável, até as imagens de memória e o testbench.",
         "desc": "O YANC é a espinha dorsal de compilação do SAPHO, conectando linguagens de descrição de processadores de alto nível com a execução de baixo nível. Ele compreende o cmmcomp — compilador da linguagem CMM — e o asmcomp — compilador de nível de montagem — além de ferramentas auxiliares para o pipeline de compilação completo.",
         "features": {
           "title": "Componentes da Cadeia de Ferramentas",
@@ -864,7 +871,7 @@
       "hits": {
         "name": "HITS",
         "full": "Sintetizador de Trem de Pulsos em Hardware",
-        "short": "Simulador FPGA em tempo real da leitura do calorímetro de telhas do ATLAS.",
+        "short": "Reproduz a leitura do calorímetro de telhas do ATLAS em tempo real, numa FPGA, no relógio do detector.",
         "desc": "O HITS é um simulador FPGA em tempo real da leitura do calorímetro de telhas (Tile Calorimeter) do ATLAS. Roda a 40 MHz em uma Terasic DE10-Nano e reconstrói a cadeia de sinal do front-end em Verilog sintetizável: hits pseudoaleatórios seguindo a estrutura de trem de bunches do LHC, amplitudes de energia sorteadas de distribuições medidas, ruído eletrônico, conformação analógica e um cancelamento polo-zero embarcado. Permite ao grupo validar a reconstrução de energia online sem acesso ao experimento."
       },
       "polaris": {
@@ -899,7 +906,7 @@
       "cgv": {
         "name": "CGV-WEB",
         "full": "Calorimeter Geometry Viewer Web",
-        "short": "Visualização 3D de eventos do calorímetro, acessível de qualquer lugar.",
+        "short": "O display de eventos do calorímetro do ATLAS, rodando num navegador. São 186 mil células em taxa interativa.",
         "desc": "O CGV-WEB é a evolução online do CaloGeoView, ferramenta originalmente desenvolvida como parte da tese de doutorado do Dr. Luciano Manhães de Andrade Filho. Ele renderiza eventos do calorímetro do CERN em 3D, colorindo cada célula do detector de acordo com o depósito de energia.",
         "features": {
           "title": "Pilha Técnica",
@@ -996,13 +1003,18 @@
       "nav_title": "Navegação",
       "contact_title": "Contato",
       "follow_title": "Siga-nos",
-      "copyright": "© 2026 NIPS-CERN — Universidade Federal de Juiz de Fora. Todos os direitos reservados.",
-      "address": "Campus UFJF, Juiz de Fora, MG — Brasil",
+      "copyright": "© 2026 NIPS-CERN. Sob a Licença NIPS-CERN 1.1.",
+      "address": "Campus UFJF, Juiz de Fora, MG, Brasil",
       "credits": "Créditos",
       "terms": "Termos",
       "privacy": "Privacidade",
       "qa": "Q&A",
-      "archived": "Projetos Arquivados"
+      "archived": "Projetos Arquivados",
+      "f_pubs": "publicações",
+      "f_years": "de produção",
+      "f_theses": "teses e dissertações orientadas",
+      "f_people": "pessoas",
+      "licence": "Licença"
     },
     "legal": {
       "eyebrow": "Jurídico",
@@ -1177,6 +1189,7 @@
         "l_docs": "Documentation",
         "l_story": "Le jour où il est apparu dans la salle de contrôle d'ATLAS",
         "l_papers": "Les articles qui le portent",
+        "built": "Construit au laboratoire. Voir comment",
         "cells_label": "cellules actives",
         "loading": "Initialisation de la géométrie du calorimètre…",
         "f_cells": "cellules",
@@ -1410,7 +1423,7 @@
       "sapho": {
         "name": "SAPHO",
         "full": "Scalable-Architecture Processor for Hardware Optimization",
-        "short": "Suite complète d'outils pour la création de processeurs et la co-conception matériel–logiciel.",
+        "short": "Concevoir un processeur, compiler pour lui, le simuler, le poser sur un FPGA. Une seule chaîne d'outils pour tout le trajet.",
         "desc": "SAPHO est une suite complète d'architecture matérielle et d'outils conçue pour la création de processeurs, l'expérimentation et la co-conception matériel–logiciel.",
         "features": {
           "title": "Ce que SAPHO Inclut",
@@ -1424,7 +1437,7 @@
       "yanc": {
         "name": "YANC",
         "full": "Yet Another Compiler",
-        "short": "La chaîne de compilation qui alimente l'écosystème SAPHO.",
+        "short": "Descend du C± ou du C++ jusqu'à l'assembleur, jusqu'au Verilog synthétisable, jusqu'aux images mémoire et au banc d'essai.",
         "desc": "YANC est l'épine dorsale de compilation de SAPHO.",
         "features": {
           "title": "Composants de la Chaîne d'Outils",
@@ -1437,7 +1450,7 @@
       "hits": {
         "name": "HITS",
         "full": "Synthétiseur Matériel de Train d'Impulsions",
-        "short": "Simulateur FPGA en temps réel de la lecture du calorimètre à tuiles d'ATLAS.",
+        "short": "Reproduit la lecture du calorimètre à tuiles d'ATLAS en temps réel, sur FPGA, à l'horloge du détecteur.",
         "desc": "HITS est un simulateur FPGA en temps réel de la lecture du calorimètre à tuiles (Tile Calorimeter) d'ATLAS. Il fonctionne à 40 MHz sur une Terasic DE10-Nano et reconstruit la chaîne de signal du front-end en Verilog synthétisable : hits pseudo-aléatoires suivant la structure des trains de paquets du LHC, amplitudes d'énergie tirées de distributions mesurées, bruit électronique, mise en forme analogique et une annulation pôle-zéro embarquée. Il permet au groupe de valider la reconstruction d'énergie en ligne sans accès à l'expérience."
       },
       "polaris": {
@@ -1457,7 +1470,7 @@
       "aurora": {
         "name": "AURORA",
         "full": "L'IDE pour SAPHO",
-        "short": "L'IDE de bureau pour SAPHO : écrire du C±, compiler, simuler et inspecter, avec Aurora Intelligence dopé à l'IA.",
+        "short": "L'environnement de bureau où l'on se sert de SAPHO : écrire, construire, simuler et lire les formes d'onde au même endroit.",
         "desc": "AURORA est l'IDE de bureau de la plateforme SAPHO. Vous décrivez un processeur en C±, puis vous le compilez, le simulez et l'inspectez sans quitter la fenêtre : éditeur Monaco, simulation Icarus Verilog et Verilator, Surfer et le visualiseur RTL PRISM. Aurora Intelligence ajoute un assistant IA qui pilote l'IDE via ses propres outils.",
         "features": {
           "title": "Fonctionnalités d'AURORA",
@@ -1472,7 +1485,7 @@
       "cgv": {
         "name": "CGV-WEB",
         "full": "Calorimeter Geometry Viewer Web",
-        "short": "Visualisation 3D des événements du calorimètre, accessible partout.",
+        "short": "L'affichage d'événements du calorimètre d'ATLAS, dans un navigateur. 186 000 cellules à cadence interactive.",
         "desc": "CGV-WEB est l'évolution en ligne de CaloGeoView.",
         "features": {
           "title": "Pile Technique",
@@ -1569,13 +1582,18 @@
       "nav_title": "Navigation",
       "contact_title": "Contact",
       "follow_title": "Suivre",
-      "copyright": "© 2026 NIPS-CERN — Université Fédérale de Juiz de Fora. Tous droits réservés.",
-      "address": "Campus UFJF, Juiz de Fora, MG — Brésil",
+      "copyright": "© 2026 NIPS-CERN. Sous la Licence NIPS-CERN 1.1.",
+      "address": "Campus UFJF, Juiz de Fora, MG, Brésil",
       "credits": "Crédits",
       "terms": "Conditions",
       "privacy": "Confidentialité",
       "qa": "Q&A",
-      "archived": "Projets archivés"
+      "archived": "Projets archivés",
+      "f_pubs": "publications",
+      "f_years": "de production",
+      "f_theses": "thèses encadrées",
+      "f_people": "personnes",
+      "licence": "Licence"
     },
     "legal": {
       "eyebrow": "Mentions légales",
@@ -1750,6 +1768,7 @@
         "l_docs": "Dokumentasjon",
         "l_story": "Dagen det kom opp på skjermen i ATLAS-kontrollrommet",
         "l_papers": "Artiklene bak det",
+        "built": "Laget her i laboratoriet. Se hvordan",
         "cells_label": "aktive celler",
         "loading": "Initialiserer kalorimeter-geometri…",
         "f_cells": "celler",
@@ -1983,7 +2002,7 @@
       "sapho": {
         "name": "SAPHO",
         "full": "Scalable-Architecture Processor for Hardware Optimization",
-        "short": "Komplett verktøykjede for prosessorskapelse og maskinvare-programvare samdesign.",
+        "short": "Tegn en prosessor, kompiler for den, simuler den, legg den på en FPGA. Én verktøykjede for hele veien.",
         "desc": "SAPHO er en komplett maskinvarearkitektur og verktøykjede for prosessorskapelse, eksperimentering og maskinvare-programvare samdesign.",
         "features": {
           "title": "Hva SAPHO Inkluderer",
@@ -1997,7 +2016,7 @@
       "yanc": {
         "name": "YANC",
         "full": "Yet Another Compiler",
-        "short": "Kompilatorverktøykjeden som driver SAPHO-økosystemet.",
+        "short": "Tar C± eller C++ ned til assembler, til synteserbar Verilog, til minnebilder og en testbenk.",
         "desc": "YANC er kompileringsryggraden til SAPHO.",
         "features": {
           "title": "Verktøykjedekomponenter",
@@ -2010,7 +2029,7 @@
       "hits": {
         "name": "HITS",
         "full": "Maskinvare-impulstogsyntetisator",
-        "short": "Sanntids FPGA-simulator av ATLAS Tile Calorimeter-avlesningen.",
+        "short": "Gjenskaper avlesningen fra ATLAS Tile Calorimeter i sanntid, på en FPGA, i detektorens egen klokke.",
         "desc": "HITS er en sanntids FPGA-simulator av avlesningen til ATLAS Tile Calorimeter. Den kjører på 40 MHz på en Terasic DE10-Nano og gjenskaper front-end-signalkjeden i syntetiserbar Verilog: pseudo-tilfeldige treff som følger LHC-ens bunch-tog-struktur, energiamplituder trukket fra målte fordelinger, elektronisk støy, analog forming og en innebygd pol-null-kansellering. Den lar gruppen validere online energirekonstruksjon uten tilgang til eksperimentet."
       },
       "polaris": {
@@ -2030,7 +2049,7 @@
       "aurora": {
         "name": "AURORA",
         "full": "IDE-en for SAPHO",
-        "short": "Desktop-IDE-en for SAPHO: skriv C±, kompiler, simuler og inspiser, med AI-drevet Aurora Intelligence.",
+        "short": "Skrivebordsmiljøet der SAPHO brukes: skrive, bygge, simulere og lese bølgeformer på ett sted.",
         "desc": "AURORA er desktop-IDE-en for SAPHO-plattformen. Du beskriver en prosessor i C±, og kompilerer, simulerer og inspiserer den uten å forlate vinduet: Monaco-editor, Icarus Verilog- og Verilator-simulering, Surfer og PRISM RTL-viseren. Aurora Intelligence legger til en AI-assistent som styrer IDE-en gjennom dens egne verktøy.",
         "features": {
           "title": "AURORA Funksjoner",
@@ -2045,7 +2064,7 @@
       "cgv": {
         "name": "CGV-WEB",
         "full": "Calorimeter Geometry Viewer Web",
-        "short": "3D-visualisering av kalorimeterhendelser, tilgjengelig overalt.",
+        "short": "Hendelsesvisningen for ATLAS-kalorimeteret, i en nettleser. 186 000 celler i interaktiv hastighet.",
         "desc": "CGV-WEB er den nettbaserte utviklingen av CaloGeoView.",
         "features": {
           "title": "Teknisk Stabel",
@@ -2142,13 +2161,18 @@
       "nav_title": "Navigasjon",
       "contact_title": "Kontakt",
       "follow_title": "Følg",
-      "copyright": "© 2026 NIPS-CERN — Føderalt Universitet i Juiz de Fora. Alle rettigheter forbeholdt.",
-      "address": "UFJF Campus, Juiz de Fora, MG — Brasil",
+      "copyright": "© 2026 NIPS-CERN. Under NIPS-CERN-lisensen 1.1.",
+      "address": "UFJF Campus, Juiz de Fora, MG, Brasil",
       "credits": "Krediteringer",
       "terms": "Vilkår",
       "privacy": "Personvern",
       "qa": "Q&A",
-      "archived": "Arkiverte prosjekter"
+      "archived": "Arkiverte prosjekter",
+      "f_pubs": "publikasjoner",
+      "f_years": "med arbeid",
+      "f_theses": "veiledede avhandlinger",
+      "f_people": "personer",
+      "licence": "Lisens"
     },
     "legal": {
       "eyebrow": "Juridisk",
