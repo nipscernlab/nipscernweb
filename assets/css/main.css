@@ -1184,9 +1184,15 @@ h1, h2, h3, h4, h5, h6 {
   color: color-mix(in srgb, var(--pc) 42%, transparent);
 }
 
-.pc-cascade.is-running .yc-track {
+/* The animation is always declared and is held with play-state, not taken away.
+   Removing it returned the track to translateY(-50%) and the column jumped back
+   to the top of the instruction set; paused, it stands still where it is and
+   goes on from there. */
+.yc-track {
   animation: yc-fall var(--dur, 18s) linear infinite;
+  animation-play-state: paused;
 }
+.pc-cascade.is-running .yc-track { animation-play-state: running; }
 
 /* Falls downward: the track starts pulled up by half its height and returns to
    zero, so the second copy is what you see entering from the top. */
@@ -1195,9 +1201,29 @@ h1, h2, h3, h4, h5, h6 {
   to   { transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pc-cascade.is-running .yc-track { animation: none; transform: translateY(-25%); }
+  .yc-track { animation: none; transform: translateY(-25%); }
   /* three columns still read as three columns when frozen */
 }
+
+/* The one control for everything moving in the grid. Sits with the heading
+   rather than over the cards, because it governs all five and belongs to none. */
+.pc-pause {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: var(--sp-5);
+  padding: 7px 14px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--border-mid);
+  background: transparent;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-muted);
+  transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+}
+.pc-pause:hover { color: var(--text-primary); border-color: var(--border-strong); }
+.pc-pause i { font-size: 13px; }
+.pc-pause.is-paused { color: var(--text-secondary); border-color: var(--border-strong); background: rgba(255,255,255,0.03); }
 
 /* ── HITS: the pulse train ──────────────────────────────────────
    A trace on a screen, so it runs clean off the left and right edges: a signal

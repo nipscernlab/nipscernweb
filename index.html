@@ -138,8 +138,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=b35f771ff2" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=b35f771ff2"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=e97e8fa0f2" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=e97e8fa0f2"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -540,6 +540,15 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <p class="body-lg" style="max-width:520px;margin:var(--sp-4) auto 0" data-i18n="home.projects.subtitle">
             Tools, architectures, and systems built at NIPS-CERN.
           </p>
+          <!-- One control for the five media in the grid. Paused, a card runs
+               only while the pointer is on it, and always from where it stopped.
+               It starts playing: a grid that opens frozen reads as broken. -->
+          <button type="button" class="pc-pause" id="pc-pause" aria-pressed="false">
+            <i class="ph ph-pause" aria-hidden="true"></i>
+            <span class="pc-pause-t">Pause</span>
+          </button>
+          <span hidden data-i18n="home.projects.pause">Pause</span>
+          <span hidden data-i18n="home.projects.play">Play</span>
         </div>
 
         <div class="pc-grid stagger-children" id="projects-grid">
@@ -799,7 +808,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        Deferred: nothing here is needed for first paint. -->
   <script src="assets/js/vendor/gsap.min.js" defer></script>
   <script src="assets/js/vendor/ScrollTrigger.min.js" defer></script>
-  <script type="module" src="assets/js/main.js?v=b35f771ff2"></script>
+  <script type="module" src="assets/js/main.js?v=e97e8fa0f2"></script>
   <script type="module" src="assets/js/home.js?v=b7a2ea3da8"></script>
 
 <script>
