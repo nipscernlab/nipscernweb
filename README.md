@@ -56,7 +56,7 @@ through [nipscern.com](https://nipscern.com).
 
 ## License
 
-This repository is licensed under the **NIPS-CERN License 1.0**
+This repository is licensed under the **NIPS-CERN License 1.1**, the laboratory base licence plus the annex for this repository
 ([LICENSE.md](LICENSE.md)): free to read, study, use and modify, including
 inside companies; **commercial exploitation requires prior written
 authorization** from the Laboratory. We are open to partnerships, talk to us.

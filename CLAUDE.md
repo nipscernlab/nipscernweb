@@ -141,7 +141,7 @@ Descobertas que mudam decisões antigas:
   com o laboratório, apenas hospedado no mesmo domínio. Fora do escopo de
   qualquer reforma ou limpeza.
 - **Licença por consolidar.** Ver seção 9.2 do plano: falta conferir se a
-  Licença NIPS-CERN 1.0 está unificada entre os repositórios e separar código do
+  Licença NIPS-CERN 1.1 está unificada entre os repositórios e separar código do
   site, conteúdo editorial e material de terceiros.
 
 ---

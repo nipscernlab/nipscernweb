@@ -188,7 +188,7 @@ function buildFooter() {
           <img src="${ROOT}assets/icons/icon_home_nipscern.svg" alt="NIPS-CERN Logo" class="nav-logo-mark">
           <span style="font-size:var(--text-base);font-weight:700;letter-spacing:0.06em">NIPS${atomIcon}CERN</span>
         </div>
-        <p class="footer-tagline" data-i18n="footer.tagline">Research and Development Laboratory at UFJF, Brazil — in collaboration with CERN, Geneva.</p>
+        <p class="footer-tagline" data-i18n="footer.tagline">Two laboratories: NIPS, at UFJF, in Brazil, and Route Salam, at CERN, in Switzerland.</p>
       </div>
 
       <div>
