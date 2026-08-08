@@ -14,26 +14,32 @@
       "hero": {
         "label": "Federal University of Juiz de Fora · CERN",
         "title": "NIPS-CERN",
-        "subtitle": "Research and Development Laboratory at UFJF, Brazil — working at the frontier of high energy physics, scientific computing, and advanced hardware systems in collaboration with CERN, Geneva.",
+        "subtitle": "High energy physics, scientific computing, 3D visualisation, hardware systems and artificial intelligence. Two laboratories: NIPS at UFJF, in Brazil, and Route Salam, at CERN, in Switzerland.",
         "cta_primary": "Explore Our Work",
         "cta_secondary": "View Projects",
         "views": "visitors"
       },
       "cgv": {
         "title": "Live Collision Event",
-        "subtitle": "Interactive 3D rendering of the ATLAS calorimeter. Each colored cell represents energy deposited by particles in a collision event.",
+        "subtitle": "Interactive 3D rendering of the ATLAS calorimeter. Each coloured cell is energy left behind by particles from a collision.",
         "btn_event": "Generate Event",
         "btn_wireframe": "Wireframe",
         "btn_beam": "Beam Axis",
         "btn_fullcgv": "Open Full CGV",
         "cells_label": "active cells",
-        "loading": "Initialising calorimeter geometry…"
+        "loading": "Initialising calorimeter geometry…",
+        "f_cells": "cells",
+        "f_sub": "sub-detectors",
+        "f_eta": "coverage",
+        "f_stack": "in the browser"
       },
       "latest": {
         "title": "Latest From the Lab",
-        "publication_label": "Latest Publication",
-        "news_label": "Latest News",
-        "read_more": "Read more"
+        "read_more": "Read more",
+        "eyebrow": "From the Lab",
+        "all": "All news",
+        "read": "Read the story",
+        "paper": "Paper"
       },
       "projects": {
         "title": "Our Projects",
@@ -44,10 +50,10 @@
         "title": "Supported By"
       },
       "stats": {
-        "years": "Years of Research",
+        "years": "Years of published work",
         "publications": "Publications",
-        "collaborators": "Brazilian Collaborator",
-        "countries": "National Institutes Involved",
+        "collaborators": "Theses supervised",
+        "countries": "Brazilian institutes",
         "students": "Students Trained",
         "experiments": "CERN Experiments"
       },
@@ -61,13 +67,17 @@
         "eyebrow": "Laboratory",
         "title": "About & Science",
         "about_heading": "Meet the Team",
-        "about_body": "Researchers, engineers, and students working at the intersection of particle physics, hardware design, and scientific computing — in collaboration with UFJF and CERN.",
+        "about_body": "Researchers, engineers, and students working at the intersection of particle physics, hardware design, and scientific computing, at UFJF and at CERN.",
         "pubs_heading": "100+ Articles",
         "pubs_body": "Spanning calorimetry, firmware design in FPGA, embedded processors, machine learning for trigger systems, and high energy physics."
       },
       "recruit": {
         "text": "Undergraduate research positions open. Applications until 28 August.",
         "cta": "Apply"
+      },
+      "sky": {
+        "note": "The sky above him is drawn at random on every visit. Of the {n} people who have been here, none saw this one.",
+        "note_plain": "The sky above him is drawn at random on every visit. No two visitors see the same one."
       }
     },
     "about": {
@@ -303,7 +313,7 @@
       "cgv": {
         "name": "CGV-WEB",
         "full": "Calorimeter Geometry Viewer Web",
-        "short": "3D calorimeter event visualisation — accessible worldwide.",
+        "short": "3D calorimeter event visualisation, accessible worldwide.",
         "desc": "CGV-WEB is the online evolution of CaloGeoView, a tool originally developed as part of the PhD thesis of Dr. Luciano Manhães de Andrade Filho. It renders CERN calorimeter events in 3D, colour-coding each detector cell by energy deposit, giving physicists a powerful visual tool for understanding collision data.",
         "features": {
           "title": "Technical Stack",
@@ -422,7 +432,7 @@
         "s3_title": "3. Cookies",
         "s3_body": "<p>This website uses <strong>one first-party cookie-equivalent</strong>: a <code>localStorage</code> key named <code>nipscern_lang</code> that stores your preferred language (English, Portuguese, French, or Norwegian). This is stored exclusively in your browser, is never transmitted to our servers, and contains no personal information.</p><p>We do not use advertising cookies, tracking cookies, or third-party analytics cookies.</p>",
         "s4_title": "4. Third-Party Services",
-        "s4_body": "<p>The following external services are loaded when you visit this website. Each has its own privacy policy.</p><ul><li><strong>Google Fonts</strong> — serves the Inter, DM Serif Display, and JetBrains Mono typefaces. Google may log your IP address when fonts are fetched. See <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">Google Privacy Policy</a>.</li><li><strong>unpkg CDN</strong> — serves Three.js and Phosphor Icons. May log request metadata. See <a href=\"https://unpkg.com\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">unpkg.com</a>.</li><li><strong>GitHub</strong> — project links point to github.com. GitHub's privacy practices apply when you navigate to those pages. See <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">GitHub Privacy Statement</a>.</li><li><strong>CERN Courier</strong> — PDF links point to cerncourier.com, operated by CERN. CERN's privacy practices apply.</li></ul>",
+        "s4_body": "<p>The following external services are loaded when you visit this website. Each has its own privacy policy.</p><ul><li><strong>GitHub</strong> — project links point to github.com. GitHub's privacy practices apply when you navigate to those pages. See <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">GitHub Privacy Statement</a>.</li><li><strong>CERN Courier</strong> — PDF links point to cerncourier.com, operated by CERN. CERN's privacy practices apply.</li></ul>",
         "s5_title": "5. Data Retention",
         "s5_body": "<p>Because we do not collect personal data, there is nothing to retain or delete. GoatCounter stores only anonymised, aggregated counts and does not provide a mechanism to identify or remove individual visitor records.</p>",
         "s6_title": "6. Your Rights (LGPD / GDPR)",
@@ -468,13 +478,11 @@
       "projects_intro": "The following research software developed by NIPS-CERN is featured on this website and is available as open source.",
       "view_project": "View project",
       "threejs_desc": "3D WebGL rendering library used for the CGV calorimeter visualisation (TileCal barrel, LAr barrel, HEC endcaps).",
-      "phosphor_desc": "Flexible icon family used throughout the interface for navigation, badges, and decorative elements.",
-      "inter_desc": "Primary sans-serif typeface. Designed by Rasmus Andersson for high legibility on screens.",
-      "dmserif_desc": "Display serif font used for hero headings and large typographic accents.",
-      "jetbrains_desc": "Monospace typeface used for version tags, code snippets, and technical labels.",
+      "phosphor_desc": "Icon family behind every glyph in the interface. Self-hosted as CSS masks over the current text colour, so only the icons this site uses are shipped.",
+      "geist_desc": "Primary sans-serif, carrying body text and interface. A contemporary grotesque, kept quiet so it does not compete with the display face. By Vercel.",
+      "bodoni_desc": "Display serif behind every heading. A didone, with the extreme stroke contrast the style is known for, and an optical size axis that keeps the hairlines fine at large sizes and solid at small ones. By Indestructible Type.",
+      "plexmono_desc": "Monospace, used for version tags, code, figures and technical labels.",
       "goatcounter_desc": "Privacy-friendly web analytics. No cookies, no personal data collected, no cross-site tracking. View counts on the home page are powered by GoatCounter.",
-      "unpkg_desc": "Content delivery network for npm packages. Used to serve Three.js and Phosphor Icons without a build step.",
-      "gfonts_desc": "Font hosting service used to serve Inter, DM Serif Display, and JetBrains Mono via CDN.",
       "sapho_desc": "Simple Architecture for Processor Hardware and Organisation — FPGA processor design platform used for teaching digital logic at UFJF.",
       "yanc_desc": "Yet Another NIPS-CERN Compiler — CMM-to-assembly and assembly-to-machine-code compiler for the SAPHO architecture.",
       "hits_desc": "Real-time FPGA simulator of the ATLAS Tile Calorimeter readout, running on a DE10-Nano board.",
@@ -560,26 +568,32 @@
       "hero": {
         "label": "Universidade Federal de Juiz de Fora · CERN",
         "title": "NIPS-CERN",
-        "subtitle": "Laboratório de Pesquisa e Desenvolvimento na UFJF, Brasil — atuando na fronteira da física de altas energias, computação científica e sistemas avançados de hardware em colaboração com o CERN, Genebra.",
+        "subtitle": "Física de altas energias, computação científica, visualização 3D, sistemas de hardware e inteligência artificial. Dois laboratórios: o NIPS, na UFJF, no Brasil, e a Route Salam, no CERN, na Suíça.",
         "cta_primary": "Explorar Nosso Trabalho",
         "cta_secondary": "Ver Projetos",
         "views": "visitantes"
       },
       "cgv": {
         "title": "Evento de Colisão ao Vivo",
-        "subtitle": "Renderização 3D interativa do calorímetro ATLAS. Cada célula colorida representa energia depositada por partículas em um evento de colisão.",
+        "subtitle": "Rendering 3D interativo do calorímetro do ATLAS. Cada célula colorida é energia deixada por partículas de uma colisão.",
         "btn_event": "Gerar Evento",
         "btn_wireframe": "Estrutura de Arame",
         "btn_beam": "Eixo do Feixe",
         "btn_fullcgv": "Abrir CGV Completo",
         "cells_label": "células ativas",
-        "loading": "Inicializando geometria do calorímetro…"
+        "loading": "Inicializando geometria do calorímetro…",
+        "f_cells": "células",
+        "f_sub": "subdetectores",
+        "f_eta": "cobertura",
+        "f_stack": "no navegador"
       },
       "latest": {
-        "title": "Últimas do Laboratório",
-        "publication_label": "Última Publicação",
-        "news_label": "Últimas Notícias",
-        "read_more": "Leia mais"
+        "title": "O que saiu do laboratório",
+        "read_more": "Leia mais",
+        "eyebrow": "Do laboratório",
+        "all": "Todas as notícias",
+        "read": "Ler a matéria",
+        "paper": "Artigo"
       },
       "projects": {
         "title": "Nossos Projetos",
@@ -590,10 +604,10 @@
         "title": "Com Apoio de"
       },
       "stats": {
-        "years": "Anos de Pesquisa",
+        "years": "Anos de produção publicada",
         "publications": "Publicações",
-        "collaborators": "Colaborador Brasileiro",
-        "countries": "Institutos Nacionais Envolvidos",
+        "collaborators": "Teses e dissertações orientadas",
+        "countries": "Institutos brasileiros",
         "students": "Estudantes Formados",
         "experiments": "Experimentos no CERN"
       },
@@ -607,13 +621,17 @@
         "eyebrow": "Laboratório",
         "title": "Sobre & Ciência",
         "about_heading": "Conheça a Equipe",
-        "about_body": "Pesquisadores, engenheiros e estudantes trabalhando na intersecção entre física de partículas, projeto de hardware e computação científica — em colaboração com a UFJF e o CERN.",
+        "about_body": "Pesquisadores, engenheiros e estudantes no encontro entre física de partículas, projeto de hardware e computação científica, na UFJF e no CERN.",
         "pubs_heading": "Mais de 100 Artigos",
         "pubs_body": "Abrangendo calorimetria, projeto de firmware em FPGA, processadores embarcados, aprendizado de máquina para sistemas de trigger e física de altas energias."
       },
       "recruit": {
         "text": "Vagas de iniciação científica abertas. Inscrições até 28 de agosto.",
         "cta": "Inscreva-se"
+      },
+      "sky": {
+        "note": "O céu acima dele é sorteado a cada visita. Das {n} pessoas que já estiveram aqui, nenhuma viu este.",
+        "note_plain": "O céu acima dele é sorteado a cada visita. Duas pessoas nunca veem o mesmo."
       }
     },
     "about": {
@@ -849,7 +867,7 @@
       "cgv": {
         "name": "CGV-WEB",
         "full": "Calorimeter Geometry Viewer Web",
-        "short": "Visualização 3D de eventos do calorímetro — acessível mundialmente.",
+        "short": "Visualização 3D de eventos do calorímetro, acessível de qualquer lugar.",
         "desc": "O CGV-WEB é a evolução online do CaloGeoView, ferramenta originalmente desenvolvida como parte da tese de doutorado do Dr. Luciano Manhães de Andrade Filho. Ele renderiza eventos do calorímetro do CERN em 3D, colorindo cada célula do detector de acordo com o depósito de energia.",
         "features": {
           "title": "Pilha Técnica",
@@ -968,7 +986,7 @@
         "s3_title": "3. Cookies",
         "s3_body": "<p>Este site usa <strong>um equivalente a cookie de origem própria</strong>: uma chave de <code>localStorage</code> chamada <code>nipscern_lang</code> que armazena o seu idioma preferido (inglês, português, francês ou norueguês). Ela fica armazenada exclusivamente no seu navegador, nunca é transmitida aos nossos servidores e não contém informações pessoais.</p><p>Não usamos cookies de publicidade, cookies de rastreamento nem cookies de análise de terceiros.</p>",
         "s4_title": "4. Serviços de Terceiros",
-        "s4_body": "<p>Os seguintes serviços externos são carregados quando você visita este site. Cada um possui sua própria política de privacidade.</p><ul><li><strong>Google Fonts</strong> — fornece as fontes Inter, DM Serif Display e JetBrains Mono. O Google pode registrar o seu endereço IP quando as fontes são carregadas. Veja a <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">Política de Privacidade do Google</a>.</li><li><strong>unpkg CDN</strong> — fornece o Three.js e o Phosphor Icons. Pode registrar metadados das requisições. Veja <a href=\"https://unpkg.com\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">unpkg.com</a>.</li><li><strong>GitHub</strong> — os links de projetos apontam para o github.com. As práticas de privacidade do GitHub aplicam-se quando você navega por essas páginas. Veja a <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">Declaração de Privacidade do GitHub</a>.</li><li><strong>CERN Courier</strong> — os links de PDF apontam para cerncourier.com, operado pelo CERN. As práticas de privacidade do CERN aplicam-se.</li></ul>",
+        "s4_body": "<p>Os seguintes serviços externos são carregados quando você visita este site. Cada um possui sua própria política de privacidade.</p><ul><li><strong>GitHub</strong> — os links de projetos apontam para o github.com. As práticas de privacidade do GitHub aplicam-se quando você navega por essas páginas. Veja a <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">Declaração de Privacidade do GitHub</a>.</li><li><strong>CERN Courier</strong> — os links de PDF apontam para cerncourier.com, operado pelo CERN. As práticas de privacidade do CERN aplicam-se.</li></ul>",
         "s5_title": "5. Retenção de Dados",
         "s5_body": "<p>Como não coletamos dados pessoais, não há nada a reter ou excluir. O GoatCounter armazena apenas contagens agregadas e anonimizadas e não oferece nenhum mecanismo para identificar ou remover registros individuais de visitantes.</p>",
         "s6_title": "6. Seus Direitos (LGPD / GDPR)",
@@ -1014,13 +1032,11 @@
       "projects_intro": "Os seguintes softwares de pesquisa desenvolvidos pelo NIPS-CERN são destacados neste site e estão disponíveis como código aberto.",
       "view_project": "Ver projeto",
       "threejs_desc": "Biblioteca de renderização 3D em WebGL usada na visualização do calorímetro do CGV (barril do TileCal, barril do LAr, tampas do HEC).",
-      "phosphor_desc": "Família de ícones flexível usada em toda a interface para navegação, selos e elementos decorativos.",
-      "inter_desc": "Fonte sans-serif principal. Desenhada por Rasmus Andersson para alta legibilidade em telas.",
-      "dmserif_desc": "Fonte serifada de destaque usada em títulos de hero e grandes acentos tipográficos.",
-      "jetbrains_desc": "Fonte monoespaçada usada em selos de versão, trechos de código e rótulos técnicos.",
+      "phosphor_desc": "Família de ícones por trás de cada glifo da interface. Hospedada por nós, como máscaras CSS sobre a cor do texto, então só chegam ao visitante os ícones que o site usa.",
+      "geist_desc": "Sans-serif principal, no texto corrido e na interface. Uma grotesca contemporânea, mantida discreta para não disputar com a fonte de título. Da Vercel.",
+      "bodoni_desc": "Serifada de destaque, em todos os títulos. É uma didone, com o contraste extremo entre haste e filete que caracteriza o estilo, e um eixo de tamanho óptico que mantém os filetes finos nos corpos grandes e firmes nos pequenos. Da Indestructible Type.",
+      "plexmono_desc": "Monoespaçada, em selos de versão, código, números e rótulos técnicos.",
       "goatcounter_desc": "Análise web que respeita a privacidade. Sem cookies, sem coleta de dados pessoais, sem rastreamento entre sites. As contagens de visualizações na página inicial são fornecidas pelo GoatCounter.",
-      "unpkg_desc": "Rede de distribuição de conteúdo para pacotes npm. Usada para servir o Three.js e o Phosphor Icons sem etapa de build.",
-      "gfonts_desc": "Serviço de hospedagem de fontes usado para servir Inter, DM Serif Display e JetBrains Mono via CDN.",
       "sapho_desc": "Simple Architecture for Processor Hardware and Organisation — plataforma de design de processadores em FPGA usada para o ensino de lógica digital na UFJF.",
       "yanc_desc": "Yet Another NIPS-CERN Compiler — compilador de CMM para assembly e de assembly para código de máquina da arquitetura SAPHO.",
       "hits_desc": "Simulador FPGA em tempo real da leitura do calorímetro de telhas do ATLAS, rodando numa placa DE10-Nano.",
@@ -1106,26 +1122,32 @@
       "hero": {
         "label": "Université Fédérale de Juiz de Fora · CERN",
         "title": "NIPS-CERN",
-        "subtitle": "Laboratoire de Recherche et Développement à l'UFJF, Brésil — à la frontière de la physique des hautes énergies, du calcul scientifique et des systèmes matériels avancés, en collaboration avec le CERN, Genève.",
+        "subtitle": "Physique des hautes énergies, calcul scientifique, visualisation 3D, systèmes matériels et intelligence artificielle. Deux laboratoires : le NIPS, à l'UFJF, au Brésil, et route Salam, au CERN, en Suisse.",
         "cta_primary": "Explorer Nos Travaux",
         "cta_secondary": "Voir les Projets",
         "views": "visiteurs"
       },
       "cgv": {
         "title": "Événement de Collision en Direct",
-        "subtitle": "Rendu 3D interactif du calorimètre ATLAS. Chaque cellule colorée représente l'énergie déposée par des particules dans une évenement de collision.",
+        "subtitle": "Rendu 3D interactif du calorimètre ATLAS. Chaque cellule colorée est de l'énergie laissée par les particules d'une collision.",
         "btn_event": "Générer un Événement",
         "btn_wireframe": "Fil de Fer",
         "btn_beam": "Axe du Faisceau",
         "btn_fullcgv": "Ouvrir le CGV Complet",
         "cells_label": "cellules actives",
-        "loading": "Initialisation de la géométrie du calorimètre…"
+        "loading": "Initialisation de la géométrie du calorimètre…",
+        "f_cells": "cellules",
+        "f_sub": "sous-détecteurs",
+        "f_eta": "couverture",
+        "f_stack": "dans le navigateur"
       },
       "latest": {
-        "title": "Dernières Nouvelles du Laboratoire",
-        "publication_label": "Dernière Publication",
-        "news_label": "Dernières Actualités",
-        "read_more": "Lire la suite"
+        "title": "Les dernières du laboratoire",
+        "read_more": "Lire la suite",
+        "eyebrow": "Du laboratoire",
+        "all": "Toutes les actualités",
+        "read": "Lire l'article",
+        "paper": "Article"
       },
       "projects": {
         "title": "Nos Projets",
@@ -1136,10 +1158,10 @@
         "title": "Soutenu Par"
       },
       "stats": {
-        "years": "Années de Recherche",
+        "years": "Années de publications",
         "publications": "Publications",
-        "collaborators": "Collaborateur Brésilien",
-        "countries": "Instituts Nationaux Impliqués",
+        "collaborators": "Thèses encadrées",
+        "countries": "Instituts brésiliens",
         "students": "Étudiants Formés",
         "experiments": "Expériences au CERN"
       },
@@ -1153,13 +1175,17 @@
         "eyebrow": "Laboratoire",
         "title": "À propos & Science",
         "about_heading": "Rencontrez l'Équipe",
-        "about_body": "Chercheurs, ingénieurs et étudiants travaillant à l'intersection de la physique des particules, de la conception matérielle et du calcul scientifique — en collaboration avec l'UFJF et le CERN.",
+        "about_body": "Chercheurs, ingénieurs et étudiants à la rencontre de la physique des particules, de la conception matérielle et du calcul scientifique, à l'UFJF et au CERN.",
         "pubs_heading": "Plus de 100 Articles",
         "pubs_body": "Couvrant la calorimétrie, la conception de firmware en FPGA, les processeurs embarqués, l'apprentissage automatique pour les systèmes de déclenchement et la physique des hautes énergies."
       },
       "recruit": {
         "text": "Postes de recherche pour étudiants ouverts. Candidatures jusqu'au 28 août.",
         "cta": "Postuler"
+      },
+      "sky": {
+        "note": "Le ciel au-dessus de lui est tiré au sort à chaque visite. Des {n} personnes venues ici, aucune n'a vu celui-ci.",
+        "note_plain": "Le ciel au-dessus de lui est tiré au sort à chaque visite. Deux visiteurs ne voient jamais le même."
       }
     },
     "about": {
@@ -1395,7 +1421,7 @@
       "cgv": {
         "name": "CGV-WEB",
         "full": "Calorimeter Geometry Viewer Web",
-        "short": "Visualisation 3D d'événements de calorimètre — accessible dans le monde entier.",
+        "short": "Visualisation 3D des événements du calorimètre, accessible partout.",
         "desc": "CGV-WEB est l'évolution en ligne de CaloGeoView.",
         "features": {
           "title": "Pile Technique",
@@ -1514,7 +1540,7 @@
         "s3_title": "3. Cookies",
         "s3_body": "<p>Ce site utilise <strong>un équivalent de cookie de première partie</strong> : une clé <code>localStorage</code> nommée <code>nipscern_lang</code> qui mémorise votre langue préférée (anglais, portugais, français ou norvégien). Elle est stockée exclusivement dans votre navigateur, n'est jamais transmise à nos serveurs et ne contient aucune information personnelle.</p><p>Nous n'utilisons pas de cookies publicitaires, de cookies de pistage ni de cookies d'analyse tiers.</p>",
         "s4_title": "4. Services Tiers",
-        "s4_body": "<p>Les services externes suivants sont chargés lorsque vous visitez ce site. Chacun dispose de sa propre politique de confidentialité.</p><ul><li><strong>Google Fonts</strong> — fournit les polices Inter, DM Serif Display et JetBrains Mono. Google peut enregistrer votre adresse IP lors du chargement des polices. Voir la <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">Politique de Confidentialité de Google</a>.</li><li><strong>unpkg CDN</strong> — fournit Three.js et Phosphor Icons. Peut enregistrer les métadonnées des requêtes. Voir <a href=\"https://unpkg.com\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">unpkg.com</a>.</li><li><strong>GitHub</strong> — les liens de projets pointent vers github.com. Les pratiques de confidentialité de GitHub s'appliquent lorsque vous naviguez sur ces pages. Voir la <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">Déclaration de Confidentialité de GitHub</a>.</li><li><strong>CERN Courier</strong> — les liens PDF pointent vers cerncourier.com, exploité par le CERN. Les pratiques de confidentialité du CERN s'appliquent.</li></ul>",
+        "s4_body": "<p>Les services externes suivants sont chargés lorsque vous visitez ce site. Chacun dispose de sa propre politique de confidentialité.</p><ul><li><strong>GitHub</strong> — les liens de projets pointent vers github.com. Les pratiques de confidentialité de GitHub s'appliquent lorsque vous naviguez sur ces pages. Voir la <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">Déclaration de Confidentialité de GitHub</a>.</li><li><strong>CERN Courier</strong> — les liens PDF pointent vers cerncourier.com, exploité par le CERN. Les pratiques de confidentialité du CERN s'appliquent.</li></ul>",
         "s5_title": "5. Conservation des Données",
         "s5_body": "<p>Comme nous ne collectons pas de données personnelles, il n'y a rien à conserver ni à supprimer. GoatCounter ne stocke que des comptages agrégés et anonymisés et n'offre aucun mécanisme pour identifier ou supprimer des enregistrements individuels de visiteurs.</p>",
         "s6_title": "6. Vos Droits (LGPD / RGPD)",
@@ -1560,13 +1586,11 @@
       "projects_intro": "Les logiciels de recherche suivants, développés par NIPS-CERN, sont présentés sur ce site et disponibles en open source.",
       "view_project": "Voir le projet",
       "threejs_desc": "Bibliothèque de rendu 3D WebGL utilisée pour la visualisation du calorimètre du CGV (tonneau du TileCal, tonneau du LAr, bouchons du HEC).",
-      "phosphor_desc": "Famille d'icônes flexible utilisée dans toute l'interface pour la navigation, les badges et les éléments décoratifs.",
-      "inter_desc": "Police sans-serif principale. Conçue par Rasmus Andersson pour une grande lisibilité à l'écran.",
-      "dmserif_desc": "Police serif d'affichage utilisée pour les titres de hero et les grands accents typographiques.",
-      "jetbrains_desc": "Police monospace utilisée pour les étiquettes de version, les extraits de code et les libellés techniques.",
+      "phosphor_desc": "Famille d'icônes derrière chaque glyphe de l'interface. Hébergée chez nous, sous forme de masques CSS sur la couleur du texte, si bien que seules les icônes utilisées sont livrées.",
+      "geist_desc": "Sans-serif principale, dans le texte courant et l'interface. Une grotesque contemporaine, volontairement discrète pour ne pas rivaliser avec la police de titrage. Par Vercel.",
+      "bodoni_desc": "Serif de titrage, sur toutes les têtes de chapitre. Une didone, avec le contraste extrême entre pleins et déliés propre au style, et un axe de taille optique qui garde les déliés fins dans les grands corps et solides dans les petits. Par Indestructible Type.",
+      "plexmono_desc": "Monospace, pour les étiquettes de version, le code, les chiffres et les libellés techniques.",
       "goatcounter_desc": "Analyse web respectueuse de la vie privée. Pas de cookies, aucune donnée personnelle collectée, aucun pistage intersites. Les comptages de vues sur la page d'accueil sont fournis par GoatCounter.",
-      "unpkg_desc": "Réseau de distribution de contenu pour les paquets npm. Utilisé pour servir Three.js et Phosphor Icons sans étape de build.",
-      "gfonts_desc": "Service d'hébergement de polices utilisé pour servir Inter, DM Serif Display et JetBrains Mono via CDN.",
       "sapho_desc": "Simple Architecture for Processor Hardware and Organisation — plateforme de conception de processeurs FPGA utilisée pour l'enseignement de la logique numérique à l'UFJF.",
       "yanc_desc": "Yet Another NIPS-CERN Compiler — compilateur du CMM vers l'assembleur et de l'assembleur vers le code machine pour l'architecture SAPHO.",
       "hits_desc": "Simulateur FPGA en temps réel de la lecture du calorimètre à tuiles d'ATLAS, sur une carte DE10-Nano.",
@@ -1652,26 +1676,32 @@
       "hero": {
         "label": "Føderalt Universitet i Juiz de Fora · CERN",
         "title": "NIPS-CERN",
-        "subtitle": "Forsknings- og utviklingslaboratorium ved UFJF, Brasil — ved fronten av høyenergifysikk, vitenskapelig databehandling og avanserte maskinvaresystemer i samarbeid med CERN, Genève.",
+        "subtitle": "Høyenergifysikk, vitenskapelig databehandling, 3D-visualisering, maskinvaresystemer og kunstig intelligens. To laboratorier: NIPS ved UFJF i Brasil, og Route Salam ved CERN i Sveits.",
         "cta_primary": "Utforsk Vårt Arbeid",
         "cta_secondary": "Se Prosjekter",
         "views": "besøkende"
       },
       "cgv": {
         "title": "Live Kollisjonshendelse",
-        "subtitle": "Interaktiv 3D-gjengivelse av ATLAS-kalorimeteret. Hver farget celle representerer energi avsatt av partikler i en simulert kollisjon.",
+        "subtitle": "Interaktiv 3D-visning av ATLAS-kalorimeteret. Hver farget celle er energi lagt igjen av partikler fra en kollisjon.",
         "btn_event": "Generer Hendelse",
         "btn_wireframe": "Trådramme",
         "btn_beam": "Stråleaksen",
         "btn_fullcgv": "Åpne Fullt CGV",
         "cells_label": "aktive celler",
-        "loading": "Initialiserer kalorimeter-geometri…"
+        "loading": "Initialiserer kalorimeter-geometri…",
+        "f_cells": "celler",
+        "f_sub": "underdetektorer",
+        "f_eta": "dekning",
+        "f_stack": "i nettleseren"
       },
       "latest": {
-        "title": "Siste fra Laboratoriet",
-        "publication_label": "Siste Publikasjon",
-        "news_label": "Siste Nyheter",
-        "read_more": "Les mer"
+        "title": "Det siste fra laboratoriet",
+        "read_more": "Les mer",
+        "eyebrow": "Fra laboratoriet",
+        "all": "Alle nyheter",
+        "read": "Les saken",
+        "paper": "Artikkel"
       },
       "projects": {
         "title": "Våre Prosjekter",
@@ -1682,10 +1712,10 @@
         "title": "Støttet av"
       },
       "stats": {
-        "years": "År med Forskning",
+        "years": "År med publisert arbeid",
         "publications": "Publikasjoner",
-        "collaborators": "Brasiliansk Samarbeidspartner",
-        "countries": "Nasjonale Institutter Involvert",
+        "collaborators": "Veiledede avhandlinger",
+        "countries": "Brasilianske institutter",
         "students": "Utdannede Studenter",
         "experiments": "CERN-eksperimenter"
       },
@@ -1699,13 +1729,17 @@
         "eyebrow": "Laboratorium",
         "title": "Om & Vitenskap",
         "about_heading": "Møt Teamet",
-        "about_body": "Forskere, ingeniører og studenter som arbeider i skjæringspunktet mellom partikkelfysikk, maskinvaredesign og vitenskapelig databehandling — i samarbeid med UFJF og CERN.",
+        "about_body": "Forskere, ingeniører og studenter i skjæringspunktet mellom partikkelfysikk, maskinvaredesign og vitenskapelig databehandling, ved UFJF og ved CERN.",
         "pubs_heading": "100+ Artikler",
         "pubs_body": "Spenner over kalorimetri, fastvaredesign i FPGA, innebygde prosessorer, maskinlæring for triggersystemer og høyenergifysikk."
       },
       "recruit": {
         "text": "Ledige forskningsplasser for studenter. Søknadsfrist 28. august.",
         "cta": "Søk"
+      },
+      "sky": {
+        "note": "Himmelen over ham trekkes tilfeldig ved hvert besøk. Av de {n} som har vært her, har ingen sett denne.",
+        "note_plain": "Himmelen over ham trekkes tilfeldig ved hvert besøk. To besøkende ser aldri den samme."
       }
     },
     "about": {
@@ -1941,7 +1975,7 @@
       "cgv": {
         "name": "CGV-WEB",
         "full": "Calorimeter Geometry Viewer Web",
-        "short": "3D kalorimeter-hendelsesvisualisering — tilgjengelig over hele verden.",
+        "short": "3D-visualisering av kalorimeterhendelser, tilgjengelig overalt.",
         "desc": "CGV-WEB er den nettbaserte utviklingen av CaloGeoView.",
         "features": {
           "title": "Teknisk Stabel",
@@ -2060,7 +2094,7 @@
         "s3_title": "3. Informasjonskapsler",
         "s3_body": "<p>Dette nettstedet bruker <strong>én førsteparts kapselekvivalent</strong>: en <code>localStorage</code>-nøkkel kalt <code>nipscern_lang</code> som lagrer ditt foretrukne språk (engelsk, portugisisk, fransk eller norsk). Den lagres utelukkende i nettleseren din, overføres aldri til våre servere og inneholder ingen personopplysninger.</p><p>Vi bruker ikke reklamekapsler, sporingskapsler eller tredjeparts analysekapsler.</p>",
         "s4_title": "4. Tredjepartstjenester",
-        "s4_body": "<p>Følgende eksterne tjenester lastes inn når du besøker dette nettstedet. Hver har sin egen personvernerklæring.</p><ul><li><strong>Google Fonts</strong> — leverer skrifttypene Inter, DM Serif Display og JetBrains Mono. Google kan logge IP-adressen din når skrifttyper hentes. Se <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">Googles personvernerklæring</a>.</li><li><strong>unpkg CDN</strong> — leverer Three.js og Phosphor Icons. Kan logge forespørselsmetadata. Se <a href=\"https://unpkg.com\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">unpkg.com</a>.</li><li><strong>GitHub</strong> — prosjektlenker peker til github.com. GitHubs personvernpraksis gjelder når du navigerer til disse sidene. Se <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">GitHubs personvernerklæring</a>.</li><li><strong>CERN Courier</strong> — PDF-lenker peker til cerncourier.com, drevet av CERN. CERNs personvernpraksis gjelder.</li></ul>",
+        "s4_body": "<p>Følgende eksterne tjenester lastes inn når du besøker dette nettstedet. Hver har sin egen personvernerklæring.</p><ul><li><strong>GitHub</strong> — prosjektlenker peker til github.com. GitHubs personvernpraksis gjelder når du navigerer til disse sidene. Se <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\" target=\"_blank\" rel=\"noopener\" class=\"text-link\">GitHubs personvernerklæring</a>.</li><li><strong>CERN Courier</strong> — PDF-lenker peker til cerncourier.com, drevet av CERN. CERNs personvernpraksis gjelder.</li></ul>",
         "s5_title": "5. Datalagring",
         "s5_body": "<p>Fordi vi ikke samler inn personopplysninger, er det ingenting å oppbevare eller slette. GoatCounter lagrer kun anonymiserte, aggregerte tellinger og tilbyr ingen mekanisme for å identifisere eller fjerne individuelle besøksregistreringer.</p>",
         "s6_title": "6. Dine Rettigheter (LGPD / GDPR)",
@@ -2106,13 +2140,11 @@
       "projects_intro": "Følgende forskningsprogramvare utviklet av NIPS-CERN er fremhevet på dette nettstedet og er tilgjengelig som åpen kildekode.",
       "view_project": "Se prosjekt",
       "threejs_desc": "3D WebGL-gjengivelsesbibliotek brukt til CGV-kalorimetervisualiseringen (TileCal-tønne, LAr-tønne, HEC-endehetter).",
-      "phosphor_desc": "Fleksibel ikonfamilie brukt gjennom hele grensesnittet for navigasjon, merker og dekorative elementer.",
-      "inter_desc": "Primær sans-serif skrifttype. Designet av Rasmus Andersson for høy lesbarhet på skjermer.",
-      "dmserif_desc": "Display serif-skrifttype brukt til hero-overskrifter og store typografiske aksenter.",
-      "jetbrains_desc": "Monospace-skrifttype brukt til versjonsmerker, kodeutdrag og tekniske etiketter.",
+      "phosphor_desc": "Ikonfamilien bak hvert glyf i grensesnittet. Med egen hosting, som CSS-masker over tekstfargen, så bare ikonene nettstedet faktisk bruker blir levert.",
+      "geist_desc": "Nettstedets viktigste sans-serif, i brødtekst og grensesnitt. En samtidsgrotesk, holdt tilbake så den ikke kappes med tittelskriften. Fra Vercel.",
+      "bodoni_desc": "Tittelserif, i alle overskrifter. En didone, med den sterke kontrasten mellom grunnstrek og hårstrek som kjennetegner stilen, og en akse for optisk størrelse som holder hårstrekene tynne i store grader og solide i små. Fra Indestructible Type.",
+      "plexmono_desc": "Monospace, til versjonsmerker, kode, tall og tekniske etiketter.",
       "goatcounter_desc": "Personvernvennlig nettanalyse. Ingen informasjonskapsler, ingen personopplysninger samlet inn, ingen sporing på tvers av nettsteder. Visningstellingene på hjemmesiden drives av GoatCounter.",
-      "unpkg_desc": "Innholdsleveringsnettverk for npm-pakker. Brukt til å levere Three.js og Phosphor Icons uten et byggetrinn.",
-      "gfonts_desc": "Skrifttypehostingtjeneste brukt til å levere Inter, DM Serif Display og JetBrains Mono via CDN.",
       "sapho_desc": "Simple Architecture for Processor Hardware and Organisation — FPGA-prosessordesignplattform brukt til å undervise i digital logikk ved UFJF.",
       "yanc_desc": "Yet Another NIPS-CERN Compiler — kompilator fra CMM til assembly og fra assembly til maskinkode for SAPHO-arkitekturen.",
       "hits_desc": "Sanntids FPGA-simulator av ATLAS Tile Calorimeter-avlesningen, på et DE10-Nano-kort.",
