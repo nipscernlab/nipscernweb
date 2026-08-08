@@ -184,6 +184,7 @@ function choreograph() {
 
        the sky        22% of headroom, travels 20.2%
        the poster     16% of headroom, travels 13.2%
+       the news cover  5% of headroom, travels  4.4%
        card media      7% of headroom, travels  6.8% */
   const driftInFrame = (el, pct, sc) => {
     if (!el) return;
@@ -202,7 +203,7 @@ function choreograph() {
   /* The cover of the lead story, inside the frame that already clips it. Set up
      on a delay because the renderer fills that lane from the JSON well after
      this runs; the height watcher re-measures once it does. */
-  setTimeout(() => driftInFrame(document.querySelector('.ln-media img'), 7, '.ln-lead'), 500);
+  setTimeout(() => driftInFrame(document.querySelector('.ln-media img'), 4, '.ln-lead'), 500);
 
   /* The boy under the hero. Not a frame, but a figure with room around it on
      every side, and he is the near plane of the same composition as the sky:
@@ -775,12 +776,10 @@ function renderLab(news, pubs) {
     const who = authorLine(p, moreTpl);
     return `
       <a class="lp-item" href="${esc(publicationUrl(p) || 'publications.html')}">
-        <div class="lp-meta">
-          <span class="lp-year">${esc(p.year)}</span>
-          <span class="lp-venue">${esc(venue(p))}</span>
-        </div>
+        <div class="lp-meta"><span class="lp-year">${esc(p.year)}</span></div>
         <h4 class="lp-title">${esc(p.title)}</h4>
         ${who ? `<p class="lp-authors">${esc(who)}</p>` : ''}
+        <span class="lp-venue">${esc(venue(p))}</span>
       </a>`;
   }).join('');
 }
