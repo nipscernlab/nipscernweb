@@ -1,0 +1,30 @@
+name: Guarda das fatias de dados
+
+# data/i18n.json, data/news.json e data/publications.json sao os arquivos que uma
+# pessoa edita. As fatias que as paginas leem sao geradas deles por
+# tools/build-data-slices.js.
+#
+# Fatia velha nao quebra nada: o carregador cai para o arquivo inteiro e a pagina
+# aparece igual, so mais pesada. E por isso mesmo que ninguem perceberia. Este
+# guard percebe: regenera e falha se o resultado nao for identico ao commitado.
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: As fatias batem com as fontes
+        run: |
+          node tools/build-data-slices.js
+          if git diff --quiet -- data/; then
+            echo "Fatias em dia."
+          else
+            echo "::error::Fatias desatualizadas. Rode: node tools/build-data-slices.js"
+            git diff --stat -- data/
+            exit 1
+          fi
