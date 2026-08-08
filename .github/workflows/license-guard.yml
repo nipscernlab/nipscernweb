@@ -1,0 +1,33 @@
+name: Guarda da licenca base
+
+# A licenca deste repositorio e a licenca base do laboratorio mais um anexo, e a
+# base tem que ser identica em todos os produtos do NIPS-CERN. Duas copias do
+# mesmo texto no mesmo repositorio e um convite a divergencia: alguem corrige uma
+# virgula no LICENSE.md, esquece o LICENSE-BASE.md, e a partir dai cada produto
+# passa a carregar uma base ligeiramente diferente sem ninguem notar.
+#
+# Este guard fecha essa porta: LICENSE.md tem que COMECAR com os bytes exatos de
+# LICENSE-BASE.md. O que vier depois e o anexo, e o anexo e livre.
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: LICENSE.md comeca com LICENSE-BASE.md
+        run: |
+          for f in LICENSE-BASE.md LICENSE.md; do
+            [ -f "$f" ] || { echo "::error::$f nao existe."; exit 1; }
+          done
+          n=$(wc -c < LICENSE-BASE.md)
+          if head -c "$n" LICENSE.md | cmp -s - LICENSE-BASE.md; then
+            echo "Base identica nos primeiros $n bytes. Anexo: $(( $(wc -c < LICENSE.md) - n )) bytes."
+          else
+            echo "::error::LICENSE.md nao comeca com o texto de LICENSE-BASE.md."
+            echo "A base do laboratorio e a mesma em todo produto e nao pode ser editada aqui."
+            echo "Primeira diferenca:"
+            head -c "$n" LICENSE.md | cmp - LICENSE-BASE.md || true
+            exit 1
+          fi
