@@ -83,6 +83,20 @@ function whileVisibleCard(el, play, hold) {
   }, { rootMargin: '120px' }).observe(el);
 }
 
+/* The same idea without the button: play while it is on screen, hold when it
+   is not. This is what everything outside the projects grid uses. */
+function whileVisible(el, play, hold) {
+  if (!('IntersectionObserver' in window)) { play(); return; }
+  let on = false;
+  new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting === on) return;
+      on = e.isIntersecting;
+      if (on) play(); else hold();
+    });
+  }, { rootMargin: '120px' }).observe(el);
+}
+
 /* ------------------------------------------------------------------
    1. Scroll choreography
    ------------------------------------------------------------------ */
@@ -595,7 +609,12 @@ function videoLoop(video) {
     video.load();
   };
 
-  whileVisibleCard(video,
+  /* Inside the projects grid a loop answers to the pause button; outside it,
+     only to being on screen. The cube in the About panel is the second case,
+     and registering it as the first would have frozen it for good: the only way
+     back from a pause is hovering a card, and it is not in one. */
+  const gate = video.closest('.pc-card') ? whileVisibleCard : whileVisible;
+  gate(video,
     () => { arm(); const p = video.play(); if (p) p.catch(() => {}); },
     () => video.pause());
 }
@@ -861,7 +880,7 @@ function init() {
   if (ys) yancCascade(ys);
 
   /* Every looping video on a card, whichever card it belongs to. */
-  document.querySelectorAll('.pc-media video').forEach(videoLoop);
+  document.querySelectorAll('.pc-media video, .cube-rail video').forEach(videoLoop);
 
   const hp = document.querySelector('[data-media="hits-pulse"]');
   if (hp) hitsPulse(hp);
