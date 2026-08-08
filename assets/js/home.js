@@ -613,11 +613,31 @@ function postText(post) {
   };
 }
 
+const LOCALE = { en: 'en-GB', pt: 'pt-BR', fr: 'fr-FR', no: 'nb-NO' };
+
+/* The long form, for the lead story, where there is a line to spare. */
 function fmtDate(iso) {
   const d = new Date(iso + 'T12:00:00');
   if (isNaN(d)) return iso;
-  const locale = { en: 'en-GB', pt: 'pt-BR', fr: 'fr-FR', no: 'nb-NO' }[docLang()];
-  return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+  return d.toLocaleDateString(LOCALE[docLang()] , { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/* The compact form, for the rows under it, which put the date in a column of its
+   own beside the headline.
+
+   That column cannot be sized for one language. Written out, the same date is
+   "2 Aug 2026" in English and "2 de ago. de 2026" in Portuguese: ten characters
+   against seventeen. The column was fixed at 108px and the date was told not to
+   wrap, so the Portuguese ran straight under the headline beside it.
+
+   Numeric, every locale gives exactly ten characters, which is a column that
+   holds in all four and lines the rows up as a bonus. A date beside a headline
+   is being scanned, not read, and 02/08/2026 is the better shape for that
+   anyway. */
+function fmtDateShort(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString(LOCALE[docLang()], { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 /* Covers live either in the repository or on the CDN, and the JSON holds both
@@ -677,7 +697,7 @@ function renderLab(news, pubs) {
       const pt = postText(p);
       return `
       <a class="ln-item" href="${esc(newsPostUrl(p, 'news/post.html'))}">
-        <time class="ln-item-date" datetime="${esc(p.date)}">${esc(fmtDate(p.date))}</time>
+        <time class="ln-item-date" datetime="${esc(p.date)}">${esc(fmtDateShort(p.date))}</time>
         <span class="ln-item-title">${esc(pt.title)}</span>
       </a>`;
     }).join('');
