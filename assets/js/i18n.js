@@ -35,17 +35,36 @@ function rootPath(rel) {
   return ROOT + rel;
 }
 
-/** Load the i18n JSON from data/i18n.json (relative to root) */
-async function loadTranslations() {
-  const path = rootPath('data/i18n.json');
+/**
+ * Load one language.
+ *
+ * data/i18n.json holds all four and is what a person edits; a visitor is shown
+ * one of them and was downloading 170 KB to read 40. tools/build-data-slices.js
+ * writes data/i18n/<lang>.json from it, and that is what gets fetched here.
+ *
+ * The whole file stays as the fallback. A missing or stale slice then costs
+ * bytes and nothing else, which is the right way round: a page with no words on
+ * it is a far worse failure than a page that loaded more than it needed.
+ */
+async function loadTranslations(lang) {
+  const want = lang || DEFAULT_LANG;
+  if (translations[want]) return;
 
   try {
-    const res = await fetch(path);
+    const res = await fetch(rootPath('data/i18n/' + want + '.json'));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    translations = await res.json();
+    Object.assign(translations, await res.json());
+    return;
+  } catch (e) {
+    console.warn('[i18n] no slice for ' + want + ', falling back to the whole file:', e);
+  }
+
+  try {
+    const res = await fetch(rootPath('data/i18n.json'));
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    Object.assign(translations, await res.json());
   } catch (e) {
     console.warn('[i18n] Could not load translations:', e);
-    translations = {};
   }
 }
 
@@ -130,7 +149,7 @@ function updateLangButtons(lang) {
 /** Set language and persist */
 export async function setLanguage(lang) {
   if (!SUPPORTED_LANGS.includes(lang)) return;
-  if (!translations[lang]) await loadTranslations();
+  if (!translations[lang]) await loadTranslations(lang);
 
   currentLang = lang;
   localStorage.setItem(STORAGE_KEY, lang);
@@ -156,8 +175,10 @@ export function getLang() {
 
 /** Initialise i18n — call once on DOMContentLoaded */
 export async function initI18n() {
-  await loadTranslations();
+  /* Detect first, then fetch. The other order downloaded a language before
+     knowing which one was wanted. */
   const lang = detectLanguage();
+  await loadTranslations(lang);
   await setLanguage(lang);
 
   // Bind lang switcher buttons

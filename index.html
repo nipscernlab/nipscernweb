@@ -64,11 +64,12 @@
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
-  <!-- Preload LCP image — responsive: 400w mobile, 840w desktop (update when news changes) -->
-  <link rel="preload" as="image"
-    imagesrcset="https://cdn.nipscern.com/images/news/ponte-sao-paulo-400.webp 400w, https://cdn.nipscern.com/images/news/ponte-sao-paulo.webp 840w"
-    imagesizes="(max-width:640px) 400px, 840px"
-    fetchpriority="high">
+  <!-- No preloaded hero image. There was one here, at fetchpriority="high", for
+     a news cover that stopped being the lead story months ago: the page never
+     requested that file, so the browser fetched 840px of it ahead of things the
+     page actually needed and then threw it away. The comment beside it said
+     "update when news changes", which is the kind of instruction nobody
+     performs. The lead cover sits below the fold and loads lazily like the rest. -->
 
   <!-- Critical CSS (above-the-fold hero styles inlined to avoid render-blocking) -->
   <style>
@@ -784,7 +785,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       entries.forEach(function (e) {
         if (e.isIntersecting) { load(); io.disconnect(); }
       });
-    }, { rootMargin: '300px' });
+    }, { rootMargin: '100px' });   /* was 300: the embed pulls 4.8 MB of geometry, so it waits until the section is nearly on screen */
     /* Observe the stage, not the iframe. The iframe is display:none until it
        has a src, and an element with no box never intersects anything, so
        observing it was a deadlock: it waited to be seen before being given the

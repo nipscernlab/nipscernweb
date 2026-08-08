@@ -542,10 +542,10 @@ function videoLoop(video) {
    Two lanes. On the left what the laboratory announced, on the right what it
    published, and neither is a footnote to the other.
 
-   Everything on screen is read out of data/news.json and data/publications.json:
-   the dates, the titles, the covers, the venue a paper appeared in and the
-   people who wrote it. Nothing is written by hand here except the lane labels,
-   and those come out of the markup so the i18n pass owns them.
+   Everything on screen is read out of the slices of data/news.json and of
+   data/publications.json: the dates, the titles, the covers, the venue a
+   paper appeared in, the people who wrote it. Nothing is written by hand here
+   except the lane labels, and those come out of the markup so i18n owns them.
    ------------------------------------------------------------------ */
 const LANGS = ['en', 'pt', 'fr', 'no'];
 
@@ -656,6 +656,11 @@ function renderLab(news, pubs) {
      stable since ES2019, so papers sharing a year keep the order the file gives
      them, which is newest first. The old code sorted the whole file, theses
      included, and took one arbitrary 2026 entry out of the six that tie. */
+  /* Works on either shape. data/home-papers.json arrives already filtered and
+     sorted, and running the same filter over it again is a no-op; the fallback
+     hands over the whole archive, where the filter is the thing that makes it
+     usable. tools/build-data-slices.js applies exactly these rules, and the two
+     have to stay in step. */
   const papers = (pubs || [])
     .filter((p) => p.type === 'journal' || p.type === 'conference')
     .slice()
@@ -682,13 +687,26 @@ async function fromTheLab() {
   if (!document.getElementById('lab-news')) return;
   const base = new URL('../../', import.meta.url).href;
   try {
+    /* The slices, not the archives. news.json carries the full body of every
+       post and publications.json all 147 papers; this section shows three
+       headlines and four citations and reads a word of neither body nor
+       archive. tools/build-data-slices.js writes the two small files, and the
+       big ones stay as the fallback, so a stale slice costs bytes and never a
+       blank section. */
+    const grab = (slim, full) =>
+      fetch(base + slim).then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+        .catch((e) => {
+          console.warn('[from the lab] no ' + slim + ', reading the whole file:', e);
+          return fetch(base + full).then((r) => r.json());
+        });
+
     const [news, pubs] = await Promise.all([
-      fetch(base + 'data/news.json').then((r) => r.json()),
-      /* The papers lane can survive without this file, so a failure here does
-         not take the news lane down with it. It does not pass in silence
-         either: an empty lane with no explanation is exactly the kind of bug
-         that goes unnoticed for months. */
-      fetch(base + 'data/publications.json').then((r) => r.json()).catch((e) => {
+      grab('data/home-news.json', 'data/news.json'),
+      /* The papers lane can survive without this, so a failure here does not
+         take the news lane down with it, and it does not pass in silence
+         either: an empty lane with no explanation is the kind of bug that goes
+         unnoticed for months. */
+      grab('data/home-papers.json', 'data/publications.json').catch((e) => {
         console.warn('[from the lab] no publications, the papers lane will be empty:', e);
         return [];
       }),

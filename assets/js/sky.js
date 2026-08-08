@@ -269,6 +269,12 @@ export function sky(canvas) {
     build();
   }
 
+  /* The sky stops when it leaves the screen. Every other animated thing on this
+     page is bound to an observer and this one was not, so 2,851 stars were being
+     redrawn sixty times a second for the whole time a reader spent on the rest
+     of the page, with the hero long gone above them. Nothing about the picture
+     changes; it simply stops being drawn when nobody is looking at it. */
+  let running = true, raf = 0;
   let last = 0;
   function frame(ts) {
     const dt = Math.min((ts - last) / 1000, 0.05);
@@ -300,7 +306,7 @@ export function sky(canvas) {
         if (shooting.life <= 0 || shooting.x > W + 40 || shooting.y > H + 40) shooting = null;
       }
     }
-    requestAnimationFrame(frame);
+    if (running) raf = requestAnimationFrame(frame);
   }
 
   /* The random field the catalogue replaces, kept as the way this fails. */
@@ -317,7 +323,15 @@ export function sky(canvas) {
   if (typeof ResizeObserver !== 'undefined') new ResizeObserver(resize).observe(canvas);
   else addEventListener('resize', resize);
 
-  requestAnimationFrame(frame);
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && !running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
+        else if (!e.isIntersecting && running) { running = false; cancelAnimationFrame(raf); }
+      });
+    }, { rootMargin: "80px" }).observe(canvas);
+  }
+  raf = requestAnimationFrame(frame);
 
   loadCatalogue()
     .then((s) => { stars = s; resize(); })
