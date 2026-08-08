@@ -375,10 +375,14 @@ input, textarea, select { font-family: inherit; }
   /* Lit from the top left. A flat tint is what a pane of glass is not: the
      gradient is the whole difference between a lighter box and a surface with
      an angle to it. */
-  background: linear-gradient(148deg,
+  /* --glass-tint is the same hook the controls use: a pane that has to be read
+     through puts a colour under the wash, and one that does not leaves it out. */
+  background:
+    linear-gradient(148deg,
       rgba(255, 255, 255, 0.10) 0%,
       rgba(255, 255, 255, 0.035) 42%,
-      rgba(255, 255, 255, 0.055) 100%);
+      rgba(255, 255, 255, 0.055) 100%),
+    var(--glass-tint, transparent);
   /* brightness is what does the work on a dark page. Blur alone has almost
      nothing to blur over a near-black background, so the pane would sit at the
      same weight as the page and read as a border and nothing else. Lifting the
@@ -395,11 +399,78 @@ input, textarea, select { font-family: inherit; }
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass {
-    background: linear-gradient(148deg,
+    background:
+      linear-gradient(148deg,
         rgba(255, 255, 255, 0.13) 0%,
         rgba(255, 255, 255, 0.06) 42%,
-        rgba(255, 255, 255, 0.08) 100%);
+        rgba(255, 255, 255, 0.08) 100%),
+      var(--glass-tint, transparent);
   }
+}
+
+/* Glass, at the size of a control
+   ------------------------------------------------------------------
+   The pane above scaled down to something you press: the same light coming
+   from the top left, the same bright line along the top edge, a smaller radius
+   and a lighter drop. Hover lifts it and opens the edge rather than repainting
+   it, because a surface that changes colour under the pointer stops reading as
+   a surface.
+
+   --glass-tint is what lets a control keep its own identity. The brand button
+   puts the blue in as the tint and comes out as blue glass rather than a flat
+   blue rectangle; left unset, the pane is neutral. --glass-edge and
+   --glass-edge-hover do the same for the hairline.
+
+   Everything that carries this is an actual control. Labels do not get it: a
+   thing that looks pressed-able and is not is worse than a plain label. */
+.glass-btn {
+  background:
+    linear-gradient(148deg,
+      rgba(255, 255, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.028) 46%,
+      rgba(255, 255, 255, 0.055) 100%),
+    var(--glass-tint, transparent);
+  backdrop-filter: blur(14px) saturate(180%) brightness(1.22);
+  -webkit-backdrop-filter: blur(14px) saturate(180%) brightness(1.22);
+  border: 1px solid var(--glass-edge, rgba(255, 255, 255, 0.11));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+              0 4px 16px rgba(0, 0, 0, 0.30);
+  transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
+}
+.glass-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--glass-edge-hover, rgba(255, 255, 255, 0.22));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+              0 8px 24px rgba(0, 0, 0, 0.38);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-btn {
+    background:
+      linear-gradient(148deg,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0.06) 46%,
+        rgba(255, 255, 255, 0.09) 100%),
+      var(--glass-tint, transparent);
+  }
+}
+
+/* A pane with panes on it
+   ------------------------------------------------------------------
+   backdrop-filter starts a new backdrop root, and everything inside it can only
+   sample what is painted within that root. A glass control on a glass plate
+   therefore has nothing behind it: the filter runs, costs what it costs, and
+   produces a flat wash. That is what happened to Open Full CGV and to the six
+   links beside it once the plate under them became glass.
+
+   So a plate that carries controls drops the filter and keeps the paint. It
+   loses nothing here, because what sits behind that plate is a flat section
+   colour with nothing in it worth blurring, and the controls on top get their
+   backdrop back. */
+.glass--flat {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .container--narrow { max-width: 860px; }
@@ -562,14 +633,43 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   transition: background var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
+
+  /* Glass from the top of the page, not only once you have scrolled. A bar with
+     no ground is a row of words lying on the page, and over the star field they
+     had nothing to sit on. Subtle on purpose: blur and a little saturation, a
+     thin wash, and the lit top edge. No brightness lift, which is the knob that
+     turns a surface into an object, and the bar should not be an object. */
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      rgba(255, 255, 255, 0.012) 100%),
+    rgba(11, 15, 28, 0.55);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
 }
 
+/* Scrolled it thickens rather than arrives. */
 #nav.scrolled {
-  background: rgba(11, 15, 28, 0.90);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 2px 24px rgba(0,0,0,0.4);
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.015) 100%),
+    rgba(11, 15, 28, 0.80);
+  border-bottom-color: rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12),
+              0 2px 22px rgba(0, 0, 0, 0.38);
+}
+
+/* The bar is now a backdrop root, so anything inside it carrying glass can only
+   sample the bar's own paint, which is a flat gradient. They keep the wash and
+   the lit edge and drop the filter, which is the part that had stopped doing
+   anything but cost. */
+#nav .glass,
+#nav .glass-btn {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .nav-inner {
@@ -661,7 +761,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-link:hover { color: var(--text-primary); background: var(--border-subtle); }
-.nav-link.active { color: var(--brand); background: var(--brand-dim); }
+/* The pane is what says which page this is. It is on the one link and not on
+   the bar: a bar of glass tells you there is a bar, which you knew, while a
+   single lit pane under one word tells you where you are. The brand goes in as
+   the tint so it stays blue rather than becoming neutral glass. */
+.nav-link.active {
+  color: var(--brand);
+  --glass-tint: rgba(91, 156, 246, 0.15);
+  --glass-edge: rgba(91, 156, 246, 0.34);
+  --glass-edge-hover: rgba(91, 156, 246, 0.52);
+}
+.nav-mobile-link.active {
+  --glass-tint: rgba(255, 255, 255, 0.05);
+  background: none;
+}
 
 .nav-right {
   display: flex;
@@ -703,13 +816,17 @@ h1, h2, h3, h4, h5, h6 {
 .nav-mobile-cgv-link:hover { background: var(--border-subtle); color: var(--text-primary); }
 
 /* Language switcher */
+/* The pane goes on the group rather than on each flag. A flag is 24 by 17: at
+   that size a pane of glass is a rounding error, and four of them are four more
+   backdrop filters for nothing. The group is the control. */
 .lang-switcher {
+  /* Inside the bar the filter is off, so without a tint the pill was a hairline
+     around four flags and nothing else. */
+  --glass-tint: rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   gap: var(--sp-1);
   padding: 3px 6px;
-  background: var(--border-subtle);
-  border: 1px solid var(--border-mid);
   border-radius: var(--r-full);
 }
 
@@ -906,38 +1023,46 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.4;
 }
 
-.btn-primary {
-  background: var(--brand);
-  color: var(--text-inverse);
-  border-color: var(--brand);
+/* All three carry .glass-btn. The tint is what keeps them apart: the brand one
+   is almost solid blue with the pane over it, so it stays the loudest thing on
+   the screen and keeps its contrast for the dark text; the outline one is a
+   thin wash of the same blue; the quiet one has no tint at all.
+
+   The border comes down from 1.5px to the 1px the pattern uses, because a
+   heavier line over a lit edge reads as a drawn box rather than a lit one. */
+/* .btn comes after .glass-btn in this file and sets border: 1.5px solid
+   transparent at the same specificity, so it was winning and the lit edge never
+   drew. Restated here, where it is later than both. */
+.btn-primary,
+.btn-ghost,
+.btn-outline {
+  border-width: 1px;
+  border-color: var(--glass-edge, rgba(255, 255, 255, 0.11));
 }
-.btn-primary:hover {
-  background: #7cb5ff;
-  border-color: #7cb5ff;
-  box-shadow: 0 4px 20px rgba(91,156,246,0.3);
-  transform: translateY(-1px);
+.btn-primary:hover,
+.btn-ghost:hover,
+.btn-outline:hover { border-color: var(--glass-edge-hover, rgba(255, 255, 255, 0.22)); }
+
+/* Tinted glass, not a blue rectangle with a gradient on it. At the 94% it
+   started on you cannot see through it, so the filter ran and the button still
+   read as paint. At 45% the page comes through and it is glass; the label goes
+   to near-white to hold its contrast, measured at about 6.6:1 against the
+   resulting ground, which is past AA for text this size. */
+.btn-primary {
+  --glass-tint: rgba(91, 156, 246, 0.45);
+  --glass-edge: rgba(150, 195, 255, 0.55);
+  --glass-edge-hover: rgba(185, 217, 255, 0.85);
+  color: #eaf2ff;
 }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--text-secondary);
-  border-color: var(--border-mid);
-}
-.btn-ghost:hover {
-  background: var(--border-subtle);
-  color: var(--text-primary);
-  border-color: var(--border-strong);
-  transform: translateY(-1px);
-}
+.btn-ghost { color: var(--text-secondary); }
+.btn-ghost:hover { color: var(--text-primary); }
 
 .btn-outline {
-  background: transparent;
+  --glass-tint: rgba(91, 156, 246, 0.16);
+  --glass-edge: rgba(91, 156, 246, 0.45);
+  --glass-edge-hover: rgba(91, 156, 246, 0.7);
   color: var(--brand);
-  border-color: var(--brand);
-}
-.btn-outline:hover {
-  background: var(--brand-dim);
-  transform: translateY(-1px);
 }
 
 .btn-sm {
@@ -1164,6 +1289,8 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: 0 1px 8px rgba(0,0,0,0.8);
 }
 
+/* The card's own colour goes in as the tint and the edge, so five arrows read
+   as five projects rather than five identical widgets. */
 .pc-go {
   flex-shrink: 0;
   width: 28px;
@@ -1172,8 +1299,9 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   border-radius: var(--r-md);
-  border: 1px solid color-mix(in srgb, var(--pc) 28%, transparent);
-  background: rgba(0,0,0,0.25);
+  --glass-tint: color-mix(in srgb, var(--pc) 14%, transparent);
+  --glass-edge: color-mix(in srgb, var(--pc) 34%, transparent);
+  --glass-edge-hover: color-mix(in srgb, var(--pc) 62%, transparent);
   color: var(--pc);
   font-size: 15px;
   transition: background var(--t-base), transform var(--t-base);
@@ -1306,18 +1434,20 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   gap: 7px;
   margin-top: var(--sp-5);
-  padding: 7px 14px;
+  padding: 8px 15px;
   border-radius: var(--r-full);
-  border: 1px solid var(--border-mid);
-  background: transparent;
   font-size: 12px;
   font-family: inherit;
   color: var(--text-muted);
-  transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
 }
-.pc-pause:hover { color: var(--text-primary); border-color: var(--border-strong); }
+.pc-pause:hover { color: var(--text-primary); }
 .pc-pause i { font-size: 13px; }
-.pc-pause.is-paused { color: var(--text-secondary); border-color: var(--border-strong); background: rgba(255,255,255,0.03); }
+/* Pressed is a state of the control, so it is the edge that says so. */
+.pc-pause.is-paused {
+  --glass-edge: rgba(255, 255, 255, 0.26);
+  --glass-tint: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
 
 /* ── HITS: the pulse train ──────────────────────────────────────
    A trace on a screen, so it runs clean off the left and right edges: a signal
@@ -2890,10 +3020,9 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
        point: the card reads as sitting on a plate rather than next to a strip. */
     width: min(600px, calc((100vw - 1000px) / 2 + 260px));
     height: clamp(560px, 92%, 940px);
-    /* Black, not the page colour. The recording is on a black stage, measured
-       at Y=16 in limited range, which is video black exactly, so the panel can
-       be larger than the footage with no visible edge where one ends. */
-    background: #000;
+    /* Nothing of its own. The footage covers the panel, and where the fog has
+       thinned it out the page is what should be behind it, not a slab. */
+    background: transparent;
     border: 1px solid var(--border-subtle);
     border-right: 0;
     border-radius: var(--r-2xl) 0 0 var(--r-2xl);
@@ -2902,19 +3031,14 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   .cube-rail video {
     display: block;
     position: absolute;
-    right: 0;
-    /* On the floor. Centred in the panel, the cube had its lit floor running
-       across the middle, which read as the bottom edge of a rectangle pasted
-       into the page rather than as a floor. Sat on the bottom it is a floor,
-       and all the height that was split above and below is now above, where
-       there is nothing but black for it to blend into. */
-    bottom: 0;
-    /* Its own width, not the panel's. The panel is wide because it runs behind
-       the card; the cube would have grown with it and gone behind the card with
-       it. It reaches about a hundred pixels past the card edge, so the cube is
-       partly covered rather than mostly missing. */
-    width: min(430px, calc((100vw - 1000px) / 2 + 130px));
-    height: auto;
+    /* Filling the panel, not standing in it. Given a width of its own and
+       sat on the floor, it left the rest of the panel as black margin, which
+       is what black is when there is nothing behind it. This footage is not
+       shot on a black stage, so there is nothing for a margin to hide in. */
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     /* Thicker fog on the way out: it starts giving way a fifth of the way
        across and is gone before the edge, so the panel does not end, it
        disperses. */
@@ -2974,12 +3098,10 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   margin-top: var(--sp-6);
   padding: 8px 16px 8px 10px;
   border-radius: var(--r-full);
-  border: 1px solid var(--border-subtle);
   color: var(--text-muted);
   text-align: left;
-  transition: border-color var(--t-fast), background var(--t-fast);
 }
-.cgv-credit:hover { border-color: var(--border-strong); background: rgba(255,255,255,0.02); }
+.cgv-credit:hover { color: var(--text-secondary); }
 .cgv-credit img { flex: none; border-radius: var(--r-md); }
 .cgv-credit > span { display: flex; flex-direction: column; line-height: 1.3; }
 .cgv-credit b { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
@@ -3005,14 +3127,17 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    being a box floating above a picture and becomes the top of the instrument. */
 /* The plate sits under the viewer, so its ground carries the viewer's dark
    down into the page rather than the other way about. */
+/* One pane for the whole plate, not one per figure. Four panes in a row made
+   four objects out of what is a single label bolted to the bottom of the
+   instrument; the plate is the object, and the figures and the way in are
+   things on it. It carries .glass, and only the corners and the missing top
+   edge are stated here, because it is joined to the viewer above it. */
 .cgv-specs-band {
   width: calc(100% - 2 * var(--container-pad));
   max-width: var(--container-max);
   margin: 0 auto;
-  border: 1px solid var(--border-mid);
   border-top: 0;
   border-radius: 0 0 var(--r-2xl) var(--r-2xl);
-  background: linear-gradient(180deg, #05070f 0%, var(--bg-0) 100%);
   overflow: hidden;
 }
 .cgv-specs-inner { padding: 0 var(--sp-6); }
@@ -3040,7 +3165,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-3) var(--sp-5);
+  gap: var(--sp-2) var(--sp-3);
   padding: var(--sp-5) 0 var(--sp-6);
   border-top: 1px solid var(--border-subtle);
   font-size: 12px;
@@ -3050,8 +3175,10 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  padding: 7px 13px;
+  border-radius: var(--r-full);
   color: var(--text-muted);
-  transition: color var(--t-fast);
+  transition: color var(--t-fast), border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
 }
 .cgv-links a:hover { color: var(--text-primary); }
 .cgv-links i { font-size: 14px; flex: none; color: var(--accent-cgv); }
@@ -3098,7 +3225,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   align-items: flex-start;
   gap: 6px;
   padding: var(--sp-5) var(--sp-5);
-  border-left: 1px solid var(--border-subtle);
+  border-left: 1px solid rgba(255, 255, 255, 0.09);
 }
 .cgv-spec:first-child { border-left: 0; padding-left: 0; }
 /* Small. These are reference figures on a plate, not headlines: at display size
@@ -4711,8 +4838,6 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-mid);
   color: var(--text-secondary);
   display: flex;
   align-items: center;
@@ -4944,14 +5069,19 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 /* ============================================================
    About & Science — info highlight cards (home)
    ============================================================ */
+/* Glass, and the panel behind the right-hand one shows through it. The tint is
+   the old card colour at three quarters rather than a wash of white: the video
+   running underneath would otherwise come through the paragraph, and a card you
+   can read is worth more than a card you can see through. */
 .info-hl-card {
+  --glass-tint: rgba(19, 24, 38, 0.74);
+  --glass-edge: rgba(255, 255, 255, 0.10);
+  --glass-edge-hover: rgba(255, 255, 255, 0.20);
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
   padding: var(--sp-8);
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--r-xl);
   text-decoration: none;
   color: inherit;

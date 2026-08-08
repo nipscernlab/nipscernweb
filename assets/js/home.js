@@ -609,12 +609,11 @@ function videoLoop(video) {
     video.load();
   };
 
-  /* Inside the projects grid a loop answers to the pause button; outside it,
-     only to being on screen. The cube in the About panel is the second case,
-     and registering it as the first would have frozen it for good: the only way
-     back from a pause is hovering a card, and it is not in one. */
-  const gate = video.closest('.pc-card') ? whileVisibleCard : whileVisible;
-  gate(video,
+  /* Every loop on the page answers to the one control, the panel in About &
+     Science included. Hovering to resume is a card affordance and the panel is
+     not a card, so for it the button is simply on or off: visible and playing,
+     or held. */
+  whileVisibleCard(video,
     () => { arm(); const p = video.play(); if (p) p.catch(() => {}); },
     () => video.pause());
 }
