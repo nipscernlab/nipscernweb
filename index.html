@@ -138,8 +138,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=1184705864" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=1184705864"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=a14c10bfdd" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=a14c10bfdd"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -200,7 +200,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        comes out on the deadline without leaving a hole in the composition. -->
   <a class="top-banner" href="https://docs.google.com/forms/d/e/1FAIpQLSeqSGVJgTFfXdOrdoWYK6uH0Jvvujd9RmhW5ANzOjLQfwk4DQ/viewform" target="_blank" rel="noopener">
     <i class="ph ph-megaphone" aria-hidden="true"></i>
-    <span data-i18n="home.recruit.text">Vagas de iniciação científica abertas. Inscrições até 28 de agosto.</span>
+    <span data-i18n="home.recruit.text">Undergraduate research positions open. Applications until 28 August.</span>
     <strong data-i18n="home.recruit.cta">Inscreva-se</strong>
     <i class="ph ph-arrow-right" aria-hidden="true"></i>
   </a>
@@ -251,11 +251,11 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       <img src="assets/images/undraw/undraw_explore.svg" alt=""
            width="423" height="880" decoding="async"
            onerror="this.closest('.stargazer').style.display='none'">
-      <figcaption class="stargazer-note" data-i18n="home.sky.note_plain">The sky above him is drawn at random on every visit. No two visitors see the same one.</figcaption>
+      <figcaption class="stargazer-note" data-i18n="home.sky.note_plain">The sky above him is the real one: every star the unaided eye can reach, each where it actually is. What changes on every visit is the direction you are looking.</figcaption>
       <!-- Same sentence with a slot for the visitor count. It sits in the DOM so
            the i18n pass keeps it in the current language for free; the script at
            the end of the page swaps it in once the count arrives. -->
-      <template id="sky-note-tpl"><span data-i18n="home.sky.note">The sky above him is drawn at random on every visit. Of the {n} people who have been here, none saw this one.</span></template>
+      <template id="sky-note-tpl"><span data-i18n="home.sky.note">The sky above him is the real one: every star the unaided eye can reach, each where it actually is. What is drawn fresh on every visit is the direction you are looking. Of the {n} people who have been here, not one got this view.</span></template>
     </figure>
 
     <!-- ======================================================
@@ -301,9 +301,24 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
             ATLAS Calorimeter
           </div>
           <h2 class="display-md" id="cgv-title" data-i18n="home.cgv.title">Live Collision Event</h2>
+          <!-- The fallback text here is what shows in the moment before i18n runs,
+               so it has to be the current English and not the sentence this key
+               used to hold. -->
           <p class="body-lg" data-i18n="home.cgv.subtitle">
-            Interactive 3D rendering of the ATLAS calorimeter. Each coloured cell is energy left behind by particles from a collision.
+            The ATLAS calorimeter drawn in 3D, live and in the browser. Every lit cell is energy a particle left behind on its way through.
           </p>
+
+          <!-- Whose viewer this is, and the way to the page about it. The section
+               showed the most substantial piece of software the group has built
+               without once saying it was theirs or offering a way in. -->
+          <a class="cgv-credit" href="projects/cgv">
+            <img src="assets/icons/icon_cgv.svg" alt="" width="30" height="30" loading="lazy" decoding="async">
+            <span>
+              <b>CGV Web</b>
+              <span data-i18n="home.cgv.built">Built at the laboratory. See how it is made</span>
+            </span>
+            <i class="ph ph-arrow-right" aria-hidden="true"></i>
+          </a>
         </div>
       </div>
 
@@ -427,7 +442,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
             <i class="ph ph-circles-three-plus" aria-hidden="true"></i>
             <span data-i18n="home.highlights.eyebrow">Laboratory</span>
           </div>
-          <h2 class="display-md" id="info-hl-title" data-i18n="home.highlights.title">About &amp; Science</h2>
+          <h2 class="display-md" id="info-hl-title" data-i18n="home.highlights.title">About & Science</h2>
         </div>
 
         <div class="grid grid-2 stagger-children" style="gap:var(--sp-6);margin-top:var(--sp-10);max-width:960px;margin-left:auto;margin-right:auto">
@@ -440,9 +455,9 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
             </div>
             <div class="info-hl-eyebrow" data-i18n="nav.about">About Us</div>
             <h3 class="info-hl-heading" data-i18n="home.highlights.about_heading">Meet the Team</h3>
-            <p class="info-hl-body" data-i18n="home.highlights.about_body">Researchers, engineers, and students working at the intersection of particle physics, hardware design, and scientific computing, at UFJF and at CERN.</p>
+            <p class="info-hl-body" data-i18n="home.highlights.about_body">Researchers, engineers and undergraduates, across two laboratories: NIPS at UFJF and Route Salam at CERN. Particle physics, hardware design and scientific computing, and the same people on both sides of it.</p>
             <div class="info-hl-cta">
-              <span data-i18n="home.about_card.cta">Explore the lab</span>
+              <span data-i18n="home.about_card.cta">Meet the people</span>
               <i class="ph ph-arrow-right" aria-hidden="true"></i>
             </div>
           </a>
@@ -538,7 +553,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           </div>
           <h2 class="display-md" id="projects-title" data-i18n="home.projects.title">Our Projects</h2>
           <p class="body-lg" style="max-width:520px;margin:var(--sp-4) auto 0" data-i18n="home.projects.subtitle">
-            Tools, architectures, and systems built at NIPS-CERN.
+            Tools, architectures and systems built at NIPS-CERN, from processor design to calorimeter visualisation.
           </p>
           <!-- One control for the five media in the grid. Paused, a card runs
                only while the pointer is on it, and always from where it stopped.
@@ -808,7 +823,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        Deferred: nothing here is needed for first paint. -->
   <script src="assets/js/vendor/gsap.min.js" defer></script>
   <script src="assets/js/vendor/ScrollTrigger.min.js" defer></script>
-  <script type="module" src="assets/js/main.js?v=1184705864"></script>
+  <script type="module" src="assets/js/main.js?v=a14c10bfdd"></script>
   <script type="module" src="assets/js/home.js?v=b7a2ea3da8"></script>
 
 <script>
