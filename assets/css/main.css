@@ -85,6 +85,13 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('../fonts/plex-mono-700-latin.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ---- Design Tokens ---- */
 :root {
@@ -2438,13 +2445,17 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   margin-bottom: var(--sp-6);
   border-bottom: 1px solid var(--border-mid);
 }
+/* News and Papers name the two halves of the section, so they are set as
+   headings rather than as captions: the real bold cut, at full text colour.
+   The tracking comes down a little, because letters that heavy at this size
+   need less air between them to hold together as a word. */
 .lane-title {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  font-weight: 700;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 .lane-all {
   display: inline-flex;
@@ -4652,18 +4663,31 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   animation: vt-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* The navigation and the announcement strip are the same on every page, so they
-   are lifted out of the page snapshot and given no animation of their own. They
-   then sit still while the page changes underneath them, which is the whole
-   point: what persists should look like it persisted. */
+/* The navigation is the same bar on every page, so it is lifted out of the page
+   snapshot and sits still while the page changes underneath it: what persists
+   should look like it persisted.
+
+   Its contents are not identical, though. One link carries .active, and the bar
+   has no background until it is scrolled, so painting the outgoing copy under
+   the incoming one showed two navigations through each other with two current
+   pages marked at once. The outgoing copy is dropped instead, and the incoming
+   one is there from the first frame.
+
+   The announcement strip is deliberately not named. It exists only on the home
+   page, and a name that matches on one side of a navigation and not the other
+   leaves the old strip painted over the new page for the length of the
+   transition. It travels inside the page snapshot, which is where a thing that
+   belongs to one page belongs. */
 #nav { view-transition-name: site-nav; }
-.top-banner { view-transition-name: site-banner; }
-::view-transition-group(site-nav),
-::view-transition-group(site-banner) { animation-duration: 0s; }
-::view-transition-old(site-nav),
-::view-transition-new(site-nav),
-::view-transition-old(site-banner),
-::view-transition-new(site-banner) { animation: none; mix-blend-mode: normal; }
+::view-transition-group(site-nav) { animation-duration: 0s; }
+::view-transition-old(site-nav) { animation: none; opacity: 0; }
+::view-transition-new(site-nav) { animation: none; opacity: 1; mix-blend-mode: normal; }
+
+/* Set by the pagereveal handler in main.js on the elements it reveals early, so
+   the first captured frame has them in place rather than mid-fade. Removed two
+   frames later, which is why it does not need !important: it only has to
+   outrank the entrance rules above, and it is further down the file. */
+.vt-settled, .vt-settled > * { transition: none; }
 
 @media (prefers-reduced-motion: reduce) {
   /* The transition itself goes, not just its movement. Someone who asked for

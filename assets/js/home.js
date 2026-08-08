@@ -36,7 +36,24 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
    says: a medium runs when it is visible, and when either the grid is playing
    or the pointer is on it. */
 const cardAnims = [];
-let gridPaused = false;
+/* Remembered between visits, under the same convention as the language.
+
+   Only an explicit choice is stored. Absent one the grid plays, so a first
+   visit is never met with a page that has frozen itself and no way of knowing
+   that was deliberate. Reading it is wrapped because localStorage throws rather
+   than returning null in a private window, and a stored preference is not worth
+   a page that fails to start. */
+const ANIM_KEY = 'nipscern_anim';
+
+function readPaused() {
+  try { return localStorage.getItem(ANIM_KEY) === 'paused'; } catch (e) { return false; }
+}
+
+function writePaused(v) {
+  try { localStorage.setItem(ANIM_KEY, v ? 'paused' : 'playing'); } catch (e) {}
+}
+
+let gridPaused = readPaused();
 
 function syncAnim(a) {
   const should = a.visible && (!gridPaused || a.hovered);
@@ -823,10 +840,14 @@ function projectsPauseButton() {
   };
   btn.addEventListener('click', () => {
     gridPaused = !gridPaused;
+    writePaused(gridPaused);
     cardAnims.forEach(syncAnim);
     label();
   });
   document.addEventListener('langchange', () => setTimeout(label, 0));
+  /* Anything that registered before this ran is still holding the default, so
+     a remembered pause is applied to it here. */
+  cardAnims.forEach(syncAnim);
   label();
 }
 

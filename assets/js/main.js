@@ -610,6 +610,34 @@ function initGridOverlay() {
 if (!window.__nipscernBooted) {
   window.__nipscernBooted = true;
 
+  /* The page that arrives under a view transition
+     ----------------------------------------------------------------
+     Entrance elements sit at opacity 0 until the IntersectionObserver marks
+     them, and that observer only runs after the translations are in. On an
+     ordinary load nobody sees the gap: the page is being painted for the first
+     time either way. Under a cross-document view transition that frame is the
+     one the browser captures as the new page, so the transition would fade from
+     a full page to an empty one and fill in afterwards, which reads as a page
+     that failed to load.
+
+     pagereveal fires before that capture and carries the transition object, so
+     nothing here touches an ordinary navigation. Anything already inside the
+     first screenful is put in place now, with its transition suppressed for the
+     frame so it lands rather than starts fading. Everything below the fold is
+     left to the observer, which is where the effect is meant to be seen. */
+  window.addEventListener('pagereveal', (e) => {
+    if (!e.viewTransition) return;
+    const h = window.innerHeight || 0;
+    const early = document.querySelectorAll('.fade-up, .fade-in, .stagger-children');
+    early.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.top < h && r.bottom > 0) el.classList.add('visible', 'vt-settled');
+    });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.querySelectorAll('.vt-settled').forEach((el) => el.classList.remove('vt-settled'));
+    }));
+  });
+
   document.addEventListener('DOMContentLoaded', async () => {
     initNav();
     initFooter();
