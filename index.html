@@ -95,8 +95,13 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
 .hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;padding-top:var(--nav-h)}
 .hero-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .hero-bg::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(91,156,246,.10) 1px,transparent 1px);background-size:52px 52px;mask-image:radial-gradient(ellipse 80% 70% at 50% 45%,black 10%,transparent 100%)}
-.hero-bg::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:700px;height:700px;border-radius:50%;background:radial-gradient(ellipse 30% 30% at 50% 50%,rgba(91,156,246,.14) 0%,transparent 60%),radial-gradient(ellipse 65% 55% at 50% 50%,rgba(91,156,246,.04) 0%,transparent 80%)}
-#hero-stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero-bg::after{content:'';position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);width:min(1180px,96vw);height:min(820px,70vh);background:radial-gradient(ellipse 40% 44% at 50% 50%,rgba(7,10,18,.80) 0%,rgba(7,10,18,.44) 46%,transparent 76%),radial-gradient(ellipse 30% 32% at 50% 50%,rgba(91,156,246,.15) 0%,transparent 62%),radial-gradient(ellipse 60% 54% at 50% 50%,rgba(91,156,246,.05) 0%,transparent 82%)}
+/* Taller than the hero and pulled up, because the scroll parallax drifts it
+   down by 18% and a canvas that only covered the hero would leave a starless
+   band at the foot of the section. Kept identical to the rule in main.css:
+   this copy is what the canvas measures itself against on the first frame, and
+   the two diverging is how the sky ended up generating for the wrong size. */
+#hero-stars{position:absolute;left:0;right:0;top:-22%;width:100%;height:144%;pointer-events:none;will-change:transform;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 48%,rgba(0,0,0,.62) 64%,rgba(0,0,0,.22) 74%,transparent 82%);mask-image:linear-gradient(180deg,#000 0%,#000 48%,rgba(0,0,0,.62) 64%,rgba(0,0,0,.22) 74%,transparent 82%)}
 .hero-content{position:relative;z-index:1;width:100%;max-width:var(--container-max);margin:0 auto;padding:80px var(--container-pad);text-align:center}
 /* RECRUIT-BANNER: faixa temporaria de IC. Remover junto com o bloco no HTML. */
 .hero-recruit{display:inline-flex;align-items:center;gap:9px;margin-bottom:28px;padding:9px 18px;border-radius:999px;border:1px solid rgba(91,156,246,.38);background:rgba(91,156,246,.10);color:var(--text-secondary);font-size:var(--text-sm);line-height:1.35;text-decoration:none;transition:background .25s ease,border-color .25s ease,transform .25s ease}
@@ -132,14 +137,20 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=47449f365b" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=47449f365b"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=f7a98d4102" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=f7a98d4102"></noscript>
 
   <!-- Google Fonts (async) -->
 
   <!-- Icons (lazy) -->
 
-  <!-- Schema.org Organization -->
+  <!-- Schema.org Organization.
+       Two parent organisations, because there are two laboratories and the
+       group belongs to both. The earlier version named only UFJF and described
+       the rest as work "in collaboration with CERN", which is wrong: the group
+       is part of CERN, it does not collaborate with it from outside. This is
+       the machine-readable copy of the same sentence the page shows the reader,
+       so it has to say the same thing. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -148,19 +159,28 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
     "alternateName": "Núcleo de Instrumentação e Processamento de Sinais",
     "url": "https://www.nipscern.com",
     "logo": "https://www.nipscern.com/assets/images/logo.png",
-    "description": "Research and development laboratory at the Federal University of Juiz de Fora, working in collaboration with CERN on high energy physics and scientific computing.",
-    "parentOrganization": {
-      "@type": "CollegeOrUniversity",
-      "name": "Universidade Federal de Juiz de Fora",
-      "url": "https://www.ufjf.br"
-    },
+    "description": "Two laboratories working in high energy physics, scientific computing, 3D visualisation, hardware systems and artificial intelligence: NIPS, at the Federal University of Juiz de Fora, in Brazil, and Route Salam, at CERN, in Switzerland.",
+    "parentOrganization": [
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "Universidade Federal de Juiz de Fora",
+        "url": "https://www.ufjf.br"
+      },
+      {
+        "@type": "ResearchOrganization",
+        "name": "CERN",
+        "alternateName": "European Organization for Nuclear Research",
+        "url": "https://home.cern"
+      }
+    ],
     "contactPoint": {
       "@type": "ContactPoint",
       "email": "contact@nipscern.com",
       "contactType": "research"
     },
     "sameAs": [
-      "https://github.com/nipscernlab"
+      "https://github.com/nipscernlab",
+      "https://gitlab.com/nips-cern"
     ]
   }
   </script>
@@ -274,8 +294,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
          so the key below reads the picture on screen. -->
     <section class="cgv-section" aria-labelledby="cgv-title">
       <div class="container">
-        <div class="cgv-header fade-up">
-          <div class="eyebrow">
+        <div class="cgv-header section-header--center fade-up">
+          <div class="eyebrow" style="justify-content:center">
             <i class="ph ph-atom" aria-hidden="true"></i>
             ATLAS Calorimeter
           </div>
@@ -283,15 +303,18 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <p class="body-lg" data-i18n="home.cgv.subtitle">
             Interactive 3D rendering of the ATLAS calorimeter. Each coloured cell is energy left behind by particles from a collision.
           </p>
-          <ul class="cgv-facts" aria-label="Calorimeter figures">
-            <li><b>186,000</b> <span data-i18n="home.cgv.f_cells">cells</span></li>
-            <li><b>6</b> <span data-i18n="home.cgv.f_sub">sub-detectors</span></li>
-            <li><b>|&eta;|&nbsp;&le;&nbsp;4.9</b> <span data-i18n="home.cgv.f_eta">coverage</span></li>
-            <li><b>WebGL2</b> <span data-i18n="home.cgv.f_stack">in the browser</span></li>
-          </ul>
         </div>
       </div>
 
+      <!-- The spec plate, bolted to the top of the instrument it describes.
+           These four figures used to run along a single line as "186,000 cells
+           6 sub-detectors |eta| <= 4.9 coverage WebGL2 in the browser", where
+           nothing told the eye which word belonged to which number and the row
+           read as one long string. Each is its own cell now: the value in the
+           monospace this site keeps for measured things, the quantity named
+           underneath it. The band runs the full width and darkens downward, so
+           the header stops being a box floating above a picture and becomes the
+           top of the viewer. -->
       <!-- A recorded event sits underneath as a poster. The live viewer is
            served by a Cloudflare Worker that proxies the cgv-web repository, so
            it is not present in a local checkout and would not exist if the
@@ -307,21 +330,95 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           loading="lazy"
           title="ATLAS Calorimeter 3D Preview"
           referrerpolicy="no-referrer"></iframe>
-
-        <a href="projects/cgvweb/" target="_blank" rel="noopener noreferrer"
-           class="btn btn-ghost btn-sm cgv-open-btn" id="cgv-open-btn"
-           data-i18n="home.cgv.btn_fullcgv">
-          <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
-          Open Full CGV
-        </a>
       </div>
+
+      <!-- The data plate, under the instrument rather than over it.
+           It sat above the viewer, which put four numbers between the reader
+           and the thing the numbers describe, and left a stretch of empty
+           ground between the paragraph and the plate. Underneath, it reads the
+           way the plate on a piece of equipment reads: here is the instrument,
+           and here is what it is.
+
+           The way out lives here too. It used to float over the top-left corner
+           of the viewer on a blurred panel, covering the event it was inviting
+           you to look at. -->
+      <div class="cgv-specs-band fade-up">
+        <div class="cgv-specs-inner">
+          <div class="cgv-specs-row">
+            <dl class="cgv-specs" aria-label="Calorimeter figures">
+            <div class="cgv-spec">
+              <dt data-i18n="home.cgv.f_cells">cells</dt>
+              <dd>186,000</dd>
+            </div>
+            <div class="cgv-spec">
+              <dt data-i18n="home.cgv.f_sub">sub-detectors</dt>
+              <dd>6</dd>
+            </div>
+            <div class="cgv-spec">
+              <dt data-i18n="home.cgv.f_eta">coverage</dt>
+              <dd>|&eta;|&nbsp;&le;&nbsp;4.9</dd>
+            </div>
+            <div class="cgv-spec">
+              <dt data-i18n="home.cgv.f_stack">in the browser</dt>
+              <dd>WebGL&nbsp;2</dd>
+            </div>
+            </dl>
+            <a href="projects/cgvweb/" target="_blank" rel="noopener noreferrer"
+               class="btn btn-primary btn-sm cgv-open" data-i18n="home.cgv.btn_fullcgv">
+              <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+              Open Full CGV
+            </a>
+          </div>
+
+          <!-- Where to go next, rather than one button reading "Open Full CGV"
+               in body size with nothing beside it. Every one of these already
+               existed somewhere on the site and none of it was reachable from
+               the section that shows the thing.
+
+               The three papers are the point. The viewer is nineteen years old:
+               a ROOT tool in 2007, a journal paper in 2012, and the rewrite for
+               the browser in 2026. Laying them out by year says that in one line
+               and says it with the group's own publications. -->
+          <nav class="cgv-links" aria-label="More about CGV Web">
+            <a href="projects/cgv" target="_blank" rel="noopener">
+              <i class="ph ph-cube" aria-hidden="true"></i>
+              <span data-i18n="home.cgv.l_project">How it is built</span>
+            </a>
+            <a href="https://www.nipscern.com/library/cgvweb/twiki" target="_blank" rel="noopener">
+              <i class="ph ph-book-open-text" aria-hidden="true"></i>
+              <span data-i18n="home.cgv.l_docs">Documentation</span>
+            </a>
+            <a href="news/post.html?id=cgvweb-atlas-control-room" target="_blank" rel="noopener">
+              <i class="ph ph-newspaper" aria-hidden="true"></i>
+              <span data-i18n="home.cgv.l_story">The day it went up in the ATLAS control room</span>
+            </a>
+
+            <span class="cgv-links-sep" aria-hidden="true"></span>
+
+            <span class="cgv-links-label" data-i18n="home.cgv.l_papers">The papers behind it</span>
+            <a href="/pdf-viewer.html?id=pub-2007-acat-A-ROOT-Tool" target="_blank" rel="noopener">
+              <i class="ph ph-file-pdf" aria-hidden="true"></i>
+              <b>2007</b> <span>ACAT</span>
+            </a>
+            <a href="/pdf-viewer.html?id=pub-2012-Three-dimensional-event" target="_blank" rel="noopener">
+              <i class="ph ph-file-pdf" aria-hidden="true"></i>
+              <b>2012</b> <span>Comput. Phys. Commun.</span>
+            </a>
+            <a href="/pdf-viewer.html?id=pub-2026-cba-cgvweb" target="_blank" rel="noopener">
+              <i class="ph ph-file-pdf" aria-hidden="true"></i>
+              <b>2026</b> <span>CBA</span>
+            </a>
+          </nav>
+        </div>
       </div>
     </section>
 
     <!-- ======================================================
          ABOUT US & PUBLICATIONS HIGHLIGHTS
          ====================================================== -->
-    <section class="section info-highlights" aria-labelledby="info-hl-title" style="background:var(--bg-1);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+    <!-- No border-top here. The calorimeter stage above already ends on a rule
+         of its own, and a second hairline a pixel below it reads as a seam. -->
+    <section class="section info-highlights" aria-labelledby="info-hl-title" style="background:var(--bg-1);border-bottom:1px solid var(--border-subtle)">
       <div class="container">
         <div class="section-header section-header--center fade-up">
           <div class="eyebrow" style="justify-content:center">
@@ -368,41 +465,62 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
     </section>
 
     <!-- ======================================================
-         LATEST FROM THE LAB
-         ====================================================== -->
-    <!-- ======================================================
          FROM THE LAB
          ------------------------------------------------------
-         One piece of news given the room it deserves, with the rest as a
-         compact row underneath. The old version was two placeholder boxes side
-         by side, each the same size, which said the latest paper and the latest
-         news carry equal weight and gave neither enough space to be read.
+         Two lanes, side by side and of equal standing: what the laboratory
+         announced, and what it published.
+
+         The version before this led with one news story at full width and put
+         the newest paper as the last line of a list beneath it, below the third
+         news item. That is the wrong order of importance. News is the report
+         that something happened; a paper is the work itself, and the group has
+         147 of them going back to 2001.
+
+         The two lanes are not built the same, because the two things are not
+         the same. A news item has a cover and an editorial voice, so it gets
+         the picture. A paper has a venue, a year and an author list, so it gets
+         typography.
          ====================================================== -->
     <section class="section" id="latest-section" aria-labelledby="latest-title">
       <div class="container">
-        <div class="lab-head fade-up">
-          <div>
-            <div class="eyebrow">
-              <i class="ph ph-newspaper" aria-hidden="true"></i>
-              <span data-i18n="home.latest.eyebrow">From the Lab</span>
-            </div>
-            <h2 class="display-md" id="latest-title" data-i18n="home.latest.title">Latest From the Lab</h2>
+        <div class="lab-head section-header--center fade-up">
+          <div class="eyebrow" style="justify-content:center">
+            <i class="ph ph-newspaper" aria-hidden="true"></i>
+            <span data-i18n="home.latest.eyebrow">From the Lab</span>
           </div>
-          <a class="lab-all" href="news/">
-            <span data-i18n="home.latest.all">All news</span>
-            <i class="ph ph-arrow-right" aria-hidden="true"></i>
-          </a>
+          <h2 class="display-md" id="latest-title" data-i18n="home.latest.title">Latest From the Lab</h2>
         </div>
 
-        <!-- Filled from data/news.json and data/publications.json by home.js -->
-        <!-- The two labels the renderer injects. They live in the markup so the
-             i18n pass keeps them in the current language, and the renderer reads
-             them back rather than carrying its own copies of four languages. -->
+        <!-- Filled from data/news.json and data/publications.json by home.js.
+             The labels the renderer injects live here in the markup, so the
+             i18n pass keeps them in the current language and the renderer reads
+             them back instead of carrying its own copies of four languages. -->
         <span hidden data-i18n="home.latest.read">Read the story</span>
-        <span hidden data-i18n="home.latest.paper">Paper</span>
+        <span hidden data-i18n="home.latest.authors_more">and {n} others</span>
 
-        <div class="lab-feature" id="lab-feature" aria-busy="true"></div>
-        <div class="lab-rest" id="lab-rest"></div>
+        <div class="lab-grid">
+          <section class="lab-lane" aria-labelledby="lab-news-h">
+            <div class="lane-head">
+              <h3 class="lane-title" id="lab-news-h" data-i18n="home.latest.news_lane">News</h3>
+              <a class="lane-all" href="news/">
+                <span data-i18n="home.latest.all">All news</span>
+                <i class="ph ph-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+            <div id="lab-news" aria-busy="true"></div>
+          </section>
+
+          <section class="lab-lane" aria-labelledby="lab-papers-h">
+            <div class="lane-head">
+              <h3 class="lane-title" id="lab-papers-h" data-i18n="home.latest.papers_lane">Papers</h3>
+              <a class="lane-all" href="publications.html">
+                <span data-i18n="home.latest.all_papers">All publications</span>
+                <i class="ph ph-arrow-right" aria-hidden="true"></i>
+              </a>
+            </div>
+            <div id="lab-papers" aria-busy="true"></div>
+          </section>
+        </div>
       </div>
     </section>
 
@@ -424,7 +542,34 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
 
         <div class="pc-grid stagger-children" id="projects-grid">
 
-          <a href="projects/sapho" class="pc-card" style="--pc:var(--accent-sapho)">
+          <!-- Every card carries its medium edge to edge, behind the words. The
+               AURORA card already worked this way and was the only one that did;
+               the other four kept their work in a 16:10 box in the lower half,
+               which framed the thing as an illustration of the project rather
+               than as the project. The fade at the edges is per card, because
+               each medium leaves the frame differently. -->
+          <!-- The card is black rather than tinted, because the footage is gold
+               on true black and the tint the other cards carry would put a gold
+               wash over gold traces and flatten both. The clip was shot white on
+               black and graded to the project's own accent, so the circuit runs
+               into the card with no edge at all.
+
+               The author cut it as a 65-frame cycle: measured, frame 65 returns
+               to frame 0 within a rounding error, so it already loops and needs
+               none of the forward-then-backward trick the other two use. Six of
+               those frames are an identical dark hold at the end, though, which
+               stops the motion dead for a fifth of a second every time round.
+               Those are dropped, and the ten frames that would then jump are
+               dissolved into the head of the clip instead, which puts the seam
+               at 2.05 against a 1.35 mean step between neighbouring frames: it
+               reads as an ordinary frame, not as a join. -->
+          <a href="projects/sapho" class="pc-card pc-card--dark" style="--pc:var(--accent-sapho)">
+            <div class="pc-media pc-media--sapho" aria-hidden="true">
+              <video data-media="sapho-loop"
+                     data-src="assets/videos/sapho-circuit-loop.mp4"
+                     poster="assets/images/projects/sapho-circuit-poster.webp"
+                     muted loop playsinline preload="none"></video>
+            </div>
             <div class="pc-top">
               <img class="pc-mark" src="assets/icons/sapho.svg" alt="SAPHO mark" width="40" height="40" loading="lazy">
               <div class="pc-id">
@@ -433,16 +578,18 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
               </div>
               <span class="pc-go" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
             </div>
+            <!-- No caption. The other captions name something the laboratory
+                 measured or computed; this footage is somebody else's and says
+                 nothing about SAPHO in particular, so a line under it would be
+                 dressing stock material up as the group's own work. The
+                 Buddhabrot the card used to carry, which the group's processor
+                 really did compute, goes to the hero of the SAPHO page, which
+                 is where the plan already asks for it. -->
             <p class="pc-desc" data-i18n="projects.sapho.short">Design a processor, compile for it, simulate it, put it on an FPGA. One toolchain for the whole path.</p>
-            <div class="pc-preview" aria-hidden="true">
-              <figure class="pc-shot">
-              <img src="assets/images/news/semic-2025-sapho-mandelbrot.webp" alt="" loading="lazy" decoding="async">
-              <figcaption data-i18n="home.projects.p_sapho">Buddhabrot, computed on a SAPHO soft-core</figcaption>
-            </figure>
-            </div>
           </a>
 
           <a href="projects/yanc" class="pc-card" style="--pc:var(--accent-yanc)">
+            <div class="pc-media pc-cascade" data-media="yanc-cascade" aria-hidden="true"></div>
             <div class="pc-top">
               <img class="pc-mark" src="assets/icons/yanc.svg" alt="YANC mark" width="40" height="40" loading="lazy">
               <div class="pc-id">
@@ -452,12 +599,10 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
               <span class="pc-go" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
             </div>
             <p class="pc-desc" data-i18n="projects.yanc.short">Takes C± or C++ down to assembly, to synthesizable Verilog, to memory images and a testbench.</p>
-            <div class="pc-preview" aria-hidden="true">
-              <div class="pc-cascade" data-media="yanc-cascade" aria-hidden="true"></div>
-            </div>
           </a>
 
           <a href="projects/hits" class="pc-card" style="--pc:var(--accent-hits)">
+            <div class="pc-media pc-media--hits" aria-hidden="true"><canvas data-media="hits-pulse"></canvas></div>
             <div class="pc-top">
               <img class="pc-mark" src="assets/icons/hits.svg" alt="HITS emblem" width="40" height="40" loading="lazy">
               <div class="pc-id">
@@ -467,13 +612,27 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
               <span class="pc-go" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
             </div>
             <p class="pc-desc" data-i18n="projects.hits.short">Reproduces the ATLAS Tile Calorimeter readout in real time, on an FPGA, at the detector clock.</p>
-            <div class="pc-preview" aria-hidden="true">
-              <div class="pc-pulse"><canvas data-media="hits-pulse" aria-hidden="true"></canvas><span class="pc-cap" data-i18n="home.projects.p_hits">TileCal pulse train, 40 MHz</span></div>
-            </div>
+            <span class="pc-cap" data-i18n="home.projects.p_hits">TileCal pulse train, 40 MHz</span>
           </a>
 
-          <a href="projects/aurora" class="pc-card pc-card--aurora" style="--pc:var(--accent-aurora)">
-            <div class="pc-aurora" aria-hidden="true"><canvas data-media="aurora"></canvas></div>
+          <a href="projects/aurora" class="pc-card" style="--pc:var(--accent-aurora)">
+            <!-- A real aurora, filmed. It replaced a WebGL shader that drew a
+                 plausible one, and with it went ogl, the 37 KB library that ran
+                 the shader: nothing else on the site used either.
+
+                 Cut the same way as the CGV clip, forward then backward inside
+                 one file, so the native loop turns over without a seam. The
+                 source is 1080x1920 and the bottom 27% is cropped away, which
+                 takes out a parked car and the photographer's party walking
+                 through the field with head torches, and leaves the pine and the
+                 treeline. Only the opening 42 frames are used, because from
+                 frame 43 the torches start crossing the shot. -->
+            <div class="pc-media pc-media--aurora" aria-hidden="true">
+              <video data-media="aurora-loop"
+                     data-src="assets/videos/aurora-borealis-loop.mp4"
+                     poster="assets/images/projects/aurora-borealis-poster.webp"
+                     muted loop playsinline preload="none"></video>
+            </div>
             <div class="pc-top">
               <img class="pc-mark" src="assets/icons/aurora.svg" alt="AURORA mark" width="40" height="40" loading="lazy">
               <div class="pc-id">
@@ -483,10 +642,42 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
               <span class="pc-go" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
             </div>
             <p class="pc-desc" data-i18n="projects.aurora.short">The desktop environment where SAPHO is used: write, build, simulate and read waveforms in one place.</p>
-            
           </a>
 
           <a href="projects/cgv" class="pc-card" style="--pc:var(--accent-cgv)">
+            <div class="pc-media pc-media--cgv" aria-hidden="true">
+              <!-- The whole frame of a 2560x1302 capture of the viewer, scaled to
+                   1000x508 and not cropped at all, so the detector reads end cap
+                   to end cap. The CSS hangs it as a band rather than scaling it
+                   to cover the card, for the reason written on .pc-media--cgv.
+
+                   What it replaced was 720x366 at 296 kbps stretched over forty
+                   seconds. Same file-size budget, five seconds instead of forty,
+                   and the bitrate goes to 3,078 kbps.
+
+                   The pass runs at 1.35x and then plays itself backwards, so the
+                   loop closes without a dissolve. Both junctions are clean by
+                   construction and neither repeats a frame: the reverse starts
+                   on the frame before the last, and ends on the frame after the
+                   first. Measured, the turn costs 1.52 against an ordinary step
+                   of 1.52, and the wrap 2.13 against 1.87.
+
+                   Two files, as this card always had. data-src is the whole
+                   recording, 149 seconds there and back, 19.2 MB, which belongs
+                   on the CDN by this project's own rule; data-fallback is five
+                   seconds in the repository, under the 2 MB guard, and it is
+                   what runs in a local checkout and on the day the CDN cannot be
+                   reached. Same framing, same grade, same speed in both.
+
+                   The CDN name is versioned because the cache there is a year
+                   long: pushing a new file under an old name would go on serving
+                   the old one. v2 is already live and cached, hence v3. -->
+              <video data-media="cgv-loop"
+                     data-src="https://cdn.nipscern.com/videos/cgv-geometry-loop-v6.mp4"
+                     data-fallback="assets/videos/cgv-geometry-loop.mp4"
+                     poster="assets/images/projects/cgv-geometry-poster.webp"
+                     muted loop playsinline preload="none"></video>
+            </div>
             <div class="pc-top">
               <img class="pc-mark" src="assets/icons/icon_cgv.svg" alt="CGV Web mark" width="40" height="40" loading="lazy">
               <div class="pc-id">
@@ -496,21 +687,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
               <span class="pc-go" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
             </div>
             <p class="pc-desc" data-i18n="projects.cgv.short">The calorimeter event display for ATLAS, running in a browser. 186,000 cells at interactive rates.</p>
-            <div class="pc-preview" aria-hidden="true">
-              <figure class="pc-shot pc-video">
-              <!-- The clip runs forward then backward inside the same file, so
-                   the native loop turns over without a cut: the last frame of
-                   the reverse pass is the first frame of the forward one.
-                   Encoded that way rather than driven from script, because a
-                   negative playbackRate is not dependable across browsers. -->
-              <video data-media="cgv-loop"
-                     data-src="https://cdn.nipscern.com/videos/cgv-geometry-loop.mp4"
-                     data-fallback="assets/videos/cgv-geometry-loop.mp4"
-                     poster="assets/images/projects/cgv-geometry-poster.webp"
-                     muted loop playsinline preload="none" aria-hidden="true"></video>
-              <figcaption data-i18n="home.projects.p_cgv">Calorimeter geometry, turning</figcaption>
-            </figure>
-            </div>
+            <span class="pc-cap" data-i18n="home.projects.p_cgv">Calorimeter geometry, turning</span>
           </a>
 
         </div>
@@ -572,115 +749,15 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   <!-- Footer (injected by main.js) -->
   <footer id="footer" role="contentinfo"></footer>
 
-<!-- Starry sky -->
-  <script>
-  (function(){
-    var canvas = document.getElementById('hero-stars');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    var W, H, stars = [], shooting = null, shootTimer = 0;
-    var NUM_STARS = 130;
-
-    function setDimensions(w, h) {
-      W = canvas.width  = w || window.innerWidth;
-      H = canvas.height = h || window.innerHeight;
-      stars = [];
-      for (var i = 0; i < NUM_STARS; i++) {
-        stars.push({
-          x: Math.random() * W,
-          y: Math.random() * H,
-          r: 0.4 + Math.random() * 1.5,
-          base: 0.25 + Math.random() * 0.65,
-          freq: 0.3 + Math.random() * 1.2,
-          phase: Math.random() * Math.PI * 2
-        });
-      }
-    }
-
-    // The canvas is deliberately taller than the hero so the parallax has room
-    // to travel, so it measures itself rather than its container.
-    var _hero = canvas;
-    if (typeof ResizeObserver !== 'undefined') {
-      new ResizeObserver(function(entries) {
-        var r = entries[0].contentRect;
-        setDimensions(Math.round(r.width), Math.round(r.height));
-      }).observe(_hero);
-    } else {
-      function resize() { setDimensions(_hero.offsetWidth, _hero.offsetHeight); }
-      window.addEventListener('resize', resize);
-      resize();
-    }
-
-    function newShooter() {
-      var edge = Math.random() < 0.5 ? 0 : 1;
-      var sx = edge === 0 ? Math.random() * W * 0.6 : W * 0.3 + Math.random() * W * 0.4;
-      var sy = Math.random() * H * 0.5;
-      var angle = (25 + Math.random() * 30) * Math.PI / 180;
-      var speed = 380 + Math.random() * 260;
-      return { x: sx, y: sy, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-               len: 90 + Math.random() * 60, life: 1, tail: [] };
-    }
-
-    var last = 0;
-    function frame(ts) {
-      var dt = Math.min((ts - last) / 1000, 0.05);
-      last = ts;
-      ctx.clearRect(0, 0, W, H);
-
-      // Stars
-      for (var i = 0; i < stars.length; i++) {
-        var s = stars[i];
-        var t  = ts * 0.001;
-        var op = s.base + 0.28 * Math.sin(t * s.freq * Math.PI * 2 + s.phase);
-        op = Math.max(0.05, Math.min(1, op));
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(210,225,255,' + op.toFixed(2) + ')';
-        ctx.fill();
-      }
-
-      if (!reduced) {
-        // Shooting star timer
-        shootTimer -= dt;
-        if (shootTimer <= 0 && !shooting) {
-          shooting = newShooter();
-          shootTimer = 8 + Math.random() * 14;
-        }
-
-        // Draw shooting star
-        if (shooting) {
-          shooting.x += shooting.vx * dt;
-          shooting.y += shooting.vy * dt;
-          shooting.life -= dt * 1.3;
-          shooting.tail.push({ x: shooting.x, y: shooting.y, a: shooting.life });
-          if (shooting.tail.length > 18) shooting.tail.shift();
-
-          ctx.lineCap = 'round';
-          for (var j = 1; j < shooting.tail.length; j++) {
-            var p0 = shooting.tail[j - 1], p1 = shooting.tail[j];
-            var a = (j / shooting.tail.length) * Math.max(0, shooting.life) * 0.75;
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
-            ctx.lineTo(p1.x, p1.y);
-            ctx.strokeStyle = 'rgba(220,235,255,' + a.toFixed(2) + ')';
-            ctx.lineWidth = 1.5 * (j / shooting.tail.length);
-            ctx.stroke();
-          }
-
-          if (shooting.life <= 0 || shooting.x > W + 40 || shooting.y > H + 40) {
-            shooting = null;
-          }
-        }
-      }
-
-      requestAnimationFrame(frame);
-    }
-
-    setDimensions(_hero.offsetWidth, _hero.offsetHeight);
-    requestAnimationFrame(frame);
-  })();
+<!-- The sky over the hero: real stars, from the HYG catalogue.
+       A module rather than an inline script now, because it grew past the size
+       that belongs in a page. It paints as soon as it runs and upgrades itself
+       when the 30 KB catalogue lands; if that never arrives it falls back to the
+       random field this used to be, and says so in the console. -->
+  <script type="module">
+    import { sky } from "./assets/js/sky.js?v=b7a2ea3da8";
+    var c = document.getElementById("hero-stars");
+    if (c) sky(c);
   </script>
 
   <!-- Main module -->
@@ -715,7 +792,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        Deferred: nothing here is needed for first paint. -->
   <script src="assets/js/vendor/gsap.min.js" defer></script>
   <script src="assets/js/vendor/ScrollTrigger.min.js" defer></script>
-  <script type="module" src="assets/js/main.js?v=47449f365b"></script>
+  <script type="module" src="assets/js/main.js?v=f7a98d4102"></script>
   <script type="module" src="assets/js/home.js?v=b7a2ea3da8"></script>
 
 <script>

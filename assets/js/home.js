@@ -5,14 +5,16 @@
  *
  *   1. Scroll choreography, driven by GSAP ScrollTrigger.
  *   2. The animated media inside the project cards.
- *   3. A WebGL aurora, drawn with ogl, for the AURORA card.
  *
  * Everything is opt-out under prefers-reduced-motion, and every animation is
- * bound to an IntersectionObserver so nothing runs while it is off screen. The
- * aurora and ogl itself are imported dynamically the first time that card comes
- * near the viewport, so a visitor who never scrolls that far never pays the
- * 37 KB the library costs.
+ * bound to an IntersectionObserver so nothing runs while it is off screen. No
+ * file is fetched until the card that needs it comes near the viewport, so a
+ * visitor who never scrolls that far pays for none of it.
  */
+
+/* The same URL builders the publications and news pages use, so a paper opened
+   from the home lands in the site's own viewer rather than on a raw PDF. */
+import { publicationUrl, newsPostUrl } from './content-links.js';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -68,19 +70,31 @@ function choreograph() {
   });
   watch.observe(document.body);
 
-  /* Parallax, as a stack rather than a single moving element.
-     One layer drifting on its own reads as a glitch; depth only appears when
-     several things move at rates the eye can compare. Three planes here, from
-     back to front:
+  /* Parallax, and the rule for where it is allowed to happen.
 
-       the starfield   far    drifts down, so it lags the page
-       the wordmark    middle rises a little as it leaves
-       the stargazer   near   rises most, since near things sweep past fastest
+     The first pass moved every band on the page: each section heading at one
+     rate, the content under it at another, seventeen layers from the hero to
+     the sponsors. Read as a whole that is not depth, it is instability. Running
+     text is the worst case, because the reader uses the gap between a heading
+     and its first line to know the two belong together, and a gap that keeps
+     changing while you read takes that away.
 
-     Only transforms are animated. If any of this fails to run, every element
-     stays exactly where the CSS already put it. */
+     So: a thing may drift only if a frame clips it. That bounds the travel and
+     makes it impossible to reach a neighbour, and it is also what parallax
+     physically is, a view through an opening onto something further away. Three
+     places qualify, and the rest of the page holds still:
 
-  // Far: the sky lags behind, which is what makes it read as distance.
+       the starfield             inside the hero, which hides its overflow
+       the calorimeter poster    inside .cgv-stage
+       the artwork in each card  inside .pc-media, which the card clips
+
+     Type never moves. Only transforms are animated, so if none of this runs the
+     page is exactly what the CSS already laid out. */
+
+  /* The sky lags the page, which is the whole of the hero's depth: the wordmark
+     is fixed to the document and the far thing slides behind it. The wordmark
+     used to counter-move as well, and the stargazer and his caption after that,
+     but stacking movers only made the header restless. */
   const stars = document.getElementById('hero-stars');
   if (stars) {
     gsap.to(stars, {
@@ -90,68 +104,8 @@ function choreograph() {
     });
   }
 
-  // Middle: the wordmark and its buttons leave a touch faster than the page.
-  const heroContent = document.querySelector('.hero-content');
-  if (heroContent) {
-    gsap.to(heroContent, {
-      yPercent: -14,
-      ease: 'none',
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.5, invalidateOnRefresh: true },
-    });
-  }
-
-  // Near: the boy sweeps past fastest. The range is the whole time he is on
-  // screen, so the travel is spread over a long scroll rather than crammed
-  // into the few hundred pixels the figure itself occupies.
-  const boy = document.querySelector('.stargazer img');
-  if (boy) {
-    gsap.fromTo(boy,
-      { yPercent: 16 },
-      {
-        yPercent: -16,
-        ease: 'none',
-        scrollTrigger: { trigger: '.stargazer', start: 'top bottom', end: 'bottom top', scrub: 0.5, invalidateOnRefresh: true },
-      });
-  }
-
-  // The line under him trails slightly further behind, which separates it from
-  // the figure instead of letting the two travel as one block.
-  const note = document.querySelector('.stargazer-note');
-  if (note) {
-    gsap.fromTo(note,
-      { yPercent: 30 },
-      {
-        yPercent: -30,
-        ease: 'none',
-        scrollTrigger: { trigger: '.stargazer', start: 'top bottom', end: 'bottom top', scrub: 0.5, invalidateOnRefresh: true },
-      });
-  }
-
-  /* Everything below the stargazer used to sit still, which made the parallax
-     read as something that happens to the header rather than a property of the
-     page. These carry it the rest of the way down.
-
-     A helper, because the pattern is the same every time: travel from +a to -a
-     over the whole time the trigger is on screen. */
-  /* Travel is in pixels, not percentages.
-     The first version used yPercent, which on a tall element means a percentage
-     of its own height: the projects grid is some 700px, so 10% was 70px of
-     movement and the grid climbed straight over the heading above it. A
-     percentage is fine for something inside a frame that clips it, and wrong
-     for a block that has neighbours. Pixels are bounded, so a band can move
-     without ever reaching what sits next to it. */
-  const drift = (sel, px, sc) => {
-    const el = typeof sel === 'string' ? document.querySelector(sel) : sel;
-    if (!el) return;
-    gsap.fromTo(el, { y: px }, {
-      y: -px,
-      ease: 'none',
-      scrollTrigger: { trigger: sc || el, start: 'top bottom', end: 'bottom top', scrub: 0.5, invalidateOnRefresh: true },
-    });
-  };
-
-  /* For media that sits inside a frame with overflow hidden, a percentage is
-     still the right unit: the frame clips whatever leaves it. */
+  /* Inside a clipping frame a percentage is the right unit: it is a share of
+     the medium's own height, and whatever leaves the frame is cut off. */
   const driftInFrame = (el, pct, sc) => {
     if (!el) return;
     gsap.fromTo(el, { yPercent: pct }, {
@@ -161,53 +115,18 @@ function choreograph() {
     });
   };
 
-  // The figures rise gently out of their strip.
-  drift('.stats-strip-inner', 18, '.stats-strip');
-
-  /* The calorimeter poster moves inside its own frame, which is the oldest
-     parallax there is and the one that reads best on a full-width band. The
-     frame clips, so the image is oversized in CSS to have somewhere to go. */
+  /* The calorimeter poster inside its stage. The oldest parallax there is, and
+     the one that reads best on a full-width band. The image is oversized in CSS
+     so the movement never pulls an empty edge into view. */
   driftInFrame(document.querySelector('.cgv-poster'), 14, '.cgv-stage');
 
-  /* Every band from here to the foot of the page.
-     The first pass stopped at the calorimeter, which left a long dead stretch
-     in the middle: parallax that quits halfway down reads worse than none at
-     all, because the eye has already been told the page has depth.
-
-     Each band moves its heading and its content at different rates, so the two
-     separate as they pass rather than travelling as one block. Rates are small
-     and all different; the point is that nothing sits perfectly still. */
-  /* Each band moves its heading and its content by different, small amounts, so
-     the two separate as they pass instead of travelling as one block. The
-     numbers are pixels and the gaps between sections are far larger, which is
-     what keeps a heading and the grid under it from ever meeting. */
-  const bands = [
-    { scope: '.cgv-section',     head: '.cgv-header',            headPx: 14, body: null,                     bodyPx: 0 },
-    { scope: '.info-highlights', head: '.section-header',        headPx: 16, body: '.info-highlights .grid', bodyPx: 26 },
-    { scope: '#latest-section',  head: '.lab-head',              headPx: 14, body: '.lab-feature',           bodyPx: 24 },
-    { scope: '#projects-section',head: '.section-header',        headPx: 16, body: '.pc-grid',               bodyPx: 26 },
-    { scope: '.sponsors-strip',  head: '.sponsors-label',        headPx: 10, body: '.sponsors-logos',        bodyPx: 18 },
-  ];
-
-  /* The list under the featured story trails it, so the two do not arrive as
-     one block. Set up after the bands because the renderer fills it later; the
-     height watcher re-measures once it does. */
-  setTimeout(() => drift('.lab-rest', 14, '#latest-section'), 400);
-  bands.forEach((b) => {
-    const scope = document.querySelector(b.scope);
-    if (!scope) return;
-    const head = scope.querySelector(b.head);
-    if (head) drift(head, b.headPx, scope);
-    if (b.body) {
-      const body = scope.querySelector(b.body) || document.querySelector(b.body);
-      if (body) drift(body, b.bodyPx, scope);
-    }
-  });
-
-  /* Inside each card the artwork drifts against its own frame, in percent,
-     because the frame clips it. What travels is the media; the frame stays. */
+  /* The artwork inside each project card. What travels is the medium; the card
+     and every word on it stay put. */
   gsap.utils.toArray('.pc-grid .pc-card').forEach((card, i) => {
-    const media = card.querySelector('.pc-shot img, .pc-video video');
+    /* Except the calorimeter. Its medium is not oversized, because on a frame
+       that wide the headroom the drift needs costs field of view, so there is
+       nothing here to move without pulling an empty edge into the card. */
+    const media = card.querySelector('.pc-media:not(.pc-media--cgv) img, .pc-media:not(.pc-media--cgv) video');
     if (media) driftInFrame(media, i % 2 ? -6 : 6, card);
   });
 
@@ -328,12 +247,45 @@ function hitsPulse(canvas) {
   const SPEED = 58;          // px/s, so roughly 36 us of signal per second
   const MEAN_GAP = 34;       // us between events, close enough to pile up
 
-  const shape = (t) => {
+  /* The two halves of the pulse are summed over different windows, and that
+     separation is the whole reason the trace is steady.
+
+     The shaped part is spent after a dozen time constants, 60 us, so a short
+     window covers it. The tail is the pole at 2.00e3 rad/s, a time constant of
+     500 us, and the first version summed it over that same 60 us window. Events
+     were dropping out while each was still worth about 0.04, and with one
+     leaving every 34 us of signal the entire baseline stepped down, again and
+     again: that is the trace sinking in stages. The tail needs some 3.5 ms of
+     history before what falls off the end is worth less than a ten-thousandth. */
+  /* Twenty-two time constants rather than twelve. Measured, the edge of the
+     window was never the problem: the index is rounded down and then backed off
+     one more event, so by the time an event leaves it is already 15 us past the
+     nominal edge and worth 0.015 of a pixel. This is margin, not a fix, and it
+     costs four events per sample either way. */
+  const FAST_SPAN = TAU * 22;         // us
+  const TAIL_SPAN = TAU_TAIL * 7;     // us
+
+  const shaped = (t) => {
     if (t <= 0) return 0;
     const csp = 1 - Math.exp(-t / TAU_F);
-    const cr4rc = Math.pow(t / TAU, N) * Math.exp(-t / TAU) / 24 / NORM;
-    return (cr4rc + TAIL_W * Math.exp(-t / TAU_TAIL)) * csp;
+    return Math.pow(t / TAU, N) * Math.exp(-t / TAU) / 24 / NORM * csp;
   };
+
+  /* The slow pole does not switch on. Both poles are downstream of the same
+     shaper, so the 500 us term is the convolution of that exponential with the
+     integrator chain, and it climbs over the shaper's own time constant rather
+     than appearing whole at the arrival time.
+
+     Splitting the two terms apart is what lost this: the tail was left as a
+     bare exp(-t/tau), which steps from nothing to 0.05 the instant an event
+     arrives. Five percent of full scale is five pixels on this card, and with
+     an event every 34 us the trace grew a small cliff every twenty pixels. In
+     the peaks it was buried; in the valleys the tail is the entire signal, so
+     every valley pulsed. Raised to the fourth, the rise matches the four RC
+     stages and takes about 20 us, which is the same 4*tau the main pulse takes
+     to reach its own peak. */
+  const tailRise = (t) => { const r = 1 - Math.exp(-t / TAU); return r * r * r * r; };
+  const tailTerm = (t) => TAIL_W * Math.exp(-t / TAU_TAIL) * tailRise(t);
 
   /* Deterministic event list. A hash rather than Math.random so an event keeps
      its time and amplitude as it travels across the panel; drawing fresh
@@ -344,6 +296,35 @@ function hitsPulse(canvas) {
   };
   const evTime = (i) => i * MEAN_GAP + (rnd(i, 1) - 0.5) * MEAN_GAP * 1.1;
   const evAmp = (i) => 0.22 + Math.pow(rnd(i, 2), 2.6) * 0.78;
+
+  /* Electronic noise, keyed to signal time on a fixed grid and interpolated
+     between the samples, so it travels along with the trace.
+
+     Two things had to be true before the waveform would sit still. The first is
+     that the noise be a function of signal time at all: it used to be drawn as
+     rnd(Math.round(t * 4)), one fresh number per pixel, and since a pixel is
+     0.62 us wide the index moved by 2.48 between neighbours and by another 2.48
+     every frame as the panel scrolled. Every point on the trace got a new random
+     value sixty times a second. That was not noise travelling with the signal,
+     it was the panel boiling.
+
+     The second is that its features be wider than a pixel. At a 0.5 us grid a
+     feature was 0.8 px across while the trace scrolls 0.97 px per frame, so the
+     texture aliased against its own movement and shimmered even though every
+     value was correct. At 1.2 us a feature is about two pixels and visibly
+     travels instead. The amplitude came down with it, because a wider wobble
+     reads as larger at the same height.
+
+     Smoothstep between samples, so the interpolation leaves no corners. */
+  const NOISE_STEP = 1.2;    // us between noise samples, about 2 px
+  const NOISE_AMP = 0.015;
+  const noiseAt = (t) => {
+    const g = t / NOISE_STEP;
+    const g0 = Math.floor(g);
+    const f = g - g0;
+    const s = f * f * (3 - 2 * f);
+    return ((rnd(g0, 7) - 0.5) * (1 - s) + (rnd(g0 + 1, 7) - 0.5) * s) * NOISE_AMP;
+  };
 
   const resize = () => {
     const r = canvas.getBoundingClientRect();
@@ -360,38 +341,94 @@ function hitsPulse(canvas) {
     const el = (ts - t0) / 1000;
     ctx.clearRect(0, 0, w, h);
 
-    /* Room for a peak of one unit sitting on a baseline the piled-up tails have
-       already lifted, so the gain is set for the sum rather than for a single
-       pulse. */
-    const base = h * 0.86;
-    const amp = h * 0.44;
+    /* The pedestal sits low and the gain is set for the sum, not for one pulse:
+       the piled-up tails lift the working baseline to roughly 0.6 on their own,
+       and a peak rides on top of that. Both numbers were retuned when the canvas
+       stopped being a 16:10 panel in the lower half of the card and became the
+       whole card, so the trace keeps to the bottom half and never climbs into
+       the description. */
+    /* Gain set from the signal's own distribution rather than by eye: over a
+       long run the median sits at 0.58 and the 99th percentile at 1.43, so at
+       this gain the quiet stretches hug the bottom of the card and the rare big
+       pulse climbs to about halfway. That spread is what a calorimeter readout
+       under pile-up actually looks like. */
+    const base = h * 0.92;
+    const amp = h * 0.22;
 
     const tShift = el * SPEED * US_PER_PX;      // us of signal scrolled past
     const tLeft = tShift;                       // time at the left edge
     const tRight = tShift + w * US_PER_PX;
 
-    /* Value at a time: every event still contributing, summed. The window
-       reaches 12 shaper time constants back because the tail is genuinely
-       still there. That summation is pile-up, and the baseline drift is not
-       drawn in anywhere: it falls out of adding the tails. */
-    const iFrom = Math.floor((tLeft - TAU * 12) / MEAN_GAP) - 2;
-    const iTo = Math.ceil(tRight / MEAN_GAP) + 2;
-    const at = (t) => {
+    /* Recent events in full, per pixel: the shaped pulse and its slow tail
+       together, rise and all. The cut is on elapsed time rather than on index,
+       because the arrival jitter is ±55% of the mean gap and an index window
+       would take events at inconsistent ages, which is the seam the recurrence
+       below then has to match exactly. */
+    const nearAt = (t) => {
+      const i0 = Math.floor((t - FAST_SPAN - MEAN_GAP) / MEAN_GAP) - 1;
+      const i1 = Math.ceil(t / MEAN_GAP) + 1;
       let v = 0;
-      for (let i = iFrom; i <= iTo; i++) {
+      for (let i = i0; i <= i1; i++) {
         const dt = t - evTime(i);
-        if (dt > 0) v += evAmp(i) * shape(dt);
+        if (dt > 0 && dt <= FAST_SPAN) v += evAmp(i) * (shaped(dt) + tailTerm(dt));
       }
       return v;
     };
 
-    // time ruler, every 50 us
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    /* The tail, as a one-pole recurrence walked across the panel.
+
+       This was a coarse grid sampled every 24 px and interpolated, on the
+       reasoning that a 500 us time constant cannot change much across the 15 us
+       a few pixels cover. The decay cannot, but the sum can: each event switches
+       its own tail on at its arrival time, so the sum has a step of up to 0.05
+       at every event, one every 34 us. Linear interpolation smeared each of
+       those steps across 24 px, and because the grid was pinned to the screen
+       rather than to the signal, the smear slid through the steps as the panel
+       scrolled. That is the wobble, and it showed in the valleys because the
+       valleys are where the tail is the whole of the signal.
+
+       A single decaying pole obeys T(t + dt) = T(t) * exp(-dt / tau) plus
+       whatever switched on inside that step, so the whole row is one multiply
+       per pixel off an exact seed at the left edge. No sampling, no
+       interpolation, and cheaper than the grid it replaces.
+
+       This sum is the pile-up. The baseline drift is drawn in nowhere: it falls
+       out of adding the tails up. */
+    const decay = Math.exp(-US_PER_PX / TAU_TAIL);
+
+    /* Older than FAST_SPAN the rise is finished to within a part in a billion,
+       so every one of these events is a plain decaying exponential and the
+       whole row is one multiply per pixel off an exact seed. */
+    let tail = 0;
+    for (let i = Math.floor((tLeft - TAIL_SPAN) / MEAN_GAP); i <= Math.ceil(tLeft / MEAN_GAP); i++) {
+      const dt = tLeft - evTime(i);
+      if (dt > FAST_SPAN) tail += evAmp(i) * TAIL_W * Math.exp(-dt / TAU_TAIL);
+    }
+
+    /* Handovers, not arrivals. An event joins this sum at the pixel where it
+       turns FAST_SPAN old and nearAt() lets go of it, so the two never hold the
+       same event and never drop it between them. Sorted by time because the
+       arrival jitter can put two events out of index order. */
+    const handover = [];
+    for (let i = Math.floor((tLeft - FAST_SPAN) / MEAN_GAP) - 2; i <= Math.ceil(tRight / MEAN_GAP) + 2; i++) {
+      const th = evTime(i) + FAST_SPAN;
+      if (th > tLeft && th <= tRight) handover.push([th, evTime(i), evAmp(i) * TAIL_W]);
+    }
+    handover.sort((p, q) => p[0] - q[0]);
+    let hi = 0;
+
+    /* The graticule, every 50 us. Tall enough to give the trace a screen to run
+       on, and stopping well short of the top: a rule that reaches the head of
+       the card turns the medium back into a boxed panel with a grid in it, which
+       is the framing this card is trying to get out of. The mask over the medium
+       fades their upper end for free. */
+    ctx.strokeStyle = 'rgba(255,255,255,0.075)';
     ctx.lineWidth = 1;
     const step = 50;
+    const tickTop = base - h * 0.44;
     for (let tk = Math.ceil(tLeft / step) * step; tk < tRight; tk += step) {
       const x = (tk - tShift) / US_PER_PX;
-      ctx.beginPath(); ctx.moveTo(x, h * 0.14); ctx.lineTo(x, base + 4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x, tickTop); ctx.lineTo(x, base + 3); ctx.stroke();
     }
 
     // pedestal
@@ -402,8 +439,12 @@ function hitsPulse(canvas) {
     ctx.beginPath();
     for (let px = 0; px <= w; px += 1) {
       const t = tShift + px * US_PER_PX;
-      let v = at(t);
-      v += (rnd(Math.round(t * 4), 7) - 0.5) * 0.03;   // electronic noise
+      if (px) tail *= decay;
+      while (hi < handover.length && handover[hi][0] <= t) {
+        tail += handover[hi][2] * Math.exp(-(t - handover[hi][1]) / TAU_TAIL);
+        hi++;
+      }
+      const v = nearAt(t) + tail + noiseAt(t);
       const y = base - v * amp;
       px ? ctx.lineTo(px, y) : ctx.moveTo(px, y);
     }
@@ -427,22 +468,26 @@ function hitsPulse(canvas) {
 }
 
 /* ------------------------------------------------------------------
-   2c. CGV — the rendered geometry loop
+   2c. Looping card video
    ------------------------------------------------------------------
+   Two cards use this: the CGV geometry turning, and the aurora over the pine
+   wood on the AURORA card. Both are cut the same way, forward then backward
+   inside one file, so the native loop turns over without a seam.
+
    The file is not fetched until the card is close, and it only plays while it
-   is on screen: a background loop that keeps decoding in a tab nobody is
-   looking at is a battery drain for no benefit. The poster stands in until the
-   first frame is ready, and stays if the video never loads at all.
+   is on screen: a background loop still decoding in a tab nobody is looking at
+   is a battery drain for no benefit. The poster stands in until the first frame
+   is ready, and stays if the video never loads at all, which is also what a
+   visitor who asked for reduced motion gets.
    ------------------------------------------------------------------ */
-function cgvLoop(video) {
+function videoLoop(video) {
   if (REDUCED) return;                     // poster only
   let armed = false;
 
-  /* Two sources. data-src is the full hundred-second cut on the CDN, which is
-     where video belongs by this project's own rules; data-fallback is a
-     shorter copy inside the repository, small enough to pass the 2 MB guard.
-     The fallback is what makes the card work in a local checkout and on the
-     day the CDN is unreachable, and it is why this is not simply one URL. */
+  /* Up to two sources. data-src is where the file is served from; data-fallback
+     is an optional copy inside the repository, small enough to pass the 2 MB
+     guard, and it is what makes the card work in a local checkout and on the day
+     the CDN is unreachable. A card with only data-src simply has the one URL. */
   const arm = () => {
     if (armed) return;
     armed = true;
@@ -463,264 +508,16 @@ function cgvLoop(video) {
     () => video.pause());
 }
 
-/* A full-screen triangle. This build of ogl exports Geometry, Plane, Box and
-   the rest but no Triangle helper, so the three vertices are written out: one
-   oversized triangle covering the viewport, which costs one less vertex and one
-   less diagonal seam than the two-triangle quad it replaces. */
-function fullScreenTriangle(Geometry, gl) {
-  return new Geometry(gl, {
-    position: { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) },
-    uv: { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) },
-  });
-}
-
-/* ------------------------------------------------------------------
-   3. AURORA — a real aurora, in WebGL
-   ------------------------------------------------------------------
-   Drawn with ogl. The palette is taken from the project's own mark rather than
-   from a generic green-and-purple aurora: the sage, amber and cold blue that
-   the icon uses are the colours the card fades between.
-
-   ogl is imported dynamically the first time this card approaches the viewport.
-   ------------------------------------------------------------------ */
-/* SoftAurora, from React Bits by David Haz, ported from its React component.
-   MIT with the Commons Clause, which restricts reselling the software rather
-   than using it on a site. Credited in credits.html.
-
-   Two layered curtains of 3D Perlin noise, each tinted through a cosine
-   gradient that drifts along the width. The last line is the reason this one
-   works here: alpha comes from the length of the colour itself, so the curtain
-   dissolves wherever it is dim and needs no mask to sit on a card.
-
-   Source: https://reactbits.dev/backgrounds/soft-aurora */
-const AURORA_VERT = `
-attribute vec2 uv;
-attribute vec2 position;
-varying vec2 vUv;
-void main() { vUv = uv; gl_Position = vec4(position, 0, 1); }
-`;
-
-const AURORA_FRAG = `
-precision highp float;
-
-uniform float uTime;
-uniform vec3  uResolution;
-uniform float uSpeed;
-uniform float uScale;
-uniform float uBrightness;
-uniform vec3  uColor1;
-uniform vec3  uColor2;
-uniform float uNoiseFreq;
-uniform float uNoiseAmp;
-uniform float uBandHeight;
-uniform float uBandSpread;
-uniform float uOctaveDecay;
-uniform float uLayerOffset;
-uniform float uColorSpeed;
-
-#define TAU 6.28318
-
-vec3 gradientHash(vec3 p) {
-  p = vec3(
-    dot(p, vec3(127.1, 311.7, 234.6)),
-    dot(p, vec3(269.5, 183.3, 198.3)),
-    dot(p, vec3(169.5, 283.3, 156.9))
-  );
-  vec3 h = fract(sin(p) * 43758.5453123);
-  float phi = acos(2.0 * h.x - 1.0);
-  float theta = TAU * h.y;
-  return vec3(cos(theta) * sin(phi), sin(theta) * cos(phi), cos(phi));
-}
-
-float quinticSmooth(float t) {
-  float t2 = t * t;
-  float t3 = t * t2;
-  return 6.0 * t3 * t2 - 15.0 * t2 * t2 + 10.0 * t3;
-}
-
-vec3 cosineGradient(float t, vec3 a, vec3 b, vec3 c, vec3 d) {
-  return a + b * cos(TAU * (c * t + d));
-}
-
-float perlin3D(float amplitude, float frequency, float px, float py, float pz) {
-  float x = px * frequency;
-  float y = py * frequency;
-
-  float fx = floor(x); float fy = floor(y); float fz = floor(pz);
-  float cx = ceil(x);  float cy = ceil(y);  float cz = ceil(pz);
-
-  vec3 g000 = gradientHash(vec3(fx, fy, fz));
-  vec3 g100 = gradientHash(vec3(cx, fy, fz));
-  vec3 g010 = gradientHash(vec3(fx, cy, fz));
-  vec3 g110 = gradientHash(vec3(cx, cy, fz));
-  vec3 g001 = gradientHash(vec3(fx, fy, cz));
-  vec3 g101 = gradientHash(vec3(cx, fy, cz));
-  vec3 g011 = gradientHash(vec3(fx, cy, cz));
-  vec3 g111 = gradientHash(vec3(cx, cy, cz));
-
-  float d000 = dot(g000, vec3(x - fx, y - fy, pz - fz));
-  float d100 = dot(g100, vec3(x - cx, y - fy, pz - fz));
-  float d010 = dot(g010, vec3(x - fx, y - cy, pz - fz));
-  float d110 = dot(g110, vec3(x - cx, y - cy, pz - fz));
-  float d001 = dot(g001, vec3(x - fx, y - fy, pz - cz));
-  float d101 = dot(g101, vec3(x - cx, y - fy, pz - cz));
-  float d011 = dot(g011, vec3(x - fx, y - cy, pz - cz));
-  float d111 = dot(g111, vec3(x - cx, y - cy, pz - cz));
-
-  float sx = quinticSmooth(x - fx);
-  float sy = quinticSmooth(y - fy);
-  float sz = quinticSmooth(pz - fz);
-
-  float lx00 = mix(d000, d100, sx);
-  float lx10 = mix(d010, d110, sx);
-  float lx01 = mix(d001, d101, sx);
-  float lx11 = mix(d011, d111, sx);
-
-  float ly0 = mix(lx00, lx10, sy);
-  float ly1 = mix(lx01, lx11, sy);
-
-  return amplitude * mix(ly0, ly1, sz);
-}
-
-float auroraGlow(float t) {
-  vec2 uv = gl_FragCoord.xy / uResolution.y;
-
-  float noiseVal = 0.0;
-  float freq = uNoiseFreq;
-  float amp = uNoiseAmp;
-  vec2 samplePos = uv * uScale;
-
-  for (float i = 0.0; i < 3.0; i += 1.0) {
-    noiseVal += perlin3D(amp, freq, samplePos.x, samplePos.y, t);
-    amp *= uOctaveDecay;
-    freq *= 2.0;
-  }
-
-  float yBand = uv.y * 10.0 - uBandHeight * 10.0;
-  return 0.3 * max(exp(uBandSpread * (1.0 - 1.1 * abs(noiseVal + yBand))), 0.0);
-}
-
-void main() {
-  vec2 uv = gl_FragCoord.xy / uResolution.xy;
-  float t = uSpeed * 0.4 * uTime;
-
-  vec3 col = vec3(0.0);
-  col += 0.99 * auroraGlow(t) *
-         cosineGradient(uv.x + uTime * uSpeed * 0.2 * uColorSpeed,
-                        vec3(0.5), vec3(0.5), vec3(1.0), vec3(0.3, 0.20, 0.20)) * uColor1;
-  col += 0.99 * auroraGlow(t + uLayerOffset) *
-         cosineGradient(uv.x + uTime * uSpeed * 0.1 * uColorSpeed,
-                        vec3(0.5), vec3(0.5), vec3(2.0, 1.0, 0.0), vec3(0.5, 0.20, 0.25)) * uColor2;
-
-  col *= uBrightness;
-  float alpha = clamp(length(col), 0.0, 1.0);
-  gl_FragColor = vec4(col, alpha);
-}
-`;
-
-/* Sage and cold blue, read off assets/icons/aurora.svg. The component ships
-   white and magenta; the cosine gradients push these through amber on their
-   own, which is the third colour in the mark. */
-const AURORA_COLOR1 = [0.671, 0.741, 0.506];   // #abbd81
-const AURORA_COLOR2 = [0.467, 0.643, 0.741];   // #77a4bd
-
-async function auroraCanvas(canvas) {
-  const host = canvas.closest('.pc-aurora');
-  /* Anything at all going wrong past this point falls back to the still wash.
-     The earlier version only caught a failed import, so a WebGL context that
-     could not be created, a shader that would not compile or a bad uniform all
-     ended the same way: an empty rectangle with no clue why. An unexplained
-     blank is the one outcome worth engineering against. */
-  const giveUp = (why) => {
-    host?.classList.add('is-static');
-    if (why) console.warn('[aurora] falling back to the static wash:', why);
-  };
-
-  if (REDUCED) { giveUp(); return; }
-
-  let mod;
-  try {
-    mod = await import('./vendor/ogl.mjs');
-  } catch (e) { giveUp(e); return; }
-
-  try {
-    await auroraRender(canvas, mod);
-  } catch (e) { giveUp(e); }
-}
-
-async function auroraRender(canvas, mod) {
-  const { Renderer, Program, Mesh, Geometry } = mod;
-
-  const renderer = new Renderer({
-    canvas, alpha: true, premultipliedAlpha: false, antialias: true,
-    dpr: Math.min(devicePixelRatio || 1, 2),
-  });
-  const gl = renderer.gl;
-  gl.clearColor(0, 0, 0, 0);
-
-  const program = new Program(gl, {
-    vertex: AURORA_VERT,
-    fragment: AURORA_FRAG,
-    uniforms: {
-      uTime: { value: 0 },
-      uResolution: { value: [1, 1, 1] },
-      uSpeed: { value: 0.55 },
-      /* Bigger noise features: a card is a small window, and at the stock
-         scale the curtain reads as speckle rather than as sheets of light. */
-      uScale: { value: 1.0 },
-      uBrightness: { value: 2.0 },
-      uColor1: { value: AURORA_COLOR1 },
-      uColor2: { value: AURORA_COLOR2 },
-      uNoiseFreq: { value: 2.5 },
-      uNoiseAmp: { value: 1.0 },
-      /* Centred on the card rather than sitting at the foot of a page-wide
-         banner, which is what the default of 0.5 assumes. */
-      uBandHeight: { value: 0.52 },
-      /* Spread is what decides how much of the card the light reaches. It
-         divides the exponent, so a high value concentrates the curtain into a
-         bright strip and a low one opens it out. At the stock 1.1 the glow
-         covered 40% of the height and left the rest dark, which is why the
-         card read as an aurora at the top and nothing below. At 0.3 it reaches
-         every part of the card, and brightness above compensates for spreading
-         the same light further. */
-      uBandSpread: { value: 0.3 },
-      uOctaveDecay: { value: 0.1 },
-      uLayerOffset: { value: 1.7 },
-      uColorSpeed: { value: 1.0 },
-    },
-  });
-  const mesh = new Mesh(gl, { geometry: fullScreenTriangle(Geometry, gl), program });
-
-  const resize = () => {
-    const r = canvas.getBoundingClientRect();
-    if (!r.width) return;
-    renderer.setSize(r.width, r.height);
-    program.uniforms.uResolution.value = [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height];
-  };
-  resize();
-  addEventListener('resize', resize);
-  requestAnimationFrame(resize);
-
-  let raf = 0, running = false;
-  const frame = (t) => {
-    program.uniforms.uTime.value = t * 0.001;
-    renderer.render({ scene: mesh });
-    raf = requestAnimationFrame(frame);
-  };
-  whileVisible(canvas,
-    () => { if (!running) { running = true; raf = requestAnimationFrame(frame); } },
-    () => { running = false; cancelAnimationFrame(raf); });
-}
-
 /* ------------------------------------------------------------------
    5. From the Lab
    ------------------------------------------------------------------
-   One story carries the section and the rest sit under it, rather than two
-   equal boxes that told the reader a paper and a news item weigh the same.
+   Two lanes. On the left what the laboratory announced, on the right what it
+   published, and neither is a footnote to the other.
 
-   Everything shown is read out of data/news.json and data/publications.json:
-   the dates, the titles, the covers, the venue a paper appeared in. The only
-   invented thing on screen is the word "Paper".
+   Everything on screen is read out of data/news.json and data/publications.json:
+   the dates, the titles, the covers, the venue a paper appeared in and the
+   people who wrote it. Nothing is written by hand here except the lane labels,
+   and those come out of the markup so the i18n pass owns them.
    ------------------------------------------------------------------ */
 const LANGS = ['en', 'pt', 'fr', 'no'];
 
@@ -755,70 +552,118 @@ function coverURL(post) {
   return /^https?:/.test(post.image) ? post.image : post.image;
 }
 
-function renderLab(news, pubs) {
-  const feature = document.getElementById('lab-feature');
-  const rest = document.getElementById('lab-rest');
-  if (!feature || !rest || !news || !news.length) return;
+/* Titles and venue names are the group's own data rather than visitor input,
+   but they still go through innerHTML, and one ampersand in a journal name is
+   enough to eat the rest of a row. */
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"]/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
 
+/* Venue names reach 96 characters. Six of them carry the full name and the
+   short one on either side of a dash, as in "10th International Symposium on
+   Instrumentation Systems, Circuits, and Transducers - INSCIT 2026". Where that
+   shape exists the short form is the one a reader recognises, and taking it
+   also drops a dash the house style does not use. The rest are cut by CSS. */
+function venue(pub) {
+  const parts = String(pub.journal || '').split(/\s+[—–]\s+/);
+  return parts[parts.length - 1].trim();
+}
+
+/* The first author in full, then how many more. Surname-only citation form
+   would have to guess where a compound Brazilian surname begins, and it gets
+   names like "Manhães de Andrade Filho" wrong more often than it gets them
+   right. */
+function authorLine(pub, moreTpl) {
+  const list = pub.authors || [];
+  if (!list.length) return '';
+  if (list.length === 1) return list[0];
+  return list[0] + ' ' + moreTpl.replace('{n}', String(list.length - 1));
+}
+
+function renderLab(news, pubs) {
+  const newsHost = document.getElementById('lab-news');
+  const paperHost = document.getElementById('lab-papers');
+  if (!newsHost || !paperHost) return;
+
+  /* Labels are read back out of the hidden spans in the markup, so this holds
+     no copies of four languages and follows a language change for free. */
   const t = (k, fb) => {
     const el = document.querySelector(`[data-i18n="${k}"]`);
     return (el && el.textContent.trim()) || fb;
   };
 
-  // ---- the story that leads
-  const lead = news[0];
-  const lt = postText(lead);
-  const cover = coverURL(lead);
-  feature.removeAttribute('aria-busy');
-  feature.innerHTML = `
-    <a class="lf-card" href="news/post.html?id=${encodeURIComponent(lead.slug || lead.id)}">
-      <div class="lf-media">
-        ${cover ? `<img src="${cover}" alt="" loading="lazy" decoding="async">` : ''}
-      </div>
-      <div class="lf-body">
-        <div class="lf-meta">
-          <time datetime="${lead.date}">${fmtDate(lead.date)}</time>
-          <span class="lf-dot" aria-hidden="true"></span>
-          <span class="lf-cat">${lead.category}</span>
-        </div>
-        <h3 class="lf-title">${lt.title}</h3>
-        <p class="lf-excerpt">${lt.excerpt || ''}</p>
-        <span class="lf-go">${t('home.latest.read', 'Read the story')}<i class="ph ph-arrow-right" aria-hidden="true"></i></span>
-      </div>
-    </a>`;
-
-  // ---- two more stories and the newest paper
-  const next = news.slice(1, 3);
-  const paper = (pubs || []).slice().sort((a, b) => Number(b.year) - Number(a.year))[0];
-
-  const items = next.map((p) => {
-    const pt = postText(p);
-    return `
-      <a class="lr-item" href="news/post.html?id=${encodeURIComponent(p.slug || p.id)}">
-        <time class="lr-date" datetime="${p.date}">${fmtDate(p.date)}</time>
-        <span class="lr-title">${pt.title}</span>
+  // ---- the news lane: one story with its cover, then two more as rows
+  if (news && news.length) {
+    const lead = news[0];
+    const lt = postText(lead);
+    const cover = coverURL(lead);
+    const rest = news.slice(1, 3).map((p) => {
+      const pt = postText(p);
+      return `
+      <a class="ln-item" href="${esc(newsPostUrl(p, 'news/post.html'))}">
+        <time class="ln-item-date" datetime="${esc(p.date)}">${esc(fmtDate(p.date))}</time>
+        <span class="ln-item-title">${esc(pt.title)}</span>
       </a>`;
-  });
+    }).join('');
 
-  if (paper) {
-    items.push(`
-      <a class="lr-item lr-item--paper" href="${paper.pdf || 'publications.html'}"${paper.pdf ? ' target="_blank" rel="noopener"' : ''}>
-        <span class="lr-date">${paper.year} <span class="lr-kind">${t('home.latest.paper', 'Paper')}</span></span>
-        <span class="lr-title">${paper.title}</span>
-        <span class="lr-venue">${paper.journal || ''}</span>
-      </a>`);
+    newsHost.removeAttribute('aria-busy');
+    newsHost.innerHTML = `
+      <a class="ln-lead" href="${esc(newsPostUrl(lead, 'news/post.html'))}">
+        <div class="ln-media">${cover ? `<img src="${esc(cover)}" alt="" loading="lazy" decoding="async">` : ''}</div>
+        <div class="ln-meta">
+          <time datetime="${esc(lead.date)}">${esc(fmtDate(lead.date))}</time>
+          <span class="ln-dot" aria-hidden="true"></span>
+          <span>${esc(lead.category)}</span>
+        </div>
+        <h4 class="ln-title">${esc(lt.title)}</h4>
+        <p class="ln-excerpt">${esc(lt.excerpt || '')}</p>
+        <span class="ln-go"><span class="ln-go-t">${esc(t('home.latest.read', 'Read the story'))}</span><i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+      </a>${rest}`;
   }
 
-  rest.innerHTML = items.join('');
+  /* ---- the papers lane.
+     Papers, not theses: a thesis is a different kind of work and the 32 of them
+     belong on the About page. Sorting is by year alone, and Array#sort has been
+     stable since ES2019, so papers sharing a year keep the order the file gives
+     them, which is newest first. The old code sorted the whole file, theses
+     included, and took one arbitrary 2026 entry out of the six that tie. */
+  const papers = (pubs || [])
+    .filter((p) => p.type === 'journal' || p.type === 'conference')
+    .slice()
+    .sort((a, b) => Number(b.year) - Number(a.year))
+    .slice(0, 4);
+
+  const moreTpl = t('home.latest.authors_more', 'and {n} others');
+  paperHost.removeAttribute('aria-busy');
+  paperHost.innerHTML = papers.map((p) => {
+    const who = authorLine(p, moreTpl);
+    return `
+      <a class="lp-item" href="${esc(publicationUrl(p) || 'publications.html')}">
+        <div class="lp-meta">
+          <span class="lp-year">${esc(p.year)}</span>
+          <span class="lp-venue">${esc(venue(p))}</span>
+        </div>
+        <h4 class="lp-title">${esc(p.title)}</h4>
+        ${who ? `<p class="lp-authors">${esc(who)}</p>` : ''}
+      </a>`;
+  }).join('');
 }
 
 async function fromTheLab() {
-  if (!document.getElementById('lab-feature')) return;
+  if (!document.getElementById('lab-news')) return;
   const base = new URL('../../', import.meta.url).href;
   try {
     const [news, pubs] = await Promise.all([
       fetch(base + 'data/news.json').then((r) => r.json()),
-      fetch(base + 'data/publications.json').then((r) => r.json()).catch(() => []),
+      /* The papers lane can survive without this file, so a failure here does
+         not take the news lane down with it. It does not pass in silence
+         either: an empty lane with no explanation is exactly the kind of bug
+         that goes unnoticed for months. */
+      fetch(base + 'data/publications.json').then((r) => r.json()).catch((e) => {
+        console.warn('[from the lab] no publications, the papers lane will be empty:', e);
+        return [];
+      }),
     ]);
     renderLab(news, pubs);
     /* Re-render on a language change so the dates and the translated titles
@@ -857,23 +702,11 @@ function init() {
   const ys = document.querySelector('[data-media="yanc-cascade"]');
   if (ys) yancCascade(ys);
 
-  const cg = document.querySelector('[data-media="cgv-loop"]');
-  if (cg) cgvLoop(cg);
+  /* Every looping video on a card, whichever card it belongs to. */
+  document.querySelectorAll('.pc-media video').forEach(videoLoop);
 
   const hp = document.querySelector('[data-media="hits-pulse"]');
   if (hp) hitsPulse(hp);
-
-  /* ogl only arrives if the card gets close. */
-  const au = document.querySelector('[data-media="aurora"]');
-  if (au) {
-    if (!('IntersectionObserver' in window)) { auroraCanvas(au); }
-    else {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((e) => { if (e.isIntersecting) { io.disconnect(); auroraCanvas(au); } });
-      }, { rootMargin: '400px' });
-      io.observe(au);
-    }
-  }
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
