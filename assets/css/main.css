@@ -2777,10 +2777,26 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   width: 100%;
   height: 110%;
   object-fit: cover;
-  will-change: transform;
+  will-change: transform, scale;
+  transition: scale var(--t-slow);
 }
-/* No hover scale on the cover: the drift writes an inline transform on this
-   same element every frame, so a rule here could never win. */
+
+/* The cover leans in under the pointer.
+   Written as `scale`, not as `transform: scale()`. The drift writes an inline
+   transform on this same element every frame, so anything spelled `transform`
+   here loses to it; `scale` is a separate property that the browser composes
+   with the transform rather than replacing it, so the two effects coexist and
+   the zoom survives the parallax.
+
+   1.05 against 5% of headroom: the frame clips, and the image already has room
+   to spare, so nothing thin creeps in at an edge on the way. */
+.ln-lead:hover .ln-media img,
+.ln-lead:focus-visible .ln-media img { scale: 1.05; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ln-media img { transition: none; }
+  .ln-lead:hover .ln-media img { scale: 1; }
+}
 
 .ln-meta {
   display: flex;
@@ -5090,39 +5106,35 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    the visitor count with nothing but a chevron in it, and the whole of its
    job is to say that the page continues. It is a real link, so pressing it
    does what pointing at it suggests. */
+/* The caret alone.
+   It used to wear the glass treatment, which on a 34px circle put a hairline
+   border and an inset white highlight around a 15px glyph: at that size the two
+   read as a stray scratch rather than as a pane of glass. The hint is a hint,
+   so it is the mark and nothing else, with the circle kept only as an invisible
+   hit area large enough to press. */
 .scroll-hint {
-  --glass-edge: rgba(255, 255, 255, 0.09);
-  --glass-edge-hover: rgba(255, 255, 255, 0.20);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   margin-top: var(--sp-6);
-  border-radius: 50%;
   color: var(--text-muted);
-  opacity: 0.55;
-  transition: opacity var(--t-base), color var(--t-fast),
-              border-color var(--t-base), background var(--t-base), transform var(--t-base);
+  opacity: 0.5;
+  transition: opacity var(--t-base), color var(--t-fast);
 }
 .scroll-hint:hover { opacity: 1; color: var(--text-primary); }
-.scroll-hint i { font-size: 15px; }
+.scroll-hint i { font-size: 20px; }
 
-/* There is no caret-down in the generated sprite. icons.css is built from the
-   Phosphor files the site actually asks for, and asking for one that was never
-   downloaded draws an empty box, which is what this was. The caret that is
-   there, turned a quarter: a caret is symmetric about that axis, so the turn is
-   exact rather than a stand-in.
-
-   The rotation has to be inside the keyframes as well. transform is one
-   property, and a bob written without it would have thrown the turn away for
-   the length of the animation. */
+/* caret-down is in the sprite now, so the caret points down because it is a
+   caret-down, not because a caret-right was turned a quarter. The rotation is
+   gone, and with it the need to repeat it inside the keyframes to stop the bob
+   from throwing the turn away. */
 @keyframes hint-bob {
-  0%, 100% { transform: rotate(90deg) translateX(0); }
-  50%      { transform: rotate(90deg) translateX(3px); }
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(3px); }
 }
 .scroll-hint i {
-  transform: rotate(90deg);
   animation: hint-bob 2.6s ease-in-out infinite;
 }
 .scroll-hint:hover i { animation-play-state: paused; }
