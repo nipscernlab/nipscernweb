@@ -2668,10 +2668,15 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    ============================================================ */
 .lab-head { margin-bottom: var(--sp-10); }
 
+/* The lanes were the same width and the rule between them was the gap. Papers
+   run to four entries with a venue and an author line each, and news to a lead
+   with an image and two rows under it, so an even split gave the denser lane
+   the narrower measure. The papers lane gets a little less width and both get
+   considerably more air between them. */
 .lab-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--sp-10) clamp(2rem, 4vw, 4rem);
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  gap: var(--sp-12) clamp(3rem, 6vw, 6rem);
   align-items: start;
 }
 
@@ -2734,16 +2739,20 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   background: var(--bg-0);
 }
 .ln-media::before { content: ''; display: block; padding-top: 62.5%; }
-/* Oversized so the cover can drift inside its frame. Nine per cent of headroom
-   either side against a travel of eight, by the same rule as the calorimeter
-   poster and the card media: the margin has to beat the travel. */
+/* Oversized so the cover can drift inside its frame, but far less than it was.
+   Height is the only thing being added, and object-fit: cover scales to reach
+   the taller of the two dimensions, so every per cent of headroom is paid for
+   in width: on a 3:2 cover in this 1.6 frame, 118% meant losing about 9.6% off
+   the sides, which is where faces and edges live. At 110% that falls to about
+   3%, and the drift comes down with it so the margin still beats the travel:
+   5% of headroom either side against 4.4% of frame travelled. */
 .ln-media img {
   position: absolute;
   left: 0;
   right: 0;
-  top: -9%;
+  top: -5%;
   width: 100%;
-  height: 118%;
+  height: 110%;
   object-fit: cover;
   will-change: transform;
 }
@@ -2831,7 +2840,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   grid-template-columns: 92px minmax(0, 1fr);
   align-items: baseline;
   gap: var(--sp-4);
-  padding: var(--sp-4) 0;
+  padding: var(--sp-5) 0;
   border-top: 1px solid var(--border-subtle);
   color: inherit;
   text-decoration: none;
@@ -2859,9 +2868,18 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 /* ---- the papers lane ---- */
 /* No picture, and none invented to fill the space. What a paper has is a venue,
    a year and the people who wrote it, and that is what the row carries. */
+/* Year, then the paper. Three stacked blocks per entry, four entries deep, put
+   twelve things in a column and left the eye to work out which line belonged to
+   which. The year steps out into a rail of its own, so the lane scans down one
+   edge as a list of years and across as a list of papers, and the venue drops
+   under the title where the rest of the citation is.
+
+   Nothing is removed. It is the same year, venue, title and author line. */
 .lp-item {
-  display: block;
-  padding: var(--sp-5) 0;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: var(--sp-4);
+  padding: var(--sp-6) 0;
   border-top: 1px solid var(--border-subtle);
   color: inherit;
   text-decoration: none;
@@ -2869,18 +2887,24 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 .lp-item:first-child { border-top: 0; padding-top: 0; }
 
 .lp-meta {
+  grid-column: 1;
+  grid-row: 1 / span 3;
   display: flex;
-  align-items: baseline;
-  gap: var(--sp-3);
+  flex-direction: column;
+  gap: 4px;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   letter-spacing: 0.04em;
+  min-width: 0;
 }
 .lp-year {
-  flex: none;
+  font-size: var(--text-sm);
   color: var(--accent-pubs);
   font-variant-numeric: tabular-nums;
 }
+/* The venue leaves the rail and sits under the title, where a citation keeps
+   it. In the rail it would have had 58px to say "Comput. Phys. Commun." in. */
+.lp-venue { grid-column: 2; grid-row: 3; order: 3; }
 /* Venue names run to 96 characters. One line, cut with an ellipsis: a journal
    is recognised from its opening words, and a wrapped venue would outweigh the
    title under it. */
@@ -2892,7 +2916,9 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   color: var(--text-muted);
 }
 .lp-title {
-  margin-top: 7px;
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 0;
   font-family: var(--font-serif);
   font-size: var(--text-lg);
   font-weight: 400;
@@ -2903,7 +2929,9 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 }
 .lp-item:hover .lp-title { color: var(--brand); }
 .lp-authors {
-  margin-top: 6px;
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 7px;
   font-size: var(--text-xs);
   line-height: 1.5;
   color: var(--text-muted);
@@ -2922,7 +2950,13 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    Three agencies that pay for the work and two institutions the group is
    inside, told apart, because those are not the same relationship and a single
    row of logos said they were. */
-.supporters { padding: var(--sp-14) 0; --seam-from: var(--bg-1); }
+/* More room under the pill than over it. It is the last thing on the page
+   before the footer, and it was landing on top of it. */
+.supporters {
+  padding-top: var(--sp-14);
+  padding-bottom: var(--sp-24);
+  --seam-from: var(--bg-1);
+}
 
 /* One bar, on one line: the label, the three agencies, a divider, the two
    institutions. The divider is the whole of what used to be two headed groups,

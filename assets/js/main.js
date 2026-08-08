@@ -250,10 +250,10 @@ function buildFooter() {
     <div class="footer-bottom">
       <p data-i18n="footer.copyright">© 2026 NIPS-CERN. Under the NIPS-CERN Licence 1.1.</p>
       <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
-        <a href="${ROOT}qa.html" class="btn btn-ghost btn-sm" data-i18n-aria="qa.hero.label" aria-label="Questions and Answers">
+        <a href="${ROOT}qa.html" class="btn btn-ghost btn-sm glass-btn" data-i18n-aria="qa.hero.label" aria-label="Questions and Answers">
           <i class="ph ph-chats-circle" aria-hidden="true"></i> <span data-i18n="footer.qa">Q&amp;A</span>
         </a>
-        <a href="${ROOT}projects/archived" class="btn btn-ghost btn-sm" aria-label="Archived Projects">
+        <a href="${ROOT}projects/archived" class="btn btn-ghost btn-sm glass-btn" aria-label="Archived Projects">
           <i class="ph ph-archive" aria-hidden="true"></i> <span data-i18n="footer.archived">Archived Projects</span>
         </a>
         <div style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--text-xs);color:var(--text-muted)">
