@@ -1,9 +1,15 @@
 name: Guarda de cache-busting
 
-# Garante que o token ?v= de main.css / main.js em todas as paginas HTML esteja
+# Garante que o token ?v= dos assets versionados em todas as paginas HTML esteja
 # sincronizado com o conteudo atual desses arquivos. O hook .githooks/pre-commit
 # faz esse bump automaticamente; este guard e a rede de seguranca para quando o
 # hook nao roda (clone sem `git config core.hooksPath`, ou commit --no-verify).
+#
+# A LISTA ABAIXO TEM QUE SER A MESMA DO HOOK. Quando license.js entrou em
+# .githooks/pre-commit e nao entrou aqui, o hook passou a somar quatro arquivos
+# e este guard continuou somando tres: os dois hashes nunca mais coincidiram e
+# todo commit reprovava, mesmo com o hook tendo feito o bump certo. Mexeu num,
+# mexa no outro.
 
 on: [push, pull_request]
 
@@ -16,12 +22,13 @@ jobs:
         run: |
           ver=$( { git cat-file blob HEAD:assets/css/main.css; \
                    git cat-file blob HEAD:assets/js/main.js; \
-                   git cat-file blob HEAD:assets/js/hearts.js; } \
+                   git cat-file blob HEAD:assets/js/hearts.js; \
+                   git cat-file blob HEAD:assets/js/license.js; } \
                  | git hash-object --stdin | cut -c1-10 )
           echo "Hash esperado do conteudo: $ver"
           bad=""
           for f in $(git ls-files '*.html'); do
-            for t in $(grep -oE '(main\.css|main\.js|hearts\.js)\?v=[A-Za-z0-9._-]+' "$f" \
+            for t in $(grep -oE '(main\.css|main\.js|hearts\.js|license\.js)\?v=[A-Za-z0-9._-]+' "$f" \
                         | sed -E 's/.*\?v=//' | sort -u); do
               [ "$t" != "$ver" ] && bad="${bad}\n  ${f}: ?v=${t}"
             done
