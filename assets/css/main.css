@@ -2446,15 +2446,21 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   background: var(--bg-0);
 }
 .ln-media::before { content: ''; display: block; padding-top: 62.5%; }
+/* Oversized so the cover can drift inside its frame. Nine per cent of headroom
+   either side against a travel of eight, by the same rule as the calorimeter
+   poster and the card media: the margin has to beat the travel. */
 .ln-media img {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: -9%;
   width: 100%;
-  height: 100%;
+  height: 118%;
   object-fit: cover;
-  transition: transform var(--t-slow);
+  will-change: transform;
 }
-.ln-lead:hover .ln-media img { transform: scale(1.03); }
+/* No hover scale on the cover: the drift writes an inline transform on this
+   same element every frame, so a rule here could never win. */
 
 .ln-meta {
   display: flex;
@@ -2678,9 +2684,11 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 .cgv-section {
   background: var(--bg-0);
   border-top: 1px solid var(--border-subtle);
-  /* No bottom padding and no bottom border: the stage runs to the edge of the
-     section and its own rule is the line between this band and the next. */
-  padding: var(--sp-20) 0 0;
+  /* Room underneath again. That comment used to say the stage ran to the edge
+     of the section, which was true while it was full bleed; now that it sits
+     inside the rails as a rounded box, ending flush against the next section
+     put its corner against a heading. */
+  padding: var(--sp-20) 0;
 }
 
 /* Centred, like every other section heading on this page. It used to sit hard
@@ -2711,14 +2719,16 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 /* The plate sits under the viewer, so its ground carries the viewer's dark
    down into the page rather than the other way about. */
 .cgv-specs-band {
-  border-bottom: 1px solid var(--border-subtle);
-  background: linear-gradient(180deg, #05070f 0%, var(--bg-0) 100%);
-}
-.cgv-specs-inner {
+  width: calc(100% - 2 * var(--container-pad));
   max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 var(--container-pad);
+  border: 1px solid var(--border-mid);
+  border-top: 0;
+  border-radius: 0 0 var(--r-2xl) var(--r-2xl);
+  background: linear-gradient(180deg, #05070f 0%, var(--bg-0) 100%);
+  overflow: hidden;
 }
+.cgv-specs-inner { padding: 0 var(--sp-6); }
 /* The figures and the way in, on one line. The button is the home's own
    primary, not a one-off tinted with the section accent: a button that exists
    nowhere else on the page reads as something bolted on. */
@@ -2853,16 +2863,21 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    viewer running edge to edge leaves nowhere to put the pointer that is not the
    viewer, and the page cannot be scrolled past it. The margins either side are
    where the wheel still belongs to the page. */
+/* The viewer and the plate under it are one object, inset from both edges of
+   the window. The margin is subtracted, not inherited from a ceiling: at a
+   window a little wider than --container-max the max-width alone left eight
+   pixels a side, which is not a margin, it is a rounding error. */
 .cgv-stage {
   position: relative;
-  width: 100%;
+  width: calc(100% - 2 * var(--container-pad));
   max-width: var(--container-max);
   margin: 0 auto;
   height: clamp(360px, 68vh, 760px);
   background: #05070f;
   overflow: hidden;
   border: 1px solid var(--border-mid);
-  border-radius: var(--r-2xl);
+  border-bottom: 0;
+  border-radius: var(--r-2xl) var(--r-2xl) 0 0;
 }
 /* The poster is a real recorded event. It stays underneath permanently; the
    live viewer paints over it once the Worker answers, and if it never does

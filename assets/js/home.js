@@ -130,6 +130,24 @@ function choreograph() {
      so the movement never pulls an empty edge into view. */
   driftInFrame(document.querySelector('.cgv-poster'), 10, '.cgv-stage');
 
+  /* The cover of the lead story, inside the frame that already clips it. Set up
+     on a delay because the renderer fills that lane from the JSON well after
+     this runs; the height watcher re-measures once it does. */
+  setTimeout(() => driftInFrame(document.querySelector('.ln-media img'), 7, '.ln-lead'), 500);
+
+  /* The boy under the hero. Not a frame, but a figure with room around it on
+     every side, and he is the near plane of the same composition as the sky:
+     the sky lags, he sweeps past. Small, and nothing but him moves here. The
+     line under him stays where it is, because that one is type. */
+  const boy = document.querySelector('.stargazer img');
+  if (boy) {
+    gsap.fromTo(boy, { yPercent: 7 }, {
+      yPercent: -7,
+      ease: 'none',
+      scrollTrigger: { trigger: '.stargazer', start: 'top bottom', end: 'bottom top', scrub: 0.5, invalidateOnRefresh: true },
+    });
+  }
+
   /* The artwork inside each project card. What travels is the medium; the card
      and every word on it stay put. */
   gsap.utils.toArray('.pc-grid .pc-card').forEach((card, i) => {
