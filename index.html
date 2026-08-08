@@ -137,8 +137,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=f5ca041390" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=f5ca041390"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=f42e9babd7" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=f42e9babd7"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -785,7 +785,12 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
         if (e.isIntersecting) { load(); io.disconnect(); }
       });
     }, { rootMargin: '300px' });
-    io.observe(f);
+    /* Observe the stage, not the iframe. The iframe is display:none until it
+       has a src, and an element with no box never intersects anything, so
+       observing it was a deadlock: it waited to be seen before being given the
+       src that would let it be seen. The poster sat there instead, which is
+       exactly what it is for, and hid the fact that the viewer never ran. */
+    io.observe(document.getElementById("cgv-stage") || f);
   })();
   </script>
   <!-- GSAP drives the scroll choreography. Free for commercial use since
@@ -793,7 +798,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        Deferred: nothing here is needed for first paint. -->
   <script src="assets/js/vendor/gsap.min.js" defer></script>
   <script src="assets/js/vendor/ScrollTrigger.min.js" defer></script>
-  <script type="module" src="assets/js/main.js?v=f5ca041390"></script>
+  <script type="module" src="assets/js/main.js?v=f42e9babd7"></script>
   <script type="module" src="assets/js/home.js?v=b7a2ea3da8"></script>
 
 <script>

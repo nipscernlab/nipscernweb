@@ -5,8 +5,7 @@
 Copyright (c) 2026 NIPS-CERN.
 
 O NIPS-CERN tem dois laboratórios: o NIPS, na Universidade Federal de Juiz de
-Fora (UFJF), no Brasil, e a Route Salam, no CERN, na Suíça. O grupo não é
-parceiro externo do CERN; é parte dele.
+Fora (UFJF), no Brasil, e a Route Salam, no CERN, na Suíça.
 
 *An English translation is provided below. In case of divergence, the
 Portuguese text prevails.*
@@ -145,8 +144,7 @@ licença.
 Copyright (c) 2026 NIPS-CERN.
 
 NIPS-CERN has two laboratories: NIPS, at the Federal University of Juiz de Fora
-(UFJF), in Brazil, and Route Salam, at CERN, in Switzerland. The group is not an
-outside partner of CERN; it is part of it.
+(UFJF), in Brazil, and Route Salam, at CERN, in Switzerland.
 
 *This is a convenience translation. The Portuguese text above prevails.*
 
