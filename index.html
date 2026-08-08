@@ -144,8 +144,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=95d0921c64" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=95d0921c64"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=c5583428f6" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=c5583428f6"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -241,6 +241,14 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <span id="view-count"></span>
           <span data-i18n="home.hero.views">visitors</span>
         </div>
+
+        <!-- Says the page continues, and stops saying it as soon as it has
+             been believed. A link rather than an ornament, so pressing it
+             does what pointing at it suggests. -->
+        <a href="#cgv-section" class="scroll-hint glass-btn" id="scroll-hint"
+           data-i18n-aria="home.hero.scroll" aria-label="Scroll down">
+          <i class="ph ph-caret-right" aria-hidden="true"></i>
+        </a>
       </div>
     </section>
 
@@ -305,7 +313,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
          The figures and the colours are not decoration. The cell counts are the
          ones published on the project page, and the palette is the viewer's own,
          so the key below reads the picture on screen. -->
-    <section class="cgv-section seam" style="--seam-from:var(--bg-1)" aria-labelledby="cgv-title">
+    <section class="cgv-section seam" id="cgv-section" style="--seam-from:var(--bg-1)" aria-labelledby="cgv-title">
       <div class="container">
         <div class="cgv-header section-header--center fade-up">
           <div class="eyebrow" style="justify-content:center">
@@ -824,7 +832,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        Deferred: nothing here is needed for first paint. -->
   <script src="assets/js/vendor/gsap.min.js" defer></script>
   <script src="assets/js/vendor/ScrollTrigger.min.js" defer></script>
-  <script type="module" src="assets/js/main.js?v=95d0921c64"></script>
+  <script type="module" src="assets/js/main.js?v=c5583428f6"></script>
   <script type="module" src="assets/js/home.js?v=b7a2ea3da8"></script>
 
 <script>

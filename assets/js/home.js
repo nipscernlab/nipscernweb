@@ -198,6 +198,20 @@ function choreograph() {
   /* The calorimeter poster inside its stage. The oldest parallax there is, and
      the one that reads best on a full-width band. The image is oversized in CSS
      so the movement never pulls an empty edge into view. */
+  /* The nudge under the hero. It leaves on the way down rather than being
+     switched off: fading while sinking a few pixels reads as the page taking
+     it away, which is the point, since the reader has just done the thing it
+     was asking for. Forty pixels of scroll and it is gone. */
+  const hint = document.getElementById('scroll-hint');
+  if (hint) {
+    gsap.to(hint, {
+      opacity: 0,
+      y: 12,
+      ease: 'none',
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: '+=40', scrub: true },
+    });
+  }
+
   driftInFrame(document.querySelector('.cgv-poster'), 10, '.cgv-stage');
 
   /* The cover of the lead story, inside the frame that already clips it. Set up
@@ -868,8 +882,37 @@ function projectsPauseButton() {
   label();
 }
 
+/* Without GSAP, and for anyone who asked for less motion, the same thing
+   without the drift: a class on the root once the page has moved at all. */
+/* The push. Smooth scrolling is deliberately off for the document, because the
+   browser animating the scroll position fights the animations that read it, so
+   the two places that want it ask for it by hand: the button back to the top,
+   and this. Anyone who asked for less motion is simply put there. */
+function scrollHintPush() {
+  const hint = document.getElementById('scroll-hint');
+  const target = document.getElementById('cgv-section');
+  if (!hint || !target) return;
+  hint.addEventListener('click', (e) => {
+    e.preventDefault();
+    target.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+  });
+}
+
+function scrollHintFallback() {
+  const hint = document.getElementById('scroll-hint');
+  if (!hint) return;
+  if (window.gsap && window.ScrollTrigger && !REDUCED) return;
+  const onScroll = () => {
+    document.documentElement.classList.toggle('has-scrolled', window.scrollY > 40);
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
 function init() {
   revealFailsafe();
+  scrollHintFallback();
+  scrollHintPush();
   projectsPauseButton();
   fromTheLab();
   choreograph();
