@@ -1342,6 +1342,125 @@ a:hover > .frame > [data-drift],
 .is-hoverable:hover .frame > [data-drift] { transform: none; }
 
 /* ============================================================
+   Roster — the team on the About page
+   ------------------------------------------------------------
+   Compact, because seventeen people is a list and not seventeen articles. Each
+   card carries the four things that tell one person from another at a glance:
+   the face, the name, the role, and the two areas they are known for. What it
+   does not carry is a paragraph of biography, which at seventeen copies is a
+   wall nobody reads to the end of.
+
+   The grid sizes itself. minmax with auto-fill means the number of columns is
+   whatever fits, so this needs no breakpoint of its own and behaves the same on
+   a phone and on a wide screen: the cards keep their size and the row count
+   changes, which is the opposite of what happens when columns are counted by
+   hand and then shrunk to fit.
+   ============================================================ */
+.rt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-8);
+}
+.rt-card {
+  --glass-tint: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  border-radius: var(--r-xl);
+  transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
+}
+.rt-card:hover { transform: translateY(-2px); }
+
+/* A circle. Seventeen photographs taken in seventeen places, at seventeen
+   crops, put through one shape read as one set; through a rectangle they read
+   as seventeen photographs. */
+.rt-photo {
+  width: 76px;
+  height: 76px;
+  border-radius: var(--r-full);
+  overflow: hidden;
+  margin-bottom: var(--sp-3);
+  background: var(--bg-elevated);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rt-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rt-photo .bubble-initials {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  color: var(--text-muted);
+}
+
+.rt-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+/* The role in mono, like every other classification on this site. */
+.rt-role {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.rt-areas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: var(--sp-3);
+}
+.rt-area {
+  font-size: 10.5px;
+  line-height: 1.5;
+  padding: 2px 7px;
+  border-radius: var(--r-full);
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Links only when there are any, and quiet until wanted. Two small marks under
+   a name should not compete with the name. */
+.rt-links {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+.rt-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-full);
+  color: var(--text-muted);
+  opacity: 0.7;
+  transition: opacity var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.rt-link:hover { opacity: 1; color: var(--text-primary); background: rgba(255, 255, 255, 0.07); }
+.rt-link i { font-size: 15px; }
+.rt-link svg { width: 14px; height: 14px; }
+
+@media (max-width: 520px) {
+  /* Two across, and a little tighter. Below this a third column would put a
+     40px face next to a wrapped name. */
+  .rt-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--sp-3); }
+  .rt-photo { width: 64px; height: 64px; }
+}
+
+/* ============================================================
    Lab stage — the panorama on the About page
    ------------------------------------------------------------
    The one full-bleed thing on that page, and the thing it should be remembered
