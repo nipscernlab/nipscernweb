@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=2af784caf2">
-  <link rel="stylesheet" href="assets/css/main.css?v=2af784caf2">
+  <link rel="stylesheet" href="assets/css/icons.css?v=ae382a5256">
+  <link rel="stylesheet" href="assets/css/main.css?v=ae382a5256">
 </head>
 <body>
 
@@ -353,6 +353,44 @@
         </div>`;
     }
 
+    /* Compact by design.
+
+       Seventeen cards each carrying a photograph, a name, a role, a paragraph
+       of biography, every research area and two links is not a team section,
+       it is seventeen pages of one, and nobody reads the fourteenth biography.
+       What stays is what tells one person from another at a glance: the face,
+       the name, the role, and the two areas they are known for. The rest is
+       still in team.json and still has somewhere to go on the day a person
+       gets a page of their own. */
+    function rosterCardHTML(member) {
+      const areas = (member.areas || []).slice(0, 2)
+      .map(function (a) { return '<span class="rt-area">' + a + '</span>'; }).join('');
+      const links = [
+      member.lattes && '<a href="' + member.lattes + '" target="_blank" rel="noopener" class="rt-link" aria-label="Lattes">' + LATTES_ICON + '</a>',
+      member.github && '<a href="' + member.github + '" target="_blank" rel="noopener" class="rt-link" aria-label="GitHub"><i class="ph ph-github-logo" aria-hidden="true"></i></a>',
+      member.linkedin && '<a href="' + member.linkedin + '" target="_blank" rel="noopener" class="rt-link" aria-label="LinkedIn"><i class="ph ph-linkedin-logo" aria-hidden="true"></i></a>'
+      ].filter(Boolean).join('');
+      return '<article class="rt-card glass" aria-labelledby="member-' + member.id + '">'
+      + '<div class="rt-photo">' + avatarImg(member) + '</div>'
+      + '<p class="rt-name" id="member-' + member.id + '">' + member.name + '</p>'
+      + '<p class="rt-role">' + roleLabel(member.role) + '</p>'
+      + (areas ? '<div class="rt-areas">' + areas + '</div>' : '')
+      + (links ? '<div class="rt-links">' + links + '</div>' : '')
+      + '</article>';
+    }
+
+    /* Researchers, then the undergraduates. The coordinator is not in this
+       list at all: that section is above, with the full card the role earns. */
+    const ROSTER_ORDER = { researcher: 0, ic: 1 };
+    function renderRoster(mount, members) {
+      const sorted = members.slice().sort(function (a, b) {
+      const ra = ROSTER_ORDER[a.role], rb = ROSTER_ORDER[b.role];
+      return (ra === undefined ? 9 : ra) - (rb === undefined ? 9 : rb);
+      });
+      mount.className = "rt-grid";
+      mount.innerHTML = sorted.map(rosterCardHTML).join("");
+    }
+
     function renderTeamCard(member) {
       if (member.role === 'coordinator') return '';
       const areas = member.areas.map(a => `<span class="team-area-tag">${a}</span>`).join('');
@@ -633,10 +671,13 @@
       const members = team.filter(m => m.role !== 'coordinator');
       const mount = document.getElementById('team-mount');
       if (mount && members.length) {
-        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const small = matchMedia('(max-width: 768px)').matches;
-        if (reduce || small) renderGridFallback(mount, members);
-        else initField(mount, members);
+        /* The roster, always. The floating field was the wide-screen version and
+           the grid beneath it was called a fallback, which meant the page held
+           two answers to one question and most visits saw the second one
+           regardless: it was already what a phone got, and what anyone who asked
+           for less motion got. Seventeen people scan better in a roster than
+           they drift in a field, and a roster is the same on every screen. */
+        renderRoster(mount, members);
       }
 
       // Localise the coordinator badge (and any fallback-grid badges)
@@ -648,11 +689,11 @@
        deferred and cost nothing before first paint; motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
        a trigger honest when images land late. docs/design-system.md, section 7. -->
-  <script src="assets/js/vendor/gsap.min.js?v=2af784caf2" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=2af784caf2" defer></script>
-  <script type="module" src="assets/js/main.js?v=2af784caf2"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=ae382a5256" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=ae382a5256" defer></script>
+  <script type="module" src="assets/js/main.js?v=ae382a5256"></script>
   <script type="module">
-    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=2af784caf2";
+    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=ae382a5256";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
@@ -660,6 +701,6 @@
     addEventListener("DOMContentLoaded", initMotion);
   </script>
 
-  <script src="assets/js/analytics.js?v=2af784caf2" defer></script>
+  <script src="assets/js/analytics.js?v=ae382a5256" defer></script>
 </body>
 </html>
