@@ -1590,7 +1590,24 @@ a:hover > .frame > [data-drift],
   padding-top: 2px;
   font-variant-numeric: tabular-nums;
 }
-.rd-links { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-7); }
+/* --sp-7 does not exist, and a var() that resolves to nothing takes its whole
+   declaration with it: this had no margin at all, so a bare "Lattes" sat against
+   the last research area and read as one more of them. Named blocks now, like
+   the two above it, so a link is announced as a link before it is one. */
+.rd-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border-subtle);
+}
+.rd-ref::after {
+  content: '\2197';
+  font-size: 0.85em;
+  margin-left: 5px;
+  opacity: 0.5;
+}
 
 @media (max-width: 520px) {
   /* Two across, and a little tighter. Below this a third column would put a
@@ -4133,25 +4150,30 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   border-radius: var(--r-2xl);
   padding: var(--sp-10);
   display: grid;
-  /* Not a fixed 200px. A hard column keeps its width while the one beside it
-     is squeezed, so between roughly 700 and 900 pixels the portrait held its
-     ground and the biography next to it came down to a ribbon of four words a
-     line. minmax lets the portrait give way first, which is the right order:
-     the text is the thing being read.
+  /* Two tracks, and the portrait is the one that gives.
+     It was a hard 200px, which keeps its width while the column beside it is
+     squeezed, so between roughly 700 and 900 pixels the biography came down to
+     a ribbon four words wide. The fix after that was worse: auto-fit with two
+     children makes two equal halves, so on a wide card the portrait sat in six
+     hundred pixels of column with a 240px picture in it and the rest empty.
+     That is the space that appeared.
 
-     The stack below is a rule and not a breakpoint. auto-fit collapses the
-     second track when there is no room for both, so the card reflows on its own
-     width rather than on the window's, which is what it should answer to: it
-     sits inside a container whose padding changes with the viewport. */
-  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-  gap: var(--sp-10);
+     minmax bounds the portrait at both ends. It shrinks before the text does,
+     which is the right order because the text is the thing being read, and it
+     never claims more room than the picture can fill. */
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+  gap: var(--sp-8);
   align-items: start;
 }
-/* The portrait keeps a ceiling of its own once the card is one column, or it
-   would grow to the full width of the card and become a poster. */
-.coordinator-card > :first-child { max-width: 240px; }
-@media (max-width: 620px) {
-  .coordinator-card { padding: var(--sp-6); gap: var(--sp-6); }
+@media (max-width: 720px) {
+  /* One column, and tighter. Below this the portrait and a line of type cannot
+     share a row without one of them being a strip. */
+  .coordinator-card {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--sp-6);
+    gap: var(--sp-6);
+  }
+  .coordinator-card > :first-child { max-width: 200px; }
 }
 
 .coordinator-avatar {
