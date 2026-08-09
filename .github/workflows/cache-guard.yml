@@ -1,15 +1,15 @@
 name: Guarda de cache-busting
 
-# Garante que o token ?v= dos assets versionados em todas as paginas HTML esteja
-# sincronizado com o conteudo atual desses arquivos. O hook .githooks/pre-commit
-# faz esse bump automaticamente; este guard e a rede de seguranca para quando o
-# hook nao roda (clone sem `git config core.hooksPath`, ou commit --no-verify).
+# Garante que o token ?v= de todo asset versionado esteja sincronizado com o
+# conteudo atual desses arquivos. O hook .githooks/pre-commit faz o bump
+# automaticamente; este guard e a rede de seguranca para quando o hook nao roda
+# (clone sem `git config core.hooksPath`, ou commit --no-verify).
 #
-# A LISTA ABAIXO TEM QUE SER A MESMA DO HOOK. Quando license.js entrou em
-# .githooks/pre-commit e nao entrou aqui, o hook passou a somar quatro arquivos
-# e este guard continuou somando tres: os dois hashes nunca mais coincidiram e
-# todo commit reprovava, mesmo com o hook tendo feito o bump certo. Mexeu num,
-# mexa no outro.
+# A LISTA VEM DO PROPRIO HOOK. Ela ja divergiu duas vezes, e nas duas o efeito
+# foi o mesmo: o hook somava um conjunto de arquivos e o guard somava outro, os
+# hashes nunca coincidiam e todo commit reprovava mesmo com o bump certo. Em vez
+# de manter uma copia aqui, este job le a variavel ASSETS de .githooks/pre-commit
+# e usa exatamente a mesma lista. Nao ha o que sincronizar.
 
 on: [push, pull_request]
 
@@ -20,24 +20,46 @@ jobs:
       - uses: actions/checkout@v4
       - name: Token ?v= bate com o hash do conteudo
         run: |
-          ver=$( { git cat-file blob HEAD:assets/css/main.css; \
-                   git cat-file blob HEAD:assets/css/icons.css; \
-                   git cat-file blob HEAD:assets/js/main.js; \
-                   git cat-file blob HEAD:assets/js/hearts.js; \
-                   git cat-file blob HEAD:assets/js/license.js; } \
-                 | git hash-object --stdin | cut -c1-10 )
+          set -euo pipefail
+
+          # A lista, lida do hook. Se o hook nao puder ser lido, isso e um erro
+          # de verdade e nao algo para contornar com um fallback silencioso.
+          ASSETS=$(sed -n '/^ASSETS="/,/"$/p' .githooks/pre-commit \
+                   | sed 's/^ASSETS="//; s/"$//' | grep -v '^$')
+          if [ -z "$ASSETS" ]; then
+            echo "::error::Nao consegui ler ASSETS de .githooks/pre-commit"
+            exit 1
+          fi
+          echo "Assets versionados:"
+          echo "$ASSETS" | sed 's/^/  /'
+
+          # Os proprios tokens saem antes do hash. Os modulos carregam o token
+          # nos seus imports, entao um modulo e um arquivo cujo conteudo contem
+          # o hash do proprio conteudo; sem neutralizar isso o valor nunca se
+          # estabiliza e o guard reprova para sempre com um token correto. O
+          # hook normaliza exatamente igual.
+          ver=$( echo "$ASSETS" | while read -r a; do
+                   git cat-file blob "HEAD:$a"
+                 done | sed -E 's/\?v=[A-Za-z0-9._-]+/?v=/g' \
+                      | git hash-object --stdin | cut -c1-10 )
           echo "Hash esperado do conteudo: $ver"
+
+          NAMES=$(echo "$ASSETS" | sed 's#.*/##; s#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
+
+          # kristoffer/ fica de fora, igual no hook: projeto pessoal que so
+          # divide o dominio, e nao e versionado por este esquema.
           bad=""
-          for f in $(git ls-files '*.html'); do
-            for t in $(grep -oE '(main\.css|icons\.css|main\.js|hearts\.js|license\.js)\?v=[A-Za-z0-9._-]+' "$f" \
+          for f in $(git ls-files '*.html' 'assets/js/*.js' | grep -v '^kristoffer/'); do
+            for t in $(grep -oE "($NAMES)\?v=[A-Za-z0-9._-]+" "$f" \
                         | sed -E 's/.*\?v=//' | sort -u); do
               [ "$t" != "$ver" ] && bad="${bad}\n  ${f}: ?v=${t}"
             done
           done
+
           if [ -n "$bad" ]; then
             echo "::error::Token de cache desatualizado. Rode o commit com o hook"
-            echo "ativo (git config core.hooksPath .githooks) para bumpar main.css/js."
-            echo "Esperado ?v=${ver} nas paginas abaixo:"
+            echo "ativo (git config core.hooksPath .githooks) para bumpar os assets."
+            echo "Esperado ?v=${ver} nos arquivos abaixo:"
             printf "%b\n" "$bad"
             exit 1
           fi

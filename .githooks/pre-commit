@@ -1,36 +1,87 @@
 #!/bin/sh
-# Auto cache-busting for main.css / main.js.
+# Auto cache-busting.
 #
-# When either asset is part of this commit, recompute the ?v= token from a hash
-# of the two files' content and rewrite it across every tracked HTML page, then
-# re-stage them. This guarantees a CSS/JS edit always reaches production, since
-# the URL changes whenever the content does. No manual bump to remember.
+# Every file the browser caches by URL is listed once, below. When any of them
+# is part of a commit, the ?v= token is recomputed from a hash of all of their
+# content and rewritten across every tracked HTML page and every module that
+# imports one of them. A change therefore always reaches production, because
+# the URL changes whenever the content does. Nothing to remember by hand.
 #
 # Enable once per clone:  git config core.hooksPath .githooks
 # Skip on a given commit: git commit --no-verify
 
 set -e
 
-# Versioned assets: a change to any of these must bust the ?v= token.
-ASSETS="assets/css/main.css assets/css/icons.css assets/js/main.js assets/js/hearts.js assets/js/license.js"
+# ------------------------------------------------------------------
+# The list. One place.
+#
+# It has been wrong three times, and each time the same way: a file was added
+# to the site with a ?v= token nobody owned, so its token froze at whatever it
+# was born with while the file went on changing. icons.css sat at one token
+# through four regenerations, which is why a fixed icon never reached a browser
+# that had already cached it. home.js did the same while it was the file under
+# the most active work on the site. publications.js and one import of main.js
+# carried tokens somebody typed by hand, and the second of those was fetching a
+# whole extra copy of main.js under a URL of its own.
+#
+# A file that is not on this list has that bug. That is the only rule.
+# ------------------------------------------------------------------
+ASSETS="assets/css/main.css
+assets/css/icons.css
+assets/js/main.js
+assets/js/home.js
+assets/js/i18n.js
+assets/js/content-links.js
+assets/js/smooth-scroll.js
+assets/js/sky.js
+assets/js/publications.js
+assets/js/hearts.js
+assets/js/license.js
+assets/js/analytics.js
+assets/js/vendor/gsap.min.js
+assets/js/vendor/ScrollTrigger.min.js
+assets/js/vendor/lenis.mjs"
 
-# Only act when one of the versioned assets is staged in this commit.
-changed=$(git diff --cached --name-only | grep -E "^($(echo "$ASSETS" | sed 's/ /|/g' | sed 's/\./\\./g'))$" || true)
+# The alternation used for rewriting is derived from the list rather than
+# written out again, because a second copy of the list is exactly the thing
+# that has gone wrong every time.
+NAMES=$(printf '%s\n' "$ASSETS" | sed 's#.*/##; s#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
+
+# Only act when one of them is staged.
+PATHS=$(printf '%s\n' "$ASSETS" | sed 's#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
+changed=$(git diff --cached --name-only | grep -E "^($PATHS)$" || true)
 [ -z "$changed" ] && exit 0
 
-# Version = short hash of the staged content of all assets (fixed order).
-ver=$( for a in $ASSETS; do git cat-file blob ":$a"; done | git hash-object --stdin | cut -c1-10 )
+# Version = short hash of the staged content of every asset, in list order,
+# with the tokens themselves blanked out first.
+#
+# That last part is not tidiness, it is the only thing that makes this converge.
+# The modules now carry the token in their own import specifiers, so a module is
+# a file whose content contains the hash of its own content: write the token in
+# and the hash changes, compute it again and you get a third value, and the
+# guard fails for ever on a token that is correct at every step. Hashing what
+# the file means rather than which token it happens to be carrying gives a fixed
+# point. The guard normalises exactly the same way.
+ver=$( printf '%s\n' "$ASSETS" | while read -r a; do
+         [ -n "$a" ] && git cat-file blob ":$a" 2>/dev/null || true
+       done | sed -E 's/\?v=[A-Za-z0-9._-]+/?v=/g' | git hash-object --stdin | cut -c1-10 )
 
-# Rewrite the token on every versioned asset reference in tracked HTML.
-changed_html=""
-for f in $(git ls-files '*.html'); do
-  if grep -qE '(main\.css|icons\.css|main\.js|hearts\.js|license\.js)\?v=' "$f"; then
-    sed -i -E "s#((main\.css|icons\.css|main\.js|hearts\.js|license\.js)\?v=)[A-Za-z0-9._-]+#\1${ver}#g" "$f"
+# Rewrite the token everywhere it appears. HTML because that is where the pages
+# reference their assets, and the modules themselves because one module
+# importing another is the same cached URL by another name.
+#
+# kristoffer/ is excluded. It is a personal project that shares the domain and
+# nothing else, and it happens to load analytics.js, which was enough to pull it
+# into a commit about the laboratory site. That page is not ours to version.
+touched=""
+for f in $(git ls-files '*.html' 'assets/js/*.js' | grep -v '^kristoffer/'); do
+  if grep -qE "($NAMES)\?v=" "$f"; then
+    sed -i -E "s#(($NAMES)\?v=)[A-Za-z0-9._-]+#\1${ver}#g" "$f"
     git add "$f"
-    changed_html="${changed_html} ${f}"
+    touched="${touched} ${f}"
   fi
 done
 
-if [ -n "$changed_html" ]; then
-  echo "pre-commit: bumped asset cache version to '${ver}' in:${changed_html}"
+if [ -n "$touched" ]; then
+  echo "pre-commit: bumped asset cache version to '${ver}' in:${touched}"
 fi
