@@ -33,15 +33,26 @@ jobs:
           echo "Assets versionados:"
           echo "$ASSETS" | sed 's/^/  /'
 
-          # Os proprios tokens saem antes do hash. Os modulos carregam o token
-          # nos seus imports, entao um modulo e um arquivo cujo conteudo contem
-          # o hash do proprio conteudo; sem neutralizar isso o valor nunca se
-          # estabiliza e o guard reprova para sempre com um token correto. O
-          # hook normaliza exatamente igual.
+          # Texto e binario entram de formas diferentes, e precisam entrar.
+          #
+          # Nos arquivos de texto os proprios tokens saem antes do hash: os
+          # modulos carregam o token nos seus imports, entao um modulo e um
+          # arquivo cujo conteudo contem o hash do proprio conteudo, e sem
+          # neutralizar isso o valor nunca se estabiliza.
+          #
+          # Os binarios entram pelo object id. Passar alguns megabytes de h264
+          # por sed nao e portavel: sed trabalha linha a linha e o que ele faz
+          # com bytes que nao sao texto depende da plataforma e do locale, e foi
+          # exatamente assim que o hook no Windows e este job no Ubuntu passaram
+          # a calcular dois numeros a partir do mesmo commit. O hook faz igual.
           ver=$( echo "$ASSETS" | while read -r a; do
-                   git cat-file blob "HEAD:$a"
-                 done | sed -E 's/\?v=[A-Za-z0-9._-]+/?v=/g' \
-                      | git hash-object --stdin | cut -c1-10 )
+                   case "$a" in
+                     *.css|*.js|*.mjs)
+                       git cat-file blob "HEAD:$a" | sed -E 's/\?v=[A-Za-z0-9._-]+/?v=/g' ;;
+                     *)
+                       git rev-parse "HEAD:$a" ;;
+                   esac
+                 done | git hash-object --stdin | cut -c1-10 )
           echo "Hash esperado do conteudo: $ver"
 
           NAMES=$(echo "$ASSETS" | sed 's#.*/##; s#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
