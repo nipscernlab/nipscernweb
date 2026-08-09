@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=c17d424caa">
-  <link rel="stylesheet" href="assets/css/main.css?v=c17d424caa">
+  <link rel="stylesheet" href="assets/css/icons.css?v=2af784caf2">
+  <link rel="stylesheet" href="assets/css/main.css?v=2af784caf2">
 </head>
 <body>
 
@@ -269,7 +269,12 @@
     </script>
 
 
-    <div id="supporters"></div>
+    <!-- --seam-from names the colour of the band above, which is what the fade
+         dissolves out of. Without it .supporters falls back to --bg-1 while the
+         section above is --bg-0, so the two met on a hard line of the wrong
+         colour instead of dissolving into each other. index.html has always
+         declared it; this page never did. -->
+    <div id="supporters" style="--seam-from:var(--bg-0)"></div>
   </main>
 
   <footer id="footer" role="contentinfo"></footer>
@@ -356,7 +361,7 @@
         ${member.github ? `<a href="${member.github}" target="_blank" rel="noopener" class="team-link"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a>` : ''}
       `;
       return `
-        <article class="team-card" aria-labelledby="member-${member.id}">
+        <article class="team-card glass" aria-labelledby="member-${member.id}">
           <div style="display:flex;gap:var(--sp-4);align-items:flex-start">
             <div style="display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);flex-shrink:0">
               ${avatarHTML(member, 64)}
@@ -444,7 +449,7 @@
       const ctx = canvas.getContext('2d');
 
       const card = document.createElement('div');
-      card.className = 'bubble-card';
+      card.className = 'bubble-card glass';
       card.id = 'team-bubble-tip';
       card.hidden = true;
       field.appendChild(card);
@@ -643,11 +648,11 @@
        deferred and cost nothing before first paint; motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
        a trigger honest when images land late. docs/design-system.md, section 7. -->
-  <script src="assets/js/vendor/gsap.min.js?v=c17d424caa" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=c17d424caa" defer></script>
-  <script type="module" src="assets/js/main.js?v=c17d424caa"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=2af784caf2" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=2af784caf2" defer></script>
+  <script type="module" src="assets/js/main.js?v=2af784caf2"></script>
   <script type="module">
-    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=c17d424caa";
+    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=2af784caf2";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
@@ -655,6 +660,6 @@
     addEventListener("DOMContentLoaded", initMotion);
   </script>
 
-  <script src="assets/js/analytics.js?v=c17d424caa" defer></script>
+  <script src="assets/js/analytics.js?v=2af784caf2" defer></script>
 </body>
 </html>
