@@ -14,12 +14,12 @@
 
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
-import { publicationUrl, newsPostUrl } from './content-links.js?v=2bf10419ec';
-import { scrollToEl } from './smooth-scroll.js?v=2bf10419ec';
+import { publicationUrl, newsPostUrl } from './content-links.js?v=76c1e9ac96';
+import { scrollToEl } from './smooth-scroll.js?v=76c1e9ac96';
 /* The scroll machinery every page shares: entrance failsafe, run-while-visible,
    and the ScrollTrigger setup with the refresh discipline that took three bugs
    to get right. What stays in this file is what only the home page has. */
-import { initMotion, revealFailsafe, stopDrift } from './motion.js?v=2bf10419ec';
+import { initMotion, revealFailsafe, stopDrift } from './motion.js?v=76c1e9ac96';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -563,10 +563,28 @@ function hitsPulse(canvas) {
 
   const start = () => { if (!running) { running = true; lastTs = 0; resize(); raf = requestAnimationFrame(draw); } };
   const stop = () => { running = false; cancelAnimationFrame(raf); };
+  /* One frame, drawn once. draw() arms the next frame at the end of itself, so
+     this paints and then takes that one back. Refused while the trace is
+     running, or a resize would paint a frame and cancel the animation with it. */
+  const paintOnce = () => {
+    if (running) return;
+    requestAnimationFrame((ts) => { if (running) return; draw(ts); stop(); });
+  };
 
   resize();
   addEventListener('resize', resize);
-  if (REDUCED) { requestAnimationFrame((ts) => { draw(ts); stop(); }); return; }
+
+  /* The card must never be an empty grey rectangle, and it was: this canvas only
+     ever drew from start(), start() only runs when the grid is playing, and a
+     visitor who had once pressed pause came back to a card with nothing on it.
+     The same rule as everywhere else on this page, one level down: animation
+     decides whether something moves, never whether it is there.
+
+     So the trace is painted here, before anything is asked about play, pause or
+     visibility. Under reduced motion that single frame is the whole panel. */
+  paintOnce();
+  addEventListener('resize', paintOnce);
+  if (REDUCED) return;
   whileVisibleCard(canvas, start, stop);
 }
 
