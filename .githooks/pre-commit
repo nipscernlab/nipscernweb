@@ -83,9 +83,24 @@ changed=$(git diff --cached --name-only | grep -E "^($PATHS)$" || true)
 # guard fails for ever on a token that is correct at every step. Hashing what
 # the file means rather than which token it happens to be carrying gives a fixed
 # point. The guard normalises exactly the same way.
+#
+# Text and binary are hashed differently, and they have to be. Piping a few
+# megabytes of h264 through sed is not portable: sed works a line at a time and
+# what it does with bytes that are not text depends on the platform and the
+# locale, so the hook on Windows and the guard on Ubuntu computed two different
+# numbers from the same commit. A binary asset contributes its object id
+# instead, which is forty characters of ASCII, is exactly as sensitive to a
+# change in the file, and never enters a pipe that has to behave identically on
+# two systems.
 ver=$( printf '%s\n' "$ASSETS" | while read -r a; do
-         [ -n "$a" ] && git cat-file blob ":$a" 2>/dev/null || true
-       done | sed -E 's/\?v=[A-Za-z0-9._-]+/?v=/g' | git hash-object --stdin | cut -c1-10 )
+         [ -z "$a" ] && continue
+         case "$a" in
+           *.css|*.js|*.mjs)
+             git cat-file blob ":$a" 2>/dev/null | sed -E 's/\?v=[A-Za-z0-9._-]+/?v=/g' ;;
+           *)
+             git rev-parse ":$a" 2>/dev/null ;;
+         esac
+       done | git hash-object --stdin | cut -c1-10 )
 
 # Rewrite the token everywhere it appears. HTML because that is where the pages
 # reference their assets, and the modules themselves because one module
