@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=daf68d1e94">
-  <link rel="stylesheet" href="assets/css/main.css?v=daf68d1e94">
+  <link rel="stylesheet" href="assets/css/icons.css?v=00e4140c6d">
+  <link rel="stylesheet" href="assets/css/main.css?v=00e4140c6d">
 </head>
 <body>
 
@@ -124,11 +124,7 @@
           </p>
         </div>
 
-        <!-- One panel, reused. Its content is written the moment it opens, so
-           seventeen biographies are never in the document at once. -->
-      <dialog id="member-dialog" class="rd-dialog glass" aria-label="Team member"></dialog>
-
-      <div id="team-mount" class="team-mount">
+        <div id="team-mount" class="team-mount">
           <!-- Floating bubble field (or static grid fallback) built by the team script below -->
         </div>
       </div>
@@ -374,7 +370,7 @@
       member.github && '<a href="' + member.github + '" target="_blank" rel="noopener" class="rt-link" aria-label="GitHub"><i class="ph ph-github-logo" aria-hidden="true"></i></a>',
       member.linkedin && '<a href="' + member.linkedin + '" target="_blank" rel="noopener" class="rt-link" aria-label="LinkedIn"><i class="ph ph-linkedin-logo" aria-hidden="true"></i></a>'
       ].filter(Boolean).join('');
-      return '<button type="button" class="rt-card glass" data-member="' + member.id + '" aria-haspopup="dialog">'
+      return '<button type="button" class="rt-card glass" data-member="' + member.id + '" aria-expanded="false">'
       + '<div class="rt-photo">' + avatarImg(member) + '</div>'
       + '<p class="rt-name">' + member.name + '</p>'
       + '<p class="rt-role">' + roleLabel(member.role) + '</p>'
@@ -434,23 +430,52 @@
         + (links ? '<div class="rd-links">' + links + '</div>' : '');
     }
 
-    function openMember(id) {
-      const m = ROSTER_BY_ID[id];
-      const dlg = document.getElementById('member-dialog');
-      if (!m || !dlg) return;
-      dlg.innerHTML = detailHTML(m);
-      dlg.showModal();
+    /* In the grid, not over it.
+       This was a modal, and a modal is the wrong shape for a biography: it
+       blacks out the page, takes the whole screen for one paragraph and puts
+       the reader in a state they have to leave before they can look at anyone
+       else. The record opens where the person is instead. It is inserted after
+       the card that was pressed and spans every column, so the grid pushes the
+       rows below it down and nothing is covered; pressing the same card again,
+       or any other, closes it. */
+    function closeMember() {
+      const open = document.querySelector('.rt-detail');
+      if (open) open.remove();
+      document.querySelectorAll('.rt-card.is-open').forEach(function (c) {
+        c.classList.remove('is-open');
+        c.setAttribute('aria-expanded', 'false');
+      });
     }
+
+    function openMember(card, id) {
+      const m = ROSTER_BY_ID[id];
+      const wasOpen = card.classList.contains('is-open');
+      closeMember();
+      if (!m || wasOpen) return;
+      const panel = document.createElement('div');
+      panel.className = 'rt-detail glass';
+      panel.innerHTML = detailHTML(m);
+      card.insertAdjacentElement('afterend', panel);
+      card.classList.add('is-open');
+      card.setAttribute('aria-expanded', 'true');
+      /* Only if it is not already on screen: a record that opens under your
+         pointer should not also move the page out from under it. */
+      const r = panel.getBoundingClientRect();
+      if (r.bottom > innerHeight) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      const card = document.querySelector('.rt-card.is-open');
+      if (!card) return;
+      closeMember();
+      card.focus();
+    });
 
     document.addEventListener('click', function (e) {
       const card = e.target.closest && e.target.closest('.rt-card[data-member]');
-      if (card) { openMember(card.getAttribute('data-member')); return; }
-      const dlg = document.getElementById('member-dialog');
-      if (!dlg || !dlg.open) return;
-      /* The backdrop is the dialog element itself as far as a click is
-         concerned, so a press that lands on it and not on the panel inside is
-         a press outside. */
-      if (e.target === dlg || (e.target.closest && e.target.closest('[data-close]'))) dlg.close();
+      if (card) { openMember(card, card.getAttribute('data-member')); return; }
+      if (e.target.closest && e.target.closest('[data-close]')) closeMember();
     });
 
     /* Researchers, then the undergraduates. The coordinator is not in this
@@ -522,11 +547,11 @@
        deferred and cost nothing before first paint; motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
        a trigger honest when images land late. docs/design-system.md, section 7. -->
-  <script src="assets/js/vendor/gsap.min.js?v=daf68d1e94" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=daf68d1e94" defer></script>
-  <script type="module" src="assets/js/main.js?v=daf68d1e94"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=00e4140c6d" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=00e4140c6d" defer></script>
+  <script type="module" src="assets/js/main.js?v=00e4140c6d"></script>
   <script type="module">
-    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=daf68d1e94";
+    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=00e4140c6d";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
@@ -534,6 +559,6 @@
     addEventListener("DOMContentLoaded", initMotion);
   </script>
 
-  <script src="assets/js/analytics.js?v=daf68d1e94" defer></script>
+  <script src="assets/js/analytics.js?v=00e4140c6d" defer></script>
 </body>
 </html>
