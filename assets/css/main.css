@@ -1453,11 +1453,117 @@ a:hover > .frame > [data-drift],
 .rt-link i { font-size: 15px; }
 .rt-link svg { width: 14px; height: 14px; }
 
+/* The card is a control, so it says so. Not with a border or an icon parked in
+   a corner: the prompt is held at nothing until the pointer arrives, and then
+   it is the only thing on the card that moved. */
+.rt-card { cursor: pointer; border: 1px solid var(--glass-edge, rgba(255,255,255,0.11)); }
+.rt-more {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-about);
+  margin-top: var(--sp-3);
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity var(--t-base), transform var(--t-base);
+}
+.rt-card:hover .rt-more,
+.rt-card:focus-visible .rt-more { opacity: 1; transform: none; }
+.rt-card:focus-visible { outline: 2px solid var(--accent-about); outline-offset: 3px; }
+
+/* ------------------------------------------------------------
+   The person, in full
+   ------------------------------------------------------------
+   Everything team.json holds about one member, which is more than the old cards
+   ever showed: every research area rather than the first two, the awards, and
+   all three links. A native dialog, so Escape closes it, the backdrop is the
+   browser's own, focus is held inside without a line of code, and the panel is
+   inert while it is shut. */
+.rd-dialog {
+  --glass-tint: var(--bg-card);
+  width: min(560px, calc(100vw - 2 * var(--sp-5)));
+  max-height: min(86vh, 760px);
+  padding: var(--sp-8);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r-2xl);
+  color: var(--text-primary);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.rd-dialog::backdrop {
+  background: rgba(4, 6, 12, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.rd-dialog:not([open]) { display: none; }
+
+.rd-close {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+.rd-close i { font-size: 16px; }
+
+.rd-head { display: flex; align-items: center; gap: var(--sp-5); }
+.rd-photo { width: 88px; height: 88px; margin-bottom: 0; }
+.rd-name {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.rd-bio {
+  margin-top: var(--sp-6);
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+.rd-block { margin-top: var(--sp-6); }
+/* The same small mono label the rest of the site uses over a group of facts. */
+.rd-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--sp-3);
+}
+.rd-areas { justify-content: flex-start; margin-top: 0; }
+.rd-awards { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); }
+.rd-award {
+  display: flex;
+  gap: var(--sp-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.rd-award-year {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--accent-about);
+  flex-shrink: 0;
+  padding-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.rd-links { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-7); }
+
 @media (max-width: 520px) {
   /* Two across, and a little tighter. Below this a third column would put a
      40px face next to a wrapped name. */
   .rt-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--sp-3); }
   .rt-photo { width: 64px; height: 64px; }
+  .rd-dialog { padding: var(--sp-6); }
+  .rd-head { gap: var(--sp-4); }
+  .rd-photo { width: 68px; height: 68px; }
 }
 
 /* ============================================================
