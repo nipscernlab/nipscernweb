@@ -1631,38 +1631,6 @@ a:hover > .frame > [data-drift],
    and bottom, which is where a falling column of type has to dissolve. The
    track is printed twice and shifted by exactly half its height, which lands
    the seam on an identical frame. */
-/* The layer under the cascade. Two things moving on one card is one too many
-   unless the second is barely there, so this is a fifth of full strength with
-   most of the colour taken out: at rest it reads as a texture in the card's own
-   teal, and what a reader follows is still the list of directives falling over
-   it. The fade is the cascade's, one notch harder, because the two masks stack
-   in the eye even though they do not in the compositor. */
-.pc-media--yanc {
-  --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.22) 16%, #000 44%, #000 82%, transparent 100%);
-  /* No colour of its own, and none to correct.
-     The clip is a syntax-highlighted editor, so it carries orange string
-     literals through every line of it. Pulling the saturation halfway down in
-     the browser did not remove those, it turned them into a dull tan, and a
-     warm cast under a teal card is what read as wrong. The file is now
-     monochrome from the encode: no chroma to knock back, and the card's own
-     tint is the only colour on this layer.
-
-     Brightness and nothing else after that. There was a blur here for a moment,
-     which was the wrong instrument: it made the layer soft rather than quiet,
-     and softness is not what a screen behind a screen should be. */
-  /* The yellow that would not go away was not in these numbers at all: the file
-     had been re-encoded to monochrome and the browser was still serving the
-     coloured one it had cached, because a video replaced under the same name
-     tells a browser nothing. The token on the URL is the actual fix and it is
-     in .githooks/pre-commit now.
-
-     What is left here is weight, and it is low. The clip is white type on black,
-     which is high contrast whatever colour it is not, so the contrast closes
-     toward the middle and the brightness holds the middle down. One eighth. */
-  opacity: 0.12;
-  filter: brightness(0.4) contrast(0.55);
-}
-
 .pc-cascade {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.30) 15%, #000 40%, #000 80%, transparent 100%);
   display: grid;
@@ -1757,33 +1725,6 @@ a:hover > .frame > [data-drift],
    that fades out before it reaches the side reads as a picture of a signal. The
    fade is vertical only, and the graticule was pulled down to a band near the
    baseline, since full-height rules turned the card back into a boxed panel. */
-/* The field under the pulse train.
-   The clip is gold traces on black with a teal running through the dark parts,
-   and two colours under a card whose whole identity is one orange is one too
-   many. sepia collapses the frame onto a single warm hue, which is the point of
-   using it here rather than as an effect: it does not tint, it removes the
-   choice of colour from the footage. saturate puts the strength back and the
-   rotation lands it on the card's own orange, a little under 30 degrees.
-
-   No colour, and no filter that could invent one. This carried sepia for a
-   while, to collapse the clip's gold and teal onto one hue before rotating it
-   to the card's orange, and sepia is a yellow-brown by definition: under a
-   saturation that low it stopped reading as orange and started reading as a
-   dirty yellow wash across the card. That was the glow that would not go away.
-
-   The chroma comes out at the encode instead, exactly as it does on YANC, so
-   there is nothing here but weight. Both cards get their colour where every
-   other card gets it: from the scrim and the hairline, which carry --pc.
-
-   And the weight is low. The trace over this is a 1.7px line, the field is
-   bright thin strokes on black, and thin bright strokes read far hotter than
-   their area suggests. A surface with movement in it, not a picture. */
-.pc-media--hits-bg {
-  --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.20) 15%, #000 42%, #000 86%, transparent 100%);
-  opacity: 0.13;
-  filter: brightness(0.45) contrast(0.85);
-}
-
 .pc-media--hits {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.16) 16%, rgba(0,0,0,0.68) 34%, #000 54%, #000 100%);
 }
