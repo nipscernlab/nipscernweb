@@ -60,7 +60,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=c56cb54c0e">
+  <link rel="stylesheet" href="assets/css/icons.css?v=c06c49b358">
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -144,8 +144,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=c56cb54c0e" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=c56cb54c0e"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=c06c49b358" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=c06c49b358"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -648,6 +648,21 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           </a>
 
           <a href="projects/yanc" class="pc-card" style="--pc:var(--accent-yanc)">
+            <!-- Two layers on this card. Underneath, a monitor with code moving
+                 on it, held down hard: the directive cascade above is what the
+                 card is about, and a second thing moving at full strength behind
+                 it would leave neither legible. It is texture, so it is graded
+                 down in the encode and taken most of the way to nothing in the
+                 CSS.
+
+                 Cut forward then backward like the others, because code that
+                 scrolls does not return to where it started. -->
+            <div class="pc-media pc-media--yanc" aria-hidden="true">
+              <video data-media="yanc-loop"
+                     data-src="assets/videos/yanc-code-loop.mp4"
+                     poster="assets/images/projects/yanc-code-poster.webp"
+                     muted loop playsinline preload="none"></video>
+            </div>
             <div class="pc-media pc-cascade" data-media="yanc-cascade" aria-hidden="true"></div>
             <div class="pc-top">
               <img class="pc-mark" src="assets/icons/yanc.svg" alt="YANC mark" width="40" height="40" loading="lazy">
@@ -823,7 +838,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.js?v=c56cb54c0e";
+    import { sky } from "./assets/js/sky.js?v=c06c49b358";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -918,10 +933,10 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   <!-- GSAP drives the scroll choreography. Free for commercial use since
        Webflow released the whole library, plugins included, in April 2025.
        Deferred: nothing here is needed for first paint. -->
-  <script src="assets/js/vendor/gsap.min.js?v=c56cb54c0e" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=c56cb54c0e" defer></script>
-  <script type="module" src="assets/js/main.js?v=c56cb54c0e"></script>
-  <script type="module" src="assets/js/home.js?v=c56cb54c0e"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=c06c49b358" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=c06c49b358" defer></script>
+  <script type="module" src="assets/js/main.js?v=c06c49b358"></script>
+  <script type="module" src="assets/js/home.js?v=c06c49b358"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -969,6 +984,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.js?v=c56cb54c0e" defer></script>
+  <script src="assets/js/analytics.js?v=c06c49b358" defer></script>
 </body>
 </html>
