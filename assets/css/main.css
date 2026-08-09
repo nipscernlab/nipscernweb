@@ -1356,8 +1356,7 @@ a:hover > .frame > [data-drift],
    ============================================================ */
 .lab-stage {
   position: relative;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
+  width: 100%;
   margin-top: var(--sp-12);
   height: clamp(220px, 34vw, 460px);
   overflow: hidden;
@@ -3864,9 +3863,12 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 /* ============================================================
    Page-specific: About
    ============================================================ */
+/* Glass, like every other surface on the site. The fill and the hairline come
+   from .glass now: leaving them here meant this rule won, because it sits later
+   in the file, and the pane never showed. --glass-tint gives it a body, since a
+   pane over a flat band is otherwise a slightly lighter rectangle. */
 .coordinator-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  --glass-tint: var(--bg-card);
   border-radius: var(--r-2xl);
   padding: var(--sp-10);
   display: grid;
@@ -3960,11 +3962,12 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 }
 
 .infra-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  --glass-tint: var(--bg-card);
   border-radius: var(--r-xl);
   overflow: hidden;
+  transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
 }
+.infra-card:hover { transform: translateY(-2px); }
 
 .infra-image {
   aspect-ratio: 16/9;
