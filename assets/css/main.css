@@ -1650,13 +1650,17 @@ a:hover > .frame > [data-drift],
      Brightness and nothing else after that. There was a blur here for a moment,
      which was the wrong instrument: it made the layer soft rather than quiet,
      and softness is not what a screen behind a screen should be. */
-  /* Greyer still. The file has no chroma, so what was left reading as bright was
-     the range: white type on black is high contrast whatever colour it is not.
-     Pulling the contrast down closes that range toward the middle, and the
-     brightness keeps the middle low, so the layer settles into one grey with
-     the code moving inside it rather than standing out of it. */
-  opacity: 0.16;
-  filter: brightness(0.42) contrast(0.62);
+  /* The yellow that would not go away was not in these numbers at all: the file
+     had been re-encoded to monochrome and the browser was still serving the
+     coloured one it had cached, because a video replaced under the same name
+     tells a browser nothing. The token on the URL is the actual fix and it is
+     in .githooks/pre-commit now.
+
+     What is left here is weight, and it is low. The clip is white type on black,
+     which is high contrast whatever colour it is not, so the contrast closes
+     toward the middle and the brightness holds the middle down. One eighth. */
+  opacity: 0.12;
+  filter: brightness(0.4) contrast(0.55);
 }
 
 .pc-cascade {
@@ -1770,8 +1774,12 @@ a:hover > .frame > [data-drift],
    picture, and the number for that turns out to be under a fifth. */
 .pc-media--hits-bg {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.20) 15%, #000 42%, #000 86%, transparent 100%);
-  opacity: 0.17;
-  filter: sepia(1) saturate(2.1) hue-rotate(-18deg) brightness(0.5) contrast(0.88);
+  /* The saturation came down with the rest of it. Thin bright strokes on black
+     read far hotter than their area suggests, and at three and a half the field
+     was a lit orange object in a card whose one lit orange object is meant to
+     be the trace. Enough hue left to say which card this is, and no more. */
+  opacity: 0.13;
+  filter: sepia(1) saturate(1.6) hue-rotate(-18deg) brightness(0.42) contrast(0.85);
 }
 
 .pc-media--hits {
