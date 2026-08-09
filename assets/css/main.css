@@ -1537,7 +1537,43 @@ a:hover > .frame > [data-drift],
   color: var(--text-muted);
   margin-bottom: var(--sp-3);
 }
-.rd-areas { justify-content: flex-start; margin-top: 0; }
+/* Areas as a line, not as a row of chips.
+   Rounded pills are what gets reached for when there is a list and no opinion
+   about it, and seven of them under a photograph is the exact look this site
+   exists to avoid. These are classifications, so they take the mono this site
+   keeps for classifications, and they are separated the way a line is
+   separated. */
+.rd-areas {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+/* References, not buttons. Three glass buttons in a row carried more weight
+   than the biography above them, and a button is for an action while these are
+   places to go and read. */
+.rd-ref {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border-mid);
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.rd-ref:hover { color: var(--text-primary); border-bottom-color: var(--accent-about); }
+
+/* The standing above the name, the way a record is headed: the honorific small
+   and quiet, the name carrying the block, the role under it. */
+.rd-id { min-width: 0; }
+.rd-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
 .rd-awards { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); }
 .rd-award {
   display: flex;
@@ -4097,9 +4133,25 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   border-radius: var(--r-2xl);
   padding: var(--sp-10);
   display: grid;
-  grid-template-columns: 200px 1fr;
+  /* Not a fixed 200px. A hard column keeps its width while the one beside it
+     is squeezed, so between roughly 700 and 900 pixels the portrait held its
+     ground and the biography next to it came down to a ribbon of four words a
+     line. minmax lets the portrait give way first, which is the right order:
+     the text is the thing being read.
+
+     The stack below is a rule and not a breakpoint. auto-fit collapses the
+     second track when there is no room for both, so the card reflows on its own
+     width rather than on the window's, which is what it should answer to: it
+     sits inside a container whose padding changes with the viewport. */
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: var(--sp-10);
   align-items: start;
+}
+/* The portrait keeps a ceiling of its own once the card is one column, or it
+   would grow to the full width of the card and become a poster. */
+.coordinator-card > :first-child { max-width: 240px; }
+@media (max-width: 620px) {
+  .coordinator-card { padding: var(--sp-6); gap: var(--sp-6); }
 }
 
 .coordinator-avatar {
