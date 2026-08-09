@@ -1650,8 +1650,13 @@ a:hover > .frame > [data-drift],
      Brightness and nothing else after that. There was a blur here for a moment,
      which was the wrong instrument: it made the layer soft rather than quiet,
      and softness is not what a screen behind a screen should be. */
+  /* Greyer still. The file has no chroma, so what was left reading as bright was
+     the range: white type on black is high contrast whatever colour it is not.
+     Pulling the contrast down closes that range toward the middle, and the
+     brightness keeps the middle low, so the layer settles into one grey with
+     the code moving inside it rather than standing out of it. */
   opacity: 0.16;
-  filter: brightness(0.5) contrast(0.9);
+  filter: brightness(0.42) contrast(0.62);
 }
 
 .pc-cascade {
@@ -1748,6 +1753,23 @@ a:hover > .frame > [data-drift],
    that fades out before it reaches the side reads as a picture of a signal. The
    fade is vertical only, and the graticule was pulled down to a band near the
    baseline, since full-height rules turned the card back into a boxed panel. */
+/* The field under the pulse train.
+   The clip is gold traces on black with a teal running through the dark parts,
+   and two colours under a card whose whole identity is one orange is one too
+   many. sepia collapses the frame onto a single warm hue, which is the point of
+   using it here rather than as an effect: it does not tint, it removes the
+   choice of colour from the footage. saturate puts the strength back and the
+   rotation lands it on the card's own orange, a little under 30 degrees.
+
+   Held at half, because the trace drawn over it is the thing this card is about
+   and it is a 1.7px line: a busy field at full strength behind it wins, and the
+   card stops being about the measurement. */
+.pc-media--hits-bg {
+  --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.20) 15%, #000 42%, #000 86%, transparent 100%);
+  opacity: 0.5;
+  filter: sepia(1) saturate(3.4) hue-rotate(-18deg) brightness(0.8);
+}
+
 .pc-media--hits {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.16) 16%, rgba(0,0,0,0.68) 34%, #000 54%, #000 100%);
 }

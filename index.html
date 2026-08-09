@@ -60,7 +60,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=17174e5a24">
+  <link rel="stylesheet" href="assets/css/icons.css?v=9f58076b85">
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -144,8 +144,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=17174e5a24" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=17174e5a24"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=9f58076b85" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=9f58076b85"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -705,6 +705,18 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           </a>
 
           <a href="projects/hits" class="pc-card" style="--pc:var(--accent-hits)">
+            <!-- Two layers, like YANC. Underneath, a field of traces flowing
+                 across the frame; over it, the pulse train this card is about,
+                 drawn from the published shaper. The one under is filtered to
+                 the card's own orange, which also takes out the teal that runs
+                 through the dark parts of the original and would have fought
+                 both the trace and the card. -->
+            <div class="pc-media pc-media--hits-bg" aria-hidden="true">
+              <video data-media="hits-flow"
+                     data-src="assets/videos/hits-flow-loop.mp4"
+                     poster="assets/images/projects/hits-flow-poster.webp"
+                     muted loop playsinline preload="none"></video>
+            </div>
             <div class="pc-media pc-media--hits" aria-hidden="true"><canvas data-media="hits-pulse"></canvas></div>
             <div class="pc-top">
               <img class="pc-mark" src="assets/icons/hits.svg" alt="HITS emblem" width="40" height="40" loading="lazy">
@@ -838,7 +850,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.js?v=17174e5a24";
+    import { sky } from "./assets/js/sky.js?v=9f58076b85";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -933,10 +945,10 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   <!-- GSAP drives the scroll choreography. Free for commercial use since
        Webflow released the whole library, plugins included, in April 2025.
        Deferred: nothing here is needed for first paint. -->
-  <script src="assets/js/vendor/gsap.min.js?v=17174e5a24" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=17174e5a24" defer></script>
-  <script type="module" src="assets/js/main.js?v=17174e5a24"></script>
-  <script type="module" src="assets/js/home.js?v=17174e5a24"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=9f58076b85" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=9f58076b85" defer></script>
+  <script type="module" src="assets/js/main.js?v=9f58076b85"></script>
+  <script type="module" src="assets/js/home.js?v=9f58076b85"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -984,6 +996,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.js?v=17174e5a24" defer></script>
+  <script src="assets/js/analytics.js?v=9f58076b85" defer></script>
 </body>
 </html>
