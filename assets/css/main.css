@@ -127,6 +127,12 @@
   --accent-hits:     #ff6d00;
   --accent-aurora:   #7c3aed;
   --accent-cgv:      #1d4e89;
+  /* Aurora Intelligence. Cyan against violet footage, because the accent has to
+     carry the card's border, its mark and its arrow, and a violet accent over a
+     violet clip carries none of them. It is also the one colour left that is
+     not already a project: clear of the YANC teal and well clear of the CGV
+     navy. */
+  --accent-ai:       #22d3ee;
   --accent-cern:     #3b82f6;
   --accent-pubs:     #f59e0b;
   --accent-news:     #ec4899;
@@ -1494,6 +1500,17 @@ a:hover > .frame > [data-drift],
   border: 1px solid color-mix(in srgb, var(--pc) 28%, transparent);
   object-fit: contain;
 }
+/* Five projects have a mark of their own and one does not yet, so that one takes
+   an icon from the sheet in the same plate. A graph rather than a brain or a
+   robot: the first two are what stock imagery thinks a model looks like, and a
+   graph of nodes and edges is what one is. */
+.pc-mark--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pc);
+}
+.pc-mark--icon i { font-size: 22px; }
 
 .pc-id { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 /* The type carries its own ground now, because the scrim behind it is thin
@@ -1525,26 +1542,32 @@ a:hover > .frame > [data-drift],
   --glass-tint: color-mix(in srgb, var(--pc) 14%, transparent);
   --glass-edge: color-mix(in srgb, var(--pc) 34%, transparent);
   --glass-edge-hover: color-mix(in srgb, var(--pc) 62%, transparent);
-  /* Held back at rest so it has somewhere to go. The plate used to light on
-     hover while the arrow drawn on it stayed exactly as bright as before, which
-     meant the one part of the control the eye actually follows never moved. */
-  color: color-mix(in srgb, var(--pc) 72%, transparent);
+  color: var(--pc);
   font-size: 15px;
-  transition: background var(--t-base), color var(--t-base),
-              box-shadow var(--t-base), transform var(--t-base);
 }
-/* Focus as well as hover: the arrow is the affordance, and a keyboard reaching
-   the card should be told the same thing a pointer is. */
+/* Nothing else. It is a .glass-btn, so hovering the card gives it exactly what
+   hovering any other glass control on the site gives: the pane lifts a pixel,
+   the edge takes --glass-edge-hover, the light along the top comes up. There
+   was a glow and a colour lifted toward white and a sideways nudge here, which
+   was three effects invented for one button and nothing like the rest of the
+   site. A control that behaves differently from every other control is not a
+   detail, it is a second design.
+
+   Focus as well as hover, since a keyboard reaching the card should be told
+   what a pointer is told. */
 .pc-card:hover .pc-go,
 .pc-card:focus-visible .pc-go {
-  background: color-mix(in srgb, var(--pc) 22%, transparent);
-  /* Full strength and then some. Lifting the project colour toward white is
-     what reads as the arrow lighting rather than merely appearing; the glow
-     carries the same colour out past the plate so it looks lit from inside. */
-  color: color-mix(in srgb, var(--pc) 62%, #ffffff);
-  --glass-edge: color-mix(in srgb, var(--pc) 62%, transparent);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--pc) 30%, transparent);
-  transform: translateX(2px);
+  transform: translateY(-1px);
+  border-color: var(--glass-edge-hover);
+  background:
+    linear-gradient(148deg,
+      rgba(255, 255, 255, 0.175) 0%,
+      rgba(255, 255, 255, 0.062) 46%,
+      rgba(255, 255, 255, 0.098) 100%),
+    var(--glass-tint);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.055),
+              0 8px 24px rgba(0, 0, 0, 0.38);
 }
 
 /* No rule under the description any more. It used to be the lid of the preview
@@ -1718,6 +1741,14 @@ a:hover > .frame > [data-drift],
    for anyone who asked for reduced motion. */
 .pc-media--aurora {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.34) 13%, #000 40%, #000 100%);
+}
+/* The brightest thing in this clip is the monitor behind the hand, and it sits
+   exactly where the name goes. The top comes off harder than the aurora's for
+   that reason, and the last few per cent come off as well, because the forearm
+   runs out of the bottom of the frame rather than ending. */
+.pc-media--ai {
+  --pc-fade: linear-gradient(180deg,
+    transparent 0%, rgba(0,0,0,0.30) 12%, #000 38%, #000 88%, rgba(0,0,0,0.45) 100%);
 }
 
 /* ── CGV: the rendered geometry, turning ────────────────────────

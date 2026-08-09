@@ -60,7 +60,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=2bf10419ec">
+  <link rel="stylesheet" href="assets/css/icons.css?v=76c1e9ac96">
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -144,8 +144,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=2bf10419ec" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=2bf10419ec"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=76c1e9ac96" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=76c1e9ac96"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -749,6 +749,39 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
             <span class="pc-cap glass" data-i18n="home.projects.p_cgv">Calorimeter geometry, turning</span>
           </a>
 
+          <!-- The sixth card, which is also what makes the grid two rows of three
+               instead of three and a pair.
+
+               The footage is not the laboratory's, and it is stock, so the card
+               carries no caption: the other captions name something the group
+               measured or computed, and a line under somebody else's clip would
+               be dressing it up as the group's own work. Same rule the SAPHO
+               card follows.
+
+               Cut forward then backward inside one file, like the CGV and aurora
+               clips, because the hand opens over the length of the take and does
+               not return: played straight it would snap from open back to closed
+               on every turn. The source is 1080x2048 and this is a 1080x1317
+               window from it, placed so the fingers sit a third of the way down
+               rather than under the wordmark. -->
+          <a href="projects/ai" class="pc-card" style="--pc:var(--accent-ai)">
+            <div class="pc-media pc-media--ai" aria-hidden="true">
+              <video data-media="ai-loop"
+                     data-src="assets/videos/ai-hand-loop.mp4"
+                     poster="assets/images/projects/ai-hand-poster.webp"
+                     muted loop playsinline preload="none"></video>
+            </div>
+            <div class="pc-top">
+              <span class="pc-mark pc-mark--icon" aria-hidden="true"><i class="ph ph-graph"></i></span>
+              <div class="pc-id">
+                <span class="pc-name">AI</span>
+                <span class="pc-full">Aurora Intelligence</span>
+              </div>
+              <span class="pc-go glass-btn" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
+            </div>
+            <p class="pc-desc" data-i18n="projects.ai.short">The laboratory's own artificial intelligence. Under development.</p>
+          </a>
+
         </div>
 
         <!-- The repository hosts used to occupy two tiles in this grid, which
@@ -790,7 +823,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.js?v=2bf10419ec";
+    import { sky } from "./assets/js/sky.js?v=76c1e9ac96";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -885,10 +918,10 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   <!-- GSAP drives the scroll choreography. Free for commercial use since
        Webflow released the whole library, plugins included, in April 2025.
        Deferred: nothing here is needed for first paint. -->
-  <script src="assets/js/vendor/gsap.min.js?v=2bf10419ec" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=2bf10419ec" defer></script>
-  <script type="module" src="assets/js/main.js?v=2bf10419ec"></script>
-  <script type="module" src="assets/js/home.js?v=2bf10419ec"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=76c1e9ac96" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=76c1e9ac96" defer></script>
+  <script type="module" src="assets/js/main.js?v=76c1e9ac96"></script>
+  <script type="module" src="assets/js/home.js?v=76c1e9ac96"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -936,6 +969,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.js?v=2bf10419ec" defer></script>
+  <script src="assets/js/analytics.js?v=76c1e9ac96" defer></script>
 </body>
 </html>
