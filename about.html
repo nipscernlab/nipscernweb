@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=ae382a5256">
-  <link rel="stylesheet" href="assets/css/main.css?v=ae382a5256">
+  <link rel="stylesheet" href="assets/css/icons.css?v=7e4188e816">
+  <link rel="stylesheet" href="assets/css/main.css?v=7e4188e816">
 </head>
 <body>
 
@@ -124,7 +124,11 @@
           </p>
         </div>
 
-        <div id="team-mount" class="team-mount">
+        <!-- One panel, reused. Its content is written the moment it opens, so
+           seventeen biographies are never in the document at once. -->
+      <dialog id="member-dialog" class="rd-dialog glass" aria-label="Team member"></dialog>
+
+      <div id="team-mount" class="team-mount">
           <!-- Floating bubble field (or static grid fallback) built by the team script below -->
         </div>
       </div>
@@ -370,14 +374,75 @@
       member.github && '<a href="' + member.github + '" target="_blank" rel="noopener" class="rt-link" aria-label="GitHub"><i class="ph ph-github-logo" aria-hidden="true"></i></a>',
       member.linkedin && '<a href="' + member.linkedin + '" target="_blank" rel="noopener" class="rt-link" aria-label="LinkedIn"><i class="ph ph-linkedin-logo" aria-hidden="true"></i></a>'
       ].filter(Boolean).join('');
-      return '<article class="rt-card glass" aria-labelledby="member-' + member.id + '">'
+      return '<button type="button" class="rt-card glass" data-member="' + member.id + '" aria-haspopup="dialog">'
       + '<div class="rt-photo">' + avatarImg(member) + '</div>'
-      + '<p class="rt-name" id="member-' + member.id + '">' + member.name + '</p>'
+      + '<p class="rt-name">' + member.name + '</p>'
       + '<p class="rt-role">' + roleLabel(member.role) + '</p>'
       + (areas ? '<div class="rt-areas">' + areas + '</div>' : '')
       + (links ? '<div class="rt-links">' + links + '</div>' : '')
-      + '</article>';
+      + '<span class="rt-more" aria-hidden="true">' + t('about.team.more') + '</span>'
+        + '</button>';
     }
+
+    /* The full record, one person at a time.
+
+       The roster had to lose the biography to be a roster: seventeen paragraphs
+       in a grid is a wall nobody reads to the end of. It is not gone, it is one
+       click away, and everything team.json holds about a person is in here,
+       which is more than the old cards ever showed: every research area rather
+       than the first two, the awards, and all three links.
+
+       A native <dialog>. Escape closes it, the backdrop belongs to the browser,
+       focus is held inside without a line of code, and the whole thing is inert
+       while it is shut. Written by hand this is two hundred lines and three
+       accessibility bugs. */
+    let ROSTER_BY_ID = {};
+
+    function detailHTML(m) {
+      const areas = (m.areas || [])
+        .map(function (a) { return '<span class="rt-area">' + a + '</span>'; }).join('');
+      const awards = (m.awards || [])
+        .map(function (a) {
+          return '<li class="rd-award"><span class="rd-award-year">' + (a.year || '') + '</span>'
+               + '<span>' + (a.title || a) + '</span></li>';
+        }).join('');
+      const links = [
+        m.lattes && '<a href="' + m.lattes + '" target="_blank" rel="noopener" class="btn btn-ghost btn-sm glass-btn">' + LATTES_ICON + ' Lattes</a>',
+        m.github && '<a href="' + m.github + '" target="_blank" rel="noopener" class="btn btn-ghost btn-sm glass-btn"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a>',
+        m.linkedin && '<a href="' + m.linkedin + '" target="_blank" rel="noopener" class="btn btn-ghost btn-sm glass-btn"><i class="ph ph-linkedin-logo" aria-hidden="true"></i> LinkedIn</a>'
+      ].filter(Boolean).join('');
+      return '<button type="button" class="rd-close glass-btn" data-close aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button>'
+        + '<div class="rd-head">'
+        +   '<div class="rt-photo rd-photo">' + avatarImg(m) + '</div>'
+        +   '<div>'
+        +     '<p class="rd-name">' + (m.title ? m.title + ' ' : '') + m.name + '</p>'
+        +     '<p class="rt-role">' + roleLabel(m.role) + '</p>'
+        +   '</div>'
+        + '</div>'
+        + (m.bio ? '<p class="rd-bio">' + m.bio + '</p>' : '')
+        + (areas ? '<div class="rd-block"><p class="rd-label">' + t('about.team.areas') + '</p><div class="rt-areas rd-areas">' + areas + '</div></div>' : '')
+        + (awards ? '<div class="rd-block"><p class="rd-label">' + t('about.team.awards') + '</p><ul class="rd-awards">' + awards + '</ul></div>' : '')
+        + (links ? '<div class="rd-links">' + links + '</div>' : '');
+    }
+
+    function openMember(id) {
+      const m = ROSTER_BY_ID[id];
+      const dlg = document.getElementById('member-dialog');
+      if (!m || !dlg) return;
+      dlg.innerHTML = detailHTML(m);
+      dlg.showModal();
+    }
+
+    document.addEventListener('click', function (e) {
+      const card = e.target.closest && e.target.closest('.rt-card[data-member]');
+      if (card) { openMember(card.getAttribute('data-member')); return; }
+      const dlg = document.getElementById('member-dialog');
+      if (!dlg || !dlg.open) return;
+      /* The backdrop is the dialog element itself as far as a click is
+         concerned, so a press that lands on it and not on the panel inside is
+         a press outside. */
+      if (e.target === dlg || (e.target.closest && e.target.closest('[data-close]'))) dlg.close();
+    });
 
     /* Researchers, then the undergraduates. The coordinator is not in this
        list at all: that section is above, with the full card the role earns. */
@@ -387,6 +452,8 @@
       const ra = ROSTER_ORDER[a.role], rb = ROSTER_ORDER[b.role];
       return (ra === undefined ? 9 : ra) - (rb === undefined ? 9 : rb);
       });
+      ROSTER_BY_ID = {};
+      sorted.forEach(function (m) { ROSTER_BY_ID[m.id] = m; });
       mount.className = "rt-grid";
       mount.innerHTML = sorted.map(rosterCardHTML).join("");
     }
@@ -689,11 +756,11 @@
        deferred and cost nothing before first paint; motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
        a trigger honest when images land late. docs/design-system.md, section 7. -->
-  <script src="assets/js/vendor/gsap.min.js?v=ae382a5256" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=ae382a5256" defer></script>
-  <script type="module" src="assets/js/main.js?v=ae382a5256"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=7e4188e816" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=7e4188e816" defer></script>
+  <script type="module" src="assets/js/main.js?v=7e4188e816"></script>
   <script type="module">
-    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=ae382a5256";
+    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=7e4188e816";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
@@ -701,6 +768,6 @@
     addEventListener("DOMContentLoaded", initMotion);
   </script>
 
-  <script src="assets/js/analytics.js?v=ae382a5256" defer></script>
+  <script src="assets/js/analytics.js?v=7e4188e816" defer></script>
 </body>
 </html>
