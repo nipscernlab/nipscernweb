@@ -1342,6 +1342,71 @@ a:hover > .frame > [data-drift],
 .is-hoverable:hover .frame > [data-drift] { transform: none; }
 
 /* ============================================================
+   Lab stage — the panorama on the About page
+   ------------------------------------------------------------
+   The one full-bleed thing on that page, and the thing it should be remembered
+   by. It was a picture inside the rails, the same width as the four thumbnails
+   above it and treated the same way, which is a panorama with its point removed.
+
+   Construction is the calorimeter stage from the home page: run to the edge of
+   the window, clip, hang the photograph oversized inside, and let it drift as
+   the page passes. The frame is the licence for the movement; the oversize is
+   what stops the travel ever pulling an empty edge into view. Fifteen per cent
+   of headroom against a drift that travels fourteen.
+   ============================================================ */
+.lab-stage {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: var(--sp-12);
+  height: clamp(220px, 34vw, 460px);
+  overflow: hidden;
+  background: var(--bg-0);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.lab-stage img {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -15%;
+  width: 100%;
+  height: 130%;
+  object-fit: cover;
+  cursor: zoom-in;
+  will-change: transform;
+}
+/* Named where the room is, in the corner, on glass. A caption under a full-bleed
+   picture would put a line of type in the gap between two bands and reopen the
+   seam the band structure exists to close. */
+.lab-stage-cap {
+  position: absolute;
+  left: var(--container-pad);
+  bottom: var(--sp-5);
+  padding: 7px var(--sp-4);
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+@media (max-width: 640px) {
+  /* Shorter, and the caption comes in off the edge with the rails. */
+  .lab-stage { height: clamp(180px, 44vw, 260px); margin-top: var(--sp-10); }
+  .lab-stage-cap { left: var(--sp-4); bottom: var(--sp-4); }
+}
+
+/* The four laboratory photographs above it are frames like everything else on
+   the site: the box owns the proportion, the picture fills it, and pointing at
+   one gives the same 4% it gives on every other cover. They were bare boxes with
+   the sizing written inline on each image. */
+.infra-image.frame {
+  --frame-ratio: 4 / 3;
+  border-radius: var(--r-lg);
+}
+.infra-card:hover .infra-image.frame > img { transform: scale(1.04); }
+
+/* ============================================================
    Cards
    ============================================================ */
 .card {
@@ -2845,6 +2910,20 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   align-items: center;
   gap: var(--sp-12);
 }
+/* A hero with nothing beside the heading is one column, not two and an empty
+   one. Grid keeps the gap between declared tracks whether or not anything is in
+   them, so taking the figure out of the About hero would otherwise have left
+   sixty-four pixels of nothing pinned to the right of the page.
+
+   And the line length comes back under control. Against a figure the text had a
+   natural limit; across the full rail a subtitle runs to well over a hundred
+   characters, which is past the point where a reader loses the start of the
+   next line. */
+.page-hero-grid:not(:has(.page-hero-accent)) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.page-hero-grid:not(:has(.page-hero-accent)) .page-hero-text > p { max-width: 62ch; }
 .page-hero-text { min-width: 0; }
 /* Single subtitle width for all interior heros (replaces 560/600/640 inline) */
 .page-hero-text .body-lg,

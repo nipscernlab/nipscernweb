@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=8c878557c4">
-  <link rel="stylesheet" href="assets/css/main.css?v=8c878557c4">
+  <link rel="stylesheet" href="assets/css/icons.css?v=f3bc1d09c5">
+  <link rel="stylesheet" href="assets/css/main.css?v=f3bc1d09c5">
 </head>
 <body>
 
@@ -55,38 +55,35 @@
               NIPS-CERN unites undergraduate students, researchers, and world-class scientists in the pursuit of knowledge at the edge of modern physics.
             </p>
           </div>
-          <figure class="page-hero-accent" aria-hidden="true">
-            <img src="assets/images/undraw/undraw_continuous-learning_a1ld.svg" alt="" width="260" height="165" loading="lazy" onerror="this.parentElement.style.display='none'">
-          </figure>
+          <!-- No stock drawing beside the heading. There was an undraw figure
+               here, from the library that used to sit on every page: a generic
+               picture of people learning, on a page that has photographs of the
+               laboratory's own rooms at CERN a screen further down. The heading
+               carries the hero and the group's own material carries the page. -->
         </div>
       </div>
     </header>
 
-    <!-- MEDIA SLOT — lab tour video or abstract SVG (replace/uncomment below) -->
-    <!--
-    <section style="padding:0;background:var(--bg-0)">
-      <div class="container container--narrow" style="padding-top:var(--sp-10);padding-bottom:var(--sp-10)">
-        <div style="aspect-ratio:16/9;border-radius:var(--r-xl);overflow:hidden">
-          <iframe src="YOUR_LAB_TOUR_VIDEO" allow="autoplay;fullscreen" style="width:100%;height:100%;border:0" loading="lazy" title="NIPS-CERN Lab Tour"></iframe>
-        </div>
-      </div>
-    </section> -->
-
     <!-- ======================================================
          MISSION
-         ====================================================== -->
-    <section class="section" aria-labelledby="mission-title">
+         ======================================================
+         Bands, not boxes. Every section from here down is a full-width band
+         whose top fades out of the colour of the one above it, which is what
+         .seam does and what --seam-from names. What they carried before was
+         `border-top: 1px solid`, a hairline that draws the join instead of
+         dissolving it. docs/design-system.md, section 1. -->
+    <section class="section seam" style="--seam-from:var(--bg-0)" aria-labelledby="mission-title">
       <div class="container container--narrow">
         <div class="fade-up">
           <div class="accent-line" aria-hidden="true"></div>
           <h2 class="heading-lg" id="mission-title" data-i18n="about.mission.title">Our Mission</h2>
           <p class="body-lg" style="margin-top:var(--sp-5)" data-i18n="about.mission.text">
-            To integrate engineering, software development, particle physics and logic into the creation of concrete tools, architectures, and systems that support scientific research — and to prepare the next generation of scientists by involving undergraduate students directly in real experiments alongside CERN researchers.
+            To bring engineering, software, particle physics and logic together into concrete tools, architectures and systems that scientific research can actually use, and to prepare the next generation of scientists by putting undergraduates inside real experiments alongside CERN researchers.
           </p>
 
           <div class="info-box" style="margin-top:var(--sp-8)">
             <i class="ph ph-star" aria-hidden="true"></i>
-            <p data-i18n="about.mission.callout">A defining aspect of NIPS-CERN is the direct involvement of undergraduate students in real CERN experiments — working side by side with international researchers on active physics analyses and detector instrumentation projects.</p>
+            <p data-i18n="about.mission.callout">What defines NIPS-CERN is where its undergraduates work. They are inside real CERN experiments, on active physics analyses and detector instrumentation, next to international researchers.</p>
           </div>
         </div>
       </div>
@@ -95,7 +92,7 @@
     <!-- ======================================================
          COORDINATOR
          ====================================================== -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="coordinator-title">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-1)" aria-labelledby="coordinator-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
@@ -114,7 +111,7 @@
     <!-- ======================================================
          TEAM
          ====================================================== -->
-    <section class="section" aria-labelledby="team-title">
+    <section class="section seam" style="--seam-from:var(--bg-0)" aria-labelledby="team-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
@@ -136,7 +133,7 @@
     <!-- ======================================================
          INFRASTRUCTURE
          ====================================================== -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="infra-title">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-1)" aria-labelledby="infra-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
@@ -145,32 +142,32 @@
           </div>
           <h2 class="heading-lg" id="infra-title" data-i18n="about.infrastructure.title">UFJF Laboratory Infrastructure at CERN</h2>
           <p class="body-base" style="max-width:640px;margin-top:var(--sp-3)" data-i18n="about.infrastructure.subtitle">
-            The NIPS-CERN team operates across two sites — NIPS in Brazil and this facility at CERN, where UFJF researchers contribute directly to the ATLAS experiment.
+            The group works from two laboratories: NIPS at UFJF, in Brazil, and this one at CERN, in Switzerland, where UFJF researchers contribute directly to the ATLAS experiment.
           </p>
         </div>
 
         <div class="infra-grid fade-up">
           <div class="infra-card">
-            <div class="infra-image">
-              <img src="assets/lab/cern/Teste_de_PMTs.webp" alt="PMT testing setup at CERN" loading="lazy" class="lightbox-trigger" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in">
+            <div class="infra-image frame">
+              <img src="assets/lab/cern/Teste_de_PMTs.webp" alt="PMT testing setup at CERN" loading="lazy" class="lightbox-trigger" style="cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.workstations">PMT testing setup</div>
           </div>
           <div class="infra-card">
-            <div class="infra-image">
-              <img src="assets/lab/cern/Mother_Boards.webp" alt="ATLAS TileCal mother boards" loading="lazy" class="lightbox-trigger" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in">
+            <div class="infra-image frame">
+              <img src="assets/lab/cern/Mother_Boards.webp" alt="ATLAS TileCal mother boards" loading="lazy" class="lightbox-trigger" style="cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.server">ATLAS TileCal mother boards</div>
           </div>
           <div class="infra-card">
-            <div class="infra-image">
-              <img src="assets/lab/cern/Detector_de_muons_com_simbolo_da_UFJF.webp" alt="Muon detector featuring the UFJF logo" loading="lazy" class="lightbox-trigger" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in">
+            <div class="infra-image frame">
+              <img src="assets/lab/cern/Detector_de_muons_com_simbolo_da_UFJF.webp" alt="Muon detector featuring the UFJF logo" loading="lazy" class="lightbox-trigger" style="cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.fpga">Muon detector board featuring the UFJF logo</div>
           </div>
           <div class="infra-card">
-            <div class="infra-image">
-              <img src="assets/lab/cern/Modulo_TileCal.webp" alt="TileCal module at CERN" loading="lazy" class="lightbox-trigger" style="width:100%;height:100%;object-fit:cover;cursor:zoom-in">
+            <div class="infra-image frame">
+              <img src="assets/lab/cern/Modulo_TileCal.webp" alt="TileCal module at CERN" loading="lazy" class="lightbox-trigger" style="cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.lab">TileCal module at CERN</div>
           </div>
@@ -180,7 +177,7 @@
         <div class="info-box fade-up" style="margin-top:var(--sp-6);display:flex;gap:var(--sp-4);align-items:flex-start;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-5)">
           <i class="ph ph-clock-counter-clockwise" aria-hidden="true" style="font-size:24px;color:var(--text-muted);flex-shrink:0;margin-top:2px"></i>
           <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0" data-i18n-html="about.infrastructure.history">
-            <strong style="color:var(--text-primary)">Formerly LAPTEL</strong> — The group was originally known as <em>LAPTEL</em> (Signal Processing and Telecommunications Laboratory) before being renamed <em>NIPS</em> (Centre for Instrumentation and Signal Processing) and later <em>NIPS-CERN</em> following the formalisation of the CERN collaboration. Our laboratory is located in the <strong style="color:var(--text-primary)">PPEE</strong> — Graduate Program in Electrical Engineering — building at UFJF.
+            <strong style="color:var(--text-primary)">Formerly LAPTEL</strong>. The group was originally known as <em>LAPTEL</em> (Signal Processing and Telecommunications Laboratory) before being renamed <em>NIPS</em> (Centre for Instrumentation and Signal Processing) and later <em>NIPS-CERN</em> following the formalisation of the CERN collaboration. Our laboratory is located in the <strong style="color:var(--text-primary)">PPEE</strong>, the Graduate Program in Electrical Engineering, building at UFJF.
           </p>
         </div>
 
@@ -195,17 +192,37 @@
           </div>
         </div>
 
-        <!-- Panoramic photo -->
-        <figure class="fade-up" style="margin-top:var(--sp-8);border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border-subtle)">
-          <img src="assets/lab/cern/Panoramica.webp" alt="Panoramic view of the UFJF laboratory at CERN" loading="lazy" class="lightbox-trigger" style="width:100%;height:auto;display:block;cursor:zoom-in">
-        </figure>
       </div>
+
+      <!-- The one thing this page is remembered by.
+           It was a picture inside the rails, the same width as the four
+           thumbnails above it and treated the same way. It is a panorama of the
+           room the laboratory actually works in at CERN, which is the most
+           substantial photograph the group owns, and a panorama held inside a
+           column is a panorama with its point removed.
+
+           So it runs to the edge of the window, and it drifts inside its own
+           frame as the page passes: the frame clips, which is the only licence
+           this site gives for movement. The photograph is hung oversized in CSS
+           so the travel never pulls an empty edge into view. Same construction
+           as the calorimeter stage on the home page.
+
+           Still a lightbox trigger, because full bleed is not full size and the
+           detail in it is worth opening. -->
+      <figure class="lab-stage fade-up" data-drift-frame>
+        <img src="assets/lab/cern/Panoramica.webp"
+             alt="Panoramic view of the UFJF laboratory at CERN"
+             class="lightbox-trigger" data-drift="7" loading="lazy" decoding="async">
+        <figcaption class="lab-stage-cap glass" data-i18n="about.infrastructure.panorama">
+          The laboratory at CERN, Route Salam, Meyrin
+        </figcaption>
+      </figure>
     </section>
 
     <!-- ======================================================
          PARTNER INSTITUTIONS
          ====================================================== -->
-    <section class="section" aria-labelledby="partners-title">
+    <section class="section seam" style="--seam-from:var(--bg-0)" aria-labelledby="partners-title">
       <div class="container">
         <div class="section-header section-header--center fade-up">
           <div class="eyebrow" style="justify-content:center">
@@ -231,7 +248,7 @@
           <a href="https://cnpq.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CNPq">
             <img src="assets/images/sponsors/cnpq.svg" alt="CNPq logo" loading="lazy" decoding="async">
           </a>
-          <a href="https://ufjf.br" target="_blank" rel="noopener" class="sponsor-logo" data-i18n-aria="about.partners.ufjf_aria" aria-label="UFJF — Federal University of Juiz de Fora">
+          <a href="https://ufjf.br" target="_blank" rel="noopener" class="sponsor-logo" data-i18n-aria="about.partners.ufjf_aria" aria-label="UFJF, Federal University of Juiz de Fora">
             <picture>
               <source srcset="assets/images/sponsors/ufjf.webp" type="image/webp">
               <img src="assets/images/sponsors/ufjf.png" alt="UFJF logo" loading="lazy" decoding="async">
@@ -442,12 +459,12 @@
 
     // Team NETWORK: avatar nodes with PERMANENT links (a fixed edge set built
     // once from nearest neighbours). The graph floats gently via light springs;
-    // the cursor does NOT push nodes — it only highlights nearby links. Borderless
+    // the cursor does NOT push nodes, it only highlights nearby links. Borderless
     // nodes, invisible field boundaries, so the network feels embedded in the page.
     function initField(mount, members) {
       const field = document.createElement('div');
       field.className = 'team-field';
-      field.setAttribute('aria-label', 'Lab members network — hover or focus a photo to read the bio');
+      field.setAttribute('aria-label', 'Lab members network. Hover or focus a photo to read the bio');
       mount.appendChild(field);
 
       const canvas = document.createElement('canvas');
@@ -652,8 +669,22 @@
     });
   </script>
 
-  <script type="module" src="assets/js/main.js?v=8c878557c4"></script>
+  <!-- The same scroll behaviour the home page has. GSAP and ScrollTrigger are
+       deferred and cost nothing before first paint; motion.js reads whatever the
+       page declares with data-drift and applies the refresh discipline that keeps
+       a trigger honest when images land late. docs/design-system.md, section 7. -->
+  <script src="assets/js/vendor/gsap.min.js?v=f3bc1d09c5" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=f3bc1d09c5" defer></script>
+  <script type="module" src="assets/js/main.js?v=f3bc1d09c5"></script>
+  <script type="module">
+    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=f3bc1d09c5";
+    /* revealFailsafe first and unconditionally: this page hides everything behind
+       .fade-up and an observer in main.js, and the net under that has to be there
+       whether or not GSAP loaded. */
+    revealFailsafe();
+    addEventListener("DOMContentLoaded", initMotion);
+  </script>
 
-  <script src="assets/js/analytics.js?v=8c878557c4" defer></script>
+  <script src="assets/js/analytics.js?v=f3bc1d09c5" defer></script>
 </body>
 </html>
