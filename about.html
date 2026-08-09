@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=f3bc1d09c5">
-  <link rel="stylesheet" href="assets/css/main.css?v=f3bc1d09c5">
+  <link rel="stylesheet" href="assets/css/icons.css?v=cba67f36d5">
+  <link rel="stylesheet" href="assets/css/main.css?v=cba67f36d5">
 </head>
 <body>
 
@@ -102,7 +102,7 @@
           <h2 class="heading-lg" id="coordinator-title" data-i18n="about.coordinator.title">Laboratory Coordinator</h2>
         </div>
 
-        <div class="coordinator-card fade-up" id="coordinator-card">
+        <div class="coordinator-card glass fade-up" id="coordinator-card">
           <!-- Populated dynamically from data/team.json -->
         </div>
       </div>
@@ -147,25 +147,25 @@
         </div>
 
         <div class="infra-grid fade-up">
-          <div class="infra-card">
+          <div class="infra-card glass">
             <div class="infra-image frame">
               <img src="assets/lab/cern/Teste_de_PMTs.webp" alt="PMT testing setup at CERN" loading="lazy" class="lightbox-trigger" style="cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.workstations">PMT testing setup</div>
           </div>
-          <div class="infra-card">
+          <div class="infra-card glass">
             <div class="infra-image frame">
               <img src="assets/lab/cern/Mother_Boards.webp" alt="ATLAS TileCal mother boards" loading="lazy" class="lightbox-trigger" style="cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.server">ATLAS TileCal mother boards</div>
           </div>
-          <div class="infra-card">
+          <div class="infra-card glass">
             <div class="infra-image frame">
               <img src="assets/lab/cern/Detector_de_muons_com_simbolo_da_UFJF.webp" alt="Muon detector featuring the UFJF logo" loading="lazy" class="lightbox-trigger" style="cursor:zoom-in">
             </div>
             <div class="infra-caption" data-i18n="about.infrastructure.items.fpga">Muon detector board featuring the UFJF logo</div>
           </div>
-          <div class="infra-card">
+          <div class="infra-card glass">
             <div class="infra-image frame">
               <img src="assets/lab/cern/Modulo_TileCal.webp" alt="TileCal module at CERN" loading="lazy" class="lightbox-trigger" style="cursor:zoom-in">
             </div>
@@ -174,7 +174,7 @@
         </div>
 
         <!-- Lab history note -->
-        <div class="info-box fade-up" style="margin-top:var(--sp-6);display:flex;gap:var(--sp-4);align-items:flex-start;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-5)">
+        <div class="info-box glass fade-up" style="--glass-tint:var(--bg-card);margin-top:var(--sp-6);border-radius:var(--r-xl)">
           <i class="ph ph-clock-counter-clockwise" aria-hidden="true" style="font-size:24px;color:var(--text-muted);flex-shrink:0;margin-top:2px"></i>
           <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0" data-i18n-html="about.infrastructure.history">
             <strong style="color:var(--text-primary)">Formerly LAPTEL</strong>. The group was originally known as <em>LAPTEL</em> (Signal Processing and Telecommunications Laboratory) before being renamed <em>NIPS</em> (Centre for Instrumentation and Signal Processing) and later <em>NIPS-CERN</em> following the formalisation of the CERN collaboration. Our laboratory is located in the <strong style="color:var(--text-primary)">PPEE</strong>, the Graduate Program in Electrical Engineering, building at UFJF.
@@ -187,7 +187,7 @@
             <div class="heading-sm" data-i18n="about.infrastructure.tour_title">360° Lab Tour</div>
             <p class="body-sm" style="margin-top:var(--sp-2);max-width:520px" data-i18n="about.infrastructure.tour_subtitle">Explore our workspace at CERN in an interactive panoramic tour.</p>
           </div>
-          <div style="aspect-ratio:16/9;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border-subtle)">
+          <div class="glass" style="--glass-tint:var(--bg-0);aspect-ratio:16/9;border-radius:var(--r-xl);overflow:hidden">
             <iframe src="https://my.matterport.com/show/?m=WS1wChijXcN" allow="autoplay; fullscreen; web-share; xr-spatial-tracking" allowfullscreen loading="lazy" style="width:100%;height:100%;border:0" title="NIPS-CERN 360° Lab Tour at CERN"></iframe>
           </div>
         </div>
@@ -673,11 +673,11 @@
        deferred and cost nothing before first paint; motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
        a trigger honest when images land late. docs/design-system.md, section 7. -->
-  <script src="assets/js/vendor/gsap.min.js?v=f3bc1d09c5" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=f3bc1d09c5" defer></script>
-  <script type="module" src="assets/js/main.js?v=f3bc1d09c5"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=cba67f36d5" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=cba67f36d5" defer></script>
+  <script type="module" src="assets/js/main.js?v=cba67f36d5"></script>
   <script type="module">
-    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=f3bc1d09c5";
+    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=cba67f36d5";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
@@ -685,6 +685,6 @@
     addEventListener("DOMContentLoaded", initMotion);
   </script>
 
-  <script src="assets/js/analytics.js?v=f3bc1d09c5" defer></script>
+  <script src="assets/js/analytics.js?v=cba67f36d5" defer></script>
 </body>
 </html>
