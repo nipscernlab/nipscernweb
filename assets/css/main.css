@@ -882,12 +882,13 @@ h1, h2, h3, h4, h5, h6 {
   --glass-tint: rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
-  /* Small. It is a setting, not a section of the site, and it sits beside a
-     wordmark it has no business rivalling: the whole pill is narrower than one
-     navigation link. The gaps come down with the circles, or shrinking the
-     marks alone would only leave the same amount of air around less. */
-  gap: 3px;
-  padding: 3px;
+  /* Small, and spaced. It is a setting, not a section of the site, so the marks
+     came down to 19px; at three pixels apart they then read as one striped
+     object rather than as four things to choose between, which is the opposite
+     of what a smaller control is for. The air goes back horizontally only: the
+     pill stays the height it was and the flags stop touching. */
+  gap: 8px;
+  padding: 3px 7px;
   border-radius: var(--r-full);
   flex-shrink: 0;
 }
@@ -961,7 +962,10 @@ h1, h2, h3, h4, h5, h6 {
 .lang-btn--row {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  /* The same horizontal breathing room the pill got. A flag pressed against the
+     word it labels reads as one thing; a step of air makes it the mark for the
+     line rather than the first letter of it. */
+  gap: var(--sp-4);
   width: 100%;
   height: auto;
   padding: var(--sp-3) var(--sp-4);
@@ -5092,10 +5096,10 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
     min-height: 36px;
     flex-shrink: 0;
   }
-  /* Nothing left to take. The pill is already the smallest control in the bar,
-     and the rule that used to be here shrank the flags themselves to 22 by 16,
-     which solved the bar's problem by making the control too small to hit. */
-  .lang-switcher { gap: 2px; padding: 2px; }
+  /* A little of the horizontal air back, and no more. The rule that used to be
+     here shrank the flags themselves to 22 by 16, which solved the bar's
+     problem by making the control too small to hit. */
+  .lang-switcher { gap: 6px; padding: 3px 5px; }
   .grid-3 { grid-template-columns: 1fr 1fr; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .experiments-grid { grid-template-columns: 1fr; }
