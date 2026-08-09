@@ -882,15 +882,19 @@ h1, h2, h3, h4, h5, h6 {
   --glass-tint: rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px;
+  /* Small. It is a setting, not a section of the site, and it sits beside a
+     wordmark it has no business rivalling: the whole pill is narrower than one
+     navigation link. The gaps come down with the circles, or shrinking the
+     marks alone would only leave the same amount of air around less. */
+  gap: 3px;
+  padding: 3px;
   border-radius: var(--r-full);
   flex-shrink: 0;
 }
 
 .lang-btn {
-  width: 26px;
-  height: 26px;
+  width: 19px;
+  height: 19px;
   border-radius: var(--r-full);
   padding: 0;
   border: 0;
@@ -901,13 +905,14 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0;
   transition: box-shadow var(--t-base), transform var(--t-base);
 }
-/* The target, which is bigger than the picture. A 26px circle is the right size
-   for this bar and half the size a finger needs, so the hit area is extended
-   past the artwork by something with no appearance of its own. */
+/* The target, which is bigger than the picture and gets bigger as the picture
+   shrinks. Nineteen pixels is under half what a finger needs, so the hit area
+   is pushed out to about 39 by something with no appearance of its own; the
+   pill can go on getting quieter without the control getting harder to use. */
 .lang-btn::before {
   content: '';
   position: absolute;
-  inset: -7px;
+  inset: -10px;
   border-radius: var(--r-full);
 }
 
@@ -920,7 +925,7 @@ h1, h2, h3, h4, h5, h6 {
   /* Inside, not around: an outer ring would sit beyond the crop and give the
      circle a rim. A flag with white in it still needs an edge against a
      near-black bar. */
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
   /* Held down by saturation rather than by opacity. Fading toward the
      background greys the whites and the mark goes soft; taking the colour out
      keeps every edge and removes only the shouting. */
@@ -942,13 +947,13 @@ h1, h2, h3, h4, h5, h6 {
    circle by a gap, which is the same mark the active navigation link carries. */
 .lang-btn.active .lang-chip { filter: none; }
 .lang-btn.active {
-  box-shadow: 0 0 0 2px var(--bg-1), 0 0 0 3.5px var(--brand);
+  box-shadow: 0 0 0 1.5px var(--bg-1), 0 0 0 3px var(--brand);
 }
-.lang-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.lang-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; }
 
 /* The named version, for the mobile menu.
    Same buttons and the same handler, a column instead of a row. There is a
-   whole panel of space there, and no reason to make somebody recognise a 26px
+   whole panel of space there, and no reason to make somebody recognise a 19px
    flag when the word fits beside it. Each language is named in its own
    language, because a reader looking for Norwegian is looking for Norsk, which
    is also why none of this needs translating. */
@@ -5087,11 +5092,10 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
     min-height: 36px;
     flex-shrink: 0;
   }
-  /* One notch, and it comes out of the gaps rather than out of the flags. The
-     rule that used to be here shrank them to 22 by 16, which solved the bar's
-     problem by making the control too small to hit; the circles keep their size
-     and the pill tightens around them. */
-  .lang-switcher { gap: 3px; padding: 3px; }
+  /* Nothing left to take. The pill is already the smallest control in the bar,
+     and the rule that used to be here shrank the flags themselves to 22 by 16,
+     which solved the bar's problem by making the control too small to hit. */
+  .lang-switcher { gap: 2px; padding: 2px; }
   .grid-3 { grid-template-columns: 1fr 1fr; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .experiments-grid { grid-template-columns: 1fr; }
