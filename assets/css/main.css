@@ -1765,21 +1765,23 @@ a:hover > .frame > [data-drift],
    choice of colour from the footage. saturate puts the strength back and the
    rotation lands it on the card's own orange, a little under 30 degrees.
 
-   Down at the same strength as the screen under YANC, and for the same reason.
-   These two are the identical job on two cards: something happening behind the
-   thing the card is actually about. Half was far too much here, because the
-   trace over it is a 1.7px line and the field is bright thin strokes on black,
-   so at anything like full weight the background wins and the card stops being
-   about the measurement. What is wanted is a surface with movement in it, not a
-   picture, and the number for that turns out to be under a fifth. */
+   No colour, and no filter that could invent one. This carried sepia for a
+   while, to collapse the clip's gold and teal onto one hue before rotating it
+   to the card's orange, and sepia is a yellow-brown by definition: under a
+   saturation that low it stopped reading as orange and started reading as a
+   dirty yellow wash across the card. That was the glow that would not go away.
+
+   The chroma comes out at the encode instead, exactly as it does on YANC, so
+   there is nothing here but weight. Both cards get their colour where every
+   other card gets it: from the scrim and the hairline, which carry --pc.
+
+   And the weight is low. The trace over this is a 1.7px line, the field is
+   bright thin strokes on black, and thin bright strokes read far hotter than
+   their area suggests. A surface with movement in it, not a picture. */
 .pc-media--hits-bg {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.20) 15%, #000 42%, #000 86%, transparent 100%);
-  /* The saturation came down with the rest of it. Thin bright strokes on black
-     read far hotter than their area suggests, and at three and a half the field
-     was a lit orange object in a card whose one lit orange object is meant to
-     be the trace. Enough hue left to say which card this is, and no more. */
   opacity: 0.13;
-  filter: sepia(1) saturate(1.6) hue-rotate(-18deg) brightness(0.42) contrast(0.85);
+  filter: brightness(0.45) contrast(0.85);
 }
 
 .pc-media--hits {
@@ -5421,19 +5423,27 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
    read as a stray scratch rather than as a pane of glass. The hint is a hint,
    so it is the mark and nothing else, with the circle kept only as an invisible
    hit area large enough to press. */
+/* A glass button, like every other control on the site.
+   The chrome came off it once because a stray stroke was showing through the
+   circle at some zoom levels, and taking the whole pane away to lose one line
+   left the one control on the hero that did not belong to the family. It is
+   round rather than rounded, which is the only thing it does differently, and
+   that is because it holds a single glyph and nothing else. */
 .scroll-hint {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   margin-top: var(--sp-6);
-  color: var(--text-muted);
-  opacity: 0.5;
-  transition: opacity var(--t-base), color var(--t-fast);
+  border-radius: var(--r-full);
+  color: var(--text-secondary);
+  opacity: 0.85;
+  transition: opacity var(--t-base), color var(--t-fast),
+              border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
 }
 .scroll-hint:hover { opacity: 1; color: var(--text-primary); }
-.scroll-hint i { font-size: 20px; }
+.scroll-hint i { font-size: 18px; }
 
 /* caret-down is in the sprite now, so the caret points down because it is a
    caret-down, not because a caret-right was turned a quarter. The rotation is
