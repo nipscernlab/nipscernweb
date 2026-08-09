@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=7dc1c43810';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=97e71883dd';
 
-import { newsPostUrl } from './content-links.js?v=7dc1c43810';
+import { newsPostUrl } from './content-links.js?v=97e71883dd';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=7dc1c43810';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=97e71883dd';
 
 // ============================================================
 // Navigation Template
@@ -99,18 +99,19 @@ function buildNav() {
     </button>
   `).join('');
 
-  /* The trigger opens with English in it and is corrected the moment i18n
-     reports which language actually loaded, which is a frame later. Starting
-     empty would flash an empty pill on every page load. */
+  /* In the bar the flag is the whole of the control: four circles in a pill, no
+     words, because two of the four languages are named in scripts of the same
+     alphabet and the mark is quicker to find than the word. The name is still
+     there for anyone who needs it, as the accessible label and the tooltip. */
+  const langBtns = SUPPORTED.map(lang => `
+    <button type="button" class="lang-btn" data-lang="${lang}" aria-pressed="false"
+            aria-label="${LANG_NAMES[lang]}" title="${LANG_NAMES[lang]}">
+      <span class="lang-chip">${FLAG_SVGS[lang]}</span>
+    </button>
+  `).join('');
+
   const langSwitch = `
-    <div class="lang-switch" data-lang-switch>
-      <button type="button" class="lang-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Language">
-        <span class="lang-chip" data-lang-chip>${FLAG_SVGS.en}</span>
-        <span class="lang-code" data-lang-code>EN</span>
-        <i class="ph ph-caret-down lang-caret" aria-hidden="true"></i>
-      </button>
-      <div class="lang-menu glass" role="menu" aria-label="Language">${langRows('')}</div>
-    </div>`;
+    <div class="lang-switcher glass" role="group" aria-label="Language selector">${langBtns}</div>`;
 
   const mobileLinksHtml = NAV_LINKS.map(link => {
     const href = ROOT + link.href;
@@ -169,58 +170,6 @@ function buildNav() {
   `;
 }
 
-/* The pill in the bar.
-   Opening and closing is all that lives here: choosing a language is already
-   handled, because every row is a .lang-btn[data-lang] and i18n.js binds those
-   once for the whole document. This only has to say what is open, keep the
-   trigger showing the language actually in use, and get out of the way when
-   somebody presses Escape or clicks past it. */
-function initLangSwitch(root) {
-  const wrap = root.querySelector('[data-lang-switch]');
-  if (!wrap) return;
-  const trigger = wrap.querySelector('.lang-trigger');
-  const chip = wrap.querySelector('[data-lang-chip]');
-  const code = wrap.querySelector('[data-lang-code]');
-
-  const setOpen = (on) => {
-    wrap.classList.toggle('open', on);
-    trigger.setAttribute('aria-expanded', on ? 'true' : 'false');
-  };
-
-  trigger.addEventListener('click', (e) => {
-    e.stopPropagation();
-    setOpen(!wrap.classList.contains('open'));
-  });
-
-  /* Any choice closes it, including one made with the keyboard, and the click
-     that selected the language is the same one that reaches i18n.js. */
-  wrap.addEventListener('click', (e) => {
-    if (e.target.closest('.lang-btn')) setOpen(false);
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!wrap.contains(e.target)) setOpen(false);
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && wrap.classList.contains('open')) {
-      setOpen(false);
-      trigger.focus();
-    }
-  });
-
-  /* i18n announces the language it settled on, which is also how the trigger
-     gets its first correct value: the markup ships with English in it so the
-     pill is never briefly empty, and this corrects it a frame later. */
-  const sync = (lang) => {
-    if (!FLAG_SVGS[lang]) return;
-    chip.innerHTML = FLAG_SVGS[lang];
-    code.textContent = lang.toUpperCase();
-    trigger.setAttribute('aria-label', LANG_NAMES[lang] || lang);
-  };
-  document.addEventListener('langchange', (e) => sync(e.detail && e.detail.lang));
-  sync(document.documentElement.lang);
-}
-
 function initNav() {
   const nav = document.getElementById('nav');
   if (!nav) return;
@@ -254,8 +203,6 @@ function initNav() {
     document.body.style.overflow = '';
     holdScroll(false);
   };
-
-  initLangSwitch(nav);
 
   btn?.addEventListener('click', openMenu);
   close?.addEventListener('click', closeMenu);
@@ -778,7 +725,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=7dc1c43810">. Each copy would otherwise append its own
+// <script src="main.js?v=97e71883dd">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {

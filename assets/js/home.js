@@ -14,8 +14,8 @@
 
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
-import { publicationUrl, newsPostUrl } from './content-links.js?v=7dc1c43810';
-import { scrollToEl } from './smooth-scroll.js?v=7dc1c43810';
+import { publicationUrl, newsPostUrl } from './content-links.js?v=97e71883dd';
+import { scrollToEl } from './smooth-scroll.js?v=97e71883dd';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
