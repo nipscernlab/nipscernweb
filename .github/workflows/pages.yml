@@ -1,31 +1,40 @@
 name: Publicacao no GitHub Pages
 
-# Substitui o build "legacy" do Pages (o pages-build-deployment que o GitHub
-# gerava sozinho a partir de Settings -> Pages -> Deploy from a branch).
+# Caminho alternativo de publicacao, parado de proposito, e que agora sabe disso.
 #
-# INERTE ATE ALGUEM TROCAR A CONFIGURACAO: enquanto Settings -> Pages -> Source
-# estiver em "Deploy from a branch", quem publica continua sendo o build legacy
-# e este workflow falha no passo de deploy. Depois de trocar Source para
-# "GitHub Actions", este arquivo passa a ser o unico caminho de publicacao.
+# Quem publica o site hoje e o build "legacy" do Pages: Settings -> Pages ->
+# Source em "Deploy from a branch", branch main, pasta raiz. Funciona, e um push
+# no main vai ao ar em menos de um minuto.
 #
-# Por que existe: em 06/08/2026 o caminho legacy parou de publicar. O artefato
-# era construido normalmente, o deployment era aceito, e ficava em
-# deployment_queued ate o proprio action desistir. O mesmo commit (a045661)
-# publicara sem erro no dia anterior, com a arvore identica, e a pagina de
-# status do GitHub nao acusava incidente.
+# Este arquivo existe porque em 06/08/2026 aquele caminho parou de publicar por
+# algumas horas. O artefato era construido normalmente, o deployment era aceito,
+# e ficava em deployment_queued ate o proprio action desistir. O mesmo commit
+# publicara sem erro no dia anterior, com a arvore identica, e a pagina de status
+# do GitHub nao acusava incidente. Se aquilo se repetir, trocar o Source para
+# "GitHub Actions" e rodar este workflow e a saida.
+#
+# O QUE FOI CONSERTADO AQUI
+#
+# Ele falhava. Nao por um defeito seu: enquanto o Source estiver em "Deploy from
+# a branch", o backend do Pages simplesmente nao processa um deployment vindo de
+# workflow, entao actions/deploy-pages ficava dez minutos em deployment_queued e
+# morria no teto rigido de 600000 ms da propria action. Duas execucoes vermelhas
+# no painel, dez minutos cada, por uma condicao que e o estado normal do
+# repositorio.
+#
+# Um workflow que nao pode fazer o seu trabalho deve dizer isso em segundos, e
+# nao falhar depois de dez minutos. O primeiro passo agora le a configuracao real
+# do Pages e, se o build_type nao for "workflow", registra o motivo e encerra
+# verde sem tentar publicar. Quando alguem trocar o Source, os passos seguintes
+# passam a rodar sozinhos, sem editar este arquivo.
 
-# SO MANUAL, de proposito. Enquanto Settings -> Pages -> Source estiver em
-# "Deploy from a branch", quem publica e o builder legacy, e um gatilho de push
-# aqui faria cada commit criar DOIS deployments concorrentes para o mesmo site:
-# o do legacy e o deste workflow, que o backend nem processa porque o
-# build_type e "legacy". Alem de nunca funcionar, isso consome em dobro o limite
-# flexivel de 10 builds/hora do Pages e mantem a fila travada.
+# So manual. Com o Source em "Deploy from a branch", um gatilho de push aqui
+# faria cada commit criar dois deployments concorrentes para o mesmo site, e
+# consumiria em dobro o limite flexivel de 10 builds/hora do Pages.
 #
-# Depois de trocar o Source para "GitHub Actions", troque este bloco por:
-#   on:
-#     push:
-#       branches: [main]
-#     workflow_dispatch:
+# Depois de trocar o Source para "GitHub Actions", acrescente:
+#   push:
+#     branches: [main]
 on:
   workflow_dispatch:
 
@@ -50,11 +59,41 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/configure-pages@v6
+      # Pergunta ao Pages quem esta publicando, antes de gastar dez minutos
+      # descobrindo. "legacy" = Deploy from a branch, e nao ha o que fazer aqui.
+      - id: mode
+        name: De onde o Pages publica hoje
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          build_type=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type' 2>/dev/null || echo "unknown")
+          echo "build_type=${build_type}" >> "$GITHUB_OUTPUT"
+          if [ "$build_type" = "workflow" ]; then
+            echo "Source esta em GitHub Actions. Publicando por aqui."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Source do Pages e '${build_type}', nao 'workflow'." \
+                 "Quem publica o site e o builder legacy, direto do branch main," \
+                 "e um deployment vindo daqui ficaria na fila ate estourar o" \
+                 "limite de 10 minutos da action. Nada a fazer: encerrando verde." \
+                 "Para publicar por este caminho, mude Settings -> Pages -> Source" \
+                 "para 'GitHub Actions' e rode de novo."
+          fi
+
+      - if: steps.mode.outputs.run == 'true'
+        uses: actions/configure-pages@v6
 
       # O site e estatico e tem .nojekyll na raiz: nao ha build, so empacotar a
-      # arvore como ela esta — o mesmo que o legacy fazia com source path "/".
-      - uses: actions/upload-pages-artifact@v5
+      # arvore como ela esta, o mesmo que o legacy faz com source path "/".
+      #
+      # A arvore tem 148 MB e 110 deles sao as capas da CERN Courier em
+      # assets/images/magazine. Se um dia este caminho virar o oficial, aquilo e
+      # a primeira coisa a mudar de lugar: o artefato inteiro sobe a cada
+      # publicacao, e o repositorio nipscern-assets existe exatamente para isso.
+      - if: steps.mode.outputs.run == 'true'
+        uses: actions/upload-pages-artifact@v5
         with:
           path: .
 
@@ -62,8 +101,7 @@ jobs:
       # action, nao apenas o padrao. Passar 1800000 so produz
       #   "timeout value is greater than the allowed maximum
       #    - timeout set to the maximum of 600000 milliseconds"
-      # e o deploy morre aos 10 min do mesmo jeito. Se a fila do Pages nao andar
-      # dentro desse limite, o caminho e reduzir o artefato (as capas da CERN
-      # Courier em assets/images/magazine sao ~80% dos 136 MB) ou abrir chamado.
+      # e o deploy morre aos 10 min do mesmo jeito.
       - id: deployment
+        if: steps.mode.outputs.run == 'true'
         uses: actions/deploy-pages@v5
