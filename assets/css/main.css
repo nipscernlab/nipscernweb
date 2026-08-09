@@ -856,81 +856,76 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Language switcher
    ------------------------------------------------------------------
-   One control, not four.
+   Four flags, and the flag is the whole of the control.
 
-   Four national flags standing open in a bar is the loudest thing that can be
-   put in the quietest part of the page. Brazil is green and yellow, France and
-   Norway and the United Kingdom are three variations on red, white and blue,
-   and the bar they sat in is near-black with a single accent. At full strength
-   they competed with the wordmark; at the half opacity they were given, they
-   were four muddy rectangles. Neither of those is a control.
+   It used to be a rectangle of 24 by 17 sitting inside a larger box, with air
+   above and below it, which is what made four of them read as four stickers
+   stuck to the bar rather than one set of four. The button is the circle now
+   and the flag fills it edge to edge: object-fit: cover takes the middle of a
+   wide flag and covers the shape with it, so nothing is letterboxed and there
+   is no ring of background inside the crop. The middle is also where the
+   recognisable part of all four happens to be, and a circle puts four marks
+   drawn to four different proportions onto one shape.
 
-   Nobody arrives looking for four languages. They arrive in one, and now and
-   then they change it. So the bar carries the language the site is in and opens
-   the other three on request: a pill the size of a button, the same on a phone
-   as on a desktop, and no colour in the bar that is not the answer to a
-   question somebody asked.
-
-   The flag fills its circle. It used to be a rectangle sitting in a box with
-   air above and below it, which is what made four of them read as four stickers
-   rather than one control. A circle also crops each flag to its centre, which
-   is where the recognisable part of all four happens to be, and puts four marks
-   drawn to four different proportions on one shape.
+   Tone is the state. Brazil is green and yellow, France and Norway and the
+   United Kingdom are three arrangements of red, white and blue, and the bar
+   they sit in is near-black with a single accent: shown flat they compete with
+   the wordmark, and at the half opacity they used to carry they were four muddy
+   discs. So at rest the saturation comes down and every edge stays, the one in
+   use is the only one at full colour, and pointing at one brings its colour up
+   as a preview of what choosing it does. Which language the site is in can be
+   read without reading anything.
    ------------------------------------------------------------------ */
-.lang-switch { position: relative; flex-shrink: 0; }
-
-.lang-trigger {
-  display: inline-flex;
+.lang-switcher {
+  /* Inside the bar the backdrop filter is off, so without a tint the pill was a
+     hairline around four flags and nothing else. */
+  --glass-tint: rgba(255, 255, 255, 0.05);
+  display: flex;
   align-items: center;
-  gap: 7px;
-  height: 34px;
-  padding: 0 8px 0 5px;
+  gap: 5px;
+  padding: 4px;
   border-radius: var(--r-full);
-  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+
+.lang-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-full);
+  padding: 0;
+  border: 0;
   background: none;
-  color: var(--text-secondary);
   cursor: pointer;
-  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  transition: box-shadow var(--t-base), transform var(--t-base);
 }
-.lang-trigger:hover,
-.lang-switch.open .lang-trigger {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--border-mid);
-  color: var(--text-primary);
+/* The target, which is bigger than the picture. A 26px circle is the right size
+   for this bar and half the size a finger needs, so the hit area is extended
+   past the artwork by something with no appearance of its own. */
+.lang-btn::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: var(--r-full);
 }
-.lang-trigger:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
-/* The code, not the name. Two letters is the whole of what the bar has room to
-   say, and it is the one abbreviation every reader of a multilingual site
-   already knows. Mono because it is a code, and tabular so the pill does not
-   change width between EN and PT. */
-.lang-code {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-}
-.lang-caret {
-  font-size: 12px;
-  opacity: 0.55;
-  transition: transform var(--t-base), opacity var(--t-fast);
-}
-.lang-trigger:hover .lang-caret { opacity: 0.9; }
-.lang-switch.open .lang-caret { transform: rotate(180deg); opacity: 0.9; }
-
-/* The flag, edge to edge. object-fit: cover on a square box takes the middle of
-   a wide flag and fills the circle with it; nothing is letterboxed and there is
-   no ring of background inside the shape. The hairline is drawn inside for the
-   same reason: a flag with white in it needs an edge against a near-black bar,
-   and an outer ring would sit outside the crop and give the circle a rim. */
 .lang-chip {
   display: block;
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
   border-radius: var(--r-full);
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  /* Inside, not around: an outer ring would sit beyond the crop and give the
+     circle a rim. A flag with white in it still needs an edge against a
+     near-black bar. */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  /* Held down by saturation rather than by opacity. Fading toward the
+     background greys the whites and the mark goes soft; taking the colour out
+     keeps every edge and removes only the shouting. */
+  filter: saturate(0.3) brightness(0.85);
+  transition: filter var(--t-base);
 }
 .lang-chip img,
 .lang-chip .flag {
@@ -940,77 +935,50 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
 }
 
-/* The panel. Right-aligned because the pill is at the right end of the bar and
-   a menu that opens away from its own edge reads as belonging to something
-   else. */
-.lang-menu {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  z-index: 60;
-  min-width: 178px;
-  padding: 5px;
-  border-radius: var(--r-lg);
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  /* Closed, and not merely invisible: a menu left in the layout keeps its
-     hit area and swallows clicks meant for the page under it. */
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-6px) scale(0.97);
-  transform-origin: top right;
-  transition: opacity var(--t-fast), transform var(--t-base), visibility 0s linear var(--t-base);
-}
-.lang-switch.open .lang-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  transition: opacity var(--t-fast), transform var(--t-base), visibility 0s;
-}
+.lang-btn:hover { transform: scale(1.1); }
+.lang-btn:hover .lang-chip { filter: none; }
 
-.lang-btn {
+/* The current language: full colour, and a ring in the accent set off from the
+   circle by a gap, which is the same mark the active navigation link carries. */
+.lang-btn.active .lang-chip { filter: none; }
+.lang-btn.active {
+  box-shadow: 0 0 0 2px var(--bg-1), 0 0 0 3.5px var(--brand);
+}
+.lang-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+
+/* The named version, for the mobile menu.
+   Same buttons and the same handler, a column instead of a row. There is a
+   whole panel of space there, and no reason to make somebody recognise a 26px
+   flag when the word fits beside it. Each language is named in its own
+   language, because a reader looking for Norwegian is looking for Norsk, which
+   is also why none of this needs translating. */
+.lang-list { display: flex; flex-direction: column; gap: 2px; }
+.lang-btn--row {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
   width: 100%;
-  padding: 8px 10px;
-  border: 0;
-  border-radius: var(--r-md);
-  background: none;
-  color: var(--text-secondary);
-  font-size: var(--text-sm);
-  text-align: left;
-  cursor: pointer;
-  transition: background var(--t-fast), color var(--t-fast);
-}
-.lang-btn:hover { background: rgba(255, 255, 255, 0.06); color: var(--text-primary); }
-.lang-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
-.lang-btn.active { color: var(--text-primary); }
-
-.lang-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* The mark for the one in use. A tick rather than a highlighted row, because a
-   highlighted row in a menu already means the pointer is on it, and the two
-   meanings on the same surface cancel each other out. */
-.lang-tick {
-  font-size: 15px;
-  color: var(--brand);
-  opacity: 0;
-  transition: opacity var(--t-fast);
-}
-.lang-btn.active .lang-tick { opacity: 1; }
-
-/* The same rows, flat, in the mobile menu. No pill and no panel: the menu is
-   already a panel, and a dropdown inside a dropdown is a place to get lost. */
-.lang-list { display: flex; flex-direction: column; gap: 2px; }
-.lang-btn--row {
+  height: auto;
   padding: var(--sp-3) var(--sp-4);
   border-radius: var(--r-lg);
+  color: var(--text-secondary);
   font-size: var(--text-base);
+  text-align: left;
+  transition: background var(--t-fast), color var(--t-fast);
 }
-.lang-btn--row .lang-chip { width: 24px; height: 24px; }
-.lang-btn--row.active { background: var(--brand-dim); }
+.lang-btn--row::before { content: none; }
+.lang-btn--row .lang-chip { width: 26px; height: 26px; flex-shrink: 0; }
+.lang-btn--row:hover { transform: none; background: var(--border-subtle); color: var(--text-primary); }
+.lang-btn--row.active {
+  box-shadow: none;
+  background: var(--brand-dim);
+  color: var(--text-primary);
+}
+.lang-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The tick belongs to the named list. In the bar the ring is the mark, and a
+   second one drawn over a 26px flag would only cover it. */
+.lang-tick { font-size: 16px; color: var(--brand); opacity: 0; transition: opacity var(--t-fast); }
+.lang-btn--row.active .lang-tick { opacity: 1; }
 
 /* Shared flag assets */
 .flag {
@@ -5056,10 +5024,11 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
     min-height: 36px;
     flex-shrink: 0;
   }
-  /* Nothing for the switcher here any more. There used to be a rule shrinking
-     four flags to 22 by 16 so they would fit, which solved the bar's problem by
-     making the control too small to hit; one pill fits at every width the site
-     is built for and needs no small-screen version of itself. */
+  /* One notch, and it comes out of the gaps rather than out of the flags. The
+     rule that used to be here shrank them to 22 by 16, which solved the bar's
+     problem by making the control too small to hit; the circles keep their size
+     and the pill tightens around them. */
+  .lang-switcher { gap: 3px; padding: 3px; }
   .grid-3 { grid-template-columns: 1fr 1fr; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .experiments-grid { grid-template-columns: 1fr; }
@@ -5073,9 +5042,11 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 }
 
 @media (max-width: 640px) {
-  /* The pill stays. It is one target the size of the hamburger beside it, and
-     the panel it opens is right-aligned to the same edge, so nothing here has
-     to change for a phone. */
+  /* On a phone the bar carries the logo, the hamburger and the CGV mark, and
+     four more circles beside them is what left every one of them too narrow.
+     The menu is one tap away and names the languages there, which is the better
+     place for them anyway. */
+  .nav-inner .lang-switcher { display: none; }
   /* Phone hero: the wordmark carries the page, so it takes the room and the
      subtitle steps back. The atom breaks onto its own line (NIPS / atom /
      CERN) — at this size the three-part lockup no longer fits one line.
