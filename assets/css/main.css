@@ -1631,6 +1631,22 @@ a:hover > .frame > [data-drift],
    and bottom, which is where a falling column of type has to dissolve. The
    track is printed twice and shifted by exactly half its height, which lands
    the seam on an identical frame. */
+/* The layer under the cascade. Two things moving on one card is one too many
+   unless the second is barely there, so this is a fifth of full strength with
+   most of the colour taken out: at rest it reads as a texture in the card's own
+   teal, and what a reader follows is still the list of directives falling over
+   it. The fade is the cascade's, one notch harder, because the two masks stack
+   in the eye even though they do not in the compositor. */
+.pc-media--yanc {
+  --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.22) 16%, #000 44%, #000 82%, transparent 100%);
+  /* A tenth, and most of the colour gone. Anything above this and it stops
+     being the surface the directives fall on and starts being a second thing
+     to read. The test is whether you notice it when you look for it and not
+     otherwise. */
+  opacity: 0.1;
+  filter: saturate(0.35) brightness(0.7) contrast(0.92);
+}
+
 .pc-cascade {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.30) 15%, #000 40%, #000 80%, transparent 100%);
   display: grid;
