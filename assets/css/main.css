@@ -1371,11 +1371,27 @@ h1, h2, h3, h4, h5, h6 {
   --glass-tint: color-mix(in srgb, var(--pc) 14%, transparent);
   --glass-edge: color-mix(in srgb, var(--pc) 34%, transparent);
   --glass-edge-hover: color-mix(in srgb, var(--pc) 62%, transparent);
-  color: var(--pc);
+  /* Held back at rest so it has somewhere to go. The plate used to light on
+     hover while the arrow drawn on it stayed exactly as bright as before, which
+     meant the one part of the control the eye actually follows never moved. */
+  color: color-mix(in srgb, var(--pc) 72%, transparent);
   font-size: 15px;
-  transition: background var(--t-base), transform var(--t-base);
+  transition: background var(--t-base), color var(--t-base),
+              box-shadow var(--t-base), transform var(--t-base);
 }
-.pc-card:hover .pc-go { background: color-mix(in srgb, var(--pc) 22%, transparent); transform: translateX(2px); }
+/* Focus as well as hover: the arrow is the affordance, and a keyboard reaching
+   the card should be told the same thing a pointer is. */
+.pc-card:hover .pc-go,
+.pc-card:focus-visible .pc-go {
+  background: color-mix(in srgb, var(--pc) 22%, transparent);
+  /* Full strength and then some. Lifting the project colour toward white is
+     what reads as the arrow lighting rather than merely appearing; the glow
+     carries the same colour out past the plate so it looks lit from inside. */
+  color: color-mix(in srgb, var(--pc) 62%, #ffffff);
+  --glass-edge: color-mix(in srgb, var(--pc) 62%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--pc) 30%, transparent);
+  transform: translateX(2px);
+}
 
 /* No rule under the description any more. It used to be the lid of the preview
    box; with the card one continuous picture, a line across it reads as a
