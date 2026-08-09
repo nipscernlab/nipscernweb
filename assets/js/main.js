@@ -7,6 +7,12 @@ import { initI18n, getLang, setLanguage } from './i18n.js';
 
 import { newsPostUrl } from './content-links.js';
 
+/* One smooth scroll for the whole site, and nowhere else. Every place that used
+   to move the scroll position with a `behavior: 'smooth'` of its own now asks
+   this module, so there is a single thing deciding how the page moves and a
+   single place to change it. */
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js';
+
 // ============================================================
 // Navigation Template
 // ============================================================
@@ -154,15 +160,20 @@ function initNav() {
   const mobile = document.getElementById('nav-mobile');
   const close = document.getElementById('nav-mobile-close');
 
+  /* overflow:hidden alone stops the document scrolling and says nothing to a
+     library driving the scroll position from a ticker, so the page went on
+     moving behind an open menu. Both, and in that order. */
   const openMenu = () => {
     mobile.classList.add('open');
     btn.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
+    holdScroll(true);
   };
   const closeMenu = () => {
     mobile.classList.remove('open');
     btn.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
+    holdScroll(false);
   };
 
   btn?.addEventListener('click', openMenu);
@@ -256,14 +267,19 @@ function buildFooter() {
         <a href="${ROOT}projects/archived" class="btn btn-ghost btn-sm glass-btn" aria-label="Archived Projects">
           <i class="ph ph-archive" aria-hidden="true"></i> <span data-i18n="footer.archived">Archived Projects</span>
         </a>
-        <div style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--text-xs);color:var(--text-muted)">
-          <a href="${ROOT}credits.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.credits">Credits</a>
+        <!-- Four links that answer to the same hover as the navigation above
+             them, so the footer behaves as one surface. They used to carry it
+             as an inline handler each, four copies of the same two colours,
+             which is also why the transition never matched: 0.15s written by
+             hand against the token everything else uses. -->
+        <div class="footer-legal">
+          <a href="${ROOT}credits.html" data-i18n="footer.credits">Credits</a>
           <span aria-hidden="true">·</span>
-          <a href="${ROOT}terms.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.terms">Terms</a>
+          <a href="${ROOT}terms.html" data-i18n="footer.terms">Terms</a>
           <span aria-hidden="true">·</span>
-          <a href="${ROOT}privacy.html" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.privacy">Privacy</a>
+          <a href="${ROOT}privacy.html" data-i18n="footer.privacy">Privacy</a>
           <span aria-hidden="true">·</span>
-          <a href="https://github.com/nipscernlab/nipscernweb/blob/main/LICENSE.md" target="_blank" rel="noopener" style="color:var(--text-muted);text-decoration:none;transition:color 0.15s" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'" data-i18n="footer.licence">Licence</a>
+          <a href="https://github.com/nipscernlab/nipscernweb/blob/main/LICENSE.md" target="_blank" rel="noopener" data-i18n="footer.licence">Licence</a>
         </div>
         <div class="footer-social">
           <a href="https://github.com/nipscernlab" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitHub">
@@ -318,7 +334,11 @@ const SUPPORTERS = [
   {
     kind: 'funding',
     of: [
-      { acr: 'FAPEMIG', href: 'https://fapemig.br', img: 'fapemig', ext: 'png', webp: true, h: 48, w: 96 },
+      // The one square in the row, and a stacked lockup inside it: roundel over
+      // wordmark, with a good tenth of the canvas as air on each side. Fitted by
+      // height like the others it measured the same and read smaller, because
+      // what arrives at 48px here is two marks sharing 38px of ink.
+      { acr: 'FAPEMIG', href: 'https://fapemig.br', img: 'fapemig', ext: 'png', webp: true, h: 66, w: 96 },
       { acr: 'CAPES',   href: 'https://capes.gov.br', img: 'capes', ext: 'png', webp: true, h: 42, w: 92 },
       { acr: 'CNPq',    href: 'https://cnpq.br', img: 'cnpq', ext: 'svg', webp: false, h: 34, w: 116 },
     ],
@@ -625,9 +645,10 @@ function initBackToTop() {
     btn.classList.toggle('visible', window.scrollY > 300);
   }, { passive: true });
 
-  btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  /* Through the shared module rather than window.scrollTo. A native smooth
+     scroll and a library holding the same position would each animate it, and
+     the button would fight the page it is trying to move. */
+  btn.addEventListener('click', scrollToTop);
 }
 
 // ============================================================
@@ -708,6 +729,10 @@ if (!window.__nipscernBooted) {
   });
 
   document.addEventListener('DOMContentLoaded', async () => {
+    /* First, because it wants to find GSAP already loaded and hang itself off
+       that ticker, and because everything after this point is free to move the
+       scroll position through it. */
+    initSmoothScroll();
     initNav();
     initFooter();
     initSupporters();

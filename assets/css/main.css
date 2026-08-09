@@ -238,6 +238,22 @@ html {
   :target { scroll-margin-top: calc(var(--nav-h) + 24px); }
 }
 
+/* Lenis. The library sets these two classes on <html> and needs the page to
+   answer; assets/js/smooth-scroll.js is the other half.
+
+   Only what it actually needs is here. The stylesheet Lenis ships also puts
+   `pointer-events: none` on every iframe, so that a wheel over one still
+   scrolls the page, and this site has an iframe that is a 3D calorimeter you
+   are meant to be able to turn. Scrolling past it is worth less than using it,
+   so that rule stays out and the viewer keeps its pointer. */
+html.lenis, html.lenis body { height: auto; }
+/* What makes stop() stop. Without it the library holds its own position and the
+   document carries on scrolling underneath an open mobile menu. */
+html.lenis.lenis-stopped { overflow: clip; }
+/* Inner scrollers keep their own wheel: a list that has reached its end should
+   not hand the rest of the gesture to the page. */
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+
 body {
   font-family: var(--font-sans);
   background: var(--bg-1);
@@ -995,6 +1011,25 @@ h1, h2, h3, h4, h5, h6 {
   transition: color var(--t-fast);
 }
 .footer-nav-list a:hover { color: var(--text-primary); }
+
+/* Credits, Terms, Privacy, Licence. One rung quieter than the navigation, since
+   they are where you go when you are looking for them and not otherwise, but
+   they answer to the same hover: a footer where half the links light up and
+   half do not reads as half of them being broken. */
+.footer-legal {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.footer-legal a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--t-fast);
+}
+.footer-legal a:hover,
+.footer-legal a:focus-visible { color: var(--text-primary); }
 
 .footer-bottom {
   max-width: var(--container-max);
@@ -2762,41 +2797,25 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   background: var(--bg-0);
 }
 .ln-media::before { content: ''; display: block; padding-top: 62.5%; }
-/* Oversized so the cover can drift inside its frame, but far less than it was.
-   Height is the only thing being added, and object-fit: cover scales to reach
-   the taller of the two dimensions, so every per cent of headroom is paid for
-   in width: on a 3:2 cover in this 1.6 frame, 118% meant losing about 9.6% off
-   the sides, which is where faces and edges live. At 110% that falls to about
-   3%, and the drift comes down with it so the margin still beats the travel:
-   5% of headroom either side against 4.4% of frame travelled. */
+/* The same hover zoom the news cards carry, written the same way.
+   This cover used to drift with the scroll, which meant an inline transform was
+   being rewritten on it every frame and no `transform` rule here could win. The
+   workaround was to zoom with the separate `scale` property; it composes in
+   theory and did not hold up in practice. The drift on this one image was worth
+   far less than a zoom that behaves like every other cover on the site, so it
+   is gone, and with it the oversize the drift needed.
+
+   Reference: .news-card-image img, a few hundred lines up. */
 .ln-media img {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: -5%;
+  inset: 0;
   width: 100%;
-  height: 110%;
+  height: 100%;
   object-fit: cover;
-  will-change: transform, scale;
-  transition: scale var(--t-slow);
+  transition: transform var(--t-slow);
 }
-
-/* The cover leans in under the pointer.
-   Written as `scale`, not as `transform: scale()`. The drift writes an inline
-   transform on this same element every frame, so anything spelled `transform`
-   here loses to it; `scale` is a separate property that the browser composes
-   with the transform rather than replacing it, so the two effects coexist and
-   the zoom survives the parallax.
-
-   1.05 against 5% of headroom: the frame clips, and the image already has room
-   to spare, so nothing thin creeps in at an edge on the way. */
 .ln-lead:hover .ln-media img,
-.ln-lead:focus-visible .ln-media img { scale: 1.05; }
-
-@media (prefers-reduced-motion: reduce) {
-  .ln-media img { transition: none; }
-  .ln-lead:hover .ln-media img { scale: 1; }
-}
+.ln-lead:focus-visible .ln-media img { transform: scale(1.04); }
 
 .ln-meta {
   display: flex;
@@ -2946,9 +2965,18 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 .lp-venue { grid-column: 2; grid-row: 3; order: 3; }
 /* Venue names run to 96 characters. One line, cut with an ellipsis: a journal
    is recognised from its opening words, and a wrapped venue would outweigh the
-   title under it. */
+   title under it.
+
+   It was also inheriting the body size, which set "INSCIT 2026" at the weight of
+   the paper that appeared there. A venue is the smallest part of a citation, so
+   it takes the size of the author line above it and the mono of the year out in
+   the rail, the other half of the same reference. */
 .lp-venue {
   min-width: 0;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3079,7 +3107,10 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   .supporters-bar { gap: var(--sp-3) var(--sp-5); padding: var(--sp-5); }
   .sup-list { flex-wrap: wrap; justify-content: center; gap: var(--sp-4); }
   .sup-div { display: none; }
-  .sup-mark { width: 84px; height: 32px; }
+  /* Scaled down, not flattened. A single height for all five would undo the
+     whole point of the boxes above and hand the stacked marks back the problem
+     of measuring like the others and reading smaller. */
+  .sup-mark { width: min(var(--mark-w, 108px), 88px); height: calc(var(--mark-h, 38px) * 0.8); }
 }
 
 /* Backgrounds that used to be written into the markup. They are here because a
@@ -3418,18 +3449,38 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   z-index: 0;
   will-change: transform;
 }
+/* Absolutely placed and always in the layout, which is the whole point.
+   It used to be display:none until a src was assigned, and the assignment did
+   two things at once: it laid out a 760px box and it started 4.8 MB of geometry
+   downloading. The box arrived first. So the swap was poster, then an empty
+   frame over it for as long as the viewer took to load, then the calorimeter,
+   and the visible part of that sequence was the empty frame.
+
+   Now the frame is always there and always the same size, so going live changes
+   nothing about the layout: it is an opacity, which the compositor handles on
+   its own thread and which cannot stutter with the main thread busy. And it
+   happens on the iframe's own load event, so what fades in is the viewer, not
+   the wait for it. */
 .cgv-stage iframe {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
   width: 100%;
   height: 100%;
   border: 0;
   display: block;
   background: transparent;
+  opacity: 0;
+  /* Nothing to click on while it is still a blank document, and this is also
+     what keeps the poster underneath from being covered by a dead surface. */
+  pointer-events: none;
+  transition: opacity 600ms ease;
 }
-/* Until a src is assigned there is nothing to show, so the iframe stays out of
-   the way and the poster reads through. */
-.cgv-stage iframe:not([src]) { display: none; }
+.cgv-stage.is-live iframe { opacity: 1; pointer-events: auto; }
+/* The poster leaves a beat after the viewer has begun arriving, so the two
+   never both fall below full and let the stage floor show between them. */
+.cgv-poster { transition: opacity 600ms ease 250ms; }
+.cgv-stage.is-live .cgv-poster { opacity: 0; }
 
 #cgv-canvas { width: 100% !important; height: 100% !important; display: block; }
 
