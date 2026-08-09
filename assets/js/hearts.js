@@ -9,7 +9,7 @@
  *   - set window.HEARTS_API_BASE = 'https://nipscern-hearts.<sub>.workers.dev'
  *   - or edit the constant below.
  */
-import { t, getLang } from './i18n.js?v=daf68d1e94';
+import { t, getLang } from './i18n.js?v=00e4140c6d';
 
 const API_BASE =
   (typeof window !== 'undefined' && window.HEARTS_API_BASE) ||
