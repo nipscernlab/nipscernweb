@@ -1264,6 +1264,57 @@ h1, h2, h3, h4, h5, h6 {
 .cat-milestone   { background: rgba(139,92,246,0.15); color: #a78bfa; }
 
 /* ============================================================
+   Frame — the one way a picture sits on this site
+   ------------------------------------------------------------
+   The frame owns the proportion and the picture fills it. Every cover, poster,
+   card medium and thumbnail on the site is this, and the home page's own frames
+   (.pc-media, .ln-media, .cgv-stage, .news-card-image) are the same thing with
+   their own ratios and their own art.
+
+   aspect-ratio, not flex. `flex: 1` on a media box is not a constraint: an
+   image at width:100% takes whatever height its ratio asks for, and the first
+   version of the project cards grew to twice the height of their own grid
+   before anyone noticed why.
+
+   overflow: hidden is what makes it a frame rather than a box, and it is also
+   the licence for anything inside it to drift with the scroll. See
+   docs/design-system.md, section 7.
+   ============================================================ */
+.frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--frame-ratio, 16 / 10);
+  background: var(--bg-0);
+  border-radius: var(--r-lg);
+}
+.frame > img,
+.frame > video,
+.frame > picture > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* The hover zoom, on every cover on the site, written once. The parent that
+     lights it is whatever carries .is-hoverable or is a link around the frame,
+     so a frame inside a card zooms with the card rather than only when the
+     pointer is on the picture itself. */
+  transition: transform var(--t-slow);
+}
+a:hover > .frame > img,
+a:focus-visible > .frame > img,
+.is-hoverable:hover .frame > img,
+.is-hoverable:focus-visible .frame > img { transform: scale(1.04); }
+
+/* An element that drifts with the scroll cannot also zoom: GSAP writes an
+   inline transform on it every frame and nothing here can outrank that. The
+   attribute says which one this frame chose, and the zoom stands down. */
+.frame > [data-drift] { transition: none; }
+a:hover > .frame > [data-drift],
+.is-hoverable:hover .frame > [data-drift] { transform: none; }
+
+/* ============================================================
    Cards
    ============================================================ */
 .card {

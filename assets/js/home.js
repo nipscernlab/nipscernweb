@@ -14,8 +14,12 @@
 
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
-import { publicationUrl, newsPostUrl } from './content-links.js?v=97e71883dd';
-import { scrollToEl } from './smooth-scroll.js?v=97e71883dd';
+import { publicationUrl, newsPostUrl } from './content-links.js?v=836d1afa4d';
+import { scrollToEl } from './smooth-scroll.js?v=836d1afa4d';
+/* The scroll machinery every page shares: entrance failsafe, run-while-visible,
+   and the ScrollTrigger setup with the refresh discipline that took three bugs
+   to get right. What stays in this file is what only the home page has. */
+import { initMotion, revealFailsafe, stopDrift } from './motion.js?v=836d1afa4d';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -94,61 +98,20 @@ function whileVisibleCard(el, play, hold) {
   }, { rootMargin: '120px' }).observe(el);
 }
 
-/* The same idea without the button: play while it is on screen, hold when it
-   is not. This is what everything outside the projects grid uses. */
-function whileVisible(el, play, hold) {
-  if (!('IntersectionObserver' in window)) { play(); return; }
-  let on = false;
-  new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (e.isIntersecting === on) return;
-      on = e.isIntersecting;
-      if (on) play(); else hold();
-    });
-  }, { rootMargin: '120px' }).observe(el);
-}
+/* whileVisible, the version without the button, comes from motion.js: it is the
+   same rule on every page and there is no reason for this one to keep a copy. */
 
 /* ------------------------------------------------------------------
    1. Scroll choreography
    ------------------------------------------------------------------ */
 function choreograph() {
+  /* Everything generic is in motion.js: registering the plugin, refusing to run
+     under reduced motion, the choice not to name a scroller, and the refresh
+     discipline, which is the part that took three separate bugs to get right
+     and the part every page needs identically. It also runs any [data-drift] a
+     page declares. What is left here is the home page's own composition. */
+  if (!initMotion()) return;
   const gsap = window.gsap;
-  if (!gsap || REDUCED) return;
-  const ST = window.ScrollTrigger;
-  if (!ST) return;
-  gsap.registerPlugin(ST);
-
-  /* No custom scroller. An earlier version passed document.scrollingElement on
-     the theory that overflow-x:hidden on html and body would confuse the
-     measurements. It did the opposite: naming a scroller puts ScrollTrigger
-     into the mode it uses for scrolling containers, and only the trigger that
-     happens to sit at scroll position zero kept working. The window is the
-     scroller here, which is the default, so it goes unsaid.
-
-     What does need saying is refresh. Start positions are measured once, and
-     the fonts, the lazily-loaded drawing and the card media all change the
-     height of the page after that first pass, which leaves every trigger below
-     the fold pointing at the wrong place. */
-  addEventListener('load', () => ST.refresh());
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ST.refresh());
-
-  /* Refresh whenever the document actually changes height.
-     Fixed timers were not enough: the latest news and publication cards are
-     fetched and injected long after load, thirteen images arrive lazily, and
-     the video swaps in later still. Every one of those changes the page height
-     and leaves every trigger below it measuring against a layout that no
-     longer exists, which is why scrolling to the bottom and back up found the
-     parallax dead. Watching the height covers all of them and anything added
-     later. */
-  let lastH = 0, pending = 0;
-  const watch = new ResizeObserver(() => {
-    const h = document.documentElement.scrollHeight;
-    if (Math.abs(h - lastH) < 4) return;
-    lastH = h;
-    clearTimeout(pending);
-    pending = setTimeout(() => ST.refresh(), 150);
-  });
-  watch.observe(document.body);
 
   /* Parallax, and the rule for where it is allowed to happen.
 
@@ -229,14 +192,8 @@ function choreograph() {
      thread the viewer is now running WebGL on. The loader in index.html says
      when, and its will-change layer goes with it. */
   const poster = document.querySelector('.cgv-poster');
-  const posterDrift = driftInFrame(poster, 10, '.cgv-stage');
-  document.addEventListener('cgv:live', () => {
-    if (posterDrift) {
-      if (posterDrift.scrollTrigger) posterDrift.scrollTrigger.kill();
-      posterDrift.kill();
-    }
-    if (poster) poster.style.willChange = 'auto';
-  }, { once: true });
+  driftInFrame(poster, 10, '.cgv-stage');
+  document.addEventListener('cgv:live', () => stopDrift(poster), { once: true });
 
   /* The lead cover deliberately does not drift. It carries the same hover zoom
      as every other cover on the site, and a scroll-driven inline transform on
@@ -867,18 +824,11 @@ async function fromTheLab() {
 /* ------------------------------------------------------------------
    Wiring
    ------------------------------------------------------------------ */
-/* Failsafe.
-   The page hides .fade-up and .stagger-children in CSS and relies on an
-   observer in main.js to add .visible. That is one script away from a blank
-   page, which is exactly what happened once already. Two seconds after load,
-   anything still hidden is revealed outright: a missed animation costs nothing,
-   invisible content costs the reader everything. */
-function revealFailsafe() {
-  setTimeout(() => {
-    document.querySelectorAll('.fade-up:not(.visible), .fade-in:not(.visible), .stagger-children:not(.visible)')
-      .forEach((el) => el.classList.add('visible'));
-  }, 2000);
-}
+/* revealFailsafe comes from motion.js. Every page hides .fade-up and
+   .stagger-children in CSS and relies on an observer in main.js to add
+   .visible, which puts every page one script away from being blank, and the
+   net under that belongs with the rest of the shared machinery rather than
+   with the home page. */
 
 /* The control. Always starts playing: a page that opens frozen looks broken,
    and the reader has no way of knowing it was a choice. */
