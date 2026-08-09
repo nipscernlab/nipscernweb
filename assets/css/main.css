@@ -1639,12 +1639,16 @@ a:hover > .frame > [data-drift],
    in the eye even though they do not in the compositor. */
 .pc-media--yanc {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.22) 16%, #000 44%, #000 82%, transparent 100%);
-  /* A tenth, and most of the colour gone. Anything above this and it stops
-     being the surface the directives fall on and starts being a second thing
-     to read. The test is whether you notice it when you look for it and not
-     otherwise. */
-  opacity: 0.1;
-  filter: saturate(0.35) brightness(0.7) contrast(0.92);
+  /* Down again, and out of focus with it.
+     Opacity alone was not the answer, because the clip is bright teal type on
+     near-black: at a tenth the code was still code, and the card had two sets
+     of legible words on top of each other with the directives losing. Brightness
+     is most of the fix. The blur is the rest of it, and it is the part that
+     matters: a pixel of it stops the lines resolving into characters, so what
+     stays is the rhythm of a screen with something happening on it, which is
+     all this layer was ever for. */
+  opacity: 0.07;
+  filter: saturate(0.28) brightness(0.4) contrast(0.85) blur(1.2px);
 }
 
 .pc-cascade {
