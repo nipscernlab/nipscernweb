@@ -1639,16 +1639,19 @@ a:hover > .frame > [data-drift],
    in the eye even though they do not in the compositor. */
 .pc-media--yanc {
   --pc-fade: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.22) 16%, #000 44%, #000 82%, transparent 100%);
-  /* Down again, and out of focus with it.
-     Opacity alone was not the answer, because the clip is bright teal type on
-     near-black: at a tenth the code was still code, and the card had two sets
-     of legible words on top of each other with the directives losing. Brightness
-     is most of the fix. The blur is the rest of it, and it is the part that
-     matters: a pixel of it stops the lines resolving into characters, so what
-     stays is the rhythm of a screen with something happening on it, which is
-     all this layer was ever for. */
-  opacity: 0.07;
-  filter: saturate(0.28) brightness(0.4) contrast(0.85) blur(1.2px);
+  /* No colour of its own, and none to correct.
+     The clip is a syntax-highlighted editor, so it carries orange string
+     literals through every line of it. Pulling the saturation halfway down in
+     the browser did not remove those, it turned them into a dull tan, and a
+     warm cast under a teal card is what read as wrong. The file is now
+     monochrome from the encode: no chroma to knock back, and the card's own
+     tint is the only colour on this layer.
+
+     Brightness and nothing else after that. There was a blur here for a moment,
+     which was the wrong instrument: it made the layer soft rather than quiet,
+     and softness is not what a screen behind a screen should be. */
+  opacity: 0.16;
+  filter: brightness(0.5) contrast(0.9);
 }
 
 .pc-cascade {
