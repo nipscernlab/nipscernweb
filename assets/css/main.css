@@ -1356,13 +1356,18 @@ a:hover > .frame > [data-drift],
    ============================================================ */
 .lab-stage {
   position: relative;
-  width: 100%;
-  margin-top: var(--sp-12);
-  height: clamp(220px, 34vw, 460px);
+  /* Not a band. Full bleed made it a strip of photograph welded between two
+     sections, with a hard edge top and bottom and nothing to say it was a
+     picture rather than a division of the page. Inside the rails it is an
+     object again: rounded, hairlined, and with air on every side of it. */
+  width: calc(100% - 2 * var(--container-pad));
+  max-width: var(--container-max);
+  margin: var(--sp-12) auto var(--sp-6);
+  height: clamp(200px, 30vw, 420px);
   overflow: hidden;
   background: var(--bg-0);
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-2xl);
 }
 .lab-stage img {
   position: absolute;
@@ -1380,7 +1385,7 @@ a:hover > .frame > [data-drift],
    seam the band structure exists to close. */
 .lab-stage-cap {
   position: absolute;
-  left: var(--container-pad);
+  left: var(--sp-5);
   bottom: var(--sp-5);
   padding: 7px var(--sp-4);
   border-radius: var(--r-full);
@@ -1391,7 +1396,7 @@ a:hover > .frame > [data-drift],
 }
 @media (max-width: 640px) {
   /* Shorter, and the caption comes in off the edge with the rails. */
-  .lab-stage { height: clamp(180px, 44vw, 260px); margin-top: var(--sp-10); }
+  .lab-stage { height: clamp(170px, 42vw, 240px); margin-top: var(--sp-10); border-radius: var(--r-xl); }
   .lab-stage-cap { left: var(--sp-4); bottom: var(--sp-4); }
 }
 
@@ -1986,9 +1991,13 @@ a:hover > .frame > [data-drift],
 }
 
 /* Team cards */
+/* Glass, like every other surface. The fill and the hairline come from .glass:
+   left here they won on source order and the pane never appeared. --glass-tint
+   keeps a body under it, since a pane over a flat band is otherwise a slightly
+   lighter rectangle, and the lit top edge is what makes eighteen of these read
+   as one set rather than as eighteen boxes. */
 .team-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  --glass-tint: var(--bg-card);
   border-radius: var(--r-xl);
   padding: var(--sp-6);
   display: flex;
@@ -2091,6 +2100,10 @@ a:hover > .frame > [data-drift],
   outline: none;
 }
 
+/* The card that opens over the field, and the strongest case for glass on this
+   page: it floats over photographs of the people it describes, which is the one
+   condition under which the treatment is worth anything at all. Opaque enough to
+   read a bio through, and no more than that. */
 .bubble-card {
   position: absolute;
   top: 0;
@@ -2098,10 +2111,9 @@ a:hover > .frame > [data-drift],
   z-index: 10;
   width: min(340px, 88%);
   padding: var(--sp-5);
-  background: var(--bg-card);
-  border: 1px solid var(--border-mid);
+  --glass-tint: color-mix(in srgb, var(--bg-card) 86%, transparent);
+  --glass-edge: var(--border-mid);
   border-radius: var(--r-xl);
-  box-shadow: var(--shadow-lg);
 }
 .bubble-card[hidden] { display: none; }
 .bubble-card-head { display: flex; gap: var(--sp-3); align-items: center; margin-bottom: var(--sp-3); }
