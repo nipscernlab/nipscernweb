@@ -1482,6 +1482,16 @@ a:hover > .frame > [data-drift],
    inert while it is shut. */
 .rd-dialog {
   --glass-tint: var(--bg-card);
+  /* Centred, and it has to be said out loud here.
+     A modal dialog is centred by the browser's own stylesheet, with `margin:
+     auto` against `inset: 0`. The reset at the top of this file sets `margin: 0`
+     on *, which is more specific than a UA rule and quietly took that away: the
+     panel pinned itself to the top left corner and ran off the top of the
+     window, and no amount of positioning on the content inside would have
+     brought it back. */
+  position: fixed;
+  inset: 0;
+  margin: auto;
   width: min(560px, calc(100vw - 2 * var(--sp-5)));
   max-height: min(86vh, 760px);
   padding: var(--sp-8);
