@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=cba67f36d5">
-  <link rel="stylesheet" href="assets/css/main.css?v=cba67f36d5">
+  <link rel="stylesheet" href="assets/css/icons.css?v=c17d424caa">
+  <link rel="stylesheet" href="assets/css/main.css?v=c17d424caa">
 </head>
 <body>
 
@@ -219,47 +219,17 @@
       </figure>
     </section>
 
-    <!-- ======================================================
-         PARTNER INSTITUTIONS
-         ====================================================== -->
-    <section class="section seam" style="--seam-from:var(--bg-0)" aria-labelledby="partners-title">
-      <div class="container">
-        <div class="section-header section-header--center fade-up">
-          <div class="eyebrow" style="justify-content:center">
-            <i class="ph ph-handshake" aria-hidden="true"></i>
-            <span data-i18n="about.partners.eyebrow">Support & Collaboration</span>
-          </div>
-          <h2 class="heading-lg" id="partners-title" data-i18n="about.partners.title">Partner Institutions</h2>
-        </div>
+    <!-- The hand-written Partner Institutions block was here, and it had been
+         broken for some time: its container class, .sponsors-logos, is not
+         defined anywhere in the stylesheet, so five logos with no layout at all
+         piled into a column at the left edge, overlapping each other, each at
+         whatever size its file happened to be.
 
-        <div class="sponsors-logos fade-up">
-          <a href="https://fapemig.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="FAPEMIG">
-            <picture>
-              <source srcset="assets/images/sponsors/fapemig.webp" type="image/webp">
-              <img src="assets/images/sponsors/fapemig.png" alt="FAPEMIG logo" loading="lazy" decoding="async">
-            </picture>
-          </a>
-          <a href="https://capes.gov.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CAPES">
-            <picture>
-              <source srcset="assets/images/sponsors/capes.webp" type="image/webp">
-              <img src="assets/images/sponsors/capes.png" alt="CAPES logo" loading="lazy" decoding="async">
-            </picture>
-          </a>
-          <a href="https://cnpq.br" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CNPq">
-            <img src="assets/images/sponsors/cnpq.svg" alt="CNPq logo" loading="lazy" decoding="async">
-          </a>
-          <a href="https://ufjf.br" target="_blank" rel="noopener" class="sponsor-logo" data-i18n-aria="about.partners.ufjf_aria" aria-label="UFJF, Federal University of Juiz de Fora">
-            <picture>
-              <source srcset="assets/images/sponsors/ufjf.webp" type="image/webp">
-              <img src="assets/images/sponsors/ufjf.png" alt="UFJF logo" loading="lazy" decoding="async">
-            </picture>
-          </a>
-          <a href="https://cern.ch" target="_blank" rel="noopener" class="sponsor-logo" aria-label="CERN">
-            <img src="assets/images/sponsors/cern.svg" alt="CERN logo" loading="lazy" decoding="async">
-          </a>
-        </div>
-      </div>
-    </section>
+         Not rebuilt: removed. The supporters bar further down already names the
+         same five, generated from one list in main.js, sorted into who funds the
+         work and who houses it, on glass, with every mark optically matched to
+         the others. This page was showing the same institutions twice, once
+         correctly and once not. -->
 
     <!-- Lightbox modal -->
     <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
@@ -673,11 +643,11 @@
        deferred and cost nothing before first paint; motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
        a trigger honest when images land late. docs/design-system.md, section 7. -->
-  <script src="assets/js/vendor/gsap.min.js?v=cba67f36d5" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=cba67f36d5" defer></script>
-  <script type="module" src="assets/js/main.js?v=cba67f36d5"></script>
+  <script src="assets/js/vendor/gsap.min.js?v=c17d424caa" defer></script>
+  <script src="assets/js/vendor/ScrollTrigger.min.js?v=c17d424caa" defer></script>
+  <script type="module" src="assets/js/main.js?v=c17d424caa"></script>
   <script type="module">
-    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=cba67f36d5";
+    import { initMotion, revealFailsafe } from "./assets/js/motion.js?v=c17d424caa";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
@@ -685,6 +655,6 @@
     addEventListener("DOMContentLoaded", initMotion);
   </script>
 
-  <script src="assets/js/analytics.js?v=cba67f36d5" defer></script>
+  <script src="assets/js/analytics.js?v=c17d424caa" defer></script>
 </body>
 </html>
