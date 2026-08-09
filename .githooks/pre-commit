@@ -12,7 +12,7 @@
 set -e
 
 # Versioned assets: a change to any of these must bust the ?v= token.
-ASSETS="assets/css/main.css assets/js/main.js assets/js/hearts.js assets/js/license.js"
+ASSETS="assets/css/main.css assets/css/icons.css assets/js/main.js assets/js/hearts.js assets/js/license.js"
 
 # Only act when one of the versioned assets is staged in this commit.
 changed=$(git diff --cached --name-only | grep -E "^($(echo "$ASSETS" | sed 's/ /|/g' | sed 's/\./\\./g'))$" || true)
@@ -24,8 +24,8 @@ ver=$( for a in $ASSETS; do git cat-file blob ":$a"; done | git hash-object --st
 # Rewrite the token on every versioned asset reference in tracked HTML.
 changed_html=""
 for f in $(git ls-files '*.html'); do
-  if grep -qE '(main\.css|main\.js|hearts\.js|license\.js)\?v=' "$f"; then
-    sed -i -E "s#((main\.css|main\.js|hearts\.js|license\.js)\?v=)[A-Za-z0-9._-]+#\1${ver}#g" "$f"
+  if grep -qE '(main\.css|icons\.css|main\.js|hearts\.js|license\.js)\?v=' "$f"; then
+    sed -i -E "s#((main\.css|icons\.css|main\.js|hearts\.js|license\.js)\?v=)[A-Za-z0-9._-]+#\1${ver}#g" "$f"
     git add "$f"
     changed_html="${changed_html} ${f}"
   fi

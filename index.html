@@ -60,7 +60,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=b7a2ea3da8">
+  <link rel="stylesheet" href="assets/css/icons.css?v=d98105631d">
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -144,8 +144,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=c864cab256" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=c864cab256"></noscript>
+  <link rel="preload" href="assets/css/main.css?v=d98105631d" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.css?v=d98105631d"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -797,34 +797,89 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
 
   <!-- Main module -->
   <script>
-  /* O preview 3D do CGV (iframe pesado) so carrega quando o usuario
-     se aproxima da secao, em vez de competir com o carregamento inicial */
+  /* The 3D viewer.
+     ----------------------------------------------------------------
+     Three separate moments, and the reason this is not one function is that
+     running them together is what made the swap feel like a stall.
+
+       reachable   a HEAD request, far out, while there is nothing else to do.
+       loading     src is assigned about a screen and a half early, so the
+                   download and the geometry parse happen before the section is
+                   the thing being looked at.
+       live        the crossfade, on the iframe's own load event.
+
+     The viewer is same-origin, which means it shares this page's main thread:
+     while it is setting up WebGL and working through 4.8 MB of geometry, every
+     scroll-driven animation here is waiting behind it. That is the freeze, and
+     it cannot be removed from a page that embeds the thing. It can be moved to
+     where nobody is watching it, and the work this page is doing at that moment
+     can be put down, which is what the two lines about the poster do.
+
+     If the Worker serving it is unreachable, or the load never completes, the
+     stage keeps the poster. It is a real recorded event, so the section shows
+     the calorimeter either way, and nothing about that path is an error state. */
   (function () {
     var f = document.getElementById('cgv-iframe');
-    if (!f) return;
-    /* Check the viewer answers before pointing the iframe at it. It is served
-       by a Worker proxying another repository, so it is absent from a local
-       checkout and could be down in production; assigning src blindly paints a
-       404 page over the poster. On failure we simply keep the poster, which is
-       a real recorded event either way. */
-    function load() {
-      if (f.src) return;
+    var stage = document.getElementById('cgv-stage');
+    if (!f || !stage) return;
+
+    var idle = window.requestIdleCallback || function (fn) { return setTimeout(fn, 1); };
+    var reachable = null;      // null = not asked yet
+    var pending = false;
+
+    /* Cheap, and worth doing long before the answer is needed: it is served by
+       a Worker proxying the cgv-web repository, so it is absent from a local
+       checkout and could be down in production, and assigning src blindly
+       paints a 404 over the poster. */
+    function probe() {
+      if (reachable !== null) return;
+      reachable = false;
       fetch(f.dataset.src, { method: 'HEAD' })
-        .then(function (r) { if (r.ok) f.src = f.dataset.src; })
+        .then(function (r) { reachable = !!r.ok; if (r.ok && pending) start(); })
         .catch(function () {});
     }
-    if (!('IntersectionObserver' in window)) { load(); return; }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { load(); io.disconnect(); }
+
+    function start() {
+      if (f.src) return;
+      if (!reachable) { pending = true; probe(); return; }
+      /* In an idle slot. The bytes can wait a few milliseconds; a scroll that
+         is happening right now cannot. */
+      idle(function () { f.src = f.dataset.src; });
+    }
+
+    /* Only now does anything change on screen, and all that changes is an
+       opacity. One frame's grace so the viewer has drawn something before it
+       is shown: load fires when its subresources are in, which is a little
+       ahead of its first painted frame. */
+    f.addEventListener('load', function () {
+      if (!f.src) return;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          stage.classList.add('is-live');
+          /* The poster's parallax is scroll-driven work on an element about to
+             be invisible, and it has been competing for the same main thread
+             the viewer is on. home.js listens for this and drops it. */
+          document.dispatchEvent(new CustomEvent('cgv:live'));
+        });
       });
-    }, { rootMargin: '100px' });   /* was 300: the embed pulls 4.8 MB of geometry, so it waits until the section is nearly on screen */
-    /* Observe the stage, not the iframe. The iframe is display:none until it
-       has a src, and an element with no box never intersects anything, so
-       observing it was a deadlock: it waited to be seen before being given the
-       src that would let it be seen. The poster sat there instead, which is
-       exactly what it is for, and hid the fact that the viewer never ran. */
-    io.observe(document.getElementById("cgv-stage") || f);
+    });
+
+    if (!('IntersectionObserver' in window)) { probe(); start(); return; }
+
+    /* Two rings around the same element. Observe the stage rather than the
+       iframe: the iframe is transparent and idle until it has a src, and an
+       earlier version observed it while it was display:none, which was a
+       deadlock. It waited to be seen before being given the src that would let
+       it be seen, and the poster sat there hiding the fact. */
+    var far = new IntersectionObserver(function (es) {
+      if (es.some(function (e) { return e.isIntersecting; })) { probe(); far.disconnect(); }
+    }, { rootMargin: '2000px' });
+    far.observe(stage);
+
+    var near = new IntersectionObserver(function (es) {
+      if (es.some(function (e) { return e.isIntersecting; })) { start(); near.disconnect(); }
+    }, { rootMargin: '1400px' });
+    near.observe(stage);
   })();
   </script>
   <!-- GSAP drives the scroll choreography. Free for commercial use since
@@ -832,7 +887,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        Deferred: nothing here is needed for first paint. -->
   <script src="assets/js/vendor/gsap.min.js" defer></script>
   <script src="assets/js/vendor/ScrollTrigger.min.js" defer></script>
-  <script type="module" src="assets/js/main.js?v=c864cab256"></script>
+  <script type="module" src="assets/js/main.js?v=d98105631d"></script>
   <script type="module" src="assets/js/home.js?v=b7a2ea3da8"></script>
 
 <script>

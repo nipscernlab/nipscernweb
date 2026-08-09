@@ -15,6 +15,7 @@
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
 import { publicationUrl, newsPostUrl } from './content-links.js';
+import { scrollToEl } from './smooth-scroll.js';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -62,8 +63,18 @@ function syncAnim(a) {
   if (should) a.play(); else a.hold();
 }
 
+/* What the pointer has to be over. Usually the card, because the medium fills
+   only part of it and the whole card is the target. The About & Science panel is
+   not a card, and its rail is the whole of what there is to point at, so it
+   hosts its own hover; it used to have none, which left it the one loop on the
+   page that the button could stop and nothing could start again. */
+function hoverHost(el) {
+  if (!el.closest) return null;
+  return el.closest('.pc-card') || el.closest('.cube-rail');
+}
+
 function registerCardAnim(el, play, hold) {
-  const card = el.closest ? el.closest('.pc-card') : null;
+  const card = hoverHost(el);
   const a = { card, play, hold, visible: false, hovered: false, on: false };
   cardAnims.push(a);
   if (card) {
@@ -187,8 +198,8 @@ function choreograph() {
        the news cover  5% of headroom, travels  4.4%
        card media      7% of headroom, travels  6.8% */
   const driftInFrame = (el, pct, sc) => {
-    if (!el) return;
-    gsap.fromTo(el, { yPercent: pct }, {
+    if (!el) return null;
+    return gsap.fromTo(el, { yPercent: pct }, {
       yPercent: -pct,
       ease: 'none',
       scrollTrigger: { trigger: sc || el, start: 'top bottom', end: 'bottom top', scrub: 0.5, invalidateOnRefresh: true },
@@ -212,12 +223,26 @@ function choreograph() {
     });
   }
 
-  driftInFrame(document.querySelector('.cgv-poster'), 10, '.cgv-stage');
+  /* The poster drifts only for as long as it is the thing on screen. Once the
+     3D viewer has loaded and faded in over it, this is a scrubbed tween writing
+     a transform every frame onto an element nobody can see, on the same main
+     thread the viewer is now running WebGL on. The loader in index.html says
+     when, and its will-change layer goes with it. */
+  const poster = document.querySelector('.cgv-poster');
+  const posterDrift = driftInFrame(poster, 10, '.cgv-stage');
+  document.addEventListener('cgv:live', () => {
+    if (posterDrift) {
+      if (posterDrift.scrollTrigger) posterDrift.scrollTrigger.kill();
+      posterDrift.kill();
+    }
+    if (poster) poster.style.willChange = 'auto';
+  }, { once: true });
 
-  /* The cover of the lead story, inside the frame that already clips it. Set up
-     on a delay because the renderer fills that lane from the JSON well after
-     this runs; the height watcher re-measures once it does. */
-  setTimeout(() => driftInFrame(document.querySelector('.ln-media img'), 4, '.ln-lead'), 500);
+  /* The lead cover deliberately does not drift. It carries the same hover zoom
+     as every other cover on the site, and a scroll-driven inline transform on
+     the same element leaves no room for one: the workaround was to zoom with
+     the separate `scale` property, which composes in theory and did not hold up
+     in Firefox. The section keeps its parallax through the heading and lanes. */
 
   /* The boy under the hero. Not a frame, but a figure with room around it on
      every side, and he is the near plane of the same composition as the sky:
@@ -625,9 +650,9 @@ function videoLoop(video) {
   };
 
   /* Every loop on the page answers to the one control, the panel in About &
-     Science included. Hovering to resume is a card affordance and the panel is
-     not a card, so for it the button is simply on or off: visible and playing,
-     or held. */
+     Science included, and to the same hover: with the grid stopped, pointing at
+     one of them runs that one alone. pause() leaves currentTime where it was, so
+     it picks up from the frame it stopped on rather than restarting. */
   whileVisibleCard(video,
     () => { arm(); const p = video.play(); if (p) p.catch(() => {}); },
     () => video.pause());
@@ -884,17 +909,16 @@ function projectsPauseButton() {
 
 /* Without GSAP, and for anyone who asked for less motion, the same thing
    without the drift: a class on the root once the page has moved at all. */
-/* The push. Smooth scrolling is deliberately off for the document, because the
-   browser animating the scroll position fights the animations that read it, so
-   the two places that want it ask for it by hand: the button back to the top,
-   and this. Anyone who asked for less motion is simply put there. */
+/* The push. Through the shared scroll module, like the button back to the top
+   and every anchor on the site: one thing decides how this page moves. Anyone
+   who asked for less motion is simply put there, which that module handles. */
 function scrollHintPush() {
   const hint = document.getElementById('scroll-hint');
   const target = document.getElementById('cgv-section');
   if (!hint || !target) return;
   hint.addEventListener('click', (e) => {
     e.preventDefault();
-    target.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+    scrollToEl(target);
   });
 }
 

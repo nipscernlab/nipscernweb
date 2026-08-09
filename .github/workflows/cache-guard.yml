@@ -21,6 +21,7 @@ jobs:
       - name: Token ?v= bate com o hash do conteudo
         run: |
           ver=$( { git cat-file blob HEAD:assets/css/main.css; \
+                   git cat-file blob HEAD:assets/css/icons.css; \
                    git cat-file blob HEAD:assets/js/main.js; \
                    git cat-file blob HEAD:assets/js/hearts.js; \
                    git cat-file blob HEAD:assets/js/license.js; } \
@@ -28,7 +29,7 @@ jobs:
           echo "Hash esperado do conteudo: $ver"
           bad=""
           for f in $(git ls-files '*.html'); do
-            for t in $(grep -oE '(main\.css|main\.js|hearts\.js|license\.js)\?v=[A-Za-z0-9._-]+' "$f" \
+            for t in $(grep -oE '(main\.css|icons\.css|main\.js|hearts\.js|license\.js)\?v=[A-Za-z0-9._-]+' "$f" \
                         | sed -E 's/.*\?v=//' | sort -u); do
               [ "$t" != "$ver" ] && bad="${bad}\n  ${f}: ?v=${t}"
             done
