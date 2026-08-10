@@ -4,9 +4,8 @@ Medido em 2026-08-10 contra `www.nipscern.com`. Tudo aqui cabe no plano
 gratuito; o que é pago está marcado como pago e listado só para você não perder
 tempo procurando.
 
-> **Estado em 2026-08-10, depois de aplicar: 10 de 12 conferidos.**
-> Falta só a Compression Rule (seção 2), que o token usado não tinha permissão
-> para criar. `bash tools/check-edge.sh` dá o estado atual a qualquer momento.
+> **Estado em 2026-08-10: 13 de 13 conferidos, nada pendente.**
+> `bash tools/check-edge.sh` dá o estado atual a qualquer momento.
 
 ---
 
@@ -154,37 +153,41 @@ zona, então nenhuma das duas regras o alcança. Não há endpoint de API sob
 
 ---
 
-## 2. Compression Rules — brotli também nos assets (grátis)
+## 2. Compression Rules — **NÃO CRIE. Foi tentado, medido e desfeito.**
 
-**O problema, medido:**
+Este documento recomendava forçar brotli. A regra foi criada, medida e removida,
+porque ela **aumenta** o arquivo mais pesado do site.
 
-```
-GET /                          content-encoding: br      (bom)
-GET /assets/css/main.min.css   content-encoding: gzip    (podia ser br)
-```
+O raciocínio original era: o HTML sai em brotli e os assets em gzip, logo há
+ganho a fazer. E a conta local dizia que sim — `main.min.css` dá 22,0 KB em gzip
+e 18,6 KB em brotli. O que faltava era saber **em que qualidade a borda
+comprime**.
 
-O HTML sai em brotli e os assets em gzip. O motivo é que o GitHub Pages já
-entrega os assets comprimidos em gzip e o Cloudflare repassa em vez de
-recomprimir. Em brotli a folha minificada cai de **22,0 KB para 18,6 KB**, e o
-mesmo vale proporcionalmente para os módulos.
+Medido com a regra ativa, no mesmo arquivo, em `MISS` e em `HIT`:
 
-Painel: *Rules → Compression Rules → Create rule*.
+| o que a borda entrega | bytes |
+|---|---:|
+| gzip (o que o GitHub Pages já produz, em repouso) | **23.454** |
+| brotli da Cloudflare, com a regra | 24.175 |
+| zstd da Cloudflare, com a regra | 26.016 |
+| brotli q11 local, o ideal inalcançável | 19.058 |
 
-Os tipos abaixo são os que o GitHub Pages realmente manda, conferidos um a um na
-resposta — repare que o JavaScript sai como `application/javascript` e não como
-`text/javascript`, que é o erro fácil de cometer nessa lista:
+A compressão dinâmica da Cloudflare roda em qualidade baixa de propósito, porque
+ela acontece **a cada resposta** e precisa ser barata. O GitHub Pages comprime
+uma vez, em repouso, e pode gastar mais tempo nisso. Recomprimir um gzip bom com
+um brotli rápido dá um arquivo maior — os três algoritmos perderam.
 
-```
-Se:      (http.response.content_type.media_type in {"text/css" "text/html"
-          "application/javascript" "text/javascript" "application/json"
-          "image/svg+xml" "application/manifest+json" "text/plain"
-          "application/xml"})
-Então:   Compression options -> brotli, depois gzip, depois none
-```
+Então: **a regra foi apagada** e o interruptor `brotli` da zona ficou como estava
+(ligado). A borda escolhe o algoritmo e não há regra forçando nada.
 
-`text/plain` e `application/xml` entram pelo `robots.txt` e pelo `sitemap.xml`.
+**O teto desta topologia.** O melhor possível seria 19.058 bytes, e chegar lá
+exigiria a origem servir um `.br` pré-comprimido em repouso. O GitHub Pages não
+serve arquivos pré-comprimidos, então esses **4,4 KB são inalcançáveis** aqui —
+não por falta de configuração, mas pela hospedagem. Seria um argumento a favor
+do Cloudflare Pages num dia em que a migração fizer sentido por outros motivos.
 
-Ganho modesto em bytes, custo zero e nenhum risco visual.
+A lição, que vale além deste item: um número medido na sua máquina não é o número
+que a borda produz.
 
 ---
 
@@ -244,16 +247,16 @@ fica como registro do que é o estado correto, não como lista de tarefas.
 | **HTTP/3 (QUIC)** | ✅ já ligado | conferido também no `alt-svc` |
 | **0-RTT** | ✅ já ligado | retoma TLS na volta do visitante |
 | **Speed Brain** | ✅ já ligado | pré-busca a próxima navegação provável |
-| **Brotli (zona)** | ✅ ligado, e mesmo assim insuficiente | ver a nota abaixo |
+| **Brotli (zona)** | ✅ ligado, como estava | ver a nota abaixo |
 | **Rocket Loader** | ✅ já desligado | ver abaixo |
 
-**A nota sobre o Brotli, que é o achado sutil desta seção.** O interruptor
-`brotli` da zona está ligado e os assets continuam saindo em gzip. Não é
-contradição: esse interruptor manda o Cloudflare **comprimir o que a origem
-mandou sem compressão**. O GitHub Pages já entrega os assets em gzip, então não
-há nada para comprimir e o Cloudflare repassa. Só uma **Compression Rule**
-recomprime o que já veio comprimido — é por isso que a seção 2 existe mesmo com
-o interruptor ligado.
+**A nota sobre o Brotli.** O interruptor `brotli` da zona está ligado e os
+assets continuam saindo em gzip. Não é contradição: esse interruptor manda o
+Cloudflare comprimir o que a origem mandou **sem** compressão, e o GitHub Pages
+já entrega tudo em gzip, então não há o que comprimir e a borda repassa.
+
+E está certo assim. A seção 2 conta a história da Compression Rule que forçava a
+recompressão: foi criada, medida, saiu maior, e foi apagada.
 | Auto Minify | não existe mais | a Cloudflare removeu em agosto de 2024. A minificação agora é do build (`tools/build-min.js`), e é melhor assim: acontece uma vez no commit e não a cada resposta |
 
 **Por que Rocket Loader não:** ele reescreve os `<script>` da página para carregar
@@ -348,7 +351,7 @@ imagens são WebP e o pôster do calorímetro agora tem `srcset` em quatro largu
 | 6 | TLS mínimo 1.0 → 1.2 | ✅ aplicado |
 | 7 | Early Hints, 0-RTT, HTTP/3, Speed Brain | ✅ já estavam ligados |
 | 8 | Rocket Loader desligado | ✅ já estava |
-| 9 | **Compression Rule (brotli)** | ⬜ **pendente** — ver abaixo |
+| 9 | Compression Rule (brotli) | ❌ **criada, medida e removida** — piorava (seção 2) |
 
 ### Por que o HSTS ficou sem `includeSubDomains`
 

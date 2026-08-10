@@ -45,10 +45,16 @@ hdr /assets/css/main.min.css >/dev/null; A2=$(hdr /assets/css/main.min.css)
 check "cf-cache-status HIT"   'HIT'                        "$(val "$A2" cf-cache-status)"
 
 echo
-echo "-- 2. Compression Rule: brotli nos estáticos"
-check "content-encoding br"   '^br$'                       "$(val "$A" content-encoding)"
+echo "-- 2. Compressão"
+# Comprimido, e não "comprimido em brotli". Uma Compression Rule forçando brotli
+# foi criada, medida e removida: a compressão dinâmica da Cloudflare roda em
+# qualidade baixa por velocidade e saiu MAIOR que o gzip que o GitHub Pages já
+# produz em repouso — 24.175 contra 23.454 bytes no main.min.css, reproduzível
+# em MISS e em HIT. O que este teste tem que garantir é que algo comprimido
+# chega; qual algoritmo, a borda escolhe, e forçar a escolha piorou.
+check "resposta comprimida"   '^(br|gzip|zstd)$'           "$(val "$A" content-encoding)"
 J=$(hdr /assets/js/home.min.js)
-check "brotli tambem no JS"   '^br$'                       "$(val "$J" content-encoding)"
+check "JS comprimido"         '^(br|gzip|zstd)$'           "$(val "$J" content-encoding)"
 
 echo
 echo "-- 3. Cache Rule: HTML na borda"
