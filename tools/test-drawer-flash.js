@@ -43,19 +43,31 @@ const olhar = async (page) =>
     const el = document.getElementById('nav-mobile');
     if (!el) return null;
     const b = el.getBoundingClientRect();
-    const cs = getComputedStyle(el);
     /* clientWidth e não innerWidth: innerWidth inclui a barra de rolagem, e o
        drawer encosta o canto esquerdo exatamente onde a barra começa. Medir
        contra innerWidth acusa uma sobra de 15 px que a barra cobre. */
     const limite = document.documentElement.clientWidth;
+
+    /* A maior imagem dentro do <nav>, barra e drawer juntos. O ícone do CGV tem
+       512 por 512 no arquivo; sem estilo o navegador desenha os 512. Este número
+       é o teste inteiro: qualquer coisa acima de 28 significa que uma imagem da
+       navegação escapou do CSS. */
+    let maiorImagem = 0, qual = null;
+    for (const img of document.querySelectorAll('#nav img')) {
+      const r = img.getBoundingClientRect();
+      const lado = Math.max(r.width, r.height);
+      if (lado > maiorImagem) { maiorImagem = Math.round(lado); qual = img.className || img.src.split('/').pop(); }
+    }
+
     return {
-      left: Math.round(b.left),
-      width: Math.round(b.width),
-      position: cs.position,
-      transform: cs.transform,
-      naTela: b.left < limite && b.right > 0 && b.width > 0 && b.height > 0,
+      drawerNaTela: b.left < limite && b.right > 0 && b.width > 0 && b.height > 0,
+      drawerLeft: Math.round(b.left),
+      maiorImagem,
+      imagem: qual,
     };
   });
+
+const LIMITE_IMG = 28;
 
 (async () => {
   const browser = await puppeteer.connect({ browserURL: BROWSER });
@@ -79,8 +91,20 @@ const olhar = async (page) =>
   linha('sem a folha', antes);
   linha('depois da folha', depois);
 
-  const ok = antes && !antes.naTela && depois && !depois.naTela;
-  console.log(ok ? '\nPASSOU: o drawer nunca esteve na área de conteúdo.'
-                 : '\nFALHOU: o drawer apareceu na tela.');
-  process.exit(ok ? 0 : 1);
+  const falhas = [];
+  for (const [quando, r] of [['sem a folha', antes], ['depois da folha', depois]]) {
+    if (!r) { falhas.push(`${quando}: o nav não foi injetado`); continue; }
+    if (r.drawerNaTela) falhas.push(`${quando}: o drawer estava na tela (left ${r.drawerLeft})`);
+    if (r.maiorImagem > LIMITE_IMG) {
+      falhas.push(`${quando}: imagem de ${r.maiorImagem}px na navegação (${r.imagem}) — o limite é ${LIMITE_IMG}`);
+    }
+  }
+
+  if (falhas.length) {
+    console.log('\nFALHOU:');
+    falhas.forEach((f) => console.log('  - ' + f));
+  } else {
+    console.log('\nPASSOU: o drawer nunca esteve na tela e nenhuma imagem da navegação passou de ' + LIMITE_IMG + 'px.');
+  }
+  process.exit(falhas.length ? 1 : 0);
 })().catch((e) => { console.error('erro:', e.message); process.exit(2); });
