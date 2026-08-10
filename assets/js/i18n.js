@@ -155,11 +155,19 @@ function applyTranslations(lang) {
 }
 
 /** Update lang switcher button states */
+/* Two switchers, two ways of saying the same thing, and the attribute has to
+   match the role. In the bar each flag is a plain button and a toggle, so it
+   takes aria-pressed. In the mobile menu the four rows are a radio group, and a
+   radio takes aria-checked — writing aria-pressed on one is invalid, which is
+   exactly what this function used to do to all eight of them. */
 function updateLangButtons(lang) {
   document.querySelectorAll('.lang-btn').forEach(btn => {
     const btnLang = btn.getAttribute('data-lang');
-    btn.classList.toggle('active', btnLang === lang);
-    btn.setAttribute('aria-pressed', btnLang === lang ? 'true' : 'false');
+    const on = btnLang === lang;
+    btn.classList.toggle('active', on);
+    const attr = btn.getAttribute('role') === 'radio' ? 'aria-checked' : 'aria-pressed';
+    btn.setAttribute(attr, on ? 'true' : 'false');
+    btn.removeAttribute(attr === 'aria-checked' ? 'aria-pressed' : 'aria-checked');
   });
 }
 

@@ -82,7 +82,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.min.css?v=fd678916d5">
+  <link rel="stylesheet" href="assets/css/icons.min.css?v=693b23013c">
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -166,8 +166,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.min.css?v=fd678916d5" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=fd678916d5"></noscript>
+  <link rel="preload" href="assets/css/main.min.css?v=693b23013c" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=693b23013c"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -387,7 +387,24 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
            thing either way, and the iframe simply fades in over it when it
            loads. -->
       <div class="cgv-stage fade-up" id="cgv-stage" role="img" aria-label="ATLAS calorimeter event display">
-        <img class="cgv-poster" src="assets/images/news/cgv/CGVWEB_2560x1440_2026-04-30T22-09-10.webp"
+        <!-- Four widths of the same frame, and the browser takes the smallest
+             that still covers the pixels it is going to draw. Nothing is
+             cropped and nothing is softened: at matching density the chosen
+             file has at least as many pixels as the stage has, which is the
+             whole point of letting the browser choose instead of sending
+             everyone the 2560. A phone was downloading all 160 KB of it to fill
+             a band about 350 px wide.
+
+             sizes follows .cgv-stage, which is the viewport less two container
+             paddings, capped at the 1320 the rest of the site is capped at. -->
+        <img class="cgv-poster"
+             src="assets/images/news/cgv/CGVWEB_2560x1440_2026-04-30T22-09-10.webp"
+             srcset="assets/images/news/cgv/CGVWEB_960w.webp 960w,
+                     assets/images/news/cgv/CGVWEB_1440w.webp 1440w,
+                     assets/images/news/cgv/CGVWEB_1920w.webp 1920w,
+                     assets/images/news/cgv/CGVWEB_2560x1440_2026-04-30T22-09-10.webp 2560w"
+             sizes="(min-width: 1400px) 1320px, 90vw"
+             width="2560" height="1440"
              alt="A recorded ATLAS collision event rendered in CGV Web" loading="lazy" decoding="async">
         <iframe
           id="cgv-iframe"
@@ -494,8 +511,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
            Video by Nicola Narracci, from Pexels. Credited in credits.html. -->
       <div class="cube-rail" aria-hidden="true">
         <video muted loop playsinline preload="none" width="720" height="1280"
-               poster="assets/images/about-light-waves-poster.webp?v=fd678916d5"
-               data-src="assets/videos/about-light-waves-loop.mp4?v=fd678916d5"></video>
+               poster="assets/images/about-light-waves-poster.webp?v=693b23013c"
+               data-src="assets/videos/about-light-waves-loop.mp4?v=693b23013c"></video>
       </div>
 
       <div class="container">
@@ -510,13 +527,21 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
         <div class="grid grid-2 stagger-children" style="gap:var(--sp-6);margin-top:var(--sp-10);max-width:960px;margin-left:auto;margin-right:auto">
 
           <!-- About Us -->
-          <a href="about.html" class="glass info-hl-card info-hl-about" aria-label="About NIPS-CERN">
+          <!-- Named by its own eyebrow and heading rather than by an aria-label.
+               The label said "About NIPS-CERN" over a card that visibly reads
+               "About Us / Meet the Team", which replaces everything on the card
+               with a phrase that appears nowhere on it: a screen reader lost the
+               heading, and anyone driving the page by voice could not say the
+               words they could see. labelledby keeps the name short and makes it
+               the text that is actually there. -->
+          <a href="about.html" class="glass info-hl-card info-hl-about"
+             aria-labelledby="info-hl-about-eyebrow info-hl-about-heading">
             <div class="info-hl-card-glow" aria-hidden="true"></div>
             <div class="info-hl-icon">
               <i class="ph ph-users-three" aria-hidden="true"></i>
             </div>
-            <div class="info-hl-eyebrow" data-i18n="nav.about">About Us</div>
-            <h3 class="info-hl-heading" data-i18n="home.highlights.about_heading">Meet the Team</h3>
+            <div class="info-hl-eyebrow" id="info-hl-about-eyebrow" data-i18n="nav.about">About Us</div>
+            <h3 class="info-hl-heading" id="info-hl-about-heading" data-i18n="home.highlights.about_heading">Meet the Team</h3>
             <p class="info-hl-body" data-i18n="home.highlights.about_body">Researchers, engineers and undergraduates, across two laboratories: NIPS at UFJF and Route Salam at CERN. Particle physics, hardware design and scientific computing, and the same people on both sides of it.</p>
             <div class="info-hl-cta">
               <span data-i18n="home.about_card.cta">Meet the people</span>
@@ -525,13 +550,14 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           </a>
 
           <!-- Publications -->
-          <a href="publications.html" class="glass info-hl-card info-hl-pubs" aria-label="NIPS-CERN Publications">
+          <a href="publications.html" class="glass info-hl-card info-hl-pubs"
+             aria-labelledby="info-hl-pubs-eyebrow info-hl-pubs-heading">
             <div class="info-hl-card-glow" aria-hidden="true"></div>
             <div class="info-hl-icon">
               <i class="ph ph-book-open-text" aria-hidden="true"></i>
             </div>
-            <div class="info-hl-eyebrow" data-i18n="nav.publications">Publications</div>
-            <h3 class="info-hl-heading" data-i18n="home.highlights.pubs_heading">100+ Articles</h3>
+            <div class="info-hl-eyebrow" id="info-hl-pubs-eyebrow" data-i18n="nav.publications">Publications</div>
+            <h3 class="info-hl-heading" id="info-hl-pubs-heading" data-i18n="home.highlights.pubs_heading">100+ Articles</h3>
             <p class="info-hl-body" data-i18n="home.highlights.pubs_body">Spanning calorimetry, firmware design in FPGA, embedded processors, machine learning for trigger systems, and high energy physics.</p>
             <div class="info-hl-cta">
               <span data-i18n="home.pubs_card.cta">Browse publications</span>
@@ -654,8 +680,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/sapho" class="pc-card pc-card--dark" style="--pc:var(--accent-sapho)">
             <div class="pc-media pc-media--sapho" aria-hidden="true">
               <video data-media="sapho-loop"
-                     data-src="assets/videos/sapho-circuit-loop.mp4?v=fd678916d5"
-                     poster="assets/images/projects/sapho-circuit-poster.webp?v=fd678916d5"
+                     data-src="assets/videos/sapho-circuit-loop.mp4?v=693b23013c"
+                     poster="assets/images/projects/sapho-circuit-poster.webp?v=693b23013c"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -710,9 +736,9 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    be indistinguishable — for 435 KB less. The H.264 is what
                    every browser without an AV1 decoder gets, unchanged. -->
               <video data-media="aurora-loop"
-                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=fd678916d5"
-                     data-src="assets/videos/aurora-borealis-loop.mp4?v=fd678916d5"
-                     poster="assets/images/projects/aurora-borealis-poster.webp?v=fd678916d5"
+                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=693b23013c"
+                     data-src="assets/videos/aurora-borealis-loop.mp4?v=693b23013c"
+                     poster="assets/images/projects/aurora-borealis-poster.webp?v=693b23013c"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -770,8 +796,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    the old one. v2 is already live and cached, hence v3. -->
               <video data-media="cgv-loop"
                      data-src="https://cdn.nipscern.com/videos/cgv-geometry-loop-v6.mp4"
-                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=fd678916d5"
-                     poster="assets/images/projects/cgv-geometry-poster.webp?v=fd678916d5"
+                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=693b23013c"
+                     poster="assets/images/projects/cgv-geometry-poster.webp?v=693b23013c"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -804,8 +830,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/ai" class="pc-card" style="--pc:var(--accent-ai)">
             <div class="pc-media pc-media--ai" aria-hidden="true">
               <video data-media="ai-loop"
-                     data-src="assets/videos/ai-hand-loop.mp4?v=fd678916d5"
-                     poster="assets/images/projects/ai-hand-poster.webp?v=fd678916d5"
+                     data-src="assets/videos/ai-hand-loop.mp4?v=693b23013c"
+                     poster="assets/images/projects/ai-hand-poster.webp?v=693b23013c"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -860,7 +886,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.min.js?v=fd678916d5";
+    import { sky } from "./assets/js/sky.min.js?v=693b23013c";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -941,14 +967,28 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        earlier version observed it while it was display:none, which was a
        deadlock. It waited to be seen before being given the src that would let
        it be seen, and the poster sat there hiding the fact. */
+    /* Both rings are measured in screens, not in pixels.
+
+       They used to be 2000px and 1400px, which is about two screens and a screen
+       and a half on the desktop they were written on, and something else
+       entirely on a phone: the viewport there is a third of the height, so 1400
+       fixed pixels reach four screens down and the ring swallowed the fold. The
+       viewer armed itself during the initial load of every mobile visit, which
+       is 237 KB of three.js from a third-party CDN plus a WebGL setup on the
+       same main thread the hero is trying to paint on. Lighthouse put the page
+       at eleven seconds to interactive and that was most of it.
+
+       A percentage in rootMargin is relative to the root's own size, so these
+       two numbers now say what the paragraph above always claimed they said,
+       and say it identically on every screen. */
     var far = new IntersectionObserver(function (es) {
       if (es.some(function (e) { return e.isIntersecting; })) { probe(); far.disconnect(); }
-    }, { rootMargin: '2000px' });
+    }, { rootMargin: '200%' });
     far.observe(stage);
 
     var near = new IntersectionObserver(function (es) {
       if (es.some(function (e) { return e.isIntersecting; })) { start(); near.disconnect(); }
-    }, { rootMargin: '1400px' });
+    }, { rootMargin: '150%' });
     near.observe(stage);
   })();
   </script>
@@ -961,8 +1001,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        114 KB of parsing should not happen for them either. Everything else is
        unchanged — it still arrives well after first paint, because home.js is a
        module and modules run after the document is parsed. -->
-  <script type="module" src="assets/js/main.min.js?v=fd678916d5"></script>
-  <script type="module" src="assets/js/home.min.js?v=fd678916d5"></script>
+  <script type="module" src="assets/js/main.min.js?v=693b23013c"></script>
+  <script type="module" src="assets/js/home.min.js?v=693b23013c"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -1010,6 +1050,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.min.js?v=fd678916d5" defer></script>
+  <script src="assets/js/analytics.min.js?v=693b23013c" defer></script>
 </body>
 </html>
