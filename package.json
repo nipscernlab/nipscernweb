@@ -11,7 +11,10 @@
     "test:drawer": "node tools/test-drawer-flash.js",
     "test:sky": "node tools/test-sky-identical.js",
     "test:cgv": "node tools/test-cgv-defer.js",
-    "test": "node tools/test-drawer-flash.js && node tools/test-cgv-defer.js && node tools/test-sky-identical.js"
+    "test": "node tools/test-drawer-flash.js && node tools/test-cgv-defer.js && node tools/test-sky-identical.js && node tools/test-icons-complete.js",
+    "build:icons": "node tools/build-icon-subsets.js",
+    "check:icons": "node tools/build-icon-subsets.js --check",
+    "test:icons": "node tools/test-icons-complete.js"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",

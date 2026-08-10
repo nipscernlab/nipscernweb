@@ -71,7 +71,29 @@ assets/js/sky.min.js
 assets/js/publications.min.js
 assets/js/hearts.min.js
 assets/js/license.min.js
-assets/js/analytics.min.js"
+assets/js/analytics.min.js
+assets/css/icons/404.css
+assets/css/icons/about.css
+assets/css/icons/cern.css
+assets/css/icons/credits.css
+assets/css/icons/index.css
+assets/css/icons/license.css
+assets/css/icons/news-index.css
+assets/css/icons/news-post.css
+assets/css/icons/pdf-viewer.css
+assets/css/icons/privacy.css
+assets/css/icons/projects-archived.css
+assets/css/icons/projects-aurora.css
+assets/css/icons/projects-cgv.css
+assets/css/icons/projects-hits.css
+assets/css/icons/projects-index.css
+assets/css/icons/projects-polaris.css
+assets/css/icons/projects-sapho.css
+assets/css/icons/projects-yanc.css
+assets/css/icons/publications-courier.css
+assets/css/icons/publications.css
+assets/css/icons/qa.css
+assets/css/icons/terms.css"
 
 # The alternation used for rewriting is derived from the list rather than
 # written out again, because a second copy of the list is exactly the thing
@@ -80,8 +102,17 @@ NAMES=$(printf '%s\n' "$ASSETS" | sed 's#.*/##; s#\.#\\.#g' | tr '\n' '|' | sed 
 
 # Only act when one of them is staged.
 PATHS=$(printf '%s\n' "$ASSETS" | sed 's#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
+# HTML também dispara, e tem que disparar.
+#
+# Os subconjuntos de ícones são derivados do HTML de cada página: quem decide o
+# que entra em assets/css/icons/<pagina>.css é o que aquela página escreve. Se o
+# gatilho fosse só a lista de assets, acrescentar um <i class="ph ph-cpu"> a uma
+# página não regeraria nada, o subconjunto ficaria sem aquele ícone, e o que o
+# leitor veria não seria "nada": a regra base é uma máscara sobre currentColor,
+# então um --ph que não existe vira um QUADRADO SÓLIDO no lugar do ícone.
 changed=$(git diff --cached --name-only | grep -E "^($PATHS)$" || true)
-[ -z "$changed" ] && exit 0
+html_changed=$(git diff --cached --name-only | grep -E '\.html$' | grep -v '^kristoffer/' || true)
+[ -z "$changed" ] && [ -z "$html_changed" ] && exit 0
 
 # ------------------------------------------------------------------
 # As cópias minificadas, geradas antes de qualquer hash.
@@ -105,6 +136,15 @@ fi
 for m in $(printf '%s\n' "$ASSETS" | grep -E '\.min\.(css|js)$'); do
   [ -f "$m" ] && git add "$m"
 done
+
+# Os subconjuntos de ícones, pela mesma razão e com a mesma severidade. O
+# gerador sai com erro se uma página usar uma classe ph-* que a folha não tem,
+# o que antes só aparecia na tela, como quadrado.
+if ! node tools/build-icon-subsets.js; then
+  echo "pre-commit: a geração dos subconjuntos de ícones falhou." >&2
+  exit 1
+fi
+git add assets/css/icons
 
 # Version = short hash of the staged content of every asset, in list order,
 # with the tokens themselves blanked out first.

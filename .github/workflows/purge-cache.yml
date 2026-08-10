@@ -1,0 +1,79 @@
+name: Purga o cache do Cloudflare
+
+# O HTML fica cinco minutos na borda. Cinco, e não duas horas, porque o deploy
+# aqui é um push no GitHub Pages e nada avisava o Cloudflare — então uma correção
+# publicada podia não aparecer, e "o site não atualizou" já custou tempo neste
+# projeto mais de uma vez.
+#
+# Com esta purga o aviso existe, e o TTL de borda do HTML pode subir sem medo.
+# Enquanto ela não estiver ligada, cinco minutos é o certo.
+#
+# ------------------------------------------------------------------
+# Para ligar (uma vez)
+# ------------------------------------------------------------------
+# 1. Crie um token em dash.cloudflare.com -> My Profile -> API Tokens,
+#    com a permissão de ZONA "Cache Purge: Purge" e nada mais, restrito a
+#    nipscern.com. É a permissão mais estreita que existe: ela não lê nem
+#    escreve configuração nenhuma, só esvazia cache.
+# 2. No repositório, Settings -> Secrets and variables -> Actions, crie
+#    CLOUDFLARE_PURGE_TOKEN com esse valor.
+# 3. O CLOUDFLARE_ZONE_ID já está abaixo: é público no painel e não é segredo,
+#    mas fica como variável para o dia em que a zona mudar.
+#
+# Sem o segredo configurado o job não falha: ele avisa e sai. Um workflow
+# vermelho a cada push por causa de uma otimização opcional é pior que a
+# otimização não estar ligada.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # Uma purga por vez. Vários pushes seguidos não precisam de várias purgas, e
+  # a última é a que importa.
+  group: purge-cache
+  cancel-in-progress: true
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Esvazia o cache da borda
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+          ZONE: 1020c6fd80f416f40f78f4721be81adf
+        run: |
+          set -euo pipefail
+
+          if [ -z "${TOKEN:-}" ]; then
+            echo "::notice::CLOUDFLARE_PURGE_TOKEN não configurado — purga ignorada."
+            echo "Veja as instruções no topo de .github/workflows/purge-cache.yml"
+            exit 0
+          fi
+
+          # O Pages leva algum tempo entre o push e a publicação. Purgar antes
+          # disso é pior que não purgar: a borda vai à origem, encontra a versão
+          # velha e a guarda de novo, agora fresquinha.
+          echo "Aguardando o deploy do Pages assentar..."
+          sleep 90
+
+          resposta=$(curl -sS -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}')
+
+          echo "$resposta"
+          if ! echo "$resposta" | grep -q '"success":true'; then
+            echo "::error::A purga falhou. Confira se o token tem 'Cache Purge: Purge' na zona."
+            exit 1
+          fi
+          echo "::notice::Cache da borda esvaziado."
+
+      - name: Confere que o site responde
+        run: |
+          set -euo pipefail
+          codigo=$(curl -sS -o /dev/null -w '%{http_code}' https://www.nipscern.com/)
+          echo "home: HTTP $codigo"
+          [ "$codigo" = "200" ]
