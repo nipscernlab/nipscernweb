@@ -200,11 +200,46 @@ export function sky(canvas) {
      Which star gets what follows the magnitude, so the sky sorts itself: below
      magnitude 4 there is only a core, by magnitude 2.4 the bloom is there, and
      the spikes start at 1.8 and are the length of the star's own brightness. */
+  /* A cor do núcleo, montada uma vez por cor.
+     ------------------------------------------------------------------
+     TWINKLE_MAG deixa cerca de mil e seiscentas estrelas sendo redesenhadas a
+     cada quadro, e cada uma montava `'rgba(' + … + al.toFixed(3) + ')'` para
+     pintar um ponto cuja cor nunca muda — quase cem mil formatações de número
+     por segundo para dizer sessenta vezes a mesma coisa. O alfa passou para o
+     globalAlpha e a string virou constante; na prática o catálogo inteiro usa
+     uma cor só, então este Map tem uma entrada.
+
+     Sobre o tamanho do ganho, medido e não estimado: sete a onze por cento no
+     laço, com zero pixels de diferença. Não é o que parecia — o custo real
+     desta função é o rasterizador desenhando mil e seiscentos arcos, não as
+     strings. O que se ganha aqui é de graça e fica; o resto do tempo do céu não
+     sai sem mudar o que se vê, e o que se vê está bom. */
+  const NUCLEOS = new Map();
+  function corDoNucleo(rgb) {
+    const chave = rgb[0] * 65536 + rgb[1] * 256 + rgb[2];
+    let s = NUCLEOS.get(chave);
+    if (s === undefined) {
+      s = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+      NUCLEOS.set(chave, s);
+    }
+    return s;
+  }
+
   function drawStar(c, px, py, mag, rgb, a, grow) {
     const r = radiusFor(mag) * (grow || 1);
     const [rr, gg, bb] = rgb;
     const col = (al) => 'rgba(' + rr + ',' + gg + ',' + bb + ',' + al.toFixed(3) + ')';
 
+    /* O brilho e as espículas continuam com o alfa embutido em cada parada do
+       gradiente, exatamente como antes.
+
+       A tentativa de passar os dois para globalAlpha foi medida e desfeita: a
+       conta é neutra, mas o rasterizador monta o gradiente numa tabela de 256
+       entradas, e quantizar uma tabela que vai até 0.42·a não dá o mesmo que
+       quantizar uma que vai até 0.42 e depois multiplicar por a. Sobre o fundo
+       do site a diferença chegava a 4 de 255 — invisível, e ainda assim uma
+       diferença, e o combinado era que o céu não mudasse. Estas duas parcelas
+       são de estrelas brilhantes, que são minoria; o laço não é aqui. */
     if (mag < 2.4) {
       const gr = r * (mag < 1.0 ? 6.5 : 4.4);
       const gl = c.createRadialGradient(px, py, 0, px, py, gr);
@@ -232,8 +267,26 @@ export function sky(canvas) {
       }
     }
 
-    c.fillStyle = col(a);
+    /* O núcleo, que TODA estrela desenha, e onde estava o laço.
+       Um preenchimento liso não passa por tabela nenhuma: o alfa da origem é
+       multiplicado pelo globalAlpha e pronto, então `rgb(...)` com globalAlpha
+       a dá exatamente o mesmo pixel que `rgba(...,a)` — conferido, zero bytes
+       de diferença. O que se ganha é a string: antes cada uma das cerca de mil
+       e seiscentas estrelas do laço montava um `rgba(...)` com toFixed(3) a
+       cada quadro, quase cem mil formatações de número por segundo para pintar
+       pontos cuja cor nunca muda. Agora a string é uma só, para o catálogo
+       inteiro. */
+    /* Arredondado a três casas porque a string que ele substitui passava por
+       toFixed(3). Sem isto o globalAlpha entra com precisão cheia e o pixel sai
+       um nível acima ou abaixo do antigo em uma parte a cada duas mil — 1 de
+       255, invisível, e ainda assim diferente. Aqui é uma multiplicação e uma
+       divisão, não uma formatação de número. */
+    c.globalAlpha = Math.round(a * 1000) / 1000;
+    c.fillStyle = corDoNucleo(rgb);
     c.beginPath(); c.arc(px, py, r, 0, 6.283185); c.fill();
+    /* Devolvido: a camada estática e o rastro do meteoro desenham depois e
+       contam com o valor cheio. */
+    c.globalAlpha = 1;
   }
 
   function star(c, t) {

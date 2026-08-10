@@ -8,7 +8,10 @@
     "start": "node tools/dev-server.js",
     "build:min": "node tools/build-min.js",
     "check:min": "node tools/build-min.js --check",
-    "test:drawer": "node tools/test-drawer-flash.js"
+    "test:drawer": "node tools/test-drawer-flash.js",
+    "test:sky": "node tools/test-sky-identical.js",
+    "test:cgv": "node tools/test-cgv-defer.js",
+    "test": "node tools/test-drawer-flash.js && node tools/test-cgv-defer.js && node tools/test-sky-identical.js"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
