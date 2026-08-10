@@ -93,6 +93,53 @@ export function whileVisible(el, play, hold, margin = '120px') {
 }
 
 /* ------------------------------------------------------------------
+   Fetching the library, and when not to
+   ------------------------------------------------------------------
+   GSAP and ScrollTrigger are 114 KB of JavaScript to parse, 45 KB over the
+   wire, and initMotion below refuses to run under prefers-reduced-motion. Both
+   files used to be plain <script defer> tags in the markup, which means a
+   reader who asked for less motion downloaded and parsed all of it in order to
+   see not one frame of what it does.
+
+   smooth-scroll.js has always treated lenis this way — it checks the query
+   first and imports second. This is the same rule applied to the file five and
+   a half times its size.
+
+   A page that still carries its own <script> tags is unaffected: the library is
+   already on window by the time this is called and it resolves at once. */
+let libsPromise = null;
+
+export function ensureMotionLibs(base) {
+  if (REDUCED) return Promise.resolve(false);
+  if (window.gsap && window.ScrollTrigger) return Promise.resolve(true);
+  if (libsPromise) return libsPromise;
+
+  /* Relative to this module, so the path is right from any depth of the site
+     and the cache stamp is the one this file was served under. */
+  const root = base || new URL('./vendor/', import.meta.url).href;
+  const stamp = (import.meta.url.split('?')[1] || '');
+  const load = (file) => new Promise((resolve) => {
+    const s = document.createElement('script');
+    s.src = root + file + (stamp ? '?' + stamp : '');
+    /* Not async: ScrollTrigger registers itself against a gsap that has to
+       already be there, and two async tags settle in whatever order the network
+       returns them. */
+    s.async = false;
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+
+  /* Both are requested now and run in order, so the second is not waiting on a
+     round trip that could have been in flight. If either fails to arrive the
+     caller gets false and the page is what the stylesheet laid out, which is
+     the same promise the rest of this file makes. */
+  libsPromise = Promise.all([load('gsap.min.js'), load('ScrollTrigger.min.js')])
+    .then((ok) => ok.every(Boolean) && !!(window.gsap && window.ScrollTrigger));
+  return libsPromise;
+}
+
+/* ------------------------------------------------------------------
    Scroll choreography
    ------------------------------------------------------------------ */
 export function initMotion() {

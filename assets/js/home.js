@@ -14,12 +14,12 @@
 
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
-import { publicationUrl, newsPostUrl } from './content-links.js?v=6321c7ffac';
-import { scrollToEl } from './smooth-scroll.js?v=6321c7ffac';
+import { publicationUrl, newsPostUrl } from './content-links.js?v=fd678916d5';
+import { scrollToEl } from './smooth-scroll.js?v=fd678916d5';
 /* The scroll machinery every page shares: entrance failsafe, run-while-visible,
    and the ScrollTrigger setup with the refresh discipline that took three bugs
    to get right. What stays in this file is what only the home page has. */
-import { initMotion, revealFailsafe, stopDrift } from './motion.js?v=6321c7ffac';
+import { initMotion, revealFailsafe, stopDrift, ensureMotionLibs } from './motion.js?v=fd678916d5';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -614,15 +614,33 @@ function videoLoop(video) {
   if (REDUCED) return;                     // poster only
   let armed = false;
 
-  /* Up to two sources. data-src is where the file is served from; data-fallback
-     is an optional copy inside the repository, small enough to pass the 2 MB
-     guard, and it is what makes the card work in a local checkout and on the day
-     the CDN is unreachable. A card with only data-src simply has the one URL. */
+  /* Can this browser decode AV1 in an MP4. Asked once, and asked rather than
+     guessed from a user-agent string: Safari plays AV1 only where the hardware
+     decodes it, which no amount of version-sniffing gets right.
+
+     A card offers AV1 with data-av1 and it is taken only when the answer is
+     yes, so nobody downloads a file they cannot play and then downloads the
+     other one. The H.264 stays exactly as it was for everyone else. */
+  const AV1 = 'video/mp4; codecs="av01.0.05M.08"';
+  const takesAV1 = () => {
+    try { return video.canPlayType(AV1) === 'probably'; } catch (e) { return false; }
+  };
+
+  /* Up to three sources. data-av1 is the same footage in a newer codec — same
+     resolution, same frame count, same duration, only fewer bytes. data-src is
+     where the file is normally served from; data-fallback is an optional copy
+     inside the repository, small enough to pass the 2 MB guard, and it is what
+     makes the card work in a local checkout and on the day the CDN is
+     unreachable. A card with only data-src simply has the one URL. */
   const arm = () => {
     if (armed) return;
     armed = true;
-    const primary = video.dataset.src;
-    const backup = video.dataset.fallback;
+    const av1 = video.dataset.av1;
+    const primary = (av1 && takesAV1()) ? av1 : video.dataset.src;
+    /* The H.264 is the backup for the AV1 too: if the file is missing or the
+       decoder refuses it after all, the error handler below swaps to something
+       every browser plays rather than leaving the poster sitting there. */
+    const backup = video.dataset.fallback || (primary === av1 ? video.dataset.src : undefined);
     const play = () => { const p = video.play(); if (p) p.catch(() => {}); };
 
     video.addEventListener('error', () => {
@@ -911,8 +929,19 @@ function scrollHintFallback() {
   onScroll();
 }
 
-function init() {
+async function init() {
+  /* First and unconditionally: it is the net under the entrances and it must
+     not be waiting behind a network request. */
   revealFailsafe();
+
+  /* GSAP is no longer two script tags in the markup. It is fetched here, and
+     only when there is something for it to do — a reader who asked for less
+     motion gets false immediately and never pays for the library. Everything
+     below this line is written on the assumption that window.gsap has settled
+     one way or the other, which is what scrollHintFallback in particular needs
+     in order to decide whether it is the one driving the hint. */
+  await ensureMotionLibs();
+
   scrollHintFallback();
   scrollHintPush();
   projectsPauseButton();

@@ -5,6 +5,11 @@
   "description": "NIPS-CERN website (nipscern.com) — static site for GitHub Pages.",
   "scripts": {
     "dev": "node tools/dev-server.js",
-    "start": "node tools/dev-server.js"
+    "start": "node tools/dev-server.js",
+    "build:min": "node tools/build-min.js",
+    "check:min": "node tools/build-min.js --check"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }
