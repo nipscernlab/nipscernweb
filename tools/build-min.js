@@ -45,9 +45,15 @@ function sourcesFromHook() {
     .map((s) => s.trim())
     .filter(Boolean)
     /* Só texto que vale minificar. vendor/ já é minificado, e um .min.js da
-       nossa própria geração não é fonte de coisa nenhuma. */
+       nossa própria geração não é fonte de coisa nenhuma.
+
+       assets/css/icons/ também fica de fora: aqueles arquivos são gerados por
+       tools/build-icon-subsets.js a partir de uma folha que já é uma regra por
+       linha, sem um espaço sobrando. Minificá-los rendia menos de meio por
+       cento e criava vinte e dois `.min.css` que página nenhuma carrega. */
     .filter((f) => /\.(css|js)$/.test(f))
     .filter((f) => !f.startsWith('assets/js/vendor/'))
+    .filter((f) => !f.startsWith('assets/css/icons/'))
     .filter((f) => !f.endsWith('.min.css') && !f.endsWith('.min.js'));
 }
 
