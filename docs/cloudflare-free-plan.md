@@ -4,6 +4,41 @@ Medido em 2026-08-10 contra `www.nipscern.com`. Tudo aqui cabe no plano
 gratuito; o que é pago está marcado como pago e listado só para você não perder
 tempo procurando.
 
+> **Estado em 2026-08-10, depois de aplicar: 10 de 12 conferidos.**
+> Falta só a Compression Rule (seção 2), que o token usado não tinha permissão
+> para criar. `bash tools/check-edge.sh` dá o estado atual a qualquer momento.
+
+---
+
+## O que foi encontrado ao aplicar, e que este documento não previa
+
+**A regra de cache dos assets já existia, estava ativa, e não fazia nada.**
+A expressão era:
+
+```
+(http.request.uri.path eq "\.(css|js|webp|png|jpg|svg|woff2|ico)$")
+```
+
+Uma regex escrita com `eq`, que é igualdade exata de string — ela só casaria com
+um caminho literalmente igual àquele texto, o que nunca acontece. Era esse o
+motivo real do `max-age=3600`, e não a ausência de regra. **`matches`, o
+operador de regex, exige plano Business**, então no gratuito a forma certa é
+`starts_with`.
+
+**O HTML não era `DYNAMIC` por padrão do Cloudflare.** Havia uma regra explícita
+chamada *HTML — No Cache* com `cache: false`. A explicação que este documento
+dava antes — de que o Cloudflare cacheia por extensão e `/` não tem uma — estava
+errada: era decisão registrada, não omissão.
+
+**Metade dos assets não tem `?v=`.** Das 34 referências a `/assets/` na home, 16
+não carregam carimbo. Um `max-age` de um ano no navegador congelaria essas por um
+ano se algum dia forem trocadas no lugar. Por isso são **duas** regras e não uma,
+separadas por `http.request.uri.query contains "v="`.
+
+**Quase todo o Speed já estava certo.** Early Hints, 0-RTT, HTTP/3 e Speed Brain
+ligados, e o Rocket Loader já desligado. Em compensação, duas coisas de segurança
+estavam abertas e foram fechadas: **HSTS desativado** e **TLS mínimo em 1.0**.
+
 A topologia, em uma linha: o site é **GitHub Pages (build legacy, deploy from a
 branch) atrás do proxy do Cloudflare**. Isso importa porque o arquivo `_headers`
 na raiz do repositório
@@ -53,28 +88,54 @@ sozinho. Uma URL dessas é imutável por construção: se o conteúdo muda, a UR
 muda. Guardar por uma hora o que poderia ser guardado por um ano é jogar fora a
 única coisa que aquele token existe para permitir.
 
-**As duas regras.** Painel: *Caching → Cache Rules → Create rule*.
+**As três regras, como estão configuradas hoje.** Painel: *Caching → Cache
+Rules*.
 
-**Regra 1 — assets imutáveis**
-
-```
-Nome:       assets imutaveis
-Se:         (starts_with(http.request.uri.path, "/assets/"))
-Então:      Cache eligibility     -> Eligible for cache
-            Edge TTL              -> Override origin: 1 year
-            Browser TTL           -> Override origin: 1 year
-```
-
-**Regra 2 — HTML na borda**
+**Regra 1 — assets carimbados**
 
 ```
-Nome:       html na borda
-Se:         (http.request.uri.path eq "/") or (ends_with(http.request.uri.path, ".html"))
-            or (not http.request.uri.path contains ".")
-Então:      Cache eligibility     -> Eligible for cache
-            Edge TTL              -> Override origin: 2 hours
-            Browser TTL           -> Override origin: 10 minutes
+Nome:  assets imutaveis (com ?v=) — 1 ano
+Se:    starts_with(http.request.uri.path, "/assets/")
+       and http.request.uri.query contains "v="
+       and not (http.host eq "cdn.nipscern.com")
+Então: Eligible for cache | Edge TTL 31536000 | Browser TTL 31536000
 ```
+
+**Regra 2 — assets sem carimbo**
+
+```
+Nome:  assets sem ?v= — borda 1 ano, navegador 1 dia
+Se:    starts_with(http.request.uri.path, "/assets/")
+       and not (http.request.uri.query contains "v=")
+       and not (http.host eq "cdn.nipscern.com")
+Então: Eligible for cache | Edge TTL 31536000 | Browser TTL 86400
+```
+
+A borda guarda por um ano nos dois casos porque a borda **você pode purgar**. O
+navegador do visitante é que não, e é por isso que só o carimbado ganha o ano lá.
+
+**Regra 3 — HTML na borda**
+
+```
+Nome:  HTML — 5 min na borda, revalida no navegador
+Se:    (ends_with(http.request.uri.path, ".html"))
+       or (http.request.uri.path eq "/")
+       or (not http.request.uri.path contains ".")
+Então: Eligible for cache | Edge TTL 300 | Browser TTL 0
+```
+
+**Cinco minutos, e não as duas horas que este documento sugeria antes.** O
+raciocínio mudou ao lembrar de como o site publica: o deploy é um push no
+GitHub Pages, sem purga automática. Com duas horas de borda, uma correção
+publicada pode não aparecer por duas horas e o diagnóstico disso é exatamente o
+"o site não atualizou" que já custou tempo aqui. Cinco minutos tira praticamente
+toda viagem à origem sob tráfego e mantém um deploy visível quase na hora.
+`Browser TTL 0` faz o navegador revalidar sempre, então na ponta a correção é
+imediata.
+
+Para subir esse TTL com segurança, o caminho é purgar no deploy: um passo no
+workflow do GitHub chamando a API de purge com um token que tenha *Cache Purge*.
+Aí 2 h, ou um dia, passam a ser seguros.
 
 O TTL de borda alto no HTML é seguro porque o deploy do Pages não é frequente e
 porque **você pode purgar**: *Caching → Configuration → Purge Everything*, ou
@@ -174,13 +235,25 @@ parte, com `Content-Security-Policy-Report-Only` primeiro.
 
 ## 4. Speed → Optimization (grátis)
 
-| Ajuste | Recomendação | Motivo |
+Conferido pela API em 2026-08-10: **tudo isto já estava como devia.** A tabela
+fica como registro do que é o estado correto, não como lista de tarefas.
+
+| Ajuste | Estado | Motivo |
 |---|---|---|
-| **Early Hints** | **ligar** | manda um `103` com os preloads antes da resposta pronta; ajuda o FCP e não muda nada visualmente |
-| **HTTP/3 (QUIC)** | já ligado | conferido no `alt-svc` |
-| **0-RTT Connection Resumption** | ligar | retoma TLS na volta do visitante |
-| **Speed Brain** | ligar | pré-busca a próxima navegação provável; grátis |
-| **Rocket Loader** | **NÃO LIGAR** | ver abaixo |
+| **Early Hints** | ✅ já ligado | manda um `103` com os preloads antes da resposta pronta |
+| **HTTP/3 (QUIC)** | ✅ já ligado | conferido também no `alt-svc` |
+| **0-RTT** | ✅ já ligado | retoma TLS na volta do visitante |
+| **Speed Brain** | ✅ já ligado | pré-busca a próxima navegação provável |
+| **Brotli (zona)** | ✅ ligado, e mesmo assim insuficiente | ver a nota abaixo |
+| **Rocket Loader** | ✅ já desligado | ver abaixo |
+
+**A nota sobre o Brotli, que é o achado sutil desta seção.** O interruptor
+`brotli` da zona está ligado e os assets continuam saindo em gzip. Não é
+contradição: esse interruptor manda o Cloudflare **comprimir o que a origem
+mandou sem compressão**. O GitHub Pages já entrega os assets em gzip, então não
+há nada para comprimir e o Cloudflare repassa. Só uma **Compression Rule**
+recomprime o que já veio comprimido — é por isso que a seção 2 existe mesmo com
+o interruptor ligado.
 | Auto Minify | não existe mais | a Cloudflare removeu em agosto de 2024. A minificação agora é do build (`tools/build-min.js`), e é melhor assim: acontece uma vez no commit e não a cada resposta |
 
 **Por que Rocket Loader não:** ele reescreve os `<script>` da página para carregar
@@ -263,18 +336,46 @@ imagens são WebP e o pôster do calorímetro agora tem `srcset` em quatro largu
 
 ---
 
-## Ordem sugerida
+## Estado, item a item
 
-| # | Ação | Onde | Ganho |
-|---|---|---|---|
-| 1 | Cache Rule para `/assets/*` | Caching → Cache Rules | segunda visita inteira sai do disco |
-| 2 | Cache Rule para o HTML | Caching → Cache Rules | tira a viagem à origem de toda visita |
-| 3 | Compression Rule (brotli) | Rules → Compression Rules | ~15% nos arquivos de texto |
-| 4 | Early Hints + 0-RTT + Speed Brain | Speed → Optimization | três interruptores, nenhum risco |
-| 5 | Cabeçalhos de segurança | Rules → Transform Rules | Best Practices, e é o certo a fazer |
-| 6 | Conferir que Rocket Loader está **desligado** | Speed → Optimization | evita quebrar os módulos |
+| # | Ação | Estado |
+|---|---|---|
+| 1 | Cache Rule `/assets/*` com `?v=` — 1 ano | ✅ aplicado (a regra que existia estava quebrada) |
+| 2 | Cache Rule `/assets/*` sem `?v=` — borda 1 ano, navegador 1 dia | ✅ aplicado |
+| 3 | Cache Rule do HTML — 5 min na borda | ✅ aplicado (era `No Cache` explícito) |
+| 4 | Cabeçalhos de segurança | ✅ aplicado — 4 via Transform Rule |
+| 5 | HSTS | ✅ ligado, 1 ano, **sem** `includeSubDomains` |
+| 6 | TLS mínimo 1.0 → 1.2 | ✅ aplicado |
+| 7 | Early Hints, 0-RTT, HTTP/3, Speed Brain | ✅ já estavam ligados |
+| 8 | Rocket Loader desligado | ✅ já estava |
+| 9 | **Compression Rule (brotli)** | ⬜ **pendente** — ver abaixo |
 
-Os itens 1 e 2 são os que valem a viagem. Os outros são higiene.
+### Por que o HSTS ficou sem `includeSubDomains`
+
+`includeSubDomains` vale para **todo** subdomínio e o navegador lembra por um
+ano. Os dois hostnames que o repositório usa falam HTTPS, mas não deu para
+enumerar o DNS da zona para saber se existe algum outro — um painel antigo, um
+staging — que ainda responda em HTTP puro. Um desses pararia de abrir e a
+lembrança dura um ano.
+
+Para acrescentar depois: abra a aba **DNS**, confirme que todo registro A, AAAA
+ou CNAME que serve web fala HTTPS, e então marque *Include subdomains* em
+**SSL/TLS → Edge Certificates → HTTP Strict Transport Security**. Deixe
+*Preload* desmarcado — sair da lista de preload leva meses.
+
+### O que falta: a Compression Rule
+
+O token usado tinha `Zone:Read`, `Zone Settings:Edit`, `Cache Rules:Edit`,
+`Transform Rules:Edit` e `Config Rules:Edit`, e mesmo a **leitura** da fase
+`http_response_compression` respondeu *request is not authorized* — é permissão
+separada, não coberta por nenhuma dessas.
+
+Dois caminhos:
+
+1. **Pelo painel**, que é mais rápido: *Rules → Compression Rules → Create rule*,
+   com a expressão da seção 2 e a ordem brotli → gzip → none.
+2. **Por API**, acrescentando ao token a permissão de compressão de resposta
+   (na lista de *Zone*, procure por *Response Compression*).
 
 ## Como conferir
 

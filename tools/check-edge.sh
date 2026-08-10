@@ -28,9 +28,20 @@ check () { # $1 rótulo  $2 esperado(regex)  $3 valor
 
 echo "== $HOST =="
 echo
-echo "-- 1. Cache Rule: assets imutáveis (/assets/*)"
-A=$(hdr /assets/css/main.min.css); hdr /assets/css/main.min.css >/dev/null; A2=$(hdr /assets/css/main.min.css)
-check "cache-control 1 ano"   'max-age=(31536000|2592000)' "$(val "$A" cache-control)"
+echo "-- 1. Cache Rules dos assets"
+# Duas regras, e o que separa as duas é o carimbo. Um asset com ?v= tem URL
+# imutável por construção e pode ficar um ano no disco do visitante; um sem
+# carimbo pode ser trocado no lugar, então a borda guarda por um ano (dá para
+# purgar) e o navegador só por um dia. Testar só uma das duas esconde metade da
+# configuração, que foi exatamente o que a primeira versão deste script fez.
+# A query aleatória força uma chave de cache nova, senão a resposta guardada
+# antes da regra responde com os cabeçalhos antigos e o teste mente.
+R=$$
+A=$(hdr "/assets/css/main.min.css?v=probe$R")
+check "com ?v=: 1 ano"        'max-age=31536000'           "$(val "$A" cache-control)"
+B=$(hdr "/assets/icons/aurora.svg?probe=$R")
+check "sem ?v=: 1 dia"        'max-age=86400'              "$(val "$B" cache-control)"
+hdr /assets/css/main.min.css >/dev/null; A2=$(hdr /assets/css/main.min.css)
 check "cf-cache-status HIT"   'HIT'                        "$(val "$A2" cf-cache-status)"
 
 echo
