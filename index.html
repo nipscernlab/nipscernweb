@@ -132,6 +132,21 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
    padding e o flex podem chegar depois, porque a essa altura ele já está fora
    da tela e ninguém os vê. */
 .nav-mobile{position:fixed;inset:0;z-index:999;transform:translateX(100%)}
+/* E a barra, pela mesma corrida e pelo mesmo motivo.
+   Esconder o drawer resolveu metade: a barra continuava sendo pintada sem
+   estilo, e o pior nela é `icon_cgv.svg`, que tem 512 por 512 no arquivo. Sem
+   `.nav-cgv-icon{width:22px}` o navegador desenha os 512 — um ícone do CGV do
+   tamanho de meia tela por cima do wordmark, que é o que se via.
+
+   A defesa contra isso não é copiar as 53 regras da navegação para cá; é
+   limitar o que pode crescer. `#nav img` cobre cada imagem que a barra e o
+   drawer tenham hoje ou venham a ter, e 28px é o maior tamanho que qualquer
+   uma delas usa em main.css, então o limite nunca briga com o valor final.
+   O resto — vidro, cores, hover — pode chegar depois: sem eles a barra fica
+   diferente, não quebrada. */
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:var(--nav-h);display:flex;align-items:center}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);width:100%;max-width:var(--container-max);margin:0 auto;padding:0 var(--container-pad)}
+#nav img{max-width:28px;max-height:28px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:clamp(.625rem,.5417rem + .3704vw,.875rem) clamp(1.125rem,.875rem + 1.1111vw,1.875rem);font-size:var(--text-sm);font-weight:600;border-radius:var(--r-lg);transition:all var(--t-base);white-space:nowrap;text-decoration:none;border:1.5px solid transparent;line-height:1.4}
 .btn-primary{background:var(--brand);color:var(--text-inverse);border-color:var(--brand)}.btn-primary:hover{background:#7cb5ff;border-color:#7cb5ff;box-shadow:0 4px 20px rgba(91,156,246,.3);transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border-mid)}.btn-ghost:hover{background:var(--border-subtle);color:var(--text-primary);border-color:var(--border-strong);transform:translateY(-1px)}
