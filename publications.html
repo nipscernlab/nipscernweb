@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.min.css?v=0b3091bfc6">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=0b3091bfc6">
+  <link rel="stylesheet" href="assets/css/icons/publications.css?v=95fe384fdc">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=95fe384fdc">
 </head>
 <body style="--page-end:var(--bg-0)">
 
@@ -186,9 +186,9 @@
   <footer id="footer" role="contentinfo"></footer>
 
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
-  <script type="module" src="assets/js/main.min.js?v=0b3091bfc6"></script>
+  <script type="module" src="assets/js/main.min.js?v=95fe384fdc"></script>
   <script type="module">
-    import { initPublications } from './assets/js/publications.min.js?v=0b3091bfc6';
+    import { initPublications } from './assets/js/publications.min.js?v=95fe384fdc';
     // Defer until after DOMContentLoaded so main.js has already run
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
@@ -196,6 +196,6 @@
       setTimeout(initPublications, 50);
     }
   </script>
-  <script src="assets/js/analytics.min.js?v=0b3091bfc6" defer></script>
+  <script src="assets/js/analytics.min.js?v=95fe384fdc" defer></script>
 </body>
 </html>

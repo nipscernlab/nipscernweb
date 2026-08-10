@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.min.css?v=0b3091bfc6">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=0b3091bfc6">
+  <link rel="stylesheet" href="assets/css/icons/about.css?v=95fe384fdc">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=95fe384fdc">
 </head>
 <body>
 
@@ -543,22 +543,28 @@
     });
   </script>
 
-  <!-- The same scroll behaviour the home page has. GSAP and ScrollTrigger are
-       deferred and cost nothing before first paint; motion.js reads whatever the
+  <!-- The same scroll behaviour the home page has. motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
-       a trigger honest when images land late. docs/design-system.md, section 7. -->
-  <script src="assets/js/vendor/gsap.min.js?v=0b3091bfc6" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=0b3091bfc6" defer></script>
-  <script type="module" src="assets/js/main.min.js?v=0b3091bfc6"></script>
+       a trigger honest when images land late. docs/design-system.md, section 7.
+
+       GSAP used to be two <script defer> tags here. It is fetched by motion.js
+       now, on the same rule the home page uses: ask for prefers-reduced-motion
+       before asking the network. initMotion already refused to run for that
+       reader, who was downloading 45 KB and parsing 114 KB in order to see not
+       one frame of what it does. -->
+  <script type="module" src="assets/js/main.min.js?v=95fe384fdc"></script>
   <script type="module">
-    import { initMotion, revealFailsafe } from "./assets/js/motion.min.js?v=0b3091bfc6";
+    import { ensureMotionLibs, initMotion, revealFailsafe } from "./assets/js/motion.min.js?v=95fe384fdc";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
     revealFailsafe();
-    addEventListener("DOMContentLoaded", initMotion);
+    addEventListener("DOMContentLoaded", async () => {
+      await ensureMotionLibs();
+      initMotion();
+    });
   </script>
 
-  <script src="assets/js/analytics.min.js?v=0b3091bfc6" defer></script>
+  <script src="assets/js/analytics.min.js?v=95fe384fdc" defer></script>
 </body>
 </html>
