@@ -85,6 +85,12 @@ visitante não.
 A ordem importa: a regra de `/assets/` deve vir antes, senão a terceira condição
 da regra 2 (caminho sem ponto) pode pegar uma URL de asset sem extensão.
 
+**Nada dinâmico corre risco aqui, conferido.** A única coisa no site que escreve
+estado é o botão de coração, e ele fala com
+`https://nipscern-hearts.nipscernlab.workers.dev` — outro hostname, fora desta
+zona, então nenhuma das duas regras o alcança. Não há endpoint de API sob
+`www.nipscern.com`.
+
 ---
 
 ## 2. Compression Rules — brotli também nos assets (grátis)
@@ -103,12 +109,19 @@ mesmo vale proporcionalmente para os módulos.
 
 Painel: *Rules → Compression Rules → Create rule*.
 
+Os tipos abaixo são os que o GitHub Pages realmente manda, conferidos um a um na
+resposta — repare que o JavaScript sai como `application/javascript` e não como
+`text/javascript`, que é o erro fácil de cometer nessa lista:
+
 ```
-Se:      (http.response.content_type.media_type in {"text/css" "text/javascript"
-          "text/html" "application/javascript" "application/json"
-          "image/svg+xml" "application/manifest+json"})
+Se:      (http.response.content_type.media_type in {"text/css" "text/html"
+          "application/javascript" "text/javascript" "application/json"
+          "image/svg+xml" "application/manifest+json" "text/plain"
+          "application/xml"})
 Então:   Compression options -> brotli, depois gzip, depois none
 ```
+
+`text/plain` e `application/xml` entram pelo `robots.txt` e pelo `sitemap.xml`.
 
 Ganho modesto em bytes, custo zero e nenhum risco visual.
 
@@ -127,17 +140,30 @@ Painel: *Rules → Transform Rules → Modify Response Header → Create rule*, 
 | `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | trava HTTPS no navegador |
 | `X-Content-Type-Options` | `nosniff` | impede o navegador de adivinhar o tipo |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | não vaza o caminho completo para terceiros |
-| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), interest-cohort=()` | recusa APIs que o site não usa |
-| `X-Frame-Options` | `SAMEORIGIN` | ver a ressalva abaixo |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), browsing-topics=()` | recusa APIs que o site não usa |
+| `X-Frame-Options` | **`SAMEORIGIN`** — nunca `DENY` | ver o aviso abaixo |
 
-**Ressalva no `X-Frame-Options`:** a home embute `projects/cgvweb/` num iframe,
-que é mesma origem, então `SAMEORIGIN` está certo. Se o visualizador algum dia
-passar a ser servido de `cdn.nipscern.com` ou de um Worker em outro hostname,
-esse cabeçalho quebra o embed. Confira antes de ligar.
+**Aviso no `X-Frame-Options`, e não é teórico.** O arquivo `_headers` do
+repositório declarava `X-Frame-Options: DENY`. Ele nunca valeu, o que foi sorte:
+a home embute `projects/cgvweb/` num `<iframe>` de mesma origem, e `DENY`
+bloqueia o embed **inclusive da própria origem**. Copiar aquele valor para uma
+Transform Rule transformaria a seção do calorímetro num retângulo vazio, sem
+erro visível. O `_headers` já foi corrigido para `SAMEORIGIN`; use `SAMEORIGIN`
+aqui também. Se um dia o visualizador passar a ser servido de outro hostname,
+troque por `Content-Security-Policy: frame-ancestors` com a lista explícita.
 
-Sobre **HSTS**: só ligue quando tiver certeza de que todo subdomínio que você usa
-fala HTTPS, porque `includeSubDomains` vale para todos e o navegador vai lembrar
-por um ano. Se tiver dúvida, comece sem `includeSubDomains`.
+**Sobre o `includeSubDomains` do HSTS — conferido, é seguro.** O projeto usa dois
+hostnames sob o domínio, e os dois respondem em HTTPS:
+
+```
+cdn.nipscern.com    HTTP 404 via HTTPS   (404 em / é normal: é CDN, não tem índice)
+www.nipscern.com    HTTP 200 via HTTPS
+```
+
+Se você tiver algum subdomínio fora do repositório — um painel, um staging, algo
+antigo no DNS — que ainda fale HTTP puro, ele para de abrir e o navegador lembra
+disso por um ano. Confira a aba DNS antes. Na dúvida, comece sem
+`includeSubDomains`; dá para acrescentar depois, e tirar é que é difícil.
 
 Não recomendo **Content-Security-Policy** por Transform Rule agora: a home carrega
 GTM, GoatCounter, o Worker dos corações e o CDN, e uma CSP escrita às pressas
@@ -250,12 +276,26 @@ imagens são WebP e o pôster do calorímetro agora tem `srcset` em quatro largu
 
 Os itens 1 e 2 são os que valem a viagem. Os outros são higiene.
 
-Depois de aplicar, confirme na resposta e não no painel:
+## Como conferir
+
+O painel diz o que foi configurado. Só a resposta diz o que chega ao navegador,
+e é ela que conta. Há um script para isso:
 
 ```bash
-curl -sS -o /dev/null -D - -H 'Accept-Encoding: br' https://www.nipscern.com/assets/css/main.min.css \
-  | grep -iE 'cache-control|cf-cache-status|content-encoding'
+bash tools/check-edge.sh                 # www.nipscern.com
+bash tools/check-edge.sh nipscern.com    # o apex
 ```
 
-Você quer ver `cache-control: max-age=31536000`, `content-encoding: br` e, na
-segunda chamada, `cf-cache-status: HIT`.
+Ele imprime OK ou FALTA para cada item deste documento, bate duas vezes em cada
+URL (o `cf-cache-status` da primeira costuma ser MISS porque o objeto ainda não
+está naquele datacenter — vale o da segunda) e tem uma checagem própria para o
+`X-Frame-Options: DENY`, que é o único jeito de quebrar o CGV sem perceber.
+
+Linha de base medida em 2026-08-10, antes de qualquer regra:
+
+```
+  3 ok, 9 pendente(s)
+```
+
+Os três que já passavam são o HTTP/3, o cache do asset chegando a HIT por conta
+própria, e a ausência de `DENY`.

@@ -1,8 +1,35 @@
+# ESTE ARQUIVO NÃO TEM EFEITO NENHUM HOJE. Leia antes de editar.
+#
+# `_headers` é convenção de Cloudflare Pages e de Netlify. Este site é GitHub
+# Pages (build legacy, deploy from a branch) atrás do proxy do Cloudflare, e o
+# GitHub Pages não lê este arquivo. Conferido na resposta real: aqui embaixo se
+# promete `immutable` para /assets/*, e o que chega ao navegador é
+# `cache-control: max-age=3600`.
+#
+# Quem manda nos cabeçalhos deste site é o painel do Cloudflare — Cache Rules,
+# Compression Rules e Transform Rules. Está tudo em docs/cloudflare-free-plan.md.
+#
+# Então por que o arquivo continua aqui? Porque ele é a declaração de intenção
+# correta para o dia em que o site mudar de hospedagem, e porque um arquivo
+# apagado não avisa ninguém. O que ele não pode ser é uma armadilha, e ele era
+# uma: veja o X-Frame-Options abaixo.
+
 /*
   X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  X-XSS-Protection: 1; mode=block
+  # SAMEORIGIN, não DENY.
+  #
+  # Dizia DENY, e nunca chegou a valer — sorte. A home embute o visualizador
+  # CGV (projects/cgvweb/) num <iframe>, que é mesma origem. Com DENY, o dia em
+  # que este arquivo passasse a ser lido seria o dia em que a seção do
+  # calorímetro viraria um retângulo vazio, sem erro visível e sem nada no
+  # repositório explicando por quê.
+  X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+  # X-XSS-Protection saiu. O filtro XSS foi removido do Chrome e do Edge, o
+  # Firefox nunca o teve, e onde ele ainda existe já foi ele próprio um vetor de
+  # ataque. Um cabeçalho que ninguém honra é ruído; um que só a versão insegura
+  # honra é pior que ruído.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
 
 /assets/css/*
   Cache-Control: public, max-age=31536000, immutable
@@ -17,6 +44,9 @@
   Cache-Control: public, max-age=31536000, immutable
 
 /assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/videos/*
   Cache-Control: public, max-age=31536000, immutable
 
 /data/*
