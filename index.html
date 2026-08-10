@@ -117,6 +117,21 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
 :focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:4px}::selection{background:var(--brand-mid);color:var(--text-primary)}
 .skip-link{position:absolute;top:-100%;left:var(--sp-4);background:var(--brand);color:var(--text-inverse);padding:8px 16px;border-radius:var(--r-md);font-size:var(--text-sm);font-weight:600;z-index:10000;transition:top var(--t-fast)}.skip-link:focus{top:var(--sp-4)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* O drawer do menu, escondido desde o primeiro quadro em que ele existe.
+   Esta é a única página do site em que main.css carrega de forma assíncrona, e
+   o nav é escrito por main.js no DOMContentLoaded. Sem estas quatro linhas há
+   uma corrida que o navegador vencia com frequência: o drawer entrava no DOM
+   antes de a folha chegar, era pintado como um bloco comum no meio da página
+   com todos os links e as quatro bandeiras à mostra, e quando main.css enfim
+   aplicava, o translateX(100%) entrava JUNTO com a transição que o acompanha —
+   por isso ele atravessava a tela da esquerda para a direita antes de sumir.
+   O que se via não era uma animação de abertura: era o menu fugindo.
+   Declarado aqui, o valor já é esse quando a folha chega, e uma transição só
+   dispara quando o valor muda. Manter em sincronia com .nav-mobile em
+   main.css — só as propriedades que decidem ONDE o drawer está; o fundo, o
+   padding e o flex podem chegar depois, porque a essa altura ele já está fora
+   da tela e ninguém os vê. */
+.nav-mobile{position:fixed;inset:0;z-index:999;transform:translateX(100%)}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:clamp(.625rem,.5417rem + .3704vw,.875rem) clamp(1.125rem,.875rem + 1.1111vw,1.875rem);font-size:var(--text-sm);font-weight:600;border-radius:var(--r-lg);transition:all var(--t-base);white-space:nowrap;text-decoration:none;border:1.5px solid transparent;line-height:1.4}
 .btn-primary{background:var(--brand);color:var(--text-inverse);border-color:var(--brand)}.btn-primary:hover{background:#7cb5ff;border-color:#7cb5ff;box-shadow:0 4px 20px rgba(91,156,246,.3);transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border-mid)}.btn-ghost:hover{background:var(--border-subtle);color:var(--text-primary);border-color:var(--border-strong);transform:translateY(-1px)}
