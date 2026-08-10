@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=00e4140c6d';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=6321c7ffac';
 
-import { newsPostUrl } from './content-links.js?v=00e4140c6d';
+import { newsPostUrl } from './content-links.js?v=6321c7ffac';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=00e4140c6d';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=6321c7ffac';
 
 // ============================================================
 // Navigation Template
@@ -206,6 +206,31 @@ function initNav() {
   mobile?.addEventListener('click', e => { if (e.target === mobile) closeMenu(); });
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+}
+
+// ============================================================
+// The announcement strip
+// ============================================================
+/* The strip is fixed to the top of the viewport and everything under it — the
+   navigation, the hero, the mobile drawer — is pushed down by its height. That
+   height used to be a literal in the stylesheet, 40px and 56px on a phone, and
+   a strip whose sentence wraps has no literal height: it depends on the
+   language, on the font once it has loaded, and on how wide the window is. The
+   stylesheet keeps those numbers as its fallback and this overrides them with
+   the measurement.
+
+   A ResizeObserver on the strip catches all three causes at once, which is why
+   there is nothing here listening for a resize or for a change of language. */
+function initTopBanner() {
+  const banner = document.querySelector('.top-banner');
+  if (!banner) return;
+  const publish = () => {
+    document.documentElement.style.setProperty('--top-banner-h', banner.offsetHeight + 'px');
+  };
+  publish();
+  if ('ResizeObserver' in window) { new ResizeObserver(publish).observe(banner); return; }
+  addEventListener('resize', publish, { passive: true });
+  document.addEventListener('langchange', () => setTimeout(publish, 0));
 }
 
 // ============================================================
@@ -722,7 +747,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=00e4140c6d">. Each copy would otherwise append its own
+// <script src="main.js?v=6321c7ffac">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {
@@ -761,6 +786,7 @@ if (!window.__nipscernBooted) {
        that ticker, and because everything after this point is free to move the
        scroll position through it. */
     initSmoothScroll();
+    initTopBanner();
     initNav();
     initFooter();
     initSupporters();

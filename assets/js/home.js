@@ -14,12 +14,12 @@
 
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
-import { publicationUrl, newsPostUrl } from './content-links.js?v=00e4140c6d';
-import { scrollToEl } from './smooth-scroll.js?v=00e4140c6d';
+import { publicationUrl, newsPostUrl } from './content-links.js?v=6321c7ffac';
+import { scrollToEl } from './smooth-scroll.js?v=6321c7ffac';
 /* The scroll machinery every page shares: entrance failsafe, run-while-visible,
    and the ScrollTrigger setup with the refresh discipline that took three bugs
    to get right. What stays in this file is what only the home page has. */
-import { initMotion, revealFailsafe, stopDrift } from './motion.js?v=00e4140c6d';
+import { initMotion, revealFailsafe, stopDrift } from './motion.js?v=6321c7ffac';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -43,15 +43,21 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const cardAnims = [];
 /* Remembered between visits, under the same convention as the language.
 
-   Only an explicit choice is stored. Absent one the grid plays, so a first
-   visit is never met with a page that has frozen itself and no way of knowing
-   that was deliberate. Reading it is wrapped because localStorage throws rather
-   than returning null in a private window, and a stored preference is not worth
-   a page that fails to start. */
+   A first visit arrives stopped. Five loops starting at once under a hero is
+   five things asking to be watched before anything has been read, and the grid
+   has an answer for the reader who wants one of them: pointing at a card runs
+   that card alone, which is the same rule the button has always used while
+   paused. The button says Play, so the state is legible and one press undoes
+   it. Only an explicit choice is stored, and only 'playing' overrides the
+   default; anything else, including a key that was never written, is stopped.
+
+   Reading it is wrapped because localStorage throws rather than returning null
+   in a private window, and a stored preference is not worth a page that fails
+   to start; the throw lands on the same default as a first visit. */
 const ANIM_KEY = 'nipscern_anim';
 
 function readPaused() {
-  try { return localStorage.getItem(ANIM_KEY) === 'paused'; } catch (e) { return false; }
+  try { return localStorage.getItem(ANIM_KEY) !== 'playing'; } catch (e) { return true; }
 }
 
 function writePaused(v) {
@@ -176,7 +182,10 @@ function choreograph() {
      switched off: fading while sinking a few pixels reads as the page taking
      it away, which is the point, since the reader has just done the thing it
      was asking for. Forty pixels of scroll and it is gone. */
-  const hint = document.getElementById('scroll-hint');
+  /* The wrapper, not the button: the transform written here is inline and would
+     otherwise sit on top of the button's :hover, which is the one place the
+     hint is allowed to move on its own. */
+  const hint = document.getElementById('scroll-hint-wrap') || document.getElementById('scroll-hint');
   if (hint) {
     gsap.to(hint, {
       opacity: 0,
@@ -848,8 +857,9 @@ async function fromTheLab() {
    net under that belongs with the rest of the shared machinery rather than
    with the home page. */
 
-/* The control. Always starts playing: a page that opens frozen looks broken,
-   and the reader has no way of knowing it was a choice. */
+/* The control. It opens on whatever readPaused decided, which on a first visit
+   is stopped, and the label is written from that state before anything else, so
+   a frozen grid always has a Play button next to it saying why. */
 function projectsPauseButton() {
   const btn = document.getElementById('pc-pause');
   if (!btn) return;
