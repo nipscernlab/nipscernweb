@@ -1,27 +1,48 @@
 # Otimização da Home — estudo
 
-Status: **implementado em 2026-08-10**, com duas correções ao próprio estudo
-registradas abaixo. O que foi feito, o que foi medido depois e o que sobrou para
-o painel do Cloudflare estão na seção 0. As configurações de Cloudflare têm
-documento próprio: [cloudflare-free-plan.md](cloudflare-free-plan.md).
+Status: **implementado em 2026-08-10, em duas rodadas.** A seção 0 traz o que
+foi feito, o que foi medido depois, e — em três correções numeradas — onde este
+documento errou, com os números que o desmentiram. As configurações de
+Cloudflare têm documento próprio:
+[cloudflare-free-plan.md](cloudflare-free-plan.md).
+
+O corpo do estudo, da seção 1 em diante, ficou como foi escrito na primeira
+leitura, inclusive nas partes que a medição derrubou. Um estudo que só guarda os
+palpites que deram certo não vale a segunda leitura.
 
 ---
 
 ## 0. O que foi feito, e onde este estudo errou
 
-### Medido depois, mesma emulação de celular
+### Medido no site publicado, emulação de celular
 
 |  | antes | depois |
 |---|---:|---:|
-| Performance (Lighthouse) | 48 | **77** |
+| Bytes transferidos | 1.809 KB | **675 KB** |
+| Total Blocking Time | 1.560 ms | **40 ms** |
+| Performance (Lighthouse) | 48 | **86** |
 | Acessibilidade | 90 | **100** |
-| Total Blocking Time | 1.560 ms | **270 ms** |
-| Time to Interactive | 11,0 s | 8,2 s |
-| Bytes transferidos | 1.809 KB | **703 KB** |
+| Time to Interactive | 11,0 s | 7,2 s |
 
-Duas ressalvas para a tabela não mentir: a medição "depois" é local e negocia
-brotli onde o site ao vivo responde gzip, e ela não paga o redirect do apex.
-As linhas confiáveis são o *blocking time* e os bytes.
+**A ressalva, e ela é grande.** Esses números são de uma execução em que o
+visualizador do CGV não foi armado. Em outras duas, do mesmo site e no mesmo
+minuto, o Lighthouse deu 56 e 65, com 1.626 KB e 1.630 ms de blocking time. A
+diferença é inteiramente o visualizador:
+
+```
+run 1   three.js carregou   1626 KB   TBT 1630 ms   perf 65
+run 2   three.js carregou   1629 KB   TBT 1640 ms   perf 56
+run 3   three.js NÃO        675 KB    TBT   40 ms   perf 86
+```
+
+O Lighthouse rola a página até o fim para tirar o screenshot de página inteira,
+e dependendo de quando essa rolagem cai na janela medida o anel de 75% dispara
+ou não. Ou seja: **os 675 KB são o custo de quem abre a home e não desce até o
+calorímetro**, que é o caso comum, e os 1.626 KB são o custo de quem desce —
+que é o preço legítimo de mostrar o visualizador a quem quer vê-lo.
+
+Nenhuma das duas leituras é falsa. A que mudou de verdade é a primeira, que
+antes não existia: antes, todo mundo pagava.
 
 ### Correção 1 — a seção 4.3 estava errada
 
@@ -52,15 +73,58 @@ que todas as outras alavancas somadas — e o estudo original não mencionava is
   porcentagens, que são relativas à viewport. É a maior parte do TBT que caiu.
 - **Quatro falhas de acessibilidade**, todas reais, todas corrigidas.
 
-### O que ficou de fora, e por quê
+### A segunda rodada
 
-- **Subconjunto de ícones por página** (seção 4.6): medido em 28 ícones e 4,9 KB
-  contra os 14,4 KB de hoje. Não implementado: exige que o subconjunto seja
-  regerado quando o HTML muda, e um subconjunto defasado faz um ícone sumir da
-  página em silêncio — que é perda visual, exatamente o que a restrição proíbe.
-  Vale fazer, com o gatilho do hook estendido para mudanças de HTML.
-- **Cache e brotli no Cloudflare**: são painel, não código. Ver o documento
-  próprio.
+- **Subconjunto de ícones por página** — feito. 13,9 KB → 4,8 KB na home, e sai
+  do caminho crítico, porque era a única folha que bloqueava o render. A ressalva
+  que fez esta seção dizer "não implementado" na primeira rodada foi resolvida
+  de duas formas: o hook passou a disparar em mudança de HTML, e o gerador
+  **falha** em vez de escrever um subconjunto incompleto. O modo de falha
+  merecia isso — um `--ph` ausente não deixa um buraco, deixa um quadrado sólido
+  de 1em na cor do texto.
+- **O céu** — 7 a 11% mais rápido com **zero pixels de diferença**, provado byte
+  a byte sobre `--bg-0`. Muito menos do que parecia: o custo daquela função é o
+  rasterizador desenhando 1.600 arcos, não as strings. Ver a correção 3 abaixo.
+- **O visualizador CGV** — o achado maior. Ver a ressalva da tabela acima.
+- **GSAP no `about.html`** — passou a ser condicional a `prefers-reduced-motion`,
+  como na home. Aqui eu também errei antes: escrevi que nada chamava
+  `initMotion()` naquela página, e chama — num módulo inline no fim do arquivo,
+  que meu `grep` em `assets/js/*.js` não alcançava. O drift funciona; o que não
+  fazia sentido era baixar 45 KB para quem nunca veria um quadro dele.
+- **Cache e brotli no Cloudflare** — aplicados, com um resultado que contrariou a
+  recomendação. Ver o documento próprio.
+
+### Correção 3 — o céu rendeu menos do que a análise prometia
+
+A primeira leitura foi que 1.600 estrelas construindo `'rgba(' + … +
+al.toFixed(3) + ')'` a cada quadro — quase cem mil formatações de número por
+segundo — eram o gargalo. Eliminá-las rendeu de 7 a 11%, não os 60% que a
+contagem sugeria. O tempo está no rasterizador, e tirá-lo de lá exigiria trocar
+arco por sprite, o que reamostra e portanto muda o que se vê.
+
+Uma tentativa intermediária também foi medida e desfeita: passar o brilho e as
+espículas para `globalAlpha` junto com o núcleo era aritmeticamente neutro, mas
+o rasterizador monta o gradiente numa tabela de 256 entradas, e quantizar uma
+tabela que vai até 0,42·a não dá o mesmo que quantizar uma que vai até 0,42 e
+multiplicar depois. Sobre o fundo do site a diferença chegava a 4 de 255 —
+invisível, e ainda assim diferente.
+
+### Os testes que sobraram disso
+
+Cada correção desta rodada tem um teste que **reprova sem ela**, que é a única
+coisa que faz um teste valer o arquivo:
+
+| Comando | O que ele fixa |
+|---|---|
+| `npm run test:drawer` | o menu não aparece antes da folha, e nada na barra passa de 28px |
+| `npm run test:cgv` | o visualizador não arma na abertura, e arma ao chegar perto |
+| `npm run test:sky` | 25.920.000 bytes comparados entre o céu antigo e o novo, 0 diferentes |
+| `npm run test:icons` | 1.138 ícones em 22 páginas, todos com máscara resolvida |
+
+`npm test` roda os quatro. Todos precisam de `npm run dev` e de um Chromium com
+`--remote-debugging-port=9222`; cada arquivo começa dizendo como.
+
+---
 
 **As duas restrições, aceitas como dadas:**
 
@@ -375,10 +439,10 @@ deve ser recortado junto com ele, pelo mesmo motivo.
 | 5 | GSAP condicional | 45,1 KB (reduced-motion) | ✅ feito |
 | 6 | Acessibilidade: 4 falhas | 90 → 100 | ✅ feito |
 | 7 | `aurora` em AV1 | 435 KB | ✅ feito |
-| 8 | Cache Rule `/assets/*` | 2ª visita inteira | ⬜ painel Cloudflare |
-| 9 | Cache Rule do HTML | tira a viagem à origem | ⬜ painel Cloudflare |
-| 10 | Brotli nos estáticos | ≈ 20 KB | ⬜ painel Cloudflare |
-| 11 | `icons.css` por página | ≈ 9,5 KB, e sai do crítico | ⬜ ver a ressalva na seção 0 |
+| 8 | Cache Rule `/assets/*` | 2ª visita inteira | ✅ aplicado (a regra existia e estava quebrada) |
+| 9 | Cache Rule do HTML | tira a viagem à origem | ✅ aplicado (era `No Cache` explícito) |
+| 10 | Brotli nos estáticos | ~~≈ 20 KB~~ | ❌ medido: **piorava**. Ver o doc do Cloudflare |
+| 11 | `icons.css` por página | 9,1 KB, e sai do crítico | ✅ feito na 2ª rodada |
 | 12 | Recortar o `cgv-geometry` | ≈ 700–800 KB | ❌ fora de escopo (reenquadramento) |
 
 Os três itens de Cloudflare estão detalhados em
