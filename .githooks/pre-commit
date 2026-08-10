@@ -50,6 +50,7 @@ assets/js/vendor/ScrollTrigger.min.js
 assets/js/vendor/lenis.mjs
 assets/videos/sapho-circuit-loop.mp4
 assets/videos/aurora-borealis-loop.mp4
+assets/videos/aurora-borealis-loop-av1.mp4
 assets/videos/cgv-geometry-loop.mp4
 assets/videos/ai-hand-loop.mp4
 assets/videos/about-light-waves-loop.mp4
@@ -57,7 +58,20 @@ assets/images/projects/sapho-circuit-poster.webp
 assets/images/projects/aurora-borealis-poster.webp
 assets/images/projects/cgv-geometry-poster.webp
 assets/images/projects/ai-hand-poster.webp
-assets/images/about-light-waves-poster.webp"
+assets/images/about-light-waves-poster.webp
+assets/css/main.min.css
+assets/css/icons.min.css
+assets/js/main.min.js
+assets/js/home.min.js
+assets/js/i18n.min.js
+assets/js/content-links.min.js
+assets/js/smooth-scroll.min.js
+assets/js/motion.min.js
+assets/js/sky.min.js
+assets/js/publications.min.js
+assets/js/hearts.min.js
+assets/js/license.min.js
+assets/js/analytics.min.js"
 
 # The alternation used for rewriting is derived from the list rather than
 # written out again, because a second copy of the list is exactly the thing
@@ -68,6 +82,29 @@ NAMES=$(printf '%s\n' "$ASSETS" | sed 's#.*/##; s#\.#\\.#g' | tr '\n' '|' | sed 
 PATHS=$(printf '%s\n' "$ASSETS" | sed 's#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
 changed=$(git diff --cached --name-only | grep -E "^($PATHS)$" || true)
 [ -z "$changed" ] && exit 0
+
+# ------------------------------------------------------------------
+# As cópias minificadas, geradas antes de qualquer hash.
+#
+# O que o site serve são os .min. Eles são derivados das fontes e não se editam
+# à mão, então quem garante que os dois lados batem é isto aqui e não a memória
+# de quem commita: a fonte entrou no commit, a cópia servida entra junto.
+#
+# Um .min defasado é o mesmo bug que este hook inteiro existe para evitar — o
+# navegador servindo uma coisa enquanto o repositório mostra outra — só que pior,
+# porque nem o ?v= denuncia: o token muda, o arquivo velho é rebaixado com token
+# novo, e a correção continua sem chegar em lugar nenhum.
+#
+# Falhar é o certo se o esbuild não estiver instalado. Um "pulei a minificação"
+# silencioso publica a fonte comentada ou, pior, uma cópia velha.
+# ------------------------------------------------------------------
+if ! node tools/build-min.js; then
+  echo "pre-commit: a minificação falhou. Rode 'npm install' e tente de novo." >&2
+  exit 1
+fi
+for m in $(printf '%s\n' "$ASSETS" | grep -E '\.min\.(css|js)$'); do
+  [ -f "$m" ] && git add "$m"
+done
 
 # Version = short hash of the staged content of every asset, in list order,
 # with the tokens themselves blanked out first.

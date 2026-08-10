@@ -34,16 +34,38 @@
 
   <!-- Canonical -->
   <link rel="canonical" href="https://www.nipscern.com/">
+  <!-- Google Tag Manager. The container stays; only the moment it is fetched
+       moves.
+
+       gtm.js is 112 KB over the wire, which is more than GSAP and ScrollTrigger
+       together and about twice the whole of main.css. Asynchronous or not, those
+       bytes and the parsing of them were competing with the wordmark's typeface
+       and the hero's stylesheet for the first second of the page — the one
+       second in which this page has to look like something.
+
+       The dataLayer bootstrap below still runs inline, at parse time, so the
+       gtm.start timestamp GTM measures itself against is the real one and every
+       push made before the container arrives is queued for it as usual. Only the
+       download waits for the load event, by which point the hero has painted and
+       the bandwidth is free. The one thing this costs is a visitor who leaves
+       before load fires; GoatCounter counts those independently and is not
+       affected. -->
   <script>
       (function (w, d, s, l, i) {
           w[l] = w[l] || [];
           w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-          var f = d.getElementsByTagName(s)[0],
-              j = d.createElement(s),
-              dl = l != "dataLayer" ? "&l=" + l : "";
-          j.async = true;
-          j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-          f.parentNode.insertBefore(j, f);
+          var dl = l != "dataLayer" ? "&l=" + l : "";
+          var load = function () {
+              var f = d.getElementsByTagName(s)[0], j = d.createElement(s);
+              j.async = true;
+              j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+              f.parentNode.insertBefore(j, f);
+          };
+          /* Already loaded when this parses is not a case that happens in the
+             head, but a script moved later by an editor should not silently
+             stop reporting. */
+          if (d.readyState === "complete") load();
+          else w.addEventListener("load", load);
       })(window, document, "script", "dataLayer", "GTM-WV6QJWVX");
   </script>
 
@@ -60,7 +82,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons.css?v=6321c7ffac">
+  <link rel="stylesheet" href="assets/css/icons.min.css?v=fd678916d5">
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -144,8 +166,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.css?v=6321c7ffac" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.css?v=6321c7ffac"></noscript>
+  <link rel="preload" href="assets/css/main.min.css?v=fd678916d5" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=fd678916d5"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -472,8 +494,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
            Video by Nicola Narracci, from Pexels. Credited in credits.html. -->
       <div class="cube-rail" aria-hidden="true">
         <video muted loop playsinline preload="none" width="720" height="1280"
-               poster="assets/images/about-light-waves-poster.webp?v=6321c7ffac"
-               data-src="assets/videos/about-light-waves-loop.mp4?v=6321c7ffac"></video>
+               poster="assets/images/about-light-waves-poster.webp?v=fd678916d5"
+               data-src="assets/videos/about-light-waves-loop.mp4?v=fd678916d5"></video>
       </div>
 
       <div class="container">
@@ -632,8 +654,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/sapho" class="pc-card pc-card--dark" style="--pc:var(--accent-sapho)">
             <div class="pc-media pc-media--sapho" aria-hidden="true">
               <video data-media="sapho-loop"
-                     data-src="assets/videos/sapho-circuit-loop.mp4?v=6321c7ffac"
-                     poster="assets/images/projects/sapho-circuit-poster.webp?v=6321c7ffac"
+                     data-src="assets/videos/sapho-circuit-loop.mp4?v=fd678916d5"
+                     poster="assets/images/projects/sapho-circuit-poster.webp?v=fd678916d5"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -680,9 +702,17 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                  treeline. Only the opening 42 frames are used, because from
                  frame 43 the torches start crossing the shot. -->
             <div class="pc-media pc-media--aurora" aria-hidden="true">
+              <!-- The same footage twice, and it is the same footage: 810x1050,
+                   30 fps, 164 frames, 5.467 s in both files. Nothing is cropped,
+                   scaled or shortened; only the codec differs. Measured at
+                   VMAF 97.08 mean and 95.01 at its worst frame against the
+                   H.264, which is above the threshold where the two are held to
+                   be indistinguishable — for 435 KB less. The H.264 is what
+                   every browser without an AV1 decoder gets, unchanged. -->
               <video data-media="aurora-loop"
-                     data-src="assets/videos/aurora-borealis-loop.mp4?v=6321c7ffac"
-                     poster="assets/images/projects/aurora-borealis-poster.webp?v=6321c7ffac"
+                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=fd678916d5"
+                     data-src="assets/videos/aurora-borealis-loop.mp4?v=fd678916d5"
+                     poster="assets/images/projects/aurora-borealis-poster.webp?v=fd678916d5"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -740,8 +770,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    the old one. v2 is already live and cached, hence v3. -->
               <video data-media="cgv-loop"
                      data-src="https://cdn.nipscern.com/videos/cgv-geometry-loop-v6.mp4"
-                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=6321c7ffac"
-                     poster="assets/images/projects/cgv-geometry-poster.webp?v=6321c7ffac"
+                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=fd678916d5"
+                     poster="assets/images/projects/cgv-geometry-poster.webp?v=fd678916d5"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -774,8 +804,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/ai" class="pc-card" style="--pc:var(--accent-ai)">
             <div class="pc-media pc-media--ai" aria-hidden="true">
               <video data-media="ai-loop"
-                     data-src="assets/videos/ai-hand-loop.mp4?v=6321c7ffac"
-                     poster="assets/images/projects/ai-hand-poster.webp?v=6321c7ffac"
+                     data-src="assets/videos/ai-hand-loop.mp4?v=fd678916d5"
+                     poster="assets/images/projects/ai-hand-poster.webp?v=fd678916d5"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -830,7 +860,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.js?v=6321c7ffac";
+    import { sky } from "./assets/js/sky.min.js?v=fd678916d5";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -924,11 +954,15 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </script>
   <!-- GSAP drives the scroll choreography. Free for commercial use since
        Webflow released the whole library, plugins included, in April 2025.
-       Deferred: nothing here is needed for first paint. -->
-  <script src="assets/js/vendor/gsap.min.js?v=6321c7ffac" defer></script>
-  <script src="assets/js/vendor/ScrollTrigger.min.js?v=6321c7ffac" defer></script>
-  <script type="module" src="assets/js/main.js?v=6321c7ffac"></script>
-  <script type="module" src="assets/js/home.js?v=6321c7ffac"></script>
+
+       It used to be two <script defer> tags here. It is fetched by motion.js
+       now, which asks for prefers-reduced-motion before asking for the network:
+       the choreography does not run for that reader, so 45 KB over the wire and
+       114 KB of parsing should not happen for them either. Everything else is
+       unchanged — it still arrives well after first paint, because home.js is a
+       module and modules run after the document is parsed. -->
+  <script type="module" src="assets/js/main.min.js?v=fd678916d5"></script>
+  <script type="module" src="assets/js/home.min.js?v=fd678916d5"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -976,6 +1010,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.js?v=6321c7ffac" defer></script>
+  <script src="assets/js/analytics.min.js?v=fd678916d5" defer></script>
 </body>
 </html>
