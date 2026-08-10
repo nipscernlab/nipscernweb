@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=fd678916d5';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=693b23013c';
 
-import { newsPostUrl } from './content-links.js?v=fd678916d5';
+import { newsPostUrl } from './content-links.js?v=693b23013c';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=fd678916d5';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=693b23013c';
 
 // ============================================================
 // Navigation Template
@@ -88,8 +88,15 @@ function buildNav() {
      Each language is named in its own language, because a reader looking for
      Norwegian is looking for Norsk, which is also why none of this is
      translated. */
+  /* role="radio", not "menuitemradio". A menuitemradio is only valid inside a
+     menu or a menubar, and this list is not one — it is four choices of which
+     exactly one holds, which is what a radio group is. The old role failed on
+     two counts at once: it had no menu parent, and aria-pressed, which i18n.js
+     writes on every .lang-btn, is not an attribute a menuitemradio may carry.
+     A radio takes aria-checked, which is what the markup already declared and
+     nothing was updating. */
   const langRows = (extra) => SUPPORTED.map(lang => `
-    <button type="button" class="lang-btn${extra}" data-lang="${lang}" role="menuitemradio" aria-checked="false">
+    <button type="button" class="lang-btn${extra}" data-lang="${lang}" role="radio" aria-checked="false">
       <span class="lang-chip">${FLAG_SVGS[lang]}</span>
       <span class="lang-name">${LANG_NAMES[lang]}</span>
       <i class="ph ph-check-circle lang-tick" aria-hidden="true"></i>
@@ -130,7 +137,7 @@ function buildNav() {
       <div class="nav-right">
         ${langSwitch}
         <a href="/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-cgv-link" aria-label="CGVWEB Project" title="CGVWEB">
-          <img src="${ROOT}assets/icons/icon_cgv.svg" alt="CGVWEB" class="nav-cgv-icon">
+          <img src="${ROOT}assets/icons/icon_cgv.svg" alt="" class="nav-cgv-icon">
         </a>
         <button class="nav-hamburger" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
           <i class="ph ph-list" aria-hidden="true" style="font-size:20px"></i>
@@ -154,12 +161,12 @@ function buildNav() {
       </nav>
       <div class="nav-mobile-cgv" style="border-top:1px solid var(--border-subtle);padding-top:var(--sp-8)">
         <a href="https://www.nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-mobile-cgv-link">
-          <img src="${ROOT}assets/icons/icon_cgv.svg" alt="CGVWEB" class="nav-cgv-icon">
+          <img src="${ROOT}assets/icons/icon_cgv.svg" alt="" class="nav-cgv-icon">
           <span>CGVWEB</span>
         </a>
       </div>
       <div class="nav-mobile-lang">
-        <div class="lang-list" role="group" aria-label="Language selector">
+        <div class="lang-list" role="radiogroup" aria-label="Language selector">
           ${langRows(' lang-btn--row')}
         </div>
       </div>
@@ -311,7 +318,12 @@ function buildFooter() {
     <div class="footer-bottom">
       <p><a href="${ROOT}license.html" class="footer-copy" data-i18n="footer.copyright">© 2026 NIPS-CERN. Under the NIPS-CERN Licence 1.1.</a></p>
       <div style="display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap">
-        <a href="${ROOT}qa.html" class="btn btn-ghost btn-sm glass-btn" data-i18n-aria="qa.hero.label" aria-label="Questions and Answers">
+        <!-- No aria-label. It read "Questions and Answers" over a button that
+             says Q&A, and an accessible name that does not contain the visible
+             text is a name nobody can say out loud to a speech-input tool. The
+             visible word is the name now, which is what the sighted reader has
+             to go on too. -->
+        <a href="${ROOT}qa.html" class="btn btn-ghost btn-sm glass-btn">
           <i class="ph ph-chats-circle" aria-hidden="true"></i> <span data-i18n="footer.qa">Q&amp;A</span>
         </a>
         <a href="${ROOT}projects/archived" class="btn btn-ghost btn-sm glass-btn" aria-label="Archived Projects">
@@ -747,7 +759,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=fd678916d5">. Each copy would otherwise append its own
+// <script src="main.js?v=693b23013c">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {

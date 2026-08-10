@@ -80,9 +80,30 @@ function handler(req, res) {
     res.end('<h1>404</h1><p>Not found: ' + pathname + '</p>');
     return;
   }
-  const type = TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream';
-  res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' });
-  fs.createReadStream(file).on('error', () => res.destroy()).pipe(res);
+  const ext = path.extname(file).toLowerCase();
+  const type = TYPES[ext] || 'application/octet-stream';
+
+  /* Compressed, because production is.
+     Serving text uncompressed here made every local measurement a lie in the
+     same direction: a Lighthouse run against this server transferred 125 KB of
+     the minified stylesheet where Cloudflare sends 22 KB, and reported a first
+     paint two seconds later than the real one. Fonts, images and video are
+     already compressed formats and are left alone — running deflate over an
+     mp4 costs CPU to make the file slightly bigger. */
+  const COMPRESSIBLE = /^(text\/|application\/(javascript|json|xml|manifest))/;
+  const accepts = String(req.headers['accept-encoding'] || '');
+  const enc = COMPRESSIBLE.test(type)
+    ? (/\bbr\b/.test(accepts) ? 'br' : (/\bgzip\b/.test(accepts) ? 'gzip' : null))
+    : null;
+
+  const head = { 'Content-Type': type, 'Cache-Control': 'no-store', 'Vary': 'Accept-Encoding' };
+  if (enc) head['Content-Encoding'] = enc;
+  res.writeHead(200, head);
+
+  const body = fs.createReadStream(file).on('error', () => res.destroy());
+  if (!enc) return body.pipe(res);
+  const zlib = require('zlib');
+  body.pipe(enc === 'br' ? zlib.createBrotliCompress() : zlib.createGzip()).pipe(res);
 }
 
 function start(candidates, i) {
