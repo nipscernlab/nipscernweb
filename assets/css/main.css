@@ -1043,6 +1043,17 @@ h1, h2, h3, h4, h5, h6 {
   transition: transform var(--t-slow);
 }
 .nav-mobile.open { transform: translateX(0); }
+/* The announcement strip is fixed at the top of the viewport and sits above
+   this panel, so a drawer pinned to inset:0 opened with its own header — the
+   wordmark and the button that closes it — underneath the strip and invisible:
+   the menu appeared to start at About Us and offered no way out but Escape.
+   It starts where the strip ends instead. The height is measured and published
+   by main.js, because a sentence that wraps is not a number a stylesheet can
+   know; the literal is the fallback for the frame before that runs. */
+body.has-top-banner .nav-mobile { top: var(--top-banner-h, 40px); }
+@media (max-width: 640px) {
+  body.has-top-banner .nav-mobile { top: var(--top-banner-h, 56px); }
+}
 
 .nav-mobile-header {
   display: flex;
@@ -2918,16 +2929,24 @@ a:hover > .frame > [data-drift],
 .top-banner strong { color: #79b1ff; font-weight: 600; white-space: nowrap; }
 .top-banner i { font-size: 1.1em; color: #79b1ff; flex-shrink: 0; }
 
-body.has-top-banner #nav { top: 40px; }
-body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
+/* Everything under the strip is offset by its height, and that height was a
+   literal written twice here: 40px, and 56px on a phone where the sentence
+   wraps to two lines. A wrapped sentence is not a fixed height — it depends on
+   the language, on the font once it has loaded, and on the width of the window
+   — so on the narrow screens the offset was a guess, and anything landing under
+   it landed too high. main.js measures the strip and publishes the answer as
+   --top-banner-h; the literals stay as the fallback for the frame before that
+   runs, and for the case where the script never does. */
+body.has-top-banner #nav { top: var(--top-banner-h, 40px); }
+body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h, 40px)); }
 
 /* On a phone the sentence wraps to two lines, so the strip is taller and the
    trailing arrow is redundant next to a wrapped call to action. */
 @media (max-width: 640px) {
   .top-banner { flex-wrap: wrap; gap: 4px 6px; font-size: var(--text-xs); padding: 7px var(--sp-4); }
   .top-banner .ph-arrow-right { display: none; }
-  body.has-top-banner #nav { top: 56px; }
-  body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 56px); }
+  body.has-top-banner #nav { top: var(--top-banner-h, 56px); }
+  body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h, 56px)); }
 }
 
 /* ============================================================
@@ -3882,8 +3901,18 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 }
 .cgv-specs-row .cgv-specs { flex: 1; min-width: 0; }
 .cgv-open { flex: none; }
+/* Stacked, the button becomes the last thing in the row, and the rule that
+   opens the links below arrives immediately under its bottom edge — close
+   enough to read as a bar stuck to the button rather than as the start of the
+   next row. On one line there was never a question, because the padded figures
+   beside it held the rule away. So the row buys that space back itself. */
 @media (max-width: 820px) {
-  .cgv-specs-row { flex-direction: column; align-items: stretch; gap: var(--sp-5); }
+  .cgv-specs-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-5);
+    padding-bottom: var(--sp-5);
+  }
   .cgv-open { align-self: flex-start; }
 }
 
@@ -5558,6 +5587,14 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
   .project-hero-inner { flex-direction: column; align-items: stretch; gap: var(--sp-8); }
   .project-hero-icon { width: 120px; height: 120px; font-size: 56px; }
   .stats-card { grid-template-columns: repeat(2, 1fr); row-gap: var(--sp-8); }
+  /* The hairline belongs to the second figure of each pair, and only there.
+     `.stat-item + .stat-item` counts along the source order and knows nothing
+     about rows: at four across it drew the three inner rules correctly, but at
+     two across the third figure starts a row and its left border landed on the
+     outside edge of the pane, hanging under Theses supervised with nothing on
+     the other side of it. */
+  .stat-item + .stat-item { border-left: 0; }
+  .stat-item:nth-child(even) { border-left: 1px solid rgba(255, 255, 255, 0.075); }
   .footer-inner { grid-template-columns: 1fr 1fr; }
 }
 
@@ -5806,18 +5843,23 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + 40px); }
 
 /* caret-down is in the sprite now, so the caret points down because it is a
    caret-down, not because a caret-right was turned a quarter. The rotation is
-   gone, and with it the need to repeat it inside the keyframes to stop the bob
-   from throwing the turn away. */
-@keyframes hint-bob {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(3px); }
-}
-.scroll-hint i {
-  animation: hint-bob 2.6s ease-in-out infinite;
-}
-.scroll-hint:hover i { animation-play-state: paused; }
+   gone, so nothing has to be repeated inside a transform to survive it.
+
+   It used to bob on a loop, which asked for attention the whole time the hero
+   was on screen instead of only when it was being considered. Now it answers
+   the pointer the way every other button does, a lift, with a little growth on
+   top of it because the circle is small and one pixel of rise reads as nothing
+   at this size. The scroll's own sink is on .scroll-hint-wrap, which is why
+   this element is free to hold a transform at all. */
+.scroll-hint-wrap { line-height: 0; }
+.scroll-hint:hover,
+.scroll-hint:focus-visible { transform: translateY(-3px) scale(1.07); }
+.scroll-hint:active { transform: translateY(-1px) scale(1.02); }
 @media (prefers-reduced-motion: reduce) {
-  .scroll-hint i { animation: none; }
+  .scroll-hint { transition: opacity var(--t-base), color var(--t-fast); }
+  .scroll-hint:hover,
+  .scroll-hint:focus-visible,
+  .scroll-hint:active { transform: none; }
 }
 
 /* The non-GSAP path: past the first stretch of scroll it is not needed and
