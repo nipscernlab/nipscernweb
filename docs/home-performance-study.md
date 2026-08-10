@@ -1,9 +1,66 @@
 # Otimização da Home — estudo
 
-Status: estudo, 2026-08-10. Nada aqui foi implementado, com uma exceção
-registrada na seção 3 (a grade de projetos passou a abrir parada nesta mesma
-sessão, e o efeito colateral de desempenho disso é grande o bastante para o
-estudo começar por ele).
+Status: **implementado em 2026-08-10**, com duas correções ao próprio estudo
+registradas abaixo. O que foi feito, o que foi medido depois e o que sobrou para
+o painel do Cloudflare estão na seção 0. As configurações de Cloudflare têm
+documento próprio: [cloudflare-free-plan.md](cloudflare-free-plan.md).
+
+---
+
+## 0. O que foi feito, e onde este estudo errou
+
+### Medido depois, mesma emulação de celular
+
+|  | antes | depois |
+|---|---:|---:|
+| Performance (Lighthouse) | 48 | **77** |
+| Acessibilidade | 90 | **100** |
+| Total Blocking Time | 1.560 ms | **270 ms** |
+| Time to Interactive | 11,0 s | 8,2 s |
+| Bytes transferidos | 1.809 KB | **703 KB** |
+
+Duas ressalvas para a tabela não mentir: a medição "depois" é local e negocia
+brotli onde o site ao vivo responde gzip, e ela não paga o redirect do apex.
+As linhas confiáveis são o *blocking time* e os bytes.
+
+### Correção 1 — a seção 4.3 estava errada
+
+O estudo estimou 1,2–1,8 MB recodificando os loops em x264. **Uma varredura de
+CRF nos cinco arquivos mostrou que todo re-encode saiu maior que o original.**
+Eles já estavam bem codificados; a premissa de que o bitrate fixo era
+desperdício não se sustentou.
+
+Só o `aurora` tinha folga real, e só trocando de codec. Ele agora tem uma cópia
+AV1 ao lado da H.264 — mesma resolução, mesmos 30 fps, mesmos 164 quadros,
+mesmos 5,467 s, nada recortado nem escalado — a VMAF 97,08 de média e 95,01 no
+pior quadro, por 435 KB a menos. É oferecida por `data-av1` e só é aceita onde
+`canPlayType` responde `probably`.
+
+### Correção 2 — a alavanca maior não estava no estudo
+
+**Minificação.** Os comentários deste repositório são 62% do que a `main.css`
+manda comprimido pela rede. As fontes ficam intactas e `tools/build-min.js`
+gera a cópia servida ao lado de cada uma. **63 KB comprimidos na Home**, mais
+que todas as outras alavancas somadas — e o estudo original não mencionava isso.
+
+### Achados que só o PageSpeed revelou
+
+- **`three.js`, 237 KB de um CDN terceiro, carregando na Home do celular.** Os
+  dois `IntersectionObserver` do visualizador do CGV usavam `rootMargin` em
+  pixels fixos (2000px e 1400px), escritos num desktop. Num celular a viewport
+  é um terço, então o anel alcançava quatro telas e engolia a dobra. Agora são
+  porcentagens, que são relativas à viewport. É a maior parte do TBT que caiu.
+- **Quatro falhas de acessibilidade**, todas reais, todas corrigidas.
+
+### O que ficou de fora, e por quê
+
+- **Subconjunto de ícones por página** (seção 4.6): medido em 28 ícones e 4,9 KB
+  contra os 14,4 KB de hoje. Não implementado: exige que o subconjunto seja
+  regerado quando o HTML muda, e um subconjunto defasado faz um ícone sumir da
+  página em silêncio — que é perda visual, exatamente o que a restrição proíbe.
+  Vale fazer, com o gatilho do hook estendido para mudanças de HTML.
+- **Cache e brotli no Cloudflare**: são painel, não código. Ver o documento
+  próprio.
 
 **As duas restrições, aceitas como dadas:**
 
@@ -118,7 +175,12 @@ Vale notar que a política de privacidade lista o GoatCounter e as três chaves 
 `localStorage` e não menciona o Tag Manager. Se ele fica, o texto precisa dizer
 que ele está lá.
 
-### 4.2 Recortar o `cgv-geometry-loop` (ganho estimado: 700–800 KB, risco visual: zero)
+### 4.2 Recortar o `cgv-geometry-loop` — **NÃO FEITO, por decisão do cliente**
+
+> Reenquadrar qualquer vídeo ficou fora de escopo: nada de recorte, nada de
+> mudança de zoom. A observação abaixo continua verdadeira e o desperdício
+> continua existindo — se um dia o arquivo de origem for reexportado, é aqui
+> que está a conta.
 
 Este é o achado mais desconfortável do estudo. O arquivo é **1100×560**, uma
 paisagem larga. A moldura em que ele toca, `.pc-media`, é o card inteiro:
@@ -149,7 +211,15 @@ Vale conferir os outros quatro pelo mesmo critério antes de recodificar — o
 `about-light-waves` (720×1280) roda na `.cube-rail`, que é outra moldura, e o
 recorte dele tem que ser medido contra ela e não contra o card.
 
-### 4.3 Recodificar os loops sem tocar na duração (ganho estimado: 1,2–1,8 MB, risco visual: baixo)
+### 4.3 Recodificar os loops sem tocar na duração — ~~1,2–1,8 MB~~ **ERRADO, ver a seção 0**
+
+> **Esta seção estava errada e fica registrada como estava.** A varredura de CRF
+> mediu o contrário do que ela previa: em x264, nos cinco arquivos e em CRF 18,
+> 20 e 22, **todo re-encode saiu maior que o original**. Os arquivos já estavam
+> bem codificados. Em AV1, só o `aurora` ganhou alguma coisa sem cair abaixo de
+> VMAF 95, e é o único que foi trocado. O raciocínio abaixo — de que um bitrate
+> alto implica desperdício — é justamente o que a medição desmentiu, e é por
+> isso que ele continua aqui.
 
 Os arquivos estão em H.264 com bitrate fixo alto. Sob o scrim do card — os loops
 correm atrás de um gradiente de legibilidade, com o texto por cima — o olho não
@@ -296,21 +366,26 @@ deve ser recortado junto com ele, pelo mesmo motivo.
 
 ## 6. Ordem sugerida
 
-| # | Alavanca | Ganho | Onde se mexe |
+| # | Alavanca | Ganho | Estado |
 |---|---|---:|---|
-| 1 | GTM: remover ou adiar | 112,5 KB | `index.html` + demais páginas |
-| 2 | Cache Rule `/assets/*` | 2ª visita inteira | painel Cloudflare |
-| 3 | Brotli nos estáticos | ≈ 20 KB | painel Cloudflare |
-| 4 | Recortar o `cgv-geometry` | ≈ 700–800 KB | `ffmpeg` + repo de assets |
-| 5 | Recodificar os outros loops por CRF | ≈ 1,2–1,8 MB | `ffmpeg` + repo de assets |
-| 6 | `icons.css` por página | ≈ 11 KB, e sai do crítico | `tools/build-icons.js` |
-| 7 | GSAP condicional | 45,1 KB (reduced-motion) | `index.html` + `home.js` |
-| 8 | `srcset` nos pôsteres | ≈ 150–200 KB no celular | `index.html` |
+| 1 | **Minificação** de CSS e JS | **63 KB** | ✅ feito — não estava no estudo |
+| 2 | `three.js` fora da carga inicial no celular | 237 KB + o grosso do TBT | ✅ feito — só o PageSpeed revelou |
+| 3 | GTM fora do caminho crítico | 112,5 KB | ✅ feito (mantido, adiado para o `load`) |
+| 4 | `srcset` no pôster do calorímetro | 132 KB no celular | ✅ feito |
+| 5 | GSAP condicional | 45,1 KB (reduced-motion) | ✅ feito |
+| 6 | Acessibilidade: 4 falhas | 90 → 100 | ✅ feito |
+| 7 | `aurora` em AV1 | 435 KB | ✅ feito |
+| 8 | Cache Rule `/assets/*` | 2ª visita inteira | ⬜ painel Cloudflare |
+| 9 | Cache Rule do HTML | tira a viagem à origem | ⬜ painel Cloudflare |
+| 10 | Brotli nos estáticos | ≈ 20 KB | ⬜ painel Cloudflare |
+| 11 | `icons.css` por página | ≈ 9,5 KB, e sai do crítico | ⬜ ver a ressalva na seção 0 |
+| 12 | Recortar o `cgv-geometry` | ≈ 700–800 KB | ❌ fora de escopo (reenquadramento) |
 
-Os itens 1 a 3 são os de melhor relação entre ganho e trabalho, e nenhum dos
-três encosta em pixel nenhum. Os 4 e 5 mexem em mídia e devem ir para o repositório
-`nipscern-assets`, com as variantes ao lado do arquivo principal.
+Os três itens de Cloudflare estão detalhados em
+[cloudflare-free-plan.md](cloudflare-free-plan.md) e são os de melhor relação
+entre ganho e trabalho que sobraram, porque nenhum deles é código.
 
-Vídeo total depois dos itens 4 e 5, mantidas as cinco durações: estimativa de
-**4,88 MB → ≈ 2,2–2,6 MB**, e nada disso desce numa primeira visita de qualquer
-forma, por causa da seção 3.
+Vídeo total: **4,88 MB → 4,44 MB**, mantidas as cinco durações, as cinco
+resoluções e os cinco enquadramentos. Muito abaixo do que este estudo previu, e
+o motivo está na correção 1 — os arquivos já estavam bons. De todo modo nada
+disso desce numa primeira visita, por causa da seção 3.
