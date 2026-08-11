@@ -39,13 +39,16 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const DATA = new URL('../../data/collab-network.json', import.meta.url).href;
 
-/* The two colours are the page's own: --accent-about for the people who work
-   here, --brand for everybody else they have written with. Colour is state on
-   this site, and the state it is carrying here is "ours" against "theirs". */
-const MEMBER = [0.72, 0.38, 0.98];   // #a855f7
-const OTHER  = [0.24, 0.42, 0.72];   // a held-down --brand
+/* One blue, two states: the laboratory's own --brand at full strength for the
+   people who work here, held down for everybody else they have written with.
+   Colour is state on this site, and the state carried here is "ours" against
+   "theirs" — the same rule the language flags follow, full colour for the one
+   in use. It was violet against blue before, but the violet was the About
+   accent, and that accent is now the brand itself. */
+const MEMBER = [0.36, 0.61, 0.96];   // #5b9cf6, --brand
+const OTHER  = [0.24, 0.42, 0.72];   // the same blue, held down
 const LINE   = [0.16, 0.26, 0.46];
-const LINK_MEMBER = [0.34, 0.22, 0.58];
+const LINK_MEMBER = [0.27, 0.44, 0.75];
 
 /* A round dot with a soft edge, painted once into a 64px canvas. A texture
    rather than a shader because a shader I cannot see running on a driver I do
@@ -107,7 +110,7 @@ export async function initNetwork(canvas, opts = {}) {
   /* No WebGL, no canvas. The plate over it carries the figures and stays. */
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=b93bdc3cee');
+    THREE = await import('./vendor/three.module.min.js?v=10756b7b89');
   } catch (e) {
     return null;
   }
