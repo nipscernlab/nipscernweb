@@ -23,7 +23,7 @@
  * wrote and the one every reader keeps if a single byte fails to arrive.
  */
 
-import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=8c4ea6da81';
+import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=7af9a938d4';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -145,7 +145,7 @@ async function mountRing() {
 
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=8c4ea6da81');
+    THREE = await import('./vendor/three.module.min.js?v=7af9a938d4');
   } catch (e) {
     /* No module, no figure. Removing the node collapses the hero to one
        column, which the grid already knows how to be. */
@@ -360,17 +360,22 @@ async function mountDescent() {
       .to(scene.querySelector('img'), { scale: 1, duration: 0.6, ease: 'none' }, i);
   });
 
-  /* The depth, counted as it is travelled. 100 m is ATLAS's own number for
-     Point 1, and it is reached with the tunnel — the two scenes after it are
-     at the same depth, looking closer, so the meter arrives and holds. */
+  /* The depth, counted as it is travelled. The first two scenes are at the
+     surface, the tunnel is 100 m down — ATLAS's own number for Point 1 — and
+     the last scene comes back up to the people. So the meter falls on the way
+     into the tunnel and climbs on the way out. */
   if (depthEl) {
     const depth = { m: 0 };
-    tl.to(depth, {
-      m: 100,
-      duration: 1,
-      ease: 'none',
-      onUpdate: () => { depthEl.textContent = '−' + Math.round(depth.m); },
-    }, 1);
+    /* "−0 m" is a reading no instrument would print. */
+    const write = () => {
+      const m = Math.round(depth.m);
+      depthEl.textContent = m ? '−' + m : '0';
+    };
+    /* Both tweens end before the last scene's own tween does, or the reading
+       is still travelling when the scroll runs out and the meter is left
+       showing a depth nobody is at. */
+    tl.to(depth, { m: 100, duration: 0.5, ease: 'none', onUpdate: write }, 2)
+      .to(depth, { m: 0, duration: 0.5, ease: 'none', onUpdate: write }, 3);
   }
 }
 

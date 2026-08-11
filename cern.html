@@ -28,8 +28,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/cern.css?v=8c4ea6da81">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=8c4ea6da81">
+  <link rel="stylesheet" href="assets/css/icons/cern.css?v=7af9a938d4">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=7af9a938d4">
 
   <style>
     /* LHC Status banner — a pane of glass pulled up over the control-room
@@ -97,8 +97,11 @@
     .cern-kv-value { font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); margin-top: var(--sp-1); font-family: var(--font-mono); }
     .cern-kv-sub { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
 
-    /* Actual images */
+    /* Actual images. The caption is a pane of glass laid over the bottom of
+       the photograph — the same construction the descent plates and the team
+       wall use, so every picture on the site is captioned in one voice. */
     .cern-img {
+      position: relative;
       width: 100%;
       border-radius: var(--r-xl);
       overflow: hidden;
@@ -111,46 +114,42 @@
       object-fit: cover;
       display: block;
     }
+    /* The tint has to carry the text on its own. Glass blurs what is behind
+       it, it does not darken it: over the white ceiling of the tunnel or the
+       lit screens of the control room, a light wash left muted grey type on a
+       pale ground and the caption was unreadable. Near-opaque ink, and the
+       type at full strength, so every caption on the page reads the same
+       whatever it happens to be lying on. */
     .cern-img figcaption {
+      position: absolute;
+      left: var(--sp-2);
+      right: var(--sp-2);
+      bottom: var(--sp-2);
+      border-radius: calc(var(--r-xl) - 6px);
+      --glass-tint: rgba(5, 8, 15, 0.82);
       padding: var(--sp-2) var(--sp-3);
       font-size: var(--text-xs);
-      color: var(--text-muted);
-      background: var(--bg-card);
+      color: var(--text-primary);
       font-family: var(--font-mono);
-      border-top: 1px solid var(--border-subtle);
+      line-height: 1.5;
     }
 
-    /* FCC section styles */
-    .fcc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--sp-4); margin-top: var(--sp-8); }
-    .fcc-stat { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); padding: var(--sp-5); }
-    .fcc-stat-label { font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
-    .fcc-stat-value { font-size: var(--text-2xl); font-weight: 700; color: var(--accent-cern); margin-top: var(--sp-1); font-family: var(--font-mono); }
-    .fcc-stat-sub { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
-    .fcc-phase { display: flex; gap: var(--sp-4); margin-top: var(--sp-8); flex-wrap: wrap; }
-    .fcc-phase-card { flex: 1; min-width: 200px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); padding: var(--sp-5); }
-    .fcc-phase-name { font-size: var(--text-sm); font-weight: 700; color: var(--text-primary); margin-bottom: var(--sp-2); display: flex; align-items: center; }
-    .fcc-phase-name::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-cern); margin-right: 8px; flex-shrink: 0; }
-    .fcc-phase-card.hh .fcc-phase-name::before { background: var(--accent-sapho); }
-    .fcc-phase-desc { font-size: var(--text-xs); color: var(--text-secondary); line-height: 1.6; }
-    .fcc-phase-energy { font-size: var(--text-xs); font-weight: 600; color: var(--accent-cern); margin-top: var(--sp-2); font-family: var(--font-mono); }
-    .fcc-phase-card.hh .fcc-phase-energy { color: var(--accent-sapho); }
-    .fcc-timeline-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: 4px var(--sp-3); background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); border-radius: var(--r-full); font-size: var(--text-xs); font-weight: 600; color: var(--accent-cern); margin-top: var(--sp-4); }
+    /* The Standard Model chart is drawn in dark ink for a white page, so it
+       gets a plate to sit on rather than being inverted: recolouring somebody
+       else's diagram is editing it. */
+    .sm-table { background: #eef1f6; padding: var(--sp-5) var(--sp-5) var(--sp-16); }
+    .sm-table img { width: 100%; height: auto; max-width: 900px; margin-inline: auto; }
 
-    /* LHC Live links panel */
+    /* The FCC section had six components of its own: two phase cards, a strip
+       of six stat boxes, a pill badge, and a hand-built timeline panel, all
+       saying the same handful of numbers in four different type sizes. It now
+       uses what the rest of the page already uses, and none of those rules
+       are needed. */
+
+    /* The three dashboard links are controls sitting on the glass banner, so
+       they are the site's own glass button, same as the home page's. Nothing
+       here but the size and the label. */
     .lhc-live-links { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-4); }
-    .lhc-live-link {
-      display: inline-flex; align-items: center; gap: var(--sp-2);
-      padding: var(--sp-2) var(--sp-4);
-      background: var(--bg-card);
-      border: 1px solid var(--border-mid);
-      border-radius: var(--r-lg);
-      font-size: var(--text-xs);
-      font-weight: 600;
-      color: var(--text-secondary);
-      transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
-      text-decoration: none;
-    }
-    .lhc-live-link:hover { color: var(--brand); border-color: var(--brand-mid); background: var(--brand-glow); }
 
     /* The ring — the hero's figure, drawn on a canvas by cern.js. The labels
        are HTML projected over it, so the experiments are named in the page's
@@ -187,7 +186,7 @@
       max-width: 46ch;
       padding: var(--sp-4) var(--sp-5);
       border-radius: var(--r-lg);
-      --glass-tint: rgba(7, 10, 18, 0.45);
+      --glass-tint: rgba(5, 8, 15, 0.8);
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -195,7 +194,7 @@
       line-height: 1.6;
       color: var(--text-primary);
     }
-    .descent-d { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--brand); font-variant-numeric: tabular-nums; }
+    .descent-d { font-family: var(--font-mono); font-size: var(--text-xs); color: #8ab6f9; font-variant-numeric: tabular-nums; }
     .descent-meter { display: none; }
 
     .descent-stage.is-live { height: 100svh; }
@@ -203,7 +202,9 @@
     .is-live .descent-scene img { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; }
     .is-live .descent-plate { bottom: var(--sp-10); }
     /* The depth, counted in the margin while the scroll travels it. Mono
-       because it is measured, tabular so the digits hold still. */
+       because it is measured, tabular so the digits hold still, and on its own
+       pane of glass because the four photographs behind it run from a dark
+       tunnel to a bright alpine sky and bare type cannot hold both. */
     .is-live .descent-meter {
       display: flex;
       align-items: baseline;
@@ -213,11 +214,13 @@
       right: var(--sp-8);
       transform: translateY(-50%);
       z-index: 3;
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: var(--r-lg);
+      --glass-tint: rgba(5, 8, 15, 0.8);
       font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
       font-size: var(--text-3xl);
       color: var(--text-primary);
-      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
     }
     .descent-meter-unit { font-size: var(--text-sm); color: var(--text-muted); }
     @media (max-width: 640px) {
@@ -292,9 +295,8 @@
               CERN &amp; the ATLAS Experiment
             </h1>
             <p class="body-lg fade-up" data-i18n="cern.hero.subtitle">
-              The world's foremost particle physics laboratory and the experiment where NIPS-CERN makes its scientific contributions — from calorimetry instrumentation to event visualisation.
+              The world's foremost particle physics laboratory and the experiment where NIPS-CERN makes its scientific contributions, from calorimetry instrumentation to event visualisation.
             </p>
-            <div class="fade-up" style="margin-top:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           </div>
           <!-- The LHC as a figure, drawn by three.js in cern.js: two beam
                pipes, the four experiments at their real stations, two bunches
@@ -347,15 +349,15 @@
           <div style="margin-left:auto;display:flex;flex-direction:column;gap:var(--sp-2)">
             <div class="lhc-status-label" style="margin-bottom:4px">Live CERN Dashboards</div>
             <div class="lhc-live-links">
-              <a href="https://op-webtools.web.cern.ch/vistar/vistars.php?usr=LHC1" target="_blank" rel="noopener" class="lhc-live-link" aria-label="LHC Page 1 — live machine status">
+              <a href="https://op-webtools.web.cern.ch/vistar/vistars.php?usr=LHC1" target="_blank" rel="noopener" class="btn btn-ghost btn-sm glass-btn" aria-label="LHC Page 1, live machine status">
                 <i class="ph ph-gauge" aria-hidden="true"></i>
                 LHC Page 1
               </a>
-              <a href="https://op-webtools.web.cern.ch/vistar/vistars.php" target="_blank" rel="noopener" class="lhc-live-link" aria-label="CERN Vistar operational displays">
+              <a href="https://op-webtools.web.cern.ch/vistar/vistars.php" target="_blank" rel="noopener" class="btn btn-ghost btn-sm glass-btn" aria-label="CERN Vistar operational displays">
                 <i class="ph ph-browsers" aria-hidden="true"></i>
                 Vistars
               </a>
-              <a href="https://home.cern/news/series/lhc-run-4" target="_blank" rel="noopener" class="lhc-live-link" aria-label="CERN news about the LHC and HL-LHC">
+              <a href="https://home.cern/news/series/lhc-run-4" target="_blank" rel="noopener" class="btn btn-ghost btn-sm glass-btn" aria-label="CERN news about the LHC and HL-LHC">
                 <i class="ph ph-newspaper" aria-hidden="true"></i>
                 CERN News
               </a>
@@ -396,6 +398,13 @@
           </figcaption>
         </figure>
         <figure class="descent-scene">
+          <img src="assets/images/cern/atlas-control-room-mural.webp" alt="The ATLAS control-room building at Point 1, with Josef Kristofoletti's mural of the detector" loading="lazy" decoding="async">
+          <figcaption class="descent-plate glass">
+            <span class="descent-d">0 m</span>
+            <span data-i18n="cern.descent.control">The ATLAS control-room building at Point 1, wearing Josef Kristofoletti's mural of the detector. The real one sits 100 metres beneath it.</span>
+          </figcaption>
+        </figure>
+        <figure class="descent-scene">
           <img src="assets/images/cern/lhc-tunnel.webp" alt="The LHC tunnel with its blue dipole magnets" loading="lazy" decoding="async">
           <figcaption class="descent-plate glass">
             <span class="descent-d">−100 m</span>
@@ -403,20 +412,13 @@
           </figcaption>
         </figure>
         <figure class="descent-scene">
-          <img src="assets/images/cern/atlas-cutaway.webp" alt="ATLAS detector cutaway — all subsystems from inner tracking to muon spectrometer" loading="lazy" decoding="async">
+          <img src="assets/images/cern/nipscern-at-cern.jpg" alt="NIPS-CERN researchers at CERN, with the Jura mountains behind" loading="lazy" decoding="async">
           <figcaption class="descent-plate glass">
-            <span class="descent-d">−100 m</span>
-            <span data-i18n="cern.descent.cavern">The ATLAS cavern at Point 1: 46 metres of detector, 7,000 tonnes, wrapped around the beam.</span>
+            <span class="descent-d">0 m</span>
+            <span data-i18n="cern.descent.team">Back at the surface: NIPS-CERN researchers at CERN. The machine below is what they came for.</span>
           </figcaption>
         </figure>
-        <figure class="descent-scene">
-          <img src="assets/images/cern/tilecal-module.webp" alt="A TileCal module — steel absorber and scintillating tiles" loading="lazy" decoding="async">
-          <figcaption class="descent-plate glass">
-            <span class="descent-d">−100 m</span>
-            <span data-i18n="cern.descent.tilecal">TileCal, the hadronic calorimeter. This is the instrument NIPS-CERN works on.</span>
-          </figcaption>
-        </figure>
-        <div class="descent-meter" aria-hidden="true"><span id="descent-depth">0</span><span class="descent-meter-unit">m</span></div>
+        <div class="descent-meter glass" aria-hidden="true"><span id="descent-depth">0</span><span class="descent-meter-unit">m</span></div>
       </div>
     </section>
 
@@ -429,10 +431,10 @@
           <div class="accent-line" aria-hidden="true"></div>
           <h2 id="whatiscern-title" data-i18n="cern.what_is_cern.title">What is CERN?</h2>
           <p data-i18n="cern.what_is_cern.text">
-            Founded on 29 September 1954, CERN — the European Organization for Nuclear Research (<em>Conseil Européen pour la Recherche Nucléaire</em>) — is the world's foremost laboratory for particle physics. Located at the Franco-Swiss border near Geneva, Switzerland, it hosts approximately 17,000 scientists and engineers from over 100 countries, with 23 member states contributing to its operation and scientific programme.
+            Founded on 29 September 1954, CERN, the European Organization for Nuclear Research (<em>Conseil Européen pour la Recherche Nucléaire</em>), is the world's foremost laboratory for particle physics. Located at the Franco-Swiss border near Geneva, Switzerland, it brings together more than 17,500 people of some 110 nationalities, with 25 Member States and 11 Associate Member States, Brazil among them since 2024, contributing to its operation and scientific programme.
           </p>
           <p>
-            CERN's primary mission is to investigate the fundamental structure of matter by accelerating particles to extremely high energies and studying the results of their collisions. The organisation has produced a succession of increasingly powerful accelerators: the Synchrocyclotron (1957), the Proton Synchrotron (1959), the Super Proton Synchrotron (1976), the Large Electron–Positron Collider (LEP, 1989–2000), and the current flagship — the Large Hadron Collider (LHC, 2008–present).
+            CERN's primary mission is to investigate the fundamental structure of matter by accelerating particles to extremely high energies and studying the results of their collisions. The organisation has produced a succession of increasingly powerful accelerators: the Synchrocyclotron (1957), the Proton Synchrotron (1959), the Super Proton Synchrotron (1976), the Large Electron–Positron Collider (LEP, 1989–2000), and the current flagship, the Large Hadron Collider (LHC, 2008–present).
           </p>
           <p>
             Beyond particle physics, CERN is home to transformative technological contributions: Tim Berners-Lee invented the World Wide Web at CERN in 1989 as a means for scientists to share information; the GRID computing infrastructure pioneered distributed computing at petabyte scale; and CERN's accelerator technology underpins medical applications such as proton therapy for cancer treatment.
@@ -446,13 +448,13 @@
             </div>
             <div class="cern-kv">
               <div class="cern-kv-label">Member States</div>
-              <div class="cern-kv-value">23</div>
-              <div class="cern-kv-sub">+ 100 nationalities</div>
+              <div class="cern-kv-value">25</div>
+              <div class="cern-kv-sub">+ 11 Associate Members, incl. Brazil</div>
             </div>
             <div class="cern-kv">
-              <div class="cern-kv-label">Scientists on-site</div>
-              <div class="cern-kv-value">~17,000</div>
-              <div class="cern-kv-sub">Engineers & physicists</div>
+              <div class="cern-kv-label">People</div>
+              <div class="cern-kv-value">17,500+</div>
+              <div class="cern-kv-sub">Of some 110 nationalities</div>
             </div>
             <div class="cern-kv">
               <div class="cern-kv-label">Address</div>
@@ -468,11 +470,11 @@
         <div class="fade-up" style="display:flex;flex-direction:column;gap:var(--sp-4)">
           <figure class="cern-img">
             <img src="assets/images/cern/cern-aerial.webp" alt="Aerial view of CERN campus at the Franco-Swiss border near Geneva" loading="lazy" style="aspect-ratio:16/9;object-fit:cover">
-            <figcaption>Aerial view of the CERN campus — Franco-Swiss border, Geneva</figcaption>
+            <figcaption class="glass">Aerial view of the CERN campus. Franco-Swiss border, Geneva</figcaption>
           </figure>
           <figure class="cern-img">
             <img src="assets/images/cern/cern-globe.webp" alt="CERN Globe of Science and Innovation" loading="lazy" style="aspect-ratio:4/3;object-fit:cover">
-            <figcaption>Globe of Science and Innovation — CERN's landmark wooden sphere</figcaption>
+            <figcaption class="glass">Globe of Science and Innovation. CERN's landmark wooden sphere</figcaption>
           </figure>
         </div>
       </div>
@@ -493,13 +495,13 @@
         <div class="cern-layout">
           <div class="cern-prose fade-up">
             <p data-i18n="cern.lhc.text">
-              The Large Hadron Collider (LHC) is the most complex scientific instrument ever built. A circular accelerator with a circumference of 27 kilometres, it is buried between 45 and 170 metres underground beneath the Swiss and French countryside near Geneva. At its core, two beams of protons — or heavy ions — travel in opposite directions in a near-perfect vacuum, guided by 1,232 superconducting dipole magnets cooled to −271.3 °C (1.9 K), colder than outer space, using superfluid helium.
+              The Large Hadron Collider (LHC) is the most complex scientific instrument ever built. A circular accelerator with a circumference of 27 kilometres, it is buried between 45 and 170 metres underground beneath the Swiss and French countryside near Geneva. At its core, two beams of protons, or heavy ions, travel in opposite directions in a near-perfect vacuum, guided by 1,232 superconducting dipole magnets cooled to −271.3 °C (1.9 K), colder than outer space, using superfluid helium.
             </p>
             <p>
-              Each proton beam carries an energy of up to 6.8 TeV (Run 3), for a combined centre-of-mass collision energy of 13.6 TeV — a record set in 2022. Proton bunches complete approximately 11,245 laps per second, close to 99.9999991% of the speed of light. At the four interaction points where the beams cross, the resulting collisions are detected by the major experiments: ATLAS, CMS, ALICE, and LHCb.
+              Each proton beam carries an energy of up to 6.8 TeV (Run 3), for a combined centre-of-mass collision energy of 13.6 TeV, a record set in 2022. Proton bunches complete approximately 11,245 laps per second, close to 99.9999991% of the speed of light. At the four interaction points where the beams cross, the resulting collisions are detected by the major experiments: ATLAS, CMS, ALICE, and LHCb.
             </p>
             <p>
-              The LHC has operated across three physics runs: Run 1 (2010–2012, 7–8 TeV), during which the Higgs boson was discovered; Run 2 (2015–2018, 13 TeV), which collected approximately 150 fb⁻¹ of proton–proton collision data per experiment; and the ongoing Run 3 (2022–present, 13.6 TeV), targeting around 300 fb⁻¹. A major upgrade, the High-Luminosity LHC (HL-LHC), is scheduled to begin operation around 2029, increasing luminosity by a factor of five to ten.
+              The LHC has operated across three physics runs: Run 1 (2010–2012, 7–8 TeV), during which the Higgs boson was discovered; Run 2 (2015–2018, 13 TeV), which collected approximately 150 fb⁻¹ of proton–proton collision data per experiment; and Run 3 (2022–2026, 13.6 TeV), which closed at the start of July 2026. Long Shutdown 3 now runs for some 47 months, and the High-Luminosity LHC starts up in June 2030 with Run 4, raising luminosity by a factor of five to ten.
             </p>
 
             <table class="cern-table" aria-label="LHC technical parameters">
@@ -524,11 +526,11 @@
           <div class="fade-up" style="display:flex;flex-direction:column;gap:var(--sp-4)">
             <figure class="cern-img">
               <img src="assets/images/cern/lhc-tunnel.webp" alt="LHC tunnel interior showing the blue dipole magnets stretching into the distance" loading="lazy" style="aspect-ratio:16/9;object-fit:cover">
-              <figcaption>LHC tunnel interior — 1,232 superconducting dipole magnets at 1.9 K</figcaption>
+              <figcaption class="glass">LHC tunnel interior. 1,232 superconducting dipole magnets at 1.9 K</figcaption>
             </figure>
             <figure class="cern-img">
               <img src="assets/images/cern/lhc-magnet.webp" alt="Cross-section of LHC superconducting dipole magnet" loading="lazy" style="aspect-ratio:1/1;object-fit:cover">
-              <figcaption>LHC superconducting dipole magnet cross-section — NbTi coils at ~8.3 T</figcaption>
+              <figcaption class="glass">LHC superconducting dipole magnet cross-section. NbTi coils at ~8.3 T</figcaption>
             </figure>
           </div>
         </div>
@@ -557,13 +559,13 @@
                 <td>ATLAS</td>
                 <td>A Toroidal LHC Apparatus</td>
                 <td>General-purpose: Higgs physics, BSM searches, top quark, B-physics, heavy ions</td>
-                <td>46 m long · 25 m tall · 7,000 t · ~3,000 scientists from 182 institutions</td>
+                <td>46 m long · 25 m tall · 7,000 t · 5,500+ members from 170+ institutions in 40 countries</td>
               </tr>
               <tr>
                 <td>CMS</td>
                 <td>Compact Muon Solenoid</td>
                 <td>General-purpose: complementary to ATLAS with different detector technology; co-discovered the Higgs in 2012</td>
-                <td>21 m long · 15 m tall · 14,000 t · 6 T solenoid — the strongest ever built</td>
+                <td>21 m long · 15 m tall · 14,000 t · 6 T solenoid, the strongest ever built</td>
               </tr>
               <tr>
                 <td>ALICE</td>
@@ -580,6 +582,16 @@
             </tbody>
           </table>
         </div>
+
+        <!-- What all four of them are looking at. Public-domain diagram by
+             Cush, credited on the credits page like everything here that the
+             laboratory did not make. -->
+        <figure class="cern-img sm-table fade-up" style="margin-top:var(--sp-8)">
+          <img src="assets/images/cern/Standard_Model_of_Elementary_Particles.svg"
+               alt="The Standard Model of elementary particles: six quarks, six leptons, the gauge bosons and the Higgs boson"
+               loading="lazy" decoding="async">
+          <figcaption class="glass">The Standard Model, which these experiments were built to test: three generations of quarks and leptons, the gauge bosons, and the Higgs. Diagram by Cush, public domain.</figcaption>
+        </figure>
       </div>
     </section>
 
@@ -609,7 +621,7 @@
           </div>
 
           <div class="cern-subsystem">
-            <div class="cern-subsystem-name">TileCal — Hadronic Tile Calorimeter</div>
+            <div class="cern-subsystem-name">TileCal, the Hadronic Tile Calorimeter</div>
             <p>The Tile Calorimeter (TileCal) is a sampling hadronic calorimeter using scintillating tiles embedded in a steel absorber structure. It covers the central pseudorapidity region |η| &lt; 1.7, segmented into three longitudinal layers and approximately 10,000 cells read out by photomultiplier tubes. Each cell is read out individually, producing analogue pulse signals digitised and processed by the trigger and data acquisition system (TDAQ). The energy resolution is approximately σ_E/E ≈ 50%/√E ⊕ 3%.</p>
             <div class="cern-nipscern-note">
               <p><strong>NIPS-CERN direct contribution:</strong> The UFJF group participates in TileCal operations, calibration, and signal processing development. Research at NIPS-CERN investigates Optimal Filtering (OF) algorithms implemented in FPGA fabric for the free-running trigger readout, a key challenge for the Phase-II ATLAS upgrade. The CGV-WEB visualiser represents TileCal geometry as three radial layers (A, BC, D) across 64 azimuthal sectors, totalling ~5,760 barrel cells.</p>
@@ -630,15 +642,15 @@
         <div class="fade-up" style="display:flex;flex-direction:column;gap:var(--sp-4);position:sticky;top:calc(var(--nav-h) + var(--sp-4))">
           <figure class="cern-img" style="background:#000">
             <img src="assets/images/cern/atlas-layers.jpg" alt="ATLAS detector layer diagram showing all subsystems" loading="lazy" style="aspect-ratio:4/3;object-fit:contain;width:100%;background:#000;padding:var(--sp-2)">
-            <figcaption>ATLAS detector — concentric subsystem layers from beam pipe to muon spectrometer</figcaption>
+            <figcaption class="glass">ATLAS detector. Concentric subsystem layers from beam pipe to muon spectrometer</figcaption>
           </figure>
           <figure class="cern-img">
             <img src="assets/images/cern/tilecal-module.webp" alt="TileCal scintillating tile calorimeter module" loading="lazy" style="aspect-ratio:4/3;object-fit:cover">
-            <figcaption>TileCal module — steel absorber with scintillating tiles and WLS fibres</figcaption>
+            <figcaption class="glass">TileCal module. Steel absorber with scintillating tiles and WLS fibres</figcaption>
           </figure>
           <figure class="cern-img">
             <img src="assets/images/cern/lar-accordion.webp" alt="LAr calorimeter accordion-shaped absorber structure" loading="lazy" style="aspect-ratio:4/3;object-fit:cover">
-            <figcaption>LAr electromagnetic calorimeter — accordion lead/stainless steel absorbers in liquid argon at 87 K</figcaption>
+            <figcaption class="glass">LAr electromagnetic calorimeter. Accordion lead and stainless steel absorbers in liquid argon at 87 K</figcaption>
           </figure>
         </div>
       </div>
@@ -653,22 +665,22 @@
           <div class="accent-line" aria-hidden="true"></div>
           <h2 id="trigger-title" data-i18n="cern.trigger.title">Trigger &amp; Data Acquisition</h2>
           <p data-i18n="cern.trigger.text">
-            The LHC delivers proton bunch crossings at 40 MHz — 40 million collisions per second. ATLAS cannot read out and store every event: the raw data rate would reach approximately 60 petabytes per second. Instead, a multi-level trigger system selects only the most physically interesting events for permanent storage.
+            The LHC delivers proton bunch crossings at 40 MHz, 40 million collisions per second. ATLAS cannot read out and store every event: the raw data rate would exceed 60 terabytes per second. Instead, a multi-level trigger system selects only the most physically interesting events for permanent storage.
           </p>
           <p>
-            The hardware-based Level-1 (L1) trigger operates in real time within a fixed latency of 2.5 µs, using coarse-granularity information from the calorimeters and muon detectors to reduce the rate from 40 MHz to approximately 100 kHz. A software-based High-Level Trigger (HLT) running on a farm of approximately 40,000 CPU cores then reduces this to around 1 kHz — the events that are written to permanent storage for physics analysis.
+            The hardware-based Level-1 (L1) trigger operates in real time within a fixed latency of 2.5 µs, using coarse-granularity information from the calorimeters and muon detectors to reduce the rate from 40 MHz to approximately 100 kHz. A software-based High-Level Trigger (HLT) running on a large CPU farm then reduces this to around 1 kHz, the events that are written to permanent storage for physics analysis.
           </p>
           <p>
-            For Run 3, ATLAS introduced a new all-hardware first-stage trigger (L0) and a free-running readout mode for TileCal, eliminating the fixed L1 latency for certain subsystems. This innovation — in which NIPS-CERN research directly participates — allows continuous digitisation and buffering of signals, enabling more flexible and powerful triggering strategies for the Phase-II HL-LHC era.
+            For the HL-LHC era, the ATLAS Phase-II upgrade replaces this chain with a single-level hardware trigger (L0) reading out at up to 1 MHz within a 10 µs latency, and TileCal moves to a free-running readout in which every sample is streamed off-detector continuously. NIPS-CERN research takes direct part in this innovation, which enables more flexible triggering strategies for the high-luminosity data.
           </p>
 
           <table class="cern-table" aria-label="ATLAS trigger chain parameters">
             <thead><tr><th>Stage</th><th>Rate (output)</th><th>Technology</th><th>Latency</th></tr></thead>
             <tbody>
               <tr><td>LHC crossing rate</td><td>40 MHz</td><td>—</td><td>25 ns per bunch</td></tr>
-              <tr><td>L0 / L1 Trigger</td><td>~100 kHz</td><td>FPGA hardware</td><td>≤ 2.5 µs</td></tr>
-              <tr><td>High-Level Trigger</td><td>~3 kHz</td><td>CPU farm (~40k cores)</td><td>O(200 ms)</td></tr>
-              <tr><td>Permanent storage</td><td>~3 kHz</td><td>CERN tape archive</td><td>—</td></tr>
+              <tr><td>Level-1 Trigger</td><td>~100 kHz</td><td>FPGA hardware</td><td>≤ 2.5 µs</td></tr>
+              <tr><td>High-Level Trigger</td><td>~1 kHz</td><td>CPU farm</td><td>O(200 ms)</td></tr>
+              <tr><td>Permanent storage</td><td>~1 kHz</td><td>CERN tape archive</td><td>—</td></tr>
             </tbody>
           </table>
         </div>
@@ -676,7 +688,7 @@
         <div class="fade-up" style="display:flex;flex-direction:column;gap:var(--sp-4)">
           <figure class="cern-img">
             <img src="assets/images/cern/atlas-trigger.png" alt="ATLAS trigger chain block diagram from 40 MHz input to permanent storage" loading="lazy" style="aspect-ratio:16/9;object-fit:contain;background:#cccdcd;padding:var(--sp-3)">
-            <figcaption>ATLAS trigger chain — from 40 MHz LHC crossings to ~3 kHz permanent storage</figcaption>
+            <figcaption class="glass">ATLAS trigger chain, from 40 MHz LHC crossings to ~1 kHz permanent storage</figcaption>
           </figure>
         </div>
       </div>
@@ -699,20 +711,28 @@
         <div class="cern-layout">
           <div class="cern-prose fade-up">
             <p data-i18n="cern.nipscern_contribution.text">
-              The UFJF group at NIPS-CERN, led by Prof. Dr. Luciano Manhães de Andrade Filho, participates in the ATLAS Collaboration through three principal research lines:
+              The UFJF group at NIPS-CERN, led by Prof. Dr. Luciano Manhães de Andrade Filho, participates in the ATLAS Collaboration through research lines that span hardware, firmware and software:
             </p>
-
-            <h3>CGV-WEB — Calorimeter Geometry Viewer</h3>
             <p>
-              CGV-WEB (Calorimeter Geometry Viewer, Web Edition) is a browser-based 3D visualisation platform for ATLAS calorimeter event data. Developed at NIPS-CERN, it renders the full TileCal, LAr, and HEC geometry cell-by-cell using Three.js and WebAssembly, allowing physicists worldwide to inspect collision events without installing specialised software. The platform is freely accessible at <a href="https://www.nipscern.com/projects/cgvweb" target="_blank" rel="noopener" style="color:var(--brand)">nipscern.com/projects/cgvweb</a>.
+              Since 13 March 2024, Brazil is an Associate Member State of CERN, the first in the Americas. Brazilian participation in the LHC experiments runs through networks such as the INCT CERN-Brasil, of which this laboratory is part. The group's own history at CERN begins earlier still, in the mid-2000s, with the production and quality control of multiwire proportional chambers for the LHCb muon system.
             </p>
 
-            <h3>FPGA-Based Signal Processing</h3>
+            <h3>TMDB, the boards that hunted muons</h3>
             <p>
-              A core research focus is the development of real-time digital signal processing algorithms for the TileCal readout electronics. NIPS-CERN investigates advanced methods that can be implemented in FPGA fabric within the tight latency constraints of the free-running trigger architecture (Phase-II upgrade). This work bridges the gap between physical detector signal characteristics and the digital processing requirements of the new electronics.
+              The Tile Muon Digitizer Board, designed by Prof. Luciano Manhães de Andrade Filho and funded by FAPERJ, was projected, produced and commissioned entirely in Brazil. The TileCal community recognises it as one of the country's most significant contributions to ATLAS. Each board received 32 analogue signals from TileCal's outermost cells over 75 metres of cable, digitised them at 40 MHz and estimated their energy on an FPGA in real time, so the muon chambers could ask the calorimeter to confirm what they thought they saw. In the trigger from 2018, the TileMuon coincidence cut the fake-muon rate in the endcap region and returned 6% of the experiment's trigger bandwidth to physics. The boards operated for eleven years, with a member of the group permanently at CERN, until their retirement with the HL-LHC electronics replacement. <a href="news/tmdb-retirement-end-of-an-era" style="color:var(--brand)">The full story is told in the news section</a>.
             </p>
 
-            <h3>SAPHO — Hardware Prototyping</h3>
+            <h3>Energy Reconstruction on FPGA</h3>
+            <p>
+              Two decades of real-time signal processing for calorimetry under pile-up: optimal filtering, matched filters, deconvolution by pseudoinverse and sparse methods, Wiener filtering with pole-zero cancellation, and lately convolutional neural networks, all implemented in FPGA fabric within the latency constraints of the TileCal readout and the free-running Phase-II architecture. The same line now contributes to the high-level-synthesis firmware upgrade of the ATLAS Liquid Argon digital trigger back-end.
+            </p>
+
+            <h3>CGV-WEB, the Calorimeter Geometry Viewer</h3>
+            <p>
+              A line that starts with a ROOT-based 3D event display in 2007 and arrives at CGVWeb: a browser-based visualisation platform that renders the full TileCal, LAr, and HEC geometry cell-by-cell in Rust and WebAssembly, letting physicists inspect collision events without installing anything. It has run on the screens of the ATLAS control room itself, and is freely accessible at <a href="projects/cgv" style="color:var(--brand)">nipscern.com/projects/cgv</a>.
+            </p>
+
+            <h3>SAPHO and hardware prototyping</h3>
             <p>
               The SAPHO processor ecosystem, developed entirely at NIPS-CERN, provides an environment for rapid hardware prototyping and hardware–software co-design. SAPHO supports the development and validation of digital signal processing circuits intended for detector front-end electronics, making it a practical tool for ATLAS R&D work.
             </p>
@@ -726,11 +746,7 @@
           <div class="fade-up" style="display:flex;flex-direction:column;gap:var(--sp-4)">
             <figure class="cern-img">
               <img src="assets/images/cern/luciano-at-cern.jpg" alt="Prof. Dr. Luciano Manhães de Andrade Filho at CERN" loading="lazy" style="aspect-ratio:3/4;object-fit:cover">
-              <figcaption>Prof. Dr. Luciano Manhães de Andrade Filho — Team Leader of UFJF in the ATLAS Experiment at CERN</figcaption>
-            </figure>
-            <figure class="cern-img">
-              <img src="assets/images/cern/nipscern-at-cern.jpg" alt="NIPS-CERN team at CERN" loading="lazy" style="aspect-ratio:4/3;object-fit:cover">
-              <figcaption>NIPS-CERN team at CERN — researchers and students from UFJF working on ATLAS</figcaption>
+              <figcaption class="glass">Prof. Dr. Luciano Manhães de Andrade Filho. Team Leader of UFJF in the ATLAS Experiment at CERN</figcaption>
             </figure>
           </div>
         </div>
@@ -779,7 +795,7 @@
             <div class="cern-tl-line"></div>
             <div class="cern-tl-content">
               <div class="cern-tl-title">Antihydrogen Produced</div>
-              <p class="cern-tl-desc">The LEAR (Low Energy Antiproton Ring) experiment produces the first atoms of antihydrogen — the antimatter counterpart of the simplest atom.</p>
+              <p class="cern-tl-desc">The LEAR (Low Energy Antiproton Ring) experiment produces the first atoms of antihydrogen, the antimatter counterpart of the simplest atom.</p>
             </div>
           </div>
           <div class="cern-tl-item">
@@ -802,7 +818,7 @@
             <div class="cern-tl-year">2022</div>
             <div class="cern-tl-line"></div>
             <div class="cern-tl-content">
-              <div class="cern-tl-title">Run 3 at 13.6 TeV — Record Energy</div>
+              <div class="cern-tl-title">Run 3 at 13.6 TeV, a record energy</div>
               <p class="cern-tl-desc">The LHC begins its third run at 13.6 TeV centre-of-mass energy, a new world record. NIPS-CERN research contributes to the TileCal free-running trigger studies for the Phase-II upgrade.</p>
             </div>
           </div>
@@ -830,87 +846,42 @@
           </div>
           <h2 class="heading-lg" id="fcc-title">The Future Circular Collider</h2>
           <p class="body-base" style="max-width:680px;margin-top:var(--sp-4)">
-            CERN's boldest proposal for the post-LHC era — a 91-kilometre ring that will extend humanity's reach into fundamental physics by an order of magnitude.
+            CERN's boldest proposal for the post-LHC era: a 91-kilometre ring that will extend humanity's reach into fundamental physics by an order of magnitude.
           </p>
         </div>
 
         <div class="cern-layout">
           <div class="cern-prose fade-up">
-            <div class="accent-line" style="background:var(--accent-cern)" aria-hidden="true"></div>
-            <h2>What is the FCC?</h2>
             <p>
-              The Future Circular Collider (FCC) is CERN's research initiative for the next generation of particle accelerators to succeed the LHC once it completes its High-Luminosity phase. The project is developing designs for a new circular tunnel with a circumference of <strong>90.7 km</strong> — more than three times the LHC — buried between 180 and 400 metres underground, with eight surface sites (seven in France, one in Switzerland) and four experimental halls.
+              The Future Circular Collider is CERN's study for what follows the LHC once its high-luminosity phase is over: a ring of 90.7 km, more than three times the present one, at an average depth of 200 metres, with eight surface points, one in Switzerland and seven in France.
             </p>
             <p>
-              The FCC programme is structured in two complementary phases, reflecting a long-term vision for fundamental physics research spanning from the late 2040s into the second half of the 21st century:
-            </p>
-
-            <div class="fcc-phase">
-              <div class="fcc-phase-card">
-                <div class="fcc-phase-name">
-                  <i class="ph ph-circles-three" aria-hidden="true" style="margin-right:6px;color:var(--accent-cern)"></i>
-                  FCC-ee — Lepton Collider
-                </div>
-                <div class="fcc-phase-energy">e⁺e⁻ precision machine</div>
-                <div class="fcc-phase-desc">
-                  An electron–positron collider that operates as a high-luminosity "Higgs factory," running from the late 2040s for approximately 15 years. Enables precision measurements of the Higgs boson, Z, W, and top quarks at unprecedented precision.
-                </div>
-              </div>
-              <div class="fcc-phase-card hh">
-                <div class="fcc-phase-name">
-                  <i class="ph ph-atom" aria-hidden="true" style="margin-right:6px;color:var(--accent-sapho)"></i>
-                  FCC-hh — Hadron Collider
-                </div>
-                <div class="fcc-phase-energy">100 TeV proton–proton</div>
-                <div class="fcc-phase-desc">
-                  A proton–proton collider beginning operations around the 2070s, reaching collision energies of <strong>100 TeV</strong> — more than seven times the LHC. Runs for approximately 25 years, opening a vast new frontier for direct discovery of new physics.
-                </div>
-              </div>
-            </div>
-
-            <h3>Science Goals</h3>
-            <p>
-              The FCC addresses fundamental open questions arising from the Higgs boson discovery — including the precise nature of the Higgs field and its role in the evolution of the early universe, the origin of matter–antimatter asymmetry, and the identity of dark matter. With increased centre-of-mass energy, the FCC-hh would explore physics beyond the Standard Model at mass scales up to tens of TeV, far beyond the reach of any existing or planned collider.
+              It is planned in two stages. The first is an electron–positron machine built for precision, a Higgs factory that would measure the Higgs, the Z, the W and the top quark far more finely than anything running today. The tunnel could then be converted for protons, at collision energies up to 100 TeV, to look directly for physics the LHC cannot reach.
             </p>
             <p>
-              The global FCC collaboration spans <strong>more than 140 institutes in more than 30 countries</strong>. A Feasibility Study report was released in 2025, and a decision by CERN Member States is expected in 2028, with construction potentially beginning in the early 2030s.
+              The Feasibility Study was completed in spring 2025. A decision by the Member States is expected around 2028, with civil engineering following in the early 2030s and start-up in the late 2040s.
             </p>
 
-            <div class="fcc-timeline-badge">
-              <i class="ph ph-calendar-check" aria-hidden="true"></i>
-              FCC Feasibility Study released 2025 · Decision by Member States expected 2028
-            </div>
-
-            <div class="fcc-grid">
-              <div class="fcc-stat">
-                <div class="fcc-stat-label">Tunnel</div>
-                <div class="fcc-stat-value">90.7 km</div>
-                <div class="fcc-stat-sub">Circumference — 3× the LHC</div>
+            <div class="cern-kv-grid">
+              <div class="cern-kv">
+                <div class="cern-kv-label">Circumference</div>
+                <div class="cern-kv-value">90.7 km</div>
+                <div class="cern-kv-sub">3× the LHC</div>
               </div>
-              <div class="fcc-stat">
-                <div class="fcc-stat-label">FCC-hh Energy</div>
-                <div class="fcc-stat-value">100 TeV</div>
-                <div class="fcc-stat-sub">Centre-of-mass · 7× LHC</div>
+              <div class="cern-kv">
+                <div class="cern-kv-label">Depth</div>
+                <div class="cern-kv-value">180–400 m</div>
+                <div class="cern-kv-sub">200 m on average</div>
               </div>
-              <div class="fcc-stat">
-                <div class="fcc-stat-label">Depth</div>
-                <div class="fcc-stat-value">180–400 m</div>
-                <div class="fcc-stat-sub">Underground access shafts</div>
+              <div class="cern-kv">
+                <div class="cern-kv-label">Proton stage</div>
+                <div class="cern-kv-value">100 TeV</div>
+                <div class="cern-kv-sub">7× the LHC</div>
               </div>
-              <div class="fcc-stat">
-                <div class="fcc-stat-label">Collaboration</div>
-                <div class="fcc-stat-value">140+</div>
-                <div class="fcc-stat-sub">Institutes in 30+ countries</div>
-              </div>
-              <div class="fcc-stat">
-                <div class="fcc-stat-label">First Operations</div>
-                <div class="fcc-stat-value">~2048</div>
-                <div class="fcc-stat-sub">FCC-ee (subject to approval)</div>
-              </div>
-              <div class="fcc-stat">
-                <div class="fcc-stat-label">Investment</div>
-                <div class="fcc-stat-value">CHF 15B</div>
-                <div class="fcc-stat-sub">FCC-ee phase estimated cost</div>
+              <div class="cern-kv">
+                <div class="cern-kv-label">Start-up</div>
+                <div class="cern-kv-value">late 2040s</div>
+                <div class="cern-kv-sub">Subject to approval in 2028</div>
               </div>
             </div>
           </div>
@@ -918,42 +889,13 @@
           <div class="fade-up" style="display:flex;flex-direction:column;gap:var(--sp-4)">
             <figure class="cern-img">
               <img src="assets/images/cern/future-circular-collider.jpg" alt="Future Circular Collider concept illustration showing the 91-km ring beneath the Geneva basin" loading="lazy" style="aspect-ratio:16/9;object-fit:cover">
-              <figcaption>FCC concept — a 90.7 km tunnel beneath the Geneva basin, shown in relation to the existing LHC (smaller ring)</figcaption>
+              <figcaption class="glass">FCC concept. A 90.7 km tunnel under the Geneva basin, drawn against the existing LHC, the smaller ring</figcaption>
             </figure>
-
-            <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-5)">
-              <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)">FCC Timeline</div>
-              <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
-                <div style="display:flex;align-items:baseline;gap:var(--sp-3)">
-                  <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--accent-cern);min-width:40px;font-weight:700">2025</span>
-                  <span style="font-size:var(--text-xs);color:var(--text-secondary)">FCC Feasibility Study report released</span>
-                </div>
-                <div style="display:flex;align-items:baseline;gap:var(--sp-3)">
-                  <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--accent-cern);min-width:40px;font-weight:700">2028</span>
-                  <span style="font-size:var(--text-xs);color:var(--text-secondary)">CERN Council decision by Member States</span>
-                </div>
-                <div style="display:flex;align-items:baseline;gap:var(--sp-3)">
-                  <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted);min-width:40px;font-weight:700">~2030</span>
-                  <span style="font-size:var(--text-xs);color:var(--text-muted)">Construction begins (civil engineering)</span>
-                </div>
-                <div style="display:flex;align-items:baseline;gap:var(--sp-3)">
-                  <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted);min-width:40px;font-weight:700">~2048</span>
-                  <span style="font-size:var(--text-xs);color:var(--text-muted)">FCC-ee first physics runs (lepton)</span>
-                </div>
-                <div style="display:flex;align-items:baseline;gap:var(--sp-3)">
-                  <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted);min-width:40px;font-weight:700">~2070</span>
-                  <span style="font-size:var(--text-xs);color:var(--text-muted)">FCC-hh first collisions at 100 TeV</span>
-                </div>
-              </div>
-
-              <div style="margin-top:var(--sp-5);padding-top:var(--sp-4);border-top:1px solid var(--border-subtle)">
-                <a href="https://home.cern/science/accelerators/future-circular-collider" target="_blank" rel="noopener"
-                   class="btn btn-ghost btn-sm" style="width:100%;justify-content:center">
-                  <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
-                  CERN FCC Official Page
-                </a>
-              </div>
-            </div>
+            <a href="https://home.cern/science/accelerators/future-circular-collider" target="_blank" rel="noopener"
+               class="btn btn-ghost btn-sm glass-btn" style="justify-content:center">
+              <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+              CERN FCC official page
+            </a>
           </div>
         </div>
       </div>
@@ -972,77 +914,77 @@
         </div>
 
         <div class="links-grid stagger-children">
-          <a href="https://cern.ch" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://cern.ch" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-atom" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">CERN</div>
               <div class="external-link-card-desc">cern.ch</div>
             </div>
           </a>
-          <a href="https://atlas.cern" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://atlas.cern" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-circles-four" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">ATLAS Experiment</div>
               <div class="external-link-card-desc">atlas.cern</div>
             </div>
           </a>
-          <a href="https://home.cern/science/accelerators/large-hadron-collider" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://home.cern/science/accelerators/large-hadron-collider" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-circles-three" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">The LHC</div>
               <div class="external-link-card-desc">CERN official</div>
             </div>
           </a>
-          <a href="https://cerncourier.com" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://cerncourier.com" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-newspaper" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">CERN Courier</div>
               <div class="external-link-card-desc">cerncourier.com</div>
             </div>
           </a>
-          <a href="https://root.cern" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://root.cern" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-tree-structure" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">ROOT Framework</div>
               <div class="external-link-card-desc">root.cern</div>
             </div>
           </a>
-          <a href="https://geant4.cern.ch" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://geant4.cern.ch" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-cube" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">Geant4</div>
               <div class="external-link-card-desc">geant4.cern.ch</div>
             </div>
           </a>
-          <a href="https://twiki.cern.ch/twiki/bin/view/AtlasPublic/TileCalPublicResults" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://twiki.cern.ch/twiki/bin/view/AtlasPublic/TileCalPublicResults" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-notebook" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">TileCal Public Results</div>
               <div class="external-link-card-desc">CERN TWiki</div>
             </div>
           </a>
-          <a href="https://indico.cern.ch" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://indico.cern.ch" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-calendar" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">Indico</div>
               <div class="external-link-card-desc">CERN event management</div>
             </div>
           </a>
-          <a href="https://home.cern/science/accelerators/future-circular-collider" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://home.cern/science/accelerators/future-circular-collider" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-circles-three" style="font-size:24px;color:var(--accent-cern)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">FCC</div>
               <div class="external-link-card-desc">Future Circular Collider</div>
             </div>
           </a>
-          <a href="https://mcmstv.web.cern.ch/lhc_status" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://mcmstv.web.cern.ch/lhc_status" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-gauge" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">LHC Status</div>
               <div class="external-link-card-desc">Live machine status</div>
             </div>
           </a>
-          <a href="https://op-webtools.web.cern.ch/vistar/" target="_blank" rel="noopener" class="external-link-card">
+          <a href="https://op-webtools.web.cern.ch/vistar/" target="_blank" rel="noopener" class="external-link-card glass">
             <i class="ph ph-monitor-play" style="font-size:24px;color:var(--text-secondary)" aria-hidden="true"></i>
             <div>
               <div class="external-link-card-name">Vistar</div>
@@ -1059,8 +1001,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=8c4ea6da81"></script>
-  <script type="module" src="assets/js/cern.min.js?v=8c4ea6da81"></script>
+  <script type="module" src="assets/js/main.min.js?v=7af9a938d4"></script>
+  <script type="module" src="assets/js/cern.min.js?v=7af9a938d4"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
@@ -1111,8 +1053,8 @@
         }
         if (el('lhc-status-value')) el('lhc-status-value').textContent = isShutdown ? 'Long Shutdown' : 'Operational';
         if (el('lhc-status-sub'))   el('lhc-status-sub').textContent   = isShutdown
-          ? 'Beams off — HL-LHC upgrade underway'
-          : 'Beams circulating — collecting data';
+          ? 'Beams off, HL-LHC upgrade underway'
+          : 'Beams circulating, collecting data';
 
         // Current phase
         if (el('lhc-phase'))     el('lhc-phase').textContent     = phase.run;
@@ -1165,6 +1107,6 @@
     })();
   </script>
 
-  <script src="assets/js/analytics.min.js?v=8c4ea6da81" defer></script>
+  <script src="assets/js/analytics.min.js?v=7af9a938d4" defer></script>
 </body>
 </html>
