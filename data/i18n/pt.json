@@ -174,6 +174,16 @@
         "title": "CERN & o Experimento ATLAS",
         "subtitle": "O maior laboratório de física de partículas do mundo e o experimento onde o NIPS-CERN faz suas contribuições científicas."
       },
+      "pulse": {
+        "eyebrow": "Sete números",
+        "title": "O que a eletrônica vê de uma colisão",
+        "lede": "Uma célula do calorímetro responde a uma partícula com um pulso conformado, e a leitura guarda sete amostras dele. Tudo o que o laboratório constrói cabe dentro desta figura.",
+        "source": "Forma de pulso de referência da Colaboração ATLAS, redesenhada a partir dos parâmetros publicados e tabulada a cada 1 ns. As amostras decorrem dela; não são contagens de ADC medidas.",
+        "s1": "A eletrônica de front-end conforma o sinal da célula num pulso de largura fixa, sempre com o mesmo formato, seja qual for a partícula. A altura dele é a energia depositada.",
+        "s2": "O pulso é digitalizado a 40 MHz e a leitura guarda sete amostras. Esse é todo o registro do evento naquela célula: sete números, e a altura precisa ser encontrada entre eles.",
+        "s3": "Os feixes se cruzam a cada 25 ns, então a próxima colisão chega antes de o pulso terminar. O sinal dela monta na mesma janela, e as sete amostras deixam de ser o pulso: passam a ser a soma. Isso é empilhamento, e piora conforme a luminosidade sobe.",
+        "s4": "A amplitude é recuperada por uma soma ponderada das amostras, com pesos calculados para que a resposta esteja certa apesar da deformação. Roda em FPGA, em tempo real, para dez mil canais ao mesmo tempo. Filtragem ótima, deconvolução e estimadores neurais para esse problema são o assunto de vinte anos de artigos do grupo."
+      },
       "descent": {
         "surface": "O sítio de Meyrin, na superfície. Debaixo destes campos corre um anel de 27 quilômetros de circunferência.",
         "control": "O prédio da sala de controle do ATLAS, no Ponto 1, vestido com o mural do detector pintado por Josef Kristofoletti. O verdadeiro está 100 metros abaixo.",
@@ -535,6 +545,7 @@
       "mural_photo_desc": "A segunda parada da descida na página do CERN. O mural no prédio é o ATLAS, pintado em 2010 por Josef Kristofoletti na metade da escala do detector que está embaixo dele. Fotografia do Wikimedia Commons, em domínio público.",
       "sm_diagram_desc": "A tabela de partículas na página do CERN. Desenhada para o Wikimedia Commons e liberada em domínio público pelo autor.",
       "data_title": "Dados",
+      "pulse_desc": "A figura da página do CERN. O pulso conformado, sua largura de 150 ns, as sete amostras a cada 25 ns e o sinal fora de tempo da colisão seguinte vêm de J. M. de Seixas, pela Colaboração ATLAS, \"The TileCal Energy Reconstruction for LHC Run2 and Future Perspectives\". A curva é redesenhada a partir dos parâmetros publicados e tabulada por tools/build-tilecal-pulse.js; as amostras decorrem dela e não são contagens de ADC medidas.",
       "hyg_desc": "Hipparcos, Yale e Gliese reunidos. O céu da página inicial é esse catálogo desenhado como ele é: cada estrela até a magnitude 6 na posição dela, com o brilho dela e a cor dela. Usado na forma compacta que o d3-celestial distribui.",
       "footage_title": "Imagens em movimento",
       "sapho_video_desc": "A placa no card do projeto SAPHO. Filmada em preto e branco e tratada aqui no dourado do próprio projeto, sobre o preto que o card divide com ela.",

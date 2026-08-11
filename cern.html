@@ -28,8 +28,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/cern.css?v=7af9a938d4">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=7af9a938d4">
+  <link rel="stylesheet" href="assets/css/icons/cern.css?v=0ab64c1b26">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=0ab64c1b26">
 
   <style>
     /* LHC Status banner — a pane of glass pulled up over the control-room
@@ -132,6 +132,63 @@
       color: var(--text-primary);
       font-family: var(--font-mono);
       line-height: 1.5;
+    }
+
+    /* The pulse. The figure sticks while the four steps scroll past it, which
+       is the one construction that lets a reader keep their eyes on the thing
+       being described. Not a second pinned section: the descent already owns
+       that gesture on this page, and sticky costs no ScrollTrigger. */
+    .pulse-band { background: var(--bg-0); padding: var(--sp-16) 0; border-top: 1px solid var(--border-subtle); }
+    /* No align-items:start here. A sticky element only sticks inside its own
+       containing block, and a grid item that shrinks to its content ends the
+       moment the figure ends: the figure then scrolls away and the last step
+       is read against nothing. Stretched, the column runs the height of the
+       steps and the figure holds. */
+    .pulse-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--sp-12); margin-top: var(--sp-10); }
+    /* The column is the tall one and the pane inside it is what sticks. A
+       sticky element that is itself the full-height grid item has nowhere to
+       travel and simply scrolls away, which is what happened first. */
+    .pulse-col { min-width: 0; }
+    .pulse-sticky { position: sticky; top: calc(var(--nav-h) + var(--sp-6)); }
+    .pulse-figure { border-radius: var(--r-xl); padding: var(--sp-4); --glass-tint: rgba(255,255,255,0.03); }
+    .pulse-svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .pulse-source { margin-top: var(--sp-3); font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
+
+    /* Plot furniture. Everything measured is mono, like every other number on
+       the site. */
+    .pl-axis { stroke: var(--border-mid); stroke-width: 1; }
+    .pl-grid { stroke: var(--border-subtle); stroke-width: 1; stroke-dasharray: 2 5; }
+    .pl-tick { stroke: var(--border-mid); stroke-width: 1; }
+    .pl-num  { font-family: var(--font-mono); font-size: 10px; fill: var(--text-muted); }
+    .pl-note { font-family: var(--font-mono); font-size: 11px; fill: var(--text-secondary); letter-spacing: 0.06em; }
+
+    /* The signal of interest carries the brand; the crossing that follows it
+       is the same blue held down; their sum is white, because the sum is the
+       only one of the three that physically exists at the digitiser. */
+    .pl-ref { fill: none; stroke: var(--brand); stroke-width: 2; }
+    .pl-oot { fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .pl-sum { fill: none; stroke: var(--text-primary); stroke-width: 2; opacity: 0.85; }
+    .pl-sample line   { stroke: var(--text-secondary); stroke-width: 1; }
+    .pl-sample circle { fill: var(--bg-0); stroke: var(--text-primary); stroke-width: 1.5; }
+    .pl-amp line   { stroke: var(--brand); stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .pl-amp circle { fill: var(--brand); }
+    .pl-amp text   { font-family: var(--font-mono); font-size: 12px; fill: var(--brand); }
+
+    /* The steps. Spaced so one is under the reader's eye at a time, and the
+       one being read is the one the figure is showing. */
+    .pulse-steps { list-style: none; margin: 0; padding: 0; }
+    /* Each step gets half a screen of its own, or the four of them go past in
+       one flick and the figure changes four times without anyone reading a
+       word. */
+    .pulse-step { min-height: 52vh; display: flex; flex-direction: column; justify-content: center; padding: var(--sp-6) 0; border-left: 2px solid var(--border-subtle); padding-left: var(--sp-6); transition: border-color var(--t-base), opacity var(--t-base); opacity: 0.4; }
+    .pulse-step.is-on { border-left-color: var(--brand); opacity: 1; }
+    .pulse-step-n { display: block; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.08em; color: var(--brand); margin-bottom: var(--sp-2); }
+    .pulse-step p { font-size: var(--text-sm); line-height: 1.75; color: var(--text-secondary); margin: 0; }
+    @media (prefers-reduced-motion: reduce) { .pulse-step { opacity: 1; } }
+    @media (max-width: 900px) {
+      .pulse-layout { grid-template-columns: minmax(0, 1fr); gap: var(--sp-6); }
+      .pulse-sticky { position: sticky; top: calc(var(--nav-h) + var(--sp-2)); background: var(--bg-0); padding-bottom: var(--sp-3); z-index: 2; }
+      .pulse-step { min-height: 0; padding: var(--sp-5) 0 var(--sp-5) var(--sp-5); opacity: 1; }
     }
 
     /* The Standard Model chart is drawn in dark ink for a white page, so it
@@ -754,6 +811,61 @@
     </section>
 
     <!-- ======================================================
+         THE PULSE
+         ------------------------------------------------------
+         The section above says the laboratory spends its days recovering an
+         amplitude from seven deformed numbers. This is those numbers. The
+         shape comes from data/tilecal-pulse.json, built by
+         tools/build-tilecal-pulse.js from the ATLAS Collaboration's published
+         reference pulse; cern.js plots it and GSAP decides the order its
+         parts arrive in. Drawn complete without JavaScript.
+         ====================================================== -->
+    <section class="pulse-band" aria-labelledby="pulse-title">
+      <div class="container">
+        <div class="section-header fade-up">
+          <div class="eyebrow">
+            <i class="ph ph-pulse" aria-hidden="true"></i>
+            <span data-i18n="cern.pulse.eyebrow">Seven numbers</span>
+          </div>
+          <h2 class="heading-lg" id="pulse-title" data-i18n="cern.pulse.title">What a collision looks like to the electronics</h2>
+          <p class="body-base" style="max-width:680px;margin-top:var(--sp-4)" data-i18n="cern.pulse.lede">
+            A cell of the calorimeter answers a particle with one shaped pulse, and the readout keeps seven samples of it. Everything the laboratory builds lives inside this picture.
+          </p>
+        </div>
+
+        <div class="pulse-layout">
+          <div class="pulse-col">
+            <div class="pulse-sticky">
+              <figure class="pulse-figure glass" id="pulse-figure"></figure>
+              <figcaption class="pulse-source" data-i18n="cern.pulse.source">
+                Reference pulse shape from the ATLAS Collaboration, redrawn from published landmarks and tabulated at 1 ns. The sample values follow from it; they are not measured ADC counts.
+              </figcaption>
+            </div>
+          </div>
+
+          <ol class="pulse-steps">
+            <li class="pulse-step">
+              <span class="pulse-step-n">150 ns</span>
+              <p data-i18n="cern.pulse.s1">The front-end shapes the cell's signal into a pulse of fixed width, the same shape every time, whatever particle made it. Its height is the energy that was deposited.</p>
+            </li>
+            <li class="pulse-step">
+              <span class="pulse-step-n">7 × 25 ns</span>
+              <p data-i18n="cern.pulse.s2">The pulse is digitised at 40 MHz and the readout keeps seven samples. This is the entire record of the event in that cell: seven numbers, and the height has to be found among them.</p>
+            </li>
+            <li class="pulse-step">
+              <span class="pulse-step-n">+50 ns</span>
+              <p data-i18n="cern.pulse.s3">Bunches cross every 25 ns, so the next collision arrives before this pulse has finished. Its signal rides on the same window, and the seven samples are no longer the pulse: they are the sum. This is pile-up, and it gets worse with luminosity.</p>
+            </li>
+            <li class="pulse-step">
+              <span class="pulse-step-n">Â</span>
+              <p data-i18n="cern.pulse.s4">The amplitude is recovered by a weighted sum of the samples, with the weights computed so that the answer is right despite the deformation. It runs in an FPGA, in real time, for ten thousand channels at once. Optimal filtering, deconvolution and neural estimators for this problem are what the group's twenty years of papers are about.</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
          KEY ACHIEVEMENTS TIMELINE
          ====================================================== -->
     <section class="cern-section" aria-labelledby="achievements-title">
@@ -1001,8 +1113,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=7af9a938d4"></script>
-  <script type="module" src="assets/js/cern.min.js?v=7af9a938d4"></script>
+  <script type="module" src="assets/js/main.min.js?v=0ab64c1b26"></script>
+  <script type="module" src="assets/js/cern.min.js?v=0ab64c1b26"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
@@ -1107,6 +1219,6 @@
     })();
   </script>
 
-  <script src="assets/js/analytics.min.js?v=7af9a938d4" defer></script>
+  <script src="assets/js/analytics.min.js?v=0ab64c1b26" defer></script>
 </body>
 </html>

@@ -174,6 +174,16 @@
         "title": "CERN & the ATLAS Experiment",
         "subtitle": "The world's largest particle physics laboratory and the experiment where NIPS-CERN makes its scientific contributions."
       },
+      "pulse": {
+        "eyebrow": "Seven numbers",
+        "title": "What a collision looks like to the electronics",
+        "lede": "A cell of the calorimeter answers a particle with one shaped pulse, and the readout keeps seven samples of it. Everything the laboratory builds lives inside this picture.",
+        "source": "Reference pulse shape from the ATLAS Collaboration, redrawn from published landmarks and tabulated at 1 ns. The sample values follow from it; they are not measured ADC counts.",
+        "s1": "The front-end shapes the cell's signal into a pulse of fixed width, the same shape every time, whatever particle made it. Its height is the energy that was deposited.",
+        "s2": "The pulse is digitised at 40 MHz and the readout keeps seven samples. This is the entire record of the event in that cell: seven numbers, and the height has to be found among them.",
+        "s3": "Bunches cross every 25 ns, so the next collision arrives before this pulse has finished. Its signal rides on the same window, and the seven samples are no longer the pulse: they are the sum. This is pile-up, and it gets worse with luminosity.",
+        "s4": "The amplitude is recovered by a weighted sum of the samples, with the weights computed so that the answer is right despite the deformation. It runs in an FPGA, in real time, for ten thousand channels at once. Optimal filtering, deconvolution and neural estimators for this problem are what the group's twenty years of papers are about."
+      },
       "descent": {
         "surface": "The Meyrin site at the surface. Under these fields runs a ring 27 kilometres around.",
         "control": "The ATLAS control-room building at Point 1, wearing Josef Kristofoletti's mural of the detector. The real one sits 100 metres beneath it.",
@@ -535,6 +545,7 @@
       "mural_photo_desc": "The second stop of the descent on the CERN page. The mural on the building is ATLAS, painted in 2010 by Josef Kristofoletti at half the scale of the detector below it. Photograph from Wikimedia Commons, dedicated to the public domain.",
       "sm_diagram_desc": "The particle table on the CERN page. Drawn for Wikimedia Commons and released to the public domain by its author.",
       "data_title": "Data",
+      "pulse_desc": "The figure on the CERN page. The shaped pulse, its 150 ns width, the seven samples 25 ns apart and the out-of-time signal from the following bunch crossing all come from J. M. de Seixas, on behalf of the ATLAS Collaboration, \"The TileCal Energy Reconstruction for LHC Run2 and Future Perspectives\". The curve is redrawn from the published landmarks and tabulated by tools/build-tilecal-pulse.js; the sample values follow from it and are not measured ADC counts.",
       "hyg_desc": "Hipparcos, Yale and Gliese combined. The sky over the home page is this catalogue drawn as it is: every star down to magnitude 6 at its own position, with its own brightness and its own colour. Taken in the packed form d3-celestial distributes.",
       "footage_title": "Footage",
       "sapho_video_desc": "The board on the SAPHO project card. Filmed in monochrome and graded here to the project's own gold, on the black the card shares with it.",

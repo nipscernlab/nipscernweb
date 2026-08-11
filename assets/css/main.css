@@ -241,7 +241,14 @@ html {
      back-to-top button, asks for it explicitly in main.js. */
   -webkit-text-size-adjust: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
+  /* clip, not hidden. Both stop a sideways scrollbar, but `hidden` makes the
+     element a scroll container, and a scroll container is what every
+     position:sticky on the site was then measured against instead of the
+     viewport: the sticky columns on this page and on the CERN page simply
+     scrolled away, because the box they were sticking inside never moved.
+     `clip` refuses the scroll rather than offering one, so the viewport stays
+     the scrollport and sticky works. */
+  overflow-x: clip;
 }
 /* Anchor links still land softly, without putting the whole document on a
    smooth scroller. */
@@ -270,7 +277,7 @@ body {
   background: var(--bg-1);
   color: var(--text-primary);
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

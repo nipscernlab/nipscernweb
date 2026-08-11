@@ -64,7 +64,7 @@ export function initSmoothScroll() {
   /* Coarse pointer means touch, and touch keeps the platform's own momentum. */
   if (matchMedia('(pointer: coarse)').matches) return;
 
-  import('./vendor/lenis.mjs?v=7af9a938d4').then(({ default: Lenis }) => {
+  import('./vendor/lenis.mjs?v=0ab64c1b26').then(({ default: Lenis }) => {
     lenis = new Lenis({
       /* Higher is snappier. The default 0.1 leaves the page still settling well
          after the wheel has stopped, which on a site with a fixed navigation and
