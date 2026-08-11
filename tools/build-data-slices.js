@@ -18,6 +18,7 @@
 */
 const fs = require('fs');
 const path = require('path');
+const { buildNetwork, serialise } = require('./build-network');
 
 const ROOT = path.join(__dirname, '..');
 const read = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
@@ -73,6 +74,21 @@ out.push(write('data/home-papers.json', pubs
   .sort((a, b) => Number(b.year) - Number(a.year))
   .slice(0, PAPERS_ON_HOME)
   .map((p) => ({ id: p.id, year: p.year, type: p.type, journal: p.journal, title: p.title, authors: p.authors }))));
+
+/* ---- a rede de coautoria da página About ----
+   O cálculo inteiro está em tools/build-network.js. É chamado daqui, e não de
+   um comando à parte, porque o que o guard roda é este arquivo: uma rede
+   gerada por um script que o CI não executa é uma rede que envelhece em
+   silêncio, que é exatamente o bug que este arquivo existe para não ter. */
+{
+  const net = buildNetwork(read('data/publications.json'), read('data/team.json'));
+  const full = path.join(ROOT, 'data/collab-network.json');
+  const text = serialise(net);
+  JSON.parse(text);
+  const before = fs.existsSync(full) ? fs.readFileSync(full, 'utf8') : null;
+  if (before !== text) fs.writeFileSync(full, text);
+  out.push({ rel: 'data/collab-network.json', bytes: text.length, changed: before !== text });
+}
 
 const kb = (n) => (n / 1024).toFixed(1) + ' KB';
 for (const o of out) console.log((o.changed ? 'escrito ' : 'inalterado ') + o.rel.padEnd(26) + kb(o.bytes));

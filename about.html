@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/about.css?v=95fe384fdc">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=95fe384fdc">
+  <link rel="stylesheet" href="assets/css/icons/about.css?v=a4d7854f36">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=a4d7854f36">
 </head>
 <body>
 
@@ -38,9 +38,38 @@
   <main id="main">
 
     <!-- ======================================================
-         PAGE HERO
+         PAGE HERO — the collaboration, drawn
+         ------------------------------------------------------
+         What floats behind and beside the heading is not an ornament. It is
+         the laboratory's published record as a figure: one dot for each of the
+         120 people who have signed one of its 147 works, one line for each of
+         the 619 pairs who signed the same one, laid out in three dimensions by
+         a force simulation over the real coauthorship and shipped as finished
+         coordinates (tools/build-network.js writes data/collab-network.json;
+         the data guard keeps it honest). The violet dots are the people on
+         this page. Everyone else is who they wrote with.
+
+         The drawing is deliberately not random. The sky on the home page
+         changes with every visit, and the line under the stargazer says so;
+         this figure is the same for every reader, because it is a measurement,
+         and a measurement that redrew itself would be claiming something it
+         does not know. The two pages state opposite things on purpose.
+
+         three.js renders it, fetched only when the module decides the stage is
+         worth it, and the page never depends on it: the figures on the plate
+         below are written into this markup from the same file the canvas
+         reads, so with no WebGL, no JavaScript or no luck the hero still says
+         the true thing in plain type.
          ====================================================== -->
-    <header class="page-hero" aria-labelledby="about-title">
+    <header class="page-hero net-hero" aria-labelledby="about-title">
+      <div class="net-stage" id="net-stage">
+        <canvas id="net-canvas" role="img" data-i18n-aria="about.net.canvas"
+                aria-label="The laboratory's coauthorship network, drawn in three dimensions"></canvas>
+        <div class="net-tip glass" id="net-tip" hidden aria-hidden="true">
+          <span class="net-tip-name" data-tip-name></span>
+          <span class="net-tip-meta" data-tip-meta></span>
+        </div>
+      </div>
       <div class="page-hero-inner">
         <div class="page-hero-grid">
           <div class="page-hero-text">
@@ -49,17 +78,43 @@
               <span data-i18n="about.hero.label">Who We Are</span>
             </div>
             <h1 class="display-lg fade-up" id="about-title" data-i18n="about.hero.title">
-              Science, Engineering, and Collaboration
+              The names on the work
             </h1>
             <p class="body-lg fade-up" data-i18n="about.hero.subtitle">
-              NIPS-CERN unites undergraduate students, researchers, and world-class scientists in the pursuit of knowledge at the edge of modern physics.
+              One group in two laboratories: NIPS at UFJF, in Brazil, and Route Salam at CERN, in Switzerland. The figure drawn around this heading is its published record, every author joined to everyone they signed with.
             </p>
           </div>
-          <!-- No stock drawing beside the heading. There was an undraw figure
-               here, from the library that used to sit on every page: a generic
-               picture of people learning, on a page that has photographs of the
-               laboratory's own rooms at CERN a screen further down. The heading
-               carries the hero and the group's own material carries the page. -->
+        </div>
+
+        <!-- The plate. Same construction as the spec band under the calorimeter
+             on the home page: measured values in mono, the quantity named under
+             each. The numbers here are the current contents of
+             data/collab-network.json, written in so the hero is truthful before
+             a byte of JavaScript runs; about.js re-reads them from the file on
+             load, so the markup going stale costs accuracy for exactly as long
+             as it takes the data guard to notice the slice changed. -->
+        <div class="net-plate glass fade-up">
+          <dl class="net-figs" aria-label="The record in figures">
+            <div class="net-fig">
+              <dt data-i18n="about.net.people">people</dt>
+              <dd data-net-people>120</dd>
+            </div>
+            <div class="net-fig">
+              <dt data-i18n="about.net.works">published works</dt>
+              <dd data-net-works>147</dd>
+            </div>
+            <div class="net-fig">
+              <dt data-i18n="about.net.links">coauthor pairs</dt>
+              <dd data-net-links>619</dd>
+            </div>
+            <div class="net-fig">
+              <dt data-i18n="about.net.span">years</dt>
+              <dd data-net-span>2001–2026</dd>
+            </div>
+          </dl>
+          <p class="net-hint">
+            <span class="net-hint-hover" data-i18n-html="about.net.hint_hover">Every dot is a person and every line is a work they signed together; the <b>violet</b> dots work here. Point at a dot to read the name. Pressing a violet one opens that person's record further down the page.</span><span class="net-hint-touch" data-i18n-html="about.net.hint_touch">Every dot is a person and every line is a work they signed together; the <b>violet</b> dots work here. Tap a dot to read the name. Tapping a violet one opens that person's record further down the page.</span>
+          </p>
         </div>
       </div>
     </header>
@@ -69,9 +124,7 @@
          ======================================================
          Bands, not boxes. Every section from here down is a full-width band
          whose top fades out of the colour of the one above it, which is what
-         .seam does and what --seam-from names. What they carried before was
-         `border-top: 1px solid`, a hairline that draws the join instead of
-         dissolving it. docs/design-system.md, section 1. -->
+         .seam does and what --seam-from names. docs/design-system.md, section 1. -->
     <section class="section seam" style="--seam-from:var(--bg-0)" aria-labelledby="mission-title">
       <div class="container container--narrow">
         <div class="fade-up">
@@ -103,29 +156,35 @@
         </div>
 
         <div class="coordinator-card glass fade-up" id="coordinator-card">
-          <!-- Populated dynamically from data/team.json -->
+          <!-- Populated from data/team.json by about.js -->
         </div>
       </div>
     </section>
 
     <!-- ======================================================
-         TEAM
+         TEAM — the wall
+         ------------------------------------------------------
+         Eighteen portraits, edge to edge in their tiles, the name on a pane of
+         real glass over each. Held down in saturation at rest so they read as
+         one wall; the pointer brings one to full colour. A tile opens the
+         person's record in place, and a violet dot in the hero above opens the
+         same record from up there. Built by about.js.
          ====================================================== -->
     <section class="section seam" style="--seam-from:var(--bg-0)" aria-labelledby="team-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
             <i class="ph ph-users-three" aria-hidden="true"></i>
-            <span data-i18n="about.team.eyebrow">Researchers & Students</span>
+            <span data-i18n="about.team.eyebrow">Researchers &amp; Students</span>
           </div>
           <h2 class="heading-lg" id="team-title" data-i18n="about.team.title">Our Team</h2>
-          <p class="body-base" style="max-width:520px;margin-top:var(--sp-3)" data-i18n="about.team.subtitle">
-            Researchers, engineers, and students working together across disciplines.
+          <p class="body-base" style="max-width:560px;margin-top:var(--sp-3)" data-i18n="about.team.subtitle">
+            Everyone in both rooms. Press a portrait to open the record: the biography, the research areas, the awards, and how much of the archive carries that name.
           </p>
         </div>
 
-        <div id="team-mount" class="team-mount">
-          <!-- Floating bubble field (or static grid fallback) built by the team script below -->
+        <div id="team-grid" class="tm-grid">
+          <!-- The wall, built by about.js from data/team.json -->
         </div>
       </div>
     </section>
@@ -173,11 +232,14 @@
           </div>
         </div>
 
-        <!-- Lab history note -->
+        <!-- Lab history note. The history belongs to the Brazilian laboratory:
+             LAPTEL, then NIPS, then NIPS-CERN when the collaboration was
+             formalised and the second laboratory, the one photographed above,
+             existed to be named after. -->
         <div class="info-box glass fade-up" style="--glass-tint:var(--bg-card);margin-top:var(--sp-6);border-radius:var(--r-xl)">
           <i class="ph ph-clock-counter-clockwise" aria-hidden="true" style="font-size:24px;color:var(--text-muted);flex-shrink:0;margin-top:2px"></i>
           <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0" data-i18n-html="about.infrastructure.history">
-            <strong style="color:var(--text-primary)">Formerly LAPTEL</strong>. The group was originally known as <em>LAPTEL</em> (Signal Processing and Telecommunications Laboratory) before being renamed <em>NIPS</em> (Centre for Instrumentation and Signal Processing) and later <em>NIPS-CERN</em> following the formalisation of the CERN collaboration. Our laboratory is located in the <strong style="color:var(--text-primary)">PPEE</strong>, the Graduate Program in Electrical Engineering, building at UFJF.
+            <strong style="color:var(--text-primary)">Formerly LAPTEL</strong>. The Brazilian laboratory has carried three names. It began as <em>LAPTEL</em>, the Signal Processing and Telecommunications Laboratory; became <em>NIPS</em>, the Centre for Instrumentation and Signal Processing; and took the name <em>NIPS-CERN</em> when the CERN collaboration was formalised and the group gained its second laboratory, at Route Salam in Meyrin. In Brazil the group works from the <strong style="color:var(--text-primary)">PPEE</strong> building, home of the Graduate Program in Electrical Engineering at UFJF.
           </p>
         </div>
 
@@ -194,21 +256,13 @@
 
       </div>
 
-      <!-- The one thing this page is remembered by.
-           It was a picture inside the rails, the same width as the four
-           thumbnails above it and treated the same way. It is a panorama of the
-           room the laboratory actually works in at CERN, which is the most
-           substantial photograph the group owns, and a panorama held inside a
-           column is a panorama with its point removed.
-
-           So it runs to the edge of the window, and it drifts inside its own
-           frame as the page passes: the frame clips, which is the only licence
-           this site gives for movement. The photograph is hung oversized in CSS
-           so the travel never pulls an empty edge into view. Same construction
-           as the calorimeter stage on the home page.
-
-           Still a lightbox trigger, because full bleed is not full size and the
-           detail in it is worth opening. -->
+      <!-- The panorama of the room the laboratory works in at CERN, the most
+           substantial photograph the group owns. It drifts inside its own frame
+           as the page passes: the frame clips, which is the only licence this
+           site gives for movement, and the photograph is hung oversized so the
+           travel never pulls an empty edge into view. Same construction as the
+           calorimeter stage on the home page. Still a lightbox trigger, because
+           full bleed is not full size and the detail in it is worth opening. -->
       <figure class="lab-stage fade-up" data-drift-frame>
         <img src="assets/lab/cern/Panoramica.webp"
              alt="Panoramic view of the UFJF laboratory at CERN"
@@ -218,18 +272,6 @@
         </figcaption>
       </figure>
     </section>
-
-    <!-- The hand-written Partner Institutions block was here, and it had been
-         broken for some time: its container class, .sponsors-logos, is not
-         defined anywhere in the stylesheet, so five logos with no layout at all
-         piled into a column at the left edge, overlapping each other, each at
-         whatever size its file happened to be.
-
-         Not rebuilt: removed. The supporters bar further down already names the
-         same five, generated from one list in main.js, sorted into who funds the
-         work and who houses it, on glass, with every mark optically matched to
-         the others. This page was showing the same institutions twice, once
-         correctly and once not. -->
 
     <!-- Lightbox modal -->
     <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
@@ -272,289 +314,26 @@
     <!-- --seam-from names the colour of the band above, which is what the fade
          dissolves out of. Without it .supporters falls back to --bg-1 while the
          section above is --bg-0, so the two met on a hard line of the wrong
-         colour instead of dissolving into each other. index.html has always
-         declared it; this page never did. -->
+         colour instead of dissolving into each other. -->
     <div id="supporters" style="--seam-from:var(--bg-0)"></div>
   </main>
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <!-- Team loader -->
-  <script type="module">
-    import { t } from './assets/js/i18n.js';
-
-    const ROLE_LABEL_KEYS = {
-      coordinator: 'about.team.roles.coordinator',
-      researcher:  'about.team.roles.researcher',
-      advisor:     'about.team.roles.advisor',
-      co_advisor:  'about.team.roles.co_advisor',
-      ic:          'about.team.roles.ic',
-      msc:         'about.team.roles.msc',
-      phd:         'about.team.roles.phd',
-    };
-
-    const LATTES_ICON = `<img src="assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px;vertical-align:middle" aria-hidden="true">`;
-
-    async function loadTeam() {
-      const res = await fetch('data/team.json');
-      return res.ok ? res.json() : [];
-    }
-
-    function roleClass(role) {
-      const map = { coordinator:'badge-blue', researcher:'badge-green', advisor:'badge-purple', co_advisor:'badge-amber', ic:'badge-cyan', msc:'badge-orange', phd:'badge-red' };
-      return map[role] || 'badge-gray';
-    }
-
-    function avatarHTML(member, size = 64) {
-      if (member.photo) {
-        return `<div class="team-avatar" style="width:${size}px;height:${size}px;overflow:hidden;border-radius:50%;flex-shrink:0" aria-label="Photo of ${member.name}">
-          <img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover">
-        </div>`;
-      }
-      return `<div class="team-avatar" style="width:${size}px;height:${size}px;font-size:${size/2.5}px;flex-shrink:0" aria-label="Photo placeholder for ${member.name}">
-        <i class="ph ph-user" aria-hidden="true"></i>
-      </div>`;
-    }
-
-    function renderCoordinator(member) {
-      const awardsHTML = Array.isArray(member.awards)
-        ? member.awards.map(a => {
-            if (typeof a === 'object') {
-              return `<div class="award-item">
-                <div class="award-year">${a.year}</div>
-                <div><div class="award-title">${a.title}</div><div class="award-body">${a.body}</div></div>
-              </div>`;
-            }
-            return `<div class="award-item"><div class="award-title" style="grid-column:1/-1">${a}</div></div>`;
-          }).join('')
-        : '';
-
-      return `
-        <div>
-          <div class="coordinator-avatar" style="overflow:hidden" aria-label="Photo of ${member.name}">
-            ${member.photo
-              ? `<img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover">`
-              : `<i class="ph ph-user" aria-hidden="true"></i>`}
-          </div>
-        </div>
-        <div>
-          <h3 class="coordinator-name">${member.title ? member.title + ' ' : ''}${member.name}</h3>
-          <div class="coordinator-role-badge" style="margin-bottom:var(--sp-4)">
-            <span class="badge role-coordinator" data-i18n="about.team.roles.coordinator">Coordinator</span>
-          </div>
-          <p class="coordinator-bio">${member.bio}</p>
-          <div class="team-links" style="margin-top:var(--sp-4);margin-bottom:var(--sp-6)">
-            ${member.lattes ? `<a href="${member.lattes}" target="_blank" rel="noopener" class="team-link">${LATTES_ICON} Lattes</a>` : ''}
-            ${member.github ? `<a href="${member.github}" target="_blank" rel="noopener" class="team-link"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a>` : ''}
-          </div>
-          ${awardsHTML ? `
-          <h4 style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);margin-bottom:var(--sp-4);text-transform:uppercase;letter-spacing:0.06em" data-i18n="about.coordinator.awards_title">Awards &amp; Recognitions</h4>
-          <div class="awards-list">${awardsHTML}</div>` : ''}
-        </div>`;
-    }
-
-    /* Compact by design.
-
-       Seventeen cards each carrying a photograph, a name, a role, a paragraph
-       of biography, every research area and two links is not a team section,
-       it is seventeen pages of one, and nobody reads the fourteenth biography.
-       What stays is what tells one person from another at a glance: the face,
-       the name, the role, and the two areas they are known for. The rest is
-       still in team.json and still has somewhere to go on the day a person
-       gets a page of their own. */
-    function rosterCardHTML(member) {
-      const areas = (member.areas || []).slice(0, 2)
-      .map(function (a) { return '<span class="rt-area">' + a + '</span>'; }).join('');
-      const links = [
-      member.lattes && '<a href="' + member.lattes + '" target="_blank" rel="noopener" class="rt-link" aria-label="Lattes">' + LATTES_ICON + '</a>',
-      member.github && '<a href="' + member.github + '" target="_blank" rel="noopener" class="rt-link" aria-label="GitHub"><i class="ph ph-github-logo" aria-hidden="true"></i></a>',
-      member.linkedin && '<a href="' + member.linkedin + '" target="_blank" rel="noopener" class="rt-link" aria-label="LinkedIn"><i class="ph ph-linkedin-logo" aria-hidden="true"></i></a>'
-      ].filter(Boolean).join('');
-      return '<button type="button" class="rt-card glass" data-member="' + member.id + '" aria-expanded="false">'
-      + '<div class="rt-photo">' + avatarImg(member) + '</div>'
-      + '<p class="rt-name">' + member.name + '</p>'
-      + '<p class="rt-role">' + roleLabel(member.role) + '</p>'
-      + (areas ? '<div class="rt-areas">' + areas + '</div>' : '')
-      + (links ? '<div class="rt-links">' + links + '</div>' : '')
-      + '<span class="rt-more" aria-hidden="true">' + t('about.team.more') + '</span>'
-        + '</button>';
-    }
-
-    /* The full record, one person at a time.
-
-       The roster had to lose the biography to be a roster: seventeen paragraphs
-       in a grid is a wall nobody reads to the end of. It is not gone, it is one
-       click away, and everything team.json holds about a person is in here,
-       which is more than the old cards ever showed: every research area rather
-       than the first two, the awards, and all three links.
-
-       A native <dialog>. Escape closes it, the backdrop belongs to the browser,
-       focus is held inside without a line of code, and the whole thing is inert
-       while it is shut. Written by hand this is two hundred lines and three
-       accessibility bugs. */
-    let ROSTER_BY_ID = {};
-
-    function detailHTML(m) {
-      /* Areas as a sentence, not as pills.
-         A row of rounded chips is what a generator reaches for when it has a
-         list and no opinion about it, and seven of them under a photograph is
-         the look this site exists to avoid. These are research areas: they read
-         as a line, separated the way a line is separated, in the mono this site
-         keeps for classification. */
-      const areas = (m.areas || []).join('  ·  ');
-      const awards = (m.awards || [])
-        .map(function (a) {
-          return '<li class="rd-award"><span class="rd-award-year">' + (a.year || '') + '</span>'
-               + '<span>' + (a.title || a) + '</span></li>';
-        }).join('');
-      /* Text links, not three glass buttons in a row. A button is for an action
-         and these are references; dressed as buttons they carried more weight
-         than the biography above them. */
-      const links = [
-        m.lattes && '<a href="' + m.lattes + '" target="_blank" rel="noopener" class="rd-ref">Lattes</a>',
-        m.github && '<a href="' + m.github + '" target="_blank" rel="noopener" class="rd-ref">GitHub</a>',
-        m.linkedin && '<a href="' + m.linkedin + '" target="_blank" rel="noopener" class="rd-ref">LinkedIn</a>'
-      ].filter(Boolean).join('');
-      return '<button type="button" class="rd-close glass-btn" data-close aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button>'
-        + '<div class="rd-head">'
-        +   '<div class="rt-photo rd-photo">' + avatarImg(m) + '</div>'
-        +   '<div class="rd-id">'
-        +     (m.title ? '<p class="rd-title">' + m.title + '</p>' : '')
-        +     '<p class="rd-name">' + m.name + '</p>'
-        +     '<p class="rt-role">' + roleLabel(m.role) + '</p>'
-        +   '</div>'
-        + '</div>'
-        + (m.bio ? '<p class="rd-bio">' + m.bio + '</p>' : '')
-        + (areas ? '<div class="rd-block"><p class="rd-label">' + t('about.team.areas') + '</p><p class="rd-areas">' + areas + '</p></div>' : '')
-        + (awards ? '<div class="rd-block"><p class="rd-label">' + t('about.team.awards') + '</p><ul class="rd-awards">' + awards + '</ul></div>' : '')
-        + (links ? '<div class="rd-links">' + links + '</div>' : '');
-    }
-
-    /* In the grid, not over it.
-       This was a modal, and a modal is the wrong shape for a biography: it
-       blacks out the page, takes the whole screen for one paragraph and puts
-       the reader in a state they have to leave before they can look at anyone
-       else. The record opens where the person is instead. It is inserted after
-       the card that was pressed and spans every column, so the grid pushes the
-       rows below it down and nothing is covered; pressing the same card again,
-       or any other, closes it. */
-    function closeMember() {
-      const open = document.querySelector('.rt-detail');
-      if (open) open.remove();
-      document.querySelectorAll('.rt-card.is-open').forEach(function (c) {
-        c.classList.remove('is-open');
-        c.setAttribute('aria-expanded', 'false');
-      });
-    }
-
-    function openMember(card, id) {
-      const m = ROSTER_BY_ID[id];
-      const wasOpen = card.classList.contains('is-open');
-      closeMember();
-      if (!m || wasOpen) return;
-      const panel = document.createElement('div');
-      panel.className = 'rt-detail glass';
-      panel.innerHTML = detailHTML(m);
-      card.insertAdjacentElement('afterend', panel);
-      card.classList.add('is-open');
-      card.setAttribute('aria-expanded', 'true');
-      /* Only if it is not already on screen: a record that opens under your
-         pointer should not also move the page out from under it. */
-      const r = panel.getBoundingClientRect();
-      if (r.bottom > innerHeight) panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
-
-    document.addEventListener('keydown', function (e) {
-      if (e.key !== 'Escape') return;
-      const card = document.querySelector('.rt-card.is-open');
-      if (!card) return;
-      closeMember();
-      card.focus();
-    });
-
-    document.addEventListener('click', function (e) {
-      const card = e.target.closest && e.target.closest('.rt-card[data-member]');
-      if (card) { openMember(card, card.getAttribute('data-member')); return; }
-      if (e.target.closest && e.target.closest('[data-close]')) closeMember();
-    });
-
-    /* Researchers, then the undergraduates. The coordinator is not in this
-       list at all: that section is above, with the full card the role earns. */
-    const ROSTER_ORDER = { researcher: 0, ic: 1 };
-    function renderRoster(mount, members) {
-      const sorted = members.slice().sort(function (a, b) {
-      const ra = ROSTER_ORDER[a.role], rb = ROSTER_ORDER[b.role];
-      return (ra === undefined ? 9 : ra) - (rb === undefined ? 9 : rb);
-      });
-      ROSTER_BY_ID = {};
-      sorted.forEach(function (m) { ROSTER_BY_ID[m.id] = m; });
-      mount.className = "rt-grid";
-      mount.innerHTML = sorted.map(rosterCardHTML).join("");
-    }
-
-
-    function roleLabel(role) {
-      const key = ROLE_LABEL_KEYS[role];
-      const tx = key ? t(key) : '';
-      return (tx && tx !== key) ? tx : (role || '');
-    }
-
-    function avatarImg(member) {
-      return member.photo
-        ? `<img src="${member.photo}" alt="" loading="lazy">`
-        : `<span class="bubble-initials" aria-hidden="true">${(member.name || '?').trim().charAt(0)}</span>`;
-    }
-
-    // Rich content for the floating bio card (reused on hover, tap and keyboard)
-
-    // Static fallback for reduced motion / small screens: the classic card grid
-
-    // Team NETWORK: avatar nodes with PERMANENT links (a fixed edge set built
-    // once from nearest neighbours). The graph floats gently via light springs;
-    // the cursor does NOT push nodes, it only highlights nearby links. Borderless
-    // nodes, invisible field boundaries, so the network feels embedded in the page.
-    /* initField was here: a hundred and forty lines of collision physics that
-       floated seventeen photographs around a box. Nothing mounts it since the
-       roster replaced the field, and a function nobody calls is not harmless,
-       it is a thing the next person has to read and decide about. */
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      const team = await loadTeam();
-      if (!team || !team.length) return;
-
-      const coordinator = team.find(m => m.role === 'coordinator');
-      const coordCard = document.getElementById('coordinator-card');
-      if (coordinator && coordCard) coordCard.innerHTML = renderCoordinator(coordinator);
-
-      const members = team.filter(m => m.role !== 'coordinator');
-      const mount = document.getElementById('team-mount');
-      if (mount && members.length) {
-        /* The roster, always. The floating field was the wide-screen version and
-           the grid beneath it was called a fallback, which meant the page held
-           two answers to one question and most visits saw the second one
-           regardless: it was already what a phone got, and what anyone who asked
-           for less motion got. Seventeen people scan better in a roster than
-           they drift in a field, and a roster is the same on every screen. */
-        renderRoster(mount, members);
-      }
-
-      // Localise the coordinator badge (and any fallback-grid badges)
-      document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: document.documentElement.lang } }));
-    });
-  </script>
+  <!-- The coordinator, the wall and the graph mount. This used to be 260 lines
+       of module inline in this file; assets/js/about.js is the same work,
+       minified and cached like every other module on the site. -->
+  <script type="module" src="assets/js/main.min.js?v=a4d7854f36"></script>
+  <script type="module" src="assets/js/about.min.js?v=a4d7854f36"></script>
 
   <!-- The same scroll behaviour the home page has. motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
        a trigger honest when images land late. docs/design-system.md, section 7.
 
-       GSAP used to be two <script defer> tags here. It is fetched by motion.js
-       now, on the same rule the home page uses: ask for prefers-reduced-motion
-       before asking the network. initMotion already refused to run for that
-       reader, who was downloading 45 KB and parsing 114 KB in order to see not
-       one frame of what it does. -->
-  <script type="module" src="assets/js/main.min.js?v=95fe384fdc"></script>
+       GSAP is fetched by motion.js, on the same rule the home page uses: ask for
+       prefers-reduced-motion before asking the network. -->
   <script type="module">
-    import { ensureMotionLibs, initMotion, revealFailsafe } from "./assets/js/motion.min.js?v=95fe384fdc";
+    import { ensureMotionLibs, initMotion, revealFailsafe } from "./assets/js/motion.min.js?v=a4d7854f36";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
@@ -565,6 +344,6 @@
     });
   </script>
 
-  <script src="assets/js/analytics.min.js?v=95fe384fdc" defer></script>
+  <script src="assets/js/analytics.min.js?v=a4d7854f36" defer></script>
 </body>
 </html>
