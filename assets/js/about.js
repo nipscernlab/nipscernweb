@@ -30,11 +30,11 @@
  * is the only literal part, and it turns over when the record is open.
  */
 
-import { t } from './i18n.js?v=a4d7854f36';
+import { t } from './i18n.js?v=b93bdc3cee';
 /* Never scrollIntoView({behavior:'smooth'}) on this site: Lenis is driving the
    scroll position from its own ticker and the two animations fight, which
    reads as no scroll at all. scrollToEl asks the library. */
-import { scrollToEl } from './smooth-scroll.js?v=a4d7854f36';
+import { scrollToEl } from './smooth-scroll.js?v=b93bdc3cee';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -145,12 +145,32 @@ function countHTML(record) {
     + (years ? '<span class="rd-count-y">' + years + '</span>' : '') + '</p>';
 }
 
+/* One award, taken apart. team.json writes the distinction, the event and the
+   years in a single string, and printed whole the list reads "Gold Medal —"
+   eight times with a parenthesis closing every line. The years go to the mono
+   column the coordinator's list already has, the distinction is read before
+   the event, and nothing in the data is touched: this is display, not
+   editing. A parenthesis that is not years — a quoted video title — stays
+   with its event. */
+function awardParts(a) {
+  if (a && typeof a === 'object') return { years: esc(a.year || ''), dist: a.title || '', event: '' };
+  let s = String(a == null ? '' : a);
+  let years = '';
+  const y = s.match(/\s*\((\d{4}(?:,\s*\d{4})*)\)\s*$/);
+  if (y) { years = y[1]; s = s.slice(0, y.index); }
+  const i = s.indexOf(' — ');
+  if (i < 0) return { years: esc(years), dist: esc(s), event: '' };
+  return { years: esc(years), dist: esc(s.slice(0, i)), event: esc(s.slice(i + 3)) };
+}
+
 function detailHTML(m, record) {
-  const areas = (m.areas || []).map(esc).join('  ·  ');
+  const areas = (m.areas || []).map((a) => '<li>' + esc(a) + '</li>').join('');
   const awards = (m.awards || []).map((a) => {
-    const year = a && typeof a === 'object' ? a.year : '';
-    const title = a && typeof a === 'object' ? a.title : esc(a);
-    return '<li class="rd-award"><span class="rd-award-year">' + esc(year) + '</span><span>' + title + '</span></li>';
+    const p = awardParts(a);
+    return '<li class="rd-award"><span class="rd-award-year">' + p.years + '</span>'
+      + '<span><span class="rd-award-dist">' + p.dist + '</span>'
+      + (p.event ? '<span class="rd-award-event">' + p.event + '</span>' : '')
+      + '</span></li>';
   }).join('');
   const links = [
     m.lattes && '<a href="' + esc(m.lattes) + '" target="_blank" rel="noopener" class="rd-ref">' + LATTES + ' Lattes</a>',
@@ -159,26 +179,33 @@ function detailHTML(m, record) {
   ].filter(Boolean).join('');
 
   const closeLabel = t('about.team.close');
-  /* The coordinator's construction, one size down: the portrait a full column
-     on the left at the tile's own 4:5, everything read beside it. Not a wide
-     box with a thumbnail in the corner, which is the shape a record takes when
-     nobody decides anything about it. */
+  /* A dossier, not a stack of blocks. The portrait holds the left column at
+     the tile's own 4:5 with the classifications and the links filed under it,
+     the way a record folder keeps its index on the inside cover. The right
+     column reads downward from the name: the standing over a rule, the
+     biography at its measure, the awards as a table. What was here before —
+     one column of centred-nothing sections under a serif heading — is the
+     shape every generated profile page takes, and this page is about the one
+     thing a generator does not have: eighteen actual people. */
   return '<button type="button" class="rd-close glass-btn" data-close aria-label="'
     + esc(closeLabel === 'about.team.close' ? 'Close' : closeLabel) + '">'
     + '<i class="ph ph-x" aria-hidden="true"></i></button>'
     + '<figure class="rd-side frame">'
     + (m.photo ? '<img src="' + esc(ROOT + m.photo) + '" alt="" loading="lazy" decoding="async">' : '')
     + '</figure>'
-    + '<div class="rd-main">'
+    + '<header class="rd-head"><div class="rd-id">'
     + (m.title ? '<p class="rd-title">' + esc(m.title) + '</p>' : '')
     + '<p class="rd-name">' + esc(m.name) + '</p>'
     + '<p class="rt-role" data-i18n="' + roleKey(m.role) + '">' + esc(roleText(m.role)) + '</p>'
-    + countHTML(record)
+    + '</div>' + countHTML(record) + '</header>'
+    + '<div class="rd-body">'
     + (m.bio ? '<p class="rd-bio">' + esc(m.bio) + '</p>' : '')
-    + (areas ? '<div class="rd-block"><p class="rd-label" data-i18n="about.team.areas">Research areas</p>'
-        + '<p class="rd-areas">' + areas + '</p></div>' : '')
     + (awards ? '<div class="rd-block"><p class="rd-label" data-i18n="about.team.awards">Awards</p>'
         + '<ul class="rd-awards">' + awards + '</ul></div>' : '')
+    + '</div>'
+    + '<div class="rd-facts">'
+    + (areas ? '<div class="rd-block"><p class="rd-label" data-i18n="about.team.areas">Research areas</p>'
+        + '<ul class="rd-areas">' + areas + '</ul></div>' : '')
     + (links ? '<div class="rd-links">' + links + '</div>' : '')
     + '</div>';
 }
@@ -295,12 +322,12 @@ function mountNetwork(net) {
   const start = () => {
     if (started) return;
     started = true;
-    import('./network.js?v=a4d7854f36').then(({ initNetwork }) =>
+    import('./network.js?v=b93bdc3cee').then(({ initNetwork }) =>
       initNetwork(canvas, { tip: document.getElementById('net-tip'), data: net })
     ).then((api) => {
       if (!api) { stage.classList.add('is-flat'); return; }
       stage.classList.add('is-live');
-      import('./motion.js?v=a4d7854f36').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
+      import('./motion.js?v=b93bdc3cee').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
     }).catch(() => stage.classList.add('is-flat'));
   };
 

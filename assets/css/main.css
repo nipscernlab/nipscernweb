@@ -1506,14 +1506,23 @@ a:hover > .frame > [data-drift],
   --glass-tint: var(--bg-card);
   grid-column: 1 / -1;
   position: relative;
-  /* The record is the coordinator's card for everyone else: the portrait a
-     full column on the left, at the same 4:5 the tile above it has, and the
-     text beside it at a reading measure. The first version kept a 96px
-     thumbnail in the corner of a wide box, which wasted the photograph and
-     left the right half of the panel empty. */
+  /* A dossier, laid out in named areas. The portrait holds the left column
+     with the classifications filed under it; the right column reads downward
+     from the name — the standing over a rule, the biography at its measure,
+     the awards as a table. The previous version stacked every group in one
+     column beside the photograph, and a stack of labelled blocks with the
+     right half of the panel empty is the shape a record takes when nobody
+     composes it. The body area spans two rows so the biography starts at the
+     rule whether the portrait has run out or not. */
   display: grid;
-  grid-template-columns: minmax(150px, 220px) minmax(0, 1fr);
-  gap: var(--sp-8);
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  grid-template-areas:
+    'photo head'
+    'photo body'
+    'facts body';
+  grid-template-rows: auto auto 1fr;
+  column-gap: var(--sp-8);
+  row-gap: var(--sp-6);
   align-items: start;
   padding: var(--sp-8);
   border-radius: var(--r-xl);
@@ -1521,8 +1530,12 @@ a:hover > .frame > [data-drift],
   animation: tm-open 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @media (max-width: 640px) {
-  .tm-detail { grid-template-columns: minmax(0, 1fr); }
-  .tm-detail .rd-side { max-width: 180px; }
+  .tm-detail {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'photo' 'head' 'body' 'facts';
+    grid-template-rows: auto;
+  }
+  .tm-detail .rd-side { max-width: 200px; }
 }
 @keyframes tm-open {
   from { opacity: 0; transform: translateY(-6px); }
@@ -1550,11 +1563,26 @@ a:hover > .frame > [data-drift],
    so opening a record reads as the tile stepping forward, not as a different
    object appearing. */
 .rd-side {
+  grid-area: photo;
   --frame-ratio: 4 / 5;
   margin: 0;
   border-radius: var(--r-lg);
 }
-.rd-main { min-width: 0; }
+/* The head of the record: the standing and the name on the left, the measured
+   line on the right, and one rule under both. The rule is what makes the rest
+   read as entries in a file rather than paragraphs on a card. */
+.rd-head {
+  grid-area: head;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-6);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border-mid);
+}
+.rd-body { grid-area: body; min-width: 0; }
+.rd-facts { grid-area: facts; min-width: 0; }
 .rd-name {
   font-family: var(--font-serif);
   font-size: var(--text-3xl);
@@ -1565,13 +1593,14 @@ a:hover > .frame > [data-drift],
 /* A reading measure, not the width of the panel. A line that runs the full
    rail is the single loudest tell of a generated layout. */
 .rd-bio {
-  margin-top: var(--sp-5);
   max-width: 68ch;
   font-size: var(--text-sm);
   line-height: 1.75;
   color: var(--text-secondary);
 }
 .rd-block { margin-top: var(--sp-6); }
+.rd-body > .rd-block:first-child,
+.rd-facts > .rd-block:first-child { margin-top: 0; }
 /* The same small mono label the rest of the site uses over a group of facts. */
 .rd-label {
   font-family: var(--font-mono);
@@ -1581,18 +1610,18 @@ a:hover > .frame > [data-drift],
   color: var(--text-muted);
   margin-bottom: var(--sp-3);
 }
-/* Areas as a line, not as a row of chips.
-   Rounded pills are what gets reached for when there is a list and no opinion
-   about it, and seven of them under a photograph is the exact look this site
-   exists to avoid. These are classifications, so they take the mono this site
-   keeps for classifications, and they are separated the way a line is
-   separated. */
+/* Areas as an index under the portrait, one to a line with a hairline between,
+   the way a folder lists what it holds on the inside cover. Not chips: rounded
+   pills are what gets reached for when there is a list and no opinion about
+   it. Classifications take the mono this site keeps for classifications. */
 .rd-areas {
+  list-style: none;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  line-height: 1.9;
   color: var(--text-secondary);
 }
+.rd-areas li { padding: 6px 0; }
+.rd-areas li + li { border-top: 1px solid var(--border-subtle); }
 
 /* References, not buttons. Three glass buttons in a row carried more weight
    than the biography above them, and a button is for an action while these are
@@ -1624,16 +1653,18 @@ a:hover > .frame > [data-drift],
   color: var(--text-muted);
   margin-bottom: 3px;
 }
-/* The measured line. The count is mono because it was counted, and it appears
-   only for people with something counted: an undergraduate who has not
-   published yet gets no line, not a zero. */
+/* The measured line, seated on the head's rule at the other end from the name.
+   The count is mono because it was counted, and it appears only for people
+   with something counted: an undergraduate who has not published yet gets no
+   line, not a zero. */
 .rd-count {
   display: flex;
   align-items: baseline;
   gap: var(--sp-2);
-  margin-top: var(--sp-2);
+  margin: 0 0 2px;
   font-size: var(--text-xs);
   color: var(--text-muted);
+  white-space: nowrap;
 }
 .rd-count-n {
   font-family: var(--font-mono);
@@ -1647,22 +1678,34 @@ a:hover > .frame > [data-drift],
   font-variant-numeric: tabular-nums;
 }
 
-.rd-awards { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); }
+/* The awards as a table, not a list of sentences. The years sit in the mono
+   column, the distinction is read first, the event under it in the quiet
+   colour, and each entry is a filed row with a hairline over it. Wide records
+   set two entries abreast; the column count comes from the space, not from a
+   breakpoint. */
+.rd-awards {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  column-gap: var(--sp-8);
+}
 .rd-award {
-  display: flex;
-  gap: var(--sp-4);
-  font-size: var(--text-sm);
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--text-xs);
   color: var(--text-secondary);
   line-height: 1.5;
 }
 .rd-award-year {
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
   color: var(--accent-about);
-  flex-shrink: 0;
-  padding-top: 2px;
   font-variant-numeric: tabular-nums;
 }
+.rd-award-dist { display: block; color: var(--text-primary); font-weight: 500; }
+.rd-award-event { display: block; color: var(--text-muted); margin-top: 1px; }
 /* --sp-7 does not exist, and a var() that resolves to nothing takes its whole
    declaration with it: this had no margin at all, so a bare "Lattes" sat against
    the last research area and read as one more of them. Named blocks now, like
@@ -1670,9 +1713,9 @@ a:hover > .frame > [data-drift],
 .rd-links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-4);
-  margin-top: var(--sp-4);
-  padding-top: var(--sp-5);
+  gap: var(--sp-3) var(--sp-4);
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-4);
   border-top: 1px solid var(--border-subtle);
 }
 .rd-ref::after {
@@ -1688,7 +1731,7 @@ a:hover > .frame > [data-drift],
   .tm-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-3); }
   .tm-plate { padding: var(--sp-2) 30px var(--sp-2) var(--sp-3); }
   .tm-name { font-size: var(--text-xs); }
-  .tm-detail { padding: var(--sp-5); gap: var(--sp-5); }
+  .tm-detail { padding: var(--sp-5); column-gap: var(--sp-5); row-gap: var(--sp-5); }
 }
 
 /* ============================================================

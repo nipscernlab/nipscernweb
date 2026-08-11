@@ -407,6 +407,32 @@ Cada fase termina com a página no ar e revisada. Sem fase pela metade.
 ponto de retorno. Cliente aprovou as sugestões do estudo e pediu o plano.
 Decidido: uma página por vez até finalizar. Blog registrado como ideia nova.
 
+**2026-08-11, About, o record dos pesquisadores.** Cliente vetou reescrita das
+bios: foram os próprios pesquisadores que escreveram, e o texto deles fica. O
+problema era o visual do record expandido, que empilhava blocos rotulados numa
+coluna só, com a metade direita do painel vazia. Redesenhado como dossiê: o
+retrato segura a coluna esquerda com as áreas de pesquisa e os links arquivados
+embaixo, o cabeçalho ganha uma régua com a linha medida na outra ponta, a bio
+fica na medida de leitura e os prêmios viram tabela com o ano em coluna mono. O
+ano e a distinção são extraídos da string na exibição, sem tocar no dado.
+
+**2026-08-11, conteúdo original (diretriz reforçada).** O cliente quer o site
+carregando material autoral de verdade, a começar pela Home: vídeos originais
+do grupo, imagens, PDFs. Regra de trabalho registrada: buscar sempre o material
+real existente (repositório, cdn.nipscern.com) em vez de fabricar arte visual
+ou prosa genérica; quando o material não existir, pedir ao grupo, não inventar.
+O que o grupo pode fornecer e onde encaixa, seguindo a seção 7:
+
+- Vídeos originais do laboratório (bancada, FPGA, sala de controle do ATLAS,
+  CGVWeb rodando): candidatos a hero da Home e da página CERN.
+- As nove fotografias do laboratório no CERN e as imagens computadas pelo
+  SAPHO (Mandelbrot, Buddhabrot, fractais): já inventariadas na seção 2.1,
+  seguem subaproveitadas.
+- PDFs (posters, apresentações, material de divulgação): candidatos a acervo
+  em Publications ou ao futuro blog.
+- Mídia pesada vai para o nipscern-assets e é servida por cdn.nipscern.com,
+  como já combinado.
+
 **2026-08-07, Fase 0, tipografia.** Branch `redesign/phase-0`. Fontes escolhidas
 e auto-hospedadas em `assets/fonts` (232 KB, licenças OFL junto):
 
