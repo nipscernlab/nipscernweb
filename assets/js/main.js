@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=10756b7b89';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=8c4ea6da81';
 
-import { newsPostUrl } from './content-links.js?v=10756b7b89';
+import { newsPostUrl } from './content-links.js?v=8c4ea6da81';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=10756b7b89';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=8c4ea6da81';
 
 // ============================================================
 // Navigation Template
@@ -759,7 +759,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=10756b7b89">. Each copy would otherwise append its own
+// <script src="main.js?v=8c4ea6da81">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {
