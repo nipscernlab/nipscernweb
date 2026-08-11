@@ -4577,18 +4577,25 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   gap: var(--sp-4);
 }
 
+/* The same pane the buttons and the plates are made of, so a grid of outbound
+   links belongs to the page it sits on rather than being a second card system
+   with a flat fill of its own. .glass in the markup paints it; what is written
+   here is the shape. */
 .external-link-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  --glass-tint: rgba(255, 255, 255, 0.035);
   border-radius: var(--r-xl);
   padding: var(--sp-5);
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  transition: all var(--t-base);
+  transition: transform var(--t-base), border-color var(--t-base), background var(--t-base);
 }
-.external-link-card:hover { border-color: var(--brand-mid); background: var(--brand-glow); transform: translateY(-2px); }
+.external-link-card:hover {
+  --glass-tint: color-mix(in srgb, var(--brand) 12%, transparent);
+  border-color: var(--brand-mid);
+  transform: translateY(-2px);
+}
 .external-link-card-name { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
 .external-link-card-desc { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
 
@@ -5575,17 +5582,23 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 }
 .fade-in.visible { opacity: 1; }
 
-/* Staggered children */
+/* Staggered children.
+   Visibility is one rule for every child; the numbered rules below carry only
+   the delay. It used to be nine rules that each did both, which meant a tenth
+   child matched nothing and stayed at opacity 0 for ever: the CERN page lists
+   eleven official resources and two of them were never drawn. Whatever the
+   entrance does, it may not decide whether content exists. */
 .stagger-children > * { opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
-.stagger-children.visible > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0ms; }
-.stagger-children.visible > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 60ms; }
-.stagger-children.visible > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 120ms; }
-.stagger-children.visible > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 180ms; }
-.stagger-children.visible > *:nth-child(5) { opacity: 1; transform: none; transition-delay: 240ms; }
-.stagger-children.visible > *:nth-child(6) { opacity: 1; transform: none; transition-delay: 300ms; }
-.stagger-children.visible > *:nth-child(7) { opacity: 1; transform: none; transition-delay: 360ms; }
-.stagger-children.visible > *:nth-child(8) { opacity: 1; transform: none; transition-delay: 420ms; }
-.stagger-children.visible > *:nth-child(9) { opacity: 1; transform: none; transition-delay: 480ms; }
+.stagger-children.visible > * { opacity: 1; transform: none; transition-delay: 540ms; }
+.stagger-children.visible > *:nth-child(1) { transition-delay: 0ms; }
+.stagger-children.visible > *:nth-child(2) { transition-delay: 60ms; }
+.stagger-children.visible > *:nth-child(3) { transition-delay: 120ms; }
+.stagger-children.visible > *:nth-child(4) { transition-delay: 180ms; }
+.stagger-children.visible > *:nth-child(5) { transition-delay: 240ms; }
+.stagger-children.visible > *:nth-child(6) { transition-delay: 300ms; }
+.stagger-children.visible > *:nth-child(7) { transition-delay: 360ms; }
+.stagger-children.visible > *:nth-child(8) { transition-delay: 420ms; }
+.stagger-children.visible > *:nth-child(9) { transition-delay: 480ms; }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
