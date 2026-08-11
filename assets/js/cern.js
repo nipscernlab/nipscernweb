@@ -23,7 +23,7 @@
  * wrote and the one every reader keeps if a single byte fails to arrive.
  */
 
-import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=e01c482ece';
+import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=63799f47d6';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -112,54 +112,85 @@ const TRAIL = 22;
    Point 1, put at the bottom of the figure, nearest the reader. */
 const onRing = (a, out) => out.set(R * Math.sin(a), -R * Math.cos(a), 0);
 
-/* One collision's worth of debris: a pool of points thrown from an
-   interaction point and faded out, then thrown again at the next crossing.
-   Directions are random on the sphere — a burst, not a jet — and the pool is
-   reused rather than allocated per collision. */
-function makeBurst(THREE, tex, n, size) {
-  const obj = pointsObj(THREE, n, size, tex, 1);
-  const col = obj.geometry.attributes.color;
-  for (let i = 0; i < n; i++) col.setXYZ(i, BEAM[0], BEAM[1], BEAM[2]);
-  col.needsUpdate = true;
-  obj.visible = false;
+/* One collision drawn the way the event displays draw it: tracks, not
+   sparks. Charged particles bend in the magnetic field and are painted
+   amber; muons leave long straight red lines; neutrals go out straight and
+   cyan. Each track is a polyline grown outward from the vertex over a few
+   tenths of a second, which is the grammar CGVWeb and the ATLAS displays
+   use. The pool of lines is reused; only their shapes are thrown again at
+   each crossing. */
+const TRACK_COLORS = {
+  charged: [1.0, 0.72, 0.25],
+  muon: [0.95, 0.3, 0.32],
+  neutral: [0.45, 0.85, 1.0],
+};
+
+function makeEvent(THREE, nTracks, scale) {
+  const SEG = 24;
+  const group = new THREE.Group();
+  group.visible = false;
+  const tracks = [];
+  for (let i = 0; i < nTracks; i++) {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array((SEG + 1) * 3), 3));
+    const line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+      transparent: true,
+      opacity: 1,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }));
+    group.add(line);
+    tracks.push(line);
+  }
   return {
-    obj,
-    vel: new Float32Array(n * 3),
+    obj: group,
     life: 1,
     fire(origin) {
-      const pos = obj.geometry.attributes.position;
-      for (let i = 0; i < n; i++) {
-        pos.setXYZ(i, origin.x, origin.y, origin.z);
-        const t = Math.random() * Math.PI * 2;
-        const p = Math.acos(2 * Math.random() - 1);
-        const s = 0.9 + Math.random() * 2.1;
-        this.vel[i * 3] = Math.sin(p) * Math.cos(t) * s;
-        this.vel[i * 3 + 1] = Math.sin(p) * Math.sin(t) * s;
-        this.vel[i * 3 + 2] = Math.cos(p) * s * 0.6;
+      for (const line of tracks) {
+        const r = Math.random();
+        const kind = r < 0.62 ? 'charged' : (r < 0.82 ? 'muon' : 'neutral');
+        const c = TRACK_COLORS[kind];
+        line.material.color.setRGB(c[0], c[1], c[2]);
+        /* A charged track is an arc: constant curvature, sign at random,
+           tighter for the slow ones. Muons run long and straight, neutrals
+           short and straight. A little out-of-plane drift so the spray is a
+           volume, not a disc. */
+        const phi = Math.random() * Math.PI * 2;
+        const zDrift = (Math.random() - 0.5) * 0.7;
+        const L = scale * (kind === 'muon' ? 1.6 + Math.random() * 0.8 : 0.5 + Math.random() * 0.9);
+        const curv = kind === 'charged'
+          ? (Math.random() < 0.5 ? -1 : 1) * (1.4 + Math.random() * 2.6) / scale
+          : 0;
+        const pos = line.geometry.attributes.position;
+        const step = L / SEG;
+        let a = phi, x = origin.x, y = origin.y, z = origin.z;
+        for (let s = 0; s <= SEG; s++) {
+          pos.setXYZ(s, x, y, z);
+          x += Math.cos(a) * step;
+          y += Math.sin(a) * step;
+          z += zDrift * step * 0.4;
+          a += curv * step;
+        }
+        pos.needsUpdate = true;
+        line.geometry.setDrawRange(0, 1);
       }
-      pos.needsUpdate = true;
       this.life = 0;
-      obj.visible = true;
+      group.visible = true;
     },
     step(dt) {
-      if (!obj.visible) return;
-      /* Short and hard: the tracks are thrown fast, slow abruptly, and are
-         gone inside three quarters of a second. A burst that lingers reads as
-         a firework; this should read as something breaking. */
-      this.life += dt / 0.75;
-      if (this.life >= 1) { obj.visible = false; return; }
-      const pos = obj.geometry.attributes.position;
-      const damp = (1 - this.life) * (1 - this.life);
-      for (let i = 0; i < n; i++) {
-        pos.setXYZ(i,
-          pos.getX(i) + this.vel[i * 3] * dt * damp,
-          pos.getY(i) + this.vel[i * 3 + 1] * dt * damp,
-          pos.getZ(i) + this.vel[i * 3 + 2] * dt * damp);
+      if (!group.visible) return;
+      this.life += dt / 1.05;
+      if (this.life >= 1) { group.visible = false; return; }
+      /* The tracks race out in the first third of the life and the whole
+         event holds, then dies quickly: an event display frame, not a
+         firework. */
+      const grow = Math.min(1, this.life / 0.32);
+      const n = Math.max(2, Math.round(grow * (SEG + 1)));
+      const fade = this.life < 0.6 ? 1 : 1 - (this.life - 0.6) / 0.4;
+      for (const line of tracks) {
+        line.geometry.setDrawRange(0, n);
+        line.material.opacity = fade;
       }
-      pos.needsUpdate = true;
-      /* Bright while it is happening, then out: full for the first fifth of
-         the life, then a fast fall. */
-      obj.material.opacity = this.life < 0.2 ? 1 : Math.max(0, 1.25 - this.life * 1.25);
     },
   };
 }
@@ -171,7 +202,7 @@ async function mountRing() {
 
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=e01c482ece');
+    THREE = await import('./vendor/three.module.min.js?v=63799f47d6');
   } catch (e) {
     /* No module, no figure. Removing the node collapses the hero to one
        column, which the grid already knows how to be. */
@@ -220,31 +251,38 @@ async function mountRing() {
         tilt.add(line);
       }
     };
-    /* Streams as texture, rivers readable, and the border the one dashed
-       line, which is how a border is drawn on every map the reader knows. */
+    /* Streams as texture, rivers in a blue that means water, and the border
+       the one dashed line, which is how a border is drawn on every map the
+       reader knows. Additive, so where lines gather the ground glows. */
     addWays(map.streams, new THREE.LineBasicMaterial({
-      color: new THREE.Color(0.14, 0.24, 0.4), transparent: true, opacity: 0.35,
+      color: new THREE.Color(0.22, 0.36, 0.6), transparent: true, opacity: 0.55,
+      blending: THREE.AdditiveBlending, depthWrite: false,
     }));
     addWays(map.rivers, new THREE.LineBasicMaterial({
-      color: new THREE.Color(0.2, 0.4, 0.62), transparent: true, opacity: 0.55,
+      color: new THREE.Color(0.28, 0.6, 1.0), transparent: true, opacity: 0.95,
+      blending: THREE.AdditiveBlending, depthWrite: false,
     }));
     addWays(map.border, new THREE.LineDashedMaterial({
-      color: new THREE.Color(0.6, 0.63, 0.7), transparent: true, opacity: 0.6,
+      color: new THREE.Color(0.72, 0.75, 0.82), transparent: true, opacity: 0.75,
       dashSize: 0.045, gapSize: 0.03,
     }), true);
 
     /* Which side is which, written on the ground with the flags. Positions
-       in metres from the ring centre, inside the window and clear of the
-       badges. The flags are the two national flags, drawn as markup. */
-    const FLAG_CH = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="m0 0h32v32h-32z" fill="#f00"/><path d="m13 6h6v7h7v6h-7v7h-6v-7h-7v-6h7z" fill="#fff"/></svg>';
-    const FLAG_FR = '<svg viewBox="0 0 3 2" aria-hidden="true"><path d="M0 0h1v2H0z" fill="#0055A4"/><path d="M1 0h1v2H1z" fill="#fff"/><path d="M2 0h1v2H2z" fill="#EF4135"/></svg>';
+       in metres from the ring centre: outside the circle, clear of the pipe
+       and the badges. The flags are the official SVGs, files of their own in
+       assets/images/flags. */
     for (const c of [
-      { name: 'FRANCE', flag: FLAG_FR, x: -3400, y: 3100 },
-      { name: 'SUISSE', flag: FLAG_CH, x: 2600, y: -4600 },
+      { name: 'FRANCE', flag: 'fr.svg', x: -4700, y: 4900 },
+      { name: 'SUISSE', flag: 'ch.svg', x: 2600, y: -4600 },
     ]) {
       const el = document.createElement('span');
       el.className = 'lhc-ring-country';
-      el.innerHTML = c.flag + '<i>' + c.name + '</i>';
+      const flag = document.createElement('img');
+      flag.src = ROOT + 'assets/images/flags/' + c.flag;
+      flag.alt = '';
+      const name = document.createElement('i');
+      name.textContent = c.name;
+      el.append(flag, name);
       host.appendChild(el);
       const world = new THREE.Vector3(c.x * S, c.y * S, 0);
       labels.push({ el, world });
@@ -257,17 +295,22 @@ async function mountRing() {
     if (!raf) { renderer.render(scene, camera); placeLabels(w, h); }
   });
 
-  /* The two beam pipes, from the library's own curve: an EllipseCurve
-     sampled into a LineLoop, twice, a hair apart. */
-  for (const r of [R, R * 0.955]) {
-    const pts = new THREE.EllipseCurve(0, 0, r, r, 0, Math.PI * 2).getPoints(160);
-    const geo = new THREE.BufferGeometry().setFromPoints(pts);
-    tilt.add(new THREE.LineLoop(geo, new THREE.LineBasicMaterial({
-      color: new THREE.Color(LINE[0], LINE[1], LINE[2]),
-      transparent: true,
-      opacity: r === R ? 0.85 : 0.45,
-    })));
-  }
+  /* The pipe is a pipe: a torus with real thickness from the library's own
+     geometry, and a fatter, fainter twin behind it carrying the glow. The
+     torus lies in the XY plane, which is the ring's plane and the map's. */
+  tilt.add(new THREE.Mesh(
+    new THREE.TorusGeometry(R, 0.013, 10, 220),
+    new THREE.MeshBasicMaterial({
+      color: new THREE.Color(0.42, 0.58, 0.88), transparent: true, opacity: 0.95,
+    })
+  ));
+  tilt.add(new THREE.Mesh(
+    new THREE.TorusGeometry(R, 0.04, 10, 220),
+    new THREE.MeshBasicMaterial({
+      color: new THREE.Color(0.22, 0.4, 0.75), transparent: true, opacity: 0.3,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    })
+  ));
 
   /* The four experiments, at their stations. ATLAS carries the brand at full
      strength; the other three are the same blue held down, exactly the wall
@@ -310,8 +353,8 @@ async function mountRing() {
   /* The collision at Point 1 is the event the page is about, so it is the one
      that is allowed to be violent: many more tracks, thrown harder and drawn
      larger than the crossing on the far side of the ring. */
-  const burstAtlas = makeBurst(THREE, tex, 90, 0.075);
-  const burstCms = makeBurst(THREE, tex, 26, 0.045);
+  const burstAtlas = makeEvent(THREE, 30, 0.52);
+  const burstCms = makeEvent(THREE, 12, 0.3);
   tilt.add(burstAtlas.obj, burstCms.obj);
 
   /* The four experiments are named by their own marks, projected over the
@@ -327,25 +370,23 @@ async function mountRing() {
     /* The classic map pin: the teardrop pointing at the interaction point,
        the mark on the white disc in its head. The pin is a container; the
        logo inside it is the experiment's own, whole and unaltered. */
-    el.innerHTML = '<span class="pin"><span class="pin-disc"></span></span>';
     const img = document.createElement('img');
     img.src = ROOT + 'assets/images/cern/experiments/' + ip.file;
     img.alt = ip.name;
     img.loading = 'lazy';
     img.decoding = 'async';
-    el.querySelector('.pin-disc').appendChild(img);
+    el.appendChild(img);
     host.appendChild(el);
     const world = new THREE.Vector3();
     onRing(ip.angle, world);
-    return { el, world, pin: true };
+    return { el, world };
   });
 
   const proj = new THREE.Vector3();
   function placeLabels(w, h) {
     for (const l of labels) {
       proj.copy(l.world).applyMatrix4(tilt.matrixWorld).project(camera);
-      /* A pin hangs by its tip; a plain label sits on its centre. */
-      l.el.style.transform = (l.pin ? 'translate(-50%, -100%) ' : 'translate(-50%, -50%) ') + 'translate('
+      l.el.style.transform = 'translate(-50%, -50%) translate('
         + ((proj.x * 0.5 + 0.5) * w).toFixed(1) + 'px,'
         + ((-proj.y * 0.5 + 0.5) * h).toFixed(1) + 'px)';
     }
