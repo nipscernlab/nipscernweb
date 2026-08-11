@@ -28,8 +28,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/cern.css?v=e01c482ece">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=e01c482ece">
+  <link rel="stylesheet" href="assets/css/icons/cern.css?v=63799f47d6">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=63799f47d6">
 
   <style>
     /* LHC Status banner — a pane of glass pulled up over the control-room
@@ -223,40 +223,35 @@
       -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 52%, transparent 98%);
       mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 52%, transparent 98%);
     }
-    /* The classic map pin, hanging by its tip over each interaction point.
-       The teardrop is the container in map red; the experiment's mark sits
-       whole and unaltered on the white disc in its head, which is the ground
-       all four were drawn for. */
-    .lhc-ring-badge { position: absolute; top: 0; left: 0; will-change: transform; }
-    .lhc-ring-badge .pin {
+    /* One white disc per experiment, big enough for the mark to be read. The
+       logo sits whole and unaltered on the disc; the disc is a container, not
+       an edit, and white is the ground all four marks were drawn for. Sized
+       for the mark to read at arm's length; the source files are exported at
+       three times this box so they stay sharp on any screen. */
+    .lhc-ring-badge {
+      position: absolute;
+      top: 0; left: 0;
       display: grid;
       place-items: center;
-      width: 46px;
-      height: 46px;
-      background: #e63946;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
-    }
-    .lhc-ring-badge .pin-disc {
-      display: grid;
-      place-items: center;
-      width: 36px;
-      height: 36px;
-      padding: 4px;
+      width: 64px;
+      height: 64px;
+      padding: 7px;
       background: #fff;
       border-radius: var(--r-full);
-      transform: rotate(45deg);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+      will-change: transform;
     }
     /* width and height outright, not max-*: a percentage max-height inside a
-       grid cell resolved against nothing here and the 200px-tall source file
-       poured out of the disc. A definite box with object-fit does what the
-       max pair was supposed to. */
+       grid cell resolved against nothing here and the source file poured out
+       of the disc. A definite box with object-fit does the containing. */
     .lhc-ring-badge img { width: 100%; height: 100%; object-fit: contain; display: block; }
-    /* The one the page is about is bigger and carries the brand, not the map
-       red: this pin is ours. */
-    .lhc-ring-badge.is-main .pin { width: 60px; height: 60px; background: var(--brand); }
-    .lhc-ring-badge.is-main .pin-disc { width: 48px; height: 48px; padding: 5px; }
+    /* The one the page is about is bigger and ringed in the brand. */
+    .lhc-ring-badge.is-main {
+      width: 84px;
+      height: 84px;
+      padding: 9px;
+      box-shadow: 0 0 0 3px var(--brand), 0 5px 20px rgba(0, 0, 0, 0.55);
+    }
     /* Which country the ground belongs to, written the way a map writes it:
        small caps in the quiet colour, the flag beside the word. */
     .lhc-ring-country {
@@ -268,7 +263,7 @@
       will-change: transform;
       pointer-events: none;
     }
-    .lhc-ring-country svg { width: 14px; height: 10px; border-radius: 2px; display: block; }
+    .lhc-ring-country img { height: 12px; width: auto; border-radius: 2px; display: block; box-shadow: 0 0 0 1px rgba(255,255,255,0.12); }
     .lhc-ring-country i {
       font-style: normal;
       font-family: var(--font-mono);
@@ -278,10 +273,8 @@
     }
     @media (max-width: 768px) {
       .lhc-ring { width: 340px; height: 300px; margin-inline: auto; }
-      .lhc-ring-badge .pin { width: 34px; height: 34px; }
-      .lhc-ring-badge .pin-disc { width: 26px; height: 26px; padding: 3px; }
-      .lhc-ring-badge.is-main .pin { width: 44px; height: 44px; }
-      .lhc-ring-badge.is-main .pin-disc { width: 34px; height: 34px; padding: 4px; }
+      .lhc-ring-badge { width: 44px; height: 44px; padding: 5px; }
+      .lhc-ring-badge.is-main { width: 56px; height: 56px; padding: 6px; }
     }
 
     /* The descent — written as a plain column of captioned photographs, which
@@ -1175,8 +1168,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=e01c482ece"></script>
-  <script type="module" src="assets/js/cern.min.js?v=e01c482ece"></script>
+  <script type="module" src="assets/js/main.min.js?v=63799f47d6"></script>
+  <script type="module" src="assets/js/cern.min.js?v=63799f47d6"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
@@ -1281,6 +1274,6 @@
     })();
   </script>
 
-  <script src="assets/js/analytics.min.js?v=e01c482ece" defer></script>
+  <script src="assets/js/analytics.min.js?v=63799f47d6" defer></script>
 </body>
 </html>
