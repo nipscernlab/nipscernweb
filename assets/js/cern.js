@@ -23,7 +23,7 @@
  * wrote and the one every reader keeps if a single byte fails to arrive.
  */
 
-import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=0ab64c1b26';
+import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=e01c482ece';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -98,15 +98,15 @@ function pointsObj(THREE, count, size, tex, opacity) {
    opposite ATLAS, which is why two bunches launched together meet at both —
    and LHCb at 8, one octant the other side. */
 const IPS = [
-  { name: 'ATLAS', angle: 0, main: true },
-  { name: 'ALICE', angle: Math.PI / 4 },
-  { name: 'CMS', angle: Math.PI },
-  { name: 'LHCb', angle: -Math.PI / 4 },
+  { name: 'ATLAS', file: 'atlas.webp', angle: 0, main: true },
+  { name: 'ALICE', file: 'alice.webp', angle: Math.PI / 4 },
+  { name: 'CMS', file: 'cms.webp', angle: Math.PI },
+  { name: 'LHCb', file: 'lhcb.webp', angle: -Math.PI / 4 },
 ];
 
 const R = 1.18;
-const LAP = 5;               /* seconds per lap, so ATLAS lights every 5 s */
-const TRAIL = 16;
+const LAP = 3;               /* seconds per lap, so ATLAS lights every 3 s */
+const TRAIL = 22;
 
 /* A bunch's place on the ring at angle a, in the ring's own plane. Angle 0 is
    Point 1, put at the bottom of the figure, nearest the reader. */
@@ -132,7 +132,7 @@ function makeBurst(THREE, tex, n, size) {
         pos.setXYZ(i, origin.x, origin.y, origin.z);
         const t = Math.random() * Math.PI * 2;
         const p = Math.acos(2 * Math.random() - 1);
-        const s = 0.5 + Math.random() * 0.9;
+        const s = 0.9 + Math.random() * 2.1;
         this.vel[i * 3] = Math.sin(p) * Math.cos(t) * s;
         this.vel[i * 3 + 1] = Math.sin(p) * Math.sin(t) * s;
         this.vel[i * 3 + 2] = Math.cos(p) * s * 0.6;
@@ -143,10 +143,13 @@ function makeBurst(THREE, tex, n, size) {
     },
     step(dt) {
       if (!obj.visible) return;
-      this.life += dt / 1.1;
+      /* Short and hard: the tracks are thrown fast, slow abruptly, and are
+         gone inside three quarters of a second. A burst that lingers reads as
+         a firework; this should read as something breaking. */
+      this.life += dt / 0.75;
       if (this.life >= 1) { obj.visible = false; return; }
       const pos = obj.geometry.attributes.position;
-      const damp = 1 - this.life * 0.5;
+      const damp = (1 - this.life) * (1 - this.life);
       for (let i = 0; i < n; i++) {
         pos.setXYZ(i,
           pos.getX(i) + this.vel[i * 3] * dt * damp,
@@ -154,7 +157,9 @@ function makeBurst(THREE, tex, n, size) {
           pos.getZ(i) + this.vel[i * 3 + 2] * dt * damp);
       }
       pos.needsUpdate = true;
-      obj.material.opacity = 1 - this.life;
+      /* Bright while it is happening, then out: full for the first fifth of
+         the life, then a fast fall. */
+      obj.material.opacity = this.life < 0.2 ? 1 : Math.max(0, 1.25 - this.life * 1.25);
     },
   };
 }
@@ -166,7 +171,7 @@ async function mountRing() {
 
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=0ab64c1b26');
+    THREE = await import('./vendor/three.module.min.js?v=e01c482ece');
   } catch (e) {
     /* No module, no figure. Removing the node collapses the hero to one
        column, which the grid already knows how to be. */
@@ -194,6 +199,63 @@ async function mountRing() {
   scene.add(tilt);
 
   const tex = dotTexture(THREE);
+
+  /* The ground over the machine, and it is the real ground: the
+     France–Switzerland border and the watercourses of the Meyrin countryside,
+     fetched from OpenStreetMap by tools/build-meyrin-map.js and committed as
+     data. The ring sits at the LHC's true centre and radius within it, so the
+     border crosses the circle where it crosses it on any published map. All
+     of it lies in the ring's own tilted plane: this is the surface the
+     accelerator is under, not a backdrop behind it. */
+  json('data/meyrin-map.json').then((map) => {
+    if (!map || !map.border) return;
+    const S = R / map.ring_r_m;
+    const addWays = (ways, material, dashed) => {
+      for (const w of ways) {
+        if (w.length < 2) continue;
+        const pts = w.map(([x, y]) => new THREE.Vector3(x * S, y * S, -0.002));
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        const line = new THREE.Line(geo, material);
+        if (dashed) line.computeLineDistances();
+        tilt.add(line);
+      }
+    };
+    /* Streams as texture, rivers readable, and the border the one dashed
+       line, which is how a border is drawn on every map the reader knows. */
+    addWays(map.streams, new THREE.LineBasicMaterial({
+      color: new THREE.Color(0.14, 0.24, 0.4), transparent: true, opacity: 0.35,
+    }));
+    addWays(map.rivers, new THREE.LineBasicMaterial({
+      color: new THREE.Color(0.2, 0.4, 0.62), transparent: true, opacity: 0.55,
+    }));
+    addWays(map.border, new THREE.LineDashedMaterial({
+      color: new THREE.Color(0.6, 0.63, 0.7), transparent: true, opacity: 0.6,
+      dashSize: 0.045, gapSize: 0.03,
+    }), true);
+
+    /* Which side is which, written on the ground with the flags. Positions
+       in metres from the ring centre, inside the window and clear of the
+       badges. The flags are the two national flags, drawn as markup. */
+    const FLAG_CH = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="m0 0h32v32h-32z" fill="#f00"/><path d="m13 6h6v7h7v6h-7v7h-6v-7h-7v-6h7z" fill="#fff"/></svg>';
+    const FLAG_FR = '<svg viewBox="0 0 3 2" aria-hidden="true"><path d="M0 0h1v2H0z" fill="#0055A4"/><path d="M1 0h1v2H1z" fill="#fff"/><path d="M2 0h1v2H2z" fill="#EF4135"/></svg>';
+    for (const c of [
+      { name: 'FRANCE', flag: FLAG_FR, x: -3400, y: 3100 },
+      { name: 'SUISSE', flag: FLAG_CH, x: 2600, y: -4600 },
+    ]) {
+      const el = document.createElement('span');
+      el.className = 'lhc-ring-country';
+      el.innerHTML = c.flag + '<i>' + c.name + '</i>';
+      host.appendChild(el);
+      const world = new THREE.Vector3(c.x * S, c.y * S, 0);
+      labels.push({ el, world });
+    }
+
+    /* The map lands after the first paint. If the loop is running it will be
+       in the next frame; under reduced motion, or while the loop is held
+       off screen, one explicit frame puts the ground under the machine. */
+    tilt.updateMatrixWorld(true);
+    if (!raf) { renderer.render(scene, camera); placeLabels(w, h); }
+  });
 
   /* The two beam pipes, from the library's own curve: an EllipseCurve
      sampled into a LineLoop, twice, a hair apart. */
@@ -245,28 +307,45 @@ async function mountRing() {
   onRing(0, atlasPos);
   onRing(Math.PI, cmsPos);
 
-  const burstAtlas = makeBurst(THREE, tex, 30, 0.06);
-  const burstCms = makeBurst(THREE, tex, 12, 0.038);
+  /* The collision at Point 1 is the event the page is about, so it is the one
+     that is allowed to be violent: many more tracks, thrown harder and drawn
+     larger than the crossing on the far side of the ring. */
+  const burstAtlas = makeBurst(THREE, tex, 90, 0.075);
+  const burstCms = makeBurst(THREE, tex, 26, 0.045);
   tilt.add(burstAtlas.obj, burstCms.obj);
 
-  /* The labels are HTML, projected — the same trick the graph's tooltip
-     uses — so the type is the page's own mono and not something rastered
-     into a texture. */
+  /* The four experiments are named by their own marks, projected over the
+     canvas as HTML so they stay crisp at any pixel ratio. Each logo is used
+     whole and unaltered, inside a white disc: CERN's design guidelines forbid
+     changing a mark's proportions, colours or composition, and cropping the
+     wordmark off the ATLAS lockup to make it fit a circle would be exactly
+     that. The disc is a container, and white is the ground all four were
+     drawn for. */
   const labels = IPS.map((ip) => {
     const el = document.createElement('span');
-    el.className = 'lhc-ring-label' + (ip.main ? ' is-main' : '');
-    el.textContent = ip.name;
+    el.className = 'lhc-ring-badge' + (ip.main ? ' is-main' : '');
+    /* The classic map pin: the teardrop pointing at the interaction point,
+       the mark on the white disc in its head. The pin is a container; the
+       logo inside it is the experiment's own, whole and unaltered. */
+    el.innerHTML = '<span class="pin"><span class="pin-disc"></span></span>';
+    const img = document.createElement('img');
+    img.src = ROOT + 'assets/images/cern/experiments/' + ip.file;
+    img.alt = ip.name;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    el.querySelector('.pin-disc').appendChild(img);
     host.appendChild(el);
     const world = new THREE.Vector3();
     onRing(ip.angle, world);
-    return { el, world };
+    return { el, world, pin: true };
   });
 
   const proj = new THREE.Vector3();
   function placeLabels(w, h) {
     for (const l of labels) {
       proj.copy(l.world).applyMatrix4(tilt.matrixWorld).project(camera);
-      l.el.style.transform = 'translate(-50%, -130%) translate('
+      /* A pin hangs by its tip; a plain label sits on its centre. */
+      l.el.style.transform = (l.pin ? 'translate(-50%, -100%) ' : 'translate(-50%, -50%) ') + 'translate('
         + ((proj.x * 0.5 + 0.5) * w).toFixed(1) + 'px,'
         + ((-proj.y * 0.5 + 0.5) * h).toFixed(1) + 'px)';
     }
@@ -296,6 +375,8 @@ async function mountRing() {
     pos.needsUpdate = true;
   }
 
+  let raf = 0, last = 0, angle = 0, lastLap = 0, lastHalf = 0;
+
   /* One static frame is the reduced-motion version: the machine drawn, the
      bunches parked at their interaction points, nothing else asked of it. */
   if (REDUCED) {
@@ -306,8 +387,6 @@ async function mountRing() {
     placeLabels(w, h);
     return;
   }
-
-  let raf = 0, last = 0, angle = 0, lastLap = 0, lastHalf = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000 || 0);
