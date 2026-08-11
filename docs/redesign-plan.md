@@ -416,6 +416,28 @@ embaixo, o cabeçalho ganha uma régua com a linha medida na outra ponta, a bio
 fica na medida de leitura e os prêmios viram tabela com o ano em coluna mono. O
 ano e a distinção são extraídos da string na exibição, sem tocar no dado.
 
+**2026-08-11, CERN, primeiros elementos da Fase 2.** Princípio novo do cliente,
+registrado como regra: nada de arte ou animação à mão; todo efeito passa por
+biblioteca consolidada. Três elementos entraram na página, todos amarrados ao
+conteúdo:
+
+- **O anel** (hero): o LHC desenhado por three.js no lugar do unDraw, com a
+  gramática do grafo do About (mesma textura de glow, mesmo azul contido).
+  Dois bunches contra-rotativos que se cruzam onde o LHC os cruza: no Ponto 1
+  (ATLAS, burst grande) e meia volta depois no Ponto 5 (CMS, burst menor).
+  ALICE e LHCb nas estações reais. Rótulos em HTML projetado, mono da página.
+- **A descida** (GSAP ScrollTrigger, gate do ensureMotionLibs): quatro
+  fotografias reais pinadas no viewport, da superfície de Meyrin ao módulo do
+  TileCal, com a profundidade contada na margem (0 → −100 m). Sem JS ou com
+  movimento reduzido, a marcação é uma coluna de figuras legendadas.
+- **O banner de status em vidro** sobre a foto da sala de controle do ATLAS,
+  onde esses números são vigiados de verdade. Único vidro da página, sobre
+  algo que vale desfocar.
+
+Saíram os dois unDraw da página. cern.js entrou na lista do hook. As legendas
+da descida foram escritas nativamente nos quatro idiomas. Pendente da Fase 2
+completa: tipografia da prosa, tabelas, FCC e o restante da harmonização.
+
 **2026-08-11, conteúdo original (diretriz reforçada).** O cliente quer o site
 carregando material autoral de verdade, a começar pela Home: vídeos originais
 do grupo, imagens, PDFs. Regra de trabalho registrada: buscar sempre o material

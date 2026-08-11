@@ -28,21 +28,30 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/cern.css?v=10756b7b89">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=10756b7b89">
+  <link rel="stylesheet" href="assets/css/icons/cern.css?v=8c4ea6da81">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=8c4ea6da81">
 
   <style>
-    /* LHC Status banner */
+    /* LHC Status banner — a pane of glass pulled up over the control-room
+       photograph behind it. The paint and the hairline come from .glass; what
+       is written here is the layout and the overlap. */
+    .lhc-status-band { background: var(--bg-0); padding: var(--sp-8) 0 var(--sp-4); }
+    .lhc-status-backdrop { --frame-ratio: 21 / 9; margin: 0; border-radius: var(--r-xl); }
     .lhc-status-banner {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-mid);
+      position: relative;
+      z-index: 2;
+      --glass-tint: rgba(7, 10, 18, 0.52);
       border-radius: var(--r-xl);
       padding: var(--sp-6) var(--sp-8);
       display: flex;
       align-items: center;
       gap: var(--sp-6);
       flex-wrap: wrap;
-      margin: 0;
+      margin: calc(-1 * var(--sp-20)) var(--sp-6) 0;
+    }
+    @media (max-width: 900px) {
+      .lhc-status-backdrop { --frame-ratio: 16 / 9; }
+      .lhc-status-banner { margin: calc(-1 * var(--sp-10)) var(--sp-3) 0; }
     }
     .lhc-status-dot {
       width: 12px;
@@ -143,24 +152,79 @@
     }
     .lhc-live-link:hover { color: var(--brand); border-color: var(--brand-mid); background: var(--brand-glow); }
 
-    /* Media placeholder */
-    .cern-media-placeholder {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: var(--bg-elevated);
-      border: 1px dashed var(--border-mid);
-      border-radius: var(--r-xl);
+    /* The ring — the hero's figure, drawn on a canvas by cern.js. The labels
+       are HTML projected over it, so the experiments are named in the page's
+       own mono rather than in pixels. */
+    .lhc-ring { position: relative; width: 360px; height: 320px; opacity: 1; }
+    .lhc-ring canvas { display: block; width: 100%; height: 100%; }
+    .lhc-ring-label {
+      position: absolute;
+      top: 0; left: 0;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      will-change: transform;
+      white-space: nowrap;
+    }
+    .lhc-ring-label.is-main { color: var(--brand); font-weight: 600; }
+    @media (max-width: 768px) { .lhc-ring { width: 280px; height: 250px; margin-inline: auto; } }
+
+    /* The descent — written as a plain column of captioned photographs, which
+       is what every reader gets if a single byte of GSAP fails to arrive.
+       cern.js adds .is-live only once ScrollTrigger is confirmed running, and
+       that class is what turns the column into one pinned viewport the scroll
+       descends through. */
+    .cern-descent { background: var(--bg-0); padding: var(--sp-8) 0 0; }
+    .descent-stage { position: relative; }
+    .descent-scene { margin: 0; position: relative; overflow: hidden; }
+    .descent-scene + .descent-scene { margin-top: var(--sp-4); }
+    .descent-scene img { width: 100%; display: block; object-fit: cover; aspect-ratio: 16 / 9; }
+    .descent-plate {
+      position: absolute;
+      left: var(--sp-6);
+      bottom: var(--sp-6);
+      max-width: 46ch;
+      padding: var(--sp-4) var(--sp-5);
+      border-radius: var(--r-lg);
+      --glass-tint: rgba(7, 10, 18, 0.45);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: var(--sp-3);
-      color: var(--text-muted);
+      gap: 4px;
       font-size: var(--text-sm);
-      text-align: center;
+      line-height: 1.6;
+      color: var(--text-primary);
     }
-    .cern-media-placeholder i { font-size: 40px; opacity: 0.4; }
-    .cern-media-placeholder span { opacity: 0.5; font-family: var(--font-mono); }
+    .descent-d { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--brand); font-variant-numeric: tabular-nums; }
+    .descent-meter { display: none; }
+
+    .descent-stage.is-live { height: 100svh; }
+    .is-live .descent-scene { position: absolute; inset: 0; margin: 0; }
+    .is-live .descent-scene img { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; }
+    .is-live .descent-plate { bottom: var(--sp-10); }
+    /* The depth, counted in the margin while the scroll travels it. Mono
+       because it is measured, tabular so the digits hold still. */
+    .is-live .descent-meter {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-2);
+      position: absolute;
+      top: 50%;
+      right: var(--sp-8);
+      transform: translateY(-50%);
+      z-index: 3;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: var(--text-3xl);
+      color: var(--text-primary);
+      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
+    }
+    .descent-meter-unit { font-size: var(--text-sm); color: var(--text-muted); }
+    @media (max-width: 640px) {
+      .descent-plate { left: var(--sp-3); right: var(--sp-3); bottom: var(--sp-3); max-width: none; }
+      .is-live .descent-plate { bottom: var(--sp-6); }
+      .is-live .descent-meter { top: var(--sp-16); right: var(--sp-4); transform: none; font-size: var(--text-2xl); }
+    }
 
     /* Pure grid — horizontal rails always come from an enclosing .container */
     .cern-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-12); align-items: start; }
@@ -232,19 +296,28 @@
             </p>
             <div class="fade-up" style="margin-top:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           </div>
-          <figure class="page-hero-accent" aria-hidden="true">
-            <img src="assets/images/undraw/undraw_space-exploration_dhu1.svg" alt="" width="260" height="165" loading="lazy" onerror="this.parentElement.style.display='none'">
-          </figure>
+          <!-- The LHC as a figure, drawn by three.js in cern.js: two beam
+               pipes, the four experiments at their real stations, two bunches
+               meeting at ATLAS once a lap and at CMS half a lap later. -->
+          <div class="page-hero-accent lhc-ring" id="lhc-ring" aria-hidden="true">
+            <canvas id="lhc-ring-canvas"></canvas>
+          </div>
         </div>
       </div>
     </header>
 
     <!-- ======================================================
-         LHC STATUS BANNER
+         LHC STATUS BANNER — a pane of glass over the ATLAS control room,
+         which is where these numbers are watched for real. The one place on
+         this page where glass earns its keep: there is a photograph behind
+         it worth blurring.
          ====================================================== -->
-    <div style="background:var(--bg-0);padding:var(--sp-8) 0 var(--sp-4)">
+    <div class="lhc-status-band">
       <div class="container">
-        <div class="lhc-status-banner fade-up" id="lhc-status-banner" aria-label="LHC operational status">
+        <figure class="lhc-status-backdrop frame" aria-hidden="true">
+          <img src="assets/images/cern/atlas-daq.webp" alt="" loading="lazy" decoding="async">
+        </figure>
+        <div class="lhc-status-banner glass fade-up" id="lhc-status-banner" aria-label="LHC operational status">
           <div style="display:flex;align-items:center;gap:var(--sp-3)">
             <div class="lhc-status-dot shutdown" id="lhc-dot"></div>
             <div>
@@ -302,15 +375,50 @@
       </div>
     </div>
 
-    <!-- MEDIA — ATLAS overview image/video placeholder -->
-    <div style="background:var(--bg-0);padding:0 0 var(--sp-12)">
-      <div class="container">
-        <img src="assets/images/cern/atlas-cutaway.webp"
-             alt="ATLAS detector cutaway — all subsystems from inner tracking to muon spectrometer"
-             loading="lazy" class="fade-up"
-             style="width:100%;display:block;border-radius:var(--r-xl);">
+    <!-- ======================================================
+         THE DESCENT — the page's argument is vertical: CERN is a place you
+         go down into. Four photographs pinned to the viewport by GSAP
+         ScrollTrigger (cern.js), the scroll carrying the reader from the
+         Meyrin site at the surface to the TileCal module the laboratory
+         works on, the depth counted in the margin as it happens. Without
+         JavaScript, or under reduced motion, this markup is simply four
+         captioned photographs in a column — the .is-live class that turns
+         it into the pinned version is added only once ScrollTrigger is
+         confirmed running.
+         ====================================================== -->
+    <section class="cern-descent" aria-label="From the surface down to the TileCal module">
+      <div class="descent-stage" id="descent">
+        <figure class="descent-scene">
+          <img src="assets/images/cern/cern-aerial.webp" alt="Aerial view of the CERN Meyrin site near Geneva" loading="lazy" decoding="async">
+          <figcaption class="descent-plate glass">
+            <span class="descent-d">0 m</span>
+            <span data-i18n="cern.descent.surface">The Meyrin site at the surface. Under these fields runs a ring 27 kilometres around.</span>
+          </figcaption>
+        </figure>
+        <figure class="descent-scene">
+          <img src="assets/images/cern/lhc-tunnel.webp" alt="The LHC tunnel with its blue dipole magnets" loading="lazy" decoding="async">
+          <figcaption class="descent-plate glass">
+            <span class="descent-d">−100 m</span>
+            <span data-i18n="cern.descent.tunnel">The LHC tunnel: 1,232 superconducting dipole magnets holding two proton beams at 1.9 K.</span>
+          </figcaption>
+        </figure>
+        <figure class="descent-scene">
+          <img src="assets/images/cern/atlas-cutaway.webp" alt="ATLAS detector cutaway — all subsystems from inner tracking to muon spectrometer" loading="lazy" decoding="async">
+          <figcaption class="descent-plate glass">
+            <span class="descent-d">−100 m</span>
+            <span data-i18n="cern.descent.cavern">The ATLAS cavern at Point 1: 46 metres of detector, 7,000 tonnes, wrapped around the beam.</span>
+          </figcaption>
+        </figure>
+        <figure class="descent-scene">
+          <img src="assets/images/cern/tilecal-module.webp" alt="A TileCal module — steel absorber and scintillating tiles" loading="lazy" decoding="async">
+          <figcaption class="descent-plate glass">
+            <span class="descent-d">−100 m</span>
+            <span data-i18n="cern.descent.tilecal">TileCal, the hadronic calorimeter. This is the instrument NIPS-CERN works on.</span>
+          </figcaption>
+        </figure>
+        <div class="descent-meter" aria-hidden="true"><span id="descent-depth">0</span><span class="descent-meter-unit">m</span></div>
       </div>
-    </div>
+    </section>
 
     <!-- ======================================================
          WHAT IS CERN
@@ -570,10 +678,6 @@
             <img src="assets/images/cern/atlas-trigger.png" alt="ATLAS trigger chain block diagram from 40 MHz input to permanent storage" loading="lazy" style="aspect-ratio:16/9;object-fit:contain;background:#cccdcd;padding:var(--sp-3)">
             <figcaption>ATLAS trigger chain — from 40 MHz LHC crossings to ~3 kHz permanent storage</figcaption>
           </figure>
-          <figure class="cern-img">
-            <img src="assets/images/cern/atlas-daq.webp" alt="ATLAS control room with monitoring screens" loading="lazy" style="aspect-ratio:4/3;object-fit:cover">
-            <figcaption>ATLAS control room — data acquisition and detector monitoring</figcaption>
-          </figure>
         </div>
       </div>
     </section>
@@ -590,10 +694,6 @@
           <h2 class="heading-lg" id="nipscern-contrib-title" data-i18n="cern.nipscern_contribution.title">
             NIPS-CERN's Contribution to ATLAS
           </h2>
-          <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_collaboration.svg -->
-          <figure style="margin:var(--sp-6) auto 0;max-width:260px;opacity:0.65" aria-hidden="true">
-            <img src="assets/images/undraw/undraw_collaboration.svg" alt="" width="260" height="165" loading="lazy" style="max-width:100%;height:auto" onerror="this.parentElement.style.display='none'">
-          </figure>
         </div>
 
         <div class="cern-layout">
@@ -959,7 +1059,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=10756b7b89"></script>
+  <script type="module" src="assets/js/main.min.js?v=8c4ea6da81"></script>
+  <script type="module" src="assets/js/cern.min.js?v=8c4ea6da81"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
@@ -1064,6 +1165,6 @@
     })();
   </script>
 
-  <script src="assets/js/analytics.min.js?v=10756b7b89" defer></script>
+  <script src="assets/js/analytics.min.js?v=8c4ea6da81" defer></script>
 </body>
 </html>
