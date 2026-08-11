@@ -30,11 +30,11 @@
  * is the only literal part, and it turns over when the record is open.
  */
 
-import { t } from './i18n.js?v=b93bdc3cee';
+import { t } from './i18n.js?v=10756b7b89';
 /* Never scrollIntoView({behavior:'smooth'}) on this site: Lenis is driving the
    scroll position from its own ticker and the two animations fight, which
    reads as no scroll at all. scrollToEl asks the library. */
-import { scrollToEl } from './smooth-scroll.js?v=b93bdc3cee';
+import { scrollToEl } from './smooth-scroll.js?v=10756b7b89';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -248,7 +248,7 @@ function mountRoster(grid, members, records) {
     card.setAttribute('aria-expanded', 'true');
     /* Only when it is not already on screen: a record that opens under your
        pointer should not also move the page out from under it. A click on a
-       violet dot in the hero always scrolls, because the record it opened is
+       member dot in the hero always scrolls, because the record it opened is
        three screens away and a panel that opens out of sight opened nothing.
        Through scrollToEl, not scrollIntoView: Lenis holds the scroll position
        and wins any fight with the browser's own smooth scrolling, which is
@@ -322,12 +322,12 @@ function mountNetwork(net) {
   const start = () => {
     if (started) return;
     started = true;
-    import('./network.js?v=b93bdc3cee').then(({ initNetwork }) =>
+    import('./network.js?v=10756b7b89').then(({ initNetwork }) =>
       initNetwork(canvas, { tip: document.getElementById('net-tip'), data: net })
     ).then((api) => {
       if (!api) { stage.classList.add('is-flat'); return; }
       stage.classList.add('is-live');
-      import('./motion.js?v=b93bdc3cee').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
+      import('./motion.js?v=10756b7b89').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
     }).catch(() => stage.classList.add('is-flat'));
   };
 
