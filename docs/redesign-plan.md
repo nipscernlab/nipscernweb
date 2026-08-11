@@ -438,6 +438,32 @@ Saíram os dois unDraw da página. cern.js entrou na lista do hook. As legendas
 da descida foram escritas nativamente nos quatro idiomas. Pendente da Fase 2
 completa: tipografia da prosa, tabelas, FCC e o restante da harmonização.
 
+**2026-08-11, CERN, o pulso.** Segundo elemento marcante da página, e o que
+mais pertence ao grupo: a figura do pulso do TileCal, depois da seção de
+contribuição. A figura gruda enquanto quatro passos passam ao lado, e em cada
+um ela muda: o pulso conformado se desenha (GSAP DrawSVGPlugin), as sete
+amostras a 25 ns caem sobre ele, a colisão seguinte entra em +50 ns e deforma
+tudo, e a amplitude é recuperada. É a linha de pesquisa inteira do laboratório
+em uma imagem.
+
+A forma vem de dado, não de curva inventada em CSS: `tools/build-tilecal-pulse.js`
+gera `data/tilecal-pulse.json` a partir dos parâmetros publicados pela
+Colaboração ATLAS (arXiv:1510.01690), com FWHM de 51 ns conferido contra a
+figura do artigo. A legenda e o credits.html dizem exatamente o que é
+reproduzido e o que não é medido.
+
+Três bugs encontrados no caminho, todos corrigidos:
+
+- `body { overflow-x: hidden }` fazia do body um contêiner de rolagem, e com
+  isso **todo `position: sticky` do site estava morto**, inclusive a coluna de
+  imagens da seção do ATLAS. Trocado por `overflow-x: clip`, que barra a
+  rolagem lateral sem criar scrollport. Conferido em seis combinações de
+  página e largura: nenhuma ganhou rolagem horizontal.
+- `.stagger-children` só definia até o nono filho, então o décimo e o décimo
+  primeiro card de recursos oficiais ficavam em `opacity: 0` para sempre.
+- Os gatilhos dos passos deixavam faixas sem passo ativo; as bordas agora se
+  encontram na mesma linha e sempre há exatamente um ativo.
+
 **2026-08-11, conteúdo original (diretriz reforçada).** O cliente quer o site
 carregando material autoral de verdade, a começar pela Home: vídeos originais
 do grupo, imagens, PDFs. Regra de trabalho registrada: buscar sempre o material
