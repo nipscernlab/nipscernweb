@@ -28,8 +28,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/cern.css?v=0ab64c1b26">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=0ab64c1b26">
+  <link rel="stylesheet" href="assets/css/icons/cern.css?v=e01c482ece">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=e01c482ece">
 
   <style>
     /* LHC Status banner — a pane of glass pulled up over the control-room
@@ -211,20 +211,78 @@
     /* The ring — the hero's figure, drawn on a canvas by cern.js. The labels
        are HTML projected over it, so the experiments are named in the page's
        own mono rather than in pixels. */
-    .lhc-ring { position: relative; width: 360px; height: 320px; opacity: 1; }
-    .lhc-ring canvas { display: block; width: 100%; height: 100%; }
-    .lhc-ring-label {
+    .lhc-ring { position: relative; width: 560px; max-width: 100%; height: 500px; opacity: 1; }
+    /* The canvas holds the machine and the countryside; the mask fades the
+       countryside out before it reaches the box, so the tracings dissolve
+       into the page instead of ending at an edge. The pins and names are
+       HTML on top and stay full strength. */
+    .lhc-ring canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 52%, transparent 98%);
+      mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 52%, transparent 98%);
+    }
+    /* The classic map pin, hanging by its tip over each interaction point.
+       The teardrop is the container in map red; the experiment's mark sits
+       whole and unaltered on the white disc in its head, which is the ground
+       all four were drawn for. */
+    .lhc-ring-badge { position: absolute; top: 0; left: 0; will-change: transform; }
+    .lhc-ring-badge .pin {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      background: #e63946;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+    }
+    .lhc-ring-badge .pin-disc {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      padding: 4px;
+      background: #fff;
+      border-radius: var(--r-full);
+      transform: rotate(45deg);
+    }
+    /* width and height outright, not max-*: a percentage max-height inside a
+       grid cell resolved against nothing here and the 200px-tall source file
+       poured out of the disc. A definite box with object-fit does what the
+       max pair was supposed to. */
+    .lhc-ring-badge img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    /* The one the page is about is bigger and carries the brand, not the map
+       red: this pin is ours. */
+    .lhc-ring-badge.is-main .pin { width: 60px; height: 60px; background: var(--brand); }
+    .lhc-ring-badge.is-main .pin-disc { width: 48px; height: 48px; padding: 5px; }
+    /* Which country the ground belongs to, written the way a map writes it:
+       small caps in the quiet colour, the flag beside the word. */
+    .lhc-ring-country {
       position: absolute;
       top: 0; left: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      will-change: transform;
+      pointer-events: none;
+    }
+    .lhc-ring-country svg { width: 14px; height: 10px; border-radius: 2px; display: block; }
+    .lhc-ring-country i {
+      font-style: normal;
       font-family: var(--font-mono);
       font-size: 10px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.22em;
       color: var(--text-muted);
-      will-change: transform;
-      white-space: nowrap;
     }
-    .lhc-ring-label.is-main { color: var(--brand); font-weight: 600; }
-    @media (max-width: 768px) { .lhc-ring { width: 280px; height: 250px; margin-inline: auto; } }
+    @media (max-width: 768px) {
+      .lhc-ring { width: 340px; height: 300px; margin-inline: auto; }
+      .lhc-ring-badge .pin { width: 34px; height: 34px; }
+      .lhc-ring-badge .pin-disc { width: 26px; height: 26px; padding: 3px; }
+      .lhc-ring-badge.is-main .pin { width: 44px; height: 44px; }
+      .lhc-ring-badge.is-main .pin-disc { width: 34px; height: 34px; padding: 4px; }
+    }
 
     /* The descent — written as a plain column of captioned photographs, which
        is what every reader gets if a single byte of GSAP fails to arrive.
@@ -373,8 +431,12 @@
          ====================================================== -->
     <div class="lhc-status-band">
       <div class="container">
-        <figure class="lhc-status-backdrop frame" aria-hidden="true">
-          <img src="assets/images/cern/atlas-daq.webp" alt="" loading="lazy" decoding="async">
+        <!-- The photograph drifts inside its frame and the glass pane rides a
+             few pixels against it, which is the site's declarative parallax:
+             data-drift for a clipped medium, data-drift-px for a block, both
+             run by motion.js and both nothing at all under reduced motion. -->
+        <figure class="lhc-status-backdrop frame" data-drift-frame aria-hidden="true">
+          <img src="assets/images/cern/atlas-daq.webp" alt="" loading="lazy" decoding="async" data-drift="6" style="height:118%">
         </figure>
         <div class="lhc-status-banner glass fade-up" id="lhc-status-banner" aria-label="LHC operational status">
           <div style="display:flex;align-items:center;gap:var(--sp-3)">
@@ -1113,8 +1175,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=0ab64c1b26"></script>
-  <script type="module" src="assets/js/cern.min.js?v=0ab64c1b26"></script>
+  <script type="module" src="assets/js/main.min.js?v=e01c482ece"></script>
+  <script type="module" src="assets/js/cern.min.js?v=e01c482ece"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
@@ -1219,6 +1281,6 @@
     })();
   </script>
 
-  <script src="assets/js/analytics.min.js?v=0ab64c1b26" defer></script>
+  <script src="assets/js/analytics.min.js?v=e01c482ece" defer></script>
 </body>
 </html>

@@ -82,7 +82,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/index.css?v=0ab64c1b26">
+  <link rel="stylesheet" href="assets/css/icons/index.css?v=e01c482ece">
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -196,8 +196,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.min.css?v=0ab64c1b26" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=0ab64c1b26"></noscript>
+  <link rel="preload" href="assets/css/main.min.css?v=e01c482ece" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=e01c482ece"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -325,10 +325,16 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
            width="423" height="880" decoding="async"
            onerror="this.closest('.stargazer').style.display='none'">
       <figcaption class="stargazer-note" data-i18n="home.sky.note_plain">The sky above him is the real one: every star the unaided eye can reach, each where it actually is. What changes on every visit is the direction you are looking.</figcaption>
-      <!-- Same sentence with a slot for the visitor count. It sits in the DOM so
-           the i18n pass keeps it in the current language for free; the script at
-           the end of the page swaps it in once the count arrives. -->
-      <template id="sky-note-tpl"><span data-i18n="home.sky.note">The sky above him is the real one: every star the unaided eye can reach, each where it actually is. What is drawn fresh on every visit is the direction you are looking. Of the {n} people who have been here, not one got this view.</span></template>
+      <!-- Same sentence with a slot for the visitor count, carried by a hidden
+           span rather than a <template>. The comment above used to claim the
+           i18n pass kept this in the current language for free, and it did not:
+           a template's content is an inert fragment, and querySelectorAll does
+           not reach inside it. So this string was never translated, and the
+           moment the visitor count arrived it overwrote the translated caption
+           with English, in every language, for good. A hidden element is in the
+           document, gets translated like everything else, and is the same
+           pattern the pause button's two labels already use below. -->
+      <span hidden id="sky-note-tpl" data-i18n="home.sky.note">The sky above him is the real one: every star the unaided eye can reach, each where it actually is. What is drawn fresh on every visit is the direction you are looking. Of the {n} people who have been here, not one got this view.</span>
     </figure>
 
     <!-- ======================================================
@@ -541,8 +547,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
            Video by Nicola Narracci, from Pexels. Credited in credits.html. -->
       <div class="cube-rail" aria-hidden="true">
         <video muted loop playsinline preload="none" width="720" height="1280"
-               poster="assets/images/about-light-waves-poster.webp?v=0ab64c1b26"
-               data-src="assets/videos/about-light-waves-loop.mp4?v=0ab64c1b26"></video>
+               poster="assets/images/about-light-waves-poster.webp?v=e01c482ece"
+               data-src="assets/videos/about-light-waves-loop.mp4?v=e01c482ece"></video>
       </div>
 
       <div class="container">
@@ -710,8 +716,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/sapho" class="pc-card pc-card--dark" style="--pc:var(--accent-sapho)">
             <div class="pc-media pc-media--sapho" aria-hidden="true">
               <video data-media="sapho-loop"
-                     data-src="assets/videos/sapho-circuit-loop.mp4?v=0ab64c1b26"
-                     poster="assets/images/projects/sapho-circuit-poster.webp?v=0ab64c1b26"
+                     data-src="assets/videos/sapho-circuit-loop.mp4?v=e01c482ece"
+                     poster="assets/images/projects/sapho-circuit-poster.webp?v=e01c482ece"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -766,9 +772,9 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    be indistinguishable — for 435 KB less. The H.264 is what
                    every browser without an AV1 decoder gets, unchanged. -->
               <video data-media="aurora-loop"
-                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=0ab64c1b26"
-                     data-src="assets/videos/aurora-borealis-loop.mp4?v=0ab64c1b26"
-                     poster="assets/images/projects/aurora-borealis-poster.webp?v=0ab64c1b26"
+                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=e01c482ece"
+                     data-src="assets/videos/aurora-borealis-loop.mp4?v=e01c482ece"
+                     poster="assets/images/projects/aurora-borealis-poster.webp?v=e01c482ece"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -826,8 +832,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    the old one. v2 is already live and cached, hence v3. -->
               <video data-media="cgv-loop"
                      data-src="https://cdn.nipscern.com/videos/cgv-geometry-loop-v6.mp4"
-                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=0ab64c1b26"
-                     poster="assets/images/projects/cgv-geometry-poster.webp?v=0ab64c1b26"
+                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=e01c482ece"
+                     poster="assets/images/projects/cgv-geometry-poster.webp?v=e01c482ece"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -860,8 +866,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/ai" class="pc-card" style="--pc:var(--accent-ai)">
             <div class="pc-media pc-media--ai" aria-hidden="true">
               <video data-media="ai-loop"
-                     data-src="assets/videos/ai-hand-loop.mp4?v=0ab64c1b26"
-                     poster="assets/images/projects/ai-hand-poster.webp?v=0ab64c1b26"
+                     data-src="assets/videos/ai-hand-loop.mp4?v=e01c482ece"
+                     poster="assets/images/projects/ai-hand-poster.webp?v=e01c482ece"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -916,7 +922,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.min.js?v=0ab64c1b26";
+    import { sky } from "./assets/js/sky.min.js?v=e01c482ece";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -1045,8 +1051,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        114 KB of parsing should not happen for them either. Everything else is
        unchanged — it still arrives well after first paint, because home.js is a
        module and modules run after the document is parsed. -->
-  <script type="module" src="assets/js/main.min.js?v=0ab64c1b26"></script>
-  <script type="module" src="assets/js/home.min.js?v=0ab64c1b26"></script>
+  <script type="module" src="assets/js/main.min.js?v=e01c482ece"></script>
+  <script type="module" src="assets/js/home.min.js?v=e01c482ece"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -1080,7 +1086,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       var note = document.querySelector('.stargazer-note');
       if (!note || !total) return;
       var t = document.getElementById('sky-note-tpl');
-      var tpl = t && t.content.firstElementChild && t.content.firstElementChild.textContent;
+      var tpl = t && t.textContent;
       if (!tpl) return;
       note.innerHTML = tpl.replace('{n}', '<b>' + total.toLocaleString() + '</b>');
     }
@@ -1094,6 +1100,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.min.js?v=0ab64c1b26" defer></script>
+  <script src="assets/js/analytics.min.js?v=e01c482ece" defer></script>
 </body>
 </html>
