@@ -26,7 +26,7 @@
  * wrote and the one every reader keeps if a single byte fails to arrive.
  */
 
-import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=afaaa0354b';
+import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=24489d9334';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -156,7 +156,7 @@ const IPS = [
 ];
 
 const R = 1.18;
-const LAP = 3.5;             /* seconds per lap, so a slot every 440 ms */
+const LAP = 4.6;             /* seconds per lap, so a slot every 575 ms */
 
 /* The filling scheme, scaled down to something an eye can count.
    ------------------------------------------------------------------
@@ -188,9 +188,45 @@ const FILLED = [1, 1, 1, 1, 0, 1, 0, 1];
 const SLOT_A = (Math.PI * 2) / NSLOTS;
 const BUNCH_TRAIL = 5;       /* points drawn behind each bunch */
 
-/* A bunch's place on the ring at angle a, in the ring's own plane. Angle 0 is
-   Point 1, put at the bottom of the figure, nearest the reader. */
+/* A place on the ring at angle a, in the ring's own plane. Angle 0 is Point 1,
+   put at the bottom of the figure, nearest the reader, and the angle grows
+   anticlockwise, which is beam 2's direction: by the LHC's own convention
+   beam 1 runs clockwise seen from above, and above is where this figure
+   stands. That convention is the reason the points are numbered the way they
+   are round this circle, and the reason LHCb's arm points where it does. */
 const onRing = (a, out) => out.set(R * Math.sin(a), -R * Math.cos(a), 0);
+
+/* Two pipes, not one.
+   ------------------------------------------------------------------
+   The LHC carries its two beams in two separate vacuum pipes for almost the
+   whole 27 km and brings them into one common pipe only around the four
+   interaction points, which is the reason collisions happen at those four
+   places and nowhere else, however often the bunches pass each other in
+   between. Drawing the machine as a single tube throws that away and leaves
+   the reader with beams that mysteriously ignore each other everywhere but
+   four spots. So the pipe here separates in the arcs and closes at the
+   points, and each beam rides its own side. */
+const SEP = 0.03;            /* half the gap between the two pipes, in the arcs */
+const MERGE = 0.42;          /* radians either side of a point where they close */
+
+/* How far apart the pipes are at angle a: shut at every interaction point,
+   open in the arcs, with a smooth step between so the two lines glide
+   together instead of hinging. */
+function pipeGap(a, ipAngles) {
+  let near = Math.PI;
+  for (const t of ipAngles) {
+    let d = Math.abs(((a - t + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+    if (d < near) near = d;
+  }
+  if (near >= MERGE) return SEP;
+  const t = near / MERGE;
+  return SEP * t * t * (3 - 2 * t);
+}
+
+const onPipe = (a, side, ipAngles, out) => {
+  const r = R + side * pipeGap(a, ipAngles);
+  out.set(r * Math.sin(a), -r * Math.cos(a), 0);
+};
 
 /* One collision drawn the way the event displays draw it: tracks, not
    sparks. Charged particles bend in the magnetic field and are painted
@@ -230,11 +266,8 @@ function makeEvent(THREE, nTracks, scale, cone) {
   return {
     obj: group,
     life: 1,
-    /* fits(x, y, z) says whether a point still lands inside the canvas. A
-       track that reaches the boundary simply ends there, the way a real
-       event display ends a track at the edge of the detector, instead of
-       being sliced by the edge of the picture. */
-    fire(origin, fits) {
+    /* One crossing, thrown from the point it happened at. */
+    fire(origin) {
       for (const line of tracks) {
         const r = Math.random();
         const kind = r < 0.55 ? 'charged'
@@ -266,30 +299,19 @@ function makeEvent(THREE, nTracks, scale, cone) {
         const zDrift = (Math.random() - 0.5) * 0.7;
         /* A muon is the one that reaches the far side of everything; a photon
            stops where the electromagnetic calorimeter stops it. */
-        let L = scale * (kind === 'muon' ? 1.6 + Math.random() * 0.8
+        const L = scale * (kind === 'muon' ? 1.6 + Math.random() * 0.8
           : kind === 'photon' ? 0.32 + Math.random() * 0.22
             : 0.5 + Math.random() * 0.9);
         const curv = kind === 'charged'
           ? (Math.random() < 0.5 ? -1 : 1) * (1.4 + Math.random() * 2.6) / scale
           : 0;
-        /* First walk the intended length dry to see how much of it stays in
-           frame, then draw the whole track at the length that fits. A track
-           the picture cannot hold is thrown shorter, not chopped: it keeps
-           its curvature, its head, its taper, and ends in mid-air the way a
-           soft track does, instead of dying on an invisible wall at the
-           canvas edge. */
-        if (fits) {
-          const step = L / SEG;
-          let a = phi, x = origin.x, y = origin.y, z = origin.z, n = SEG;
-          for (let s = 1; s <= SEG; s++) {
-            x += Math.cos(a) * step;
-            y += Math.sin(a) * step;
-            z += zDrift * step * 0.4;
-            a += curv * step;
-            if (!fits(x, y, z)) { n = s - 1; break; }
-          }
-          if (n < SEG) L = Math.max(L * (n / SEG) * 0.9, scale * 0.2);
-        }
+        /* A track that runs out of the picture runs out of the picture. An
+           earlier version measured the frame first and threw the track
+           shorter so nothing was ever cut, and the cost of that was a lie:
+           the sprays nearest an edge came out lopsided, all of them bending
+           away from the boundary, and LHCb's arm had to be aimed at whatever
+           side the canvas could hold rather than at the side the machine
+           points. Direction is the fact here; the edge of a picture is not. */
         const pos = line.geometry.attributes.position;
         const step = L / SEG;
         let a = phi, x = origin.x, y = origin.y, z = origin.z;
@@ -308,7 +330,7 @@ function makeEvent(THREE, nTracks, scale, cone) {
     },
     step(dt) {
       if (!group.visible) return;
-      this.life += dt / 1.05;
+      this.life += dt / 0.95;
       if (this.life >= 1) { group.visible = false; return; }
       /* The tracks race out in the first third of the life and the whole
          event holds, then dies quickly: an event display frame, not a
@@ -331,7 +353,7 @@ async function mountRing() {
 
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=afaaa0354b');
+    THREE = await import('./vendor/three.module.min.js?v=24489d9334');
   } catch (e) {
     /* No module, no figure. Removing the node collapses the hero to one
        column, which the grid already knows how to be. */
@@ -502,26 +524,42 @@ async function mountRing() {
      carries. Draw order is stated with renderOrder instead — pipe first,
      beams and events over it — which is the answer three.js gives for
      transparent things that share a position. */
-  /* Held down to a wall's brightness: the tube used to be painted nearly
-     white, and a near-white bunch over a near-white pipe is invisible — the
-     glow belongs to the beam, not to the plumbing that carries it. */
-  const pipe = new THREE.Mesh(
-    new THREE.TorusGeometry(R, 0.013, 10, 220),
-    new THREE.MeshBasicMaterial({
-      color: new THREE.Color(0.34, 0.48, 0.76), transparent: true, opacity: 0.55,
-      depthWrite: false,
-    })
-  );
+  /* Held down to a wall's brightness: a near-white bunch over a near-white
+     pipe is invisible, and the glow belongs to the beam and not to the
+     plumbing that carries it. Each pipe is a tube swept along its own curve,
+     so the pair opens through the arcs and shuts at the four points. */
+  const ipAngles = IPS.map((ip) => ip.angle);
+  const pipeCurve = (side) => {
+    const pts = [];
+    const p = new THREE.Vector3();
+    for (let i = 0; i < 320; i++) {
+      onPipe((i / 320) * Math.PI * 2, side, ipAngles, p);
+      pts.push(p.clone());
+    }
+    return new THREE.CatmullRomCurve3(pts, true, 'catmullrom', 0.5);
+  };
+  for (const side of [1, -1]) {
+    const wall = new THREE.Mesh(
+      new THREE.TubeGeometry(pipeCurve(side), 320, 0.009, 6, true),
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color(0.36, 0.5, 0.78), transparent: true, opacity: 0.62,
+        depthWrite: false,
+      })
+    );
+    wall.renderOrder = 1;
+    tilt.add(wall);
+  }
+  /* One faint halo over both, which is the cryostat they share: the two
+     pipes are 194 mm apart inside one cold mass, not two machines. */
   const pipeGlow = new THREE.Mesh(
-    new THREE.TorusGeometry(R, 0.04, 10, 220),
+    new THREE.TorusGeometry(R, 0.045, 8, 200),
     new THREE.MeshBasicMaterial({
-      color: new THREE.Color(0.22, 0.4, 0.75), transparent: true, opacity: 0.3,
+      color: new THREE.Color(0.2, 0.36, 0.7), transparent: true, opacity: 0.16,
       blending: THREE.AdditiveBlending, depthWrite: false,
     })
   );
-  pipe.renderOrder = 1;
   pipeGlow.renderOrder = 1;
-  tilt.add(pipe, pipeGlow);
+  tilt.add(pipeGlow);
 
   /* The four experiments, at their stations. ATLAS carries the brand at full
      strength; the other three are the same blue held down, exactly the wall
@@ -557,15 +595,6 @@ async function mountRing() {
     return { obj, dir };
   });
 
-  /* Where the canvas ends, in the machine's own coordinates: a point projects
-     through the tilt and the camera, and 0.97 leaves a couple of pixels so a
-     clamped track ends at the edge rather than under it. */
-  const fitV = new THREE.Vector3();
-  const fits = (x, y, z) => {
-    fitV.set(x, y, z).applyMatrix4(tilt.matrixWorld).project(camera);
-    return Math.abs(fitV.x) < 0.97 && Math.abs(fitV.y) < 0.97;
-  };
-
   /* One station per experiment, each with the event its machine actually
      sees. Every one of the four is fed by the same train and every one of
      them collides; what differs is how much of it each is allowed to take.
@@ -584,14 +613,17 @@ async function mountRing() {
     onRing(ip.angle, pos);
     const spec = {
       ATLAS: { n: 30, scale: 0.52, level: 1, pool: 2 },
-      CMS: { n: 26, scale: 0.46, level: 1, pool: 2 },
-      /* The cone runs along the beam line, which at this station is the
-         tangent, and it is drawn on the side the frame can hold: pointed the
-         other way it leaves the canvas within a centimetre and every track
-         comes back a stub. Which of the two directions the real arm follows
-         is a fact about the cavern this figure does not claim. */
-      LHCb: { n: 14, scale: 0.42, level: 0.34, pool: 1, cone: { at: ip.angle + Math.PI, half: 0.3 } },
-      ALICE: { n: 46, scale: 0.3, level: 0.2, pool: 1 },
+      CMS: { n: 24, scale: 0.44, level: 0.85, pool: 2 },
+      /* The arm points where the real one points, and the chain is short.
+         LHCb's z axis runs from the crossing toward the muon stations;
+         beam 1 is the beam codirectional with that z; and beam 1 runs
+         clockwise seen from above, which is where this figure stands. So at
+         Point 8 the spray leaves along the clockwise tangent, which is the
+         way round toward Point 1, and that is ip.angle + pi here because the
+         angle in this figure grows the other way. The numbering agrees:
+         beam 1 goes 8 to 1, and on this circle that is 45 degrees to 0. */
+      LHCb: { n: 14, scale: 0.46, level: 0.34, pool: 1, cone: { at: ip.angle + Math.PI, half: 0.26 } },
+      ALICE: { n: 44, scale: 0.3, level: 0.18, pool: 1 },
     }[ip.name];
     const events = [];
     for (let i = 0; i < spec.pool; i++) {
@@ -674,23 +706,27 @@ async function mountRing() {
   resize();
 
   const v = new THREE.Vector3();
-  /* The whole train at a phase: a bunch per filled slot, each dragging its
-     short tail behind it in the direction it travels. The heads scintillate,
-     brightness thrown fresh every frame, and each one on its own so the train
-     shimmers rather than blinking in unison. */
+  /* The whole train at a phase: a bunch per filled slot, each riding its own
+     pipe and dragging a short tail behind it. The two trains therefore drift
+     apart through the arcs and come together at the four points, which is
+     where they are allowed to meet.
+
+     The heads used to have their brightness thrown fresh every frame. It
+     looked like sparkle and said nothing, so it is gone: a bunch is a steady
+     thing, and the only movement in this figure is now movement something is
+     actually doing. */
   function setBeam(beam, phase) {
     const pos = beam.obj.geometry.attributes.position;
     const col = beam.obj.geometry.attributes.color;
     let n = 0;
     for (const s of SLOTS) {
       const head = phase + s * SLOT_A;
-      const tw = 0.7 + Math.random() * 0.5;
       for (let i = 0; i < BUNCH_TRAIL; i++) {
-        onRing(head - beam.dir * i * 0.028, v);
+        onPipe(head - beam.dir * i * 0.026, beam.dir, ipAngles, v);
         pos.setXYZ(n, v.x, v.y, v.z);
-        if (!i) col.setXYZ(n, Math.min(1, 1.4 * tw), Math.min(1, 1.4 * tw), Math.min(1, 1.5 * tw));
+        if (!i) col.setXYZ(n, 1, 1, 1);
         else {
-          const k = (1 - i / BUNCH_TRAIL) * 0.9;
+          const k = (1 - i / BUNCH_TRAIL) * 0.85;
           col.setXYZ(n, BEAM[0] * k, BEAM[1] * k, BEAM[2] * k);
         }
         n++;
@@ -707,8 +743,8 @@ async function mountRing() {
      it. Half a slot apart so both are visible rather than one hiding inside
      the other. */
   if (REDUCED) {
-    setBeam(beams[0], 0);
-    setBeam(beams[1], SLOT_A / 2);
+    setBeam(beams[0], SLOT_A * 0.42);
+    setBeam(beams[1], -SLOT_A * 0.42);
     tilt.updateMatrixWorld(true);
     renderer.render(scene, camera);
     placeLabels(w, h);
@@ -739,7 +775,7 @@ async function mountRing() {
         const s2 = ((st.q + tick) % NSLOTS + NSLOTS) % NSLOTS;
         if (!FILLED[s1] || !FILLED[s2]) continue;
         if (st.level < 1 && Math.random() > st.level) continue;
-        st.events[st.next].fire(st.pos, fits);
+        st.events[st.next].fire(st.pos);
         st.next = (st.next + 1) % st.events.length;
       }
     }
