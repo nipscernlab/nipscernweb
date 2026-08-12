@@ -16,14 +16,6 @@ que falta e o que acabou de ser feito, para retomar sem arqueologia.
       260–660); o markup dos cards vive inline no `index.html` (~687–870).
       A página Projects de hoje é o template antigo de cards com ícone.
 
-- [ ] **Logos dos experimentos: pedir permissão formal.**
-      Os logos de ATLAS, CMS, ALICE e LHCb no hero do CERN estão como TESTE.
-      As diretrizes do CERN exigem aprovação prévia para uso por terceiros e
-      proíbem modificar as marcas (por isso estão inteiras, em discos
-      brancos). Ação do grupo, não do código: encaminhar o pedido às
-      colaborações. Referências: design-guidelines.web.cern.ch e
-      atlas.cern/design.
-
 - [ ] **CERN, resto da Fase 2.**
       Harmonizar prosa, tabelas e tipografia restantes com o sistema
       (Bodoni/Geist/Plex Mono), revisar as seções que não foram tocadas.
@@ -40,6 +32,74 @@ que falta e o que acabou de ser feito, para retomar sem arqueologia.
       cdn.nipscern.com.
 
 ---
+
+## Feito em 2026-08-11, segunda rodada no hero do CERN
+
+- [x] **Pins: seções dos detectores no lugar dos logos.** Os quatro pins
+      passaram por logos, depois por fotos das cavernas (poluídas a 40 px), e
+      agora são vigias abertas na página: cortes das próprias máquinas nos
+      raios publicados, desenhados por `tools/build-experiment-figures.js`.
+      ATLAS, CMS e ALICE em seção transversal, LHCb de lado porque é
+      espectrômetro frontal. Sem disco branco: o SVG é o círculo inteiro,
+      escuro como a página, com uma linha azul fina na borda como todo o
+      contorno. Duas regras seguram o conjunto: o ímã é o que faz cada máquina
+      ter uma forma diferente, então o ímã é a única coisa quente em cada
+      figura; e toda figura tem traços saindo do cruzamento, porque detector
+      sem evento dentro é desenho de buraco (a ALICE tem quarenta, que é o que
+      um evento chumbo-chumbo parece). Isso **encerra o pedido de permissão de
+      uso das marcas**: o hero não usa mais logo nenhum. Os arquivos dos logos
+      ficam no disco (`atlas.webp` e companhia) e trocar os nomes em `IPS`
+      volta atrás, mas aí o pedido às colaborações renasce. Cada pin ganhou o
+      nome embaixo, em mono, com o do ATLAS no azul da própria borda. Os
+      traços saem em quatro cores de croma cheio (âmbar, vermelho, ciano,
+      verde), as mesmas que o anel usa nas colisões, então quem vê o evento
+      disparar no Ponto 1 e depois olha o pin lê uma paleta só. Verificado por
+      medição, não por opinião: nenhum pixel branco sobrou, croma médio de
+      0,42 a 0,53 nos pixels acesos, cada figura tem o seu ímã e a sua borda
+      azul, e as quatro são distintas entre si (RMS 55 a 77 em 255).
+- [x] **ALICE e LHCb estavam trocados de lado no anel.** Erro de fato, não de
+      gosto: o Ponto 2 (ALICE) fica sob Saint-Genis-Pouilly, a oeste do sítio
+      de Meyrin, e o Ponto 8 (LHCb) sob Ferney-Voltaire, a leste, perto do
+      aeroporto. Como o ângulo corre anti-horário a partir de baixo nesta
+      figura, ALICE é o octante negativo e LHCb o positivo. Conferido passando
+      a posição de cada pin pelas vias de fronteira do `meyrin-map.json`: o
+      ATLAS cai do lado suíço e os outros três do francês, que é o que o chão
+      diz. O classificador por paridade só funciona com âncora local (Meyrin);
+      com raio longo até a borda da bbox ele erra, porque a fronteira é
+      cortada pelo quadro e o raio escapa pelo buraco.
+- [x] **Traçados do mapa suavizados.** As poligonais chegam do OSM
+      simplificadas a 60 m, e cada curva era uma quina. Passam por corte de
+      cantos de Chaikin antes de desenhar, 3 vezes na fronteira e 2 na água,
+      mantendo as pontas onde o levantamento diz que estão.
+- [x] **Fronteira: tentativa desfeita, fica a linha fina.** Ela chegou a ser
+      reconstruída como malha (um quad por traço, com corredor contínuo por
+      baixo) para ficar impossível de perder. Ficou impossível de perder e
+      errada: a medida diz que a fronteira passou a ocupar tanto pixel quanto
+      toda a água do mapa junta, e o chão virou o assunto no lugar da máquina.
+      Voltou à tracejada fina de sempre, com rios e riachos na intensidade
+      anterior. O leitor acha a fronteira porque ela é tracejada e porque
+      FRANCE e SUISSE estão escritos dos dois lados, não porque ela grita.
+- [x] Bandeira do país na legenda de cada pin, com os mesmos SVGs oficiais que
+      os rótulos FRANCE e SUISSE usam no chão. O ATLAS é o único dos quatro na
+      Suíça, e é o que este laboratório trabalha.
+- [x] Créditos: a entrada dos logos virou a das seções, nos 4 idiomas.
+- [x] Feixe visível no tubo: a parede do toro escrevia no depth buffer e
+      ocultava os prótons que correm na sua linha de centro. `depthWrite:false`
+      mais `renderOrder` explícito (tubo, dots, feixes/eventos); tubo
+      escurecido e cabeça do bunch cintilando. Volta de 3 s para 2 s.
+- [x] Trajetórias não são mais cortadas: cada trilha faz uma caminhada seca
+      pelo frustum antes de ser desenhada e é **reescalada** para caber, em
+      vez de bater numa parede invisível na borda. Canvas mais alto e câmera
+      recuada. Cores mais quentes, com uma temperatura sorteada por trilha.
+- [x] Mapa maior e sem borda cortada: bbox do OSM ampliado (~15 km do centro),
+      e o fade deixou de ser elipse fixa em CSS — cada vértice é projetado
+      pela câmera e some perto da borda real do quadro, com os segmentos
+      longos subdivididos para o fade chegar a zero antes dela. A fronteira
+      ficou a linha mais forte do chão, que é o que diz quem está na Suíça e
+      quem está na França.
+- [x] Parallax do banner: a folga de 18% da foto agora fica metade acima e
+      metade abaixo (`top:-9%`), senão a borda reta da imagem entrava no
+      quadro arredondado no extremo do drift.
 
 ## Feito em 2026-08-11
 

@@ -23,7 +23,7 @@
  * wrote and the one every reader keeps if a single byte fails to arrive.
  */
 
-import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=63799f47d6';
+import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=dc95fb84c8';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -77,6 +77,31 @@ function dotTexture(THREE) {
   return tex;
 }
 
+/* Chaikin's corner cutting. The ways arrive from OpenStreetMap simplified to
+   sixty metres, which is the right tolerance for a file that has to be
+   downloaded and the wrong one for a line that is then drawn two pixels
+   thick: every bend in the border was a visible corner. Cutting each corner
+   twice replaces it with a pair of points a quarter of the way in, which is
+   the same curve a draughtsman gets by leaning on the spline, and costs a
+   few thousand vertices once at load. The endpoints are kept, so a way still
+   starts and ends where the survey says it does. */
+function smooth(pts, iters) {
+  let out = pts;
+  for (let it = 0; it < iters && out.length > 2; it++) {
+    const next = [out[0]];
+    for (let i = 0; i < out.length - 1; i++) {
+      const a = out[i], b = out[i + 1];
+      next.push(
+        [a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25],
+        [a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75]
+      );
+    }
+    next.push(out[out.length - 1]);
+    out = next;
+  }
+  return out;
+}
+
 function pointsObj(THREE, count, size, tex, opacity) {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(count * 3), 3));
@@ -93,19 +118,42 @@ function pointsObj(THREE, count, size, tex, opacity) {
   }));
 }
 
-/* Where the experiments actually are. Angles around the ring measured from
-   Point 1: the LHC has eight points, ATLAS at 1, ALICE at 2, CMS at 5 — dead
-   opposite ATLAS, which is why two bunches launched together meet at both —
-   and LHCb at 8, one octant the other side. */
+/* Where the experiments actually are, and which country each one is under.
+   Angles around the ring measured from Point 1: the LHC has eight points,
+   ATLAS at 1, ALICE at 2, CMS at 5 — dead opposite ATLAS, which is why two
+   bunches launched together meet at both — and LHCb at 8, one octant the
+   other side.
+
+   Which octant is which side matters, and the first version had it backwards:
+   ALICE sits at Point 2 under Saint-Genis-Pouilly, west of the Meyrin site,
+   and LHCb at Point 8 under Ferney-Voltaire, east of it by the airport. In
+   this figure the angle runs anticlockwise from the bottom, so ALICE is the
+   negative octant and LHCb the positive one, not the other way round.
+
+   The countries are the municipalities the four caverns are in, and they are
+   checked against the drawn border rather than asserted: putting each pin's
+   position through the France-Switzerland ways in data/meyrin-map.json puts
+   ATLAS on the Swiss side and the other three on the French, which is what
+   the ground says. ATLAS is the only one of the four in Switzerland, and it
+   is the one this laboratory works on. */
+/* Each pin carries a section through the machine itself, drawn at its real
+   radii by tools/build-experiment-figures.js: three barrels around a
+   collision and, for LHCb, the forward spectrometer standing beside one. The
+   magnet is the only thing in colour in each, because the magnet is what
+   makes the four of them different shapes. Figures rather than logos on
+   purpose — a mark is a trademark to ask permission for, and at this size it
+   says the name the pin already carries instead of saying what the machine
+   is. The logos stay on disk beside them (atlas.webp and the rest), so
+   swapping the file names here swaps the identity system back. */
 const IPS = [
-  { name: 'ATLAS', file: 'atlas.webp', angle: 0, main: true },
-  { name: 'ALICE', file: 'alice.webp', angle: Math.PI / 4 },
-  { name: 'CMS', file: 'cms.webp', angle: Math.PI },
-  { name: 'LHCb', file: 'lhcb.webp', angle: -Math.PI / 4 },
+  { name: 'ATLAS', file: 'atlas-figure.svg', angle: 0, main: true, flag: 'ch' },
+  { name: 'ALICE', file: 'alice-figure.svg', angle: -Math.PI / 4, flag: 'fr' },
+  { name: 'CMS', file: 'cms-figure.svg', angle: Math.PI, flag: 'fr' },
+  { name: 'LHCb', file: 'lhcb-figure.svg', angle: Math.PI / 4, flag: 'fr' },
 ];
 
 const R = 1.18;
-const LAP = 3;               /* seconds per lap, so ATLAS lights every 3 s */
+const LAP = 2;               /* seconds per lap, so ATLAS lights every 2 s */
 const TRAIL = 22;
 
 /* A bunch's place on the ring at angle a, in the ring's own plane. Angle 0 is
@@ -119,10 +167,15 @@ const onRing = (a, out) => out.set(R * Math.sin(a), -R * Math.cos(a), 0);
    tenths of a second, which is the grammar CGVWeb and the ATLAS displays
    use. The pool of lines is reused; only their shapes are thrown again at
    each crossing. */
+/* The same four colours the pins are drawn with, so the collision that fires
+   at Point 1 and the section inside the ATLAS pin are one palette rather than
+   two. Kept at full chroma: under additive blending anything less turns to
+   pastel the moment two tracks cross. */
 const TRACK_COLORS = {
-  charged: [1.0, 0.72, 0.25],
-  muon: [0.95, 0.3, 0.32],
-  neutral: [0.45, 0.85, 1.0],
+  charged: [1.0, 0.76, 0.12],
+  muon: [1.0, 0.23, 0.36],
+  neutral: [0.13, 0.88, 1.0],
+  photon: [0.24, 0.94, 0.54],
 };
 
 function makeEvent(THREE, nTracks, scale) {
@@ -145,22 +198,58 @@ function makeEvent(THREE, nTracks, scale) {
   return {
     obj: group,
     life: 1,
-    fire(origin) {
+    /* fits(x, y, z) says whether a point still lands inside the canvas. A
+       track that reaches the boundary simply ends there, the way a real
+       event display ends a track at the edge of the detector, instead of
+       being sliced by the edge of the picture. */
+    fire(origin, fits) {
       for (const line of tracks) {
         const r = Math.random();
-        const kind = r < 0.62 ? 'charged' : (r < 0.82 ? 'muon' : 'neutral');
+        const kind = r < 0.55 ? 'charged'
+          : r < 0.73 ? 'muon'
+            : r < 0.87 ? 'neutral' : 'photon';
         const c = TRACK_COLORS[kind];
-        line.material.color.setRGB(c[0], c[1], c[2]);
+        /* Not every track burns the same: a few run hot toward white, most
+           sit on the palette, which is how a real display reads — energy is
+           a distribution, not a constant. */
+        const heat = 0.8 + Math.random() * 0.5;
+        line.material.color.setRGB(
+          Math.min(1, c[0] * heat + (heat > 1.15 ? 0.25 : 0)),
+          Math.min(1, c[1] * heat + (heat > 1.15 ? 0.2 : 0)),
+          Math.min(1, c[2] * heat + (heat > 1.15 ? 0.2 : 0))
+        );
         /* A charged track is an arc: constant curvature, sign at random,
            tighter for the slow ones. Muons run long and straight, neutrals
            short and straight. A little out-of-plane drift so the spray is a
            volume, not a disc. */
         const phi = Math.random() * Math.PI * 2;
         const zDrift = (Math.random() - 0.5) * 0.7;
-        const L = scale * (kind === 'muon' ? 1.6 + Math.random() * 0.8 : 0.5 + Math.random() * 0.9);
+        /* A muon is the one that reaches the far side of everything; a photon
+           stops where the electromagnetic calorimeter stops it. */
+        let L = scale * (kind === 'muon' ? 1.6 + Math.random() * 0.8
+          : kind === 'photon' ? 0.32 + Math.random() * 0.22
+            : 0.5 + Math.random() * 0.9);
         const curv = kind === 'charged'
           ? (Math.random() < 0.5 ? -1 : 1) * (1.4 + Math.random() * 2.6) / scale
           : 0;
+        /* First walk the intended length dry to see how much of it stays in
+           frame, then draw the whole track at the length that fits. A track
+           the picture cannot hold is thrown shorter, not chopped: it keeps
+           its curvature, its head, its taper, and ends in mid-air the way a
+           soft track does, instead of dying on an invisible wall at the
+           canvas edge. */
+        if (fits) {
+          const step = L / SEG;
+          let a = phi, x = origin.x, y = origin.y, z = origin.z, n = SEG;
+          for (let s = 1; s <= SEG; s++) {
+            x += Math.cos(a) * step;
+            y += Math.sin(a) * step;
+            z += zDrift * step * 0.4;
+            a += curv * step;
+            if (!fits(x, y, z)) { n = s - 1; break; }
+          }
+          if (n < SEG) L = Math.max(L * (n / SEG) * 0.9, scale * 0.2);
+        }
         const pos = line.geometry.attributes.position;
         const step = L / SEG;
         let a = phi, x = origin.x, y = origin.y, z = origin.z;
@@ -186,7 +275,7 @@ function makeEvent(THREE, nTracks, scale) {
          firework. */
       const grow = Math.min(1, this.life / 0.32);
       const n = Math.max(2, Math.round(grow * (SEG + 1)));
-      const fade = this.life < 0.6 ? 1 : 1 - (this.life - 0.6) / 0.4;
+      const fade = this.life < 0.72 ? 1 : 1 - (this.life - 0.72) / 0.28;
       for (const line of tracks) {
         line.geometry.setDrawRange(0, n);
         line.material.opacity = fade;
@@ -202,7 +291,7 @@ async function mountRing() {
 
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=63799f47d6');
+    THREE = await import('./vendor/three.module.min.js?v=dc95fb84c8');
   } catch (e) {
     /* No module, no figure. Removing the node collapses the hero to one
        column, which the grid already knows how to be. */
@@ -220,8 +309,13 @@ async function mountRing() {
   renderer.setClearAlpha(0);
 
   const scene = new THREE.Scene();
+  /* Backed off far enough that the tracks a Point 1 event throws toward the
+     reader still land inside the canvas: at 3.4 the sprays out of ATLAS ran
+     off the bottom edge and were guillotined by it. The box is taller in the
+     stylesheet by the same proportion, so the ring itself keeps its size on
+     the page and the new room is all below, where the event happens. */
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-  camera.position.set(0, 0, 3.4);
+  camera.position.set(0, 0, 3.9);
 
   /* The ring leans back the way the published aerial figures draw it: a
      circle read at an angle, the near side toward the reader. */
@@ -241,11 +335,65 @@ async function mountRing() {
   json('data/meyrin-map.json').then((map) => {
     if (!map || !map.border) return;
     const S = R / map.ring_r_m;
-    const addWays = (ways, material, dashed) => {
-      for (const w of ways) {
-        if (w.length < 2) continue;
-        const pts = w.map(([x, y]) => new THREE.Vector3(x * S, y * S, -0.002));
-        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    /* The countryside dissolves into the page, but the dissolve is baked into
+       the lines themselves as vertex colour rather than laid over the canvas
+       as a CSS mask: a mask on the canvas faded everything on it, and the
+       tracks a collision throws are not scenery. Under additive blending a
+       darker vertex is a fainter line, so the falloff is written once, here,
+       and touches nothing but the ground. Full strength out to just past the
+       ring, gone before the countryside reaches the edge of the box. */
+    /* The dissolve is measured in the frame's own terms: each vertex is
+       projected through the tilt and the camera and fades as it nears the
+       edge of the canvas, wherever that edge happens to lie on the ground.
+       The tilt compresses the far side, so the top of the frame holds some
+       sixteen kilometres of countryside where the bottom holds five — the
+       projection knows that without being told, which is why the fade is
+       computed and not drawn. A second, gentler falloff with plain distance
+       keeps the far country quieter than the fields the ring sits in. */
+    tilt.updateMatrixWorld(true);
+    camera.updateMatrixWorld(true);
+    const pv = new THREE.Vector3();
+    const ease = (t) => (t <= 0 ? 1 : t >= 1 ? 0 : 1 - t * t * (3 - 2 * t));
+    const fadeAt = (px, py) => {
+      pv.set(px, py, 0).applyMatrix4(tilt.matrixWorld).project(camera);
+      const edge = Math.max(Math.abs(pv.x), Math.abs(pv.y));
+      const kFar = 1 - 0.45 * Math.min(1, Math.max(0, (Math.hypot(px, py) - 1.4) / 3));
+      return ease((edge - 0.7) / 0.26) * kFar;
+    };
+    /* The source ways are simplified to 60 m, which leaves segments long
+       enough that a vertex colour interpolated across one could still be
+       half-lit where the segment crosses the frame. Long segments are cut
+       into short ones first, so the fade has vertices wherever it needs to
+       reach zero — before the edge, always. */
+    const MAXSEG = 0.06;
+    const addWays = (ways, rounds, material, dashed) => {
+      material.vertexColors = true;
+      for (const w0 of ways) {
+        if (w0.length < 2) continue;
+        const w = smooth(w0, rounds || 0);
+        const pts = [];
+        let lx = 0, ly = 0;
+        w.forEach(([x, y], i) => {
+          const px = x * S, py = y * S;
+          if (!i) pts.push(px, py);
+          else {
+            const n = Math.max(1, Math.ceil(Math.hypot(px - lx, py - ly) / MAXSEG));
+            for (let k = 1; k <= n; k++) pts.push(lx + (px - lx) * k / n, ly + (py - ly) * k / n);
+          }
+          lx = px; ly = py;
+        });
+        const count = pts.length / 2;
+        const pos = new Float32Array(count * 3);
+        const col = new Float32Array(count * 3);
+        for (let i = 0; i < count; i++) {
+          const px = pts[i * 2], py = pts[i * 2 + 1];
+          pos.set([px, py, -0.002], i * 3);
+          const k = fadeAt(px, py);
+          col.set([k, k, k], i * 3);
+        }
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
         const line = new THREE.Line(geo, material);
         if (dashed) line.computeLineDistances();
         tilt.add(line);
@@ -253,18 +401,29 @@ async function mountRing() {
     };
     /* Streams as texture, rivers in a blue that means water, and the border
        the one dashed line, which is how a border is drawn on every map the
-       reader knows. Additive, so where lines gather the ground glows. */
-    addWays(map.streams, new THREE.LineBasicMaterial({
-      color: new THREE.Color(0.22, 0.36, 0.6), transparent: true, opacity: 0.55,
+       reader knows. Additive, so where lines gather the ground glows. The
+       ground is context, not subject: held well below the machine so the
+       ring and the beams stay the brightest things in the figure. */
+    addWays(map.streams, 2, new THREE.LineBasicMaterial({
+      color: new THREE.Color(0.22, 0.36, 0.6), transparent: true, opacity: 0.28,
       blending: THREE.AdditiveBlending, depthWrite: false,
     }));
-    addWays(map.rivers, new THREE.LineBasicMaterial({
-      color: new THREE.Color(0.28, 0.6, 1.0), transparent: true, opacity: 0.95,
+    addWays(map.rivers, 2, new THREE.LineBasicMaterial({
+      color: new THREE.Color(0.28, 0.6, 1.0), transparent: true, opacity: 0.5,
       blending: THREE.AdditiveBlending, depthWrite: false,
     }));
-    addWays(map.border, new THREE.LineDashedMaterial({
-      color: new THREE.Color(0.72, 0.75, 0.82), transparent: true, opacity: 0.75,
+    /* The border says ATLAS is in Switzerland and CMS, ALICE and LHCb are in
+       France, which is a fact about this laboratory and not decoration. It
+       is still one thin dashed line, and it stays that way. It was built as
+       a ribbon for a while — a quad per dash over a wide soft corridor — to
+       make it impossible to miss, and impossible to miss is what it became:
+       a band heavier than the machine it is supposed to lie under. A reader
+       finds a border because it is dashed and because FRANCE and SUISSE are
+       written either side of it, not because it shouts. */
+    addWays(map.border, 3, new THREE.LineDashedMaterial({
+      color: new THREE.Color(0.8, 0.83, 0.9), transparent: true, opacity: 0.9,
       dashSize: 0.045, gapSize: 0.03,
+      blending: THREE.AdditiveBlending, depthWrite: false,
     }), true);
 
     /* Which side is which, written on the ground with the flags. Positions
@@ -297,25 +456,38 @@ async function mountRing() {
 
   /* The pipe is a pipe: a torus with real thickness from the library's own
      geometry, and a fatter, fainter twin behind it carrying the glow. The
-     torus lies in the XY plane, which is the ring's plane and the map's. */
-  tilt.add(new THREE.Mesh(
+     torus lies in the XY plane, which is the ring's plane and the map's.
+     Neither writes depth: the bunches run the tube's own centre line, and a
+     pipe wall that lands in the depth buffer occludes the very beam it
+     carries. Draw order is stated with renderOrder instead — pipe first,
+     beams and events over it — which is the answer three.js gives for
+     transparent things that share a position. */
+  /* Held down to a wall's brightness: the tube used to be painted nearly
+     white, and a near-white bunch over a near-white pipe is invisible — the
+     glow belongs to the beam, not to the plumbing that carries it. */
+  const pipe = new THREE.Mesh(
     new THREE.TorusGeometry(R, 0.013, 10, 220),
     new THREE.MeshBasicMaterial({
-      color: new THREE.Color(0.42, 0.58, 0.88), transparent: true, opacity: 0.95,
+      color: new THREE.Color(0.34, 0.48, 0.76), transparent: true, opacity: 0.55,
+      depthWrite: false,
     })
-  ));
-  tilt.add(new THREE.Mesh(
+  );
+  const pipeGlow = new THREE.Mesh(
     new THREE.TorusGeometry(R, 0.04, 10, 220),
     new THREE.MeshBasicMaterial({
       color: new THREE.Color(0.22, 0.4, 0.75), transparent: true, opacity: 0.3,
       blending: THREE.AdditiveBlending, depthWrite: false,
     })
-  ));
+  );
+  pipe.renderOrder = 1;
+  pipeGlow.renderOrder = 1;
+  tilt.add(pipe, pipeGlow);
 
   /* The four experiments, at their stations. ATLAS carries the brand at full
      strength; the other three are the same blue held down, exactly the wall
      of portraits' rule: colour is which one matters here. */
   const ipDots = pointsObj(THREE, IPS.length, 0.16, tex, 1);
+  ipDots.renderOrder = 2;
   {
     const pos = ipDots.geometry.attributes.position;
     const col = ipDots.geometry.attributes.color;
@@ -333,12 +505,22 @@ async function mountRing() {
 
   /* The bunches and their trails: the head bright, the tail dimming behind
      it, which under additive blending is a fade written as colour. */
+  /* The bunch head burns white — brighter than anything on the pipe by
+     construction, since the pipe is held at half strength — and the trail
+     cools to the beam blue behind it. */
   const beams = [1, -1].map((dir) => {
-    const obj = pointsObj(THREE, TRAIL, 0.085, tex, 1);
+    const obj = pointsObj(THREE, TRAIL, 0.12, tex, 1);
+    obj.renderOrder = 3;
     const col = obj.geometry.attributes.color;
     for (let i = 0; i < TRAIL; i++) {
       const k = 1 - i / TRAIL;
-      col.setXYZ(i, BEAM[0] * k, BEAM[1] * k, BEAM[2] * k);
+      const boost = i < 2 ? 1.7 : 1;
+      col.setXYZ(
+        i,
+        Math.min(1, BEAM[0] * k * boost),
+        Math.min(1, BEAM[1] * k * boost),
+        Math.min(1, BEAM[2] * k * boost)
+      );
     }
     col.needsUpdate = true;
     tilt.add(obj);
@@ -350,11 +532,22 @@ async function mountRing() {
   onRing(0, atlasPos);
   onRing(Math.PI, cmsPos);
 
+  /* Where the canvas ends, in the machine's own coordinates: a point projects
+     through the tilt and the camera, and 0.97 leaves a couple of pixels so a
+     clamped track ends at the edge rather than under it. */
+  const fitV = new THREE.Vector3();
+  const fits = (x, y, z) => {
+    fitV.set(x, y, z).applyMatrix4(tilt.matrixWorld).project(camera);
+    return Math.abs(fitV.x) < 0.97 && Math.abs(fitV.y) < 0.97;
+  };
+
   /* The collision at Point 1 is the event the page is about, so it is the one
      that is allowed to be violent: many more tracks, thrown harder and drawn
      larger than the crossing on the far side of the ring. */
   const burstAtlas = makeEvent(THREE, 30, 0.52);
   const burstCms = makeEvent(THREE, 12, 0.3);
+  burstAtlas.obj.renderOrder = 3;
+  burstCms.obj.renderOrder = 3;
   tilt.add(burstAtlas.obj, burstCms.obj);
 
   /* The four experiments are named by their own marks, projected over the
@@ -366,7 +559,7 @@ async function mountRing() {
      drawn for. */
   const labels = IPS.map((ip) => {
     const el = document.createElement('span');
-    el.className = 'lhc-ring-badge' + (ip.main ? ' is-main' : '');
+    el.className = 'lhc-ring-badge is-' + ip.name.toLowerCase() + (ip.main ? ' is-main' : '');
     /* The classic map pin: the teardrop pointing at the interaction point,
        the mark on the white disc in its head. The pin is a container; the
        logo inside it is the experiment's own, whole and unaltered. */
@@ -376,6 +569,25 @@ async function mountRing() {
     img.loading = 'lazy';
     img.decoding = 'async';
     el.appendChild(img);
+    /* The name under the porthole. The figure says what shape the machine is
+       and the word says which one it is; without it the reader is asked to
+       recognise four sections by heart. ATLAS is written in the blue of its
+       own rim, which is the same rule the rest of the page uses for saying
+       which of the four this laboratory works on. */
+    const name = document.createElement('i');
+    name.className = 'lhc-ring-name';
+    if (ip.flag) {
+      /* The flag of the country the cavern is actually in, which is the
+         answer the border is drawn to let the reader work out and this
+         states outright. Same official SVGs the FRANCE and SUISSE labels
+         use, so the ground and the pins agree. */
+      const flag = document.createElement('img');
+      flag.src = ROOT + 'assets/images/flags/' + ip.flag + '.svg';
+      flag.alt = ip.flag === 'ch' ? 'Switzerland' : 'France';
+      name.appendChild(flag);
+    }
+    name.appendChild(document.createTextNode(ip.name));
+    el.appendChild(name);
     host.appendChild(el);
     const world = new THREE.Vector3();
     onRing(ip.angle, world);
@@ -414,6 +626,14 @@ async function mountRing() {
       pos.setXYZ(i, v.x, v.y, v.z);
     }
     pos.needsUpdate = true;
+    /* The bunch itself scintillates: the head's brightness is thrown fresh
+       every frame, a star riding the pipe. Only the head — the trail behind
+       it keeps its steady cooling gradient. */
+    const col = beam.obj.geometry.attributes.color;
+    const tw = 0.7 + Math.random() * 0.5;
+    col.setXYZ(0, Math.min(1, 1.4 * tw), Math.min(1, 1.4 * tw), Math.min(1, 1.5 * tw));
+    col.setXYZ(1, Math.min(1, BEAM[0] * 1.2 * tw), Math.min(1, BEAM[1] * 1.2 * tw), Math.min(1, BEAM[2] * 1.2 * tw));
+    col.needsUpdate = true;
   }
 
   let raf = 0, last = 0, angle = 0, lastLap = 0, lastHalf = 0;
@@ -441,9 +661,9 @@ async function mountRing() {
        there together once a lap, and at Point 5 half a lap later — the
        geometry of the real machine, not a scheduled effect. */
     const lap = Math.floor(angle / (Math.PI * 2));
-    if (lap > lastLap) { lastLap = lap; burstAtlas.fire(atlasPos); }
+    if (lap > lastLap) { lastLap = lap; burstAtlas.fire(atlasPos, fits); }
     const half = Math.floor((angle + Math.PI) / (Math.PI * 2));
-    if (half > lastHalf) { lastHalf = half; burstCms.fire(cmsPos); }
+    if (half > lastHalf) { lastHalf = half; burstCms.fire(cmsPos, fits); }
     burstAtlas.step(dt);
     burstCms.step(dt);
 

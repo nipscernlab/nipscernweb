@@ -20,8 +20,11 @@ const https = require('https');
 
 const OUT = path.join(__dirname, '..', 'data', 'meyrin-map.json');
 
-/* The window around the ring, a little wider than tall, like the canvas. */
-const BBOX = { s: 46.175, w: 5.9, n: 46.36, e: 6.21 };
+/* The window around the ring. Generous to the north on purpose: the figure
+   tilts the ground away from the reader, so the top of the canvas holds
+   about sixteen kilometres of countryside where the bottom holds five, and
+   the data has to reach at least as far as the frame can see. */
+const BBOX = { s: 46.13, w: 5.87, n: 46.43, e: 6.24 };
 
 /* LHC centre and radius. Circumference 26,659 m -> r = C / 2π = 4,243 m. */
 const RING = { lat: 46.271, lon: 6.055, r_m: 4243 };
