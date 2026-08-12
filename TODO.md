@@ -33,6 +33,34 @@ que falta e o que acabou de ser feito, para retomar sem arqueologia.
 
 ---
 
+## Feito em 2026-08-11, quarta rodada: dois tubos, e menos brilho à toa
+
+- [x] **O tubo virou dois tubos, que é o que o LHC tem.** A máquina carrega os
+      dois feixes em canos separados por quase os 27 km inteiros e só os junta
+      num cano comum em torno dos quatro pontos, e é por isso que colisão
+      acontece nesses quatro lugares e em nenhum outro, por mais que os
+      pacotes se cruzem no meio do caminho. Desenhar um tubo só jogava esse
+      fato fora. Agora os dois canos abrem nos arcos (uns 10 px) e fecham em
+      cada ponto de interação, com passo suave, e cada trem anda no seu lado:
+      dá para ver os feixes se aproximarem antes de cada cruzamento. Conferido
+      na geometria, não no olho: a separação vai a zero exatamente em 0°, 45°,
+      180° e 315°.
+- [x] **Traços na direção certa, mesmo que a moldura corte.** A regra que
+      encurtava o traço para caber mentia: as colisões perto de uma borda
+      saíam todas tortas, fugindo do limite, e o braço do LHCb tinha de ser
+      apontado para o lado que o quadro aguentava. Saiu. O braço do LHCb agora
+      aponta onde o de verdade aponta, e a cadeia do fato é curta: o eixo z do
+      LHCb vai do cruzamento para as câmaras de múon, o feixe 1 é codirecional
+      a esse z, e o feixe 1 corre no sentido horário visto de cima. Logo, no
+      Ponto 8 o jato sai pela tangente horária, que é o caminho para o Ponto 1.
+      Medido: concentração 0,65 apontando para 216°, que é a direção do ATLAS.
+- [x] **Menos cintilação, menos poluição.** A cabeça de cada pacote tinha o
+      brilho sorteado a cada quadro. Parecia purpurina e não dizia nada: saiu.
+      O ritmo caiu para uma volta a cada 4,6 s com nivelamento mais baixo, e a
+      cobertura de traços no quadro ficou em 1,55%. Atividade medida: ATLAS
+      76% dos intervalos, CMS 56%, LHCb 40%, ALICE 32%. Suíte do repositório
+      passando, 55 a 61 fps.
+
 ## Feito em 2026-08-11, terceira rodada: os quatro colidem
 
 - [x] **Os quatro experimentos colidem, porque na máquina os quatro colidem.**
