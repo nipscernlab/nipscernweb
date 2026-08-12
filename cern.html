@@ -28,8 +28,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/cern.css?v=63799f47d6">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=63799f47d6">
+  <link rel="stylesheet" href="assets/css/icons/cern.css?v=dc95fb84c8">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=dc95fb84c8">
 
   <style>
     /* LHC Status banner — a pane of glass pulled up over the control-room
@@ -211,23 +211,25 @@
     /* The ring — the hero's figure, drawn on a canvas by cern.js. The labels
        are HTML projected over it, so the experiments are named in the page's
        own mono rather than in pixels. */
-    .lhc-ring { position: relative; width: 560px; max-width: 100%; height: 500px; opacity: 1; }
-    /* The canvas holds the machine and the countryside; the mask fades the
-       countryside out before it reaches the box, so the tracings dissolve
-       into the page instead of ending at an edge. The pins and names are
-       HTML on top and stay full strength. */
+    /* Taller than it is wide by the amount the camera backed off, so the ring
+       keeps its size and the extra rows all land below ATLAS, where the
+       collision throws its tracks toward the reader. */
+    .lhc-ring { position: relative; width: 560px; max-width: 100%; height: 580px; opacity: 1; }
+    /* No mask on the canvas: the countryside's dissolve is baked into the map
+       lines themselves as vertex colour in cern.js, so the ground fades into
+       the page while the machine — pipe, beams, and the tracks a collision
+       throws — stays at full strength all the way to the edge. A mask here
+       faded whatever crossed it, and a track is not scenery. */
     .lhc-ring canvas {
       display: block;
       width: 100%;
       height: 100%;
-      -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 52%, transparent 98%);
-      mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 52%, transparent 98%);
     }
-    /* One white disc per experiment, big enough for the mark to be read. The
-       logo sits whole and unaltered on the disc; the disc is a container, not
-       an edit, and white is the ground all four marks were drawn for. Sized
-       for the mark to read at arm's length; the source files are exported at
-       three times this box so they stay sharp on any screen. */
+    /* One porthole per experiment, cut into the ground the ring is drawn on.
+       No white disc and no padding: the figure is the pin, drawn to its own
+       rim by tools/build-experiment-figures.js, dark like the page it lands
+       on. The shadow is all the container that is left, and it is there so
+       the pin lifts off the countryside behind it. */
     .lhc-ring-badge {
       position: absolute;
       top: 0; left: 0;
@@ -235,22 +237,53 @@
       place-items: center;
       width: 64px;
       height: 64px;
-      padding: 7px;
-      background: #fff;
       border-radius: var(--r-full);
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
       will-change: transform;
     }
     /* width and height outright, not max-*: a percentage max-height inside a
        grid cell resolved against nothing here and the source file poured out
        of the disc. A definite box with object-fit does the containing. */
     .lhc-ring-badge img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    /* The name under the porthole, in the page's mono like every other label
+       on this figure. Absolutely placed so it hangs off the pin without
+       touching the grid that centres the drawing, and shadowed because it
+       lands on whatever the countryside happens to be doing there. */
+    .lhc-ring-name {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-style: normal;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      pointer-events: none;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    }
+    /* The flag rides at cap height beside the name, the same size the
+       FRANCE and SUISSE marks on the ground are drawn at. */
+    .lhc-ring-name img {
+      height: 9px;
+      width: auto;
+      display: block;
+      border-radius: 1px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
+    }
+    .lhc-ring-badge.is-main .lhc-ring-name { color: var(--brand); font-size: 11px; }
     /* The one the page is about is bigger and ringed in the brand. */
+    /* The one the page is about is the bigger pin, and its own rim is drawn
+       brighter inside the figure. No second ring out here: two blue circles
+       a pixel apart read as a mistake, not as emphasis. */
     .lhc-ring-badge.is-main {
       width: 84px;
       height: 84px;
-      padding: 9px;
-      box-shadow: 0 0 0 3px var(--brand), 0 5px 20px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
     }
     /* Which country the ground belongs to, written the way a map writes it:
        small caps in the quiet colour, the flag beside the word. */
@@ -272,9 +305,12 @@
       color: var(--text-muted);
     }
     @media (max-width: 768px) {
-      .lhc-ring { width: 340px; height: 300px; margin-inline: auto; }
-      .lhc-ring-badge { width: 44px; height: 44px; padding: 5px; }
-      .lhc-ring-badge.is-main { width: 56px; height: 56px; padding: 6px; }
+      .lhc-ring { width: 340px; height: 350px; margin-inline: auto; }
+      .lhc-ring-badge { width: 44px; height: 44px; }
+      .lhc-ring-badge.is-main { width: 56px; height: 56px; }
+      .lhc-ring-name { font-size: 8px; letter-spacing: 0.12em; top: calc(100% + 3px); gap: 3px; }
+      .lhc-ring-name img { height: 7px; }
+      .lhc-ring-badge.is-main .lhc-ring-name { font-size: 9px; }
     }
 
     /* The descent — written as a plain column of captioned photographs, which
@@ -429,7 +465,13 @@
              data-drift for a clipped medium, data-drift-px for a block, both
              run by motion.js and both nothing at all under reduced motion. -->
         <figure class="lhc-status-backdrop frame" data-drift-frame aria-hidden="true">
-          <img src="assets/images/cern/atlas-daq.webp" alt="" loading="lazy" decoding="async" data-drift="6" style="height:118%">
+          <!-- The 18% of slack has to straddle the frame, not pool at the
+               bottom: .frame pins images to the top, so an undriven 118%
+               image already covers, but the moment the drift pushed it down
+               the photograph's own straight top edge slid into the rounded
+               opening. Half the slack above, half below, and the drift never
+               runs out of picture in either direction. -->
+          <img src="assets/images/cern/atlas-daq.webp" alt="" loading="lazy" decoding="async" data-drift="6" style="height:118%;top:-9%">
         </figure>
         <div class="lhc-status-banner glass fade-up" id="lhc-status-banner" aria-label="LHC operational status">
           <div style="display:flex;align-items:center;gap:var(--sp-3)">
@@ -1168,8 +1210,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=63799f47d6"></script>
-  <script type="module" src="assets/js/cern.min.js?v=63799f47d6"></script>
+  <script type="module" src="assets/js/main.min.js?v=dc95fb84c8"></script>
+  <script type="module" src="assets/js/cern.min.js?v=dc95fb84c8"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
@@ -1274,6 +1316,6 @@
     })();
   </script>
 
-  <script src="assets/js/analytics.min.js?v=63799f47d6" defer></script>
+  <script src="assets/js/analytics.min.js?v=dc95fb84c8" defer></script>
 </body>
 </html>
