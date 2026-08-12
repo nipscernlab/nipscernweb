@@ -6,11 +6,14 @@
  * The ring. In the hero, where a stock illustration used to sit: the LHC as a
  * figure, drawn by three.js the way the About page draws the collaboration —
  * the same glow texture, the same additive blending, the same held-down blue
- * for everything that is not the point. Two proton bunches run the ring in
- * opposite directions and meet where they meet in the real machine: at Point 1,
- * which is ATLAS, and half a lap away at Point 5, which is CMS. ALICE and LHCb
- * sit at their real stations either side of ATLAS. The figure is schematic but
- * it is not decoration: it is the page's subject, drawn.
+ * for everything that is not the point. Two trains of proton bunches run it in
+ * opposite directions and all four experiments collide, because all four of
+ * them do: ATLAS at Point 1, ALICE at 2, CMS at 5 and LHCb at 8, each fed by
+ * the same train and each getting a different pair of bunches out of it. An
+ * earlier version lit only ATLAS and CMS, which was not physics but a
+ * consequence of drawing a single bunch per beam: two points launched together
+ * on a circle can only meet where they started and half a lap away. The figure
+ * is schematic but it is not decoration: it is the page's subject, drawn.
  *
  * The descent. The page's argument is vertical — CERN is a place you go down
  * into — so the section that says it moves that way: four photographs pinned
@@ -23,7 +26,7 @@
  * wrote and the one every reader keeps if a single byte fails to arrive.
  */
 
-import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=dc95fb84c8';
+import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=afaaa0354b';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -153,8 +156,37 @@ const IPS = [
 ];
 
 const R = 1.18;
-const LAP = 2;               /* seconds per lap, so ATLAS lights every 2 s */
-const TRAIL = 22;
+const LAP = 3.5;             /* seconds per lap, so a slot every 440 ms */
+
+/* The filling scheme, scaled down to something an eye can count.
+   ------------------------------------------------------------------
+   The real machine puts bunches in a grid of 3,564 slots 25 ns apart and
+   fills about 2,800 of them, leaving gaps for the injection kickers and a
+   three microsecond hole for the beam dump. Drawn at that density the ring
+   is a solid line, so this figure keeps the structure and drops the count:
+   eight slots, six of them filled, one gap.
+
+   The structure is what matters, because it is what decides which point
+   lights when. A bunch of beam 1 in slot s sits at angle (turn + s); a bunch
+   of beam 2 in slot s' sits at angle (s' - turn), the two running opposite
+   ways. So at the tick where the ring has turned k slots, the pair meeting at
+   a point q slots round is s = q - k and s' = q + k, and there is a collision
+   there only if both of those slots carry a bunch. That single line is the
+   whole of it: every point runs on the same clock, and yet each one gets a
+   different pair, so the gaps in the train reach the four of them at
+   different moments and each one falls silent on its own beat. Real filling
+   schemes are quoted exactly this way, as a different number of collisions
+   per experiment out of one train: 2748b_2736_2258_2374 means 2,736 crossings
+   in ATLAS and CMS, 2,258 in ALICE and 2,374 in LHCb, out of the same 2,748
+   bunches. This pattern gives five, five, four and six out of eight, which
+   keeps what matters — the four schedules all differ, ATLAS and CMS match
+   each other, ALICE gets the fewest — and cannot reproduce the exact ordering,
+   because eight slots is not 3,564. The visible difference in rate between
+   the experiments is not this anyway: it is the levelling further down. */
+const NSLOTS = 8;
+const FILLED = [1, 1, 1, 1, 0, 1, 0, 1];
+const SLOT_A = (Math.PI * 2) / NSLOTS;
+const BUNCH_TRAIL = 5;       /* points drawn behind each bunch */
 
 /* A bunch's place on the ring at angle a, in the ring's own plane. Angle 0 is
    Point 1, put at the bottom of the figure, nearest the reader. */
@@ -178,7 +210,7 @@ const TRACK_COLORS = {
   photon: [0.24, 0.94, 0.54],
 };
 
-function makeEvent(THREE, nTracks, scale) {
+function makeEvent(THREE, nTracks, scale, cone) {
   const SEG = 24;
   const group = new THREE.Group();
   group.visible = false;
@@ -222,7 +254,15 @@ function makeEvent(THREE, nTracks, scale) {
            tighter for the slow ones. Muons run long and straight, neutrals
            short and straight. A little out-of-plane drift so the spray is a
            volume, not a disc. */
-        const phi = Math.random() * Math.PI * 2;
+        /* Isotropic for the three barrels, which surround the crossing and
+           are built to catch whatever comes out of it. LHCb gets a cone
+           instead: it is a spectrometer standing to one side, covering out
+           to 250 mrad of the beam it looks along, so its spray leaves the
+           crossing pointing one way and the empty half of the picture is
+           part of the fact. */
+        const phi = cone
+          ? cone.at + (Math.random() * 2 - 1) * cone.half
+          : Math.random() * Math.PI * 2;
         const zDrift = (Math.random() - 0.5) * 0.7;
         /* A muon is the one that reaches the far side of everything; a photon
            stops where the electromagnetic calorimeter stops it. */
@@ -291,7 +331,7 @@ async function mountRing() {
 
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=dc95fb84c8');
+    THREE = await import('./vendor/three.module.min.js?v=afaaa0354b');
   } catch (e) {
     /* No module, no figure. Removing the node collapses the hero to one
        column, which the grid already knows how to be. */
@@ -503,34 +543,19 @@ async function mountRing() {
   }
   tilt.add(ipDots);
 
-  /* The bunches and their trails: the head bright, the tail dimming behind
-     it, which under additive blending is a fade written as colour. */
-  /* The bunch head burns white — brighter than anything on the pipe by
-     construction, since the pipe is held at half strength — and the trail
-     cools to the beam blue behind it. */
+  /* A train of bunches per beam rather than one dot: the slots that carry a
+     bunch, each with a short tail behind it. The head burns white, brighter
+     than anything on the pipe by construction since the pipe is held at half
+     strength, and the tail cools to the beam blue. The gap in the train is
+     drawn by simply not being there, and it is the reason the four points do
+     not all light on the same beat. */
+  const SLOTS = FILLED.map((f, i) => (f ? i : -1)).filter((i) => i >= 0);
   const beams = [1, -1].map((dir) => {
-    const obj = pointsObj(THREE, TRAIL, 0.12, tex, 1);
+    const obj = pointsObj(THREE, SLOTS.length * BUNCH_TRAIL, 0.11, tex, 1);
     obj.renderOrder = 3;
-    const col = obj.geometry.attributes.color;
-    for (let i = 0; i < TRAIL; i++) {
-      const k = 1 - i / TRAIL;
-      const boost = i < 2 ? 1.7 : 1;
-      col.setXYZ(
-        i,
-        Math.min(1, BEAM[0] * k * boost),
-        Math.min(1, BEAM[1] * k * boost),
-        Math.min(1, BEAM[2] * k * boost)
-      );
-    }
-    col.needsUpdate = true;
     tilt.add(obj);
     return { obj, dir };
   });
-
-  const atlasPos = new THREE.Vector3();
-  const cmsPos = new THREE.Vector3();
-  onRing(0, atlasPos);
-  onRing(Math.PI, cmsPos);
 
   /* Where the canvas ends, in the machine's own coordinates: a point projects
      through the tilt and the camera, and 0.97 leaves a couple of pixels so a
@@ -541,14 +566,44 @@ async function mountRing() {
     return Math.abs(fitV.x) < 0.97 && Math.abs(fitV.y) < 0.97;
   };
 
-  /* The collision at Point 1 is the event the page is about, so it is the one
-     that is allowed to be violent: many more tracks, thrown harder and drawn
-     larger than the crossing on the far side of the ring. */
-  const burstAtlas = makeEvent(THREE, 30, 0.52);
-  const burstCms = makeEvent(THREE, 12, 0.3);
-  burstAtlas.obj.renderOrder = 3;
-  burstCms.obj.renderOrder = 3;
-  tilt.add(burstAtlas.obj, burstCms.obj);
+  /* One station per experiment, each with the event its machine actually
+     sees. Every one of the four is fed by the same train and every one of
+     them collides; what differs is how much of it each is allowed to take.
+
+     ATLAS and CMS run at the top of the luminosity, so every crossing their
+     slots allow is an event, and both keep two event objects so a second
+     crossing can land while the first is still flying, which is the pile-up
+     those two are built to live with. LHCb is levelled about an order of
+     magnitude below them, and its spray leaves in a cone because it is a
+     spectrometer looking along the beam rather than a barrel around it.
+     ALICE is levelled lower still, on purpose: it is built to count
+     thousands of tracks in one event and drowns in pile-up, so it fires
+     rarely and, when it does, throws far more tracks than anyone else. */
+  const STATIONS = IPS.map((ip) => {
+    const pos = new THREE.Vector3();
+    onRing(ip.angle, pos);
+    const spec = {
+      ATLAS: { n: 30, scale: 0.52, level: 1, pool: 2 },
+      CMS: { n: 26, scale: 0.46, level: 1, pool: 2 },
+      /* The cone runs along the beam line, which at this station is the
+         tangent, and it is drawn on the side the frame can hold: pointed the
+         other way it leaves the canvas within a centimetre and every track
+         comes back a stub. Which of the two directions the real arm follows
+         is a fact about the cavern this figure does not claim. */
+      LHCb: { n: 14, scale: 0.42, level: 0.34, pool: 1, cone: { at: ip.angle + Math.PI, half: 0.3 } },
+      ALICE: { n: 46, scale: 0.3, level: 0.2, pool: 1 },
+    }[ip.name];
+    const events = [];
+    for (let i = 0; i < spec.pool; i++) {
+      const ev = makeEvent(THREE, spec.n, spec.scale, spec.cone);
+      ev.obj.renderOrder = 3;
+      tilt.add(ev.obj);
+      events.push(ev);
+    }
+    /* Where round the ring this point sits, counted in slots. It is what the
+       pairing rule is written in. */
+    return { q: Math.round(ip.angle / SLOT_A), pos, level: spec.level, events, next: 0 };
+  });
 
   /* The four experiments are named by their own marks, projected over the
      canvas as HTML so they stay crisp at any pixel ratio. Each logo is used
@@ -619,30 +674,41 @@ async function mountRing() {
   resize();
 
   const v = new THREE.Vector3();
-  function setBeam(beam, head) {
+  /* The whole train at a phase: a bunch per filled slot, each dragging its
+     short tail behind it in the direction it travels. The heads scintillate,
+     brightness thrown fresh every frame, and each one on its own so the train
+     shimmers rather than blinking in unison. */
+  function setBeam(beam, phase) {
     const pos = beam.obj.geometry.attributes.position;
-    for (let i = 0; i < TRAIL; i++) {
-      onRing(head - beam.dir * i * 0.045, v);
-      pos.setXYZ(i, v.x, v.y, v.z);
+    const col = beam.obj.geometry.attributes.color;
+    let n = 0;
+    for (const s of SLOTS) {
+      const head = phase + s * SLOT_A;
+      const tw = 0.7 + Math.random() * 0.5;
+      for (let i = 0; i < BUNCH_TRAIL; i++) {
+        onRing(head - beam.dir * i * 0.028, v);
+        pos.setXYZ(n, v.x, v.y, v.z);
+        if (!i) col.setXYZ(n, Math.min(1, 1.4 * tw), Math.min(1, 1.4 * tw), Math.min(1, 1.5 * tw));
+        else {
+          const k = (1 - i / BUNCH_TRAIL) * 0.9;
+          col.setXYZ(n, BEAM[0] * k, BEAM[1] * k, BEAM[2] * k);
+        }
+        n++;
+      }
     }
     pos.needsUpdate = true;
-    /* The bunch itself scintillates: the head's brightness is thrown fresh
-       every frame, a star riding the pipe. Only the head — the trail behind
-       it keeps its steady cooling gradient. */
-    const col = beam.obj.geometry.attributes.color;
-    const tw = 0.7 + Math.random() * 0.5;
-    col.setXYZ(0, Math.min(1, 1.4 * tw), Math.min(1, 1.4 * tw), Math.min(1, 1.5 * tw));
-    col.setXYZ(1, Math.min(1, BEAM[0] * 1.2 * tw), Math.min(1, BEAM[1] * 1.2 * tw), Math.min(1, BEAM[2] * 1.2 * tw));
     col.needsUpdate = true;
   }
 
-  let raf = 0, last = 0, angle = 0, lastLap = 0, lastHalf = 0;
+  let raf = 0, last = 0, angle = 0, lastTick = -1;
 
   /* One static frame is the reduced-motion version: the machine drawn, the
-     bunches parked at their interaction points, nothing else asked of it. */
+     two trains sitting in the pipe between crossings, nothing else asked of
+     it. Half a slot apart so both are visible rather than one hiding inside
+     the other. */
   if (REDUCED) {
     setBeam(beams[0], 0);
-    setBeam(beams[1], Math.PI);
+    setBeam(beams[1], SLOT_A / 2);
     tilt.updateMatrixWorld(true);
     renderer.render(scene, camera);
     placeLabels(w, h);
@@ -657,15 +723,27 @@ async function mountRing() {
     setBeam(beams[0], angle);
     setBeam(beams[1], -angle);
 
-    /* The crossings. Both bunches left Point 1 together, so they are back
-       there together once a lap, and at Point 5 half a lap later — the
-       geometry of the real machine, not a scheduled effect. */
-    const lap = Math.floor(angle / (Math.PI * 2));
-    if (lap > lastLap) { lastLap = lap; burstAtlas.fire(atlasPos, fits); }
-    const half = Math.floor((angle + Math.PI) / (Math.PI * 2));
-    if (half > lastHalf) { lastHalf = half; burstCms.fire(cmsPos, fits); }
-    burstAtlas.step(dt);
-    burstCms.step(dt);
+    /* The crossings, on one clock. Every slot the ring turns is a tick, and
+       on that tick the pair arriving at a point q slots round is (q - k) from
+       one beam and (q + k) from the other. Both slots carrying a bunch is a
+       crossing; the levelling then decides whether that crossing is an event
+       here, which is what the machine itself does by pulling the beams apart
+       at ALICE and LHCb so their detectors are not buried. The beams pass
+       each other all the way round the ring and only these four points ever
+       light, because everywhere else the two of them are in separate pipes. */
+    const tick = Math.floor(angle / SLOT_A);
+    if (tick > lastTick) {
+      lastTick = tick;
+      for (const st of STATIONS) {
+        const s1 = ((st.q - tick) % NSLOTS + NSLOTS) % NSLOTS;
+        const s2 = ((st.q + tick) % NSLOTS + NSLOTS) % NSLOTS;
+        if (!FILLED[s1] || !FILLED[s2]) continue;
+        if (st.level < 1 && Math.random() > st.level) continue;
+        st.events[st.next].fire(st.pos, fits);
+        st.next = (st.next + 1) % st.events.length;
+      }
+    }
+    for (const st of STATIONS) for (const ev of st.events) ev.step(dt);
 
     tilt.updateMatrixWorld(true);
     renderer.render(scene, camera);

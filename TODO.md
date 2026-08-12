@@ -33,6 +33,33 @@ que falta e o que acabou de ser feito, para retomar sem arqueologia.
 
 ---
 
+## Feito em 2026-08-11, terceira rodada: os quatro colidem
+
+- [x] **Os quatro experimentos colidem, porque na máquina os quatro colidem.**
+      Antes só ATLAS e CMS acendiam, e isso não era física: era consequência
+      de desenhar um pacote por feixe. Dois pontos largados juntos num círculo
+      só podem se reencontrar onde saíram e meia volta depois. Agora cada
+      feixe é um trem de pacotes num grid de oito slots com seis preenchidos,
+      que é o esqueleto de um esquema de preenchimento real reduzido ao que o
+      olho conta. A regra é uma linha só: no tique em que o anel girou k
+      slots, o par que se encontra num ponto a q slots é (q−k) e (q+k), e há
+      colisão ali se os dois slots carregam pacote. Daí sai sozinho o resto:
+      todos os pontos no mesmo relógio, cada um com um par diferente, e as
+      lacunas do trem chegando em momentos distintos a cada um.
+- [x] **Nivelamento de luminosidade, que é o que separa os quatro de fato.**
+      ATLAS e CMS tomam toda colisão que os slots permitem e guardam dois
+      objetos de evento cada, para um segundo cruzamento pousar enquanto o
+      primeiro ainda voa, que é o empilhamento com que eles vivem. LHCb entra
+      nivelado abaixo e sai em cone, porque é espectrômetro e não barril.
+      ALICE é a mais rara e a mais densa: 46 traços quando dispara, porque é
+      para isso que ela existe e é por isso que ela não aguenta empilhamento.
+      Medido por diferença entre quadros: ATLAS ativo em 96% dos intervalos,
+      CMS 78%, LHCb 70%, ALICE 22%, com o pico de traços da ALICE maior que o
+      do CMS. Concentração angular confirma o cone: R = 0,77 no LHCb contra
+      0,01 a 0,22 nos três barris.
+- [x] Os pacotes agora aparecem como trem, com lacuna visível, e o quadro do
+      movimento reduzido mostra os dois trens parados no tubo. 61 fps.
+
 ## Feito em 2026-08-11, segunda rodada no hero do CERN
 
 - [x] **Pins: seções dos detectores no lugar dos logos.** Os quatro pins
