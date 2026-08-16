@@ -60,7 +60,7 @@
           </p>
           <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links fade-up">
-            <a href="https://github.com/nipscernlab/sapho/releases" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
+            <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
               <i class="ph ph-download" aria-hidden="true"></i>
               Download Latest Release
             </a>
@@ -361,5 +361,27 @@
 
   <script type="module" src="../assets/js/main.min.js?v=24489d9334"></script>
   <script src="../assets/js/analytics.min.js?v=24489d9334" defer></script>
+
+  <!-- O nome do instalador carrega a versão (sapho-aurora-Setup-vX.Y.Z.exe),
+       então não existe URL fixa para "a última". Este script pergunta à API do
+       GitHub qual é a release mais recente e aponta o botão de download direto
+       para o executável. Se a API falhar, o href original (página da última
+       release) continua valendo. -->
+  <script>
+    (async () => {
+      const links = document.querySelectorAll('a[data-direct-download="sapho"]');
+      if (!links.length) return;
+      try {
+        const r = await fetch('https://api.github.com/repos/nipscernlab/sapho/releases/latest', {
+          headers: { Accept: 'application/vnd.github+json' }
+        });
+        if (!r.ok) return;
+        const rel = await r.json();
+        const asset = (rel.assets || []).find((a) => /\.exe$/i.test(a.name));
+        if (!asset) return;
+        links.forEach((a) => { a.href = asset.browser_download_url; });
+      } catch (_) { /* mantém o link para a página de releases */ }
+    })();
+  </script>
 </body>
 </html>
