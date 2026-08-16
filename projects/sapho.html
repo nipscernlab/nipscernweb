@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SAPHO | Scalable-Architecture Processor for Hardware Optimization | NIPS-CERN</title>
-  <meta name="description" content="SAPHO is a scalable hardware architecture and toolchain for processor creation, experimentation, and hardware–software co-design. Includes YANC, AURORA, Surfer, and PRISM. Developed at NIPS-CERN/UFJF.">
+  <meta name="description" content="Write an algorithm in C±. SAPHO builds the processor around it: only the hardware blocks your program uses are synthesised. Compiler suite, IDE, simulators, waveform viewers and an RTL diagram, in one installer. Built at NIPS-CERN/UFJF, running at CERN.">
 
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://www.nipscern.com/projects/sapho">
-  <meta property="og:title" content="SAPHO | Scalable-Architecture Processor for Hardware Optimization">
-  <meta property="og:description" content="Complete toolchain for processor creation, experimentation, and hardware–software co-design. Built at NIPS-CERN.">
+  <meta property="og:title" content="SAPHO | The processor shaped by your program">
+  <meta property="og:description" content="Write C±, get a Verilog processor that carries only the blocks your algorithm uses. Toolchain, IDE and manual, free and open.">
   <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -26,11 +26,61 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/plex-sans-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fraunces-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=24489d9334">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=24489d9334">
+  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=3747f18bb9">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=3747f18bb9">
 
   <style>
     :root { --page-accent: var(--accent-sapho); --page-accent-dim: rgba(212,160,23,0.12); }
+
+    /* ── The cost card: the manual's PRISM experiment, live on the page ── */
+    .sapho-cost { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-2xl); overflow: hidden; }
+    .sapho-cost-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); background: rgba(212,160,23,0.05); }
+    .sapho-cost-title { font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-sapho); }
+    .sapho-toggle { display: inline-flex; border: 1px solid var(--border-subtle); border-radius: 999px; overflow: hidden; }
+    .sapho-toggle button { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); background: transparent; border: 0; padding: 6px 14px; cursor: pointer; transition: color .15s ease, background .15s ease; }
+    .sapho-toggle button[aria-pressed="true"] { background: var(--page-accent-dim); color: var(--accent-sapho); }
+    .sapho-code { margin: 0; padding: var(--sp-4) var(--sp-5); font-family: var(--font-mono); font-size: 13px; line-height: 1.75; color: var(--text-secondary); overflow-x: auto; white-space: pre; }
+    .sapho-code .c  { color: #6b7488; }
+    .sapho-code .k  { color: #8fb6f0; }
+    .sapho-code .hl { color: var(--accent-sapho); background: var(--page-accent-dim); border-radius: 4px; padding: 1px 4px; }
+    .sapho-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--border-subtle); }
+    .sapho-chip { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-secondary); background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 10px; }
+    .sapho-chip--div { color: var(--accent-sapho); border-color: rgba(212,160,23,0.45); background: var(--page-accent-dim); display: none; }
+    .sapho-cost[data-op="div"] .sapho-chip--div { display: inline-block; }
+    .sapho-cost[data-op="div"] .sapho-chip--shr { display: none; }
+    .sapho-cost-note { padding: 0 var(--sp-5) var(--sp-4); font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
+
+    /* ── The dual-track band: one wave, two languages ── */
+    .sapho-band { border-block: 1px solid var(--border-subtle); background: var(--bg-0); overflow: hidden; }
+    .sapho-band svg { display: block; width: 100%; height: auto; }
+    .sapho-band text { font-family: var(--font-mono); font-size: 11px; fill: var(--text-muted); }
+    .sapho-band .lbl { fill: var(--accent-sapho); font-weight: 600; }
+
+    /* ── Pipeline ── */
+    .sapho-pipe { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+    .sapho-stage { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); padding: var(--sp-5); }
+    .sapho-stage b { display: block; font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 600; color: var(--accent-sapho); margin-bottom: var(--sp-2); }
+    .sapho-stage span { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; display: block; }
+    .sapho-artifacts { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--sp-3); }
+    @media (max-width: 760px) { .sapho-pipe { grid-template-columns: 1fr; } }
+
+    /* ── Facts strip ── */
+    .sapho-facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+    .sapho-fact { text-align: center; padding: var(--sp-5) var(--sp-3); background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); }
+    .sapho-fact strong { display: block; font-size: var(--text-2xl); color: var(--accent-sapho); font-variant-numeric: tabular-nums; }
+    .sapho-fact span { font-size: var(--text-xs); color: var(--text-muted); }
+    .sapho-fact code { font-family: var(--font-mono); font-size: var(--text-lg); color: var(--accent-sapho); }
+    @media (max-width: 760px) { .sapho-facts { grid-template-columns: repeat(2, 1fr); } }
+
+    /* ── Screenshot cards ── */
+    .sapho-shot { display: block; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); overflow: hidden; text-decoration: none; transition: border-color .2s ease, transform .2s ease; }
+    .sapho-shot:hover { border-color: rgba(212,160,23,0.45); transform: translateY(-2px); }
+    .sapho-shot figure { margin: 0; overflow: hidden; }
+    .sapho-shot img { width: 100%; height: auto; display: block; }
+    .sapho-shot figcaption { padding: var(--sp-4) var(--sp-5); }
+    .sapho-shot .t { font-weight: 600; color: var(--text-primary); font-size: var(--text-sm); display: flex; align-items: center; gap: var(--sp-2); }
+    .sapho-shot .t i { color: var(--accent-sapho); }
+    .sapho-shot .d { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -55,8 +105,8 @@
             <span style="color:var(--accent-sapho)">SAPHO</span>
           </h1>
           <p class="project-hero-fullname fade-up" data-i18n="projects.sapho.full">Scalable-Architecture Processor for Hardware Optimization</p>
-          <p class="project-hero-desc fade-up" data-i18n="projects.sapho.desc">
-            SAPHO is a scalable hardware architecture and integrated toolchain for processor creation, experimentation, and hardware–software co-design — designed to make custom processor development accessible from university classrooms to research labs.
+          <p class="project-hero-desc fade-up">
+            Most processors are built first and programmed later. SAPHO turns that around: you write the algorithm in C±, a small dialect of C, and the toolchain emits a Verilog processor shaped by that exact program. Word width, memory sizes, even which ALU blocks exist: everything follows from your code. Divide nowhere, carry no divider.
           </p>
           <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links fade-up">
@@ -64,13 +114,13 @@
               <i class="ph ph-download" aria-hidden="true"></i>
               Download Latest Release
             </a>
+            <a href="/library/sapho/" class="btn btn-ghost">
+              <i class="ph ph-book-open" aria-hidden="true"></i>
+              Read the Manual
+            </a>
             <a href="https://github.com/nipscernlab/sapho" target="_blank" rel="noopener" class="btn btn-ghost">
               <i class="ph ph-github-logo" aria-hidden="true"></i>
               View on GitHub
-            </a>
-            <a href="/library/sapho/" class="btn btn-ghost">
-              <i class="ph ph-book-open" aria-hidden="true"></i>
-              Documentation
             </a>
             <a href="./" class="btn btn-ghost">
               <i class="ph ph-arrow-left" aria-hidden="true"></i>
@@ -89,266 +139,298 @@
         <span class="badge badge-gray">Open Source</span>
         <span class="badge badge-gray">MIT License</span>
         <span class="badge badge-green">Active</span>
-        <span class="badge badge-orange">Used in UFJF — DLP discipline</span>
+        <span class="badge badge-orange">Teaching platform of the DLP course at UFJF</span>
       </div>
     </div>
 
-    <!-- ── What SAPHO is ─────────────────────────────────────── -->
-    <section class="section">
+    <!-- ── Pay only for what you use ─────────────────────────── -->
+    <section class="section" aria-labelledby="cost-title">
       <div class="container">
-        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+        <div class="grid grid-2" style="gap:var(--sp-12);align-items:center">
 
-          <!-- Left: Description -->
           <div class="fade-up">
             <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
-            <h2 class="heading-lg" data-i18n="projects.sapho.features.title">What SAPHO Includes</h2>
+            <h2 class="heading-lg" id="cost-title">Every line has a price in silicon. Here it is.</h2>
             <p class="body-base" style="margin-top:var(--sp-4)">
-              SAPHO provides an end-to-end environment for processor design: from writing high-level CMM code to compiling, simulating, and visualising the resulting hardware. It bundles four major components — YANC, AURORA, Surfer, and PRISM — into a single cohesive installer.
+              Inside the generated processor, each instruction your program uses becomes a Verilog parameter set to 1; every other block is left out of synthesis entirely. A program that never divides ships without a divider. A program in integers carries no floating-point adder.
             </p>
             <p class="body-base" style="margin-top:var(--sp-4)">
-              The architecture is designed around a custom processor model that students and researchers can modify freely. SAPHO runs identically on Windows and Linux, and the entire compilation pipeline — from source to machine code — executes without any cloud dependency.
+              The card on the right is the moving-average filter from the manual's first processor tutorial. Flip the average between a bit shift and a division and watch the ALU change under it. In the IDE, the PRISM diagram shows the same block appearing in the actual circuit.
             </p>
-
-            <div class="feature-list" style="margin-top:var(--sp-8)">
-              <div class="feature-item">
-                <div class="feature-icon" style="background:rgba(0,180,166,0.12);color:var(--accent-yanc)"><i class="ph ph-code-block" aria-hidden="true"></i></div>
-                <div>
-                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">YANC toolchain</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted)">CMM compiler + assembly compiler — the compilation backbone</div>
-                </div>
-              </div>
-              <div class="feature-item">
-                <div class="feature-icon" style="background:rgba(124,58,237,0.12);color:var(--accent-aurora)"><i class="ph ph-app-window" aria-hidden="true"></i></div>
-                <div>
-                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">AURORA IDE</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Desktop IDE with Monaco Editor, simulation and the PRISM viewer in one window</div>
-                </div>
-              </div>
-              <div class="feature-item">
-                <div class="feature-icon" style="background:rgba(91,156,246,0.12);color:var(--brand)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
-                <div>
-                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">Surfer</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Waveform viewing and signal-timeline analysis, open from the IDE</div>
-                </div>
-              </div>
-              <div class="feature-item">
-                <div class="feature-icon" style="background:rgba(212,160,23,0.12);color:var(--accent-sapho)"><i class="ph ph-graph" aria-hidden="true"></i></div>
-                <div>
-                  <div class="feature-text" style="font-weight:600;color:var(--text-primary)">PRISM RTL Viewer</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted)">Processor structure and datapath visualisation in RTL</div>
-                </div>
-              </div>
+            <div style="margin-top:var(--sp-6);display:flex;gap:var(--sp-3);flex-wrap:wrap">
+              <a href="/library/sapho/sapho/tutorial-filtro.html" class="btn btn-outline btn-sm">
+                <i class="ph ph-book-open" aria-hidden="true"></i>
+                The tutorial behind this card
+              </a>
+              <a href="/library/sapho/sapho/prism.html" class="btn btn-ghost btn-sm">
+                <i class="ph ph-graph" aria-hidden="true"></i>
+                PRISM, the circuit drawn
+              </a>
             </div>
           </div>
 
-          <!-- Right: Ecosystem cards -->
-          <div class="fade-up">
-            <h3 class="heading-sm" style="margin-bottom:var(--sp-5)">The SAPHO Ecosystem</h3>
-            <div class="ecosystem-grid">
-              <a href="yanc" class="eco-card" style="--project-accent:var(--accent-yanc)">
-                <div style="font-size:24px;color:var(--accent-yanc);margin-bottom:var(--sp-2)"><i class="ph ph-code-block" aria-hidden="true"></i></div>
-                <div class="eco-card-name">YANC</div>
-                <div class="eco-card-desc">CMM + ASM compiler</div>
-              </a>
-              <a href="aurora" class="eco-card" style="--project-accent:var(--accent-aurora)">
-                <div style="font-size:24px;color:var(--accent-aurora);margin-bottom:var(--sp-2)"><i class="ph ph-app-window" aria-hidden="true"></i></div>
-                <div class="eco-card-name">AURORA</div>
-                <div class="eco-card-desc">Desktop IDE</div>
-              </a>
-              <div class="eco-card">
-                <div style="font-size:24px;color:var(--brand);margin-bottom:var(--sp-2)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
-                <div class="eco-card-name">Surfer</div>
-                <div class="eco-card-desc">Waveform viewer</div>
-              </div>
-              <div class="eco-card">
-                <div style="font-size:24px;color:var(--accent-sapho);margin-bottom:var(--sp-2)"><i class="ph ph-graph" aria-hidden="true"></i></div>
-                <div class="eco-card-name">PRISM</div>
-                <div class="eco-card-desc">RTL Viewer</div>
-              </div>
+          <div class="fade-up sapho-cost" id="sapho-cost" data-op="shr">
+            <div class="sapho-cost-head">
+              <span class="sapho-cost-title">media_movel.cmm</span>
+              <span class="sapho-toggle" role="group" aria-label="Choose how the average is computed">
+                <button type="button" id="op-shr" aria-pressed="true">soma &gt;&gt; 2</button>
+                <button type="button" id="op-div" aria-pressed="false">soma / 4</button>
+              </span>
             </div>
+<pre class="sapho-code"><span class="k">while</span> (1)
+{
+    x[3] = x[2];          <span class="c">// shift the history</span>
+    x[2] = x[1];
+    x[1] = x[0];
+    x[0] = in(0);         <span class="c">// read the new sample</span>
 
-            <div style="margin-top:var(--sp-6);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-5)">
-              <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)">Supported Platforms</div>
-              <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
-                <div style="display:flex;align-items:center;gap:var(--sp-3)">
-                  <i class="ph ph-windows-logo" style="color:var(--accent-sapho);font-size:18px" aria-hidden="true"></i>
-                  <span style="font-size:var(--text-sm);color:var(--text-secondary)">Windows 10 / 11 — 64-bit installer (.exe)</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:var(--sp-3)">
-                  <i class="ph ph-linux-logo" style="color:var(--accent-sapho);font-size:18px" aria-hidden="true"></i>
-                  <span style="font-size:var(--text-sm);color:var(--text-secondary)">Linux x86_64 — binary tarball (.tar.gz)</span>
-                </div>
-              </div>
+    soma = x[0] + x[1] + x[2] + x[3];
+    out(0, <span class="hl" id="op-line">soma &gt;&gt; 2</span>);
+}</pre>
+            <div class="sapho-chips" aria-live="polite">
+              <span class="sapho-chip">ADD adder</span>
+              <span class="sapho-chip sapho-chip--shr" id="chip-shr">SHR shifter</span>
+              <span class="sapho-chip sapho-chip--div" id="chip-div">DIV integer divider</span>
+              <span class="sapho-chip">INN input port</span>
+              <span class="sapho-chip">OUT output port</span>
+              <span class="sapho-chip">JMP &middot; JIZ branches</span>
             </div>
+            <p class="sapho-cost-note">ALU blocks synthesised for this program. The assembler prints this same inventory in the TASM terminal on every build.</p>
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- ── Education at UFJF ─────────────────────────────────── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
-      <div class="container">
-        <div class="grid grid-2" style="gap:var(--sp-12);align-items:start">
+    <!-- ── One wave, two languages ───────────────────────────── -->
+    <div class="sapho-band" aria-hidden="true">
+      <svg viewBox="0 0 1200 150" preserveAspectRatio="xMidYMid slice">
+        <!-- clock -->
+        <path id="wave-clk" d="M0 40 H50 V20 H100 V40 H150 V20 H200 V40 H250 V20 H300 V40 H350 V20 H400 V40 H450 V20 H500 V40 H550 V20 H600 V40 H650 V20 H700 V40 H750 V20 H800 V40 H850 V20 H900 V40 H950 V20 H1000 V40 H1050 V20 H1100 V40 H1150 V20 H1200"
+              fill="none" stroke="rgba(228,232,242,0.28)" stroke-width="1.5"/>
+        <!-- the average climbing the step, in gold -->
+        <path id="wave-soma" d="M0 105 H300 V95 H400 V85 H500 V75 H600 V70 H1200"
+              fill="none" stroke="#d4a017" stroke-width="2"/>
+        <text x="8"  y="34">clk</text>
+        <text x="8"  y="120">out(0)</text>
+        <text class="lbl" x="304" y="132">LOD</text>
+        <text class="lbl" x="404" y="132">ADD</text>
+        <text class="lbl" x="504" y="132">SHR</text>
+        <text class="lbl" x="604" y="132">OUT</text>
+        <text x="304" y="146">x[0] = in(0);</text>
+        <text x="504" y="146">out(0, soma &gt;&gt; 2);</text>
+      </svg>
+    </div>
+    <div class="container" style="padding-top:var(--sp-4)">
+      <p class="body-sm fade-up" style="color:var(--text-muted);max-width:720px">
+        A SAPHO waveform carries two extra tracks: the assembly instruction retiring on each clock, and the C± source line it came from. You watch your own <code style="font-family:var(--font-mono)">while</code> loop execute, cycle by cycle. <a href="/library/sapho/sapho/simulacao.html" class="wlink">How the tracks work</a>.
+      </p>
+    </div>
 
-          <div class="fade-up">
-            <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
-            <h2 class="heading-lg">From the Lab to the Classroom</h2>
-            <p class="body-base" style="margin-top:var(--sp-4)">
-              SAPHO is being implemented as the core platform for the <strong>DLP (Dispositivos Lógicos Programáveis — Programmable Logic Devices)</strong> discipline at UFJF — Universidade Federal de Juiz de Fora. Every student enrolled in this course designs, compiles, and simulates custom processor architectures using SAPHO.
-            </p>
-            <p class="body-base" style="margin-top:var(--sp-4)">
-              This means NIPS-CERN is directly shaping the next generation of hardware engineers graduating from UFJF. SAPHO bridges the gap between theoretical computer architecture concepts and hands-on hardware design experience.
-            </p>
-            <div style="margin-top:var(--sp-6);background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.2);border-radius:var(--r-xl);padding:var(--sp-5)">
-              <div style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-sapho);margin-bottom:var(--sp-3)">Impact</div>
-              <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
-                All students who take or will take the DLP discipline at UFJF work with our custom processor. NIPS-CERN is forming a generation of engineers on our own platform, with our own tools, built in-house.
-              </p>
-            </div>
-          </div>
-
-          <div class="fade-up">
-            <h3 class="heading-sm" style="margin-bottom:var(--sp-5)">What Students Do with SAPHO</h3>
-            <div style="display:flex;flex-direction:column;gap:var(--sp-3)">
-              <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
-                <div style="min-width:32px;height:32px;border-radius:var(--r-md);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:16px">
-                  <i class="ph ph-file-code" aria-hidden="true"></i>
-                </div>
-                <div>
-                  <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Write CMM Programs</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Design custom processor instruction sets and write programs in the CMM high-level language using AURORA IDE</div>
-                </div>
-              </div>
-              <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
-                <div style="min-width:32px;height:32px;border-radius:var(--r-md);background:rgba(0,180,166,0.12);color:var(--accent-yanc);display:flex;align-items:center;justify-content:center;font-size:16px">
-                  <i class="ph ph-gear" aria-hidden="true"></i>
-                </div>
-                <div>
-                  <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Compile with YANC</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Pass CMM source through cmmcomp and asmcomp, generating binary for their custom processor</div>
-                </div>
-              </div>
-              <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
-                <div style="min-width:32px;height:32px;border-radius:var(--r-md);background:rgba(91,156,246,0.12);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:16px">
-                  <i class="ph ph-wave-sine" aria-hidden="true"></i>
-                </div>
-                <div>
-                  <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Simulate &amp; Analyse</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Verify signal behaviour with Surfer and visualise datapath structure in PRISM</div>
-                </div>
-              </div>
-              <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-4);display:flex;align-items:flex-start;gap:var(--sp-4)">
-                <div style="min-width:32px;height:32px;border-radius:var(--r-md);background:rgba(29,78,137,0.12);color:var(--accent-cgv);display:flex;align-items:center;justify-content:center;font-size:16px">
-                  <i class="ph ph-circuitry" aria-hidden="true"></i>
-                </div>
-                <div>
-                  <div style="font-size:var(--text-sm);font-weight:600;color:var(--text-primary)">Deploy to FPGA</div>
-                  <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">Synthesise the processor design onto FPGA boards available in the NIPS-CERN laboratory</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ── Technical Architecture ────────────────────────────── -->
-    <section class="section" style="border-top:1px solid var(--border-subtle)">
+    <!-- ── Three compilers ───────────────────────────────────── -->
+    <section class="section" aria-labelledby="pipe-title">
       <div class="container">
         <div class="section-header fade-up">
-          <h2 class="heading-lg">Technical Architecture</h2>
-          <p class="body-base" style="max-width:640px;margin-top:var(--sp-4)">SAPHO's design separates compilation, simulation, and visualisation into dedicated components, each independently usable yet tightly integrated through the AURORA IDE.</p>
+          <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="pipe-title">One button, three compilers</h2>
+          <p class="body-base" style="max-width:640px;margin-top:var(--sp-4)">
+            The Compile C± button in AURORA runs the YANC chain end to end. Each stage is an ordinary executable you could run by hand; the IDE simply never makes you.
+          </p>
+        </div>
+        <div class="sapho-pipe fade-up">
+          <div class="sapho-stage">
+            <b>1 &middot; cmmcomp</b>
+            <span>Translates C± into SAPHO assembly: variables placed, expressions scheduled through the accumulator, library routines appended only when called.</span>
+            <div class="sapho-artifacts">.cmm &rarr; .asm</div>
+          </div>
+          <div class="sapho-stage">
+            <b>2 &middot; appcomp</b>
+            <span>A first pass over the assembly. Counts instructions and data, resolves label addresses, so the single-pass assembler knows every size before emitting a word.</span>
+            <div class="sapho-artifacts">.asm &rarr; addresses</div>
+          </div>
+          <div class="sapho-stage">
+            <b>3 &middot; asmcomp</b>
+            <span>Assembles the program, sizes both memories exactly, and writes the processor with only the used blocks switched on. A testbench comes out with it.</span>
+            <div class="sapho-artifacts">&rarr; .v + .mif + testbench</div>
+          </div>
+        </div>
+        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-5)">
+          The <code style="font-family:var(--font-mono)">.v</code> and the two <code style="font-family:var(--font-mono)">.mif</code> memory images are exactly what goes to Quartus or Vivado for the real FPGA. <a href="/library/sapho/sapho/compilacao.html" class="wlink">The chain in detail</a> &middot; <a href="/library/sapho/juntos/fpga.html" class="wlink">Taking it to the board</a>.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── Facts ─────────────────────────────────────────────── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-label="Architecture facts">
+      <div class="container">
+        <div class="sapho-facts fade-up">
+          <div class="sapho-fact"><strong>108</strong><span>instructions in the ISA, synthesised only when used</span></div>
+          <div class="sapho-fact"><strong>3</strong><span>pipeline stages, one instruction per cycle, no hazards by construction</span></div>
+          <div class="sapho-fact"><strong>2</strong><span>separate memories, program and data, sized to your exact program</span></div>
+          <div class="sapho-fact"><code>N = M + E + 1</code><span>word width is mantissa plus exponent plus sign: floating point is a design parameter</span></div>
+        </div>
+        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-5);max-width:720px">
+          Accumulator machine, Harvard memories, synchronous reset. The whole HDL library is five Verilog files you can read in an afternoon. <a href="/library/sapho/avancado/modulos-hdl.html" class="wlink">The modules, opened up</a> &middot; <a href="/library/sapho/referencia/instrucoes.html" class="wlink">The full instruction set</a>.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── One window ────────────────────────────────────────── -->
+    <section class="section" aria-labelledby="window-title">
+      <div class="container">
+        <div class="section-header fade-up">
+          <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="window-title">The whole flow in one window</h2>
+          <p class="body-base" style="max-width:640px;margin-top:var(--sp-4)">
+            AURORA is the desktop IDE of the platform: editor, project manager, compilers, two simulators, two waveform viewers and the circuit diagram, with no cloud behind any of it.
+          </p>
         </div>
 
         <div class="grid grid-2" style="gap:var(--sp-6)">
-          <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
-            <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
-              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(0,180,166,0.12);color:var(--accent-yanc);display:flex;align-items:center;justify-content:center;font-size:20px">
-                <i class="ph ph-code-block" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div style="font-weight:700;color:var(--text-primary)">YANC Compiler Suite</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted)">Written in C · Flex · Bison · GCC</div>
-              </div>
-            </div>
-            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
-              YANC bridges the gap between high-level description and machine execution. It includes <code style="font-family:var(--font-mono);font-size:var(--text-xs);background:var(--bg-elevated);padding:1px 4px;border-radius:3px;color:var(--accent-yanc)">cmmcomp</code> (CMM → assembly), <code style="font-family:var(--font-mono);font-size:var(--text-xs);background:var(--bg-elevated);padding:1px 4px;border-radius:3px;color:var(--accent-yanc)">asmcomp</code> (assembly → binary/hex), and <code style="font-family:var(--font-mono);font-size:var(--text-xs);background:var(--bg-elevated);padding:1px 4px;border-radius:3px;color:var(--accent-yanc)">APP</code> auxiliary tools.
-            </p>
-          </div>
+          <a class="sapho-shot fade-up" href="/library/sapho/diaadia/tour-interface.html">
+            <figure>
+              <img src="../assets/images/sapho/ide.webp" alt="The AURORA IDE with a C± file open, terminals and status bar" width="1280" height="820" loading="lazy">
+              <figcaption>
+                <span class="t"><i class="ph ph-app-window" aria-hidden="true"></i> AURORA, the IDE</span>
+                <span class="d">Monaco editor with C± and Verilog analysis as you type, six purpose-built terminals, and a status bar that always shows what will run. Tour in the manual.</span>
+              </figcaption>
+            </figure>
+          </a>
+          <a class="sapho-shot fade-up" href="/library/sapho/sapho/prism.html">
+            <figure>
+              <img src="../assets/images/sapho/prism-alu.webp" alt="PRISM drawing the RTL of a generated processor" width="1600" height="906" loading="lazy">
+              <figcaption>
+                <span class="t"><i class="ph ph-graph" aria-hidden="true"></i> PRISM, the circuit drawn</span>
+                <span class="d">Yosys elaborates, the page draws. Click a module to descend the hierarchy; double-click a cell to land on its source line. The divider experiment happens here.</span>
+              </figcaption>
+            </figure>
+          </a>
+          <a class="sapho-shot fade-up" href="/library/sapho/verilog/ondas.html">
+            <figure>
+              <img src="../assets/images/sapho/wave-config.webp" alt="Wave configuration with the processor signal tree" width="1600" height="898" loading="lazy">
+              <figcaption>
+                <span class="t"><i class="ph ph-wave-sine" aria-hidden="true"></i> Waves, curated</span>
+                <span class="d">Icarus when you want every signal, Verilator when you want speed. GTKWave or Surfer open with your variables named and grouped, not a raw dump.</span>
+              </figcaption>
+            </figure>
+          </a>
+          <a class="sapho-shot fade-up" href="/library/sapho/sapho/linguagem.html">
+            <figure>
+              <img src="../assets/images/sapho/editor-cmm.webp" alt="C± source in the AURORA editor" width="1280" height="820" loading="lazy">
+              <figcaption>
+                <span class="t"><i class="ph ph-file-code" aria-hidden="true"></i> C±, the language</span>
+                <span class="d">C without what cannot become fixed hardware, plus what silicon deserves: native complex numbers, Dirac notation for linear algebra, bit-reversed indexing for FFT.</span>
+              </figcaption>
+            </figure>
+          </a>
+        </div>
 
-          <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
-            <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
-              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(124,58,237,0.12);color:var(--accent-aurora);display:flex;align-items:center;justify-content:center;font-size:20px">
-                <i class="ph ph-app-window" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div style="font-weight:700;color:var(--text-primary)">AURORA IDE</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted)">Electron · Monaco Editor · Aurora Intelligence</div>
-              </div>
-            </div>
-            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
-              AURORA is the desktop IDE for SAPHO. It embeds Monaco Editor (the engine behind VS Code) for code, runs Icarus Verilog and Verilator simulations, and brings compilation, waveform inspection and the PRISM RTL viewer into one window. Aurora Intelligence adds an AI assistant that drives the IDE through its own tools.
-            </p>
-          </div>
+        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-6);max-width:760px">
+          For graduate work the language goes further: an adaptive RLS filter is 66 lines when <code style="font-family:var(--font-mono)">⟨w|x⟩</code> is an expression, and an 8-point FFT loads its samples pre-shuffled because <code style="font-family:var(--font-mono)">data[i)</code> reverses the index bits in hardware.
+          <a href="/library/sapho/avancado/dirac.html" class="wlink">Dirac notation</a> &middot;
+          <a href="/library/sapho/avancado/fft.html" class="wlink">FFT in hardware</a> &middot;
+          <a href="/library/sapho/verilog/testbenches.html" class="wlink">Testbenches in Verilog and cocotb</a> &middot;
+          <a href="aurora" class="wlink">Aurora Intelligence, the AI in the IDE</a>
+        </p>
+      </div>
+    </section>
 
-          <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
-            <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
-              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(91,156,246,0.12);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:20px">
-                <i class="ph ph-wave-sine" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div style="font-weight:700;color:var(--text-primary)">Surfer</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted)">Waveform viewer · a fork we maintain</div>
-              </div>
-            </div>
-            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
-              Surfer is a fast, open-source waveform viewer. The group maintains a fork of it wired into AURORA, so inspecting signal timelines, register states, and data flows over clock cycles happens without switching tools.
+    <!-- ── Proven where it counts ────────────────────────────── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="proof-title">
+      <div class="container">
+        <div class="section-header fade-up">
+          <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="proof-title">Proven where it counts</h2>
+        </div>
+        <div class="grid grid-3" style="gap:var(--sp-6)">
+          <div class="card fade-up" style="padding:var(--sp-6)">
+            <div style="font-size:22px;color:var(--accent-sapho);margin-bottom:var(--sp-3)"><i class="ph ph-atom" aria-hidden="true"></i></div>
+            <div style="font-weight:600;color:var(--text-primary);margin-bottom:var(--sp-2)">Running at CERN</div>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0 0 var(--sp-4)">
+              A SAPHO processor drives the real-time pulse simulator used in test benches for the TileCal calorimeter electronics of the ATLAS experiment.
             </p>
+            <a class="wlink" href="https://cdn.nipscern.com/publications/sbai-2025-simulador-de-pulsos-do-tilecal.pdf" target="_blank" rel="noopener">The SBAI 2025 paper</a>
           </div>
+          <div class="card fade-up" style="padding:var(--sp-6)">
+            <div style="font-size:22px;color:var(--accent-sapho);margin-bottom:var(--sp-3)"><i class="ph ph-newspaper" aria-hidden="true"></i></div>
+            <div style="font-weight:600;color:var(--text-primary);margin-bottom:var(--sp-2)">Published</div>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0 0 var(--sp-4)">
+              The architecture and its program-driven resource allocation are described in the platform's reference article, with results on FPGA.
+            </p>
+            <a class="wlink" href="https://cdn.nipscern.com/publications/ieee-2026-soft-core-processors.pdf" target="_blank" rel="noopener">The IEEE 2026 article</a>
+          </div>
+          <div class="card fade-up" style="padding:var(--sp-6)">
+            <div style="font-size:22px;color:var(--accent-sapho);margin-bottom:var(--sp-3)"><i class="ph ph-books" aria-hidden="true"></i></div>
+            <div style="font-weight:600;color:var(--text-primary);margin-bottom:var(--sp-2)">Taught at UFJF</div>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0 0 var(--sp-4)">
+              SAPHO is the platform of the Programmable Logic Devices course: every student designs, compiles and simulates a processor of their own. The manual follows the course order, Verilog first, then C±, then both together.
+            </p>
+            <a class="wlink" href="/library/sapho/verilog/tutorial-contador.html">Tutorial 1: a counter in Verilog</a><br>
+            <a class="wlink" href="/library/sapho/sapho/tutorial-filtro.html">Tutorial 2: your first processor</a><br>
+            <a class="wlink" href="/library/sapho/referencia/folha-rapida.html">The bench cheat sheet</a>
+          </div>
+        </div>
+        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-5)">
+          More reading in the manual's <a href="/library/sapho/publicacoes.html" class="wlink">selected publications</a> and in the lab's <a href="../publications" class="wlink">full list</a>.
+        </p>
+      </div>
+    </section>
 
-          <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-xl);padding:var(--sp-6)">
-            <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4)">
-              <div style="width:40px;height:40px;border-radius:var(--r-lg);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:20px">
-                <i class="ph ph-graph" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div style="font-weight:700;color:var(--text-primary)">PRISM RTL Viewer</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted)">Processor structure visualisation</div>
-              </div>
-            </div>
-            <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0">
-              PRISM renders processor structure and datapaths as RTL diagrams, making it straightforward to understand and debug the hardware description. Students can visually trace how data moves through their processor design.
-            </p>
-          </div>
+    <!-- ── Ecosystem ─────────────────────────────────────────── -->
+    <section class="section" aria-labelledby="eco-title">
+      <div class="container">
+        <div class="section-header fade-up">
+          <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="eco-title">The pieces, each with its own page</h2>
+        </div>
+        <div class="ecosystem-grid fade-up">
+          <a href="aurora" class="eco-card" style="--project-accent:var(--accent-aurora)">
+            <div style="font-size:24px;color:var(--accent-aurora);margin-bottom:var(--sp-2)"><i class="ph ph-app-window" aria-hidden="true"></i></div>
+            <div class="eco-card-name">AURORA</div>
+            <div class="eco-card-desc">The desktop IDE, with Aurora Intelligence</div>
+          </a>
+          <a href="yanc" class="eco-card" style="--project-accent:var(--accent-yanc)">
+            <div style="font-size:24px;color:var(--accent-yanc);margin-bottom:var(--sp-2)"><i class="ph ph-code-block" aria-hidden="true"></i></div>
+            <div class="eco-card-name">YANC</div>
+            <div class="eco-card-desc">The compiler suite: cmmcomp, appcomp, asmcomp</div>
+          </a>
+          <a href="https://gitlab.com/nips-cern/surfer-aurora" target="_blank" rel="noopener" class="eco-card">
+            <div style="font-size:24px;color:var(--brand);margin-bottom:var(--sp-2)"><i class="ph ph-wave-sine" aria-hidden="true"></i></div>
+            <div class="eco-card-name">Surfer</div>
+            <div class="eco-card-desc">Waveform viewer, the fork we maintain</div>
+          </a>
+          <a href="/library/sapho/sapho/prism.html" class="eco-card">
+            <div style="font-size:24px;color:var(--accent-sapho);margin-bottom:var(--sp-2)"><i class="ph ph-graph" aria-hidden="true"></i></div>
+            <div class="eco-card-name">PRISM</div>
+            <div class="eco-card-desc">The RTL diagram, in the manual</div>
+          </a>
         </div>
       </div>
     </section>
 
-    <!-- ── Download ───────────────────────────────────────────── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+    <!-- ── Download ──────────────────────────────────────────── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="dl-title">
       <div class="container container--narrow">
         <div class="fade-up" style="background:var(--bg-card);border:1px solid rgba(212,160,23,0.3);border-radius:var(--r-2xl);padding:var(--sp-10);text-align:center">
           <div style="width:56px;height:56px;border-radius:var(--r-2xl);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto var(--sp-5)">
             <i class="ph ph-download" aria-hidden="true"></i>
           </div>
-          <h2 class="heading-md" style="margin-bottom:var(--sp-4)">Download SAPHO</h2>
-          <p class="body-base" style="max-width:480px;margin:0 auto var(--sp-6)">
-            Download the latest SAPHO installer for Windows or Linux from the official GitHub Releases page. The installer bundles YANC, AURORA, Surfer, and PRISM into a single setup.
+          <h2 class="heading-md" id="dl-title" style="margin-bottom:var(--sp-4)">Download SAPHO</h2>
+          <p class="body-base" style="max-width:520px;margin:0 auto var(--sp-6)">
+            One installer brings the whole platform: AURORA, the YANC compilers, both simulators, both waveform viewers and an embedded Python for cocotb. The button always fetches the latest release.
           </p>
           <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
-            <a href="https://github.com/nipscernlab/sapho/releases" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
+            <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
               <i class="ph ph-download" aria-hidden="true"></i>
-              GitHub Releases
+              Download Latest Release
             </a>
-            <a href="https://github.com/nipscernlab/sapho" target="_blank" rel="noopener" class="btn btn-ghost">
-              <i class="ph ph-github-logo" aria-hidden="true"></i>
-              Source Code
-            </a>
-            <a href="/library/sapho/" class="btn btn-ghost">
+            <a href="/library/sapho/inicio/instalacao.html" class="btn btn-ghost">
               <i class="ph ph-book-open" aria-hidden="true"></i>
-              Documentation
+              Install, step by step
+            </a>
+            <a href="/library/sapho/_static/downloads/AURORA-Manual-6.4.2.pdf" class="btn btn-ghost">
+              <i class="ph ph-file-pdf" aria-hidden="true"></i>
+              Manual as PDF
             </a>
           </div>
         </div>
@@ -359,12 +441,12 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=24489d9334"></script>
-  <script src="../assets/js/analytics.min.js?v=24489d9334" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=3747f18bb9"></script>
+  <script src="../assets/js/analytics.min.js?v=3747f18bb9" defer></script>
 
   <!-- O nome do instalador carrega a versão (sapho-aurora-Setup-vX.Y.Z.exe),
        então não existe URL fixa para "a última". Este script pergunta à API do
-       GitHub qual é a release mais recente e aponta o botão de download direto
+       GitHub qual é a release mais recente e aponta os botões de download direto
        para o executável. Se a API falhar, o href original (página da última
        release) continua valendo. -->
   <script>
@@ -382,6 +464,66 @@
         links.forEach((a) => { a.href = asset.browser_download_url; });
       } catch (_) { /* mantém o link para a página de releases */ }
     })();
+  </script>
+
+  <!-- Movimento da página, todo pelo pipeline da casa (motion.js + GSAP
+       vendorizado). Nada aqui decide visibilidade: sem JavaScript, a página é
+       o que o CSS desenhou, com as ondas já traçadas e o cartão no estado do
+       deslocamento. -->
+  <script type="module">
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=3747f18bb9';
+
+    revealFailsafe();
+
+    /* O cartão do custo: trocar o operador troca a linha destacada e o bloco
+       da ULA. Funciona sem GSAP; com ele, o chip do divisor entra com um pulso. */
+    const cost = document.getElementById('sapho-cost');
+    const btnShr = document.getElementById('op-shr');
+    const btnDiv = document.getElementById('op-div');
+    const opLine = document.getElementById('op-line');
+    function setOp(op) {
+      cost.dataset.op = op;
+      opLine.textContent = op === 'div' ? 'soma / 4' : 'soma >> 2';
+      btnShr.setAttribute('aria-pressed', String(op === 'shr'));
+      btnDiv.setAttribute('aria-pressed', String(op === 'div'));
+      const chip = document.getElementById(op === 'div' ? 'chip-div' : 'chip-shr');
+      if (window.gsap && chip) {
+        window.gsap.fromTo(chip, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(2)' });
+      }
+    }
+    btnShr.addEventListener('click', () => setOp('shr'));
+    btnDiv.addEventListener('click', () => setOp('div'));
+
+    const ok = await ensureMotionLibs();
+    if (!ok) { /* prefere menos movimento, ou a rede falhou: a página já está inteira */ }
+    else {
+      initMotion();
+
+      /* A faixa de onda: o clock e a média sobem o degrau conforme a página
+         rola, com o DrawSVG que a página do CERN já usa. Sem o plugin, os
+         traços ficam completos, que é o estado do CSS. */
+      const STAMP = '?v=24489d9334';
+      const loadDraw = () => new Promise((res) => {
+        if (window.DrawSVGPlugin) return res(true);
+        const s = document.createElement('script');
+        s.src = '../assets/js/vendor/DrawSVGPlugin.min.js' + STAMP;
+        s.onload = () => res(true);
+        s.onerror = () => res(false);
+        document.head.appendChild(s);
+      });
+      if (await loadDraw()) {
+        window.gsap.registerPlugin(window.DrawSVGPlugin);
+        const band = document.querySelector('.sapho-band');
+        window.gsap.fromTo('#wave-clk', { drawSVG: '0%' }, {
+          drawSVG: '100%', ease: 'none',
+          scrollTrigger: { trigger: band, start: 'top 90%', end: 'bottom 40%', scrub: 0.6 }
+        });
+        window.gsap.fromTo('#wave-soma', { drawSVG: '0%' }, {
+          drawSVG: '100%', ease: 'none',
+          scrollTrigger: { trigger: band, start: 'top 85%', end: 'bottom 35%', scrub: 0.6 }
+        });
+      }
+    }
   </script>
 </body>
 </html>
