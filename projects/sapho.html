@@ -769,8 +769,19 @@
       renderer.shadowMap.type = T.PCFSoftShadowMap;
       const scene = new T.Scene();
       const cam = new T.PerspectiveCamera(27, 1, 0.1, 100);
-      cam.position.set(0.2, 5.3, 8.8);
-      cam.lookAt(0, -0.1, 0);
+      /* A camera se afasta o quanto o palco pedir: meia-diagonal do
+         encapsulamento na horizontal e a projecao inclinada na vertical,
+         com folga, para nenhum canto cortar em nenhuma proporcao nem
+         durante o arrasto. */
+      const camDir = new T.Vector3(0.022, 0.52, 0.85).normalize();
+      function fitCamera() {
+        const vf = (cam.fov * Math.PI) / 180;
+        const hf = 2 * Math.atan(Math.tan(vf / 2) * cam.aspect);
+        const d = Math.max(2.9 / Math.tan(vf / 2), 3.45 / Math.tan(hf / 2));
+        cam.position.copy(camDir).multiplyScalar(d);
+        cam.lookAt(0, -0.1, 0);
+      }
+      fitCamera();
 
       scene.add(new T.AmbientLight(0xaabbdd, 0.55));
       scene.add(new T.HemisphereLight(0x93b3e8, 0x080b14, 0.8));
@@ -948,6 +959,7 @@
         renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
         renderer.setSize(r.width, r.height, false);
         cam.aspect = r.width / r.height; cam.updateProjectionMatrix();
+        fitCamera();
       }
       new ResizeObserver(resize).observe(stage);
       resize();
