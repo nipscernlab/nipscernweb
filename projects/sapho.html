@@ -138,8 +138,24 @@
     .sapho-plate-head .fn { color: var(--gold-hi); }
     .sapho-plate-head .tag { color: var(--ink-faint); }
     .sapho-plate pre { margin: 0; padding: var(--sp-4) var(--sp-5); font-family: var(--font-mono); font-size: 13px; line-height: 1.7;
-      color: var(--text-secondary); overflow-x: auto; white-space: pre; }
-    .sapho-plate .c { color: #6b7488; } .sapho-plate .k { color: #8fb6f0; } .sapho-plate .g { color: var(--gold); }
+      color: #aeb8ce; overflow-x: auto; white-space: pre; }
+    .sapho-plate .c { color: #5d6780; }                    /* comentario */
+    .sapho-plate .k { color: #8fb6f0; }                    /* palavra-chave */
+    .sapho-plate .t { color: #4ecdc0; }                    /* tipo */
+    .sapho-plate .b { color: #a9c6f2; }                    /* builtin de I/O */
+    .sapho-plate .n { color: #cfa75f; }                    /* numero */
+    .sapho-plate .s { color: #9cc492; }                    /* string */
+    .sapho-plate .g { color: var(--gold-hi); }             /* operador que vira bloco */
+    /* um token que compila para um bloco e apontavel: passar o mouse acende
+       o parametro correspondente no Verilog gerado, e vice-versa */
+    .sapho-plate [data-op] { border-bottom: 1px dotted rgba(212,160,23,0.45); cursor: help; border-radius: 3px;
+      transition: background .15s ease, color .15s ease; }
+    .sapho-plate [data-op].hl { background: rgba(212,160,23,0.18); color: #ffd966; }
+    .sapho-copy { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; color: var(--text-muted);
+      background: none; border: 1px solid var(--rule); border-radius: 6px; padding: 3px 9px; cursor: pointer;
+      transition: color .15s, border-color .15s; }
+    .sapho-copy:hover { color: var(--gold-hi); border-color: var(--gold-line); }
+    .sapho-copy.ok { color: var(--gold); border-color: var(--gold-line); }
 
     /* a instancia do processor: o truque inteiro numa chamada */
     .sapho-wrapper-plate pre { font-size: 12.5px; }
@@ -294,7 +310,7 @@
           <p class="sapho-fullname">Scalable-Architecture Processor for Hardware Optimization</p>
           <p class="sapho-thesis">You do not program this processor. <em>You author it.</em></p>
           <p class="sapho-lede">
-            Most processors are built first and programmed later. SAPHO turns that around: you write the algorithm in <em>C±</em>, a small dialect of C, and the toolchain emits a Verilog processor with exactly the hardware those lines require. Word width, memories, stacks and every ALU block follow from the code; what the program never asks for is never built.
+            Most processors are built first and programmed later. SAPHO turns that around: you write the algorithm in <em>C±</em>, a small dialect of C, and the toolchain emits a Verilog processor shaped by those exact lines. What the program never asks for is never built.
           </p>
           <div style="margin-top:var(--sp-4)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links">
@@ -319,7 +335,7 @@
 
         <div class="sapho-die-stage fade-in" aria-label="Three-dimensional floorplan of a SAPHO processor: fixed modules plus one cell per instruction; only the gold cells are synthesised">
           <canvas id="die-canvas"></canvas>
-          <span class="sapho-die-hint" id="die-hint">the die of media_movel.cmm — hover a block</span>
+          <span class="sapho-die-hint" id="die-hint">media_movel.cmm · 8 blocks built — drag to turn, hover a block</span>
         </div>
       </div>
     </header>
@@ -345,7 +361,7 @@
           <span class="note">ula.v · generate if</span>
         </div>
         <p class="sec-lede fade-up">
-          Open a generated <code>&lt;proc&gt;.v</code> and the whole trick is one instantiation: every instruction your program uses becomes a Verilog parameter set to 1, and inside the HDL library each block sits behind a <code>generate if</code> on that parameter. Instruction not used, block not synthesised. Pick a program and watch the parameter list, the block count and the die above all change with it.
+          The whole trick is one instantiation: each instruction your program uses becomes a Verilog parameter set to 1, and each block sits behind a <code>generate if</code> on it. Not used, not built. Pick a program; the dotted tokens are the ones that become hardware, so point at one.
         </p>
 
         <div class="sapho-tabs fade-up" role="tablist" aria-label="Example programs">
@@ -356,16 +372,16 @@
 
         <div class="sapho-prog fade-up">
           <div class="sapho-plate glass glass--flat">
-            <div class="sapho-plate-head"><span class="fn" id="src-name">media_movel.cmm</span><span class="tag" id="src-tag">int · 16 bits</span></div>
-            <pre id="src-code"><span class="k">while</span> (1)
+            <div class="sapho-plate-head"><span class="fn" id="src-name">media_movel.cmm</span><span style="display:inline-flex;align-items:center;gap:12px"><span class="tag" id="src-tag">int · 16 bits</span><button class="sapho-copy" id="src-copy" aria-label="Copy the C&#177; source">COPY</button></span></div>
+            <pre id="src-code"><span class="k">while</span> (<span class="n">1</span>)
 {
-    x[3] = x[2];              <span class="c">// shift the history</span>
-    x[2] = x[1];
-    x[1] = x[0];
-    x[0] = in(0);             <span class="c">// new sample</span>
+    x[<span class="n">3</span>] = x[<span class="n">2</span>];              <span class="c">// shift the history</span>
+    x[<span class="n">2</span>] = x[<span class="n">1</span>];
+    x[<span class="n">1</span>] = x[<span class="n">0</span>];
+    x[<span class="n">0</span>] = <span class="b" data-op="INN">in</span>(<span class="n">0</span>);             <span class="c">// new sample</span>
 
-    soma = x[0] + x[1] + x[2] + x[3];
-    out(0, <span class="g">soma &gt;&gt; 2</span>);    <span class="c">// mean, no divider</span>
+    soma = x[<span class="n">0</span>] <span data-op="ADD">+</span> x[<span class="n">1</span>] <span data-op="ADD">+</span> x[<span class="n">2</span>] <span data-op="ADD">+</span> x[<span class="n">3</span>];
+    <span class="b" data-op="OUT">out</span>(<span class="n">0</span>, soma <span class="g" data-op="SHR">&gt;&gt;</span> <span class="n">2</span>);    <span class="c">// mean, no divider</span>
 }</pre>
           </div>
 
@@ -374,8 +390,8 @@
               <div class="sapho-plate-head"><span class="fn" id="wrap-name">media_movel.v</span><span class="tag">generated</span></div>
               <pre>processor #(
     .NUBITS(16), .NBMANT(10), .NBEXPO(5),
-    <span class="live" id="wrap-params">.LOD(1), .SET(1), .INN(1), .OUT(1),
-    .JMP(1), .JIZ(1), .ADD(1), .SHR(1)</span>
+    <span class="live" id="wrap-params"><span data-op="LOD">.LOD(1)</span>, <span data-op="SET">.SET(1)</span>, <span data-op="INN">.INN(1)</span>, <span data-op="OUT">.OUT(1)</span>,
+    <span data-op="JMP">.JMP(1)</span>, <span data-op="JIZ">.JIZ(1)</span>, <span data-op="ADD">.ADD(1)</span>, <span data-op="SHR">.SHR(1)</span></span>
     <span class="c">// every other instruction stays 0</span>
 ) u_proc ( <span class="c">/* ... */</span> );</pre>
             </div>
@@ -388,7 +404,7 @@
 
         <p class="sapho-figcap fade-up" style="margin-top:var(--sp-6)">
           <span class="fig-no">FIG. 1</span>
-          <span class="cap">One button runs the chain: <span style="font-family:var(--font-mono);color:var(--gold)">cmmcomp &rarr; appcomp &rarr; asmcomp &rarr; .v + .mif + testbench</span>. The assembler prints this same inventory in the TASM terminal on every build, and the die up top re-floorplans itself as you switch.
+          <span class="cap">One button runs the chain: <span style="font-family:var(--font-mono);color:var(--gold)">cmmcomp &rarr; appcomp &rarr; asmcomp &rarr; .v + .mif + testbench</span>; the TASM terminal prints this same inventory on every build.
           <a href="/library/sapho/sapho/compilacao.html" class="wlink">The chain in detail</a> &middot;
           <a href="/library/sapho/sapho/prism.html" class="wlink">See it as a circuit, in PRISM</a></span>
         </p>
@@ -404,7 +420,7 @@
           <span class="note">simulation harness · asm + C± tracks</span>
         </div>
         <p class="sec-lede fade-up">
-          A SAPHO simulation carries two extra tracks: the assembly instruction retiring on each clock, and the C± source line it came from. Below, one turn of the filter loop, one instruction per cycle. The traces draw themselves as you arrive; then run the loop, or drag across.
+          A SAPHO simulation carries two extra tracks: the assembly instruction retiring on each clock, and the C± line it came from. One turn of the filter loop below; run it, or drag across.
         </p>
 
         <div class="sapho-plate glass glass--flat fade-up">
@@ -485,7 +501,7 @@
           <span class="note">AURORA · desktop IDE</span>
         </div>
         <p class="sec-lede fade-up">
-          AURORA is the desktop IDE of the platform: editor, project manager, compilers, two simulators, two waveform viewers and the circuit diagram, with no cloud behind any of it.
+          AURORA is the desktop IDE of the platform: editor, compilers, two simulators, two waveform viewers and the circuit diagram, no cloud behind any of it.
         </p>
 
         <div class="sapho-figs">
@@ -673,42 +689,42 @@
     const PROGRAMS = {
       int: {
         name: 'media_movel.cmm', wrap: 'media_movel.v', tag: 'int · 16 bits',
-        code: `<span class="k">while</span> (1)
+        code: `<span class="k">while</span> (<span class="n">1</span>)
 {
-    x[3] = x[2];              <span class="c">// shift the history</span>
-    x[2] = x[1];
-    x[1] = x[0];
-    x[0] = in(0);             <span class="c">// new sample</span>
+    x[<span class="n">3</span>] = x[<span class="n">2</span>];              <span class="c">// shift the history</span>
+    x[<span class="n">2</span>] = x[<span class="n">1</span>];
+    x[<span class="n">1</span>] = x[<span class="n">0</span>];
+    x[<span class="n">0</span>] = <span class="b" data-op="INN">in</span>(<span class="n">0</span>);             <span class="c">// new sample</span>
 
-    soma = x[0] + x[1] + x[2] + x[3];
-    out(0, <span class="g">soma &gt;&gt; 2</span>);    <span class="c">// mean, no divider</span>
+    soma = x[<span class="n">0</span>] <span data-op="ADD">+</span> x[<span class="n">1</span>] <span data-op="ADD">+</span> x[<span class="n">2</span>] <span data-op="ADD">+</span> x[<span class="n">3</span>];
+    <span class="b" data-op="OUT">out</span>(<span class="n">0</span>, soma <span class="g" data-op="SHR">&gt;&gt;</span> <span class="n">2</span>);    <span class="c">// mean, no divider</span>
 }`,
         on: ['LOD', 'SET', 'INN', 'OUT', 'JMP', 'JIZ', 'ADD', 'SHR'],
       },
       fir: {
         name: 'fir8.cmm', wrap: 'fir8.v', tag: 'float · 32 bits',
-        code: `<span class="k">float</span> h[8] <span class="g">"coef.txt"</span>;    <span class="c">// taps from a file</span>
-<span class="k">float</span> x[8], y;
+        code: `<span class="t">float</span> h[<span class="n">8</span>] <span class="s">"coef.txt"</span>;    <span class="c">// taps from a file</span>
+<span class="t">float</span> x[<span class="n">8</span>], y;
 
-<span class="k">while</span> (1)
+<span class="k">while</span> (<span class="n">1</span>)
 {
-    x # fin(0) -&gt; |x⟩;        <span class="c">// shift register, one line</span>
-    y = <span class="g">⟨h|x⟩</span>;                <span class="c">// inner product, unrolled</span>
-    fout(0, y);
+    x # <span class="b" data-op="INN">fin</span>(<span class="n">0</span>) -&gt; |x⟩;        <span class="c">// shift register, one line</span>
+    y = <span class="g" data-op="F_MLT">⟨h|x⟩</span>;                <span class="c">// inner product, unrolled</span>
+    <span class="b" data-op="OUT">fout</span>(<span class="n">0</span>, y);
 }`,
         on: ['LOD', 'SET', 'PSH', 'POP', 'INN', 'OUT', 'JMP', 'JIZ', 'F_ADD', 'F_MLT', 'I2F'],
       },
       fft: {
         name: 'proc_fft.cmm', wrap: 'proc_fft.v', tag: 'comp · 32 bits · #FFTSIZ 3',
-        code: `<span class="k">comp</span> data[8];
+        code: `<span class="t">comp</span> data[<span class="n">8</span>];
 
-<span class="k">for</span> (i = 0; i &lt; 8; i++)
+<span class="k">for</span> (i = <span class="n">0</span>; i &lt; <span class="n">8</span>; i++)
 {
-    data[<span class="g">i)</span> = complex(fin(0), 0.0);  <span class="c">// i) = bits reversed</span>
+    data[<span class="g" data-op="ISI">i)</span> = <span class="b">complex</span>(<span class="b" data-op="INN">fin</span>(<span class="n">0</span>), <span class="n">0.0</span>);  <span class="c">// i) = bits reversed</span>
 }
 
 <span class="c">// butterflies: tw = exp(complex(0.0, ang)); u + tw*v ...</span>
-<span class="k">for</span> (i = 0; i &lt; 8; i++) fout(0, abs(data[i]));`,
+<span class="k">for</span> (i = <span class="n">0</span>; i &lt; <span class="n">8</span>; i++) <span class="b" data-op="OUT">fout</span>(<span class="n">0</span>, <span class="b" data-op="F_ABS">abs</span>(data[i]));`,
         on: ['LOD', 'SET', 'PSH', 'POP', 'LDI', 'STI', 'ILI', 'ISI', 'INN', 'OUT', 'JMP', 'JIZ', 'CAL', 'RET',
              'ADD', 'EQU', 'LES', 'F_ADD', 'F_MLT', 'F_DIV', 'F_SU1', 'F_ABS', 'F_LES', 'I2F', 'F_ROT', 'F_SCL', 'XPO'],
       },
@@ -736,6 +752,7 @@
        diz o que cada bloco faz. whileVisible desliga o loop fora da
        tela; com prefers-reduced-motion o die e um still. */
     let dieSetProgram = null;
+    let diePulse = null;
     (async () => {
       const stage = document.querySelector('.sapho-die-stage');
       const canvas = document.getElementById('die-canvas');
@@ -746,25 +763,50 @@
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
       renderer.setClearAlpha(0);
+      renderer.toneMapping = T.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.18;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = T.PCFSoftShadowMap;
       const scene = new T.Scene();
       const cam = new T.PerspectiveCamera(27, 1, 0.1, 100);
       cam.position.set(0.2, 5.3, 8.8);
       cam.lookAt(0, -0.1, 0);
 
-      scene.add(new T.AmbientLight(0xaabbdd, 1.1));
-      const sun = new T.DirectionalLight(0xffffff, 2.3); sun.position.set(3.5, 6, 4); scene.add(sun);
+      scene.add(new T.AmbientLight(0xaabbdd, 0.55));
+      scene.add(new T.HemisphereLight(0x93b3e8, 0x080b14, 0.8));
+      const sun = new T.DirectionalLight(0xffffff, 2.6); sun.position.set(3.5, 6, 4); scene.add(sun);
+      sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024);
+      sun.shadow.camera.left = -3.4; sun.shadow.camera.right = 3.4;
+      sun.shadow.camera.top = 3.4; sun.shadow.camera.bottom = -3.4;
+      sun.shadow.camera.near = 1; sun.shadow.camera.far = 20;
+      sun.shadow.bias = -0.0004;
       const rim = new T.DirectionalLight(0x5b9cf6, 0.9); rim.position.set(-4, 2.5, -3); scene.add(rim);
-      const warm = new T.PointLight(0xd4a017, 8, 15); warm.position.set(-2.2, 3, 2.5); scene.add(warm);
+      const warm = new T.PointLight(0xd4a017, 7, 15); warm.position.set(-2.2, 3, 2.5); scene.add(warm);
 
       const rig = new T.Group();
       scene.add(rig);
 
       /* encapsulamento e substrato */
+      {
+        const cv = document.createElement('canvas'); cv.width = 256; cv.height = 256;
+        const g = cv.getContext('2d');
+        const rad = g.createRadialGradient(128, 128, 20, 128, 128, 126);
+        rad.addColorStop(0, 'rgba(0,0,0,0.55)'); rad.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = rad; g.fillRect(0, 0, 256, 256);
+        const ground = new T.Mesh(
+          new T.PlaneGeometry(7.4, 5.8),
+          new T.MeshBasicMaterial({ map: new T.CanvasTexture(cv), transparent: true, depthWrite: false })
+        );
+        ground.rotation.x = -Math.PI / 2; ground.position.y = -0.20;
+        rig.add(ground);
+      }
       const pkg = new T.Mesh(
         new T.BoxGeometry(5.15, 0.10, 3.95),
         new T.MeshStandardMaterial({ color: 0x0a0e18, metalness: 0.5, roughness: 0.6 })
       );
       pkg.position.y = -0.115;
+      pkg.receiveShadow = true;
       rig.add(pkg);
       /* face superior com as ruas e a microgravacao, como num die real */
       const topTex = (() => {
@@ -782,10 +824,14 @@
       })();
       const sideMat = new T.MeshStandardMaterial({ color: 0x0e1524, metalness: 0.72, roughness: 0.38 });
       const topMat = new T.MeshStandardMaterial({ map: topTex, metalness: 0.72, roughness: 0.38 });
-      rig.add(new T.Mesh(
-        new T.BoxGeometry(4.7, 0.14, 3.5),
-        [sideMat, sideMat, topMat, sideMat, sideMat, sideMat]
-      ));
+      {
+        const sub = new T.Mesh(
+          new T.BoxGeometry(4.7, 0.14, 3.5),
+          [sideMat, sideMat, topMat, sideMat, sideMat, sideMat]
+        );
+        sub.receiveShadow = true;
+        rig.add(sub);
+      }
       const TOP = 0.07;   /* face superior do substrato */
 
       /* anel de pads */
@@ -813,7 +859,8 @@
       function slab(x, z, w, d, name, what, file) {
         const m = new T.Mesh(unit, new T.MeshStandardMaterial({ color: 0x22304e, metalness: 0.55, roughness: 0.5 }));
         m.position.set(x, TOP, z); m.scale.set(w, 0.065, d);
-        m.userData = { name, what, file, fixed: true };
+        m.castShadow = m.receiveShadow = true;
+        m.userData = { name, what, file, fixed: true, h: 0 };
         rig.add(m); FIXED.push(m);
       }
       slab(-1.575, -0.775, 0.95, 1.35, 'MEM PROG', 'program memory, initialised from the .mif by $readmemb', 'processor.v');
@@ -838,13 +885,14 @@
       /* celulas de instrucao: fluxo (7 x 2) e ULA (6 x 5) */
       const FLOW = ['LOD', 'SET', 'PSH', 'POP', 'LDI', 'STI', 'ILI', 'ISI', 'INN', 'OUT', 'JMP', 'JIZ', 'CAL', 'RET'];
       const CELLS = [];
-      const goldC = new T.Color(0xbf9424), goldE = new T.Color(0x2e2204);
-      const dimC = new T.Color(0x1d2740), blackE = new T.Color(0x000000);
+      const goldC = new T.Color(0xd0951a), goldE = new T.Color(0x2e2204);
+      const dimC = new T.Color(0x222d4c), blackE = new T.Color(0x000000);
       function cellAt(x, z, w, d, m4) {
-        const mat = new T.MeshStandardMaterial({ color: 0x1a2338, metalness: 0.9, roughness: 0.3, emissive: 0x000000 });
+        const mat = new T.MeshStandardMaterial({ color: 0x1a2338, metalness: 0.72, roughness: 0.42, emissive: 0x000000 });
         const mesh = new T.Mesh(unit, mat);
         mesh.position.set(x, TOP, z); mesh.scale.set(w, 0.022, d);
-        mesh.userData = { name: m4, cell: true, glow: 0 };
+        mesh.castShadow = mesh.receiveShadow = true;
+        mesh.userData = { name: m4, cell: true, glow: 0, h: 0, pulse: 0 };
         rig.add(mesh); CELLS.push(mesh);
       }
       {
@@ -861,21 +909,37 @@
 
       let currentSet = new Set(PROGRAMS.int.on);
       dieSetProgram = (key) => { currentSet = new Set((PROGRAMS[key] || PROGRAMS.int).on); };
+      diePulse = (op) => {
+        const c = CELLS.find((m) => m.userData.name === op);
+        if (c) c.userData.pulse = 1;
+      };
 
-      /* o re-floorplan: altura e cor perseguem o alvo a cada quadro */
+      /* o re-floorplan: altura, cor e brilho perseguem o alvo a cada
+         quadro. O hover levanta o bloco e o faz brilhar de verdade; o
+         pulso chega do codigo, quando um token e apontado na secao 01. */
       let hovered = null;
       function paint(dt) {
         const kLerp = Math.min(1, dt * 3.4);
+        const kHover = Math.min(1, dt * 11);
         for (const m of CELLS) {
-          const target = currentSet.has(m.userData.name) ? 1 : 0;
-          const g = m.userData.glow + (target - m.userData.glow) * kLerp;
-          m.userData.glow = g;
-          m.scale.y = 0.022 + g * 0.085;
-          m.material.color.copy(dimC).lerp(goldC, g);
-          m.material.emissive.copy(blackE).lerp(goldE, g * (m === hovered ? 2.4 : 1));
-          if (m === hovered && g < 0.5) m.material.emissive.setHex(0x1c2540);
+          const u = m.userData;
+          const target = currentSet.has(u.name) ? 1 : 0;
+          const g = u.glow + (target - u.glow) * kLerp;
+          u.glow = g;
+          u.h += ((m === hovered ? 1 : 0) - u.h) * kHover;
+          u.pulse = Math.max(0, u.pulse - dt * 1.1);
+          const wave = u.pulse > 0 ? Math.sin(u.pulse * Math.PI) : 0;
+          m.scale.y = 0.022 + g * 0.085 + (u.h * 0.075 + wave * 0.06) * (0.45 + g);
+          m.material.color.copy(dimC).lerp(goldC, Math.max(g, wave * 0.8));
+          const e = g * (0.32 + u.h * 2.4 + wave * 1.9) + (1 - g) * (u.h * 0.35 + wave * 0.45);
+          m.material.emissive.setRGB(0.85 * e, 0.63 * e, 0.10 * e);
         }
-        for (const f of FIXED) f.material.emissive.setHex(f === hovered ? 0x131c33 : 0x000000);
+        for (const f of FIXED) {
+          const u = f.userData;
+          u.h += ((f === hovered ? 1 : 0) - u.h) * kHover;
+          f.material.emissive.setRGB(0.07 * u.h, 0.12 * u.h, 0.25 * u.h);
+          f.scale.y = 0.065 + u.h * 0.03;
+        }
       }
 
       function resize() {
@@ -893,10 +957,35 @@
       const ptr = new T.Vector2();
       const tip = document.getElementById('die-tip');
       let px = 0, py = 0, overCanvas = false, needRay = false;
+      let dragging = false, dragX = 0, dragY = 0, userYaw = 0, userPitch = 0, yawVel = 0;
+      canvas.style.cursor = 'grab';
+      canvas.style.touchAction = 'pan-y';   /* horizontal gira, vertical rola a pagina */
       addEventListener('pointermove', (e) => {
         px = e.clientX / innerWidth - 0.5; py = e.clientY / innerHeight - 0.5;
       }, { passive: true });
+      canvas.addEventListener('pointerdown', (e) => {
+        dragging = true; dragX = e.clientX; dragY = e.clientY; yawVel = 0;
+        canvas.setPointerCapture(e.pointerId);
+        canvas.style.cursor = 'grabbing';
+        hovered = null;
+        if (tip) tip.classList.remove('show');
+      });
+      const endDrag = () => {
+        if (!dragging) return;
+        dragging = false;
+        canvas.style.cursor = 'grab';
+      };
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
       canvas.addEventListener('pointermove', (e) => {
+        if (dragging) {
+          const dx = e.clientX - dragX, dy = e.clientY - dragY;
+          dragX = e.clientX; dragY = e.clientY;
+          userYaw += dx * 0.0052; yawVel = dx * 0.0052;
+          userPitch = Math.max(-0.35, Math.min(0.5, userPitch + dy * 0.0032));
+          needRay = false;
+          return;
+        }
         const r = canvas.getBoundingClientRect();
         ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
         ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
@@ -916,6 +1005,7 @@
         ray.setFromCamera(ptr, cam);
         const hit = ray.intersectObjects([...CELLS, ...FIXED], false)[0];
         const m = hit ? hit.object : null;
+        canvas.style.cursor = m ? 'pointer' : 'grab';
         if (m === hovered) return;
         hovered = m;
         if (!tip) return;
@@ -943,8 +1033,13 @@
         raf = requestAnimationFrame(frame);
         const dt = Math.min(0.05, (now - last) / 1000 || 0); last = now;
         t += dt;
-        rig.rotation.y = -0.42 + Math.sin(t * 0.22) * 0.07 + px * 0.24;
-        rig.rotation.x = 0.02 + py * 0.05;
+        if (!dragging) {
+          userYaw += yawVel; yawVel *= 0.94;                 /* inercia do arremesso */
+          userYaw *= 1 - Math.min(1, dt * 0.12);             /* volta devagar ao repouso */
+          userPitch += (0 - userPitch) * Math.min(1, dt * 0.8);
+        }
+        rig.rotation.y = -0.42 + Math.sin(t * 0.22) * 0.07 + (dragging ? 0 : px * 0.20) + userYaw;
+        rig.rotation.x = 0.02 + userPitch + (dragging ? 0 : py * 0.04);
         if (needRay && overCanvas) runRay();
         paint(dt);
         renderer.render(scene, cam);
@@ -958,7 +1053,8 @@
     const srcCode = document.getElementById('src-code');
 
     function paramsLine(on) {
-      return on.map((m) => `.${m}(1)`).reduce((acc, p, i) => acc + p + ((i + 1) % 4 ? ', ' : ',\n    '), '').replace(/,\s*$/, '');
+      return on.map((m, i) => `<span data-op="${m}">.${m}(1)</span>` +
+        (i < on.length - 1 ? ((i + 1) % 4 ? ', ' : ',\n    ') : '')).join('');
     }
 
     function showProgram(key, animateIt = true) {
@@ -966,9 +1062,9 @@
       document.getElementById('src-name').textContent = p.name;
       document.getElementById('src-tag').innerHTML = p.tag;
       document.getElementById('wrap-name').textContent = p.wrap;
-      document.getElementById('wrap-params').textContent = paramsLine(p.on);
+      document.getElementById('wrap-params').innerHTML = paramsLine(p.on);
       const hint = document.getElementById('die-hint');
-      if (hint) hint.textContent = `the die of ${p.name} — hover a block`;
+      if (hint) hint.textContent = `${p.name} · ${p.on.length} blocks built — drag to turn, hover a block`;
       document.querySelectorAll('.sapho-tabs [role="tab"]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.prog === key)));
 
       /* o codigo troca com um respiro, para a mudanca ser vista */
@@ -990,6 +1086,53 @@
       }
     }
     document.querySelectorAll('.sapho-tabs [role="tab"]').forEach((b) => b.addEventListener('click', () => showProgram(b.dataset.prog)));
+
+    /* Apontar um token que vira hardware acende o mesmo bloco onde quer
+       que ele aparece: no C±, no processor #() gerado e no die. */
+    {
+      const prog = document.querySelector('.sapho-prog');
+      const tip = document.getElementById('die-tip');
+      let lit = [];
+      const clear = () => { lit.forEach((el) => el.classList.remove('hl')); lit = []; };
+      prog.addEventListener('pointerover', (e) => {
+        const tk = e.target.closest('[data-op]');
+        clear();
+        if (!tk) { if (tip) tip.classList.remove('show'); return; }
+        const op = tk.dataset.op;
+        lit = [...prog.querySelectorAll(`[data-op="${op}"]`)];
+        lit.forEach((el) => el.classList.add('hl'));
+        if (diePulse) diePulse(op);
+        if (tip) {
+          const on = true;
+          tip.innerHTML = `<b>${op}</b><span class="what">${DICAS[op] || ''}</span>` +
+            `<span class="state yes">● this token builds the ${op} block</span>`;
+          tip.classList.add('show');
+        }
+      });
+      prog.addEventListener('pointermove', (e) => {
+        if (!tip || !tip.classList.contains('show')) return;
+        if (!e.target.closest('[data-op]')) return;
+        const w = tip.offsetWidth || 260, h = tip.offsetHeight || 70;
+        tip.style.left = Math.min(innerWidth - w - 12, e.clientX + 16) + 'px';
+        tip.style.top = (e.clientY - h - 14 < 8 ? e.clientY + 20 : e.clientY - h - 14) + 'px';
+      });
+      prog.addEventListener('pointerleave', () => { clear(); if (tip) tip.classList.remove('show'); });
+    }
+
+    /* Copiar o C± da chapa, com resposta no proprio botao. */
+    {
+      const btn = document.getElementById('src-copy');
+      if (btn && navigator.clipboard) {
+        let back = 0;
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(srcCode.textContent).then(() => {
+            btn.textContent = 'COPIED'; btn.classList.add('ok');
+            clearTimeout(back);
+            back = setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('ok'); }, 1600);
+          });
+        });
+      } else if (btn) { btn.remove(); }
+    }
 
     /* as setas andam pelas abas, como um tablist pede */
     document.querySelector('.sapho-tabs').addEventListener('keydown', (e) => {
