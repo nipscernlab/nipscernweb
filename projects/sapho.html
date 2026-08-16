@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SAPHO | Scalable-Architecture Processor for Hardware Optimization | NIPS-CERN</title>
-  <meta name="description" content="Write an algorithm in C±. SAPHO builds the processor around it: only the hardware blocks your program uses are synthesised. Compiler suite, IDE, simulators, waveform viewers and an RTL diagram, in one installer. Built at NIPS-CERN/UFJF, running at CERN.">
+  <meta name="description" content="Write an algorithm in C±. SAPHO builds the processor around it: word width, memories and ALU blocks all follow from your program. Toolchain, IDE, simulators and waveform viewers in one installer. Built at NIPS-CERN/UFJF, running at CERN.">
 
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://www.nipscern.com/projects/sapho">
@@ -21,66 +21,136 @@
   <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
 
-  <!-- Self-hosted typefaces. Preloaded because the @font-face rules live
-       in main.css, which on some pages loads asynchronously; without this
-       the fetch could not start until that stylesheet parsed. -->
+  <!-- Self-hosted typefaces. Preloaded because the @font-face rules live in
+       main.css, which loads asynchronously on some pages. -->
   <link rel="preload" href="../assets/fonts/plex-sans-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fraunces-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=3747f18bb9">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=3747f18bb9">
+  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=9e6e3652e2">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=9e6e3652e2">
 
   <style>
-    :root { --page-accent: var(--accent-sapho); --page-accent-dim: rgba(212,160,23,0.12); }
+    :root { --page-accent: var(--accent-sapho); --gold-dim: rgba(212,160,23,0.12); --gold-line: rgba(212,160,23,0.35); }
 
-    /* ── The cost card: the manual's PRISM experiment, live on the page ── */
-    .sapho-cost { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-2xl); overflow: hidden; }
-    .sapho-cost-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); background: rgba(212,160,23,0.05); }
-    .sapho-cost-title { font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent-sapho); }
-    .sapho-toggle { display: inline-flex; border: 1px solid var(--border-subtle); border-radius: 999px; overflow: hidden; }
-    .sapho-toggle button { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); background: transparent; border: 0; padding: 6px 14px; cursor: pointer; transition: color .15s ease, background .15s ease; }
-    .sapho-toggle button[aria-pressed="true"] { background: var(--page-accent-dim); color: var(--accent-sapho); }
-    .sapho-code { margin: 0; padding: var(--sp-4) var(--sp-5); font-family: var(--font-mono); font-size: 13px; line-height: 1.75; color: var(--text-secondary); overflow-x: auto; white-space: pre; }
-    .sapho-code .c  { color: #6b7488; }
-    .sapho-code .k  { color: #8fb6f0; }
-    .sapho-code .hl { color: var(--accent-sapho); background: var(--page-accent-dim); border-radius: 4px; padding: 1px 4px; }
-    .sapho-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--border-subtle); }
-    .sapho-chip { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-secondary); background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 10px; }
-    .sapho-chip--div { color: var(--accent-sapho); border-color: rgba(212,160,23,0.45); background: var(--page-accent-dim); display: none; }
-    .sapho-cost[data-op="div"] .sapho-chip--div { display: inline-block; }
-    .sapho-cost[data-op="div"] .sapho-chip--shr { display: none; }
-    .sapho-cost-note { padding: 0 var(--sp-5) var(--sp-4); font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
+    /* ── Hero: the die ─────────────────────────────────────── */
+    .sapho-hero { position: relative; min-height: 92vh; display: flex; align-items: center; overflow: hidden;
+      background: radial-gradient(ellipse 90% 70% at 78% 40%, rgba(212,160,23,0.10) 0%, transparent 60%), var(--bg-0); }
+    #die-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .sapho-hero-inner { position: relative; z-index: 2; width: min(1180px, calc(100% - 2*var(--sp-6))); margin-inline: auto;
+      display: grid; grid-template-columns: minmax(0, 620px) 1fr; padding-block: var(--sp-10); }
+    .sapho-hero-panel { padding: var(--sp-8); border-radius: var(--r-2xl); }
+    .sapho-hero h1 { font-family: var(--font-serif); font-weight: 640; color: var(--accent-sapho);
+      font-size: clamp(64px, 9vw, 118px); line-height: 0.95; letter-spacing: 0.01em; margin: var(--sp-3) 0 var(--sp-2); }
+    .sapho-hero h1 .l { display: inline-block; }
+    .sapho-fullname { font-size: var(--text-sm); color: var(--text-muted); letter-spacing: 0.04em; }
+    .sapho-lede { margin-top: var(--sp-5); color: var(--text-secondary); font-size: var(--text-base); line-height: 1.75; max-width: 54ch; }
+    .sapho-lede em { color: var(--text-primary); font-style: normal; }
+    .sapho-verchip { display: inline-flex; align-items: center; gap: 8px; margin-top: var(--sp-4);
+      font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted);
+      border: 1px solid var(--border-subtle); border-radius: 999px; padding: 5px 12px; }
+    .sapho-verchip b { color: var(--accent-sapho); font-weight: 600; }
+    .sapho-die-caption { position: absolute; right: var(--sp-6); bottom: var(--sp-5); z-index: 2;
+      font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted);
+      padding: 8px 14px; border-radius: var(--r-lg); max-width: 340px; line-height: 1.6; }
+    .sapho-die-caption b { color: var(--accent-sapho); font-weight: 600; }
+    @media (max-width: 900px) {
+      .sapho-hero-inner { grid-template-columns: 1fr; }
+      .sapho-die-caption { display: none; }
+    }
 
-    /* ── The dual-track band: one wave, two languages ── */
-    .sapho-band { border-block: 1px solid var(--border-subtle); background: var(--bg-0); overflow: hidden; }
-    .sapho-band svg { display: block; width: 100%; height: auto; }
-    .sapho-band text { font-family: var(--font-mono); font-size: 11px; fill: var(--text-muted); }
-    .sapho-band .lbl { fill: var(--accent-sapho); font-weight: 600; }
+    /* ── Marquee: the ISA going by ─────────────────────────── */
+    .sapho-marquee { border-block: 1px solid var(--border-subtle); background: var(--bg-1); overflow: hidden; padding: 10px 0;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+              mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+    .sapho-marquee + .sapho-marquee { border-top: 0; }
+    .sapho-marquee-track { display: inline-flex; gap: var(--sp-6); white-space: nowrap; will-change: transform;
+      animation: sapho-scroll 46s linear infinite; }
+    .sapho-marquee--rev .sapho-marquee-track { animation-direction: reverse; animation-duration: 58s; }
+    .sapho-marquee:hover .sapho-marquee-track { animation-play-state: paused; }
+    .sapho-marquee span { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }
+    .sapho-marquee span.g { color: var(--accent-sapho); }
+    @keyframes sapho-scroll { to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .sapho-marquee-track { animation: none; } }
 
-    /* ── Pipeline ── */
-    .sapho-pipe { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
-    .sapho-stage { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); padding: var(--sp-5); }
-    .sapho-stage b { display: block; font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 600; color: var(--accent-sapho); margin-bottom: var(--sp-2); }
-    .sapho-stage span { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; display: block; }
-    .sapho-artifacts { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--sp-3); }
-    @media (max-width: 760px) { .sapho-pipe { grid-template-columns: 1fr; } }
+    /* ── Programs: three programs, three processors ────────── */
+    .sapho-tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid var(--border-subtle); background: var(--bg-1); }
+    .sapho-tabs button { border: 0; background: transparent; color: var(--text-muted); font-size: var(--text-sm);
+      padding: 8px 18px; border-radius: 999px; cursor: pointer; transition: color .15s, background .15s; }
+    .sapho-tabs button[aria-selected="true"] { background: var(--gold-dim); color: var(--accent-sapho); }
+    .sapho-prog { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--sp-6); align-items: stretch; margin-top: var(--sp-6); }
+    .sapho-src { border: 1px solid var(--border-subtle); border-radius: var(--r-2xl); overflow: hidden; background: var(--bg-card); }
+    .sapho-src-head { display: flex; justify-content: space-between; align-items: center; padding: 10px var(--sp-5);
+      border-bottom: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--accent-sapho); letter-spacing: .06em; }
+    .sapho-src pre { margin: 0; padding: var(--sp-4) var(--sp-5); font-family: var(--font-mono); font-size: 13px; line-height: 1.7;
+      color: var(--text-secondary); overflow-x: auto; white-space: pre; }
+    .sapho-src .c { color: #6b7488; } .sapho-src .k { color: #8fb6f0; } .sapho-src .g { color: var(--accent-sapho); }
+    .sapho-inv { border-radius: var(--r-2xl); padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+    .sapho-inv h3 { font-size: var(--text-xs); font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-muted); margin: 0; }
+    .sapho-inv-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sapho-inv-chip { font-family: var(--font-mono); font-size: 11px; padding: 3px 9px; border-radius: 6px;
+      border: 1px solid var(--border-subtle); color: var(--text-faint); transition: all .25s ease; }
+    .sapho-inv-chip.on { color: var(--accent-sapho); border-color: var(--gold-line); background: var(--gold-dim); }
+    .sapho-meter { margin-top: auto; }
+    .sapho-meter-label { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--text-muted); margin-bottom: 6px; }
+    .sapho-meter-label b { color: var(--accent-sapho); font-family: var(--font-mono); }
+    .sapho-meter-bar { height: 6px; border-radius: 999px; background: var(--bg-elevated); overflow: hidden; }
+    .sapho-meter-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, rgba(212,160,23,.55), var(--accent-sapho)); }
+    .sapho-pipe-note { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-5);
+      font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }
+    .sapho-pipe-note i { font-style: normal; color: var(--accent-sapho); }
+    @media (max-width: 900px) { .sapho-prog { grid-template-columns: 1fr; } }
 
-    /* ── Facts strip ── */
+    /* ── Wave inspector ────────────────────────────────────── */
+    .sapho-wave { position: relative; border: 1px solid var(--border-subtle); border-radius: var(--r-2xl); background: var(--bg-0);
+      overflow: hidden; cursor: crosshair; }
+    .sapho-wave svg { display: block; width: 100%; height: auto; }
+    .sapho-wave text { font-family: var(--font-mono); font-size: 11px; fill: var(--text-muted); }
+    .sapho-wave .asm { fill: var(--accent-sapho); font-weight: 600; }
+    #wave-head { stroke: var(--accent-sapho); stroke-width: 1; opacity: .9; }
+    #wave-head-dot { fill: var(--accent-sapho); }
+    .sapho-wave-tip { position: absolute; top: 12px; left: 12px; z-index: 2; pointer-events: none;
+      border-radius: var(--r-lg); padding: 10px 14px; font-family: var(--font-mono); font-size: var(--text-xs);
+      color: var(--text-secondary); line-height: 1.7; min-width: 240px; }
+    .sapho-wave-tip b { color: var(--accent-sapho); font-weight: 600; }
+    .sapho-wave-tip small { color: var(--text-muted); }
+    .sapho-wave-play { position: absolute; right: 12px; top: 12px; z-index: 2; }
+
+    /* ── Facts ─────────────────────────────────────────────── */
     .sapho-facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
-    .sapho-fact { text-align: center; padding: var(--sp-5) var(--sp-3); background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); }
-    .sapho-fact strong { display: block; font-size: var(--text-2xl); color: var(--accent-sapho); font-variant-numeric: tabular-nums; }
-    .sapho-fact span { font-size: var(--text-xs); color: var(--text-muted); }
-    .sapho-fact code { font-family: var(--font-mono); font-size: var(--text-lg); color: var(--accent-sapho); }
+    .sapho-fact { text-align: center; padding: var(--sp-6) var(--sp-3); border-radius: var(--r-xl); }
+    .sapho-fact strong { display: block; font-family: var(--font-serif); font-size: 44px; color: var(--accent-sapho); font-variant-numeric: tabular-nums; }
+    .sapho-fact code { font-family: var(--font-mono); font-size: 24px; color: var(--accent-sapho); }
+    .sapho-fact span { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; display: block; margin-top: 6px; }
     @media (max-width: 760px) { .sapho-facts { grid-template-columns: repeat(2, 1fr); } }
 
-    /* ── Screenshot cards ── */
-    .sapho-shot { display: block; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--r-xl); overflow: hidden; text-decoration: none; transition: border-color .2s ease, transform .2s ease; }
-    .sapho-shot:hover { border-color: rgba(212,160,23,0.45); transform: translateY(-2px); }
-    .sapho-shot figure { margin: 0; overflow: hidden; }
-    .sapho-shot img { width: 100%; height: auto; display: block; }
-    .sapho-shot figcaption { padding: var(--sp-4) var(--sp-5); }
+    /* ── Bento of screenshots ──────────────────────────────── */
+    .sapho-bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--sp-5); }
+    .sapho-shot { position: relative; display: block; border-radius: var(--r-xl); overflow: hidden; text-decoration: none;
+      border: 1px solid var(--border-subtle); background: var(--bg-card); transition: border-color .25s, transform .25s; }
+    .sapho-shot:hover { border-color: var(--gold-line); transform: translateY(-3px); }
+    .sapho-shot img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+    .sapho-shot figure { margin: 0; height: 100%; display: flex; flex-direction: column; }
+    .sapho-shot .pic { flex: 1; min-height: 0; overflow: hidden; }
+    .sapho-shot figcaption { padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--border-subtle);
+      backdrop-filter: blur(10px); background: rgba(19,24,38,0.66); }
     .sapho-shot .t { font-weight: 600; color: var(--text-primary); font-size: var(--text-sm); display: flex; align-items: center; gap: var(--sp-2); }
     .sapho-shot .t i { color: var(--accent-sapho); }
     .sapho-shot .d { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; line-height: 1.6; }
+    .sapho-shot--a { grid-column: span 4; } .sapho-shot--b { grid-column: span 2; grid-row: span 2; }
+    .sapho-shot--c { grid-column: span 2; } .sapho-shot--d { grid-column: span 2; }
+    @media (max-width: 900px) { .sapho-bento { grid-template-columns: 1fr; } .sapho-shot { grid-column: auto !important; grid-row: auto !important; } }
+
+    /* ── Thank-you after download ──────────────────────────── */
+    .sapho-thanks { position: fixed; right: var(--sp-5); bottom: var(--sp-5); z-index: 90; width: min(380px, calc(100vw - 2*var(--sp-5)));
+      border-radius: var(--r-2xl); padding: var(--sp-6); transform: translateY(16px); opacity: 0; pointer-events: none;
+      transition: opacity .3s ease, transform .3s ease; }
+    .sapho-thanks.show { opacity: 1; transform: none; pointer-events: auto; }
+    .sapho-thanks h3 { margin: 0 0 var(--sp-2); font-size: var(--text-base); color: var(--text-primary); display: flex; gap: var(--sp-2); align-items: center; }
+    .sapho-thanks h3 i { color: var(--accent-sapho); }
+    .sapho-thanks p { margin: 0 0 var(--sp-3); font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.65; }
+    .sapho-thanks ol { margin: 0 0 var(--sp-2); padding-left: 1.2em; font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.9; }
+    .sapho-thanks a { color: var(--accent-sapho); }
+    .sapho-thanks-close { position: absolute; top: 10px; right: 10px; background: none; border: 0; color: var(--text-muted);
+      font-size: 16px; cursor: pointer; padding: 6px; }
   </style>
 </head>
 <body>
@@ -90,193 +160,172 @@
 
   <main id="main">
 
-    <!-- ── Hero ──────────────────────────────────────────────── -->
-    <header class="project-hero" style="background: radial-gradient(ellipse 70% 50% at 0% 50%, rgba(212,160,23,0.07) 0%, transparent 70%), var(--bg-0)" aria-labelledby="sapho-title">
-      <div class="project-hero-inner">
-        <div class="project-hero-icon" style="background:rgba(212,160,23,0.12);color:var(--accent-sapho)">
-          <i class="ph ph-cpu" aria-hidden="true"></i>
-        </div>
-        <div class="project-hero-text">
-          <div class="eyebrow fade-up">
-            <i class="ph ph-code" aria-hidden="true"></i>
+    <!-- ── Hero: the silicon die ─────────────────────────────── -->
+    <header class="sapho-hero" aria-labelledby="sapho-title">
+      <canvas id="die-canvas" aria-hidden="true"></canvas>
+
+      <div class="sapho-hero-inner">
+        <div class="sapho-hero-panel glass fade-up">
+          <div class="eyebrow">
+            <i class="ph ph-cpu" aria-hidden="true"></i>
             Hardware Architecture &amp; Toolchain
           </div>
-          <h1 class="project-hero-name fade-up" id="sapho-title" style="color:var(--text-primary)">
-            <span style="color:var(--accent-sapho)">SAPHO</span>
-          </h1>
-          <p class="project-hero-fullname fade-up" data-i18n="projects.sapho.full">Scalable-Architecture Processor for Hardware Optimization</p>
-          <p class="project-hero-desc fade-up">
-            Most processors are built first and programmed later. SAPHO turns that around: you write the algorithm in C±, a small dialect of C, and the toolchain emits a Verilog processor shaped by that exact program. Word width, memory sizes, even which ALU blocks exist: everything follows from your code. Divide nowhere, carry no divider.
+          <h1 id="sapho-title">SAPHO</h1>
+          <p class="sapho-fullname">Scalable-Architecture Processor for Hardware Optimization</p>
+          <p class="sapho-lede">
+            Most processors are built first and programmed later. SAPHO turns that around: you write the algorithm in <em>C±</em>, a small dialect of C, and the toolchain emits a Verilog processor shaped by that exact program. Word width, memory sizes, even which ALU blocks exist. <em>Divide nowhere, carry no divider.</em>
           </p>
-          <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
-          <div class="project-links fade-up">
-            <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
+          <div class="sapho-verchip"><i class="ph ph-cube" aria-hidden="true"></i>&nbsp;<span id="sapho-version">latest release</span> &middot; <b>MIT</b> &middot; Windows &amp; Linux</div>
+          <div style="margin:var(--sp-4) 0 var(--sp-2)"><span class="content-lang-badge" data-content-lang="en"></span></div>
+          <div class="project-links">
+            <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary glass-btn" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
               <i class="ph ph-download" aria-hidden="true"></i>
               Download Latest Release
             </a>
-            <a href="/library/sapho/" class="btn btn-ghost">
+            <a href="/library/sapho/" class="btn btn-ghost glass-btn">
               <i class="ph ph-book-open" aria-hidden="true"></i>
               Read the Manual
             </a>
-            <a href="https://github.com/nipscernlab/sapho" target="_blank" rel="noopener" class="btn btn-ghost">
+            <a href="https://github.com/nipscernlab/sapho" target="_blank" rel="noopener" class="btn btn-ghost glass-btn">
               <i class="ph ph-github-logo" aria-hidden="true"></i>
-              View on GitHub
+              GitHub
             </a>
-            <a href="./" class="btn btn-ghost">
+            <a href="./" class="btn btn-ghost glass-btn">
               <i class="ph ph-arrow-left" aria-hidden="true"></i>
               All Projects
             </a>
           </div>
         </div>
       </div>
+
+      <div class="sapho-die-caption glass glass--flat" id="die-caption">
+        <b id="die-prog">media_movel.cmm</b><br>
+        <span id="die-note">every lit block is a synthesised resource; the dark ones were never built</span>
+      </div>
     </header>
 
-    <!-- ── Badge strip ───────────────────────────────────────── -->
-    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) 0">
-      <div class="container" style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
-        <span class="badge badge-orange"><i class="ph ph-windows-logo" aria-hidden="true"></i> Windows</span>
-        <span class="badge badge-orange"><i class="ph ph-linux-logo" aria-hidden="true"></i> Linux</span>
-        <span class="badge badge-gray">Open Source</span>
-        <span class="badge badge-gray">MIT License</span>
-        <span class="badge badge-green">Active</span>
-        <span class="badge badge-orange">Teaching platform of the DLP course at UFJF</span>
-      </div>
+    <!-- ── The ISA going by ──────────────────────────────────── -->
+    <div class="sapho-marquee" aria-hidden="true">
+      <div class="sapho-marquee-track" id="mq1"></div>
+    </div>
+    <div class="sapho-marquee sapho-marquee--rev" aria-hidden="true">
+      <div class="sapho-marquee-track" id="mq2"></div>
     </div>
 
-    <!-- ── Pay only for what you use ─────────────────────────── -->
-    <section class="section" aria-labelledby="cost-title">
+    <!-- ── Three programs, three processors ──────────────────── -->
+    <section class="section" aria-labelledby="prog-title">
       <div class="container">
-        <div class="grid grid-2" style="gap:var(--sp-12);align-items:center">
+        <div class="section-header fade-up">
+          <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
+          <h2 class="heading-lg" id="prog-title">Three programs, three different processors</h2>
+          <p class="body-base" style="max-width:680px;margin-top:var(--sp-4)">
+            Inside the generated Verilog, every instruction the program uses becomes a parameter set to 1, and each unused block never enters synthesis. Pick a program; the inventory on the right is the processor it produces. The die above is doing the same thing.
+          </p>
+          <div class="sapho-tabs" role="tablist" aria-label="Example programs" style="margin-top:var(--sp-5)">
+            <button role="tab" aria-selected="true"  data-prog="int">Integer filter</button>
+            <button role="tab" aria-selected="false" data-prog="fir">FIR, floating point</button>
+            <button role="tab" aria-selected="false" data-prog="fft">FFT, complex</button>
+          </div>
+        </div>
 
-          <div class="fade-up">
-            <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
-            <h2 class="heading-lg" id="cost-title">Every line has a price in silicon. Here it is.</h2>
-            <p class="body-base" style="margin-top:var(--sp-4)">
-              Inside the generated processor, each instruction your program uses becomes a Verilog parameter set to 1; every other block is left out of synthesis entirely. A program that never divides ships without a divider. A program in integers carries no floating-point adder.
-            </p>
-            <p class="body-base" style="margin-top:var(--sp-4)">
-              The card on the right is the moving-average filter from the manual's first processor tutorial. Flip the average between a bit shift and a division and watch the ALU change under it. In the IDE, the PRISM diagram shows the same block appearing in the actual circuit.
-            </p>
-            <div style="margin-top:var(--sp-6);display:flex;gap:var(--sp-3);flex-wrap:wrap">
-              <a href="/library/sapho/sapho/tutorial-filtro.html" class="btn btn-outline btn-sm">
-                <i class="ph ph-book-open" aria-hidden="true"></i>
-                The tutorial behind this card
-              </a>
-              <a href="/library/sapho/sapho/prism.html" class="btn btn-ghost btn-sm">
-                <i class="ph ph-graph" aria-hidden="true"></i>
-                PRISM, the circuit drawn
-              </a>
-            </div>
+        <div class="sapho-prog fade-up">
+          <div class="sapho-src">
+            <div class="sapho-src-head"><span id="src-name">media_movel.cmm</span><span id="src-tag">int &middot; 16 bits</span></div>
+            <pre id="src-code"></pre>
           </div>
 
-          <div class="fade-up sapho-cost" id="sapho-cost" data-op="shr">
-            <div class="sapho-cost-head">
-              <span class="sapho-cost-title">media_movel.cmm</span>
-              <span class="sapho-toggle" role="group" aria-label="Choose how the average is computed">
-                <button type="button" id="op-shr" aria-pressed="true">soma &gt;&gt; 2</button>
-                <button type="button" id="op-div" aria-pressed="false">soma / 4</button>
-              </span>
+          <div class="sapho-inv glass">
+            <h3>Synthesised inventory</h3>
+            <div>
+              <div style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:4px">Memory &amp; flow</div>
+              <div class="sapho-inv-group" data-g="mem"></div>
             </div>
-<pre class="sapho-code"><span class="k">while</span> (1)
-{
-    x[3] = x[2];          <span class="c">// shift the history</span>
-    x[2] = x[1];
-    x[1] = x[0];
-    x[0] = in(0);         <span class="c">// read the new sample</span>
-
-    soma = x[0] + x[1] + x[2] + x[3];
-    out(0, <span class="hl" id="op-line">soma &gt;&gt; 2</span>);
-}</pre>
-            <div class="sapho-chips" aria-live="polite">
-              <span class="sapho-chip">ADD adder</span>
-              <span class="sapho-chip sapho-chip--shr" id="chip-shr">SHR shifter</span>
-              <span class="sapho-chip sapho-chip--div" id="chip-div">DIV integer divider</span>
-              <span class="sapho-chip">INN input port</span>
-              <span class="sapho-chip">OUT output port</span>
-              <span class="sapho-chip">JMP &middot; JIZ branches</span>
+            <div>
+              <div style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:4px">Integer ALU</div>
+              <div class="sapho-inv-group" data-g="ialu"></div>
             </div>
-            <p class="sapho-cost-note">ALU blocks synthesised for this program. The assembler prints this same inventory in the TASM terminal on every build.</p>
+            <div>
+              <div style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:4px">Floating-point ALU</div>
+              <div class="sapho-inv-group" data-g="falu"></div>
+            </div>
+            <div class="sapho-meter">
+              <div class="sapho-meter-label"><span>ALU blocks in this processor</span><b><span id="meter-n">0</span> / 30</b></div>
+              <div class="sapho-meter-bar"><div class="sapho-meter-fill" id="meter-fill"></div></div>
+            </div>
           </div>
+        </div>
 
+        <div class="sapho-pipe-note fade-up">
+          One button runs the whole chain: <i>cmmcomp</i> &rarr; <i>appcomp</i> &rarr; <i>asmcomp</i> &rarr; <i>.v + .mif + testbench</i>.
+          The assembler prints this same inventory in the TASM terminal on every build.
+          <a href="/library/sapho/sapho/compilacao.html" class="wlink">The chain in detail</a> &middot;
+          <a href="/library/sapho/sapho/prism.html" class="wlink">See it as a circuit, in PRISM</a>
         </div>
       </div>
     </section>
 
-    <!-- ── One wave, two languages ───────────────────────────── -->
-    <div class="sapho-band" aria-hidden="true">
-      <svg viewBox="0 0 1200 150" preserveAspectRatio="xMidYMid slice">
-        <!-- clock -->
-        <path id="wave-clk" d="M0 40 H50 V20 H100 V40 H150 V20 H200 V40 H250 V20 H300 V40 H350 V20 H400 V40 H450 V20 H500 V40 H550 V20 H600 V40 H650 V20 H700 V40 H750 V20 H800 V40 H850 V20 H900 V40 H950 V20 H1000 V40 H1050 V20 H1100 V40 H1150 V20 H1200"
-              fill="none" stroke="rgba(228,232,242,0.28)" stroke-width="1.5"/>
-        <!-- the average climbing the step, in gold -->
-        <path id="wave-soma" d="M0 105 H300 V95 H400 V85 H500 V75 H600 V70 H1200"
-              fill="none" stroke="#d4a017" stroke-width="2"/>
-        <text x="8"  y="34">clk</text>
-        <text x="8"  y="120">out(0)</text>
-        <text class="lbl" x="304" y="132">LOD</text>
-        <text class="lbl" x="404" y="132">ADD</text>
-        <text class="lbl" x="504" y="132">SHR</text>
-        <text class="lbl" x="604" y="132">OUT</text>
-        <text x="304" y="146">x[0] = in(0);</text>
-        <text x="504" y="146">out(0, soma &gt;&gt; 2);</text>
-      </svg>
-    </div>
-    <div class="container" style="padding-top:var(--sp-4)">
-      <p class="body-sm fade-up" style="color:var(--text-muted);max-width:720px">
-        A SAPHO waveform carries two extra tracks: the assembly instruction retiring on each clock, and the C± source line it came from. You watch your own <code style="font-family:var(--font-mono)">while</code> loop execute, cycle by cycle. <a href="/library/sapho/sapho/simulacao.html" class="wlink">How the tracks work</a>.
-      </p>
-    </div>
-
-    <!-- ── Three compilers ───────────────────────────────────── -->
-    <section class="section" aria-labelledby="pipe-title">
+    <!-- ── The wave you can hold ─────────────────────────────── -->
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="wave-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
-          <h2 class="heading-lg" id="pipe-title">One button, three compilers</h2>
-          <p class="body-base" style="max-width:640px;margin-top:var(--sp-4)">
-            The Compile C± button in AURORA runs the YANC chain end to end. Each stage is an ordinary executable you could run by hand; the IDE simply never makes you.
+          <h2 class="heading-lg" id="wave-title">A waveform that speaks your language</h2>
+          <p class="body-base" style="max-width:680px;margin-top:var(--sp-4)">
+            A SAPHO simulation carries two extra tracks: the assembly instruction retiring on each clock, and the C± source line it came from. This is one turn of the filter loop, one instruction per cycle. Run it, or drag across.
           </p>
         </div>
-        <div class="sapho-pipe fade-up">
-          <div class="sapho-stage">
-            <b>1 &middot; cmmcomp</b>
-            <span>Translates C± into SAPHO assembly: variables placed, expressions scheduled through the accumulator, library routines appended only when called.</span>
-            <div class="sapho-artifacts">.cmm &rarr; .asm</div>
+
+        <div class="sapho-wave fade-up" id="wave-box" aria-label="Interactive waveform of one loop iteration">
+          <div class="sapho-wave-tip glass glass--flat" id="wave-tip">
+            <b id="tip-instr">INN 0</b> &nbsp;<small>cycle <span id="tip-cyc">7</span>/15</small><br>
+            <small id="tip-line">x[0] = in(0);</small>
           </div>
-          <div class="sapho-stage">
-            <b>2 &middot; appcomp</b>
-            <span>A first pass over the assembly. Counts instructions and data, resolves label addresses, so the single-pass assembler knows every size before emitting a word.</span>
-            <div class="sapho-artifacts">.asm &rarr; addresses</div>
-          </div>
-          <div class="sapho-stage">
-            <b>3 &middot; asmcomp</b>
-            <span>Assembles the program, sizes both memories exactly, and writes the processor with only the used blocks switched on. A testbench comes out with it.</span>
-            <div class="sapho-artifacts">&rarr; .v + .mif + testbench</div>
-          </div>
+          <button class="btn btn-ghost btn-sm glass-btn sapho-wave-play" id="wave-play" aria-pressed="false">
+            <i class="ph ph-play" aria-hidden="true"></i> Run the loop
+          </button>
+          <svg viewBox="0 0 1240 260" preserveAspectRatio="xMidYMid meet" id="wave-svg">
+            <path id="w-clk" fill="none" stroke="rgba(228,232,242,0.30)" stroke-width="1.5"
+              d="M40 60 H80 V36 H120 V60 H160 V36 H200 V60 H240 V36 H280 V60 H320 V36 H360 V60 H400 V36 H440 V60 H480 V36 H520 V60 H560 V36 H600 V60 H640 V36 H680 V60 H720 V36 H760 V60 H800 V36 H840 V60 H880 V36 H920 V60 H960 V36 H1000 V60 H1040 V36 H1080 V60 H1120 V36 H1160 V60 H1200 V36 H1240"/>
+            <text x="8" y="52">clk</text>
+            <path id="w-acc" fill="none" stroke="#d4a017" stroke-width="2"
+              d="M40 150 H120 V138 H200 V150 H280 V138 H360 V150 H440 V138 H520 V126 H600 V138 H680 V126 H760 V114 H840 V102 H920 V90 H1000 V102 H1080 V114 H1160 V102 H1240"/>
+            <text x="8" y="146">acc</text>
+            <g id="w-instr"></g>
+            <g id="w-lines"></g>
+            <line id="wave-head" x1="560" y1="20" x2="560" y2="240"/>
+            <circle id="wave-head-dot" cx="560" cy="20" r="3"></circle>
+          </svg>
         </div>
-        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-5)">
-          The <code style="font-family:var(--font-mono)">.v</code> and the two <code style="font-family:var(--font-mono)">.mif</code> memory images are exactly what goes to Quartus or Vivado for the real FPGA. <a href="/library/sapho/sapho/compilacao.html" class="wlink">The chain in detail</a> &middot; <a href="/library/sapho/juntos/fpga.html" class="wlink">Taking it to the board</a>.
+
+        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-4);max-width:720px">
+          In the IDE the tracks are decoded straight from the build, for any program, with your variables shown by name.
+          <a href="/library/sapho/sapho/simulacao.html" class="wlink">How the tracks work</a> &middot;
+          <a href="/library/sapho/verilog/ondas.html" class="wlink">Waves, viewers and layouts</a>
         </p>
       </div>
     </section>
 
     <!-- ── Facts ─────────────────────────────────────────────── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-label="Architecture facts">
+    <section class="section" aria-label="Architecture in numbers">
       <div class="container">
-        <div class="sapho-facts fade-up">
-          <div class="sapho-fact"><strong>108</strong><span>instructions in the ISA, synthesised only when used</span></div>
-          <div class="sapho-fact"><strong>3</strong><span>pipeline stages, one instruction per cycle, no hazards by construction</span></div>
-          <div class="sapho-fact"><strong>2</strong><span>separate memories, program and data, sized to your exact program</span></div>
-          <div class="sapho-fact"><code>N = M + E + 1</code><span>word width is mantissa plus exponent plus sign: floating point is a design parameter</span></div>
+        <div class="sapho-facts fade-up" id="facts">
+          <div class="sapho-fact glass glass--flat"><strong data-count="108">0</strong><span>instructions in the ISA, each synthesised only when used</span></div>
+          <div class="sapho-fact glass glass--flat"><strong data-count="3">0</strong><span>pipeline stages, one instruction per cycle, no hazards by construction</span></div>
+          <div class="sapho-fact glass glass--flat"><strong data-count="5">0</strong><span>Verilog files in the whole HDL library, readable in an afternoon</span></div>
+          <div class="sapho-fact glass glass--flat"><code>N = M + E + 1</code><span>word width is mantissa plus exponent plus sign: floating point is a design parameter</span></div>
         </div>
-        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-5);max-width:720px">
-          Accumulator machine, Harvard memories, synchronous reset. The whole HDL library is five Verilog files you can read in an afternoon. <a href="/library/sapho/avancado/modulos-hdl.html" class="wlink">The modules, opened up</a> &middot; <a href="/library/sapho/referencia/instrucoes.html" class="wlink">The full instruction set</a>.
+        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-5);max-width:760px">
+          Accumulator machine, Harvard memories, synchronous reset. For graduate work the language keeps going: an adaptive RLS filter is 66 lines when <code style="font-family:var(--font-mono)">⟨w|x⟩</code> is an expression, and an FFT loads its samples pre-shuffled because <code style="font-family:var(--font-mono)">data[i)</code> reverses index bits in hardware.
+          <a href="/library/sapho/avancado/modulos-hdl.html" class="wlink">The modules, opened up</a> &middot;
+          <a href="/library/sapho/avancado/dirac.html" class="wlink">Dirac notation</a> &middot;
+          <a href="/library/sapho/avancado/fft.html" class="wlink">FFT in hardware</a> &middot;
+          <a href="/library/sapho/referencia/instrucoes.html" class="wlink">The full instruction set</a>
         </p>
       </div>
     </section>
 
     <!-- ── One window ────────────────────────────────────────── -->
-    <section class="section" aria-labelledby="window-title">
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="window-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
@@ -286,64 +335,63 @@
           </p>
         </div>
 
-        <div class="grid grid-2" style="gap:var(--sp-6)">
-          <a class="sapho-shot fade-up" href="/library/sapho/diaadia/tour-interface.html">
+        <div class="sapho-bento">
+          <a class="sapho-shot sapho-shot--a fade-up" href="/library/sapho/diaadia/tour-interface.html">
             <figure>
-              <img src="../assets/images/sapho/ide.webp" alt="The AURORA IDE with a C± file open, terminals and status bar" width="1280" height="820" loading="lazy">
+              <span class="pic"><img src="../assets/images/sapho/ide.webp" alt="The AURORA IDE with a C± file open, terminals and status bar" width="1280" height="820" loading="lazy"></span>
               <figcaption>
                 <span class="t"><i class="ph ph-app-window" aria-hidden="true"></i> AURORA, the IDE</span>
-                <span class="d">Monaco editor with C± and Verilog analysis as you type, six purpose-built terminals, and a status bar that always shows what will run. Tour in the manual.</span>
+                <span class="d">Monaco editor with C± and Verilog analysis as you type, six purpose-built terminals, a status bar that always shows what will run.</span>
               </figcaption>
             </figure>
           </a>
-          <a class="sapho-shot fade-up" href="/library/sapho/sapho/prism.html">
+          <a class="sapho-shot sapho-shot--b fade-up" href="/library/sapho/sapho/prism.html">
             <figure>
-              <img src="../assets/images/sapho/prism-alu.webp" alt="PRISM drawing the RTL of a generated processor" width="1600" height="906" loading="lazy">
+              <span class="pic"><img src="../assets/images/sapho/prism-alu.webp" alt="PRISM drawing the RTL of a generated processor" width="1600" height="906" loading="lazy"></span>
               <figcaption>
-                <span class="t"><i class="ph ph-graph" aria-hidden="true"></i> PRISM, the circuit drawn</span>
-                <span class="d">Yosys elaborates, the page draws. Click a module to descend the hierarchy; double-click a cell to land on its source line. The divider experiment happens here.</span>
+                <span class="t"><i class="ph ph-graph" aria-hidden="true"></i> PRISM</span>
+                <span class="d">Click a module to descend the hierarchy; double-click a cell to land on its source line.</span>
               </figcaption>
             </figure>
           </a>
-          <a class="sapho-shot fade-up" href="/library/sapho/verilog/ondas.html">
+          <a class="sapho-shot sapho-shot--c fade-up" href="/library/sapho/verilog/ondas.html">
             <figure>
-              <img src="../assets/images/sapho/wave-config.webp" alt="Wave configuration with the processor signal tree" width="1600" height="898" loading="lazy">
+              <span class="pic"><img src="../assets/images/sapho/wave-config.webp" alt="Wave configuration with the processor signal tree" width="1600" height="898" loading="lazy"></span>
               <figcaption>
                 <span class="t"><i class="ph ph-wave-sine" aria-hidden="true"></i> Waves, curated</span>
-                <span class="d">Icarus when you want every signal, Verilator when you want speed. GTKWave or Surfer open with your variables named and grouped, not a raw dump.</span>
+                <span class="d">Icarus for every signal, Verilator for speed; GTKWave or Surfer open with your variables named and grouped.</span>
               </figcaption>
             </figure>
           </a>
-          <a class="sapho-shot fade-up" href="/library/sapho/sapho/linguagem.html">
+          <a class="sapho-shot sapho-shot--d fade-up" href="/library/sapho/sapho/linguagem.html">
             <figure>
-              <img src="../assets/images/sapho/editor-cmm.webp" alt="C± source in the AURORA editor" width="1280" height="820" loading="lazy">
+              <span class="pic"><img src="../assets/images/sapho/editor-cmm.webp" alt="C± source in the AURORA editor" width="1280" height="820" loading="lazy"></span>
               <figcaption>
                 <span class="t"><i class="ph ph-file-code" aria-hidden="true"></i> C±, the language</span>
-                <span class="d">C without what cannot become fixed hardware, plus what silicon deserves: native complex numbers, Dirac notation for linear algebra, bit-reversed indexing for FFT.</span>
+                <span class="d">C without what cannot become fixed hardware, plus what silicon deserves: complex numbers, Dirac notation, bit-reversed indexing.</span>
               </figcaption>
             </figure>
           </a>
         </div>
 
-        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-6);max-width:760px">
-          For graduate work the language goes further: an adaptive RLS filter is 66 lines when <code style="font-family:var(--font-mono)">⟨w|x⟩</code> is an expression, and an 8-point FFT loads its samples pre-shuffled because <code style="font-family:var(--font-mono)">data[i)</code> reverses the index bits in hardware.
-          <a href="/library/sapho/avancado/dirac.html" class="wlink">Dirac notation</a> &middot;
-          <a href="/library/sapho/avancado/fft.html" class="wlink">FFT in hardware</a> &middot;
-          <a href="/library/sapho/verilog/testbenches.html" class="wlink">Testbenches in Verilog and cocotb</a> &middot;
-          <a href="aurora" class="wlink">Aurora Intelligence, the AI in the IDE</a>
+        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-6)">
+          Also in the box: cocotb for testbenches in Python, Git built in, and Aurora Intelligence, the AI assistant that drives the IDE through its own tools.
+          <a href="/library/sapho/verilog/testbenches.html" class="wlink">Testbenches</a> &middot;
+          <a href="aurora" class="wlink">The AURORA page</a> &middot;
+          <a href="/library/sapho/diaadia/aurora-intelligence.html" class="wlink">Aurora Intelligence in the manual</a>
         </p>
       </div>
     </section>
 
     <!-- ── Proven where it counts ────────────────────────────── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="proof-title">
+    <section class="section" aria-labelledby="proof-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
           <h2 class="heading-lg" id="proof-title">Proven where it counts</h2>
         </div>
         <div class="grid grid-3" style="gap:var(--sp-6)">
-          <div class="card fade-up" style="padding:var(--sp-6)">
+          <div class="card glass fade-up" style="padding:var(--sp-6)">
             <div style="font-size:22px;color:var(--accent-sapho);margin-bottom:var(--sp-3)"><i class="ph ph-atom" aria-hidden="true"></i></div>
             <div style="font-weight:600;color:var(--text-primary);margin-bottom:var(--sp-2)">Running at CERN</div>
             <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0 0 var(--sp-4)">
@@ -351,15 +399,16 @@
             </p>
             <a class="wlink" href="https://cdn.nipscern.com/publications/sbai-2025-simulador-de-pulsos-do-tilecal.pdf" target="_blank" rel="noopener">The SBAI 2025 paper</a>
           </div>
-          <div class="card fade-up" style="padding:var(--sp-6)">
+          <div class="card glass fade-up" style="padding:var(--sp-6)">
             <div style="font-size:22px;color:var(--accent-sapho);margin-bottom:var(--sp-3)"><i class="ph ph-newspaper" aria-hidden="true"></i></div>
             <div style="font-weight:600;color:var(--text-primary);margin-bottom:var(--sp-2)">Published</div>
             <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0 0 var(--sp-4)">
               The architecture and its program-driven resource allocation are described in the platform's reference article, with results on FPGA.
             </p>
-            <a class="wlink" href="https://cdn.nipscern.com/publications/ieee-2026-soft-core-processors.pdf" target="_blank" rel="noopener">The IEEE 2026 article</a>
+            <a class="wlink" href="https://cdn.nipscern.com/publications/ieee-2026-soft-core-processors.pdf" target="_blank" rel="noopener">The IEEE 2026 article</a><br>
+            <a class="wlink" href="/library/sapho/publicacoes.html">More reading, curated in the manual</a>
           </div>
-          <div class="card fade-up" style="padding:var(--sp-6)">
+          <div class="card glass fade-up" style="padding:var(--sp-6)">
             <div style="font-size:22px;color:var(--accent-sapho);margin-bottom:var(--sp-3)"><i class="ph ph-books" aria-hidden="true"></i></div>
             <div style="font-weight:600;color:var(--text-primary);margin-bottom:var(--sp-2)">Taught at UFJF</div>
             <p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7;margin:0 0 var(--sp-4)">
@@ -370,14 +419,11 @@
             <a class="wlink" href="/library/sapho/referencia/folha-rapida.html">The bench cheat sheet</a>
           </div>
         </div>
-        <p class="body-sm fade-up" style="color:var(--text-muted);margin-top:var(--sp-5)">
-          More reading in the manual's <a href="/library/sapho/publicacoes.html" class="wlink">selected publications</a> and in the lab's <a href="../publications" class="wlink">full list</a>.
-        </p>
       </div>
     </section>
 
     <!-- ── Ecosystem ─────────────────────────────────────────── -->
-    <section class="section" aria-labelledby="eco-title">
+    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="eco-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="accent-line" style="background:var(--accent-sapho)" aria-hidden="true"></div>
@@ -409,10 +455,10 @@
     </section>
 
     <!-- ── Download ──────────────────────────────────────────── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)" aria-labelledby="dl-title">
+    <section class="section" style="border-top:1px solid var(--border-subtle)" aria-labelledby="dl-title">
       <div class="container container--narrow">
-        <div class="fade-up" style="background:var(--bg-card);border:1px solid rgba(212,160,23,0.3);border-radius:var(--r-2xl);padding:var(--sp-10);text-align:center">
-          <div style="width:56px;height:56px;border-radius:var(--r-2xl);background:rgba(212,160,23,0.12);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto var(--sp-5)">
+        <div class="fade-up glass" style="border:1px solid var(--gold-line);border-radius:var(--r-2xl);padding:var(--sp-10);text-align:center">
+          <div style="width:56px;height:56px;border-radius:var(--r-2xl);background:var(--gold-dim);color:var(--accent-sapho);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto var(--sp-5)">
             <i class="ph ph-download" aria-hidden="true"></i>
           </div>
           <h2 class="heading-md" id="dl-title" style="margin-bottom:var(--sp-4)">Download SAPHO</h2>
@@ -420,15 +466,15 @@
             One installer brings the whole platform: AURORA, the YANC compilers, both simulators, both waveform viewers and an embedded Python for cocotb. The button always fetches the latest release.
           </p>
           <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
-            <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
+            <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary glass-btn" style="background:var(--accent-sapho);border-color:var(--accent-sapho)">
               <i class="ph ph-download" aria-hidden="true"></i>
               Download Latest Release
             </a>
-            <a href="/library/sapho/inicio/instalacao.html" class="btn btn-ghost">
+            <a href="/library/sapho/inicio/instalacao.html" class="btn btn-ghost glass-btn">
               <i class="ph ph-book-open" aria-hidden="true"></i>
               Install, step by step
             </a>
-            <a href="/library/sapho/_static/downloads/AURORA-Manual-6.4.2.pdf" class="btn btn-ghost">
+            <a href="/library/sapho/_static/downloads/AURORA-Manual-6.4.2.pdf" class="btn btn-ghost glass-btn">
               <i class="ph ph-file-pdf" aria-hidden="true"></i>
               Manual as PDF
             </a>
@@ -439,91 +485,399 @@
 
   </main>
 
+  <!-- Thank-you panel, shown after a download click, in the site language. -->
+  <aside class="sapho-thanks glass" id="sapho-thanks" role="status" aria-live="polite">
+    <button class="sapho-thanks-close" id="thanks-close" aria-label="Close"><i class="ph ph-x" aria-hidden="true"></i></button>
+    <h3><i class="ph ph-check-circle" aria-hidden="true"></i> <span id="thanks-title"></span></h3>
+    <p id="thanks-body"></p>
+    <ol id="thanks-steps"></ol>
+  </aside>
+
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=3747f18bb9"></script>
-  <script src="../assets/js/analytics.min.js?v=3747f18bb9" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=9e6e3652e2"></script>
+  <script src="../assets/js/analytics.min.js?v=9e6e3652e2" defer></script>
 
-  <!-- O nome do instalador carrega a versão (sapho-aurora-Setup-vX.Y.Z.exe),
-       então não existe URL fixa para "a última". Este script pergunta à API do
-       GitHub qual é a release mais recente e aponta os botões de download direto
-       para o executável. Se a API falhar, o href original (página da última
-       release) continua valendo. -->
-  <script>
-    (async () => {
-      const links = document.querySelectorAll('a[data-direct-download="sapho"]');
-      if (!links.length) return;
-      try {
-        const r = await fetch('https://api.github.com/repos/nipscernlab/sapho/releases/latest', {
-          headers: { Accept: 'application/vnd.github+json' }
-        });
-        if (!r.ok) return;
-        const rel = await r.json();
-        const asset = (rel.assets || []).find((a) => /\.exe$/i.test(a.name));
-        if (!asset) return;
-        links.forEach((a) => { a.href = asset.browser_download_url; });
-      } catch (_) { /* mantém o link para a página de releases */ }
-    })();
-  </script>
-
-  <!-- Movimento da página, todo pelo pipeline da casa (motion.js + GSAP
-       vendorizado). Nada aqui decide visibilidade: sem JavaScript, a página é
-       o que o CSS desenhou, com as ondas já traçadas e o cartão no estado do
-       deslocamento. -->
   <script type="module">
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=3747f18bb9';
+    /* A página degrada por inteiro: sem JavaScript, o CSS já desenhou tudo, e a
+       única animação restante (o marquee) respeita prefers-reduced-motion. As
+       bibliotecas são as da casa (three.js e GSAP vendorizados, motion.js) mais
+       o anime.js 4, vendorizado na mesma pasta. */
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=9e6e3652e2';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=9e6e3652e2';
 
+    const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
 
-    /* O cartão do custo: trocar o operador troca a linha destacada e o bloco
-       da ULA. Funciona sem GSAP; com ele, o chip do divisor entra com um pulso. */
-    const cost = document.getElementById('sapho-cost');
-    const btnShr = document.getElementById('op-shr');
-    const btnDiv = document.getElementById('op-div');
-    const opLine = document.getElementById('op-line');
-    function setOp(op) {
-      cost.dataset.op = op;
-      opLine.textContent = op === 'div' ? 'soma / 4' : 'soma >> 2';
-      btnShr.setAttribute('aria-pressed', String(op === 'shr'));
-      btnDiv.setAttribute('aria-pressed', String(op === 'div'));
-      const chip = document.getElementById(op === 'div' ? 'chip-div' : 'chip-shr');
-      if (window.gsap && chip) {
-        window.gsap.fromTo(chip, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(2)' });
-      }
+    /* ── Dados reais que alimentam a página ─────────────────── */
+
+    const CHIPS = {
+      mem:  ['LOD', 'SET', 'PSH', 'POP', 'LDI', 'STI', 'ILI', 'ISI', 'INN', 'OUT', 'JMP', 'JIZ', 'CAL', 'RET'],
+      ialu: ['ADD', 'MLT', 'DIV', 'MOD', 'SHL', 'SHR', 'SRS', 'AND', 'ORR', 'XOR', 'INV', 'EQU', 'GRE', 'LES', 'ABS', 'PST', 'NRM'],
+      falu: ['F_ADD', 'F_MLT', 'F_DIV', 'F_SU1', 'F_ABS', 'F_SGN', 'F_LES', 'F_GRE', 'I2F', 'F2I', 'F_ROT', 'F_SCL', 'XPO'],
+    };
+    const ALL_ALU = [...CHIPS.ialu, ...CHIPS.falu];   /* 30 blocos mostrados */
+
+    const PROGRAMS = {
+      int: {
+        name: 'media_movel.cmm', tag: 'int · 16 bits',
+        note: 'a 4-sample moving average: adder, shifter, ports. No divider, no floating point.',
+        code: `<span class="k">while</span> (1)
+{
+    x[3] = x[2];              <span class="c">// shift the history</span>
+    x[2] = x[1];
+    x[1] = x[0];
+    x[0] = in(0);             <span class="c">// new sample</span>
+
+    soma = x[0] + x[1] + x[2] + x[3];
+    out(0, <span class="g">soma &gt;&gt; 2</span>);    <span class="c">// mean, no divider</span>
+}`,
+        on: ['LOD', 'SET', 'INN', 'OUT', 'JMP', 'JIZ', 'ADD', 'SHR'],
+      },
+      fir: {
+        name: 'fir8.cmm', tag: 'float · 32 bits',
+        note: 'an 8-tap FIR in floating point: the float adder and multiplier come in.',
+        code: `<span class="k">float</span> h[8] <span class="g">"coef.txt"</span>;    <span class="c">// taps from a file</span>
+<span class="k">float</span> x[8], y;
+
+<span class="k">while</span> (1)
+{
+    x # fin(0) -&gt; |x⟩;        <span class="c">// shift register, one line</span>
+    y = <span class="g">⟨h|x⟩</span>;                <span class="c">// inner product, unrolled</span>
+    fout(0, y);
+}`,
+        on: ['LOD', 'SET', 'PSH', 'POP', 'INN', 'OUT', 'JMP', 'JIZ', 'F_ADD', 'F_MLT', 'I2F'],
+      },
+      fft: {
+        name: 'proc_fft.cmm', tag: 'comp · 32 bits · #FFTSIZ 3',
+        note: 'an 8-point FFT on complex numbers: float ALU plus bit-reversed addressing.',
+        code: `<span class="k">comp</span> data[8];
+
+<span class="k">for</span> (i = 0; i &lt; 8; i++)
+{
+    data[<span class="g">i)</span> = complex(fin(0), 0.0);  <span class="c">// i) = bits reversed</span>
+}
+
+<span class="c">// butterflies: tw = exp(complex(0.0, ang)); u + tw*v ...</span>
+<span class="k">for</span> (i = 0; i &lt; 8; i++) fout(0, abs(data[i]));`,
+        on: ['LOD', 'SET', 'PSH', 'POP', 'LDI', 'STI', 'ILI', 'ISI', 'INN', 'OUT', 'JMP', 'JIZ', 'CAL', 'RET',
+             'ADD', 'EQU', 'LES', 'F_ADD', 'F_MLT', 'F_DIV', 'F_SU1', 'F_ABS', 'F_LES', 'I2F', 'F_ROT', 'F_SCL', 'XPO'],
+      },
+    };
+
+    /* Um giro do laço do filtro, uma instrução por ciclo. */
+    const TRACE = [
+      ['LOD x[2]', 'x[3] = x[2];'], ['SET x[3]', 'x[3] = x[2];'],
+      ['LOD x[1]', 'x[2] = x[1];'], ['SET x[2]', 'x[2] = x[1];'],
+      ['LOD x[0]', 'x[1] = x[0];'], ['SET x[1]', 'x[1] = x[0];'],
+      ['INN 0',    'x[0] = in(0);'], ['SET x[0]', 'x[0] = in(0);'],
+      ['ADD x[1]', 'soma = x[0] + x[1] + x[2] + x[3];'],
+      ['ADD x[2]', 'soma = x[0] + x[1] + x[2] + x[3];'],
+      ['ADD x[3]', 'soma = x[0] + x[1] + x[2] + x[3];'],
+      ['SET soma', 'soma = x[0] + x[1] + x[2] + x[3];'],
+      ['SHR c2',   'out(0, soma >> 2);'], ['OUT 0', 'out(0, soma >> 2);'],
+      ['JMP laco', 'while (1)'],
+    ];
+
+    /* ── Marquee: a ISA e a linguagem passando ──────────────── */
+    const MQ2 = ['int', 'float', 'comp', '⟨w|x⟩', 'data[i)', '#NUBITS', '#NBMANT', '#NBEXPO', '#FFTSIZ',
+                 'in(0)', 'fout(0, y)', 'a # |M|b⟩', '#PRACA', '#TOAQUI', 'while (1)', 'sqrt', 'sin', 'exp',
+                 'conj(z)', 'mod2(z)', '#define N 8', 'x # c -> |x⟩'];
+    function fillMarquee(el, items, goldEvery) {
+      const seq = items.map((t, i) => `<span${i % goldEvery === 0 ? ' class="g"' : ''}>${t}</span>`).join('');
+      el.innerHTML = seq + seq; /* dobrado para o loop de -50% fechar sem emenda */
     }
-    btnShr.addEventListener('click', () => setOp('shr'));
-    btnDiv.addEventListener('click', () => setOp('div'));
+    fillMarquee(document.getElementById('mq1'), [...CHIPS.mem, ...CHIPS.ialu, ...CHIPS.falu], 5);
+    fillMarquee(document.getElementById('mq2'), MQ2, 4);
 
-    const ok = await ensureMotionLibs();
-    if (!ok) { /* prefere menos movimento, ou a rede falhou: a página já está inteira */ }
-    else {
-      initMotion();
+    /* ── Programas: inventário, medidor e legenda do die ────── */
+    const groups = { mem: document.querySelector('[data-g="mem"]'), ialu: document.querySelector('[data-g="ialu"]'), falu: document.querySelector('[data-g="falu"]') };
+    for (const g in groups) {
+      groups[g].innerHTML = CHIPS[g].map((m) => `<span class="sapho-inv-chip" data-m="${m}">${m}</span>`).join('');
+    }
+    const meterN = document.getElementById('meter-n');
+    const meterFill = document.getElementById('meter-fill');
 
-      /* A faixa de onda: o clock e a média sobem o degrau conforme a página
-         rola, com o DrawSVG que a página do CERN já usa. Sem o plugin, os
-         traços ficam completos, que é o estado do CSS. */
-      const STAMP = '?v=24489d9334';
-      const loadDraw = () => new Promise((res) => {
-        if (window.DrawSVGPlugin) return res(true);
-        const s = document.createElement('script');
-        s.src = '../assets/js/vendor/DrawSVGPlugin.min.js' + STAMP;
-        s.onload = () => res(true);
-        s.onerror = () => res(false);
-        document.head.appendChild(s);
+    let dieSetProgram = null; /* preenchido pelo die 3D quando ele sobe */
+
+    function showProgram(key, animateIt = true) {
+      const p = PROGRAMS[key];
+      document.getElementById('src-name').textContent = p.name;
+      document.getElementById('src-tag').innerHTML = p.tag;
+      document.getElementById('src-code').innerHTML = p.code;
+      document.querySelectorAll('.sapho-tabs [role="tab"]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.prog === key)));
+
+      const onSet = new Set(p.on);
+      const fresh = [];
+      document.querySelectorAll('.sapho-inv-chip').forEach((el) => {
+        const want = onSet.has(el.dataset.m);
+        if (want && !el.classList.contains('on')) fresh.push(el);
+        el.classList.toggle('on', want);
       });
-      if (await loadDraw()) {
-        window.gsap.registerPlugin(window.DrawSVGPlugin);
-        const band = document.querySelector('.sapho-band');
-        window.gsap.fromTo('#wave-clk', { drawSVG: '0%' }, {
-          drawSVG: '100%', ease: 'none',
-          scrollTrigger: { trigger: band, start: 'top 90%', end: 'bottom 40%', scrub: 0.6 }
-        });
-        window.gsap.fromTo('#wave-soma', { drawSVG: '0%' }, {
-          drawSVG: '100%', ease: 'none',
-          scrollTrigger: { trigger: band, start: 'top 85%', end: 'bottom 35%', scrub: 0.6 }
-        });
+      if (animateIt && !REDUCED && fresh.length) {
+        animate(fresh, { scale: [0.7, 1], opacity: [0.4, 1], duration: 350, delay: stagger(20), ease: 'outBack(2)' });
       }
+
+      const aluCount = p.on.filter((m) => ALL_ALU.includes(m)).length;
+      meterN.textContent = String(aluCount);
+      const pct = Math.round(100 * aluCount / ALL_ALU.length) + '%';
+      if (animateIt && !REDUCED) animate(meterFill, { width: pct, duration: 550, ease: 'outCubic' });
+      else meterFill.style.width = pct;
+
+      document.getElementById('die-prog').textContent = p.name;
+      document.getElementById('die-note').textContent = p.note;
+      if (dieSetProgram) dieSetProgram(key);
     }
+    document.querySelectorAll('.sapho-tabs [role="tab"]').forEach((b) => b.addEventListener('click', () => showProgram(b.dataset.prog)));
+    showProgram('int', false);
+
+    /* O herói alterna os programas sozinho até a primeira interação. */
+    if (!REDUCED) {
+      const order = ['int', 'fir', 'fft'];
+      let i = 0;
+      const auto = setInterval(() => { i = (i + 1) % 3; showProgram(order[i]); }, 5200);
+      document.querySelector('.sapho-tabs').addEventListener('click', () => clearInterval(auto), { once: true });
+    }
+
+    /* ── O die em três dimensões ────────────────────────────── */
+    (async () => {
+      const canvas = document.getElementById('die-canvas');
+      let T;
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=9e6e3652e2'); }
+      catch (_) { canvas.remove(); return; }
+
+      const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
+      renderer.setClearAlpha(0);
+      const scene = new T.Scene();
+      const cam = new T.PerspectiveCamera(34, 1, 0.1, 100);
+      cam.position.set(0, 2.6, 6.2);
+      cam.lookAt(0, 0.2, 0);
+
+      scene.add(new T.AmbientLight(0xaabbdd, 1.2));
+      const key = new T.DirectionalLight(0xffffff, 2.2); key.position.set(3, 6, 4); scene.add(key);
+      const warm = new T.PointLight(0xd4a017, 10, 14); warm.position.set(-2, 3, 2); scene.add(warm);
+
+      const rig = new T.Group();
+      rig.position.x = 1.45;           /* o die vive à direita do painel de vidro */
+      rig.rotation.x = 0.45;
+      scene.add(rig);
+
+      const sub = new T.Mesh(
+        new T.BoxGeometry(4.6, 0.14, 3.4),
+        new T.MeshStandardMaterial({ color: 0x18213a, metalness: 0.7, roughness: 0.4 })
+      );
+      rig.add(sub);
+
+      /* blocos: uma grade 13 x 9; cada bloco, um recurso. */
+      const COLS = 13, ROWS = 9, N = COLS * ROWS;
+      const geo = new T.BoxGeometry(0.26, 0.14, 0.26);
+      /* branco: a cor real vem por instância, e instanceColor multiplica material.color */
+      const mat = new T.MeshStandardMaterial({ color: 0xffffff, metalness: 0.35, roughness: 0.5 });
+      const mesh = new T.InstancedMesh(geo, mat, N);
+      const m4 = new T.Matrix4();
+      for (let i = 0; i < N; i++) {
+        const cx = (i % COLS - (COLS - 1) / 2) * 0.335;
+        const cz = (Math.floor(i / COLS) - (ROWS - 1) / 2) * 0.345;
+        m4.setPosition(cx, 0.14, cz);
+        mesh.setMatrixAt(i, m4);
+        mesh.setColorAt(i, new T.Color(0x2a3346));
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      rig.add(mesh);
+
+      /* conjuntos de blocos por programa, com tamanhos na proporção real dos
+         inventários (8, 11 e 27 recursos) */
+      const seed = (n) => { let s = n || 1; return () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648; };
+      function pick(count, salt) {
+        const r = seed(salt); const set = new Set();
+        while (set.size < count) set.add(Math.floor(r() * N));
+        return set;
+      }
+      const DIESETS = { int: pick(24, 7), fir: pick(40, 21), fft: pick(72, 5) };
+      const gold = new T.Color(0xe0b02c), dim = new T.Color(0x2a3346), c = new T.Color();
+      let currentSet = DIESETS.int;
+      const glow = new Float32Array(N);
+      dieSetProgram = (keyName) => { currentSet = DIESETS[keyName] || DIESETS.int; };
+
+      function paint(dt) {
+        let dirty = false;
+        for (let i = 0; i < N; i++) {
+          const target = currentSet.has(i) ? 1 : 0;
+          const v = glow[i] + (target - glow[i]) * Math.min(1, dt * 3.2);
+          if (Math.abs(v - glow[i]) > 0.0005) { glow[i] = v; dirty = true; }
+          c.copy(dim).lerp(gold, glow[i] * 0.95);
+          mesh.setColorAt(i, c);
+        }
+        if (dirty && mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      }
+
+      function resize() {
+        const r = canvas.parentElement.getBoundingClientRect();
+        if (!r.width) return;
+        renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+        renderer.setSize(r.width, r.height, false);
+        cam.aspect = r.width / r.height; cam.updateProjectionMatrix();
+      }
+      new ResizeObserver(resize).observe(canvas.parentElement);
+      resize();
+
+      let px = 0, py = 0;
+      addEventListener('pointermove', (e) => { px = e.clientX / innerWidth - 0.5; py = e.clientY / innerHeight - 0.5; }, { passive: true });
+
+      if (REDUCED) { currentSet.forEach((i) => (glow[i] = 1)); paint(1); renderer.render(scene, cam); return; }
+
+      let raf = 0, last = 0, spin = 0;
+      function frame(t) {
+        raf = requestAnimationFrame(frame);
+        const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
+        spin += dt * 0.1;
+        rig.rotation.y = spin + px * 0.35;
+        rig.rotation.z = py * -0.05;
+        paint(dt);
+        renderer.render(scene, cam);
+      }
+      whileVisible(canvas, () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } },
+                          () => { cancelAnimationFrame(raf); raf = 0; });
+    })();
+
+    /* ── Título com entrada por letras (anime.js) ───────────── */
+    if (!REDUCED) {
+      const h1 = document.getElementById('sapho-title');
+      h1.innerHTML = h1.textContent.split('').map((ch) => `<span class="l">${ch}</span>`).join('');
+      animate(h1.querySelectorAll('.l'), {
+        translateY: [26, 0], opacity: [0, 1],
+        duration: 700, delay: stagger(55, { start: 120 }), ease: 'outExpo',
+      });
+    }
+
+    /* ── Inspetor de onda ───────────────────────────────────── */
+    {
+      const CYCLES = TRACE.length, X0 = 40, DX = 80;
+      const gi = document.getElementById('w-instr');
+      const gl = document.getElementById('w-lines');
+      const NS = 'http://www.w3.org/2000/svg';
+      TRACE.forEach(([instr], i) => {
+        const t = document.createElementNS(NS, 'text');
+        t.setAttribute('x', X0 + i * DX + DX / 2); t.setAttribute('y', 205);
+        t.setAttribute('text-anchor', 'middle'); t.setAttribute('class', 'asm');
+        t.textContent = instr.split(' ')[0];
+        gi.appendChild(t);
+      });
+      [['x[3..1] slide', 0, 6], ['in(0)', 6, 8], ['soma', 8, 12], ['>> 2 · out', 12, 14], ['loop', 14, 15]].forEach(([lbl, xs, xe]) => {
+        const t = document.createElementNS(NS, 'text');
+        t.setAttribute('x', X0 + ((xs + xe) / 2) * DX); t.setAttribute('y', 232); t.setAttribute('text-anchor', 'middle');
+        t.textContent = lbl;
+        gl.appendChild(t);
+      });
+
+      const head = document.getElementById('wave-head');
+      const dot = document.getElementById('wave-head-dot');
+      const tipI = document.getElementById('tip-instr');
+      const tipC = document.getElementById('tip-cyc');
+      const tipL = document.getElementById('tip-line');
+      function setCycle(i) {
+        i = Math.max(0, Math.min(CYCLES - 1, i | 0));
+        const x = X0 + i * DX + DX / 2;
+        head.setAttribute('x1', x); head.setAttribute('x2', x); dot.setAttribute('cx', x);
+        tipI.textContent = TRACE[i][0];
+        tipC.textContent = String(i + 1);
+        tipL.textContent = TRACE[i][1];
+      }
+      setCycle(6);
+
+      const box = document.getElementById('wave-box');
+      const svg = document.getElementById('wave-svg');
+      let run = null;
+      const playBtn = document.getElementById('wave-play');
+      function stopRun() {
+        if (!run) return;
+        run.pause(); run = null;
+        playBtn.setAttribute('aria-pressed', 'false');
+        playBtn.innerHTML = '<i class="ph ph-play" aria-hidden="true"></i> Run the loop';
+      }
+      box.addEventListener('pointermove', (e) => {
+        const r = svg.getBoundingClientRect();
+        const vx = (e.clientX - r.left) / r.width * 1240;
+        setCycle(Math.floor((vx - X0) / DX));
+        stopRun();
+      });
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (run) { stopRun(); return; }
+        const o = { c: 0 };
+        playBtn.setAttribute('aria-pressed', 'true');
+        playBtn.innerHTML = '<i class="ph ph-pause" aria-hidden="true"></i> Pause';
+        run = animate(o, {
+          c: CYCLES - 1, duration: 4200, loop: true, ease: 'linear',
+          onUpdate: () => setCycle(Math.round(o.c)),
+        });
+      });
+      playBtn.addEventListener('pointermove', (e) => e.stopPropagation());
+    }
+
+    /* ── Contadores dos fatos ───────────────────────────────── */
+    {
+      const els = document.querySelectorAll('#facts [data-count]');
+      let done = false;
+      new IntersectionObserver((entries) => {
+        if (done || !entries.some((e) => e.isIntersecting)) return;
+        done = true;
+        els.forEach((el) => {
+          const target = +el.dataset.count;
+          if (REDUCED) { el.textContent = String(target); return; }
+          const o = { v: 0 };
+          animate(o, { v: target, duration: 1200, ease: 'outExpo', onUpdate: () => { el.textContent = String(Math.round(o.v)); } });
+        });
+      }, { threshold: 0.4 }).observe(document.getElementById('facts'));
+    }
+
+    /* ── Download: link direto, versão no chip e agradecimento ── */
+    {
+      const links = document.querySelectorAll('a[data-direct-download="sapho"]');
+      fetch('https://api.github.com/repos/nipscernlab/sapho/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((rel) => {
+          if (!rel) return;
+          const asset = (rel.assets || []).find((a) => /\.exe$/i.test(a.name));
+          if (asset) links.forEach((a) => { a.href = asset.browser_download_url; });
+          const v = document.getElementById('sapho-version');
+          if (v && rel.tag_name) v.innerHTML = `<b>${rel.tag_name}</b>${asset ? ' · ' + Math.round(asset.size / 1048576) + ' MB' : ''}`;
+        })
+        .catch(() => { /* o href da página de releases continua valendo */ });
+
+      const L = {
+        en: { title: 'Thanks for downloading SAPHO!', body: 'While the installer arrives, three steps and you are simulating:',
+              steps: ['<a href="/library/sapho/inicio/instalacao.html">Install, step by step</a>',
+                      '<a href="/library/sapho/verilog/tutorial-contador.html">Tutorial 1: a counter in Verilog</a>',
+                      '<a href="/library/sapho/sapho/tutorial-filtro.html">Tutorial 2: your first processor</a>'] },
+        pt: { title: 'Obrigado por baixar o SAPHO!', body: 'Enquanto o instalador chega, três passos e você está simulando:',
+              steps: ['<a href="/library/sapho/inicio/instalacao.html">Instale, passo a passo</a>',
+                      '<a href="/library/sapho/verilog/tutorial-contador.html">Tutorial 1: um contador em Verilog</a>',
+                      '<a href="/library/sapho/sapho/tutorial-filtro.html">Tutorial 2: seu primeiro processador</a>'] },
+        fr: { title: 'Merci d’avoir téléchargé SAPHO !', body: 'Pendant que l’installateur arrive, trois étapes et vous simulez :',
+              steps: ['<a href="/library/sapho/inicio/instalacao.html">Installer, pas à pas</a>',
+                      '<a href="/library/sapho/verilog/tutorial-contador.html">Tutoriel 1 : un compteur en Verilog</a>',
+                      '<a href="/library/sapho/sapho/tutorial-filtro.html">Tutoriel 2 : votre premier processeur</a>'] },
+        no: { title: 'Takk for at du lastet ned SAPHO!', body: 'Mens installasjonen kommer: tre steg, så simulerer du.',
+              steps: ['<a href="/library/sapho/inicio/instalacao.html">Installer, steg for steg</a>',
+                      '<a href="/library/sapho/verilog/tutorial-contador.html">Veiledning 1: en teller i Verilog</a>',
+                      '<a href="/library/sapho/sapho/tutorial-filtro.html">Veiledning 2: din første prosessor</a>'] },
+      };
+      const panel = document.getElementById('sapho-thanks');
+      function showThanks() {
+        const lang = localStorage.getItem('nipscern_lang') || (navigator.language || 'en').slice(0, 2);
+        const t = L[lang] || L.en;
+        document.getElementById('thanks-title').textContent = t.title;
+        document.getElementById('thanks-body').textContent = t.body;
+        document.getElementById('thanks-steps').innerHTML = t.steps.map((s) => `<li>${s}</li>`).join('');
+        panel.classList.add('show');
+      }
+      links.forEach((a) => a.addEventListener('click', () => setTimeout(showThanks, 600)));
+      document.getElementById('thanks-close').addEventListener('click', () => panel.classList.remove('show'));
+    }
+
+    /* ── Parallax de rolagem da casa ────────────────────────── */
+    ensureMotionLibs().then((ok) => { if (ok) initMotion(); });
   </script>
 </body>
 </html>
