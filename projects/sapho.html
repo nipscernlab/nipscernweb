@@ -227,14 +227,30 @@
       padding: 7px var(--sp-4); border-bottom: 1px solid var(--rule);
       font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; color: var(--ink-faint); }
     .sapho-shot .fig-tab b { color: var(--gold); font-weight: 600; }
-    .sapho-shot .pic { flex: 1; min-height: 0; overflow: hidden; display: block; }
-    .sapho-shot img { width: 100%; height: 114%; object-fit: cover; object-position: top left; display: block; }
-    .sapho-shot figcaption { padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--rule); }
+    /* O quadro manda na proporcao e a captura preenche, como no resto do site.
+       A versao anterior dava flex:1 ao quadro e 114% de altura a imagem, e o
+       tile do PRISM, que ocupava duas linhas, virava uma coluna alta: de uma
+       captura 16:9 sobrava o canto superior esquerdo, ou seja, canvas vazio, e
+       o diagrama ficava inteiro fora do quadro. Cada quadro agora tem a
+       proporcao exata do PNG que recebe, entao cover nao corta nada. */
+    .sapho-shot .pic { position: relative; display: block; overflow: hidden; }
+    .sapho-shot img { position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: top left; display: block;
+      transition: transform var(--t-slow); }
+    .sapho-shot:hover img { transform: scale(1.04); }
+    .sapho-shot figcaption { margin-top: auto; padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--rule); }
     .sapho-shot .t { font-weight: 600; color: var(--text-primary); font-size: var(--text-sm); }
     .sapho-shot .d { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; line-height: 1.6; }
-    .sapho-shot--a { grid-column: span 4; } .sapho-shot--b { grid-column: span 2; grid-row: span 2; }
-    .sapho-shot--c { grid-column: span 2; } .sapho-shot--d { grid-column: span 2; }
-    @media (max-width: 900px) { .sapho-figs { grid-template-columns: 1fr; } .sapho-shot { grid-column: auto !important; grid-row: auto !important; } }
+    .sapho-shot--a { grid-column: span 6; } .sapho-shot--a .pic { aspect-ratio: 1920 / 1078; }
+    .sapho-shot--b { grid-column: span 3; } .sapho-shot--b .pic { aspect-ratio: 1920 / 1078; }
+    /* O editor entra recortado no arquivo (820x460 do canto superior esquerdo
+       da captura de 1560x994): num tile de meia largura a captura inteira poe
+       o codigo a 7px e ninguem le a linguagem que a figura existe para mostrar.
+       O recorte guarda as diretivas, o main e as declaracoes, na mesma
+       proporcao do PRISM ao lado. */
+    .sapho-shot--c { grid-column: span 3; } .sapho-shot--c .pic { aspect-ratio: 820 / 460; }
+    .sapho-shot--d { grid-column: span 6; } .sapho-shot--d .pic { aspect-ratio: 2560 / 1300; }
+    @media (max-width: 900px) { .sapho-figs { grid-template-columns: 1fr; } .sapho-shot { grid-column: auto !important; } }
 
     /* ── 05: bill of materials ────────────────────────────────── */
     .sapho-bom { border-top: 1px solid var(--rule); }
@@ -515,7 +531,7 @@
           <a class="sapho-shot sapho-shot--a fade-up" href="/library/sapho/diaadia/tour-interface.html">
             <figure>
               <span class="fig-tab"><span><b>FIG. 3</b> · AURORA.EXE</span><span>main window</span></span>
-              <span class="pic" data-drift-frame><img src="../assets/images/sapho/ide.webp" alt="The AURORA IDE with a C± file open, terminals and status bar" width="1280" height="820" loading="lazy" data-drift="6"></span>
+              <span class="pic"><img src="../assets/images/sapho/aurora-window.webp" alt="The AURORA main window: file tree on the left, a Verilog module in the editor, the six terminals below and the status bar" width="1920" height="1078" loading="lazy" decoding="async"></span>
               <figcaption>
                 <span class="t">AURORA, the IDE</span>
                 <span class="d">Monaco editor with C± and Verilog analysis as you type, six purpose-built terminals, a status bar that always shows what will run.</span>
@@ -525,30 +541,30 @@
           <a class="sapho-shot sapho-shot--b fade-up" href="/library/sapho/sapho/prism.html">
             <figure>
               <span class="fig-tab"><span><b>FIG. 4</b> · PRISM</span><span>RTL view</span></span>
-              <span class="pic" data-drift-frame><img src="../assets/images/sapho/prism-alu.webp" alt="PRISM drawing the RTL of a generated processor" width="1600" height="906" loading="lazy" data-drift="6"></span>
+              <span class="pic"><img src="../assets/images/sapho/prism-top.webp" alt="PRISM at the top level of a generated processor, with the ports wired into the p_media_movel block" width="1920" height="1078" loading="lazy" decoding="async"></span>
               <figcaption>
                 <span class="t">PRISM</span>
                 <span class="d">Click a module to descend the hierarchy; double-click a cell to land on its source line.</span>
               </figcaption>
             </figure>
           </a>
-          <a class="sapho-shot sapho-shot--c fade-up" href="/library/sapho/verilog/ondas.html">
+          <a class="sapho-shot sapho-shot--c fade-up" href="/library/sapho/sapho/linguagem.html">
             <figure>
-              <span class="fig-tab"><span><b>FIG. 5</b> · WAVES</span><span>two viewers</span></span>
-              <span class="pic" data-drift-frame><img src="../assets/images/sapho/wave-config.webp" alt="Wave configuration with the processor signal tree" width="1600" height="898" loading="lazy" data-drift="6"></span>
+              <span class="fig-tab"><span><b>FIG. 5</b> · EDITOR</span><span>C± source</span></span>
+              <span class="pic"><img src="../assets/images/sapho/editor-cmm-fft.webp" alt="An FFT written in C±, the processor directives declared at the top of the file" width="820" height="460" loading="lazy" decoding="async"></span>
               <figcaption>
-                <span class="t">Waves, curated</span>
-                <span class="d">Icarus for every signal, Verilator for speed; layouts arrive named and grouped.</span>
+                <span class="t">C±, the language</span>
+                <span class="d">C without what cannot become fixed hardware, plus what silicon deserves. The directives at the top of the file are the processor being sized.</span>
               </figcaption>
             </figure>
           </a>
-          <a class="sapho-shot sapho-shot--d fade-up" href="/library/sapho/sapho/linguagem.html">
+          <a class="sapho-shot sapho-shot--d fade-up" href="/library/sapho/verilog/ondas.html">
             <figure>
-              <span class="fig-tab"><span><b>FIG. 6</b> · EDITOR</span><span>C± source</span></span>
-              <span class="pic" data-drift-frame><img src="../assets/images/sapho/editor-cmm.webp" alt="C± source in the AURORA editor" width="1280" height="820" loading="lazy" data-drift="6"></span>
+              <span class="fig-tab"><span><b>FIG. 6</b> · WAVES</span><span>two viewers</span></span>
+              <span class="pic"><img src="../assets/images/sapho/waves-surfer.webp" alt="Surfer showing a SAPHO run: the clock and reset, the analogue input and the computed quantities, and below them the assembly and the C± line being executed" width="2560" height="1300" loading="lazy" decoding="async"></span>
               <figcaption>
-                <span class="t">C±, the language</span>
-                <span class="d">C without what cannot become fixed hardware, plus what silicon deserves.</span>
+                <span class="t">Waves, curated</span>
+                <span class="d">Icarus for every signal, Verilator for speed; the layout arrives named and grouped, with the assembly and the C± line running under the waveform.</span>
               </figcaption>
             </figure>
           </a>
@@ -1320,10 +1336,10 @@
       document.getElementById('thanks-close').addEventListener('click', () => panel.classList.remove('show'));
     }
 
-    /* ── Rolagem da casa: drift nas figuras e os tracos se desenhando ── */
+    /* ── Rolagem da casa: os tracos se desenhando ─────────────────── */
     ensureMotionLibs().then(async (ok) => {
       if (!ok) return;
-      initMotion();   /* ativa os data-drift das figuras da IDE */
+      initMotion();   /* registra o ScrollTrigger e os data-drift da pagina */
 
       const STAMP = '?v=3747f18bb9';
       const loaded = window.DrawSVGPlugin ? true : await new Promise((res) => {
