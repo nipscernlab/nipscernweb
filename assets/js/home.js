@@ -14,12 +14,12 @@
 
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
-import { publicationUrl, newsPostUrl } from './content-links.js?v=838992a674';
-import { scrollToEl } from './smooth-scroll.js?v=838992a674';
+import { publicationUrl, newsPostUrl } from './content-links.js?v=fc0407e6d5';
+import { scrollToEl } from './smooth-scroll.js?v=fc0407e6d5';
 /* The scroll machinery every page shares: entrance failsafe, run-while-visible,
    and the ScrollTrigger setup with the refresh discipline that took three bugs
    to get right. What stays in this file is what only the home page has. */
-import { initMotion, revealFailsafe, stopDrift, ensureMotionLibs } from './motion.js?v=838992a674';
+import { initMotion, revealFailsafe, stopDrift, ensureMotionLibs } from './motion.js?v=fc0407e6d5';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 

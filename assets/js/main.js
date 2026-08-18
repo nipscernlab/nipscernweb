@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=838992a674';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=fc0407e6d5';
 
-import { newsPostUrl } from './content-links.js?v=838992a674';
+import { newsPostUrl } from './content-links.js?v=fc0407e6d5';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=838992a674';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=fc0407e6d5';
 
 // ============================================================
 // Navigation Template
@@ -306,6 +306,7 @@ function buildFooter() {
         <ul class="footer-nav-list">
           <li><a href="https://github.com/nipscernlab" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-github-logo" aria-hidden="true"></i> GitHub</a></li>
           <li><a href="https://gitlab.com/nips-cern" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-gitlab-logo" aria-hidden="true"></i> GitLab</a></li>
+          <li><a href="https://www.instagram.com/nipscern/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><i class="ph ph-instagram-logo" aria-hidden="true"></i> Instagram</a></li>
           <li><a href="https://www.nipscern.com" target="_blank" rel="noopener">nipscern.com</a></li>
           <li><a href="https://lattes.cnpq.br/5454168673866452" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px">
             <img src="${ROOT}assets/icons/lattes_icon.svg" alt="Lattes" style="width:14px;height:14px" aria-hidden="true"> Luciano no Lattes
@@ -352,6 +353,9 @@ function buildFooter() {
           </a>
           <a href="https://gitlab.com/nips-cern" class="footer-social-link" target="_blank" rel="noopener" aria-label="GitLab">
             <i class="ph ph-gitlab-logo" aria-hidden="true" style="font-size:18px"></i>
+          </a>
+          <a href="https://www.instagram.com/nipscern/" class="footer-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+            <i class="ph ph-instagram-logo" aria-hidden="true" style="font-size:18px"></i>
           </a>
         </div>
       </div>
@@ -759,7 +763,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=838992a674">. Each copy would otherwise append its own
+// <script src="main.js?v=fc0407e6d5">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {
