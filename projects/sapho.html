@@ -25,12 +25,12 @@
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=838992a674">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=838992a674">
+  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=fc0407e6d5">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=fc0407e6d5">
 
   <style>
     /* ==================================================================
-       SAPHO — a pagina como desenho de engenharia.
+       SAPHO: a pagina como desenho de engenharia.
        A identidade: papel milimetrado, reguas finas, numeros de secao em
        mono, figuras numeradas e um floorplan verdadeiro do processador
        gerado. Nada de vidro, nada de 3D, nada aleatorio: cada elemento
@@ -243,8 +243,13 @@
       transition: background .2s, padding-left .2s; }
     .sapho-bom a:hover { background: rgba(212,160,23,0.04); padding-left: var(--sp-4); }
     .sapho-bom .ref { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink-faint); }
-    .sapho-bom .item { display: flex; align-items: center; gap: 12px; font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
-    .sapho-bom .item img { width: 22px; height: 22px; object-fit: contain; }
+    .sapho-bom .item { display: flex; align-items: center; gap: 14px; font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+    /* Logotipos vem em proporcoes diferentes: o do PRISM e quase o dobro de
+       largo que alto, e um quadrado de 22px o encolhia para 11px de altura,
+       menor que todos os vizinhos. Alinhar pela ALTURA e o que iguala a massa
+       optica de marcas largas e estreitas; a caixa reserva a maior largura. */
+    .sapho-bom .item .logo { flex: 0 0 46px; display: flex; align-items: center; justify-content: center; }
+    .sapho-bom .item img { height: 24px; width: auto; max-width: 46px; object-fit: contain; }
     .sapho-bom .role { font-size: var(--text-sm); color: var(--text-muted); }
     .sapho-bom .go { color: var(--ink-faint); font-size: 14px; transition: color .2s, transform .2s; }
     .sapho-bom a:hover .go { color: var(--gold); transform: translateX(3px); }
@@ -337,7 +342,7 @@
 
         <div class="sapho-die-stage fade-in" aria-label="Three-dimensional floorplan of a SAPHO processor: fixed modules plus one cell per instruction; only the gold cells are synthesised">
           <canvas id="die-canvas"></canvas>
-          <span class="sapho-die-hint" id="die-hint">media_movel.cmm · 8 blocks built — drag to turn, hover a block</span>
+          <span class="sapho-die-hint" id="die-hint">media_movel.cmm · 8 blocks built · drag to turn, hover a block</span>
         </div>
       </div>
     </header>
@@ -563,16 +568,16 @@
           These are the actual tools that ship, each doing the job it is best at.
         </p>
         <div class="sapho-bom fade-up">
-          <a href="aurora"><span class="ref">01</span><span class="item"><img src="../assets/images/sapho/tools/sapho_aurora_icon.svg" alt="">AURORA</span><span class="role">the IDE, one window for the whole flow</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="yanc"><span class="ref">02</span><span class="item"><img src="../assets/images/sapho/tools/yanc.svg" alt="">YANC</span><span class="role">the compilers: cmmcomp, appcomp, asmcomp</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="/library/sapho/sapho/linguagem.html"><span class="ref">03</span><span class="item"><img src="../assets/images/sapho/tools/cmm_file.svg" alt="">C±</span><span class="role">the language your processor is drawn from</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="/library/sapho/verilog/ondas.html"><span class="ref">04</span><span class="item"><img src="../assets/images/sapho/tools/Icarus_Verilog_logo.png" alt="">Icarus Verilog</span><span class="role">simulation, every signal visible</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="/library/sapho/verilog/ondas.html"><span class="ref">05</span><span class="item"><img src="../assets/images/sapho/tools/Verilator_logo.png" alt="">Verilator</span><span class="role">fast simulation for long runs</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="/library/sapho/verilog/ondas.html"><span class="ref">06</span><span class="item"><img src="../assets/images/sapho/tools/gtkwave.svg" alt="">GTKWave</span><span class="role">waveform viewer, the classic</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="https://gitlab.com/nips-cern/surfer-aurora" target="_blank" rel="noopener"><span class="ref">07</span><span class="item"><img src="../assets/images/sapho/tools/surfer.svg" alt="">Surfer</span><span class="role">waveform viewer, our fork</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="/library/sapho/sapho/prism.html"><span class="ref">08</span><span class="item"><img src="../assets/images/sapho/tools/yosys.svg" alt="">Yosys</span><span class="role">RTL analysis behind the diagram</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="/library/sapho/sapho/prism.html"><span class="ref">09</span><span class="item"><img src="../assets/images/sapho/tools/aurora_prism.svg" alt="">PRISM</span><span class="role">the circuit diagram, hierarchy and all</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
-          <a href="/library/sapho/verilog/testbenches.html"><span class="ref">10</span><span class="item"><img src="../assets/images/sapho/tools/python.svg" alt="">cocotb</span><span class="role">testbenches in Python</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="aurora"><span class="ref">01</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/sapho_aurora_icon.svg" alt=""></span>AURORA</span><span class="role">the IDE, one window for the whole flow</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="yanc"><span class="ref">02</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/yanc.svg" alt=""></span>YANC</span><span class="role">the compilers: cmmcomp, appcomp, asmcomp</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="/library/sapho/sapho/linguagem.html"><span class="ref">03</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/cmm_file.svg" alt=""></span>C±</span><span class="role">the language your processor is drawn from</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="/library/sapho/verilog/ondas.html"><span class="ref">04</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/Icarus_Verilog_logo.png" alt=""></span>Icarus Verilog</span><span class="role">simulation, every signal visible</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="/library/sapho/verilog/ondas.html"><span class="ref">05</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/Verilator_logo.png" alt=""></span>Verilator</span><span class="role">fast simulation for long runs</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="/library/sapho/verilog/ondas.html"><span class="ref">06</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/gtkwave.svg" alt=""></span>GTKWave</span><span class="role">waveform viewer, the classic</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="https://gitlab.com/nips-cern/surfer-aurora" target="_blank" rel="noopener"><span class="ref">07</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/surfer.svg" alt=""></span>Surfer</span><span class="role">waveform viewer, our fork</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="/library/sapho/sapho/prism.html"><span class="ref">08</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/yosys.svg" alt=""></span>Yosys</span><span class="role">RTL analysis behind the diagram</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="/library/sapho/sapho/prism.html"><span class="ref">09</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/aurora_prism.svg" alt=""></span>PRISM</span><span class="role">the circuit diagram, hierarchy and all</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
+          <a href="/library/sapho/verilog/testbenches.html"><span class="ref">10</span><span class="item"><span class="logo"><img src="../assets/images/sapho/tools/python.svg" alt=""></span>cocotb</span><span class="role">testbenches in Python</span><i class="ph ph-arrow-right go" aria-hidden="true"></i></a>
         </div>
       </div>
     </section>
@@ -653,16 +658,16 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=838992a674"></script>
-  <script src="../assets/js/analytics.min.js?v=838992a674" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=fc0407e6d5"></script>
+  <script src="../assets/js/analytics.min.js?v=fc0407e6d5" defer></script>
 
   <script type="module">
     /* Sem JavaScript a pagina fica inteira: o programa padrao esta no HTML,
        o die ja acende as celulas dele, os tracos da onda estao completos.
        O script so troca estados. Bibliotecas: GSAP da casa e anime.js 4,
        ambos vendorizados. */
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=838992a674';
-    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=838992a674';
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=fc0407e6d5';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=fc0407e6d5';
 
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
@@ -760,7 +765,7 @@
       const canvas = document.getElementById('die-canvas');
       if (!canvas) return;
       let T;
-      try { T = await import('../assets/js/vendor/three.module.min.js?v=838992a674'); }
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=fc0407e6d5'); }
       catch (_) { stage.remove(); return; }
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
@@ -1028,10 +1033,10 @@
         if (u.cell) {
           const on = currentSet.has(u.name);
           tip.innerHTML = `<b>${u.name}</b><span class="what">${DICAS[u.name] || ''}</span>` +
-            `<span class="state ${on ? 'yes' : 'no'}">${on ? '● synthesised for this program' : '○ never asked for — costs nothing'}</span>`;
+            `<span class="state ${on ? 'yes' : 'no'}">${on ? '● synthesised for this program' : '○ never asked for, costs nothing'}</span>`;
         } else {
           tip.innerHTML = `<b>${u.name}</b><span class="what">${u.what}</span>` +
-            `<span class="state fix">■ fixed structure — ${u.file}</span>`;
+            `<span class="state fix">■ fixed structure, from ${u.file}</span>`;
         }
         tip.classList.add('show');
       }
@@ -1078,7 +1083,7 @@
       document.getElementById('wrap-name').textContent = p.wrap;
       document.getElementById('wrap-params').innerHTML = paramsLine(p.on);
       const hint = document.getElementById('die-hint');
-      if (hint) hint.textContent = `${p.name} · ${p.on.length} blocks built — drag to turn, hover a block`;
+      if (hint) hint.textContent = `${p.name} · ${p.on.length} blocks built · drag to turn, hover a block`;
       document.querySelectorAll('.sapho-tabs [role="tab"]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.prog === key)));
 
       /* o codigo troca com um respiro, para a mudanca ser vista */
