@@ -306,6 +306,28 @@
       font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
       background: rgba(0, 0, 0, 0.28); color: inherit; }
 
+    /* ── O que mudou (notas de release vindas do GitHub) ──────── */
+    .sapho-log { display: grid; gap: var(--sp-4); }
+    .sapho-rel { border: 1px solid var(--border-subtle); border-radius: var(--radius-md, 8px);
+      background: rgba(255, 255, 255, 0.014); overflow: hidden; }
+    .sapho-rel > summary { cursor: pointer; list-style: none; padding: var(--sp-4) var(--sp-5);
+      display: flex; align-items: baseline; gap: var(--sp-3); flex-wrap: wrap; }
+    .sapho-rel > summary::-webkit-details-marker { display: none; }
+    .sapho-rel > summary:hover { background: rgba(255, 255, 255, 0.03); }
+    .sapho-rel-tag { font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 600; color: var(--gold); }
+    .sapho-rel-data { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); }
+    .sapho-rel-resumo { font-size: var(--text-sm); color: var(--text-secondary); margin-left: auto; }
+    .sapho-rel-corpo { padding: 0 var(--sp-5) var(--sp-5); }
+    .sapho-rel-corpo h4 { margin: var(--sp-4) 0 var(--sp-2); font-size: var(--text-xs);
+      letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+    .sapho-rel-corpo ul { margin: 0; padding-left: 1.15em; }
+    .sapho-rel-corpo li { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.75; }
+    .sapho-rel-corpo li b { color: var(--text-primary); font-weight: 600; }
+    .sapho-rel-corpo code { font-family: var(--font-mono); font-size: .92em; color: var(--gold-hi); }
+    .sapho-rel-corpo a { color: var(--text-muted); text-decoration: none; border-bottom: 1px solid var(--border-subtle); }
+    .sapho-rel-corpo a:hover { color: var(--gold); }
+    .sapho-log-vazio { font-size: var(--text-sm); color: var(--text-muted); }
+
     /* ── Agradecimento pos-download ───────────────────────────── */
     .sapho-thanks { position: fixed; right: var(--sp-5); bottom: var(--sp-5); z-index: 90; width: min(380px, calc(100vw - 2*var(--sp-5)));
       border-color: var(--gold-line) !important; padding: var(--sp-6);
@@ -374,7 +396,7 @@
     <div class="sapho-specstrip" role="complementary" aria-label="Project data">
       <div class="in">
         <span class="item"><span class="k">Revision</span><span id="sapho-version"><b>latest</b> release</span></span>
-        <span class="item"><span class="k">License</span>MIT, free and open</span>
+        <span class="item"><span class="k">License</span>NIPS-CERN 1.1, free and open</span>
         <span class="item"><span class="k">Targets</span>Windows &amp; Linux</span>
         <span class="item"><span class="k">Field use</span>CERN · ATLAS TileCal</span>
         <span class="item"><span class="k">Classroom</span>UFJF, programmable logic</span>
@@ -640,6 +662,26 @@
       </div>
     </section>
 
+    <!-- ── 07: o que mudou ──────────────────────────────────────
+         O conteudo nao esta escrito aqui. Cada linha vem das notas de release
+         do GitHub, que o release-please gera a partir das mensagens de commit,
+         entao a mudanca e descrita uma vez so, quando acontece. -->
+    <section class="section" aria-labelledby="log-title">
+      <div class="container container--narrow">
+        <div class="sec-head fade-up">
+          <span class="no">07</span>
+          <h2 id="log-title">What changed</h2>
+          <span class="note">straight from the release notes</span>
+        </div>
+        <div class="sapho-log fade-up" id="sapho-log" data-log>
+          <p class="sapho-log-vazio">Loading the release notes&hellip;</p>
+        </div>
+        <p style="margin-top:var(--sp-5)">
+          <a class="wlink" href="https://github.com/nipscernlab/sapho/releases" target="_blank" rel="noopener">Every release, in full, on GitHub</a>
+        </p>
+      </div>
+    </section>
+
     <!-- ── 07: download ──────────────────────────────────────── -->
     <section class="section" aria-labelledby="dl-title">
       <div class="container container--narrow">
@@ -663,7 +705,7 @@
               Manual as PDF
             </a>
           </div>
-          <div class="sapho-verchip"><i class="ph ph-cube" aria-hidden="true"></i>&nbsp;<span id="sapho-version-dl">latest release</span> &middot; <b>MIT</b> &middot; Windows &amp; Linux</div>
+          <div class="sapho-verchip"><i class="ph ph-cube" aria-hidden="true"></i>&nbsp;<span id="sapho-version-dl">latest release</span> &middot; <b>NIPS-CERN 1.1</b> &middot; Windows &amp; Linux</div>
         </div>
       </div>
     </section>
@@ -1324,6 +1366,7 @@
         .then((r) => (r.ok ? r.json() : null))
         .then((rels) => {
           if (!Array.isArray(rels)) return;
+          renderizarLog(rels);
           const total = rels.reduce((soma, rel) =>
             soma + (rel.assets || [])
               .filter((a) => /\.exe$/i.test(a.name))
@@ -1338,6 +1381,96 @@
           });
         })
         .catch(() => { /* sem numero e melhor que numero errado */ });
+
+      // ── O que mudou ─────────────────────────────────────────────
+      // A mesma resposta ja pedida acima traz o corpo de cada release, entao
+      // nao ha requisicao nova: uma so alimenta o contador e esta lista. O
+      // texto e o que o release-please escreveu a partir dos commits, e por
+      // isso a mudanca continua sendo descrita num lugar so.
+      //
+      // O corpo vem em Markdown, e aqui ele e convertido a mao, num
+      // subconjunto minusculo: titulo de secao, item de lista, negrito e
+      // codigo. Nao ha biblioteca porque nao ha necessidade, e porque texto
+      // de fora que vira HTML e exatamente o lugar onde uma dependencia a
+      // mais vira uma superficie a mais. Tudo e escapado antes.
+      const escapar = (t) => String(t)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      // Nomes de secao mais legiveis que os do conventional commits.
+      const SECOES = {
+        'features': 'New',
+        'bug fixes': 'Fixes',
+        'performance improvements': 'Performance',
+        'reverts': 'Reverted',
+        'documentation': 'Docs',
+        'miscellaneous chores': 'Housekeeping',
+        'code refactoring': 'Under the hood',
+        'build system': 'Build',
+        'continuous integration': 'CI',
+        'tests': 'Tests',
+      };
+
+      const emLinha = (t) => escapar(t)
+        // Link de commit no fim do item: e ruido numa pagina de produto, e a
+        // pagina de releases logo abaixo leva a ele.
+        .replace(/\s*\(\[[0-9a-f]{6,}\]\([^)]*\)\)\s*$/i, '')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+          '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+      function corpoEmHtml(md) {
+        const partes = [];
+        let itens = [];
+        const fecharLista = () => {
+          if (itens.length) { partes.push('<ul>' + itens.join('') + '</ul>'); itens = []; }
+        };
+        for (const linha of String(md || '').split(/[\r\n]+/)) {
+          const secao = linha.match(/^#{2,4}\s+(.+?)\s*$/);
+          if (secao) {
+            // O primeiro titulo do release-please e a propria versao, que ja
+            // esta no cabecalho do item.
+            if (/^\[?\d+\.\d+\.\d+/.test(secao[1])) continue;
+            fecharLista();
+            const nome = SECOES[secao[1].toLowerCase()] || secao[1];
+            partes.push('<h4>' + escapar(nome) + '</h4>');
+            continue;
+          }
+          const item = linha.match(/^\s*[*-]\s+(.+)$/);
+          if (item) { itens.push('<li>' + emLinha(item[1]) + '</li>'); continue; }
+          fecharLista();
+        }
+        fecharLista();
+        return partes.join('');
+      }
+
+      function renderizarLog(rels) {
+        const caixa = document.getElementById('sapho-log');
+        if (!caixa) return;
+        const lista = rels
+          .filter((r) => !r.draft && !r.prerelease)
+          .slice(0, 6);
+        if (!lista.length) return;   // a mensagem de carregando vira o aviso
+
+        caixa.innerHTML = lista.map((rel, i) => {
+          const corpo = corpoEmHtml(rel.body);
+          const quantos = (corpo.match(/<li>/g) || []).length;
+          const data = rel.published_at
+            ? new Date(rel.published_at).toLocaleDateString('en-GB',
+                { day: '2-digit', month: 'short', year: 'numeric' })
+            : '';
+          return '<details class="sapho-rel"' + (i === 0 ? ' open' : '') + '>'
+            + '<summary>'
+            + '<span class="sapho-rel-tag">' + escapar(rel.tag_name || '') + '</span>'
+            + '<span class="sapho-rel-data">' + escapar(data) + '</span>'
+            + '<span class="sapho-rel-resumo">' + quantos
+            + (quantos === 1 ? ' change' : ' changes') + '</span>'
+            + '</summary>'
+            + '<div class="sapho-rel-corpo">'
+            + (corpo || '<p class="sapho-log-vazio">No notes for this release.</p>')
+            + '</div></details>';
+        }).join('');
+      }
 
       const L = {
         en: { title: 'Thanks for downloading SAPHO!', body: 'While the installer arrives, three steps and you are simulating:',
