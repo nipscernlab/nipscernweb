@@ -129,10 +129,18 @@ function montarCorpo(d) {
 /**
  * Limite por IP. Usa o KV quando existe; sem KV, deixa passar em vez de barrar
  * todo mundo, porque um relato perdido custa mais do que um repetido.
+ *
+ * O IP é dado pessoal (LGPD), então ele não é guardado: vira um hash com sal
+ * do dia, que só serve para contar dentro da janela e expira sozinho em
+ * minutos. O IP nunca entra na issue nem em log nenhum deste Worker.
  */
 async function excedeuLimite(env, ip) {
   if (!env.BUGREPORT_KV || !ip) return false;
-  const chave = `ip:${ip}`;
+  const sal = new Date().toISOString().slice(0, 10);
+  const bytes = await crypto.subtle.digest(
+    'SHA-256', new TextEncoder().encode(`${sal}:${ip}`));
+  const chave = 'ip:' + [...new Uint8Array(bytes)].slice(0, 12)
+    .map((b) => b.toString(16).padStart(2, '0')).join('');
   const atual = Number(await env.BUGREPORT_KV.get(chave)) || 0;
   if (atual >= RELATOS_POR_JANELA) return true;
   await env.BUGREPORT_KV.put(chave, String(atual + 1), { expirationTtl: JANELA_SEGUNDOS });
