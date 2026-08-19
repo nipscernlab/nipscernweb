@@ -299,6 +299,12 @@
       font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted);
       border: 1px solid var(--border-subtle); border-radius: 999px; padding: 5px 12px; }
     .sapho-verchip b { color: var(--gold); font-weight: 600; }
+    /* Emblema do contador de downloads, dentro do botao dourado. Pilula escura
+       sobre o dourado para o numero nao brigar com o rotulo do botao; some por
+       inteiro (hidden) enquanto a API nao respondeu, para nao piscar "0". */
+    .dl-count { margin-left: 10px; padding: 3px 10px; border-radius: 999px;
+      font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
+      background: rgba(0, 0, 0, 0.28); color: inherit; }
 
     /* ── Agradecimento pos-download ───────────────────────────── */
     .sapho-thanks { position: fixed; right: var(--sp-5); bottom: var(--sp-5); z-index: 90; width: min(380px, calc(100vw - 2*var(--sp-5)));
@@ -340,6 +346,7 @@
             <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary glass-btn" style="background:var(--gold);border-color:var(--gold)">
               <i class="ph ph-download" aria-hidden="true"></i>
               Download Latest Release
+              <span class="dl-count" data-dl-count hidden></span>
             </a>
             <a href="/library/sapho/" class="btn btn-ghost glass-btn">
               <i class="ph ph-book-open" aria-hidden="true"></i>
@@ -645,6 +652,7 @@
             <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary glass-btn" style="background:var(--gold);border-color:var(--gold)">
               <i class="ph ph-download" aria-hidden="true"></i>
               Download Latest Release
+              <span class="dl-count" data-dl-count hidden></span>
             </a>
             <a href="/library/sapho/inicio/instalacao.html" class="btn btn-ghost glass-btn">
               <i class="ph ph-book-open" aria-hidden="true"></i>
@@ -1304,6 +1312,32 @@
           }
         })
         .catch(() => { /* o href da pagina de releases continua valendo */ });
+
+      // Contador de downloads. O GitHub ja conta cada download de asset e
+      // devolve `download_count` na propria API de releases, entao nao ha
+      // worker nem banco aqui: uma requisicao, a soma dos instaladores de
+      // todas as releases, e o numero no botao. Se a API falhar ou o limite
+      // de requisicoes estourar, o emblema simplesmente nao aparece, que e
+      // melhor do que aparecer errado.
+      fetch('https://api.github.com/repos/nipscernlab/sapho/releases?per_page=100',
+        { headers: { Accept: 'application/vnd.github+json' } })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((rels) => {
+          if (!Array.isArray(rels)) return;
+          const total = rels.reduce((soma, rel) =>
+            soma + (rel.assets || [])
+              .filter((a) => /\.exe$/i.test(a.name))
+              .reduce((s2, a) => s2 + (a.download_count || 0), 0), 0);
+          if (!total) return;
+          const fmt = total >= 1000
+            ? (total / 1000).toFixed(total >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k'
+            : String(total);
+          document.querySelectorAll('[data-dl-count]').forEach((el) => {
+            el.textContent = fmt + ' downloads';
+            el.hidden = false;
+          });
+        })
+        .catch(() => { /* sem numero e melhor que numero errado */ });
 
       const L = {
         en: { title: 'Thanks for downloading SAPHO!', body: 'While the installer arrives, three steps and you are simulating:',
