@@ -33,6 +33,7 @@ const LIMITES = {
   oQueEsperava: 4000,
   comoReproduzir: 4000,
   email: 120,
+  terminal: 24000,
   log: 40000,
 };
 
@@ -108,27 +109,34 @@ function montarCorpo(d) {
     `| AURORA | ${limpar(diag.versao, 40)}${diag.empacotado === false ? ' (dev)' : ''} |`,
     `| Sistema | ${limpar(diag.sistema, 120)} |`,
     `| Máquina | ${Number(diag.nucleos) || '?'} núcleos, ${Number(diag.memoriaGB) || '?'} GB |`,
+    `| Disco livre | ${diag.discoLivreGB == null ? '?' : Number(diag.discoLivreGB) + ' GB'} |`,
+    `| Componentes | ${limpar(diag.componentes, 300) || '?'} |`,
     `| Electron | ${limpar(diag.electron, 40)} |`,
     `| Chromium | ${limpar(diag.chrome, 40)} |`,
     `| Node | ${limpar(diag.node, 40)} |`,
     '',
   );
 
+  // Bloco de log recolhível. A cerca não pode ser quebrada por conteúdo do
+  // log, senão o resto do corpo escapa do bloco de código.
+  const bloco = (titulo, conteudo, aberto) => [
+    `<details${aberto ? ' open' : ''}><summary>${titulo}</summary>`,
+    '',
+    '```',
+    conteudo.replace(/```/g, "'''"),
+    '```',
+    '',
+    '</details>',
+    '',
+  ];
+
+  // O terminal vem antes, e já aberto: é o que explica a compilação que
+  // falhou, e quem tria os relatos deve poder ler sem clicar.
+  const terminal = limpar(d.terminal, LIMITES.terminal);
+  if (terminal) partes.push(...bloco('Terminal (erros e o que estava em volta)', terminal, true));
+
   const registro = limpar(diag.log, LIMITES.log);
-  if (registro) {
-    partes.push(
-      '<details><summary>Fim do log</summary>',
-      '',
-      '```',
-      // A cerca não pode ser quebrada por conteúdo do log, senão o resto do
-      // corpo escapa do bloco de código.
-      registro.replace(/```/g, "'''"),
-      '```',
-      '',
-      '</details>',
-      '',
-    );
-  }
+  if (registro) partes.push(...bloco('Fim do log do aplicativo', registro, false));
 
   partes.push('_Enviado pelo relato de problema da AURORA._');
   return partes.join('\n');
@@ -141,18 +149,37 @@ function montarCorpo(d) {
  * O IP é dado pessoal (LGPD), então ele não é guardado: vira um hash com sal
  * do dia, que só serve para contar dentro da janela e expira sozinho em
  * minutos. O IP nunca entra na issue nem em log nenhum deste Worker.
+ *
+ * Devolve QUANTOS SEGUNDOS faltam, e não um sim ou não. Quem foi barrado
+ * precisa saber quando pode tentar de novo: "aguarde" sem prazo é o tipo de
+ * aviso que faz a pessoa clicar de novo em seguida e ser barrada de novo. O
+ * instante de expiração viaja como metadado do próprio contador, então o
+ * prazo é o de verdade, não uma estimativa.
+ *
+ * @returns {Promise<number>} segundos a esperar, ou 0 quando pode enviar.
  */
-async function excedeuLimite(env, ip) {
-  if (!env.BUGREPORT_KV || !ip) return false;
+async function segundosDeEspera(env, ip) {
+  if (!env.BUGREPORT_KV || !ip) return 0;
   const sal = new Date().toISOString().slice(0, 10);
   const bytes = await crypto.subtle.digest(
     'SHA-256', new TextEncoder().encode(`${sal}:${ip}`));
   const chave = 'ip:' + [...new Uint8Array(bytes)].slice(0, 12)
     .map((b) => b.toString(16).padStart(2, '0')).join('');
-  const atual = Number(await env.BUGREPORT_KV.get(chave)) || 0;
-  if (atual >= RELATOS_POR_JANELA) return true;
-  await env.BUGREPORT_KV.put(chave, String(atual + 1), { expirationTtl: JANELA_SEGUNDOS });
-  return false;
+
+  const { value, metadata } = await env.BUGREPORT_KV.getWithMetadata(chave);
+  const atual = Number(value) || 0;
+  if (atual >= RELATOS_POR_JANELA) {
+    const restam = metadata && metadata.ate
+      ? Math.ceil((metadata.ate - Date.now()) / 1000)
+      : JANELA_SEGUNDOS;
+    // Nunca zero: zero significaria "pode enviar", e aqui ja se sabe que nao.
+    return Math.min(JANELA_SEGUNDOS, Math.max(1, restam));
+  }
+  await env.BUGREPORT_KV.put(chave, String(atual + 1), {
+    expirationTtl: JANELA_SEGUNDOS,
+    metadata: { ate: Date.now() + JANELA_SEGUNDOS * 1000 },
+  });
+  return 0;
 }
 
 export default {
@@ -171,7 +198,22 @@ export default {
     if (!oQue) return json({ erro: 'sem descricao' }, 400);
 
     const ip = request.headers.get('cf-connecting-ip');
-    if (await excedeuLimite(env, ip)) return json({ erro: 'muitos relatos seguidos' }, 429);
+    const espera = await segundosDeEspera(env, ip);
+    if (espera) {
+      // Retry-After e o cabecalho padrao para isto, e o corpo repete em
+      // numero para o cliente nao ter que interpretar cabecalho.
+      return new Response(
+        JSON.stringify({ erro: 'muitos relatos seguidos', esperar: espera }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': String(espera),
+            ...CORS,
+          },
+        },
+      );
+    }
 
     if (!env.GITHUB_TOKEN || !env.REPO) return json({ erro: 'canal nao configurado' }, 503);
 
@@ -181,6 +223,7 @@ export default {
       oQueEsperava: limpar(dados.oQueEsperava, LIMITES.oQueEsperava),
       comoReproduzir: limpar(dados.comoReproduzir, LIMITES.comoReproduzir),
       email: limpar(dados.email, LIMITES.email),
+      terminal: limpar(dados.terminal, LIMITES.terminal),
       diagnostico: dados.diagnostico || {},
     });
 
