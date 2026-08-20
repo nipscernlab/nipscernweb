@@ -1,0 +1,23 @@
+name = "sapho-bugreport"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+# Limite de frequencia por IP (hash com sal do dia, expira sozinho).
+[[kv_namespaces]]
+binding = "BUGREPORT_KV"
+id = "79e1270bf85c429da1b0c3e2371f627a"
+
+# Para onde as issues vao. Nao e segredo; o token e (wrangler secret put GITHUB_TOKEN).
+[vars]
+REPO = "nipscernlab/sapho-relatos"
+
+# O endpoint que a AURORA chama (main/ipc/bug_report.js). O apex tambem e
+# registrado porque um POST feito la responderia 301, e cliente antigo pode
+# nao seguir.
+[[routes]]
+pattern = "www.nipscern.com/api/sapho/bugreport*"
+zone_name = "nipscern.com"
+
+[[routes]]
+pattern = "nipscern.com/api/sapho/bugreport*"
+zone_name = "nipscern.com"
