@@ -32,6 +32,7 @@ const LIMITES = {
   oQueAconteceu: 8000,
   oQueEsperava: 4000,
   comoReproduzir: 4000,
+  email: 120,
   log: 40000,
 };
 
@@ -90,6 +91,13 @@ function montarCorpo(d) {
   }
   if (d.comoReproduzir) {
     partes.push('### Como reproduzir', '', citar(neutralizar(d.comoReproduzir)), '');
+  }
+
+  // O contato e opcional e so aparece se veio: e-mail e dado pessoal, e a
+  // issue vive num repositorio privado justamente por causa disto. O
+  // neutralizar barra o @ de virar mencao do GitHub.
+  if (d.email) {
+    partes.push('### Contato', '', neutralizar(d.email), '');
   }
 
   partes.push(
@@ -172,6 +180,7 @@ export default {
       oQueAconteceu: oQue,
       oQueEsperava: limpar(dados.oQueEsperava, LIMITES.oQueEsperava),
       comoReproduzir: limpar(dados.comoReproduzir, LIMITES.comoReproduzir),
+      email: limpar(dados.email, LIMITES.email),
       diagnostico: dados.diagnostico || {},
     });
 
