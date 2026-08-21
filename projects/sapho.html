@@ -25,8 +25,8 @@
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=5be27fcda5">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=5be27fcda5">
+  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=fbd73f83c1">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=fbd73f83c1">
 
   <style>
     /* ==================================================================
@@ -77,7 +77,7 @@
     .sec-head .note { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink-faint); letter-spacing: 0.06em; }
     @media (max-width: 700px) { .sec-head .note { display: none; } }
     .sec-lede { max-width: 68ch; color: var(--text-secondary); font-size: var(--text-base); line-height: 1.75; margin-bottom: var(--sp-8); }
-    .sec-lede code, .sapho-margin-note code { font-family: var(--font-mono); font-size: 0.92em; color: var(--gold-hi); }
+    .sec-lede code { font-family: var(--font-mono); font-size: 0.92em; color: var(--gold-hi); }
 
     /* ── Heroi: prancheta com o die em 3D ─────────────────────── */
     .sapho-hero { position: relative; min-height: 92vh; display: flex; align-items: center; overflow: clip; }
@@ -110,13 +110,6 @@
     .sapho-lede em { color: var(--text-primary); font-style: normal; }
     .sapho-hero .project-links { margin-top: var(--sp-8); }
 
-    /* a faixa de dados sob o heroi, como a tarja de titulo de uma prancha */
-    .sapho-specstrip { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
-    .sapho-specstrip .in { width: min(1320px, calc(100% - 2*var(--container-pad))); margin-inline: auto;
-      display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-10); padding: var(--sp-4) 0; font-family: var(--font-mono); }
-    .sapho-specstrip .item { font-size: var(--text-xs); color: var(--text-muted); letter-spacing: 0.04em; }
-    .sapho-specstrip .item .k { color: var(--ink-faint); letter-spacing: 0.14em; text-transform: uppercase; font-size: 10px; margin-right: 8px; }
-    .sapho-specstrip .item b { color: var(--gold); font-weight: 600; }
     @media (max-width: 900px) {
       .sapho-hero { min-height: 0; }
       .sapho-hero-inner { grid-template-columns: 1fr; gap: var(--sp-6); }
@@ -200,23 +193,16 @@
     .sapho-wave text { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-faint); }
     .sapho-wave .asm { fill: rgba(212,160,23,0.55); font-weight: 600; transition: fill .15s; }
     .sapho-wave .asm.cur { fill: #ffd966; }
-    #wave-head { stroke: var(--gold); stroke-width: 1; opacity: .9; }
+    /* A barra do cursor para logo acima da fila de diretivas (LOD, SET, ADD)
+       e some numa gradacao antes disso. Ela ia ate embaixo e cruzava os nomes,
+       riscando justamente a informacao que o cursor existe para apontar. O
+       fade e no proprio traco, e nao uma mascara por cima: assim ele vale em
+       qualquer fundo, inclusive o do tema claro. */
+    #wave-head { stroke: url(#wave-head-fade); stroke-width: 1; }
     #wave-head-dot { fill: var(--gold); }
 
-    /* ── 03: o datasheet ──────────────────────────────────────── */
-    .sapho-spec { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--sp-16); }
-    @media (max-width: 860px) { .sapho-spec { grid-template-columns: 1fr; } }
-    .sapho-spec .row { display: grid; grid-template-columns: 148px 1fr; gap: var(--sp-5); align-items: baseline;
-      padding: var(--sp-4) 0; border-bottom: 1px solid var(--rule); }
-    .sapho-spec .k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; color: var(--ink-faint); text-transform: uppercase; }
-    .sapho-spec .v { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.65; }
-    .sapho-spec .v strong { font-family: var(--font-serif); font-size: var(--text-2xl); font-weight: 520; color: var(--gold);
-      font-variant-numeric: tabular-nums; line-height: 1; margin-right: 6px; }
-    .sapho-spec .v code { font-family: var(--font-mono); font-size: 0.95em; color: var(--gold-hi); }
-    .sapho-margin-note { margin-top: var(--sp-8); max-width: 76ch; color: var(--text-muted); font-size: var(--text-sm); line-height: 1.8; }
-    .sapho-margin-note em { font-family: var(--font-serif); font-style: italic; font-weight: 480; font-size: 1.08em; color: var(--text-secondary); }
-
-    /* ── 04: figuras da IDE ───────────────────────────────────── */
+ figuras da IDE ───────────────────────────────────── */
+    /* ── 03: figuras da IDE ───────────────────────────────────── */
     .sapho-figs { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--sp-6); }
     .sapho-shot { position: relative; display: block; text-decoration: none;
       border: 1px solid var(--rule); border-radius: var(--r-md); overflow: hidden; background: rgba(10,14,24,0.5);
@@ -252,7 +238,7 @@
     .sapho-shot--d { grid-column: span 6; } .sapho-shot--d .pic { aspect-ratio: 2560 / 1300; }
     @media (max-width: 900px) { .sapho-figs { grid-template-columns: 1fr; } .sapho-shot { grid-column: auto !important; } }
 
-    /* ── 05: bill of materials ────────────────────────────────── */
+    /* ── 04: bill of materials ────────────────────────────────── */
     .sapho-bom { border-top: 1px solid var(--rule); }
     .sapho-bom a { display: grid; grid-template-columns: 44px 240px 1fr 22px; gap: var(--sp-5); align-items: center;
       padding: var(--sp-4) var(--sp-2); border-bottom: 1px solid var(--rule); text-decoration: none;
@@ -274,7 +260,7 @@
       .sapho-bom .ref, .sapho-bom .role { display: none; }
     }
 
-    /* ── 06: registro de campo ────────────────────────────────── */
+    /* ── 05: registro de campo ────────────────────────────────── */
     .sapho-field { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-10); }
     @media (max-width: 860px) { .sapho-field { grid-template-columns: 1fr; } }
     .sapho-field .col { border-top: 1px solid var(--gold-line); padding-top: var(--sp-5); }
@@ -299,21 +285,35 @@
       font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted);
       border: 1px solid var(--border-subtle); border-radius: 999px; padding: 5px 12px; }
     .sapho-verchip b { color: var(--gold); font-weight: 600; }
-    /* Emblema do contador de downloads, dentro do botao dourado. Pilula escura
-       sobre o dourado para o numero nao brigar com o rotulo do botao; some por
-       inteiro (hidden) enquanto a API nao respondeu, para nao piscar "0". */
-    .dl-count { margin-left: 10px; padding: 3px 10px; border-radius: 999px;
-      font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
-      background: rgba(0, 0, 0, 0.28); color: inherit; }
+    /* O botao de download em duas linhas: o rotulo em cima, e embaixo o que
+       a pessoa precisa saber ANTES de clicar, o peso do arquivo e quantas
+       vezes ele ja foi baixado. Os dois numeros lado a lado, e nao soltos ao
+       longo da linha do rotulo: assim o botao continua tendo uma frase so, e
+       os numeros se leem como uma legenda dela.
 
-    /* O peso do download, ao lado do botao. Quem esta num laboratorio com a
-       rede dividida entre trinta maquinas decide por este numero, e ele nao
-       pode obrigar a pessoa a comecar o download para descobrir. Mesma capsula
-       do contador, com o icone junto para o numero nao ser lido como versao. */
+       A coluna e um flex proprio porque o .btn e um inline-flex de UMA linha
+       (align-items:center, white-space:nowrap): sem o invólucro, a segunda
+       linha empurraria o icone para o meio da altura e o rotulo para cima. */
+    .dl-stack { display: inline-flex; flex-direction: column; align-items: center;
+      gap: 4px; line-height: 1.25; }
+    /* O icone da seta entra na PRIMEIRA linha, colado no rotulo, e nao solto na
+       borda esquerda do botao: com duas linhas ele ficava no meio da altura,
+       parecendo pertencer aos numeros em vez do verbo. Rotulo e numeros ficam
+       centrados, entao o botao tem um eixo so. */
+    .dl-label { display: inline-flex; align-items: center; gap: var(--sp-2); }
+    .dl-meta { display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px; flex-wrap: wrap; }
+
+    /* As duas capsulas: escuras sobre o dourado, para os numeros nao brigarem
+       com o rotulo. Cada uma some por inteiro (hidden) enquanto a API nao
+       respondeu, para nao piscar "0" nem um vao vazio. O icone junto e o que
+       impede o numero de ser lido como versao. */
+    .dl-count,
     .dl-size { display: inline-flex; align-items: center; gap: 5px;
-      margin-left: 8px; padding: 3px 10px; border-radius: 999px;
+      padding: 2px 9px; border-radius: 999px;
       font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
       background: rgba(0, 0, 0, 0.28); color: inherit; }
+    .dl-count i,
     .dl-size i { font-size: 1.05em; }
 
     /* ── O que mudou (notas de release vindas do GitHub) ──────── */
@@ -371,15 +371,21 @@
           <p class="sapho-fullname">Scalable-Architecture Processor for Hardware Optimization</p>
           <p class="sapho-thesis">You do not program this processor. <em>You author it.</em></p>
           <p class="sapho-lede">
-            Most processors are built first and programmed later. SAPHO turns that around: you write the algorithm in <em>C±</em>, a small dialect of C, and the toolchain emits a Verilog processor shaped by those exact lines. What the program never asks for is never built.
+            Most processors are built first and programmed later. SAPHO turns that around: you write the algorithm in <em>C±</em>, a language of our own with C at the base and hardware in the syntax, and the toolchain emits a Verilog processor shaped by those exact lines. What the program never asks for is never built.
           </p>
           <div style="margin-top:var(--sp-4)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links">
             <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary glass-btn" style="background:var(--gold);border-color:var(--gold)">
-              <i class="ph ph-download" aria-hidden="true"></i>
-              Download Latest Release
-              <span class="dl-size" data-dl-size hidden></span>
-              <span class="dl-count" data-dl-count hidden></span>
+              <span class="dl-stack">
+                <span class="dl-label">
+                  <i class="ph ph-download" aria-hidden="true"></i>
+                  Download Latest Release
+                </span>
+                <span class="dl-meta">
+                  <span class="dl-size" data-dl-size hidden></span>
+                  <span class="dl-count" data-dl-count hidden></span>
+                </span>
+              </span>
             </a>
             <a href="/library/sapho/" class="btn btn-ghost glass-btn">
               <i class="ph ph-book-open" aria-hidden="true"></i>
@@ -403,17 +409,6 @@
       </div>
     </header>
 
-    <!-- a tarja de dados da prancha -->
-    <div class="sapho-specstrip" role="complementary" aria-label="Project data">
-      <div class="in">
-        <span class="item"><span class="k">Revision</span><span id="sapho-version"><b>latest</b> release</span></span>
-        <span class="item"><span class="k">License</span>NIPS-CERN 1.1, free and open</span>
-        <span class="item"><span class="k">Targets</span>Windows &amp; Linux</span>
-        <span class="item"><span class="k">Field use</span>CERN · ATLAS TileCal</span>
-        <span class="item"><span class="k">Classroom</span>UFJF, programmable logic</span>
-        <span class="item"><span class="k">Drawn by</span>your program</span>
-      </div>
-    </div>
 
     <!-- ── 01: tres programas, tres processadores ────────────── -->
     <section class="section" aria-labelledby="prog-title">
@@ -498,6 +493,17 @@
           </div>
           <div class="sapho-wave" id="wave-box" tabindex="0" aria-label="Interactive waveform of one loop iteration">
             <svg viewBox="0 0 1240 250" preserveAspectRatio="xMidYMid meet" id="wave-svg">
+              <defs>
+                <!-- A barra do cursor desaparece antes de chegar nas diretivas.
+                     `userSpaceOnUse` porque uma linha vertical tem caixa de
+                     largura zero, e o gradiente padrao (objectBoundingBox) nao
+                     sabe o que fazer com isso: sai sem pintar. -->
+                <linearGradient id="wave-head-fade" gradientUnits="userSpaceOnUse" x1="0" y1="20" x2="0" y2="186">
+                  <stop offset="0" stop-color="#d4a017" stop-opacity="0.9"/>
+                  <stop offset="0.72" stop-color="#d4a017" stop-opacity="0.9"/>
+                  <stop offset="1" stop-color="#d4a017" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
               <path id="w-clk" fill="none" stroke="rgba(228,232,242,0.30)" stroke-width="1.5"
                 d="M40 60 H80 V36 H120 V60 H160 V36 H200 V60 H240 V36 H280 V60 H320 V36 H360 V60 H400 V36 H440 V60 H480 V36 H520 V60 H560 V36 H600 V60 H640 V36 H680 V60 H720 V36 H760 V60 H800 V36 H840 V60 H880 V36 H920 V60 H960 V36 H1000 V60 H1040 V36 H1080 V60 H1120 V36 H1160 V60 H1200 V36 H1240"/>
               <text x="8" y="52">clk</text>
@@ -506,7 +512,7 @@
               <text x="8" y="146">acc</text>
               <g id="w-instr"></g>
               <g id="w-lines"></g>
-              <line id="wave-head" x1="560" y1="20" x2="560" y2="238"/>
+              <line id="wave-head" x1="560" y1="20" x2="560" y2="186"/>
               <circle id="wave-head-dot" cx="560" cy="20" r="3"></circle>
             </svg>
           </div>
@@ -521,45 +527,11 @@
       </div>
     </section>
 
-    <!-- ── 03: o datasheet ───────────────────────────────────── -->
-    <section class="section" aria-labelledby="spec-title">
-      <div class="container">
-        <div class="sec-head fade-up">
-          <span class="no">03</span>
-          <h2 id="spec-title">The datasheet</h2>
-          <span class="note">architecture at a glance</span>
-        </div>
-
-        <div class="sapho-spec fade-up" id="facts">
-          <div>
-            <div class="row"><span class="k">Instruction set</span><span class="v"><strong data-count="108">108</strong> opcodes, each synthesised only when used</span></div>
-            <div class="row"><span class="k">Pipeline</span><span class="v"><strong data-count="3">3</strong> stages, one instruction per cycle; no hazards by construction, branches resolve at fetch</span></div>
-            <div class="row"><span class="k">Register model</span><span class="v">a single accumulator; expressions use the data stack <code>#NDSTAC</code>, calls use the return stack <code>#SDEPTH</code></span></div>
-            <div class="row"><span class="k">Memories</span><span class="v">Harvard, program and data separate, sized to the exact instruction and cell count of your program</span></div>
-          </div>
-          <div>
-            <div class="row"><span class="k">Word</span><span class="v"><code>N = M + E + 1</code> &nbsp;mantissa plus exponent plus sign: floating point is a design parameter</span></div>
-            <div class="row"><span class="k">HDL library</span><span class="v"><strong data-count="5">5</strong> Verilog files: <code>processor.v</code> <code>core.v</code> <code>instr_dec.v</code> <code>ula.v</code> <code>addr_dec.v</code></span></div>
-            <div class="row"><span class="k">Reset</span><span class="v">synchronous everywhere, an FPGA-friendly choice</span></div>
-            <div class="row"><span class="k">Build output</span><span class="v"><code>&lt;proc&gt;.v</code> + <code>.mif</code> + testbench, ready for simulation or synthesis</span></div>
-          </div>
-        </div>
-
-        <p class="sapho-margin-note fade-up">
-          <em>For graduate work the language keeps going:</em> an adaptive RLS filter is 66 lines when <code>⟨w|x⟩</code> is an expression, and an FFT loads its samples pre-shuffled because <code>data[i)</code> reverses index bits in hardware.
-          <a href="/library/sapho/avancado/modulos-hdl.html" class="wlink">The modules, opened up</a> &middot;
-          <a href="/library/sapho/avancado/dirac.html" class="wlink">Dirac notation</a> &middot;
-          <a href="/library/sapho/avancado/fft.html" class="wlink">FFT in hardware</a> &middot;
-          <a href="/library/sapho/referencia/instrucoes.html" class="wlink">The full instruction set</a>
-        </p>
-      </div>
-    </section>
-
-    <!-- ── 04: a bancada ─────────────────────────────────────── -->
+    <!-- ── 03: a bancada ─────────────────────────────────────── -->
     <section class="section" aria-labelledby="window-title">
       <div class="container">
         <div class="sec-head fade-up">
-          <span class="no">04</span>
+          <span class="no">03</span>
           <h2 id="window-title">The whole flow <em>in one window</em></h2>
           <span class="note">AURORA · desktop IDE</span>
         </div>
@@ -612,11 +584,11 @@
       </div>
     </section>
 
-    <!-- ── 05: bill of materials ─────────────────────────────── -->
+    <!-- ── 04: bill of materials ─────────────────────────────── -->
     <section class="section" aria-labelledby="tools-title">
       <div class="container">
         <div class="sec-head fade-up">
-          <span class="no">05</span>
+          <span class="no">04</span>
           <h2 id="tools-title">Bill of materials</h2>
           <span class="note">one installer · no cloud · no licences</span>
         </div>
@@ -638,11 +610,11 @@
       </div>
     </section>
 
-    <!-- ── 06: registro de campo ─────────────────────────────── -->
+    <!-- ── 05: registro de campo ─────────────────────────────── -->
     <section class="section" aria-labelledby="proof-title">
       <div class="container">
         <div class="sec-head fade-up">
-          <span class="no">06</span>
+          <span class="no">05</span>
           <h2 id="proof-title">Field record</h2>
           <span class="note">deployed · published · taught</span>
         </div>
@@ -673,14 +645,14 @@
       </div>
     </section>
 
-    <!-- ── 07: o que mudou ──────────────────────────────────────
+    <!-- ── 06: o que mudou ──────────────────────────────────────
          O conteudo nao esta escrito aqui. Cada linha vem das notas de release
          do GitHub, que o release-please gera a partir das mensagens de commit,
          entao a mudanca e descrita uma vez so, quando acontece. -->
     <section class="section" aria-labelledby="log-title">
       <div class="container container--narrow">
         <div class="sec-head fade-up">
-          <span class="no">07</span>
+          <span class="no">06</span>
           <h2 id="log-title">What changed</h2>
           <span class="note">straight from the release notes</span>
         </div>
@@ -703,10 +675,16 @@
           </p>
           <div style="display:flex;gap:var(--sp-3);justify-content:center;flex-wrap:wrap">
             <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary glass-btn" style="background:var(--gold);border-color:var(--gold)">
-              <i class="ph ph-download" aria-hidden="true"></i>
-              Download Latest Release
-              <span class="dl-size" data-dl-size hidden></span>
-              <span class="dl-count" data-dl-count hidden></span>
+              <span class="dl-stack">
+                <span class="dl-label">
+                  <i class="ph ph-download" aria-hidden="true"></i>
+                  Download Latest Release
+                </span>
+                <span class="dl-meta">
+                  <span class="dl-size" data-dl-size hidden></span>
+                  <span class="dl-count" data-dl-count hidden></span>
+                </span>
+              </span>
             </a>
             <a href="/library/sapho/inicio/instalacao.html" class="btn btn-ghost glass-btn">
               <i class="ph ph-book-open" aria-hidden="true"></i>
@@ -717,7 +695,7 @@
               Manual as PDF
             </a>
           </div>
-          <div class="sapho-verchip"><i class="ph ph-cube" aria-hidden="true"></i>&nbsp;<span id="sapho-version-dl">latest release</span> &middot; <b>NIPS-CERN 1.1</b> &middot; Windows &amp; Linux</div>
+          <div class="sapho-verchip"><i class="ph ph-cube" aria-hidden="true"></i>&nbsp;<span id="sapho-version-dl">latest release</span> &middot; <b>NIPS-CERN 1.1</b> &middot; Windows</div>
         </div>
       </div>
     </section>
@@ -736,16 +714,16 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=5be27fcda5"></script>
-  <script src="../assets/js/analytics.min.js?v=5be27fcda5" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=fbd73f83c1"></script>
+  <script src="../assets/js/analytics.min.js?v=fbd73f83c1" defer></script>
 
   <script type="module">
     /* Sem JavaScript a pagina fica inteira: o programa padrao esta no HTML,
        o die ja acende as celulas dele, os tracos da onda estao completos.
        O script so troca estados. Bibliotecas: GSAP da casa e anime.js 4,
        ambos vendorizados. */
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=5be27fcda5';
-    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=5be27fcda5';
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=fbd73f83c1';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=fbd73f83c1';
 
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
@@ -843,7 +821,7 @@
       const canvas = document.getElementById('die-canvas');
       if (!canvas) return;
       let T;
-      try { T = await import('../assets/js/vendor/three.module.min.js?v=5be27fcda5'); }
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=fbd73f83c1'); }
       catch (_) { stage.remove(); return; }
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
@@ -1333,22 +1311,6 @@
       });
     }
 
-    /* ── Contadores do datasheet ────────────────────────────── */
-    {
-      const els = document.querySelectorAll('#facts [data-count]');
-      let done = false;
-      new IntersectionObserver((entries) => {
-        if (done || !entries.some((e) => e.isIntersecting)) return;
-        done = true;
-        els.forEach((el) => {
-          const target = +el.dataset.count;
-          if (REDUCED) { el.textContent = String(target); return; }
-          const o = { v: 0 };
-          animate(o, { v: target, duration: 1200, ease: 'outExpo', onUpdate: () => { el.textContent = String(Math.round(o.v)); } });
-        });
-      }, { threshold: 0.4 }).observe(document.getElementById('facts'));
-    }
-
     /* ── Download: link direto, versao e agradecimento ──────── */
     {
       const links = document.querySelectorAll('a[data-direct-download="sapho"]');
@@ -1374,8 +1336,6 @@
             });
           }
           if (rel.tag_name) {
-            const rail = document.getElementById('sapho-version');
-            if (rail) rail.innerHTML = `<b>${rel.tag_name}</b>`;
             const chip = document.getElementById('sapho-version-dl');
             if (chip) chip.innerHTML = `<b>${rel.tag_name}</b>${asset ? ' · ' + Math.round(asset.size / 1048576) + ' MB' : ''}`;
           }
@@ -1403,7 +1363,8 @@
             ? (total / 1000).toFixed(total >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k'
             : String(total);
           document.querySelectorAll('[data-dl-count]').forEach((el) => {
-            el.textContent = fmt + ' downloads';
+            el.innerHTML = '<i class="ph ph-download-simple" aria-hidden="true"></i>'
+              + fmt + ' downloads';
             el.hidden = false;
           });
         })
