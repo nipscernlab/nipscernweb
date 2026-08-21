@@ -6,9 +6,9 @@
  * by default and revealed per item with a toggle.
  */
 
-import { t } from './i18n.js?v=fbd73f83c1';
-import { pubLangFlag } from './main.js?v=fbd73f83c1';
-import { publicationUrl } from './content-links.js?v=fbd73f83c1';
+import { t } from './i18n.js?v=7a8294c79a';
+import { pubLangFlag } from './main.js?v=7a8294c79a';
+import { publicationUrl } from './content-links.js?v=7a8294c79a';
 
 const TYPE_BADGE = {
   article:      'badge-blue',
