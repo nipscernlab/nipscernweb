@@ -25,8 +25,8 @@
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=fbd73f83c1">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=fbd73f83c1">
+  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=7a8294c79a">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=7a8294c79a">
 
   <style>
     /* ==================================================================
@@ -313,8 +313,22 @@
       padding: 2px 9px; border-radius: 999px;
       font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
       background: rgba(0, 0, 0, 0.28); color: inherit; }
+    /* A plataforma, no botao do topo. Ali nao ha o chip da secao de download
+       para dizer que isto e um .exe de Windows, e a pessoa so descobriria
+       depois do arquivo na mao. So o icone: escrever "Windows" ao lado de
+       dois numeros deixaria a legenda mais comprida que o rotulo. */
+    .dl-plat { display: inline-flex; align-items: center;
+      padding: 2px 8px; border-radius: 999px;
+      background: rgba(0, 0, 0, 0.28); color: inherit; }
     .dl-count i,
+    .dl-plat i,
     .dl-size i { font-size: 1.05em; }
+    /* `hidden` e `display:none`, e um `display` declarado na classe ganha dele.
+       Sem esta linha, a capsula que a API nao preencheu (limite de requisicoes,
+       rede fora) aparecia como uma pilula vazia ao lado do numero, que e o
+       oposto do que o `hidden` estava ali para fazer. */
+    .dl-count[hidden],
+    .dl-size[hidden] { display: none; }
 
     /* ── O que mudou (notas de release vindas do GitHub) ──────── */
     .sapho-log { display: grid; gap: var(--sp-4); }
@@ -382,6 +396,7 @@
                   Download Latest Release
                 </span>
                 <span class="dl-meta">
+                  <span class="dl-plat"><i class="ph ph-windows-logo" role="img" aria-label="Windows"></i></span>
                   <span class="dl-size" data-dl-size hidden></span>
                   <span class="dl-count" data-dl-count hidden></span>
                 </span>
@@ -695,7 +710,7 @@
               Manual as PDF
             </a>
           </div>
-          <div class="sapho-verchip"><i class="ph ph-cube" aria-hidden="true"></i>&nbsp;<span id="sapho-version-dl">latest release</span> &middot; <b>NIPS-CERN 1.1</b> &middot; Windows</div>
+          <div class="sapho-verchip"><i class="ph ph-cube" aria-hidden="true"></i>&nbsp;<span id="sapho-version-dl">latest release</span> &middot; <a class="wlink" href="../license.html"><b>NIPS-CERN 1.1</b></a> &middot; <i class="ph ph-windows-logo" role="img" aria-label="Windows"></i></div>
         </div>
       </div>
     </section>
@@ -714,16 +729,16 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=fbd73f83c1"></script>
-  <script src="../assets/js/analytics.min.js?v=fbd73f83c1" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=7a8294c79a"></script>
+  <script src="../assets/js/analytics.min.js?v=7a8294c79a" defer></script>
 
   <script type="module">
     /* Sem JavaScript a pagina fica inteira: o programa padrao esta no HTML,
        o die ja acende as celulas dele, os tracos da onda estao completos.
        O script so troca estados. Bibliotecas: GSAP da casa e anime.js 4,
        ambos vendorizados. */
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=fbd73f83c1';
-    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=fbd73f83c1';
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=7a8294c79a';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=7a8294c79a';
 
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
@@ -821,7 +836,7 @@
       const canvas = document.getElementById('die-canvas');
       if (!canvas) return;
       let T;
-      try { T = await import('../assets/js/vendor/three.module.min.js?v=fbd73f83c1'); }
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=7a8294c79a'); }
       catch (_) { stage.remove(); return; }
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
@@ -1335,9 +1350,12 @@
               el.hidden = false;
             });
           }
+          // Só a versão aqui. O peso do arquivo passou a viver no botão, e
+          // repetido no chip logo abaixo virava a mesma informação duas vezes
+          // na mesma altura da tela.
           if (rel.tag_name) {
             const chip = document.getElementById('sapho-version-dl');
-            if (chip) chip.innerHTML = `<b>${rel.tag_name}</b>${asset ? ' · ' + Math.round(asset.size / 1048576) + ' MB' : ''}`;
+            if (chip) chip.innerHTML = `<b>${rel.tag_name}</b>`;
           }
         })
         .catch(() => { /* o href da pagina de releases continua valendo */ });

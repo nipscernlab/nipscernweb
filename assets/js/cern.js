@@ -26,7 +26,7 @@
  * wrote and the one every reader keeps if a single byte fails to arrive.
  */
 
-import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=fbd73f83c1';
+import { ensureMotionLibs, initMotion, whileVisible } from './motion.js?v=7a8294c79a';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -353,7 +353,7 @@ async function mountRing() {
 
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=fbd73f83c1');
+    THREE = await import('./vendor/three.module.min.js?v=7a8294c79a');
   } catch (e) {
     /* No module, no figure. Removing the node collapses the hero to one
        column, which the grid already knows how to be. */
