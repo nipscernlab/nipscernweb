@@ -25,8 +25,8 @@
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=fc0407e6d5">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=fc0407e6d5">
+  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=5be27fcda5">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=5be27fcda5">
 
   <style>
     /* ==================================================================
@@ -306,6 +306,16 @@
       font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
       background: rgba(0, 0, 0, 0.28); color: inherit; }
 
+    /* O peso do download, ao lado do botao. Quem esta num laboratorio com a
+       rede dividida entre trinta maquinas decide por este numero, e ele nao
+       pode obrigar a pessoa a comecar o download para descobrir. Mesma capsula
+       do contador, com o icone junto para o numero nao ser lido como versao. */
+    .dl-size { display: inline-flex; align-items: center; gap: 5px;
+      margin-left: 8px; padding: 3px 10px; border-radius: 999px;
+      font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
+      background: rgba(0, 0, 0, 0.28); color: inherit; }
+    .dl-size i { font-size: 1.05em; }
+
     /* ── O que mudou (notas de release vindas do GitHub) ──────── */
     .sapho-log { display: grid; gap: var(--sp-4); }
     .sapho-rel { border: 1px solid var(--border-subtle); border-radius: var(--radius-md, 8px);
@@ -368,6 +378,7 @@
             <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary glass-btn" style="background:var(--gold);border-color:var(--gold)">
               <i class="ph ph-download" aria-hidden="true"></i>
               Download Latest Release
+              <span class="dl-size" data-dl-size hidden></span>
               <span class="dl-count" data-dl-count hidden></span>
             </a>
             <a href="/library/sapho/" class="btn btn-ghost glass-btn">
@@ -694,6 +705,7 @@
             <a href="https://github.com/nipscernlab/sapho/releases/latest" data-direct-download="sapho" target="_blank" rel="noopener" class="btn btn-primary glass-btn" style="background:var(--gold);border-color:var(--gold)">
               <i class="ph ph-download" aria-hidden="true"></i>
               Download Latest Release
+              <span class="dl-size" data-dl-size hidden></span>
               <span class="dl-count" data-dl-count hidden></span>
             </a>
             <a href="/library/sapho/inicio/instalacao.html" class="btn btn-ghost glass-btn">
@@ -724,16 +736,16 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=fc0407e6d5"></script>
-  <script src="../assets/js/analytics.min.js?v=fc0407e6d5" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=5be27fcda5"></script>
+  <script src="../assets/js/analytics.min.js?v=5be27fcda5" defer></script>
 
   <script type="module">
     /* Sem JavaScript a pagina fica inteira: o programa padrao esta no HTML,
        o die ja acende as celulas dele, os tracos da onda estao completos.
        O script so troca estados. Bibliotecas: GSAP da casa e anime.js 4,
        ambos vendorizados. */
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=fc0407e6d5';
-    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=fc0407e6d5';
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=5be27fcda5';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=5be27fcda5';
 
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
@@ -831,7 +843,7 @@
       const canvas = document.getElementById('die-canvas');
       if (!canvas) return;
       let T;
-      try { T = await import('../assets/js/vendor/three.module.min.js?v=fc0407e6d5'); }
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=5be27fcda5'); }
       catch (_) { stage.remove(); return; }
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
@@ -1346,6 +1358,21 @@
           if (!rel) return;
           const asset = (rel.assets || []).find((a) => /\.exe$/i.test(a.name));
           if (asset) links.forEach((a) => { a.href = asset.browser_download_url; });
+
+          // O peso do instalador, ao lado do botao. Vem do proprio asset da
+          // release, e nao de um numero escrito na pagina: o instalador mudou
+          // de tamanho tres vezes este ano, e um numero escrito a mao envelhece
+          // sem avisar. Se a API falhar, o emblema simplesmente nao aparece.
+          if (asset && asset.size) {
+            const mb = asset.size / 1048576;
+            const texto = mb >= 1024
+              ? (mb / 1024).toFixed(1) + ' GB'
+              : Math.round(mb) + ' MB';
+            document.querySelectorAll('[data-dl-size]').forEach((el) => {
+              el.innerHTML = '<i class="ph ph-package" aria-hidden="true"></i>' + texto;
+              el.hidden = false;
+            });
+          }
           if (rel.tag_name) {
             const rail = document.getElementById('sapho-version');
             if (rail) rail.innerHTML = `<b>${rel.tag_name}</b>`;
