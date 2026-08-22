@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=7a8294c79a';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=3b1c931500';
 
-import { newsPostUrl } from './content-links.js?v=7a8294c79a';
+import { newsPostUrl } from './content-links.js?v=3b1c931500';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=7a8294c79a';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=3b1c931500';
 
 // ============================================================
 // Navigation Template
@@ -341,6 +341,8 @@ function buildFooter() {
           <a href="${ROOT}terms.html" data-i18n="footer.terms">Terms</a>
           <span aria-hidden="true">·</span>
           <a href="${ROOT}privacy.html" data-i18n="footer.privacy">Privacy</a>
+          <span aria-hidden="true">·</span>
+          <a href="${ROOT}code-signing.html" data-i18n="footer.signing">Code signing</a>
           <span aria-hidden="true">·</span>
           <!-- The page, not the raw file on GitHub. license.html reads LICENSE.md
                and renders it, so it is the same text with the site around it,
@@ -763,7 +765,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=7a8294c79a">. Each copy would otherwise append its own
+// <script src="main.js?v=3b1c931500">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {

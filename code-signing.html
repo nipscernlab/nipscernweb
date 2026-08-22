@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <title>Code Signing Policy | NIPS-CERN</title>
+  <meta name="description" content="How the SAPHO and AURORA Windows installer is built, reviewed, approved and signed, and how anyone can verify a downloaded copy.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/code-signing">
+  <meta property="og:title" content="Code Signing Policy | NIPS-CERN">
+  <meta property="og:description" content="How the SAPHO installer is built, approved and signed, and how to verify it.">
+
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://www.nipscern.com/code-signing">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/icons/code-signing.css?v=7a8294c79a">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=3b1c931500">
+
+  <style>
+    .legal-body {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: var(--sp-12) var(--container-pad);
+    }
+    .legal-body h2 {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--sp-2);
+    }
+    .legal-updated {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-bottom: var(--sp-8);
+    }
+    .privacy-highlight {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-4);
+      background: rgba(74,222,128,0.06);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: var(--r-lg);
+      padding: var(--sp-5) var(--sp-6);
+      margin-bottom: var(--sp-8);
+    }
+    .privacy-highlight i {
+      font-size: 24px;
+      color: var(--accent-cgv);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .privacy-highlight p {
+      margin-bottom: 0;
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    /* O comando de verificação precisa quebrar em telas estreitas sem
+       empurrar a página para os lados. */
+    .legal-body pre {
+      overflow-x: auto;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--r-md);
+      padding: var(--sp-4);
+      font-size: var(--text-xs);
+      margin-bottom: var(--sp-6);
+    }
+    .legal-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: var(--sp-6);
+      font-size: var(--text-sm);
+    }
+    .legal-body th,
+    .legal-body td {
+      text-align: left;
+      padding: var(--sp-3) var(--sp-2);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="page-hero page-hero--legal" aria-labelledby="signing-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-grid">
+          <div class="page-hero-text">
+            <div class="eyebrow fade-up">
+              <i class="ph ph-shield-check" aria-hidden="true"></i>
+              <span data-i18n="legal.eyebrow">Legal</span>
+            </div>
+            <h1 class="display-md fade-up" id="signing-title" data-i18n="legal.signing.title">Code Signing Policy</h1>
+            <p class="body-base fade-up" data-i18n="legal.signing.subtitle">
+              How the SAPHO installer is built, reviewed, approved and signed, and how anyone can check the copy they downloaded.
+            </p>
+          </div>
+          <figure class="page-hero-accent" aria-hidden="true">
+            <img src="assets/images/undraw/undraw_building-a-website_1wrp.svg" alt="" width="220" height="140" loading="lazy" onerror="this.parentElement.style.display='none'">
+          </figure>
+        </div>
+      </div>
+    </header>
+
+    <div class="legal-body">
+
+      <p class="legal-updated" data-i18n="legal.signing.updated">Last updated: August 2026</p>
+
+      <div class="privacy-highlight">
+        <i class="ph ph-shield-check" aria-hidden="true"></i>
+        <p data-i18n="legal.signing.highlight">Every released installer is built by a public workflow from a public commit, and no person can upload an installer built on their own machine.</p>
+      </div>
+
+      <h2 data-i18n="legal.signing.s1_title">1. What this covers</h2>
+      <div data-i18n-html="legal.signing.s1_body">
+        <p>This policy covers the Windows installer of the SAPHO platform, published as <strong>sapho-aurora-Setup-vX.Y.Z.exe</strong>. It is the only artefact we sign. The source code lives at <a href="https://github.com/nipscernlab/aurora">github.com/nipscernlab/aurora</a> and the installers are published at <a href="https://github.com/nipscernlab/sapho/releases">github.com/nipscernlab/sapho/releases</a>.</p>
+        <p>SAPHO is developed by NIPS-CERN, the Center for Instrumentation and Signal Processing, working from two laboratories: NIPS, at the Federal University of Juiz de Fora, in Brazil, and Route Salam, at CERN, in Switzerland.</p>
+      </div>
+
+      <h2 data-i18n="legal.signing.s2_title">2. Roles</h2>
+      <div data-i18n-html="legal.signing.s2_body">
+        <p>Three roles take part in a release. They are separate on purpose: the person who writes a change is never the only person who lets it become a signed installer.</p>
+        <table>
+          <tr>
+            <th>Role</th>
+            <th>Who</th>
+            <th>What they do</th>
+          </tr>
+          <tr>
+            <td><strong>Author</strong></td>
+            <td>Any contributor</td>
+            <td>Writes the change and opens a pull request. Anyone may be an author, including people outside the laboratory.</td>
+          </tr>
+          <tr>
+            <td><strong>Reviewer</strong></td>
+            <td>A project maintainer</td>
+            <td>Reviews the pull request and merges it. Continuous integration must pass first: linting, type checking, unit, end-to-end and toolchain tests.</td>
+          </tr>
+          <tr>
+            <td><strong>Approver</strong></td>
+            <td>Luciano M. de A. Filho, Chrysthofer A. A. Afonso</td>
+            <td>Approves each individual signing request in the SignPath panel, after checking that it came from a tagged release built by the project's own workflow.</td>
+          </tr>
+        </table>
+        <p>Approvers hold individual accounts with two-factor authentication. Accounts are never shared, and a signing request is never approved by the person who submitted it alone.</p>
+      </div>
+
+      <h2 data-i18n="legal.signing.s3_title">3. How a signed installer is produced</h2>
+      <div data-i18n-html="legal.signing.s3_body">
+        <p>The chain is deliberately closed end to end, so that a signature means something more than "a file reached us":</p>
+        <ol>
+          <li>A change is merged into <code>main</code> after review and a green build.</li>
+          <li>Release automation opens a release pull request; merging it creates the version tag.</li>
+          <li>A GitHub Actions workflow, running on GitHub-hosted Windows runners and defined in the public repository, checks out that exact commit, builds the installer and produces the update manifest.</li>
+          <li>The workflow submits the built installer to SignPath through the trusted build system integration. It cannot submit anything that was not built in that run.</li>
+          <li>An approver receives the request and approves or rejects it.</li>
+          <li>The signed installer is published to the distribution repository, together with the update manifest and the block map used for incremental updates.</li>
+        </ol>
+        <p>No maintainer can sign an installer built on a personal machine: the signing credential exists only inside the continuous integration environment, and SignPath verifies that the request originates from the project's own workflow.</p>
+      </div>
+
+      <h2 data-i18n="legal.signing.s4_title">4. The certificate and the publisher name</h2>
+      <div data-i18n-html="legal.signing.s4_body">
+        <p>The certificate is provided by the <strong>SignPath Foundation</strong>, which issues free certificates to open source projects. This has a consequence worth stating plainly, because it surprises people who verify a download: the publisher shown by Windows is <strong>SignPath Foundation</strong>, not NIPS-CERN and not the university. That is expected and is not a sign of tampering.</p>
+        <p>Windows SmartScreen builds reputation over time, per certificate. The first signed releases may still show a warning; it fades as more copies are downloaded and run.</p>
+      </div>
+
+      <h2 data-i18n="legal.signing.s5_title">5. Verifying a download</h2>
+      <div data-i18n-html="legal.signing.s5_body">
+        <p>Anyone can check a downloaded installer without installing it. In PowerShell:</p>
+        <pre><code>Get-AuthenticodeSignature .\sapho-aurora-Setup-v6.9.0.exe | Format-List</code></pre>
+        <p>A valid copy reports the status as <code>Valid</code> and names the certificate subject. Right-clicking the file, then Properties and Digital Signatures, shows the same information.</p>
+        <p>Independently of the signature, every release also publishes a <code>latest.yml</code> carrying the SHA-512 of the installer. The application's own updater verifies that hash before running anything it downloaded.</p>
+      </div>
+
+      <h2 data-i18n="legal.signing.s6_title">6. Privacy</h2>
+      <div data-i18n-html="legal.signing.s6_body">
+        <p>Signing involves no data about the people who use SAPHO. What SignPath processes is the installer itself, the metadata of the build that produced it, such as repository, commit and workflow run, and the account details of the maintainers who submit and approve requests. Nothing about downloads or installations is reported back to us.</p>
+        <p>How this website handles visitors is covered separately in the <a href="/privacy">Privacy Policy</a>.</p>
+      </div>
+
+      <h2 data-i18n="legal.signing.s7_title">7. Reporting a problem</h2>
+      <div data-i18n-html="legal.signing.s7_body">
+        <p>If a copy of the installer fails verification, or if you believe a signed release does not match its published source, do not open a public issue. Follow the disclosure process in the project's security policy, or write to <a href="mailto:contact@nipscern.com">contact@nipscern.com</a>.</p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="assets/js/main.min.js?v=3b1c931500"></script>
+  <script src="assets/js/analytics.min.js?v=3b1c931500" defer></script>
+</body>
+</html>

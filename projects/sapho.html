@@ -25,8 +25,8 @@
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=7a8294c79a">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=7a8294c79a">
+  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=3b1c931500">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=3b1c931500">
 
   <style>
     /* ==================================================================
@@ -729,16 +729,16 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=7a8294c79a"></script>
-  <script src="../assets/js/analytics.min.js?v=7a8294c79a" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=3b1c931500"></script>
+  <script src="../assets/js/analytics.min.js?v=3b1c931500" defer></script>
 
   <script type="module">
     /* Sem JavaScript a pagina fica inteira: o programa padrao esta no HTML,
        o die ja acende as celulas dele, os tracos da onda estao completos.
        O script so troca estados. Bibliotecas: GSAP da casa e anime.js 4,
        ambos vendorizados. */
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=7a8294c79a';
-    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=7a8294c79a';
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=3b1c931500';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=3b1c931500';
 
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
@@ -836,7 +836,7 @@
       const canvas = document.getElementById('die-canvas');
       if (!canvas) return;
       let T;
-      try { T = await import('../assets/js/vendor/three.module.min.js?v=7a8294c79a'); }
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=3b1c931500'); }
       catch (_) { stage.remove(); return; }
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
