@@ -157,7 +157,7 @@
             <td>Approves each individual signing request in the SignPath panel, after checking that it came from a tagged release built by the project's own workflow.</td>
           </tr>
         </table>
-        <p>Approvers hold individual accounts with two-factor authentication. Accounts are never shared, and a signing request is never approved by the person who submitted it alone.</p>
+        <p>Both maintainers hold individual accounts protected by two-factor authentication, and either of them may approve a signing request, so that a release is never held up by one person being unavailable.</p><p>The guarantee that matters most does not depend on who clicks approve. A signing request can only carry an installer that the project's own workflow built, in that same run, from a commit that anyone can read. Approving does not let anyone attach the certificate to something built elsewhere, and there is no path from a maintainer's own machine to a signed release.</p>
       </div>
 
       <h2 data-i18n="legal.signing.s3_title">3. How a signed installer is produced</h2>
