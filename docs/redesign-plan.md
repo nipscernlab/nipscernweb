@@ -276,8 +276,10 @@ Elemento: uma partícula perdida. Pequeno, com humor, sem custo.
   concorrendo entre si.
 - Remover a faixa de recrutamento do hero após 28/08/2026 (marcada no código
   como `RECRUIT-BANNER`).
-- Decidir o destino de `kristoffer/`: está público, desconectado do site, com
-  design próprio e três CDNs externos que o resto do site não usa.
+- ~~Decidir o destino de `kristoffer/`~~ Decidido em 23/08/2026: continua
+  público e desconectado do site, com design próprio. Ganhou descrição e Open
+  Graph, e as três bibliotecas externas passaram a ser servidas de
+  `kristoffer/vendor/`, então não depende mais de CDN.
 - Substituir o `onmouseover` inline do footer.
 
 ---
@@ -395,7 +397,7 @@ Cada fase termina com a página no ar e revisada. Sem fase pela metade.
 
 - Escolha tipográfica final (seção 4).
 - Escopo e formato do blog (seção 9).
-- Destino de `kristoffer/` (seção 8).
+- ~~Destino de `kristoffer/` (seção 8).~~ Decidido: fica como está, fora do site.
 - O céu estrelado da home é substituído ou coexiste com o event display?
 - As quatro traduções continuam obrigatórias em todas as páginas novas?
 
