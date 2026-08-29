@@ -7159,8 +7159,43 @@
 <script>
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    // Suaviza a roda do mouse sem tomar a rolagem do navegador: botao do meio,
+    // teclado, barra e toque continuam nativos, e o alvo se ressincroniza com eles.
+    const smooth = (function () {
+        if (prefersReducedMotion || !window.matchMedia('(pointer: fine)').matches) return null;
+        let target = window.scrollY, current = target, raf = null;
+        const maxY = () => document.documentElement.scrollHeight - window.innerHeight;
+        function step() {
+            current += (target - current) * 0.14;
+            if (Math.abs(target - current) < 0.5) {
+                current = target; raf = null;
+                window.scrollTo({ top: current, behavior: 'instant' });
+                return;
+            }
+            window.scrollTo({ top: current, behavior: 'instant' });
+            raf = requestAnimationFrame(step);
+        }
+        function go(y) {
+            target = Math.max(0, Math.min(maxY(), y));
+            if (!raf) { current = window.scrollY; raf = requestAnimationFrame(step); }
+        }
+        window.addEventListener('wheel', (e) => {
+            if (e.ctrlKey || e.defaultPrevented) return;
+            let dy = e.deltaY;
+            if (e.deltaMode === 1) dy *= 16; else if (e.deltaMode === 2) dy *= window.innerHeight;
+            e.preventDefault();
+            go((raf ? target : window.scrollY) + dy * 1.1);
+        }, { passive: false });
+        window.addEventListener('scroll', () => { if (!raf) target = current = window.scrollY; }, { passive: true });
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 1 && raf) { cancelAnimationFrame(raf); raf = null; target = current = window.scrollY; }
+        });
+        return { go };
+    })();
+
     function scrollTop() {
-        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+        if (smooth) smooth.go(0);
+        else window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     }
 
     function fireConfetti(opts) {
