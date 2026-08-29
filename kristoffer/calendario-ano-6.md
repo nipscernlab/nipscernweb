@@ -18,7 +18,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 28/02/2032
 
-### Lógica (11 textos)
+### Lógica (12 textos)
 
 - Basic Proof Theory, A.S. Troelstra & H. Schwichtenberg. CURIOSITY
 - Types and Programming Languages, Benjamin C. Pierce. CURIOSITY
@@ -31,6 +31,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Homotopy Type Theory, Univalent Foundations Program. CURIOSITY
 - Seven Sketches in Compositionality, Brendan Fong & David I. Spivak. CURIOSITY
 - Word and Object · Philosophy of Logic, W.V.O. Quine. CORE
+- The Logical Basis of Metaphysics, Michael Dummett. CORE
 
 ### Cultura (43 itens)
 
@@ -97,7 +98,6 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ### Lógica (11 textos)
 
-- The Logical Basis of Metaphysics, Michael Dummett. CORE
 - Logical Pluralism, JC Beall & Greg Restall. CORE
 - On the Concept of Logical Consequence (+ Etchemendy), Alfred Tarski. PAPER, CORE
 - Is Logic Empirical? (Anti-exceptionalism), Hilary Putnam · Timothy Williamson. CORE
@@ -108,6 +108,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Linear Logic, Jean-Yves Girard. BREADTH
 - Conceptual Mathematics (Categorical Logic & Topos), Lawvere & Schanuel. CURIOSITY
 - Insolubilia (Sophismata), Jean Buridan. PAPER, CURIOSITY
+- Attention Is All You Need, Vaswani et al. (2017). PAPER, CURIOSITY
 
 ### Cultura (39 itens)
 

@@ -30,7 +30,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Informal Logic, Douglas Walton. CORE
 - Om det tragiske (On the Tragic), Peter Wessel Zapffe. CORE
 
-### Cultura (53 itens)
+### Cultura (55 itens)
 
 **Books**
 - Women, Fire, and Dangerous Things, George Lakoff. CURIOSITY
@@ -46,6 +46,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Мастер и Маргарита (The Master and Margarita), Mikhail Bulgakov. BREADTH
 - Ficciones (Fictions), Jorge Luis Borges. CORE
 - L'Étranger · La Peste (The Stranger · The Plague), Albert Camus. CORE
+- The God of Small Things, Arundhati Roy. BREADTH
 
 **Poetry**
 - Veinte poemas de amor y una canción desesperada (Twenty Love Poems and a Song of Despair), Pablo Neruda. BREADTH
@@ -77,6 +78,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Buena Vista Social Club, Cuban son ensemble. CURIOSITY
 - Miss Perfumado, Cesária Évora. CORE
 - In the Heart of the Moon, Ali Farka Touré & Toumani Diabaté. CURIOSITY
+- Tinariwen, Tuareg desert blues. CORE
 
 **Theater**
 - Три сестры · Вишнёвый сад · Дядя Ваня (Three Sisters · The Cherry Orchard · Uncle Vanya), Антон Чехов (Anton Chekhov). CURIOSITY
@@ -107,7 +109,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2031
 
-### Lógica (8 textos)
+### Lógica (9 textos)
 
 - On the Logic of Theory Change (AGM), Alchourrón, Gärdenfors & Makinson (1985). PAPER, CORE
 - Counterfactuals, David Lewis (1973). CORE
@@ -117,11 +119,11 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Studies in the Logic of Confirmation, Carl Gustav Hempel (1945). PAPER, CORE
 - Logical Foundations of Probability, Rudolf Carnap (1950). BREADTH
 - Truth and Probability, Frank Ramsey · Bruno de Finetti. PAPER, BREADTH
+- Logik der Forschung (The Logic of Scientific Discovery), Karl Popper (1934). BREADTH
 
-### Cultura (47 itens)
+### Cultura (50 itens)
 
 **Books**
-- The God of Small Things, Arundhati Roy. BREADTH
 - موسم الهجرة إلى الشمال (Season of Migration to the North), Tayeb Salih. BREADTH
 - Sjálfstætt fólk (Independent People), Halldór Laxness. CORE
 - Septologien (Septology), Jon Fosse. CORE
@@ -134,6 +136,8 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Beloved · Song of Solomon, Toni Morrison. CORE
 - Rayuela (Hopscotch), Julio Cortázar. CORE
 - Lolita · Pale Fire, Vladimir Nabokov. CORE
+- Eichmann in Jerusalem, Hannah Arendt. CORE
+- Grande Sertão: Veredas (The Devil to Pay in the Backlands), João Guimarães Rosa. BREADTH
 
 **Poetry**
 - Den stora gåtan (The Great Enigma), Tomas Tranströmer. CORE
@@ -151,7 +155,6 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - MASP · SESC Pompéia, Lina Bo Bardi. CURIOSITY
 
 **Music**
-- Tinariwen, Tuareg desert blues. CORE
 - Fado de Amália, Amália Rodrigues. CURIOSITY
 - Cante jondo, Camarón de la Isla. CURIOSITY
 - Te Vaka, Pacific Island fusion. CURIOSITY
@@ -162,11 +165,13 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Misa Criolla (Creole Mass), Mercedes Sosa · Ariel Ramírez (1964). CURIOSITY
 - Soro · Folon, Salif Keita (1987 · 1995). CORE
 - Ten Love Songs, Susanne Sundfør (2015). CORE
+- Cartola (1974) · Verde que te quero rosa, Cartola. CURIOSITY
 
 **Theater**
 - 4.48 Psychosis, Sarah Kane. CORE
 - 舞踏 (Butoh), Tatsumi Hijikata · Kazuo Ohno. CURIOSITY
 - The Birthday Party, Harold Pinter (1958). CURIOSITY
+- Die Physiker · Der Besuch der alten Dame (The Physicists · The Visit), Friedrich Dürrenmatt. CORE
 
 **Film**
 - Orfeu Negro (Black Orpheus), Marcel Camus (1959). CURIOSITY
@@ -175,6 +180,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - 2001: A Space Odyssey · Barry Lyndon, Stanley Kubrick. CORE
 - Shoah, Claude Lanzmann (1985). CORE
 - Sans Soleil, Chris Marker (1983). CURIOSITY
+- Deus e o Diabo na Terra do Sol (Black God, White Devil), Glauber Rocha (1964). CURIOSITY
 
 **Animation**
 - パプリカ (Paprika), Satoshi Kon (2006). CURIOSITY

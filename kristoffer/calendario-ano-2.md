@@ -18,15 +18,16 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 28/02/2028
 
-### Lógica (5 textos)
+### Lógica (6 textos)
 
 - How to Prove It: A Structured Approach, Daniel J. Velleman. CURIOSITY
 - Modal Logic for Philosophers, James Garson. CORE
 - Naming and Necessity, Saul Kripke. CORE
 - An Essay in Modal Logic, Georg Henrik von Wright. CORE
 - The Mathematical Analysis of Logic, George Boole (1847). PAPER, CURIOSITY
+- Reasoning about Knowledge, Fagin, Halpern, Moses, Vardi. CURIOSITY
 
-### Cultura (42 itens)
+### Cultura (43 itens)
 
 **Books**
 - The Diversity of Life, Edward O. Wilson. CURIOSITY
@@ -45,6 +46,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - 源氏物語 (The Tale of Genji), Murasaki Shikibu. BREADTH
 - ألف ليلة وليلة (One Thousand and One Nights), Various (Arab/Persian). BREADTH
 - Τὰ εἰς ἑαυτόν (Meditations), Marcus Aurelius. CORE
+- Ἐγχειρίδιον (Enchiridion), Epictetus. CORE
 
 **Poetry**
 - رباعیات (Rubaiyat), Omar Khayyām. BREADTH
@@ -86,17 +88,17 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2028
 
-### Lógica (4 textos)
+### Lógica (5 textos)
 
-- Reasoning about Knowledge, Fagin, Halpern, Moses, Vardi. CURIOSITY
 - Meditationes de Prima Philosophia (Meditations), René Descartes (1641). CORE
 - An Enquiry Concerning Human Understanding, David Hume (1748). CORE
 - Past, Present and Future, Arthur Prior (1967). CORE
+- Monadologie · Characteristica universalis (Monadology · selected texts), Gottfried Wilhelm Leibniz. CURIOSITY
+- Kritik der reinen Vernunft (Critique of Pure Reason), Immanuel Kant (1781). CORE
 
-### Cultura (39 itens)
+### Cultura (40 itens)
 
 **Books**
-- Ἐγχειρίδιον (Enchiridion), Epictetus. CORE
 - Confessiones (Confessions), Augustine of Hippo. CORE
 - Cantar de mio Cid (The Song of the Cid), Anonymous (Spain). BREADTH
 - منطق‌الطیر (Manṭiq al-ṭayr), Farīd ud-Dīn ʿAṭṭār. BREADTH
@@ -111,6 +113,8 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Il Canzoniere (The Songbook), Francesco Petrarca. BREADTH
 - Il Decameron (The Decameron), Giovanni Boccaccio. BREADTH
 - The Canterbury Tales, Geoffrey Chaucer. BREADTH
+- Summa Theologiae (selected questions), Thomas Aquinas. CURIOSITY
+- 平家物語 (Heike monogatari, The Tale of the Heike), Anonymous (Japan, 13th c.). BREADTH
 
 **Poetry**
 - دیوان حافظ (Dīwān-e Ḥāfeẓ), Hafez of Shiraz. BREADTH

@@ -18,7 +18,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 28/02/2029
 
-### Lógica (6 textos)
+### Lógica (7 textos)
 
 - मूलमध्यमककारिका (Mūlamadhyamakakārikā), Nāgārjuna. CORE
 - Die Grundlagen der Arithmetik (The Foundations of Arithmetic), Gottlob Frege. BREADTH
@@ -26,8 +26,9 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Gödel's Theorem: An Incomplete Guide to Its Use and Abuse, Torkel Franzén. CORE
 - Tractatus Logico-Philosophicus, Ludwig Wittgenstein. CORE
 - Philosophische Untersuchungen (Philosophical Investigations), Ludwig Wittgenstein. CORE
+- How to Do Things with Words, J.L. Austin. CORE
 
-### Cultura (46 itens)
+### Cultura (49 itens)
 
 **Books**
 - The Silk Roads, Peter Frankopan. CURIOSITY
@@ -37,6 +38,9 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - El ingenioso hidalgo don Quijote de la Mancha (Don Quixote), Miguel de Cervantes. BREADTH
 - 紅樓夢 (Hóng lóu mèng / Dream of the Red Chamber), Cao Xueqin (曹雪芹). BREADTH
 - Il Principe (The Prince), Niccolò Machiavelli. BREADTH
+- Ethica, ordine geometrico demonstrata (Ethics), Baruch Spinoza. CORE
+- Philosophiæ Naturalis Principia Mathematica (Principia), Isaac Newton. BREADTH
+- Dialogo sopra i due massimi sistemi del mondo (Dialogue Concerning the Two Chief World Systems), Galileo Galilei. BREADTH
 
 **Poetry**
 - Sonnets, William Shakespeare. BREADTH
@@ -95,24 +99,27 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2029
 
-### Lógica (5 textos)
+### Lógica (6 textos)
 
-- How to Do Things with Words, J.L. Austin. CORE
 - Über Sinn und Bedeutung, Gottlob Frege (1892). PAPER, CORE
 - Collected Papers (Relations, Abduction & Existential Graphs), Charles Sanders Peirce. CORE
 - Wissenschaftslehre (Theory of Science), Bernard Bolzano (1837). CORE
 - Naive Set Theory, Paul Halmos. BREADTH
+- On Denoting, Bertrand Russell (1905). PAPER, CORE
+- Introduction to Mathematical Philosophy, Bertrand Russell (1919). BREADTH
 
-### Cultura (42 itens)
+### Cultura (44 itens)
 
 **Books**
-- Ethica, ordine geometrico demonstrata (Ethics), Baruch Spinoza. CORE
-- Philosophiæ Naturalis Principia Mathematica (Principia), Isaac Newton. BREADTH
-- Dialogo sopra i due massimi sistemi del mondo (Dialogue Concerning the Two Chief World Systems), Galileo Galilei. BREADTH
 - Phänomenologie des Geistes (Phenomenology of Spirit), G.W.F. Hegel. BREADTH
 - Die Welt als Wille und Vorstellung (The World as Will and Representation), Arthur Schopenhauer. CORE
 - Faust (Part I), Johann Wolfgang von Goethe. CORE
 - Pride and Prejudice, Jane Austen. BREADTH
+- Pensées (Thoughts), Blaise Pascal. BREADTH
+- Leviathan (Parts I and II), Thomas Hobbes. BREADTH
+- Second Treatise of Government, John Locke. BREADTH
+- Du contrat social (The Social Contract), Jean-Jacques Rousseau. BREADTH
+- Os Lusíadas (The Lusiads), Luís de Camões. BREADTH
 
 **Poetry**
 - 俳句 (Haiku, Selected), Bashō · Issa · Buson. BREADTH

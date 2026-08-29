@@ -29,7 +29,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - A Rulebook for Arguments, Anthony Weston. CORE
 - Avicenna on the Logic of Conditionals, Tony Street. PAPER, BREADTH
 
-### Cultura (70 itens)
+### Cultura (74 itens)
 
 **Books**
 - Sapiens: A Brief History of Humankind, Yuval Noah Harari. CURIOSITY
@@ -52,6 +52,10 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Snorra Edda (The Prose Edda), Snorri Sturluson (Iceland). CORE
 - Heimskringla, Snorri Sturluson. CORE
 - Egils saga Skallagrímssonar (Egil's Saga), Anonymous (Iceland/Norway). CORE
+- Enūma Eliš (When on High), Babylonian. BREADTH
+- Rw nw prt m hrw (The Book of the Dead), Ancient Egypt. CORE
+- 古事記 (Kojiki), Ō no Yasumaro. BREADTH
+- रामायण (Rāmāyaṇa), Vālmīki. BREADTH
 
 **Poetry**
 - Dreamtime Songlines, Aboriginal Australia. BREADTH
@@ -123,21 +127,18 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2027
 
-### Lógica (5 textos)
+### Lógica (6 textos)
 
 - Materials For the Study of Navya-Nyāya Logic, Daniel H. H. Ingalls. BREADTH
 - An Introduction to Non-Classical Logic, Graham Priest. BREADTH
 - The Development of Logic, William & Martha Kneale. BREADTH
 - Later Mohist Logic, Ethics and Science, A.C. Graham. BREADTH
 - Konungs skuggsjá (The King's Mirror), Anonymous (Old Norwegian, 13th c.). BREADTH
+- Summa Logicae (selections), William of Ockham (c. 1323). CURIOSITY
 
-### Cultura (65 itens)
+### Cultura (68 itens)
 
 **Books**
-- Enūma Eliš (When on High), Babylonian. BREADTH
-- Rw nw prt m hrw (The Book of the Dead), Ancient Egypt. CORE
-- 古事記 (Kojiki), Ō no Yasumaro. BREADTH
-- रामायण (Rāmāyaṇa), Vālmīki. BREADTH
 - महाभारतम् (Mahābhārata, selections), Vyāsa. BREADTH
 - Sunjata (Sundiata: An Epic of Old Mali), Djeli Mamoudou Kouyaté. BREADTH
 - Mwindo Epic, Nyanga people (Congo). BREADTH
@@ -154,6 +155,13 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Ἱστορίαι (History of the Peloponnesian War), Thucydides. BREADTH
 - Βίοι Παράλληλοι (Parallel Lives), Plutarch. BREADTH
 - Στοιχεῖα (Elements), Euclid. CORE
+- Εὐαγγέλιον κατὰ Μᾶρκον · κατὰ Ἰωάννην (Gospel of Mark · Gospel of John), Anonymous (Greek, 1st c.). BREADTH
+- القرآن (Qurʾān, selections), Arabic, 7th c.. BREADTH
+- उपनिषद् (Upaniṣads, selections), Sanskrit, 8th to 3rd c. BCE. CURIOSITY
+- धम्मपद (Dhammapada), Pali, 3rd c. BCE. BREADTH
+- 莊子 (Zhuangzi, Inner Chapters), Zhuang Zhou (China, 4th c. BCE). BREADTH
+- ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ (Guru Granth Sahib, selections), Sikh Gurus and others (Punjab, 1604). CURIOSITY
+- Ἠθικὰ Νικομάχεια · Περὶ ποιητικῆς (Nicomachean Ethics · Poetics), Aristotle. BREADTH
 
 **Poetry**
 - Inuit Traditional Songs, Various. BREADTH

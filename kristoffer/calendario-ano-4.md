@@ -18,7 +18,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 28/02/2030
 
-### Lógica (8 textos)
+### Lógica (10 textos)
 
 - Sistemas Formais Inconsistentes (Inconsistent Formal Systems), Newton da Costa (1963). CORE
 - In Contradiction, Graham Priest. CORE
@@ -28,8 +28,10 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - The Uses of Argument, Stephen Toulmin. CORE
 - Über die Vollständigkeit des Logikkalküls, Kurt Gödel (1929). PAPER, CURIOSITY
 - Untersuchungen über das logische Schließen, Gerhard Gentzen (1935). PAPER, CURIOSITY
+- Grundbegriffe der Wahrscheinlichkeitsrechnung, Andrey Kolmogorov (1933). PAPER, BREADTH
+- Entailment: The Logic of Relevance and Necessity, Alan Anderson & Nuel Belnap. CORE
 
-### Cultura (64 itens)
+### Cultura (68 itens)
 
 **Books**
 - Sein und Zeit (Part I), Martin Heidegger. CORE
@@ -47,6 +49,8 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - À la recherche du temps perdu (In Search of Lost Time), Marcel Proust. BREADTH
 - Die Verwandlung · Der Process · Das Schloss (The Metamorphosis · The Trial · The Castle), Franz Kafka. CORE
 - Ulysses, James Joyce. BREADTH
+- Mrs Dalloway · To the Lighthouse, Virginia Woolf. BREADTH
+- Der Zauberberg · Tod in Venedig (The Magic Mountain · Death in Venice), Thomas Mann. BREADTH
 
 **Poetry**
 - The Waste Land, T.S. Eliot. BREADTH
@@ -67,6 +71,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - La trahison des images · Le Fils de l'homme (The Treachery of Images · The Son of Man), René Magritte. CURIOSITY
 - Metamorfosis de Narciso (Metamorphosis of Narcissus), Salvador Dalí. CURIOSITY
 - Le Penseur · La Porte de l'Enfer (The Thinker · The Gates of Hell), Auguste Rodin. CURIOSITY
+- The Decisive Moment, Henri Cartier-Bresson. CURIOSITY
 
 **Places & Architecture**
 - Bauhaus, Dessau, Walter Gropius. CURIOSITY
@@ -86,6 +91,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Symfoni nr. 4 "Det Uudslukkelige" (Symphony No. 4 "The Inextinguishable"), Carl Nielsen. CORE
 - Blue Train · A Love Supreme, John Coltrane. CURIOSITY
 - Sinfonietta · Glagolská mše (Sinfonietta · Glagolitic Mass), Leoš Janáček (1926 · 1927). CURIOSITY
+- Ромео и Джульетта · Петя и волк (Romeo and Juliet · Peter and the Wolf), Sergei Prokofiev (1935 · 1936). CURIOSITY
 
 **Theater**
 - Mutter Courage und ihre Kinder · Leben des Galilei (Mother Courage and Her Children · Life of Galileo), Bertolt Brecht. CURIOSITY
@@ -117,22 +123,21 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2030
 
-### Lógica (8 textos)
+### Lógica (9 textos)
 
-- Grundbegriffe der Wahrscheinlichkeitsrechnung, Andrey Kolmogorov (1933). PAPER, BREADTH
-- Entailment: The Logic of Relevance and Necessity, Alan Anderson & Nuel Belnap. CORE
 - Model Theory: An Introduction, David Marker. BREADTH
 - The Logic of Provability, George Boolos. CORE
 - Foundations without Foundationalism (Second-Order Logic), Stewart Shapiro. BREADTH
 - Many-Valued Logics (Łukasiewicz & Kleene systems), Łukasiewicz · Kleene. BREADTH
 - Mathematical Fuzzy Logic, Petr Hájek. CURIOSITY
 - Computability and Logic, Boolos, Burgess & Jeffrey. CURIOSITY
+- Computing Machinery and Intelligence, Alan Turing (1950). PAPER, CORE
+- A Logical Calculus of the Ideas Immanent in Nervous Activity, Warren McCulloch & Walter Pitts (1943). PAPER, BREADTH
+- Minds, Brains, and Programs, John Searle (1980). PAPER, CORE
 
-### Cultura (62 itens)
+### Cultura (64 itens)
 
 **Books**
-- Mrs Dalloway · To the Lighthouse, Virginia Woolf. BREADTH
-- Der Zauberberg · Tod in Venedig (The Magic Mountain · Death in Venice), Thomas Mann. BREADTH
 - Markens grøde (Growth of the Soil), Knut Hamsun. CORE
 - Min Kamp (vol. 1), Karl Ove Knausgård. CORE
 - Things Fall Apart, Chinua Achebe. BREADTH
@@ -146,6 +151,10 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Tales & Poems, Edgar Allan Poe. CORE
 - Евгений Онегин (Eugene Onegin), Alexander Pushkin. BREADTH
 - Мёртвые души · Шинель (Dead Souls · The Overcoat), Nikolai Gogol. BREADTH
+- On Liberty, John Stuart Mill. BREADTH
+- Manifest der Kommunistischen Partei (The Communist Manifesto), Karl Marx & Friedrich Engels. CURIOSITY
+- Memórias Póstumas de Brás Cubas (The Posthumous Memoirs of Brás Cubas), Machado de Assis. BREADTH
+- Vidas Secas (Barren Lives), Graciliano Ramos. BREADTH
 
 **Poetry**
 - Реквием (Requiem), Анна Ахматова (Anna Akhmatova). CORE
@@ -154,7 +163,6 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - The Complete Poems, Emily Dickinson. BREADTH
 
 **Art**
-- The Decisive Moment, Henri Cartier-Bresson. CURIOSITY
 - Moi et le village (I and the Village), Marc Chagall (1911). CURIOSITY
 - Nu couché (Reclining Nude), Amedeo Modigliani (1917–18). CURIOSITY
 - Straße, Berlin (Street, Berlin), Ernst Ludwig Kirchner (1913). CURIOSITY
@@ -166,6 +174,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - D'où venons-nous ? Que sommes-nous ? Où allons-nous ? (Where Do We Come From? What Are We? Where Are We Going?), Paul Gauguin. CURIOSITY
 - L'Absinthe · La Classe de danse (Absinthe · The Dance Class), Edgar Degas. CURIOSITY
 - Un dimanche après-midi à l'Île de la Grande Jatte (A Sunday Afternoon on the Island of La Grande Jatte), Georges Seurat. CURIOSITY
+- Angelus Novus · Ad Parnassum, Paul Klee. CURIOSITY
 
 **Places & Architecture**
 - Auschwitz-Birkenau Memorial, Memory site (Poland). CORE
@@ -174,7 +183,6 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Hiroshima Peace Memorial (Genbaku Dome), Hiroshima, Japan (1945 / 1996 UNESCO). CORE
 
 **Music**
-- Ромео и Джульетта · Петя и волк (Romeo and Juliet · Peter and the Wolf), Sergei Prokofiev (1935 · 1936). CURIOSITY
 - Der Ring des Nibelungen · Tristan und Isolde (The Ring of the Nibelung · Tristan and Isolde), Richard Wagner. CORE
 - Eine Faust-Symphonie · Klaviersonate h-Moll · Nuages gris (A Faust Symphony · Piano Sonata in B minor · Grey Clouds), Franz Liszt. CURIOSITY
 - Otello · Requiem · La Traviata, Giuseppe Verdi. CURIOSITY
@@ -185,6 +193,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Картинки с выставки · Борис Годунов (Pictures at an Exhibition · Boris Godunov), Modest Mussorgsky. CURIOSITY
 - La Bohème · Tosca, Giacomo Puccini. CURIOSITY
 - Carmen, Georges Bizet. CURIOSITY
+- Wozzeck, Alban Berg (1925). CURIOSITY
 
 **Theater**
 - La Cantatrice chauve · Rhinocéros (The Bald Soprano · Rhinoceros), Eugène Ionesco (1950 · 1959). CURIOSITY
