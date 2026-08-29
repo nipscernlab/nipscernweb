@@ -476,7 +476,8 @@
       "f_years": "on record",
       "f_theses": "theses supervised",
       "f_people": "people",
-      "licence": "Licence"
+      "licence": "Licence",
+      "signing": "Code signing"
     },
     "legal": {
       "eyebrow": "Legal",
@@ -525,6 +526,26 @@
         "s8_body": "<p>These terms may be updated from time to time. Continued use of the website after changes are posted constitutes acceptance of the revised terms. The date of the most recent revision appears at the top of this page.</p>",
         "s9_title": "9. Contact",
         "s9_body": "<p>For questions regarding these terms, please contact the NIPS-CERN group through the <a href=\"about.html\" class=\"text-link\">About</a> page or via the contact information listed there.</p>"
+      },
+      "signing": {
+        "title": "Code Signing Policy",
+        "subtitle": "How the SAPHO installer is built, reviewed, approved and signed, and how anyone can check the copy they downloaded.",
+        "updated": "Last updated: August 2026",
+        "highlight": "Every released installer is built by a public workflow from a public commit, and no person can upload an installer built on their own machine.",
+        "s1_title": "1. What this covers",
+        "s2_title": "2. Roles",
+        "s3_title": "3. How a signed installer is produced",
+        "s4_title": "4. The certificate and the publisher name",
+        "s5_title": "5. Verifying a download",
+        "s6_title": "6. Privacy",
+        "s7_title": "7. Reporting a problem",
+        "s1_body": "<p>This policy covers the Windows installer of the SAPHO platform, published as <strong>sapho-aurora-Setup-vX.Y.Z.exe</strong>. It is the only artefact we sign. The source code lives at <a href=\"https://github.com/nipscernlab/aurora\">github.com/nipscernlab/aurora</a> and the installers are published at <a href=\"https://github.com/nipscernlab/sapho/releases\">github.com/nipscernlab/sapho/releases</a>.</p><p>SAPHO is developed by NIPS-CERN, the Center for Instrumentation and Signal Processing, working from two laboratories: NIPS, at the Federal University of Juiz de Fora, in Brazil, and Route Salam, at CERN, in Switzerland.</p>",
+        "s2_body": "<p>Three roles take part in a release. They are separate on purpose: the person who writes a change is never the only person who lets it become a signed installer.</p><table><tr><th>Role</th><th>Who</th><th>What they do</th></tr><tr><td><strong>Author</strong></td><td>Any contributor</td><td>Writes the change and opens a pull request. Anyone may be an author, including people outside the laboratory.</td></tr><tr><td><strong>Reviewer</strong></td><td>A project maintainer</td><td>Reviews the pull request and merges it. Continuous integration must pass first: linting, type checking, unit, end-to-end and toolchain tests.</td></tr><tr><td><strong>Approver</strong></td><td>Luciano M. de A. Filho, Chrysthofer A. A. Afonso</td><td>Approves each individual signing request in the SignPath panel, after checking that it came from a tagged release built by the project's own workflow.</td></tr></table><p>Both maintainers hold individual accounts protected by two-factor authentication, and either of them may approve a signing request, so that a release is never held up by one person being unavailable.</p><p>The guarantee that matters most does not depend on who clicks approve. A signing request can only carry an installer that the project's own workflow built, in that same run, from a commit that anyone can read. Approving does not let anyone attach the certificate to something built elsewhere, and there is no path from a maintainer's own machine to a signed release.</p>",
+        "s3_body": "<p>The chain is deliberately closed end to end, so that a signature means something more than \"a file reached us\":</p><ol><li>A change is merged into <code>main</code> after review and a green build.</li><li>Release automation opens a release pull request; merging it creates the version tag.</li><li>A GitHub Actions workflow, running on GitHub-hosted Windows runners and defined in the public repository, checks out that exact commit, builds the installer and produces the update manifest.</li><li>The workflow submits the built installer to SignPath through the trusted build system integration. It cannot submit anything that was not built in that run.</li><li>An approver receives the request and approves or rejects it.</li><li>The signed installer is published to the distribution repository, together with the update manifest and the block map used for incremental updates.</li></ol><p>No maintainer can sign an installer built on a personal machine: the signing credential exists only inside the continuous integration environment, and SignPath verifies that the request originates from the project's own workflow.</p>",
+        "s4_body": "<p>The certificate is provided by the <strong>SignPath Foundation</strong>, which issues free certificates to open source projects. This has a consequence worth stating plainly, because it surprises people who verify a download: the publisher shown by Windows is <strong>SignPath Foundation</strong>, not NIPS-CERN and not the university. That is expected and is not a sign of tampering.</p><p>Windows SmartScreen builds reputation over time, per certificate. The first signed releases may still show a warning; it fades as more copies are downloaded and run.</p>",
+        "s5_body": "<p>Anyone can check a downloaded installer without installing it. In PowerShell:</p><pre><code>Get-AuthenticodeSignature .\\sapho-aurora-Setup-v6.9.0.exe | Format-List</code></pre><p>A valid copy reports the status as <code>Valid</code> and names the certificate subject. Right-clicking the file, then Properties and Digital Signatures, shows the same information.</p><p>Independently of the signature, every release also publishes a <code>latest.yml</code> carrying the SHA-512 of the installer. The application's own updater verifies that hash before running anything it downloaded.</p>",
+        "s6_body": "<p>Signing involves no data about the people who use SAPHO. What SignPath processes is the installer itself, the metadata of the build that produced it, such as repository, commit and workflow run, and the account details of the maintainers who submit and approve requests. Nothing about downloads or installations is reported back to us.</p><p>How this website handles visitors is covered separately in the <a href=\"/privacy\">Privacy Policy</a>.</p>",
+        "s7_body": "<p>If a copy of the installer fails verification, or if you believe a signed release does not match its published source, do not open a public issue. Follow the disclosure process in the project's security policy, or write to <a href=\"mailto:contact@nipscern.com\">contact@nipscern.com</a>.</p>"
       }
     },
     "credits": {
@@ -1105,7 +1126,8 @@
       "f_years": "de produção",
       "f_theses": "teses e dissertações orientadas",
       "f_people": "pessoas",
-      "licence": "Licença"
+      "licence": "Licença",
+      "signing": "Assinatura"
     },
     "legal": {
       "eyebrow": "Jurídico",
@@ -1154,6 +1176,26 @@
         "s8_body": "<p>Estes termos podem ser atualizados periodicamente. O uso contínuo do site após a publicação de alterações constitui aceitação dos termos revisados. A data da revisão mais recente aparece no topo desta página.</p>",
         "s9_title": "9. Contato",
         "s9_body": "<p>Para dúvidas sobre estes termos, entre em contato com o grupo NIPS-CERN por meio da página <a href=\"about.html\" class=\"text-link\">Sobre</a> ou pelas informações de contato listadas lá.</p>"
+      },
+      "signing": {
+        "title": "Política de Assinatura de Código",
+        "subtitle": "Como o instalador do SAPHO é construído, revisado, aprovado e assinado, e como qualquer pessoa pode conferir a cópia que baixou.",
+        "updated": "Última atualização: agosto de 2026",
+        "highlight": "Todo instalador publicado é construído por um fluxo público a partir de um commit público, e ninguém consegue subir um instalador feito na própria máquina.",
+        "s1_title": "1. O que esta política cobre",
+        "s1_body": "<p>Esta política cobre o instalador do SAPHO para Windows, publicado como <strong>sapho-aurora-Setup-vX.Y.Z.exe</strong>. É o único artefato que assinamos. O código-fonte está em <a href=\"https://github.com/nipscernlab/aurora\">github.com/nipscernlab/aurora</a> e os instaladores são publicados em <a href=\"https://github.com/nipscernlab/sapho/releases\">github.com/nipscernlab/sapho/releases</a>.</p><p>O SAPHO é desenvolvido pelo NIPS-CERN, o Núcleo de Instrumentação e Processamento de Sinais, que trabalha em dois laboratórios: o NIPS, na Universidade Federal de Juiz de Fora, no Brasil, e o Route Salam, no CERN, na Suíça.</p>",
+        "s2_title": "2. Papéis",
+        "s2_body": "<p>Três papéis participam de uma publicação. Eles são separados de propósito: quem escreve uma mudança nunca é a única pessoa que a deixa virar um instalador assinado.</p><table><tr><th>Papel</th><th>Quem</th><th>O que faz</th></tr><tr><td><strong>Autor</strong></td><td>Qualquer pessoa que contribui</td><td>Escreve a mudança e abre um pull request. Qualquer pessoa pode ser autora, inclusive de fora do laboratório.</td></tr><tr><td><strong>Revisor</strong></td><td>Uma pessoa mantenedora do projeto</td><td>Revisa o pull request e faz o merge. A integração contínua precisa passar antes: lint, verificação de tipos, testes de unidade, de ponta a ponta e da cadeia de compilação.</td></tr><tr><td><strong>Aprovador</strong></td><td>Luciano M. de A. Filho, Chrysthofer A. A. Afonso</td><td>Aprova cada requisição de assinatura no painel da SignPath, depois de conferir que ela veio de uma versão marcada, construída pelo fluxo do próprio projeto.</td></tr></table><p>As duas pessoas mantenedoras têm contas individuais protegidas por autenticação em dois fatores, e qualquer uma delas pode aprovar uma requisição, para que uma publicação nunca fique parada porque alguém está indisponível.</p><p>A garantia que mais importa não depende de quem clica em aprovar. Uma requisição de assinatura só pode carregar um instalador que o próprio fluxo do projeto construiu, naquela mesma execução, a partir de um commit que qualquer pessoa pode ler. Aprovar não permite a ninguém colar o certificado em algo construído em outro lugar, e não existe caminho da máquina de uma pessoa mantenedora até uma versão assinada.</p>",
+        "s3_title": "3. Como um instalador assinado é produzido",
+        "s3_body": "<p>A cadeia é fechada de ponta a ponta de propósito, para que a assinatura signifique mais do que \"um arquivo chegou até nós\":</p><ol><li>A mudança entra na <code>main</code> depois de revisada e com a integração contínua verde.</li><li>A automação de release abre um pull request de versão; o merge dele cria a etiqueta.</li><li>Um fluxo do GitHub Actions, rodando em máquinas Windows do próprio GitHub e definido no repositório público, faz o checkout daquele commit exato, constrói o instalador e produz o manifesto de atualização.</li><li>O fluxo envia o instalador recém-construído à SignPath pela integração de sistema de build confiável. Ele não consegue enviar nada que não tenha sido construído naquela execução.</li><li>Uma pessoa aprovadora recebe a requisição e aprova ou recusa.</li><li>O instalador assinado é publicado no repositório de distribuição, junto do manifesto de atualização e do mapa de blocos que permite a atualização incremental.</li></ol><p>Nenhuma pessoa mantenedora consegue assinar um instalador feito na própria máquina: a credencial de assinatura existe apenas dentro do ambiente de integração contínua, e a SignPath confere que a requisição veio do fluxo do próprio projeto.</p>",
+        "s4_title": "4. O certificado e o nome do publicador",
+        "s4_body": "<p>O certificado é fornecido pela <strong>SignPath Foundation</strong>, que emite certificados gratuitos para projetos de código aberto. Isso tem uma consequência que vale dizer com todas as letras, porque surpreende quem confere um download: o publicador mostrado pelo Windows é <strong>SignPath Foundation</strong>, e não NIPS-CERN nem a universidade. Isso é esperado e não é sinal de adulteração.</p><p>O SmartScreen do Windows acumula reputação com o tempo, por certificado. As primeiras versões assinadas ainda podem exibir um aviso; ele desaparece à medida que mais cópias são baixadas e executadas.</p>",
+        "s5_title": "5. Conferindo um download",
+        "s5_body": "<p>Qualquer pessoa pode conferir o instalador baixado sem instalá-lo. No PowerShell:</p><pre><code>Get-AuthenticodeSignature .\\sapho-aurora-Setup-v6.9.0.exe | Format-List</code></pre><p>Uma cópia válida informa o estado como <code>Valid</code> e nomeia o titular do certificado. Clicar com o botão direito no arquivo, em Propriedades e Assinaturas Digitais, mostra a mesma informação.</p><p>Independentemente da assinatura, toda versão também publica um <code>latest.yml</code> com o SHA-512 do instalador. O atualizador da própria aplicação confere esse resumo antes de executar qualquer coisa que tenha baixado.</p>",
+        "s6_title": "6. Privacidade",
+        "s6_body": "<p>A assinatura não envolve dado nenhum sobre quem usa o SAPHO. O que a SignPath processa é o próprio instalador, os metadados da construção que o produziu, como repositório, commit e execução do fluxo, e os dados de conta das pessoas mantenedoras que enviam e aprovam requisições. Nada sobre downloads ou instalações volta para nós.</p><p>Como este site trata quem o visita está na <a href=\"/privacy\">Política de Privacidade</a>.</p>",
+        "s7_title": "7. Relatar um problema",
+        "s7_body": "<p>Se uma cópia do instalador falhar na verificação, ou se você acredita que uma versão assinada não corresponde ao código publicado, não abra uma issue pública. Siga o processo de divulgação da política de segurança do projeto, ou escreva para <a href=\"mailto:contact@nipscern.com\">contact@nipscern.com</a>.</p>"
       }
     },
     "credits": {
@@ -1734,7 +1776,8 @@
       "f_years": "de production",
       "f_theses": "thèses encadrées",
       "f_people": "personnes",
-      "licence": "Licence"
+      "licence": "Licence",
+      "signing": "Signature du code"
     },
     "legal": {
       "eyebrow": "Mentions légales",
@@ -2363,7 +2406,8 @@
       "f_years": "med arbeid",
       "f_theses": "veiledede avhandlinger",
       "f_people": "personer",
-      "licence": "Lisens"
+      "licence": "Lisens",
+      "signing": "Kodesignering"
     },
     "legal": {
       "eyebrow": "Juridisk",
