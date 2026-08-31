@@ -157,7 +157,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - MASP · SESC Pompéia, Lina Bo Bardi. CURIOSITY
 
 **Music**
-- Fado de Amália, Amália Rodrigues. CURIOSITY
+- Busto, Amália Rodrigues (1962). CURIOSITY
 - Cante jondo, Camarón de la Isla. CURIOSITY
 - Te Vaka, Pacific Island fusion. CURIOSITY
 - Ágætis byrjun · ( ) · Takk..., Sigur Rós. CORE

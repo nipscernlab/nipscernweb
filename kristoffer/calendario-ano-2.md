@@ -41,7 +41,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Atlas Fotográfico de Anatomia Humana (Color Atlas of Anatomy), Yokochi · Rohen · Lütjen-Drecoll. CURIOSITY
 - Essentials of Human Anatomy and Physiology, Elaine N. Marieb. CURIOSITY
 - The Body: A Guide for Occupants, Bill Bryson. CURIOSITY
-- Manual de Primeiros Socorros (First Aid Manual), Cruz Vermelha Brasileira. CORE
+- Curso de Primeiros Socorros (First Aid Course), Cruz Vermelha Brasileira. CORE
 - Expecting Better, Emily Oster. CURIOSITY
 - 源氏物語 (The Tale of Genji), Murasaki Shikibu. BREADTH
 - ألف ليلة وليلة (One Thousand and One Nights), Various (Arab/Persian). BREADTH
