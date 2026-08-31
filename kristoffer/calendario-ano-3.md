@@ -50,7 +50,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Leaves of Grass, Walt Whitman. BREADTH
 
 **Art**
-- David · Cappella Sistina (David · Sistine Chapel), Michelangelo Buonarroti. CORE
+- David · Volta della Cappella Sistina (David · The Sistine Chapel Ceiling), Michelangelo Buonarroti. CORE
 - L'Ultima Cena · La Gioconda · Uomo Vitruviano (The Last Supper · Mona Lisa · Vitruvian Man), Leonardo da Vinci. CORE
 - Primavera · Nascita di Venere (Spring · The Birth of Venus), Sandro Botticelli. CURIOSITY
 - La Scuola di Atene (The School of Athens), Raffaello Sanzio. CURIOSITY
@@ -62,7 +62,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Selbstbildnis · Melencolia I · Ritter, Tod und Teufel (Self-Portrait · Melencolia I · Knight, Death and the Devil), Albrecht Dürer. CORE
 - De tuin der lusten (Garden of Earthly Delights), Hieronymus Bosch. CURIOSITY
 - Jagers in de Sneeuw · De Toren van Babel (Hunters in the Snow · The Tower of Babel), Pieter Bruegel de Oude. CURIOSITY
-- Het Lam Gods (Ghent Altarpiece) · Portret van Giovanni Arnolfini, Jan van Eyck. CURIOSITY
+- Het Lam Gods · Portret van Giovanni Arnolfini en zijn vrouw (The Ghent Altarpiece · The Arnolfini Portrait), Hubert & Jan van Eyck. CURIOSITY
 - The Ambassadors, Hans Holbein der Jüngere. CURIOSITY
 
 **Places & Architecture**
@@ -132,7 +132,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 **Art**
 - Eventyrillustrasjoner (Folktale Illustrations), Theodor Kittelsen. CORE
 - Dogon Masks, Dogon People (Mali). CURIOSITY
-- Tintoretto — L'Ultima Cena (San Giorgio), Jacopo Tintoretto (1594). CURIOSITY
+- L'Ultima Cena (The Last Supper, San Giorgio Maggiore), Jacopo Tintoretto (1594). CURIOSITY
 - Le nozze di Cana (The Wedding at Cana), Paolo Veronese (1563). CURIOSITY
 - De Nachtwacht (The Night Watch) · Self-Portraits, Rembrandt van Rijn. CURIOSITY
 - Het meisje met de parel (Girl with a Pearl Earring), Johannes Vermeer. CURIOSITY
@@ -152,7 +152,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - San Carlo alle Quattro Fontane, Francesco Borromini. CURIOSITY
 
 **Music**
-- Späte Streichquartette (Op. 130–135), Ludwig van Beethoven. CURIOSITY
+- Späte Streichquartette (Op. 127–135), Ludwig van Beethoven. CURIOSITY
 - Gloria · Stabat Mater, Antonio Vivaldi (1715 · 1712). CURIOSITY
 - Die Schöpfung · Streichquartette Op. 76 (The Creation · String Quartets Op. 76), Joseph Haydn (1798 · 1797). CURIOSITY
 - Winterreise · Die schöne Müllerin (Winter Journey · The Fair Maid of the Mill), Franz Schubert (1827 · 1823). CORE
@@ -166,7 +166,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Fuenteovejuna, Lope de Vega. CURIOSITY
 - La vida es sueño (Life Is a Dream), Pedro Calderón de la Barca. CURIOSITY
 - A Midsummer Night's Dream, William Shakespeare (~1595). CURIOSITY
-- Arlecchino servitore di due padroni (The Servant of Two Masters), Carlo Goldoni. CURIOSITY
+- Il servitore di due padroni (The Servant of Two Masters), Carlo Goldoni. CURIOSITY
 
 **Film**
 - Smultronstället (Wild Strawberries), Ingmar Bergman (1957). CORE

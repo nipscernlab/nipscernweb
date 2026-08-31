@@ -24,7 +24,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Modal Logic for Philosophers, James Garson. CORE
 - Naming and Necessity, Saul Kripke. CORE
 - An Essay in Modal Logic, Georg Henrik von Wright. CORE
-- The Mathematical Analysis of Logic, George Boole (1847). PAPER, CURIOSITY
+- The Mathematical Analysis of Logic, George Boole (1847). CURIOSITY
 - Reasoning about Knowledge, Fagin, Halpern, Moses, Vardi. CURIOSITY
 
 ### Cultura (43 itens)
@@ -50,7 +50,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 **Poetry**
 - رباعیات (Rubaiyat), Omar Khayyām. BREADTH
-- Σαπφώ (Complete Poems), Sappho. BREADTH
+- If Not, Winter: Fragments of Sappho, Sappho, tr. Anne Carson. BREADTH
 
 **Art**
 - 浮世絵 (Ukiyo-e Prints — The Great Wave), Katsushika Hokusai. CURIOSITY
@@ -74,7 +74,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 **Music**
 - Brandenburgische Konzerte (Brandenburg Concertos), Johann Sebastian Bach. CURIOSITY
-- सितार रागें (Ragas — Sitar), Ravi Shankar. CURIOSITY
+- सितार राग (Ragas for Sitar), Ravi Shankar. CURIOSITY
 - قوّالی (Qawwali), Nusrat Fateh Ali Khan. CURIOSITY
 - Mbira Music, Zimbabwe (Shona). CURIOSITY
 - Peer Gynt-suitene · Lyriske stykker (Peer Gynt Suites · Lyric Pieces), Edvard Grieg. CORE
@@ -105,7 +105,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Brennu-Njáls saga (Njál's Saga), Anonymous (Iceland). CORE
 - Sult (Hunger), Knut Hamsun. CORE
 - Kristin Lavransdatter, Sigrid Undset. CORE
-- 葉隱 (Hagakure), Yamamoto Tsunetomo. CORE
+- 葉隠 (Hagakure), Yamamoto Tsunetomo. CORE
 - مثنوی معنوی (Masnavī), Jalāl al-Dīn Rūmī. BREADTH
 - Le Roman de la Rose (The Romance of the Rose), Guillaume de Lorris & Jean de Meun. BREADTH
 - Parzival, Wolfram von Eschenbach. BREADTH
@@ -124,7 +124,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Vinternatt i Rondane (Winter Night in the Mountains), Harald Sohlberg. CORE
 - Las Meninas, Diego Velázquez. CURIOSITY
 - Lindisfarne Gospels, Eadfrith of Lindisfarne (~715 CE). CURIOSITY
-- Crocifisso di Santa Croce (Santa Croce Crucifix), Giovanni Cimabue (~1287–88). CURIOSITY
+- Crocifisso di Santa Croce (Santa Croce Crucifix), Cimabue (Cenni di Pepo, ~1287–88). CURIOSITY
 - Affreschi di San Marco (San Marco Frescoes), Fra Angelico (1438–45). CURIOSITY
 - Persian Miniature (Bihzād), Herat School (15th c.). CURIOSITY
 - 水墨画 (Sumi-e Ink Painting), Sesshū Tōyō (15th c.). CURIOSITY
@@ -140,11 +140,11 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - பெருவுடையார் கோயில் (Brihadīśvara Temple), Chola Dynasty (1010). CURIOSITY
 
 **Music**
-- Spem in Alium (Hope in Any Other), Thomas Tallis. CORE
+- Spem in alium nunquam habui (I Have Never Put My Hope in Any Other), Thomas Tallis. CORE
 - Missa Pange Lingua, Josquin des Prez. CURIOSITY
 - Missa Papae Marcelli (Pope Marcellus Mass), Giovanni Pierluigi da Palestrina. CORE
 - Madrigali (Madrigals), Carlo Gesualdo. CURIOSITY
-- Viderunt omnes · Sederunt principes, Pérotin (~1198–1236). CURIOSITY
+- Viderunt omnes · Sederunt principes, Pérotin (fl. c. 1200). CURIOSITY
 - Stabat Mater, Giovanni Battista Pergolesi (1736) · Antonio Vivaldi (1712). CURIOSITY
 
 **Theater**

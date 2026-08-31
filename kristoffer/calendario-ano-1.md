@@ -24,10 +24,10 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Ὄργανον (Categories & Prior Analytics), Aristotle. CORE
 - Πολιτεία (Republic) & Socratic Dialogues, Plato. CORE
 - Stoic Logic Fragments, Chrysippus. PAPER, CORE
-- Τέχνη Ῥητορική (Ars Rhetorica), Aristotle. CORE
+- Τέχνη Ῥητορική (Rhetoric), Aristotle. CORE
 - न्यायसूत्र (Nyāya Sūtras), Akṣapāda Gautama. BREADTH
 - A Rulebook for Arguments, Anthony Weston. CORE
-- Avicenna on the Logic of Conditionals, Tony Street. PAPER, BREADTH
+- Avicenna on the Logic of Conditionals, Nicholas Rescher (1963). PAPER, BREADTH
 
 ### Cultura (74 itens)
 
@@ -44,7 +44,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Ὀδύσσεια (Odyssey), Homer. BREADTH
 - 道德經 (Tao Te Ching), Lao Tzu. BREADTH
 - 論語 (The Analects), Confucius (孔子). BREADTH
-- The Essential Rumi (مولانا), Jalāl al-Dīn Rūmī. BREADTH
+- The Essential Rumi, Jalāl al-Dīn Rūmī, tr. Coleman Barks. BREADTH
 - 詩經 (Shī Jīng / Book of Songs), Various (China). BREADTH
 - Sæmundar Edda (The Poetic Edda), Anonymous (Iceland). CORE
 - Bēowulf, Anonymous (Anglo-Saxon). BREADTH
@@ -72,7 +72,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Lascaux & Altamira Caves, Prehistoric (~17,000 BCE). CURIOSITY
 - Chauvet Cave, Prehistoric (~30,000 BCE). CURIOSITY
 - 兵馬俑 (Terracotta Army), Qin Dynasty. CURIOSITY
-- Parthenon Marbles, Phidias. CURIOSITY
+- Parthenon Marbles, Phidias and workshop (Athens, 447–432 BCE). CURIOSITY
 - Olmec Colossal Heads, Mesoamerica. CURIOSITY
 - Moai Statues, Rapa Nui (Easter Island). CURIOSITY
 - Aboriginal Rock Art (Kakadu), Aboriginal Australia. CURIOSITY
@@ -121,7 +121,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Baraka (1992), Ron Fricke. CURIOSITY
 
 **Dance**
-- नाट्य शास्त्र (Nāṭya Śāstra) & Bharatanatyam, Bharata Muni. CURIOSITY
+- नाट्यशास्त्र (Nāṭyaśāstra) & Bharatanatyam, Bharata Muni. CURIOSITY
 
 ---
 
@@ -140,14 +140,14 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 **Books**
 - महाभारतम् (The Mahābhārata), Vyāsa, tr. John D. Smith. BREADTH
-- Sunjata (Sundiata: An Epic of Old Mali), Djeli Mamoudou Kouyaté. BREADTH
+- Sunjata (Sundiata: An Epic of Old Mali), D. T. Niane, from the griot Djeli Mamoudou Kouyaté. BREADTH
 - Mwindo Epic, Nyanga people (Congo). BREADTH
-- Avesta, Zarathuštra (Zoroastrian). BREADTH
+- Avesta (The Gāthās and the later Avesta), Zarathuštra and the later Avestan priesthood. BREADTH
 - Pyramid Texts, Ancient Egypt. BREADTH
 - 易經 (Yìjīng / I Ching), Anonymous (China). BREADTH
 - בראשית · איוב · קהלת (Genesis · Job · Ecclesiastes), Hebrew Bible. CORE
 - Escher on Escher: Exploring the Infinite, M.C. Escher. CORE
-- Sinuhe the Egyptian (Story of Sinuhe), Anonymous (Egypt, ~1875 BCE). BREADTH
+- Sinuhe (The Tale of Sinuhe), Anonymous (Egypt, ~1875 BCE). BREADTH
 - Aeneis (Aeneid), Virgil. BREADTH
 - Metamorphōseōn librī (Metamorphoses), Ovid. BREADTH
 - De Rerum Natura (On the Nature of Things), Lucretius. BREADTH
@@ -184,7 +184,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - San Rock Paintings (Drakensberg), Southern Africa. CURIOSITY
 - Oseberg Ship & Viking Funerary Art, Norway (9th c.). CORE
 - Lapita Pottery, Pacific Islands (~1600–500 BCE). CURIOSITY
-- Early Chinese Landscape Painting (Travelers Among Mountains and Streams), Fan Kuan · Guo Xi (Song Dynasty). CURIOSITY
+- 谿山行旅圖 · 早春圖 (Travelers Among Mountains and Streams · Early Spring), Fan Kuan · Guo Xi (Song Dynasty). CURIOSITY
 - 蘭亭集序 (Lantingji Xu) & Chinese Calligraphy, Wang Xizhi. CURIOSITY
 
 **Places & Architecture**

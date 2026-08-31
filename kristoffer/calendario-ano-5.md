@@ -51,7 +51,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 **Poetry**
 - Veinte poemas de amor y una canción desesperada (Twenty Love Poems and a Song of Despair), Pablo Neruda. BREADTH
-- Poemas escolhidos (Selected Poems), Fernando Pessoa, ed. Richard Zenith. BREADTH
+- Fernando Pessoa & Co.: Selected Poems, Fernando Pessoa, ed. Richard Zenith (1998). BREADTH
 - Ariel, Sylvia Plath. BREADTH
 
 **Art**
@@ -94,7 +94,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - পথের পাঁচালী (Pather Panchali), Satyajit Ray (1955). CURIOSITY
 - L'Avventura · Blow-Up (The Adventure · Blow-Up), Michelangelo Antonioni. CURIOSITY
 - 花樣年華 (In the Mood for Love), Wong Kar-wai (2000). CURIOSITY
-- نمای نزدیک (Close-Up) · طعم گيلاس (Taste of Cherry), Abbas Kiarostami. CURIOSITY
+- نمای نزدیک (Close-Up) · طعم گیلاس (Taste of Cherry), Abbas Kiarostami. CURIOSITY
 
 **Animation**
 - 千と千尋の神隠し · となりのトトロ (Spirited Away · Totoro), Hayao Miyazaki. CURIOSITY
@@ -118,7 +118,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Fact, Fiction, and Forecast, Nelson Goodman. CORE
 - Studies in the Logic of Confirmation, Carl Gustav Hempel (1945). PAPER, CORE
 - Logical Foundations of Probability, Rudolf Carnap (1950). BREADTH
-- Truth and Probability, Frank Ramsey · Bruno de Finetti. PAPER, BREADTH
+- Truth and Probability, Frank Ramsey (1926). PAPER, BREADTH
 - Logik der Forschung (The Logic of Scientific Discovery), Karl Popper (1934). BREADTH
 - Basic Proof Theory, A.S. Troelstra & H. Schwichtenberg. CURIOSITY
 - Types and Programming Languages, Benjamin C. Pierce. CURIOSITY
@@ -164,7 +164,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Homogenic · Vespertine, Björk. CORE
 - Officium, Jan Garbarek & Hilliard Ensemble. CORE
 - Saxophone Colossus, Sonny Rollins (1956). CURIOSITY
-- Misa Criolla (Creole Mass), Mercedes Sosa · Ariel Ramírez (1964). CURIOSITY
+- Misa Criolla (Creole Mass), Ariel Ramírez · Los Fronterizos (1964). CURIOSITY
 - Soro · Folon, Salif Keita (1987 · 1995). CORE
 - Ten Love Songs, Susanne Sundfør (2015). CORE
 - Cartola (1974) · Verde que te quero rosa, Cartola. CURIOSITY

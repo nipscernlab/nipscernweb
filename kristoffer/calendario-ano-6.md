@@ -21,11 +21,11 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 ### Lógica (11 textos)
 
 - Philosophical Logic, John P. Burgess. CORE
-- Deontic Logic and Legal Systems, Carlos E. Alchourrón & Eugenio Bulygin. CORE
+- Deontic Logic and Legal Systems, Pablo E. Navarro & Jorge L. Rodríguez (2014). CORE
 - Paradoxes and Contemporary Logic, Andrea Cantini. PAPER, CORE
 - The Concept of Truth in Formalized Languages, Alfred Tarski (1933). PAPER, CORE
 - Outline of a Theory of Truth, Saul Kripke (1975). PAPER, CORE
-- Quantum Logic and Probability Theory, Itamar Pitowsky. CURIOSITY
+- Quantum Probability, Quantum Logic, Itamar Pitowsky (1989). CURIOSITY
 - Homotopy Type Theory, Univalent Foundations Program. CURIOSITY
 - Seven Sketches in Compositionality, Brendan Fong & David I. Spivak. CURIOSITY
 - Word and Object · Philosophy of Logic, W.V.O. Quine. CORE
@@ -50,12 +50,12 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - The Gates, Christo and Jeanne-Claude. CURIOSITY
 - El Anatsui (Metal Tapestries), El Anatsui. CURIOSITY
 - Margarete · Bleierne Bücher · Sternenfall (Margarete · Lead Books · Falling Stars), Anselm Kiefer (1981–99). CORE
-- Birkenau · Atlas · Cage, Gerhard Richter (1988–2014). CORE
+- Birkenau · Atlas · Cage, Gerhard Richter (1962–2014). CORE
 - The Painter, Marlene Dumas (1994). CURIOSITY
 - Fifty Days at Iliam, Cy Twombly (1978). CURIOSITY
 
 **Places & Architecture**
-- Brasília, Oscar Niemeyer. CURIOSITY
+- Brasília, Oscar Niemeyer & Lúcio Costa. CURIOSITY
 - Barcelona Pavilion, Mies van der Rohe. CURIOSITY
 - Therme Vals · Bruder Klaus Feldkapelle, Peter Zumthor (1996 · 2007). CORE
 - Naoshima Art Island, Tadao Ando · Lee Ufan · Chichu Museum (1992–present). CURIOSITY
@@ -68,9 +68,9 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - In C, Terry Riley. CURIOSITY
 - In Rainbows, Radiohead. CURIOSITY
 - Loveless, My Bloody Valentine. CURIOSITY
-- Tabula Rasa · Spiegel im Spiegel · Für Alina (Tabula Rasa · Mirror in the Mirror · For Alina), Arvo Pärt (1977–84). CORE
+- Tabula Rasa · Spiegel im Spiegel · Für Alina (Tabula Rasa · Mirror in the Mirror · For Alina), Arvo Pärt (1976–84). CORE
 - III Symfonia „Symfonia pieśni żałosnych“ (Symphony No. 3 "Symphony of Sorrowful Songs"), Henryk Górecki (1976). CORE
-- Einstein on the Beach, Philip Glass (1976). CURIOSITY
+- Einstein on the Beach, Philip Glass & Robert Wilson (1976). CURIOSITY
 - Shaker Loops · Harmonielehre, John Adams (1978 · 1985). CURIOSITY
 - Atmosphères · Lux Aeterna · Études, György Ligeti (1961 · 1966 · 1985–2001). CURIOSITY
 
@@ -101,7 +101,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Is Logic Empirical? (Anti-exceptionalism), Hilary Putnam · Timothy Williamson. CORE
 - Philosophy of Logics · Deviant Logic, Susan Haack. CORE
 - Vagueness, Timothy Williamson (+ Fine). CORE
-- Free Logic & Plural Logic, Oliver & Smiley · Boolos. BREADTH
+- Free Logic & Plural Logic, Karel Lambert · Oliver & Smiley · Boolos. BREADTH
 - Parts: A Study in Ontology (Mereology), Peter Simons. CURIOSITY
 - Linear Logic, Jean-Yves Girard. BREADTH
 - Conceptual Mathematics (Categorical Logic & Topos), Lawvere & Schanuel. CURIOSITY
@@ -151,14 +151,14 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 **Film**
 - Sånger från andra våningen (Songs from the Second Floor), Roy Andersson (2000). CORE
 - Turist · The Square (Force Majeure · The Square), Ruben Östlund (2014 · 2017). CORE
-- Sátántangó · A Torinói ló (Sátántangó · The Turin Horse), Béla Tarr (1994 · 2011). CURIOSITY
+- Sátántangó · A torinói ló (Sátántangó · The Turin Horse), Béla Tarr (1994 · 2011). CURIOSITY
 - Rosetta · L'Enfant (Rosetta · The Child), Jean-Pierre & Luc Dardenne (1999 · 2005). CURIOSITY
 - Caché · Amour (Hidden · Love), Michael Haneke (2005 · 2012). CURIOSITY
 
 **Series**
 - Chernobyl, Craig Mazin (2019). CORE
 - Heimat: Eine deutsche Chronik (Heimat: A German Chronicle), Edgar Reitz (1984). CURIOSITY
-- The Leftovers, Damon Lindelof (2014–17). CURIOSITY
+- The Leftovers, Damon Lindelof & Tom Perrotta (2014–17). CURIOSITY
 - Better Call Saul, Vince Gilligan & Peter Gould (2015–22). CURIOSITY
 
 ---

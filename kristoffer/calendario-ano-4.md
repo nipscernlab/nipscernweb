@@ -25,7 +25,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - The Uses of Argument, Stephen Toulmin. CORE
 - Über die Vollständigkeit des Logikkalküls, Kurt Gödel (1929). PAPER, CURIOSITY
 - Untersuchungen über das logische Schließen, Gerhard Gentzen (1935). PAPER, CURIOSITY
-- Grundbegriffe der Wahrscheinlichkeitsrechnung, Andrey Kolmogorov (1933). PAPER, BREADTH
+- Grundbegriffe der Wahrscheinlichkeitsrechnung, Andrey Kolmogorov (1933). BREADTH
 - Entailment: The Logic of Relevance and Necessity, Alan Anderson & Nuel Belnap. CORE
 - Model Theory: An Introduction, David Marker. CURIOSITY
 
@@ -125,8 +125,8 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 - The Logic of Provability, George Boolos. CORE
 - Foundations without Foundationalism (Second-Order Logic), Stewart Shapiro. BREADTH
-- Many-Valued Logics (Łukasiewicz & Kleene systems), Łukasiewicz · Kleene. BREADTH
-- Mathematical Fuzzy Logic, Petr Hájek. CURIOSITY
+- Many-Valued Logics, Grzegorz Malinowski (1993). BREADTH
+- Metamathematics of Fuzzy Logic, Petr Hájek (1998). CURIOSITY
 - Computability and Logic, Boolos, Burgess & Jeffrey. BREADTH
 - Computing Machinery and Intelligence, Alan Turing (1950). PAPER, CORE
 - A Logical Calculus of the Ideas Immanent in Nervous Activity, Warren McCulloch & Walter Pitts (1943). PAPER, BREADTH
