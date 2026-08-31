@@ -64,6 +64,22 @@
       color: var(--text-primary);
       font-weight: 500;
     }
+    /* Onde o programa de assinatura esta hoje. A politica abaixo e normativa,
+       descreve o processo que rege uma versao assinada, e continua no presente;
+       este bloco diz o que ja vale e o que ainda esta em andamento, para que
+       ninguem baixe o instalador esperando o que ele ainda nao traz. */
+    .legal-status {
+      background: rgba(251,191,36,0.06);
+      border: 1px solid rgba(251,191,36,0.22);
+      border-radius: var(--r-lg);
+      padding: var(--sp-5) var(--sp-6);
+      margin-bottom: var(--sp-8);
+    }
+    .legal-status p {
+      margin-bottom: 0;
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
     /* O comando de verificação precisa quebrar em telas estreitas sem
        empurrar a página para os lados. */
     .legal-body pre {
@@ -124,6 +140,10 @@
       <div class="privacy-highlight">
         <i class="ph ph-shield-check" aria-hidden="true"></i>
         <p data-i18n="legal.signing.highlight">Every released installer is built by a public workflow from a public commit, and no person can upload an installer built on their own machine.</p>
+      </div>
+
+      <div class="legal-status">
+        <p data-i18n="legal.signing.status">Status, August 2026. SAPHO was approved into the SignPath Foundation programme on 6 August 2026, and the organisation SAPHO [OSS] exists on the platform. The chain described below is built and has been tested end to end, signing run included. Two steps are still open before it governs published releases: the licence is under review by SignPath&#39;s legal team, and hardware-backed signing, with the key held in a security module on their premises, is being provisioned. Until that is done a published installer may still arrive unsigned, and the SHA-512 released with it is the check that applies.</p>
       </div>
 
       <h2 data-i18n="legal.signing.s1_title">1. What this covers</h2>
