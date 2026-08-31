@@ -27,7 +27,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Untersuchungen über das logische Schließen, Gerhard Gentzen (1935). PAPER, CURIOSITY
 - Grundbegriffe der Wahrscheinlichkeitsrechnung, Andrey Kolmogorov (1933). PAPER, BREADTH
 - Entailment: The Logic of Relevance and Necessity, Alan Anderson & Nuel Belnap. CORE
-- Model Theory: An Introduction, David Marker. BREADTH
+- Model Theory: An Introduction, David Marker. CURIOSITY
 
 ### Cultura (68 itens)
 
