@@ -134,18 +134,18 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - The Development of Logic, William & Martha Kneale. BREADTH
 - Later Mohist Logic, Ethics and Science, A.C. Graham. BREADTH
 - Konungs skuggsjá (The King's Mirror), Anonymous (Old Norwegian, 13th c.). BREADTH
-- Summa Logicae (selections), William of Ockham (c. 1323). CURIOSITY
+- Summa Logicae I (Ockham's Theory of Terms), William of Ockham (c. 1323), tr. Michael Loux. CURIOSITY
 
 ### Cultura (68 itens)
 
 **Books**
-- महाभारतम् (Mahābhārata, selections), Vyāsa. BREADTH
+- महाभारतम् (The Mahābhārata), Vyāsa, tr. John D. Smith. BREADTH
 - Sunjata (Sundiata: An Epic of Old Mali), Djeli Mamoudou Kouyaté. BREADTH
 - Mwindo Epic, Nyanga people (Congo). BREADTH
 - Avesta, Zarathuštra (Zoroastrian). BREADTH
 - Pyramid Texts, Ancient Egypt. BREADTH
 - 易經 (Yìjīng / I Ching), Anonymous (China). BREADTH
-- תנ״ך (Tanakh, selections), Hebrew Bible. CORE
+- בראשית · איוב · קהלת (Genesis · Job · Ecclesiastes), Hebrew Bible. CORE
 - Escher on Escher: Exploring the Infinite, M.C. Escher. CORE
 - Sinuhe the Egyptian (Story of Sinuhe), Anonymous (Egypt, ~1875 BCE). BREADTH
 - Aeneis (Aeneid), Virgil. BREADTH
@@ -156,11 +156,11 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Βίοι Παράλληλοι (Parallel Lives), Plutarch. BREADTH
 - Στοιχεῖα (Elements), Euclid. CORE
 - Εὐαγγέλιον κατὰ Μᾶρκον · κατὰ Ἰωάννην (Gospel of Mark · Gospel of John), Anonymous (Greek, 1st c.). BREADTH
-- القرآن (Qurʾān, selections), Arabic, 7th c.. BREADTH
-- उपनिषद् (Upaniṣads, selections), Sanskrit, 8th to 3rd c. BCE. CURIOSITY
+- القرآن (The Qurʾan), Arabic, 7th c., tr. M.A.S. Abdel Haleem. BREADTH
+- उपनिषद् (The Early Upaniṣads), Sanskrit, 8th to 3rd c. BCE, tr. Patrick Olivelle. CURIOSITY
 - धम्मपद (Dhammapada), Pali, 3rd c. BCE. BREADTH
-- 莊子 (Zhuangzi, Inner Chapters), Zhuang Zhou (China, 4th c. BCE). BREADTH
-- ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ (Guru Granth Sahib, selections), Sikh Gurus and others (Punjab, 1604). CURIOSITY
+- 莊子 (Zhuangzi: The Complete Writings), Zhuang Zhou (China, 4th c. BCE), tr. Brook Ziporyn. BREADTH
+- ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ (Hymns of the Sikh Gurus), Sikh Gurus and others (Punjab, 1604), tr. Nikky-Guninder Kaur Singh. CURIOSITY
 - Ἠθικὰ Νικομάχεια · Περὶ ποιητικῆς (Nicomachean Ethics · Poetics), Aristotle. BREADTH
 
 **Poetry**
@@ -249,3 +249,8 @@ tomando mais tempo que um CORE.
 2. Em semana ruim, 15 minutos valem mais que zero.
 3. Cultura de profundidade no fim de semana; o resto é ambiental, durante a semana.
 4. A data não move. A lista move.
+5. Um CORE de Lógica aberto por vez. O próximo só começa quando o caderno do
+   anterior fecha. Texto curto não quer dizer texto rápido, e três labirintos
+   abertos ao mesmo tempo não fecham nenhum.
+6. A lista move, mas não empilha. O que não fechou passa para o semestre
+   seguinte uma vez. Se não fechar de novo, vira CURIOSITY ou sai do plano.

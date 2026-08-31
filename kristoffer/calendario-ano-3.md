@@ -18,7 +18,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 28/02/2029
 
-### Lógica (7 textos)
+### Lógica (8 textos)
 
 - मूलमध्यमककारिका (Mūlamadhyamakakārikā), Nāgārjuna. CORE
 - Die Grundlagen der Arithmetik (The Foundations of Arithmetic), Gottlob Frege. BREADTH
@@ -27,6 +27,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Tractatus Logico-Philosophicus, Ludwig Wittgenstein. CORE
 - Philosophische Untersuchungen (Philosophical Investigations), Ludwig Wittgenstein. CORE
 - How to Do Things with Words, J.L. Austin. CORE
+- Über Sinn und Bedeutung, Gottlob Frege (1892). PAPER, CORE
 
 ### Cultura (49 itens)
 
@@ -99,14 +100,16 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2029
 
-### Lógica (6 textos)
+### Lógica (8 textos)
 
-- Über Sinn und Bedeutung, Gottlob Frege (1892). PAPER, CORE
 - Collected Papers (Relations, Abduction & Existential Graphs), Charles Sanders Peirce. CORE
 - Wissenschaftslehre (Theory of Science), Bernard Bolzano (1837). CORE
 - Naive Set Theory, Paul Halmos. BREADTH
 - On Denoting, Bertrand Russell (1905). PAPER, CORE
 - Introduction to Mathematical Philosophy, Bertrand Russell (1919). BREADTH
+- The Annotated Turing, Charles Petzold. CURIOSITY
+- Cybernetics, Norbert Wiener. CURIOSITY
+- A Mathematical Theory of Communication, Claude Shannon (1948). PAPER, CURIOSITY
 
 ### Cultura (44 itens)
 
@@ -116,13 +119,13 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Faust (Part I), Johann Wolfgang von Goethe. CORE
 - Pride and Prejudice, Jane Austen. BREADTH
 - Pensées (Thoughts), Blaise Pascal. BREADTH
-- Leviathan (Parts I and II), Thomas Hobbes. BREADTH
+- Leviathan, Thomas Hobbes. BREADTH
 - Second Treatise of Government, John Locke. BREADTH
 - Du contrat social (The Social Contract), Jean-Jacques Rousseau. BREADTH
 - Os Lusíadas (The Lusiads), Luís de Camões. BREADTH
 
 **Poetry**
-- 俳句 (Haiku, Selected), Bashō · Issa · Buson. BREADTH
+- 俳句 (The Essential Haiku), Bashō · Buson · Issa, ed. Robert Hass. BREADTH
 - Sonnets from the Portuguese, Elizabeth Barrett Browning. BREADTH
 - Primero Sueño (First Dream), Sor Juana Inés de la Cruz. BREADTH
 
@@ -186,3 +189,8 @@ A long essay reading Michelangelo's Sistine Chapel · Da Vinci's Last Supper · 
 2. Em semana ruim, 15 minutos valem mais que zero.
 3. Cultura de profundidade no fim de semana; o resto é ambiental, durante a semana.
 4. A data não move. A lista move.
+5. Um CORE de Lógica aberto por vez. O próximo só começa quando o caderno do
+   anterior fecha. Texto curto não quer dizer texto rápido, e três labirintos
+   abertos ao mesmo tempo não fecham nenhum.
+6. A lista move, mas não empilha. O que não fechou passa para o semestre
+   seguinte uma vez. Se não fechar de novo, vira CURIOSITY ou sai do plano.

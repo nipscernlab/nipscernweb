@@ -20,7 +20,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ### Lógica (6 textos)
 
-- How to Prove It: A Structured Approach, Daniel J. Velleman. CURIOSITY
+- How to Prove It: A Structured Approach, Daniel J. Velleman. BREADTH
 - Modal Logic for Philosophers, James Garson. CORE
 - Naming and Necessity, Saul Kripke. CORE
 - An Essay in Modal Logic, Georg Henrik von Wright. CORE
@@ -93,7 +93,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Meditationes de Prima Philosophia (Meditations), René Descartes (1641). CORE
 - An Enquiry Concerning Human Understanding, David Hume (1748). CORE
 - Past, Present and Future, Arthur Prior (1967). CORE
-- Monadologie · Characteristica universalis (Monadology · selected texts), Gottfried Wilhelm Leibniz. CURIOSITY
+- Philosophical Essays, Gottfried Wilhelm Leibniz, ed. Ariew & Garber. CURIOSITY
 - Kritik der reinen Vernunft (Critique of Pure Reason), Immanuel Kant (1781). CORE
 
 ### Cultura (40 itens)
@@ -113,7 +113,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Il Canzoniere (The Songbook), Francesco Petrarca. BREADTH
 - Il Decameron (The Decameron), Giovanni Boccaccio. BREADTH
 - The Canterbury Tales, Geoffrey Chaucer. BREADTH
-- Summa Theologiae (selected questions), Thomas Aquinas. CURIOSITY
+- Summa Theologiae (A Concise Translation), Thomas Aquinas, ed. Timothy McDermott. CURIOSITY
 - 平家物語 (Heike monogatari, The Tale of the Heike), Anonymous (Japan, 13th c.). BREADTH
 
 **Poetry**
@@ -168,3 +168,8 @@ A long-form essay reading Hagia Sophia · Chartres · Lalibela · Forbidden City
 2. Em semana ruim, 15 minutos valem mais que zero.
 3. Cultura de profundidade no fim de semana; o resto é ambiental, durante a semana.
 4. A data não move. A lista move.
+5. Um CORE de Lógica aberto por vez. O próximo só começa quando o caderno do
+   anterior fecha. Texto curto não quer dizer texto rápido, e três labirintos
+   abertos ao mesmo tempo não fecham nenhum.
+6. A lista move, mas não empilha. O que não fechou passa para o semestre
+   seguinte uma vez. Se não fechar de novo, vira CURIOSITY ou sai do plano.

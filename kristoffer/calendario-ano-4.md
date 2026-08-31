@@ -18,23 +18,21 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 28/02/2030
 
-### Lógica (10 textos)
+### Lógica (8 textos)
 
 - Sistemas Formais Inconsistentes (Inconsistent Formal Systems), Newton da Costa (1963). CORE
 - In Contradiction, Graham Priest. CORE
-- The Annotated Turing, Charles Petzold. CURIOSITY
-- A Mathematical Theory of Communication, Claude Shannon (1948). PAPER, CURIOSITY
-- Cybernetics, Norbert Wiener. CURIOSITY
 - The Uses of Argument, Stephen Toulmin. CORE
 - Über die Vollständigkeit des Logikkalküls, Kurt Gödel (1929). PAPER, CURIOSITY
 - Untersuchungen über das logische Schließen, Gerhard Gentzen (1935). PAPER, CURIOSITY
 - Grundbegriffe der Wahrscheinlichkeitsrechnung, Andrey Kolmogorov (1933). PAPER, BREADTH
 - Entailment: The Logic of Relevance and Necessity, Alan Anderson & Nuel Belnap. CORE
+- Model Theory: An Introduction, David Marker. BREADTH
 
 ### Cultura (68 itens)
 
 **Books**
-- Sein und Zeit (Part I), Martin Heidegger. CORE
+- Sein und Zeit (Being and Time), Martin Heidegger. CORE
 - Le Mythe de Sisyphe (The Myth of Sisyphus), Albert Camus. CORE
 - Zur Genealogie der Moral (On the Genealogy of Morals), Friedrich Nietzsche. CORE
 - Frygt og Bæven (Fear and Trembling), Søren Kierkegaard. CORE
@@ -123,14 +121,13 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2030
 
-### Lógica (9 textos)
+### Lógica (8 textos)
 
-- Model Theory: An Introduction, David Marker. BREADTH
 - The Logic of Provability, George Boolos. CORE
 - Foundations without Foundationalism (Second-Order Logic), Stewart Shapiro. BREADTH
 - Many-Valued Logics (Łukasiewicz & Kleene systems), Łukasiewicz · Kleene. BREADTH
 - Mathematical Fuzzy Logic, Petr Hájek. CURIOSITY
-- Computability and Logic, Boolos, Burgess & Jeffrey. CURIOSITY
+- Computability and Logic, Boolos, Burgess & Jeffrey. BREADTH
 - Computing Machinery and Intelligence, Alan Turing (1950). PAPER, CORE
 - A Logical Calculus of the Ideas Immanent in Nervous Activity, Warren McCulloch & Walter Pitts (1943). PAPER, BREADTH
 - Minds, Brains, and Programs, John Searle (1980). PAPER, CORE
@@ -139,7 +136,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 **Books**
 - Markens grøde (Growth of the Soil), Knut Hamsun. CORE
-- Min Kamp (vol. 1), Karl Ove Knausgård. CORE
+- Min Kamp: Første bok (My Struggle: Book One), Karl Ove Knausgård. CORE
 - Things Fall Apart, Chinua Achebe. BREADTH
 - Wide Sargasso Sea, Jean Rhys. BREADTH
 - The Sound and the Fury · Absalom, Absalom!, William Faulkner (1929 · 1936). BREADTH
@@ -159,7 +156,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 **Poetry**
 - Реквием (Requiem), Анна Ахматова (Anna Akhmatova). CORE
 - Todesfuge (Death Fugue), Paul Celan. CORE
-- Марина Цветаева — стихи (Selected Poems), Marina Tsvetaeva. BREADTH
+- Марина Цветаева — стихи (Selected Poems), Marina Tsvetaeva, tr. Elaine Feinstein. BREADTH
 - The Complete Poems, Emily Dickinson. BREADTH
 
 **Art**
@@ -237,3 +234,8 @@ A long essay reading Kafka's Process · Picasso's Guernica · Shostakovich's Sev
 2. Em semana ruim, 15 minutos valem mais que zero.
 3. Cultura de profundidade no fim de semana; o resto é ambiental, durante a semana.
 4. A data não move. A lista move.
+5. Um CORE de Lógica aberto por vez. O próximo só começa quando o caderno do
+   anterior fecha. Texto curto não quer dizer texto rápido, e três labirintos
+   abertos ao mesmo tempo não fecham nenhum.
+6. A lista move, mas não empilha. O que não fechou passa para o semestre
+   seguinte uma vez. Se não fechar de novo, vira CURIOSITY ou sai do plano.

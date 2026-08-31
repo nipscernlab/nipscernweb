@@ -18,7 +18,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 28/02/2031
 
-### Lógica (9 textos)
+### Lógica (10 textos)
 
 - Norm and Action, Georg Henrik von Wright (1963). CORE
 - Deontic Logic, Georg Henrik von Wright (1951). PAPER, CORE
@@ -29,6 +29,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - The Book of Why, Judea Pearl. BREADTH
 - Informal Logic, Douglas Walton. CORE
 - Om det tragiske (On the Tragic), Peter Wessel Zapffe. CORE
+- On the Logic of Theory Change (AGM), Alchourrón, Gärdenfors & Makinson (1985). PAPER, CORE
 
 ### Cultura (55 itens)
 
@@ -50,7 +51,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 **Poetry**
 - Veinte poemas de amor y una canción desesperada (Twenty Love Poems and a Song of Despair), Pablo Neruda. BREADTH
-- Poemas escolhidos (Selected Poems), Fernando Pessoa. BREADTH
+- Poemas escolhidos (Selected Poems), Fernando Pessoa, ed. Richard Zenith. BREADTH
 - Ariel, Sylvia Plath. BREADTH
 
 **Art**
@@ -109,9 +110,8 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2031
 
-### Lógica (9 textos)
+### Lógica (10 textos)
 
-- On the Logic of Theory Change (AGM), Alchourrón, Gärdenfors & Makinson (1985). PAPER, CORE
 - Counterfactuals, David Lewis (1973). CORE
 - A Theory of Conditionals, Robert Stalnaker (1968). PAPER, CORE
 - The Logic of Decision, Richard Jeffrey. CORE
@@ -120,6 +120,8 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Logical Foundations of Probability, Rudolf Carnap (1950). BREADTH
 - Truth and Probability, Frank Ramsey · Bruno de Finetti. PAPER, BREADTH
 - Logik der Forschung (The Logic of Scientific Discovery), Karl Popper (1934). BREADTH
+- Basic Proof Theory, A.S. Troelstra & H. Schwichtenberg. CURIOSITY
+- Types and Programming Languages, Benjamin C. Pierce. CURIOSITY
 
 ### Cultura (50 itens)
 
@@ -209,3 +211,8 @@ A long-form essay reading García Márquez · Mo Yan · Soyinka · Morrison as f
 2. Em semana ruim, 15 minutos valem mais que zero.
 3. Cultura de profundidade no fim de semana; o resto é ambiental, durante a semana.
 4. A data não move. A lista move.
+5. Um CORE de Lógica aberto por vez. O próximo só começa quando o caderno do
+   anterior fecha. Texto curto não quer dizer texto rápido, e três labirintos
+   abertos ao mesmo tempo não fecham nenhum.
+6. A lista move, mas não empilha. O que não fechou passa para o semestre
+   seguinte uma vez. Se não fechar de novo, vira CURIOSITY ou sai do plano.

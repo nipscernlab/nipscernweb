@@ -18,10 +18,8 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 28/02/2032
 
-### Lógica (12 textos)
+### Lógica (11 textos)
 
-- Basic Proof Theory, A.S. Troelstra & H. Schwichtenberg. CURIOSITY
-- Types and Programming Languages, Benjamin C. Pierce. CURIOSITY
 - Philosophical Logic, John P. Burgess. CORE
 - Deontic Logic and Legal Systems, Carlos E. Alchourrón & Eugenio Bulygin. CORE
 - Paradoxes and Contemporary Logic, Andrea Cantini. PAPER, CORE
@@ -32,6 +30,7 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 - Seven Sketches in Compositionality, Brendan Fong & David I. Spivak. CURIOSITY
 - Word and Object · Philosophy of Logic, W.V.O. Quine. CORE
 - The Logical Basis of Metaphysics, Michael Dummett. CORE
+- Logical Pluralism, JC Beall & Greg Restall. CORE
 
 ### Cultura (43 itens)
 
@@ -96,9 +95,8 @@ BREADTH: inteiro, sem se demorar. CURIOSITY: uma passada, para o mapa.
 
 ## Até 31/08/2032
 
-### Lógica (11 textos)
+### Lógica (10 textos)
 
-- Logical Pluralism, JC Beall & Greg Restall. CORE
 - On the Concept of Logical Consequence (+ Etchemendy), Alfred Tarski. PAPER, CORE
 - Is Logic Empirical? (Anti-exceptionalism), Hilary Putnam · Timothy Williamson. CORE
 - Philosophy of Logics · Deviant Logic, Susan Haack. CORE
@@ -187,3 +185,8 @@ With personal annotations on each.
 2. Em semana ruim, 15 minutos valem mais que zero.
 3. Cultura de profundidade no fim de semana; o resto é ambiental, durante a semana.
 4. A data não move. A lista move.
+5. Um CORE de Lógica aberto por vez. O próximo só começa quando o caderno do
+   anterior fecha. Texto curto não quer dizer texto rápido, e três labirintos
+   abertos ao mesmo tempo não fecham nenhum.
+6. A lista move, mas não empilha. O que não fechou passa para o semestre
+   seguinte uma vez. Se não fechar de novo, vira CURIOSITY ou sai do plano.
