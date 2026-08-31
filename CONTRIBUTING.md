@@ -23,7 +23,11 @@ Ao contribuir, você concorda com a seção 4 da [Licença NIPS-CERN](LICENSE.md
    dimensões explícitas quando abaixo da dobra.
 4. **Não toque** em `workers/` sem combinar antes: esses arquivos espelham
    Workers ativos no Cloudflare.
-5. Issues e PRs podem ser escritos em português ou inglês.
+5. **O `main` só recebe pull request.** A regra está ativa no GitHub e vale
+   para todo mundo, membros inclusive. Quem tem permissão de administrador
+   consegue empurrar direto, e o servidor registra o desvio; não faça isso.
+   Trabalhe num branch e abra o PR, mesmo que a revisão seja sua.
+6. Issues e PRs podem ser escritos em português ou inglês.
 
 ## Estamos contratando
 
@@ -52,7 +56,11 @@ By contributing, you agree to section 4 of the [NIPS-CERN License](LICENSE.md).
    explicit dimensions when below the fold.
 4. **Do not touch** `workers/` without prior discussion: those files mirror
    live Cloudflare Workers.
-5. Issues and PRs may be written in Portuguese or English.
+5. **`main` only accepts pull requests.** The rule is active on GitHub and
+   applies to everyone, members included. Administrators can push straight to
+   it and the server logs the bypass; do not. Work on a branch and open the
+   PR, even when you are your own reviewer.
+6. Issues and PRs may be written in Portuguese or English.
 
 ## We are hiring
 
