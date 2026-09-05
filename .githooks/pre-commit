@@ -121,7 +121,7 @@ PATHS=$(printf '%s\n' "$ASSETS" | sed 's#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
 # leitor veria não seria "nada": a regra base é uma máscara sobre currentColor,
 # então um --ph que não existe vira um QUADRADO SÓLIDO no lugar do ícone.
 changed=$(git diff --cached --name-only | grep -E "^($PATHS)$" || true)
-html_changed=$(git diff --cached --name-only | grep -E '\.html$' | grep -v '^kristoffer/' || true)
+html_changed=$(git diff --cached --name-only | grep -E '\.html$' || true)
 [ -z "$changed" ] && [ -z "$html_changed" ] && exit 0
 
 # ------------------------------------------------------------------
@@ -189,11 +189,8 @@ ver=$( printf '%s\n' "$ASSETS" | while read -r a; do
 # reference their assets, and the modules themselves because one module
 # importing another is the same cached URL by another name.
 #
-# kristoffer/ is excluded. It is a personal project that shares the domain and
-# nothing else, and it happens to load analytics.js, which was enough to pull it
-# into a commit about the laboratory site. That page is not ours to version.
 touched=""
-for f in $(git ls-files '*.html' 'assets/js/*.js' | grep -v '^kristoffer/'); do
+for f in $(git ls-files '*.html' 'assets/js/*.js'); do
   if grep -qE "($NAMES)\?v=" "$f"; then
     sed -i -E "s#(($NAMES)\?v=)[A-Za-z0-9._-]+#\1${ver}#g" "$f"
     git add "$f"

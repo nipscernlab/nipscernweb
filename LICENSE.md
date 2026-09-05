@@ -253,10 +253,6 @@ revistas, as tipografias sob licença OFL, os ícones e bibliotecas sob licença
 próprias, e as filmagens de terceiros usadas nos cards de projeto. Cada um
 permanece sob seus próprios termos, listados em **nipscern.com/credits**.
 
-**A.3** O diretório `kristoffer/` é projeto pessoal, sem relação com o
-Laboratório, apenas hospedado no mesmo domínio. Não está coberto por esta
-licença.
-
 ---
 
 ## Annex A: nipscernweb
@@ -272,7 +268,3 @@ CERN media, the publications, which belong to their authors and journals, the
 typefaces under the OFL, the icons and libraries under their own licences, and
 the third-party footage used on the project cards. Each remains under its own
 terms, listed at **nipscern.com/credits**.
-
-**A.3** The `kristoffer/` directory is a personal project, unrelated to the
-Laboratory and merely hosted on the same domain. It is not covered by this
-licence.
