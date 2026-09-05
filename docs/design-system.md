@@ -286,8 +286,10 @@ have drifted.
 - **2 MB per file**, enforced in CI. Heavier media goes to the
   `nipscern-assets` repository and is served from `cdn.nipscern.com`, with a
   smaller fallback committed here so a local checkout still works.
-- **`kristoffer/` is not part of this site.** It shares the domain and nothing
-  else. It is excluded from the cache scheme. Do not touch it.
+- **The Architect is not in this repository.** It lives at
+  `kristoffer.nipscern.com`, served from `Chrysthofer/the-architect`, and
+  `/kristoffer` on this site is a Worker route on the zone, not a folder.
+  Nothing here versions, caches or links it.
 - **Critical CSS.** `index.html` inlines a copy of the hero rules and the
   view-transition opt-in. Change both, or the home page paints one thing and
   settles into another.

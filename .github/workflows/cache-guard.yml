@@ -57,10 +57,8 @@ jobs:
 
           NAMES=$(echo "$ASSETS" | sed 's#.*/##; s#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
 
-          # kristoffer/ fica de fora, igual no hook: projeto pessoal que so
-          # divide o dominio, e nao e versionado por este esquema.
           bad=""
-          for f in $(git ls-files '*.html' 'assets/js/*.js' | grep -v '^kristoffer/'); do
+          for f in $(git ls-files '*.html' 'assets/js/*.js'); do
             for t in $(grep -oE "($NAMES)\?v=[A-Za-z0-9._-]+" "$f" \
                         | sed -E 's/.*\?v=//' | sort -u); do
               [ "$t" != "$ver" ] && bad="${bad}\n  ${f}: ?v=${t}"

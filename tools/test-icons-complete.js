@@ -37,7 +37,7 @@ const ROOT = path.join(__dirname, '..');
 (async () => {
   const paginas = cp.execSync('git ls-files "*.html"', { cwd: ROOT, encoding: 'utf8' })
     .split('\n')
-    .filter((f) => f && !f.startsWith('kristoffer/'))
+    .filter(Boolean)
     .filter((f) => /assets\/css\/icons/.test(fs.readFileSync(path.join(ROOT, f), 'utf8')));
 
   const browser = await puppeteer.connect({ browserURL: BROWSER });

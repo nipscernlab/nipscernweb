@@ -84,7 +84,7 @@ const nomeDoArquivo = (html) =>
      subconjunto para elas produzia catorze arquivos que ninguém pede. */
   const paginas = cp.execSync('git ls-files "*.html"', { cwd: ROOT, encoding: 'utf8' })
     .split('\n')
-    .filter((f) => f && !f.startsWith('kristoffer/'))
+    .filter(Boolean)
     .filter((f) => /assets\/css\/icons/.test(ler(f)));
 
   fs.mkdirSync(path.join(ROOT, DESTINO), { recursive: true });

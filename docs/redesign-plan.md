@@ -21,9 +21,9 @@ visual de template e passar a usar o material autoral que o grupo já produz.
 - Mídia pesada vai para o repositório de assets (cdn.nipscern.com).
 - Escolha da arquitetura delegada a quem implementa.
 - Criar um blog (seção 9).
-- `kristoffer/` não se toca. É projeto pessoal do Chrysthofer, sem relação com o
-  laboratório, apenas hospedado no mesmo domínio. Fora do escopo da reforma e de
-  qualquer limpeza.
+- The Architect não mora mais aqui. Desde 05/09/2026 vive em
+  `kristoffer.nipscern.com`, servido do repositório `Chrysthofer/the-architect`;
+  `/kristoffer` no site é uma rota de Worker na zona, não uma pasta.
 - O céu estrelado da home é marca e permanece. Variações podem ser testadas; os
   traços de partícula entram como camada sobre ele, não no lugar dele.
 - Tipografia: base padronizada para o site, com liberdade de fontes próprias nas
@@ -134,7 +134,7 @@ gratuitos, animação vetorial autoral sai de SVG escrito à mão.
 redundante se o GSAP entrar. Carregar as duas seria desperdício.
 
 **Lenis (smooth scroll).** Briga com a rolagem nativa e prejudica
-acessibilidade. Já está no `kristoffer/` e não deve migrar para o site.
+acessibilidade. Não entra.
 
 ---
 
@@ -276,10 +276,10 @@ Elemento: uma partícula perdida. Pequeno, com humor, sem custo.
   concorrendo entre si.
 - Remover a faixa de recrutamento do hero após 28/08/2026 (marcada no código
   como `RECRUIT-BANNER`).
-- ~~Decidir o destino de `kristoffer/`~~ Decidido em 23/08/2026: continua
-  público e desconectado do site, com design próprio. Ganhou descrição e Open
-  Graph, e as três bibliotecas externas passaram a ser servidas de
-  `kristoffer/vendor/`, então não depende mais de CDN.
+- ~~Decidir o destino de `kristoffer/`~~ Decidido em 05/09/2026: saiu do
+  repositório e do histórico. Vive em `kristoffer.nipscern.com`, com
+  repositório próprio (`Chrysthofer/the-architect`) e login; `/kristoffer`
+  no site é uma rota de Worker que leva para lá.
 - Substituir o `onmouseover` inline do footer.
 
 ---
@@ -397,7 +397,8 @@ Cada fase termina com a página no ar e revisada. Sem fase pela metade.
 
 - Escolha tipográfica final (seção 4).
 - Escopo e formato do blog (seção 9).
-- ~~Destino de `kristoffer/` (seção 8).~~ Decidido: fica como está, fora do site.
+- ~~Destino de `kristoffer/` (seção 8).~~ Decidido: saiu do repositório, vive em
+  `kristoffer.nipscern.com`.
 - O céu estrelado da home é substituído ou coexiste com o event display?
 - As quatro traduções continuam obrigatórias em todas as páginas novas?
 
