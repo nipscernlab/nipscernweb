@@ -274,8 +274,10 @@ Elemento: uma partícula perdida. Pequeno, com humor, sem custo.
 - Remover o importmap morto do three.js na home.
 - Limpar as metatags duplicadas da home: 4 `og:title` e 5 `description`
   concorrendo entre si.
-- Remover a faixa de recrutamento do hero após 28/08/2026 (marcada no código
-  como `RECRUIT-BANNER`).
+- ~~Remover a faixa de recrutamento após 28/08/2026 (marcada no código como
+  `RECRUIT-BANNER`).~~ Feito em 05/09/2026: saiu a faixa, a classe
+  `has-top-banner` e as quatro traduções do prazo. O mecanismo da faixa fica
+  em `main.css` e `main.js`, dormente, para o próximo anúncio.
 - ~~Decidir o destino de `kristoffer/`~~ Decidido em 05/09/2026: saiu do
   repositório e do histórico. Vive em `kristoffer.nipscern.com`, com
   repositório próprio (`Chrysthofer/the-architect`) e login; `/kristoffer`

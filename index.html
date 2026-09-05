@@ -82,7 +82,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/index.css?v=3b1c931500">
+  <link rel="stylesheet" href="assets/css/icons/index.css?v=2d59185653">
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -162,16 +162,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
    the two diverging is how the sky ended up generating for the wrong size. */
 #hero-stars{position:absolute;left:0;right:0;top:-22%;width:100%;height:144%;pointer-events:none;will-change:transform;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 48%,rgba(0,0,0,.62) 64%,rgba(0,0,0,.22) 74%,transparent 82%);mask-image:linear-gradient(180deg,#000 0%,#000 48%,rgba(0,0,0,.62) 64%,rgba(0,0,0,.22) 74%,transparent 82%)}
 .hero-content{position:relative;z-index:1;width:100%;max-width:var(--container-max);margin:0 auto;padding:80px var(--container-pad);text-align:center}
-/* RECRUIT-BANNER: faixa temporaria de IC. Remover junto com o bloco no HTML. */
-.hero-recruit{display:inline-flex;align-items:center;gap:9px;margin-bottom:28px;padding:9px 18px;border-radius:999px;border:1px solid rgba(91,156,246,.38);background:rgba(91,156,246,.10);color:var(--text-secondary);font-size:var(--text-sm);line-height:1.35;text-decoration:none;transition:background .25s ease,border-color .25s ease,transform .25s ease}
-.hero-recruit:hover{background:rgba(91,156,246,.19);border-color:rgba(91,156,246,.62);transform:translateY(-1px)}
-.hero-recruit strong{color:#79b1ff;font-weight:600;white-space:nowrap}
-.hero-recruit i{font-size:15px;color:#79b1ff;flex-shrink:0}
-@media(max-width:640px){.hero-recruit{flex-direction:column;gap:6px;margin-bottom:22px;padding:14px 20px;border-radius:16px;font-size:13px;text-align:center;max-width:min(92vw,340px)}
-.hero-recruit>span{display:block}
-.hero-recruit strong{display:inline-flex;align-items:center;gap:6px;margin-top:2px}
-.hero-recruit .ph-arrow-right{display:none}
-.hero-recruit strong::after{content:'\2192';font-weight:400}}
 @keyframes foil-shimmer{0%{background-position:-100% center}100%{background-position:100% center}}
 @keyframes foil-halo{0%,100%{filter:drop-shadow(0 0 18px rgba(120,177,255,.16)) drop-shadow(0 0 3px rgba(255,255,255,.10))}50%{filter:drop-shadow(0 0 30px rgba(150,197,255,.26)) drop-shadow(0 0 5px rgba(255,255,255,.16))}}
 @keyframes foil-halo-atom{0%,100%{filter:drop-shadow(0 0 10px rgba(120,177,255,.35)) drop-shadow(0 0 4px rgba(255,255,255,.22))}50%{filter:drop-shadow(0 0 20px rgba(150,197,255,.50)) drop-shadow(0 0 7px rgba(255,255,255,.34))}}
@@ -196,8 +186,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.min.css?v=3b1c931500" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=3b1c931500"></noscript>
+  <link rel="preload" href="assets/css/main.min.css?v=2d59185653" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=2d59185653"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -244,24 +234,11 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   }
   </script>
 </head>
-<body class="has-top-banner">
+<body>
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WV6QJWVX" title="Google Tag" height="0" width="0" style="display: none; visibility: hidden;"></iframe></noscript>
 
   <!-- Skip to content -->
   <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
-
-  <!-- RECRUIT-BANNER: temporary undergraduate recruitment strip. Remove this
-       element and the body class after 2026-08-28.
-       It used to sit above the wordmark inside the hero, where it pushed the
-       title down and competed with it for the first look. As a strip above the
-       navigation it is read before anything else, costs the hero nothing, and
-       comes out on the deadline without leaving a hole in the composition. -->
-  <a class="top-banner" href="https://docs.google.com/forms/d/e/1FAIpQLSeqSGVJgTFfXdOrdoWYK6uH0Jvvujd9RmhW5ANzOjLQfwk4DQ/viewform" target="_blank" rel="noopener">
-    <i class="ph ph-megaphone" aria-hidden="true"></i>
-    <span data-i18n="home.recruit.text">Undergraduate research positions open. Applications until 28 August.</span>
-    <strong data-i18n="home.recruit.cta">Inscreva-se</strong>
-    <i class="ph ph-arrow-right" aria-hidden="true"></i>
-  </a>
 
   <!-- Navigation (injected by main.js) -->
   <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
@@ -547,8 +524,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
            Video by Nicola Narracci, from Pexels. Credited in credits.html. -->
       <div class="cube-rail" aria-hidden="true">
         <video muted loop playsinline preload="none" width="720" height="1280"
-               poster="assets/images/about-light-waves-poster.webp?v=3b1c931500"
-               data-src="assets/videos/about-light-waves-loop.mp4?v=3b1c931500"></video>
+               poster="assets/images/about-light-waves-poster.webp?v=2d59185653"
+               data-src="assets/videos/about-light-waves-loop.mp4?v=2d59185653"></video>
       </div>
 
       <div class="container">
@@ -716,8 +693,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/sapho" class="pc-card pc-card--dark" style="--pc:var(--accent-sapho)">
             <div class="pc-media pc-media--sapho" aria-hidden="true">
               <video data-media="sapho-loop"
-                     data-src="assets/videos/sapho-circuit-loop.mp4?v=3b1c931500"
-                     poster="assets/images/projects/sapho-circuit-poster.webp?v=3b1c931500"
+                     data-src="assets/videos/sapho-circuit-loop.mp4?v=2d59185653"
+                     poster="assets/images/projects/sapho-circuit-poster.webp?v=2d59185653"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -772,9 +749,9 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    be indistinguishable — for 435 KB less. The H.264 is what
                    every browser without an AV1 decoder gets, unchanged. -->
               <video data-media="aurora-loop"
-                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=3b1c931500"
-                     data-src="assets/videos/aurora-borealis-loop.mp4?v=3b1c931500"
-                     poster="assets/images/projects/aurora-borealis-poster.webp?v=3b1c931500"
+                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=2d59185653"
+                     data-src="assets/videos/aurora-borealis-loop.mp4?v=2d59185653"
+                     poster="assets/images/projects/aurora-borealis-poster.webp?v=2d59185653"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -832,8 +809,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    the old one. v2 is already live and cached, hence v3. -->
               <video data-media="cgv-loop"
                      data-src="https://cdn.nipscern.com/videos/cgv-geometry-loop-v6.mp4"
-                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=3b1c931500"
-                     poster="assets/images/projects/cgv-geometry-poster.webp?v=3b1c931500"
+                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=2d59185653"
+                     poster="assets/images/projects/cgv-geometry-poster.webp?v=2d59185653"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -866,8 +843,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/ai" class="pc-card" style="--pc:var(--accent-ai)">
             <div class="pc-media pc-media--ai" aria-hidden="true">
               <video data-media="ai-loop"
-                     data-src="assets/videos/ai-hand-loop.mp4?v=3b1c931500"
-                     poster="assets/images/projects/ai-hand-poster.webp?v=3b1c931500"
+                     data-src="assets/videos/ai-hand-loop.mp4?v=2d59185653"
+                     poster="assets/images/projects/ai-hand-poster.webp?v=2d59185653"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -922,7 +899,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.min.js?v=3b1c931500";
+    import { sky } from "./assets/js/sky.min.js?v=2d59185653";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -1051,8 +1028,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        114 KB of parsing should not happen for them either. Everything else is
        unchanged — it still arrives well after first paint, because home.js is a
        module and modules run after the document is parsed. -->
-  <script type="module" src="assets/js/main.min.js?v=3b1c931500"></script>
-  <script type="module" src="assets/js/home.min.js?v=3b1c931500"></script>
+  <script type="module" src="assets/js/main.min.js?v=2d59185653"></script>
+  <script type="module" src="assets/js/home.min.js?v=2d59185653"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -1100,6 +1077,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.min.js?v=3b1c931500" defer></script>
+  <script src="assets/js/analytics.min.js?v=2d59185653" defer></script>
 </body>
 </html>
