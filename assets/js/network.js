@@ -110,7 +110,7 @@ export async function initNetwork(canvas, opts = {}) {
   /* No WebGL, no canvas. The plate over it carries the figures and stays. */
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=2d59185653');
+    THREE = await import('./vendor/three.module.min.js?v=1477d19c03');
   } catch (e) {
     return null;
   }

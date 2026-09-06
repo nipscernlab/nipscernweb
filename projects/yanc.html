@@ -26,8 +26,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-yanc.css?v=2d59185653">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=2d59185653">
+  <link rel="stylesheet" href="../assets/css/icons/projects-yanc.css?v=1477d19c03">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=1477d19c03">
 
   <style>
     :root {
@@ -170,23 +170,6 @@
       background: var(--bg-card);
     }
     .merge-chip b { color: var(--ync-text); font-weight: 600; }
-
-    /* pipeline: the line map */
-    .pipemap {
-      margin: 0; background: #0a0d16; border: 1px solid var(--border-subtle);
-      border-radius: var(--r-lg); padding: var(--sp-5) var(--sp-4) var(--sp-4);
-      box-shadow: 0 24px 60px -40px rgba(0,0,0,0.9);
-    }
-    .pm-scroll { overflow-x: auto; }
-    .pm-scroll svg { min-width: 980px; width: 100%; height: auto; display: block; }
-    .pipemap figcaption { margin-top: var(--sp-4); padding: 0 var(--sp-2); font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
-    .pm text { font-family: var(--font-mono); text-anchor: middle; }
-    .pm .l  { fill: #c7d0e0; font-size: 12.5px; font-weight: 500; }
-    .pm .s  { fill: #586079; font-size: 10.5px; }
-    .pm .f  { fill: #7fe7dc; font-size: 11.5px; }
-    .pm .z  { fill: #9fb0c8; font-size: 12.5px; }
-    .pm .zt { fill: #586079; font-size: 10px; letter-spacing: 0.14em; }
-    .pm .lg { fill: #586079; font-size: 10.5px; text-anchor: start; }
 
     /* companion tools (real icons) */
     .tools { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -493,118 +476,6 @@
           </p>
         </div>
 
-        <figure class="pipemap fade-up" style="margin-top:var(--sp-7)">
-          <div class="pm-scroll">
-            <svg class="pm" viewBox="0 0 1160 386" xmlns="http://www.w3.org/2000/svg" role="img"
-                 aria-label="Line map of the YANC pipeline: a C± line and a C++ line converge into one assembly, pass through appcomp and asmcomp, fan out into the Verilog core, memory images and testbench, and continue to simulation and the waveform viewer. A dotted rail carries the trace metadata from the front-ends straight to the viewer.">
-              <defs>
-                <linearGradient id="pm-grad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#22d3ee"/>
-                </linearGradient>
-                <marker id="pm-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                  <path d="M0,0 L10,5 L0,10 z" fill="#7fe7dc"/>
-                </marker>
-                <marker id="pm-arr-m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                  <path d="M0,0 L10,5 L0,10 z" fill="rgba(127,231,220,0.55)"/>
-                </marker>
-                <marker id="pm-arr-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
-                  <path d="M0,0 L10,5 L0,10 z" fill="#586079"/>
-                </marker>
-              </defs>
-
-              <!-- trace-metadata rail (dotted): front-ends to the viewer -->
-              <text class="s" x="620" y="30">trace metadata: cmm_log.txt · pc_*_mem.txt</text>
-              <g stroke="rgba(127,231,220,0.5)" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round" fill="none">
-                <path d="M 250 88 V 40"/>
-                <path d="M 352 218 V 110"/>
-                <path d="M 352 90 V 40"/>
-                <path d="M 250 40 H 1132 V 196" marker-end="url(#pm-arr-m)"/>
-              </g>
-
-              <!-- source pills -->
-              <g fill="#10141f" stroke="#263042">
-                <rect x="46" y="87"  width="64" height="26" rx="13"/>
-                <rect x="46" y="217" width="64" height="26" rx="13"/>
-              </g>
-              <text class="f" x="78" y="104.5">.cmm</text>
-              <text class="f" x="78" y="234.5">.cpp</text>
-
-              <!-- the two language lines -->
-              <path d="M 110 100 H 468 C 505 100 518 150 555 150" fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round"/>
-              <path d="M 110 230 H 468 C 505 230 518 150 555 150" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>
-              <!-- merged assembly line -->
-              <path d="M 555 150 H 800" fill="none" stroke="url(#pm-grad)" stroke-width="3.5" stroke-linecap="round"/>
-              <!-- fan into artifacts -->
-              <g fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
-                <path d="M 800 150 C 828 150 836 96 862 96"/>
-                <path d="M 800 150 H 862"/>
-                <path d="M 800 150 C 828 150 836 204 862 204"/>
-              </g>
-
-              <!-- stations -->
-              <g fill="#0a0d16" stroke-width="2.5">
-                <circle cx="250" cy="100" r="7" stroke="#2dd4bf"/>
-                <circle cx="230" cy="230" r="7" stroke="#22d3ee"/>
-                <circle cx="352" cy="230" r="7" stroke="#22d3ee"/>
-                <circle cx="555" cy="150" r="5.5" stroke="#7fe7dc"/>
-                <circle cx="655" cy="150" r="7" stroke="#7fe7dc"/>
-                <circle cx="760" cy="150" r="7" stroke="#7fe7dc"/>
-              </g>
-              <text class="l" x="250" y="127">cmmcomp</text>
-              <text class="s" x="250" y="141">C± → assembly</text>
-              <text class="l" x="230" y="257">cpppp</text>
-              <text class="s" x="230" y="271">preprocess</text>
-              <text class="l" x="352" y="257">cppcomp</text>
-              <text class="s" x="352" y="271">C++ → assembly</text>
-              <text class="f" x="555" y="176">proc.asm</text>
-              <text class="l" x="655" y="127">appcomp</text>
-              <text class="s" x="655" y="174">resolves every address</text>
-              <text class="l" x="760" y="127">asmcomp</text>
-              <text class="s" x="760" y="174">writes the hardware</text>
-
-              <!-- artifact yard -->
-              <g fill="#10141f" stroke="#263042">
-                <rect x="862" y="84"  width="60" height="24" rx="6"/>
-                <rect x="862" y="138" width="54" height="24" rx="6"/>
-                <rect x="862" y="192" width="82" height="24" rx="6"/>
-              </g>
-              <text class="f" x="892" y="100">proc.v</text>
-              <text class="f" x="889" y="154">*.mif</text>
-              <text class="f" x="903" y="208">proc_tb.v</text>
-              <line x1="960" y1="96" x2="960" y2="204" stroke="#263042" stroke-width="2"/>
-              <path d="M 960 150 H 1000" fill="none" stroke="#7fe7dc" stroke-width="1.8" marker-end="url(#pm-arr)"/>
-
-              <!-- after YANC -->
-              <rect x="1006" y="56" width="138" height="252" rx="12" fill="none" stroke="rgba(94,234,212,0.25)" stroke-dasharray="5 5"/>
-              <text class="zt" x="1075" y="82">AFTER YANC</text>
-              <text class="z" x="1075" y="130">simulate</text>
-              <text class="s" x="1075" y="146">Icarus · Verilator</text>
-              <path d="M 1075 158 V 184" fill="none" stroke="#586079" stroke-width="1.5" marker-end="url(#pm-arr-g)"/>
-              <text class="s" x="1090" y="174" text-anchor="start">vcd</text>
-              <text class="z" x="1075" y="210">watch</text>
-              <text class="s" x="1075" y="226">Surfer · GTKWave</text>
-
-              <!-- legend -->
-              <g stroke-linecap="round" fill="none">
-                <path d="M 46 362 H 78"  stroke="#2dd4bf" stroke-width="3"/>
-                <path d="M 130 362 H 162" stroke="#22d3ee" stroke-width="3"/>
-                <path d="M 232 362 H 264" stroke="url(#pm-grad)" stroke-width="3.5"/>
-                <path d="M 424 362 H 456" stroke="rgba(127,231,220,0.5)" stroke-width="1.6" stroke-dasharray="2 5"/>
-              </g>
-              <text class="lg" x="86"  y="366">C±</text>
-              <text class="lg" x="170" y="366">C++</text>
-              <text class="lg" x="272" y="366">assembly onward</text>
-              <text class="lg" x="464" y="366">trace metadata</text>
-            </svg>
-          </div>
-          <figcaption>
-            The whole descent, drawn as it runs. The dotted rail is the part most toolchains do not have: the
-            front-ends write <span class="ic" style="background:none;padding:0">cmm_log.txt</span> and
-            <span class="ic" style="background:none;padding:0">pc_*_mem.txt</span> alongside the assembly, and the
-            waveform viewer reads them to show your source code executing, line by line.
-          </figcaption>
-        </figure>
-
         <div class="fade-up" style="margin-top:var(--sp-7)">
           <p class="ksub">After YANC: simulate and watch</p>
           <div class="tools">
@@ -791,7 +662,7 @@ a <span class="op">#</span> 0.001<span class="brk">|in(0)⟩</span>;</pre>
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=2d59185653"></script>
-  <script src="../assets/js/analytics.min.js?v=2d59185653" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=1477d19c03"></script>
+  <script src="../assets/js/analytics.min.js?v=1477d19c03" defer></script>
 </body>
 </html>

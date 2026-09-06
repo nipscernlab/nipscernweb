@@ -4162,7 +4162,12 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 }
 .net-stage {
   position: absolute;
-  inset: 0;
+  /* Not inset:0. The drawing is the whole band's background, so it grew with
+     the band and its lowest strands kept running under the plate no matter
+     how far down the plate was moved. The stage stops above the plate
+     instead: the hero's own bottom padding, plus the plate's height, plus a
+     margin so the faintest line still ends clear of the hairline. */
+  inset: 0 0 calc(var(--sp-16) + 190px) 0;
   overflow: hidden;
 }
 #net-canvas {
@@ -4240,13 +4245,16 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 .net-plate {
   position: relative;
   z-index: 1;
-  margin-top: var(--sp-16);
+  /* Two tokens lower than it first sat. The graph is drawn on the whole band,
+     and at --sp-16 its lowest strands ran under the plate; the reader asked
+     for the plate below the figure, not over it, and this is the margin at
+     which the faintest line still ends above the hairline. */
+  margin-top: var(--sp-32);
   border-radius: var(--r-xl);
   padding: var(--sp-5) var(--sp-6);
-  /* Real glass, not the flat variant: the graph's own lines run behind this
-     plate, and blurring them under the figures is the point — the pane reads
-     as glass because there is visibly something behind it. The tint keeps the
-     mono legible where the graph is at its densest. */
+  /* Glass, like every other pane. The tint keeps the mono legible over the
+     band, and over whatever the graph reaches at widths this was not measured
+     at. */
   --glass-tint: rgba(7, 10, 18, 0.45);
   /* The hero's inner column lets the pointer through to the canvas; the plate
      takes it back, so its figures can be selected and copied like any text. */

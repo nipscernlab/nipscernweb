@@ -9,7 +9,7 @@
   <meta property="og:type"  content="website">
   <meta property="og:url"   content="https://www.nipscern.com/projects/cgv">
   <meta property="og:title" content="CGV-WEB | Calorimeter Geometry Viewer Web | NIPS-CERN">
-  <meta property="og:description" content="3D calorimeter event visualisation for the ATLAS experiment — being integrated into the ATLAS Control Room at CERN.">
+  <meta property="og:description" content="3D calorimeter event visualisation for the ATLAS experiment, being integrated into the ATLAS Control Room at CERN.">
   <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
 
   <meta name="twitter:card" content="summary_large_image">
@@ -26,11 +26,16 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-cgv.css?v=2d59185653">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=2d59185653">
+  <link rel="stylesheet" href="../assets/css/icons/projects-cgv.css?v=1477d19c03">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=1477d19c03">
 
   <style>
     :root { --page-accent: var(--accent-cgv); }
+
+    /* The project's own mark, at the right of the text, where .project-hero-icon
+       used to put the generic cube. No glow: the mark is drawn, not lit. */
+    .cgv-emblem { order: 2; width: 132px; height: 132px; flex-shrink: 0; }
+    @media (max-width: 640px) { .cgv-emblem { width: 96px; height: 96px; } }
 
     /* ATLAS Control Room highlight banner */
     .atlas-cr-banner {
@@ -111,9 +116,6 @@
 
     <header class="project-hero" style="background: radial-gradient(ellipse 70% 50% at 0% 50%, rgba(29,78,137,0.07) 0%, transparent 70%), var(--bg-0)" aria-labelledby="cgv-title">
       <div class="project-hero-inner">
-        <div class="project-hero-icon" style="background:rgba(29,78,137,0.12);color:var(--accent-cgv)">
-          <i class="ph ph-cube" aria-hidden="true"></i>
-        </div>
         <div class="project-hero-text">
           <div class="eyebrow fade-up">
             <i class="ph ph-atom" aria-hidden="true"></i>
@@ -124,7 +126,7 @@
           </h1>
           <p class="project-hero-fullname fade-up" data-i18n="projects.cgv.full">Calorimeter Geometry Viewer Web</p>
           <p class="project-hero-desc fade-up" data-i18n="projects.cgv.desc">
-            CGV-WEB renders CERN ATLAS calorimeter collision events in real-time 3D, colour-coding each detector cell by energy deposit. Built on <strong>Rust/WebAssembly</strong>, <strong>Three.js</strong>, and backed by <strong>ROOT</strong> data pipelines, it is NIPS-CERN's most technically ambitious project — led by <strong>Chrysthofer Arthur</strong> — and is being integrated into the <strong>ATLAS Control Room at CERN</strong>.
+            CGV-WEB is the browser version of CaloGeoView, the event display Luciano wrote for his doctorate. It draws the ATLAS calorimeters in three dimensions and colours each of the 186,000 cells by the energy it recorded, so a collision can be read at a glance. Rust compiled to WebAssembly does the geometry, Three.js draws it and ROOT files feed it. Led by Luciano Andrade and Chrysthofer Arthur, it is being integrated into the ATLAS Control Room at CERN.
           </p>
           <div class="fade-up" style="margin-bottom:var(--sp-5)"><span class="content-lang-badge" data-content-lang="en"></span></div>
           <div class="project-links fade-up">
@@ -146,6 +148,7 @@
             </a>
           </div>
         </div>
+        <img class="cgv-emblem" src="../assets/icons/icon_cgv.svg" alt="CGV-WEB mark" width="132" height="132">
       </div>
     </header>
 
@@ -169,7 +172,7 @@
         <div class="atlas-cr-banner fade-up">
           <div class="atlas-cr-icon"><i class="ph ph-monitor" aria-hidden="true"></i></div>
           <div>
-            <div class="atlas-cr-title">ATLAS Control Room Integration — CERN</div>
+            <div class="atlas-cr-title">ATLAS Control Room integration at CERN</div>
             <div class="atlas-cr-text">
               CGV-WEB is being integrated into the <strong>ATLAS Control Room at CERN</strong>, where it will appear on the main display screen used by researchers monitoring live particle collisions in the LHC. This milestone represents NIPS-CERN's most direct contribution to the operational infrastructure of a major LHC detector, placing work produced at UFJF on the walls of one of the world's most advanced physics facilities.
             </div>
@@ -492,7 +495,7 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="./../assets/js/main.min.js?v=2d59185653"></script>
-  <script src="../assets/js/analytics.min.js?v=2d59185653" defer></script>
+  <script type="module" src="./../assets/js/main.min.js?v=1477d19c03"></script>
+  <script src="../assets/js/analytics.min.js?v=1477d19c03" defer></script>
 </body>
 </html>
