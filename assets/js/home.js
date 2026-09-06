@@ -14,12 +14,12 @@
 
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
-import { publicationUrl, newsPostUrl } from './content-links.js?v=1477d19c03';
-import { scrollToEl } from './smooth-scroll.js?v=1477d19c03';
+import { publicationUrl, newsPostUrl } from './content-links.js?v=f8d16ce7c5';
+import { scrollToEl } from './smooth-scroll.js?v=f8d16ce7c5';
 /* The scroll machinery every page shares: entrance failsafe, run-while-visible,
    and the ScrollTrigger setup with the refresh discipline that took three bugs
    to get right. What stays in this file is what only the home page has. */
-import { initMotion, revealFailsafe, stopDrift, ensureMotionLibs } from './motion.js?v=1477d19c03';
+import { initMotion, revealFailsafe, stopDrift, ensureMotionLibs } from './motion.js?v=f8d16ce7c5';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -651,13 +651,37 @@ function videoLoop(video) {
     video.load();
   };
 
-  /* Every loop on the page answers to the one control, the panel in About &
-     Science included, and to the same hover: with the grid stopped, pointing at
-     one of them runs that one alone. pause() leaves currentTime where it was, so
-     it picks up from the frame it stopped on rather than restarting. */
+  /* The loop waits to be asked.
+     Four of these used to start the moment they entered the viewport, which
+     meant four decoders running side by side through the projects grid on a
+     machine that was already behind. The poster is a real frame of each film,
+     so the grid reads the same standing still; pointing at a card, tabbing to
+     it, or touching it starts that one. pause() leaves currentTime where it
+     was, so it picks up from the frame it stopped on rather than restarting.
+
+     Off screen it still stops, and it still answers the grid's pause button:
+     whileVisibleCard keeps both, and only the play half is now conditional on
+     the reader having asked. */
+  let wanted = false;
+  const card = video.closest('.pc-card, .cube-rail, .frame') || video.parentElement;
+
+  const start = () => { arm(); const p = video.play(); if (p) p.catch(() => {}); };
+  const stop = () => video.pause();
+
   whileVisibleCard(video,
-    () => { arm(); const p = video.play(); if (p) p.catch(() => {}); },
-    () => video.pause());
+    () => { if (wanted) start(); },
+    stop);
+
+  const ask = () => { wanted = true; start(); };
+  const drop = () => { wanted = false; stop(); };
+
+  card.addEventListener('pointerenter', ask);
+  card.addEventListener('pointerleave', drop);
+  card.addEventListener('focusin', ask);
+  card.addEventListener('focusout', drop);
+  /* On touch there is no hover: the first tap on the card runs it, and it
+     keeps running while the card is on screen. */
+  card.addEventListener('touchstart', ask, { passive: true });
 }
 
 /* ------------------------------------------------------------------

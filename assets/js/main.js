@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=1477d19c03';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=f8d16ce7c5';
 
-import { newsPostUrl } from './content-links.js?v=1477d19c03';
+import { newsPostUrl } from './content-links.js?v=f8d16ce7c5';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=1477d19c03';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=f8d16ce7c5';
 
 // ============================================================
 // Navigation Template
@@ -228,6 +228,17 @@ function initNav() {
 
    A ResizeObserver on the strip catches all three causes at once, which is why
    there is nothing here listening for a resize or for a change of language. */
+/* The wordmark's two animations, held while it is off screen. See the note on
+   .hero-title.is-held in main.css: one of them animates `filter` and repaints
+   the whole title every frame for as long as it runs. */
+function initHeroHold() {
+  const title = document.querySelector('.hero-title');
+  if (!title || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver((entries) => {
+    entries.forEach((e) => title.classList.toggle('is-held', !e.isIntersecting));
+  }, { rootMargin: '120px' }).observe(title);
+}
+
 function initTopBanner() {
   const banner = document.querySelector('.top-banner');
   if (!banner) return;
@@ -765,7 +776,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=1477d19c03">. Each copy would otherwise append its own
+// <script src="main.js?v=f8d16ce7c5">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {
@@ -805,6 +816,7 @@ if (!window.__nipscernBooted) {
        scroll position through it. */
     initSmoothScroll();
     initTopBanner();
+    initHeroHold();
     initNav();
     initFooter();
     initSupporters();

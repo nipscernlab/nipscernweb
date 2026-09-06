@@ -3003,6 +3003,16 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   50% { opacity: 0.4; }
 }
 
+/* Off screen, the wordmark stops animating.
+   foil-halo animates `filter`, which is not a compositable property: while it
+   runs, the browser repaints the whole title every frame, and it ran for the
+   entire length of the page. Held here rather than removed, because the reader
+   who is looking at it sees exactly what it always was. main.js marks the
+   class from an IntersectionObserver; without the script the title simply
+   animates as before. */
+.hero-title.is-held,
+.hero-title.is-held .hero-atom { animation-play-state: paused; }
+
 @keyframes foil-shimmer {
   /* Soft luminous band drifts across the title */
   0%   { background-position: -100% center; }

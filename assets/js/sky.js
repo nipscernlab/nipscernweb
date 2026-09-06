@@ -104,7 +104,15 @@ export function sky(canvas) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  /* How much sky this machine can afford.
+     The field is the site's mark and it is drawn the same way everywhere;
+     what changes on a slow machine is how many pixels it is drawn into and
+     how many stars scintillate. Both are invisible next to the alternative,
+     which is the mark stuttering. The test is the two numbers a browser will
+     actually answer: cores, and the memory class it admits to. */
+  const MODEST = (navigator.hardwareConcurrency || 8) <= 4
+    || (navigator.deviceMemory || 8) <= 4;
+  const DPR = Math.min(window.devicePixelRatio || 1, MODEST ? 1 : 2);
   let W = 0, H = 0, statik = null, twinklers = [], shooting = null, shootTimer = 0;
   let stars = null, view = randomView();
 
@@ -142,7 +150,7 @@ export function sky(canvas) {
      scintillation is what makes a sky look alive, so it goes down to magnitude 5
      and covers sixteen hundred of them. The rest are still, which is also true:
      the faintest are at the edge of being seen at all. */
-  const TWINKLE_MAG = 5.5;
+  const TWINKLE_MAG = MODEST ? 4.2 : 5.5;
 
   const radiusFor = (mag) => Math.max(0.55, 0.55 + (6 - mag) * 0.27);
   const alphaFor = (mag) => Math.max(0.42, Math.min(1, 0.42 + (6 - mag) * 0.105));
