@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=1aa557f3a6';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=7340b337c6';
 
-import { newsPostUrl } from './content-links.js?v=1aa557f3a6';
+import { newsPostUrl } from './content-links.js?v=7340b337c6';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=1aa557f3a6';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=7340b337c6';
 
 // ============================================================
 // Navigation Template
@@ -380,6 +380,79 @@ function initFooter() {
   const footer = document.getElementById('footer');
   if (!footer) return;
   footer.innerHTML = buildFooter();
+}
+
+/* Where one band ends and the next begins
+   ------------------------------------------------------------------
+   A band fades out of the colour above it over its first 200px, and --seam-from
+   is what names that colour. Written by hand it goes wrong quietly and stays
+   wrong: the supporters bar carried --bg-1 on every page, including the ones
+   whose last section is --bg-0, and the footer carried whatever --page-end the
+   page happened to declare, which on four pages was not the colour under it.
+   Either way the reader sees a step where the fade should be.
+
+   So it is read off the page instead. Two elements need it and both are built
+   here, which is why this lives next to them.
+
+   Nothing depends on it running: without JavaScript there is no footer and no
+   supporters bar to seam, and the CSS keeps its own fallbacks. */
+function seamFromAbove(el) {
+  if (!el) return;
+
+  /* An element is part of the page's colour only if it is in the flow and
+     visible. The lightbox on a news post is fixed, hidden and painted almost
+     black; taken as the band above the footer it would have read as the page
+     ending in black. */
+  const inFlow = (n) => {
+    const cs = getComputedStyle(n);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+    if (cs.position === 'fixed' || cs.position === 'absolute') return false;
+    return n.getBoundingClientRect().height > 0;
+  };
+  const painted = (c) => c && c !== 'transparent' && c !== 'rgba(0, 0, 0, 0)';
+
+  const measure = () => {
+    let node = el.previousElementSibling;
+    while (node && !inFlow(node)) node = node.previousElementSibling;
+
+    let found = '';
+    for (let depth = 0; node && depth < 12; depth++) {
+      const c = getComputedStyle(node).backgroundColor;
+      if (painted(c)) { found = c; break; }
+      /* A transparent wrapper is not a band; the band is its last child that
+         runs the full width and ends where the wrapper ends. Anything narrower
+         or shorter is something standing on the band, not the band itself,
+         which is what keeps the supporters plate from being mistaken for the
+         colour under the footer. */
+      const box = node.getBoundingClientRect();
+      const kids = Array.from(node.children).filter((k) => {
+        if (!inFlow(k)) return false;
+        const r = k.getBoundingClientRect();
+        return r.width >= box.width - 1 && Math.abs(r.bottom - box.bottom) < 2;
+      });
+      if (!kids.length) break;
+      node = kids[kids.length - 1];
+    }
+
+    el.style.setProperty('--seam-from',
+      found || getComputedStyle(document.body).backgroundColor);
+  };
+
+  measure();
+  /* Images, fonts and anything a page fetches for itself all change the height
+     of the document, and a post writes its own last band minutes after this
+     first pass. Watching the height covers every one of them. */
+  addEventListener('load', measure);
+  if (typeof ResizeObserver === 'function') {
+    let last = 0, pending = 0;
+    new ResizeObserver(() => {
+      const h = document.documentElement.scrollHeight;
+      if (Math.abs(h - last) < 4) return;
+      last = h;
+      clearTimeout(pending);
+      pending = setTimeout(measure, 120);
+    }).observe(document.body);
+  }
 }
 
 /**
@@ -776,7 +849,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=1aa557f3a6">. Each copy would otherwise append its own
+// <script src="main.js?v=7340b337c6">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {
@@ -820,6 +893,10 @@ if (!window.__nipscernBooted) {
     initNav();
     initFooter();
     initSupporters();
+    /* After both, because each has to exist before the colour under it can be
+       measured, and the supporters bar is the thing under the footer. */
+    seamFromAbove(document.getElementById('supporters'));
+    seamFromAbove(document.getElementById('footer'));
     initBackToTop();
     initGridOverlay();
     initContentLangBadges();

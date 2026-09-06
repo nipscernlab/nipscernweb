@@ -27,10 +27,10 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/publications.css?v=1aa557f3a6">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=1aa557f3a6">
+  <link rel="stylesheet" href="assets/css/icons/publications.css?v=7340b337c6">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=7340b337c6">
 </head>
-<body style="--page-end:var(--bg-0)">
+<body>
 
   <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
   <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
@@ -85,6 +85,9 @@
             >
           </div>
 
+          <div class="select-wrap">
+            <i class="ph ph-funnel" aria-hidden="true"></i>
+            <i class="ph ph-caret-down select-caret" aria-hidden="true"></i>
           <select id="pub-filter-type" class="select-filter glass-btn" aria-label="Filter by type" data-i18n-aria="publications.filter_type">
             <option value="" data-i18n="publications.filter_all">All types</option>
             <option value="journal" data-i18n="publications.types.journal">Journal Article</option>
@@ -93,6 +96,7 @@
             <option value="undergraduate thesis" data-i18n="publications.types.undergraduate thesis">Undergraduate Thesis</option>
             <option value="doctoral thesis" data-i18n="publications.types.doctoral thesis">Doctoral Thesis</option>
           </select>
+          </div>
 
           <div class="author-combo" id="pub-author-combo">
             <i class="ph ph-user" aria-hidden="true"></i>
@@ -116,15 +120,23 @@
             <ul class="author-combo-list glass" id="pub-author-list" role="listbox" aria-label="Authors" hidden></ul>
           </div>
 
-          <select id="pub-filter-year" class="select-filter glass-btn" aria-label="Filter by year" data-i18n-aria="publications.filter_year">
-            <option value="" data-i18n="publications.all_years">All years</option>
-          </select>
+          <div class="select-wrap">
+            <i class="ph ph-calendar" aria-hidden="true"></i>
+            <i class="ph ph-caret-down select-caret" aria-hidden="true"></i>
+            <select id="pub-filter-year" class="select-filter glass-btn" aria-label="Filter by year" data-i18n-aria="publications.filter_year">
+              <option value="" data-i18n="publications.all_years">All years</option>
+            </select>
+          </div>
 
-          <select id="pub-sort" class="select-filter glass-btn" aria-label="Sort publications" data-i18n-aria="publications.sort">
-            <option value="year" data-i18n="publications.sort_year">By year</option>
-            <option value="recent" data-i18n="publications.sort_recent">Most recent</option>
-            <option value="featured" data-i18n="publications.sort_featured">Featured</option>
-          </select>
+          <div class="select-wrap">
+            <i class="ph ph-sort-ascending" aria-hidden="true"></i>
+            <i class="ph ph-caret-down select-caret" aria-hidden="true"></i>
+            <select id="pub-sort" class="select-filter glass-btn" aria-label="Sort publications" data-i18n-aria="publications.sort">
+              <option value="year" data-i18n="publications.sort_year">By year</option>
+              <option value="recent" data-i18n="publications.sort_recent">Most recent</option>
+              <option value="featured" data-i18n="publications.sort_featured">Featured</option>
+            </select>
+          </div>
         </div>
 
         <!-- Result count -->
@@ -185,15 +197,15 @@
     </section>
 
 
-    <div id="supporters" style="--seam-from:var(--bg-0)"></div>
+    <div id="supporters"></div>
   </main>
 
   <footer id="footer" role="contentinfo"></footer>
 
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
-  <script type="module" src="assets/js/main.min.js?v=1aa557f3a6"></script>
+  <script type="module" src="assets/js/main.min.js?v=7340b337c6"></script>
   <script type="module">
-    import { initPublications } from './assets/js/publications.min.js?v=1aa557f3a6';
+    import { initPublications } from './assets/js/publications.min.js?v=7340b337c6';
     // Defer until after DOMContentLoaded so main.js has already run
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
@@ -201,6 +213,6 @@
       setTimeout(initPublications, 50);
     }
   </script>
-  <script src="assets/js/analytics.min.js?v=1aa557f3a6" defer></script>
+  <script src="assets/js/analytics.min.js?v=7340b337c6" defer></script>
 </body>
 </html>

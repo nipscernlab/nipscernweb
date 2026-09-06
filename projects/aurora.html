@@ -26,8 +26,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-aurora.css?v=1aa557f3a6">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=1aa557f3a6">
+  <link rel="stylesheet" href="../assets/css/icons/projects-aurora.css?v=7340b337c6">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=7340b337c6">
 
   <style>
     :root {
@@ -335,7 +335,7 @@
     </header>
 
     <!-- ── Identity strip ── -->
-    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);padding:var(--sp-4) 0">
+    <div class="seam" style="background:var(--bg-card);--seam-from:var(--bg-0);padding:var(--sp-4) 0">
       <div class="container" style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
         <span class="badge badge-green">Active development</span>
         <span class="badge badge-gray">v6.3.2</span>
@@ -353,7 +353,7 @@
     </div>
 
     <!-- ── The idea: the header IS the hardware ── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-card)">
       <div class="container">
         <div class="sec-label fade-up"><span class="n">01</span> The idea</div>
         <div class="split lead">
@@ -400,7 +400,7 @@
     </section>
 
     <!-- ── What AURORA is (relocated intro) ── -->
-    <section class="section" style="border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+    <section class="section seam" style="--seam-from:var(--bg-0)">
       <div class="container container--narrow" style="text-align:center">
         <p class="lede fade-up">
           SAPHO is NIPS-CERN's platform for building custom processors. <span class="hl">AURORA is how you use it</span>:
@@ -477,7 +477,7 @@
           </figure>
         </div>
 
-        <div class="fade-up" style="margin-top:var(--sp-8);display:flex;gap:var(--sp-5);align-items:center;border:1px solid var(--border-subtle);border-radius:var(--r-lg);background:var(--bg-elevated);padding:var(--sp-5) var(--sp-6)">
+        <div class="glass fade-up" style="margin-top:var(--sp-8);display:flex;gap:var(--sp-5);align-items:center;border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-6)">
           <img src="../assets/icons/aurora/surfer.svg" alt="Surfer logo" style="width:56px;height:56px;flex-shrink:0" loading="lazy">
           <div class="prose">
             <p class="ksub" style="margin-bottom:6px">A fork of Surfer, inside AURORA</p>
@@ -510,7 +510,7 @@
     </section>
 
     <!-- ── PRISM ── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+    <section class="section seam section--lit" style="background:var(--bg-0);--seam-from:var(--bg-1)">
       <div class="container">
         <div class="sec-label fade-up"><span class="n">03</span> PRISM</div>
         <div class="split">
@@ -543,7 +543,7 @@
     <!-- ════════════════════════════════════════════════════════════
          AURORA INTELLIGENCE: explained (no mock chat, no glow)
          ════════════════════════════════════════════════════════════ -->
-    <section class="section">
+    <section class="section seam section--lit" style="--seam-from:var(--bg-0)">
       <div class="container">
         <div class="sec-label fade-up"><span class="n">04</span> Aurora Intelligence</div>
         <div class="ai-panel fade-up">
@@ -625,7 +625,7 @@
     </section>
 
     <!-- ── Where it's used ── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-1)">
       <div class="container container--narrow">
         <div class="sec-label fade-up"><span class="n">05</span> Where it's used</div>
         <div class="prose fade-up">
@@ -642,9 +642,9 @@
     </section>
 
     <!-- ── Get it ── -->
-    <section class="section">
+    <section class="section seam section--lit" style="--seam-from:var(--bg-0)">
       <div class="container container--narrow">
-        <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-2xl);padding:var(--sp-10)">
+        <div class="glass fade-up" style="padding:var(--sp-10)">
           <div class="split" style="align-items:center;gap:var(--sp-8)">
             <div class="prose">
               <h2 class="heading-md" style="margin-bottom:var(--sp-3)">Get AURORA</h2>
@@ -758,7 +758,7 @@
     requestAnimationFrame(frame);
   })();
   </script>
-  <script type="module" src="../assets/js/main.min.js?v=1aa557f3a6"></script>
-  <script src="../assets/js/analytics.min.js?v=1aa557f3a6" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=7340b337c6"></script>
+  <script src="../assets/js/analytics.min.js?v=7340b337c6" defer></script>
 </body>
 </html>

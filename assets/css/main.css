@@ -1120,9 +1120,10 @@ body.has-top-banner .nav-mobile { top: var(--top-banner-h, 40px); }
 /* ============================================================
    Footer
    ============================================================ */
-/* The last colour change on any page, and it was still a step. --page-end lets
-   a page whose final section is dark say so; every other page ends on the body
-   colour, which is the default. */
+/* The last colour change on any page, and it was still a step. The colour the
+   footer fades out of is measured off the page by seamFromAbove() in main.js,
+   which writes --seam-from on this element; --page-end stays as the value to
+   fall back on if that never runs. */
 #footer {
   background: var(--bg-0);
   position: relative;
@@ -2314,10 +2315,17 @@ a:hover > .frame > [data-drift],
 .pc-repos a:hover { color: var(--brand); }
 
 /* ── Legacy project cards, still used by projects/index.html ── */
+/* Eight cards, eight colours, one component. --project-accent is already on
+   each card; the glass tokens derive from it with color-mix, which is the case
+   docs/design-system.md names in section 4. The band under them is
+   .section--lit, so the filter has a gradient to work on rather than a flat
+   fill. */
 .project-card {
   position: relative;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  --glass-tint: color-mix(in srgb, var(--project-accent, var(--brand)) 7%, transparent);
+  --glass-edge: color-mix(in srgb, var(--project-accent, var(--brand)) 22%, transparent);
+  --glass-edge-hover: color-mix(in srgb, var(--project-accent, var(--brand)) 48%, transparent);
+  border-color: var(--glass-edge);
   border-radius: var(--r-2xl, 20px);
   overflow: hidden;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
@@ -2338,11 +2346,15 @@ a:hover > .frame > [data-drift],
   transition: opacity 0.25s ease;
 }
 
+/* The hover keeps the pane's two inset hairlines, which are what make it read
+   as a surface with thickness; without them restated here the shorthand would
+   drop them and the card would flatten under the pointer. */
 .project-card:hover {
-  border-color: color-mix(in srgb, var(--project-accent, var(--brand)) 35%, var(--border-subtle));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--project-accent, var(--brand)) 20%, transparent),
-              0 8px 40px rgba(0,0,0,0.45),
-              0 0 60px color-mix(in srgb, var(--project-accent, var(--brand)) 8%, transparent);
+  border-color: var(--glass-edge-hover);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.17),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.045),
+              0 16px 46px rgba(0, 0, 0, 0.46),
+              0 0 60px color-mix(in srgb, var(--project-accent, var(--brand)) 10%, transparent);
   transform: translateY(-5px);
 }
 
@@ -2681,42 +2693,58 @@ a:hover > .frame > [data-drift],
 
 /* "Featured story" ribbon for the regular news card (smaller variant of the
    featured cover ribbon, kept consistent visually). */
-/* This is the case the pane was designed for: a cover photograph behind it and
+/* The featured mark
+   ------------------------------------------------------------------
+   It used to be the words FEATURED STORY set in caps across the top of the
+   cover, which is a banner laid over a photograph and the loudest thing on a
+   page of fourteen articles. It is one bit of information: this is the one.
+   A star says that, and a star is small enough to sit on the picture without
+   standing on it.
+
+   This is the case the pane was designed for: a cover photograph behind it and
    nothing flat anywhere near. Written from the same vocabulary as .glass, the
    light from the top left, the bright top edge and the tint under the wash, at
-   the size of a chip, so the radius and the drop stay the ribbon's own. */
-.news-card-ribbon {
+   the size of a disc. The name stays on the element for anyone who cannot see
+   the star. */
+.news-card-ribbon,
+.news-featured-ribbon {
   position: absolute;
-  top: var(--sp-3);
-  left: var(--sp-3);
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  --glass-tint: rgba(7, 10, 18, 0.72);
-  --glass-edge: var(--brand-mid);
+  justify-content: center;
+  --glass-tint: rgba(7, 10, 18, 0.55);
+  --glass-edge: color-mix(in srgb, var(--brand) 45%, transparent);
   background:
     linear-gradient(148deg,
-      rgba(255, 255, 255, 0.10) 0%,
-      rgba(255, 255, 255, 0.028) 46%,
-      rgba(255, 255, 255, 0.055) 100%),
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.035) 46%,
+      rgba(255, 255, 255, 0.07) 100%),
     var(--glass-tint);
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid var(--glass-edge);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16),
-              0 4px 14px rgba(0, 0, 0, 0.34);
   border-radius: var(--r-full);
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+              0 4px 14px rgba(0, 0, 0, 0.34);
   color: var(--brand);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   z-index: 1;
   pointer-events: none;
 }
-.news-card-ribbon .ph { font-size: 11px; }
+.news-card-ribbon {
+  top: var(--sp-3);
+  left: var(--sp-3);
+  width: 30px;
+  height: 30px;
+}
+.news-featured-ribbon {
+  top: var(--sp-4);
+  left: var(--sp-4);
+  width: 36px;
+  height: 36px;
+}
+.news-card-ribbon .ph { font-size: 15px; }
+.news-featured-ribbon .ph { font-size: 18px; }
 
 /* People-tagged cover photo — news posts that carry a `people` array get one
    focusable dot per person over an uncropped cover. The name shows on hover
@@ -4681,11 +4709,17 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 /* ============================================================
    Page-specific: Publications
    ============================================================ */
+/* Five fields on one rail, in named tracks rather than left to wrap. Flex-wrap
+   put the search box and three filters on one line and the fourth on a line of
+   its own with two thirds of the plate empty beside it, which reads as five
+   loose things and not as one panel. Every field also carries the icon for
+   what it filters, so the row can be read across without opening anything. */
 .pub-controls {
-  display: flex;
-  gap: var(--sp-4);
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 1.4fr 1fr 1.1fr;
+  gap: var(--sp-3);
+  align-items: center;
   margin-bottom: var(--sp-8);
-  flex-wrap: wrap;
   /* The plate the search box and the four filters stand on. It carries the
      glass paint and drops the filter (.glass--flat in the markup), because a
      pane that blurs opens a new backdrop root and every control on it would
@@ -4699,12 +4733,25 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   z-index: 5;
 }
 
-.search-input-wrap {
-  flex: 1;
-  min-width: 240px;
-  position: relative;
+@media (max-width: 1080px) {
+  .pub-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pub-controls .search-input-wrap { grid-column: 1 / -1; }
 }
-.search-input-wrap i {
+@media (max-width: 620px) {
+  .pub-controls { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* A field and the icon that names it. The icon has to be raised out of the
+   flow: backdrop-filter promotes the input into the positioned layer, and with
+   both at the same level the one written later in the markup wins, which is
+   how the magnifier disappeared behind its own search box. */
+.search-input-wrap,
+.select-wrap {
+  position: relative;
+  min-width: 0;
+}
+.search-input-wrap > i,
+.select-wrap > i {
   position: absolute;
   left: var(--sp-3);
   top: 50%;
@@ -4712,6 +4759,20 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   color: var(--text-muted);
   font-size: 16px;
   pointer-events: none;
+  z-index: 2;
+}
+/* The chevron is the icon sheet's, not a data URI written into a background:
+   a select cannot hold a child, so it is a sibling on the wrapper. */
+.select-wrap > i.select-caret {
+  position: absolute;
+  left: auto;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 2;
 }
 .search-input {
   width: 100%;
@@ -4726,54 +4787,24 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 .search-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-dim); outline: none; }
 
 .select-filter {
+  width: 100%;
   border-radius: var(--r-lg);
-  padding: var(--sp-3) var(--sp-4);
+  padding: var(--sp-3) var(--sp-8) var(--sp-3) var(--sp-10);
   font-size: var(--text-sm);
   color: var(--text-primary);
   transition: border-color var(--t-fast);
-  min-width: 160px;
   -webkit-appearance: none;
   appearance: none;
-  padding-right: 36px;
   cursor: pointer;
-}
-/* The chevron has to ride on top of the glass wash rather than replace it.
-   background-image is a longhand: declaring it alone drops the two layers
-   .glass-btn paints and leaves a flat control with an arrow on it. Both are
-   named here in order, the tint stays on background-color, and the arrow is
-   held in a custom property so the hover state can restate the wash without
-   restating the drawing. */
-.select-filter.glass-btn {
-  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a86a6' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-image: var(--chevron),
-    linear-gradient(148deg,
-      rgba(255, 255, 255, 0.10) 0%,
-      rgba(255, 255, 255, 0.028) 46%,
-      rgba(255, 255, 255, 0.055) 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-position: right 12px center, 0 0;
-  background-size: 16px 16px, cover;
-  background-color: var(--glass-tint, transparent);
-}
-.select-filter.glass-btn:hover {
-  background-image: var(--chevron),
-    linear-gradient(148deg,
-      rgba(255, 255, 255, 0.175) 0%,
-      rgba(255, 255, 255, 0.062) 46%,
-      rgba(255, 255, 255, 0.098) 100%);
+  text-overflow: ellipsis;
 }
 .select-filter:focus { border-color: var(--brand); outline: none; }
-.select-filter-author {
-  min-width: 280px;
-  flex: 1 1 280px;
-}
 
 /* Searchable author filter (combobox) */
 .author-combo {
   position: relative;
   z-index: 40;
-  min-width: 280px;
-  flex: 1 1 280px;
+  min-width: 0;
 }
 .author-combo > i {
   position: absolute;
@@ -4783,6 +4814,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   color: var(--text-muted);
   font-size: 16px;
   pointer-events: none;
+  z-index: 2;
 }
 .author-combo-input {
   width: 100%;
@@ -4798,6 +4830,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 .author-combo-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-dim); outline: none; }
 .author-combo-clear {
   position: absolute;
+  z-index: 2;
   right: var(--sp-3);
   top: 50%;
   transform: translateY(-50%);
@@ -6435,39 +6468,6 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 }
 .news-featured:hover .news-featured-media img { transform: scale(1.04); }
 .news-featured-media .ph { font-size: 60px; }
-
-/* "Featured Story" ribbon, top-left over the cover */
-.news-featured-ribbon {
-  position: absolute;
-  top: var(--sp-4);
-  left: var(--sp-4);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  --glass-tint: rgba(7, 10, 18, 0.72);
-  --glass-edge: var(--brand-mid);
-  background:
-    linear-gradient(148deg,
-      rgba(255, 255, 255, 0.10) 0%,
-      rgba(255, 255, 255, 0.028) 46%,
-      rgba(255, 255, 255, 0.055) 100%),
-    var(--glass-tint);
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
-  border: 1px solid var(--glass-edge);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16),
-              0 4px 14px rgba(0, 0, 0, 0.34);
-  border-radius: var(--r-full);
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--brand);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  z-index: 1;
-}
-.news-featured-ribbon .ph { font-size: 12px; }
 
 /* Body — magazine typography */
 .news-featured-body {
