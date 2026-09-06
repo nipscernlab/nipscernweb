@@ -25,8 +25,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=301ab40fbd">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=301ab40fbd">
+  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=df6b1a345f">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=df6b1a345f">
 </head>
 <body>
 
@@ -153,11 +153,11 @@
   </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=301ab40fbd';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=301ab40fbd';
-    import { newsPostUrl } from '../assets/js/content-links.min.js?v=301ab40fbd';
-    import { mountPostHeart } from '../assets/js/hearts.min.js?v=301ab40fbd';
-    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=301ab40fbd';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=df6b1a345f';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=df6b1a345f';
+    import { newsPostUrl } from '../assets/js/content-links.min.js?v=df6b1a345f';
+    import { mountPostHeart } from '../assets/js/hearts.min.js?v=df6b1a345f';
+    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=df6b1a345f';
 
     /* The cover drifts inside the frame it is clipped by, and nothing else on
        this page moves: a story is running text, and running text is the case
@@ -354,6 +354,29 @@
           requestAnimationFrame(function() { scrollToHeading(targetId); });
         }
       }
+    }
+
+    /**
+     * Put a mark on the paper link in the Try it block.
+     *
+     * The three links there are one set and read as one, so all three carry a
+     * symbol. Two of them carry the destination's own logo, written into the
+     * article as <img>: the CGV octagon and the TWiki mark. The third goes to
+     * this site's own PDF viewer and has no logo to carry, so it gets the icon
+     * the publications archive uses for exactly that action.
+     *
+     * Added to the rendered DOM rather than to the article, which does not
+     * change by a word, and taken from assets/css/icons.css by class, so no
+     * Phosphor path is copied anywhere.
+     */
+    function markPaperLink(bodyEl) {
+      bodyEl.querySelectorAll('.story-cta a[href*="pdf-viewer"]').forEach(function (a) {
+        if (a.querySelector('.ph')) return;
+        const icon = document.createElement('i');
+        icon.className = 'ph ph-file-pdf';
+        icon.setAttribute('aria-hidden', 'true');
+        a.prepend(icon);
+      });
     }
 
     /** Make all .story-figure img elements clickable lightbox triggers. */
@@ -705,6 +728,7 @@
         bodyEl.classList.add('post-body-featured');
         bodyEl.innerHTML = post.content_html;
         initLightbox(bodyEl);
+        markPaperLink(bodyEl);
       } else {
         const rawContent = _tr.content || post.content || '';
         const paragraphs = rawContent.split('\n\n').map(p => p.trim().startsWith('<') ? p.trim() : `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
@@ -848,13 +872,14 @@
           bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${featured.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
         }
         initLightbox(bodyEl);
+        markPaperLink(bodyEl);
         injectToc(bodyEl);
       } catch (e) { /* keep current rendering on failure */ }
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=301ab40fbd"></script>
+  <script type="module" src="../assets/js/main.min.js?v=df6b1a345f"></script>
 
-  <script src="../assets/js/analytics.min.js?v=301ab40fbd" defer></script>
+  <script src="../assets/js/analytics.min.js?v=df6b1a345f" defer></script>
 </body>
 </html>

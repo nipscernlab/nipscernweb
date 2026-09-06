@@ -6091,6 +6091,25 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   animation: wave-move 0.6s linear infinite;
 }
 
+/* A button in a post body is not a link in running text.
+   ------------------------------------------------------------------
+   The rule above is the wavy underline: brand colour, a 2px strip of padding
+   under the text for the wave to sit in, and the wave painted as a background.
+   It is written for prose and it outranks .btn, so every button inside an
+   article arrived with thirteen pixels of padding above the label and two
+   below it. That is the five and a half pixels the labels in the Try it block
+   were sitting low by, measured against the middle of the button.
+
+   The padding comes back to the one .btn declares, and the wave stays off a
+   surface that is already a surface. Colour is restored per variant further
+   down, where each button says which one it is. */
+.post-body a.btn {
+  padding-block: clamp(0.625rem, 0.5417rem + 0.3704vw, 0.875rem);
+  background-image: none;
+  background-size: auto;
+}
+.post-body a.btn:hover { background-size: auto; animation: none; }
+
 /* A flag on each address, sized to the line rather than to a grid: 0.85em tall,
    so it sits inside the text it belongs to instead of standing beside it. Small
    enough to be read as punctuation and not as an icon. */
@@ -6762,6 +6781,10 @@ body.post-featured .post-excerpt {
       rgba(255, 255, 255, 0.098) 100%),
     var(--glass-tint, transparent);
 }
+/* .post-body paints every link in the body brand blue and outranks
+   .btn-primary, so the primary button's label was arriving blue on blue. Each
+   button gets its own colour back here, where the selector is heavier. */
+.post-body-featured a.btn-primary { color: #eaf2ff; }
 .post-body-featured a.btn-ghost { color: var(--text-secondary); }
 .post-body-featured a.btn-ghost:hover { color: var(--text-primary); }
 
@@ -6947,13 +6970,42 @@ body.post-featured .post-excerpt {
 .news-read-more::after { right: 1.6em; }
 .post-body-featured a:not(.btn):has(> i.ph)::after { right: 1.4em; }
 
-/* CTA — minimal, button-only block. */
+/* Try it
+   ------------------------------------------------------------------
+   Three ways into the same work: the application, its documentation, the
+   paper. They are one set, so they are laid out as one: three cells of equal
+   width rather than three pills of whatever width their labels happened to
+   need, which is what made the row read as leftovers.
+
+   The marks go in one box each. The CGV octagon is a square SVG and the TWiki
+   logo a wide raster file, and at their own inline sizes they arrived at two
+   different weights next to each other. */
 .post-body-featured .story-cta {
   margin-top: var(--sp-12);
-  padding: var(--sp-8) 0;
+  padding: var(--sp-10) 0;
   text-align: center;
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
+}
+.post-body-featured .story-cta .btn {
+  justify-content: center;
+  padding-inline: var(--sp-4);
+  min-width: 0;
+}
+/* One box for every mark, whichever kind it is: the CGV octagon is a square
+   SVG, the TWiki logo a wide raster file, and the paper's icon a mask from the
+   sheet. !important on the images because the sizes it overrides are inline
+   styles written into the article, and the article does not change. */
+.post-body-featured .story-cta .btn img {
+  width: 18px !important;
+  height: 18px !important;
+  object-fit: contain;
+  margin: 0 !important;
+  flex: none;
+}
+.post-body-featured .story-cta .btn > .ph {
+  font-size: 18px;
+  flex: none;
 }
 .post-body-featured .story-cta h2 {
   margin: 0 0 var(--sp-5);
@@ -6966,10 +7018,12 @@ body.post-featured .post-excerpt {
 }
 .post-body-featured .story-cta p {
   margin-bottom: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sp-3);
-  justify-content: center;
-  flex-wrap: wrap;
+}
+@media (max-width: 560px) {
+  .post-body-featured .story-cta p { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Section dropcap rule — only the very first .story-lead has it */
