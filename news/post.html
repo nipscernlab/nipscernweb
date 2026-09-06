@@ -25,10 +25,10 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=eec324f6b6">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=eec324f6b6">
+  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=1aa557f3a6">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=1aa557f3a6">
 </head>
-<body>
+<body style="--page-end:var(--bg-0)">
 
   <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
   <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
@@ -69,34 +69,49 @@
       <span data-i18n="common.loading">Loading…</span>
     </div>
 
-    <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
-    <div id="post-cover" style="display:none;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"></div>
+    <!-- The reading band. The header above ends on --bg-0 and this fades out
+         of it over its first 200px, which is what .seam does; .section--lit
+         puts the two washes under the chapter sidebar so the pane has
+         something to blur. The cover is pulled up out of this band by 80px so
+         the header's colour bleeds behind its top edge. -->
+    <div class="post-stage seam section--lit" style="--seam-from:var(--bg-0)">
 
-    <!-- Post body (and TOC injected alongside it for featured posts) -->
-    <div class="post-body" id="post-body" style="display:none"></div>
+      <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
+      <div id="post-cover" style="display:none;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"></div>
 
-    <!-- Appreciation / heart control (populated by hearts.js) -->
-    <div class="post-hearts" id="post-hearts" style="display:none"></div>
-
-    <!-- Related articles (populated by JS) -->
-    <div id="post-related" style="display:none;border-top:1px solid var(--border-subtle);padding:var(--sp-8) var(--container-pad)">
-      <div style="max-width:720px;margin:0 auto">
-        <p style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)" data-i18n="news.related">Related</p>
-        <div id="post-related-list" style="display:flex;flex-direction:column;gap:var(--sp-3)"></div>
-      </div>
+      <!-- Post body (and TOC injected alongside it for featured posts) -->
+      <div class="post-body" id="post-body" style="display:none"></div>
     </div>
 
-    <!-- Post footer / share -->
-    <div id="post-footer" style="display:none;border-top:1px solid var(--border-subtle);padding:var(--sp-8) var(--container-pad)">
-      <div style="max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-4)">
-        <a href="./" class="btn btn-ghost" data-i18n="news.back">
-          <i class="ph ph-arrow-left" aria-hidden="true"></i>
-          Back to News
-        </a>
-        <!-- Generic share panel — deep links open the visitor's own apps
-             (WhatsApp/X/Telegram/LinkedIn), plus copy-link, native Web Share
-             on mobile and a ready-made LinkedIn caption. Populated by JS. -->
-        <div id="post-share" class="share-panel"></div>
+    <!-- The closing band: appreciation, related, share. One band, one seam,
+         rather than three blocks each ruled off from the last with a hairline.
+         Hidden until the post has rendered, so an empty page never paints a
+         seam over nothing. -->
+    <div class="post-close seam section--lit" id="post-close" hidden style="--seam-from:var(--bg-1)">
+
+      <!-- Appreciation / heart control (populated by hearts.js) -->
+      <div class="post-hearts" id="post-hearts" style="display:none"></div>
+
+      <!-- Related articles (populated by JS) -->
+      <div id="post-related" style="display:none;padding:var(--sp-8) var(--container-pad)">
+        <div style="max-width:720px;margin:0 auto">
+          <p style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)" data-i18n="news.related">Related</p>
+          <div id="post-related-list" style="display:flex;flex-direction:column;gap:var(--sp-3)"></div>
+        </div>
+      </div>
+
+      <!-- Post footer / share -->
+      <div id="post-footer" style="display:none;padding:var(--sp-8) var(--container-pad)">
+        <div style="max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-4)">
+          <a href="./" class="btn btn-ghost" data-i18n="news.back">
+            <i class="ph ph-arrow-left" aria-hidden="true"></i>
+            Back to News
+          </a>
+          <!-- Generic share panel — deep links open the visitor's own apps
+               (WhatsApp/X/Telegram/LinkedIn), plus copy-link, native Web Share
+               on mobile and a ready-made LinkedIn caption. Populated by JS. -->
+          <div id="post-share" class="share-panel"></div>
+        </div>
       </div>
     </div>
 
@@ -138,10 +153,26 @@
   </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=eec324f6b6';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=eec324f6b6';
-    import { newsPostUrl } from '../assets/js/content-links.min.js?v=eec324f6b6';
-    import { mountPostHeart } from '../assets/js/hearts.min.js?v=eec324f6b6';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=1aa557f3a6';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=1aa557f3a6';
+    import { newsPostUrl } from '../assets/js/content-links.min.js?v=1aa557f3a6';
+    import { mountPostHeart } from '../assets/js/hearts.min.js?v=1aa557f3a6';
+    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=1aa557f3a6';
+
+    /* The cover drifts inside the frame it is clipped by, and nothing else on
+       this page moves: a story is running text, and running text is the case
+       parallax must never touch. docs/design-system.md, section 7.
+
+       This runs at the end of loadPost rather than on `load`, because the
+       cover is written by loadPost itself and the window load event arrives
+       while the article is still being fetched. motion.js fetches GSAP on its
+       own, and only after asking for prefers-reduced-motion. */
+    let _motionStarted = false;
+    async function startCoverDrift() {
+      if (_motionStarted || !document.querySelector('[data-drift]')) return;
+      _motionStarted = true;
+      if (await ensureMotionLibs()) initMotion();
+    }
 
     function catClass(cat) {
       const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
@@ -238,7 +269,7 @@
 
       // Build sidebar DOM
       const sidebar = document.createElement('nav');
-      sidebar.className = 'post-toc-sidebar';
+      sidebar.className = 'post-toc-sidebar glass';
       sidebar.setAttribute('aria-label', 'Story chapters');
 
       const label = document.createElement('div');
@@ -406,16 +437,16 @@
         { cls: 'share-li', icon: 'li', key: 'news.share_li', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
       ];
       const socialsHtml = socials.map(s =>
-        `<a class="share-social ${s.cls}" href="${s.href}" target="_blank" rel="noopener noreferrer" aria-label="${t(s.key)}" data-i18n-aria="${s.key}">${svgIcon(s.icon)}</a>`
+        `<a class="share-social glass-btn ${s.cls}" href="${s.href}" target="_blank" rel="noopener noreferrer" aria-label="${t(s.key)}" data-i18n-aria="${s.key}">${svgIcon(s.icon)}</a>`
       ).join('');
 
       container.innerHTML = `
         <span class="share-panel-label" data-i18n="news.share">${t('news.share')}</span>
         <div class="share-social-row">
           ${socialsHtml}
-          <button type="button" class="share-social share-copy" aria-label="${t('news.copy_link')}" data-i18n-aria="news.copy_link"><i class="ph ph-link" aria-hidden="true"></i></button>
-          <button type="button" class="share-social share-download" aria-expanded="false" aria-label="${t('news.share_download')}" data-i18n-aria="news.share_download"><i class="ph ph-images" aria-hidden="true"></i></button>
-          <button type="button" class="share-social share-native" aria-label="${t('news.share_native')}" data-i18n-aria="news.share_native" hidden><i class="ph ph-share-network" aria-hidden="true"></i></button>
+          <button type="button" class="share-social glass-btn share-copy" aria-label="${t('news.copy_link')}" data-i18n-aria="news.copy_link"><i class="ph ph-link" aria-hidden="true"></i></button>
+          <button type="button" class="share-social glass-btn share-download" aria-expanded="false" aria-label="${t('news.share_download')}" data-i18n-aria="news.share_download"><i class="ph ph-images" aria-hidden="true"></i></button>
+          <button type="button" class="share-social glass-btn share-native" aria-label="${t('news.share_native')}" data-i18n-aria="news.share_native" hidden><i class="ph ph-share-network" aria-hidden="true"></i></button>
         </div>
         <button type="button" class="share-caption-btn" data-i18n="news.share_caption">${t('news.share_caption')}</button>
         <span class="share-caption-sep" aria-hidden="true"></span>
@@ -648,12 +679,20 @@
           });
           coverEl.appendChild(wrap);
         } else {
+          // A frame, because that is the only thing on this site a picture is
+          // allowed to move inside: it clips, so the travel is bounded and the
+          // far edge can never be pulled into view. motion.js reads the two
+          // attributes and needs nothing written here. See .post-cover-frame.
+          const frame = document.createElement('div');
+          frame.className = 'frame post-cover-frame';
+          frame.setAttribute('data-drift-frame', '');
           const img = document.createElement('img');
           img.src = coverSrc;
           img.alt = post.title;
-          img.style.cssText = 'width:100%;max-height:460px;object-fit:cover;display:block;border-radius:var(--r-xl)';
           img.loading = 'eager';
-          coverEl.appendChild(img);
+          img.setAttribute('data-drift', '6');
+          frame.appendChild(img);
+          coverEl.appendChild(frame);
         }
         coverEl.style.display = 'block';
         document.getElementById('post-header').classList.add('has-cover');
@@ -720,19 +759,15 @@
           relatedPosts.forEach(rp => {
             const a = document.createElement('a');
             a.href = newsPostUrl(rp);
-            a.style.cssText = 'display:flex;gap:var(--sp-3);align-items:center;padding:var(--sp-3) var(--sp-4);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-lg);text-decoration:none;transition:border-color 0.15s';
-            a.onmouseover = () => { a.style.borderColor = 'var(--border-mid)'; };
-            a.onmouseout  = () => { a.style.borderColor = 'var(--border-subtle)'; };
+            a.className = 'post-related-item glass';
             const badgeEl = document.createElement('span');
             badgeEl.className = 'badge ' + catClass(rp.category);
-            badgeEl.style.flexShrink = '0';
             badgeEl.textContent = rp.category;
             const titleEl = document.createElement('span');
-            titleEl.style.cssText = 'font-size:var(--text-sm);color:var(--text-primary);flex:1;line-height:1.4';
+            titleEl.className = 'post-related-title';
             titleEl.textContent = rp.title;
             const arrow = document.createElement('i');
             arrow.className = 'ph ph-arrow-right';
-            arrow.style.cssText = 'color:var(--text-muted);flex-shrink:0';
             a.appendChild(badgeEl);
             a.appendChild(titleEl);
             a.appendChild(arrow);
@@ -743,11 +778,15 @@
       }
 
       document.getElementById('post-footer').style.display = 'block';
+      document.getElementById('post-close').hidden = false;
 
       // Generic share panel (deep links + copy + native Web Share + LinkedIn caption)
       buildSharePanel(post);
+
+      startCoverDrift();
     }
 
+    revealFailsafe();
     document.addEventListener('DOMContentLoaded', loadPost);
 
     // If the user changes language while reading the featured story, re-render
@@ -814,7 +853,8 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=eec324f6b6"></script>
-  <script src="../assets/js/analytics.min.js?v=eec324f6b6" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=1aa557f3a6"></script>
+
+  <script src="../assets/js/analytics.min.js?v=1aa557f3a6" defer></script>
 </body>
 </html>

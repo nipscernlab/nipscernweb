@@ -6,9 +6,9 @@
  * by default and revealed per item with a toggle.
  */
 
-import { t } from './i18n.js?v=eec324f6b6';
-import { pubLangFlag } from './main.js?v=eec324f6b6';
-import { publicationUrl } from './content-links.js?v=eec324f6b6';
+import { t } from './i18n.js?v=1aa557f3a6';
+import { pubLangFlag } from './main.js?v=1aa557f3a6';
+import { publicationUrl } from './content-links.js?v=1aa557f3a6';
 
 const TYPE_BADGE = {
   article:      'badge-blue',
@@ -84,7 +84,7 @@ function renderItem(pub, { showYear } = {}) {
     : '';
   const pdfViewerUrl = pub.pdf ? publicationUrl(pub) : '';
   const pdfBtn = pdfViewerUrl
-    ? `<a href="${pdfViewerUrl}" class="pub-open" aria-label="${t('publications.open_pdf')}: ${pub.title}"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>${t('publications.open_pdf')}</span></a>`
+    ? `<a href="${pdfViewerUrl}" class="pub-open glass-btn glass--flat" aria-label="${t('publications.open_pdf')}: ${pub.title}"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>${t('publications.open_pdf')}</span></a>`
     : '';
   const venue = (pub.journal && String(pub.journal).trim()) ? `<span class="pub-venue">${pub.journal}</span>` : '';
   const meta = [showYear ? pub.year : null, typeLabel].filter(Boolean).join(' · ');
@@ -148,7 +148,7 @@ function renderFeaturedCard(pub) {
   const typeLabel = t(`publications.types.${pub.type}`);
   const href = pub.pdf ? publicationUrl(pub) : '#';
   return `
-    <a class="pub-feat-card" href="${href}">
+    <a class="pub-feat-card glass" href="${href}">
       <div class="pub-feat-meta">
         <span class="badge ${typeClass}">${typeLabel}</span>
         <span class="pub-feat-year">${pub.year}</span>
