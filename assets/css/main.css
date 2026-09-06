@@ -2344,6 +2344,15 @@ a:hover > .frame > [data-drift],
    fill. */
 .project-card {
   position: relative;
+  /* Estes oito sao o caso que a nota sobre .glass descreve: um
+     backdrop-filter que se repete pagina abaixo e que o navegador refaz a
+     cada quadro enquanto ela rola. O desfoque e a metade cara e, aqui, a
+     metade invisivel: atras dos cards esta o degrade da propria banda, e
+     borrar um degrade devolve o degrade. Medido contra o original, o pior
+     pixel anda 3 de 255 e 0,13% deles se mexem. O que separa o card da
+     pagina e o brilho, e esse fica. */
+  backdrop-filter: saturate(190%) brightness(1.28);
+  -webkit-backdrop-filter: saturate(190%) brightness(1.28);
   --glass-tint: color-mix(in srgb, var(--project-accent, var(--brand)) 7%, transparent);
   --glass-edge: color-mix(in srgb, var(--project-accent, var(--brand)) 22%, transparent);
   --glass-edge-hover: color-mix(in srgb, var(--project-accent, var(--brand)) 48%, transparent);

@@ -63,8 +63,22 @@ export function initSmoothScroll() {
   if (REDUCED) return;
   /* Coarse pointer means touch, and touch keeps the platform's own momentum. */
   if (matchMedia('(pointer: coarse)').matches) return;
+  /* And only where something is actually hung off the scroll position.
 
-  import('./vendor/lenis.mjs?v=df6b1a345f').then(({ default: Lenis }) => {
+     The reason this file exists is the ordering problem: a scrubbed
+     ScrollTrigger reads the position that Lenis writes, once per frame, in
+     that order. A page with nothing scrubbed has no such problem to solve,
+     and what it got instead was 33 KB of library and a ticker moving the
+     window by hand for the length of the visit. That is a page that scrolls
+     worse than the browser would have scrolled it, which is the opposite of
+     the point.
+
+     So the pages that need it ask for it, on <html>, and the rest keep the
+     scrolling the platform already tuned. The three that ask today are the
+     home, the CERN page and SAPHO, which are the three with a scrub. */
+  if (!document.documentElement.hasAttribute('data-smooth-scroll')) return;
+
+  import('./vendor/lenis.mjs?v=2629530263').then(({ default: Lenis }) => {
     lenis = new Lenis({
       /* Higher is snappier. The default 0.1 leaves the page still settling well
          after the wheel has stopped, which on a site with a fixed navigation and
