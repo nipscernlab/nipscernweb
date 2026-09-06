@@ -26,8 +26,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-index.css?v=1aa557f3a6">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=1aa557f3a6">
+  <link rel="stylesheet" href="../assets/css/icons/projects-index.css?v=7340b337c6">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=7340b337c6">
 </head>
 <body>
 
@@ -56,12 +56,16 @@
       </div>
     </header>
 
-    <section class="section">
+    <!-- The grid.
+         A band that fades out of the hero's colour (.seam / --seam-from) with
+         the washes the cards need under them (.section--lit).
+         docs/design-system.md, sections 1 and 3. -->
+    <section class="section seam section--lit" style="--seam-from:var(--bg-0)">
       <div class="container">
         <div class="grid grid-auto-lg stagger-children">
 
           <!-- SAPHO -->
-          <a href="sapho" class="project-card" style="--project-accent:var(--accent-sapho)" aria-label="SAPHO: Scalable-Architecture Processor for Hardware Optimization">
+          <a href="sapho" class="project-card glass" style="--project-accent:var(--accent-sapho)" aria-label="SAPHO: Scalable-Architecture Processor for Hardware Optimization">
             <i class="ph ph-cpu project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
               <div class="project-icon"><i class="ph ph-cpu" aria-hidden="true"></i></div>
@@ -86,7 +90,7 @@
           </a>
 
           <!-- YANC -->
-          <a href="yanc" class="project-card" style="--project-accent:var(--accent-yanc)" aria-label="YANC: Yet Another NIPS-CERN Compiler">
+          <a href="yanc" class="project-card glass" style="--project-accent:var(--accent-yanc)" aria-label="YANC: Yet Another NIPS-CERN Compiler">
             <i class="ph ph-terminal project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
               <div class="project-icon"><i class="ph ph-terminal" aria-hidden="true"></i></div>
@@ -111,7 +115,7 @@
           </a>
 
           <!-- HITS -->
-          <a href="hits" class="project-card" style="--project-accent:var(--accent-hits)" aria-label="HITS: Hardware Impulse Train Synthesizer, an FPGA simulator of the ATLAS Tile Calorimeter readout">
+          <a href="hits" class="project-card glass" style="--project-accent:var(--accent-hits)" aria-label="HITS: Hardware Impulse Train Synthesizer, an FPGA simulator of the ATLAS Tile Calorimeter readout">
             <i class="ph ph-pulse project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
               <div class="project-icon"><i class="ph ph-pulse" aria-hidden="true"></i></div>
@@ -136,7 +140,7 @@
           </a>
 
           <!-- AURORA -->
-          <a href="aurora" class="project-card" style="--project-accent:var(--accent-aurora)" aria-label="AURORA: Advanced Utility Running Optimized Resource Architectures">
+          <a href="aurora" class="project-card glass" style="--project-accent:var(--accent-aurora)" aria-label="AURORA: Advanced Utility Running Optimized Resource Architectures">
             <i class="ph ph-app-window project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
               <div class="project-icon"><i class="ph ph-app-window" aria-hidden="true"></i></div>
@@ -161,7 +165,7 @@
           </a>
 
           <!-- CGV-WEB -->
-          <a href="cgv" class="project-card" style="--project-accent:var(--accent-cgv)" aria-label="CGV: Calorimeter Geometry Viewer">
+          <a href="cgv" class="project-card glass" style="--project-accent:var(--accent-cgv)" aria-label="CGV: Calorimeter Geometry Viewer">
             <i class="ph ph-atom project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
               <div class="project-icon"><i class="ph ph-atom" aria-hidden="true"></i></div>
@@ -186,7 +190,7 @@
           </a>
 
           <!-- GitHub -->
-          <a href="https://github.com/nipscernlab" target="_blank" rel="noopener" class="project-card" style="--project-accent:#f0f6fc;--project-accent-dim:rgba(240,246,252,0.08)" aria-label="NIPS-CERN on GitHub — Open Source Repository">
+          <a href="https://github.com/nipscernlab" target="_blank" rel="noopener" class="project-card glass" style="--project-accent:#f0f6fc;--project-accent-dim:rgba(240,246,252,0.08)" aria-label="NIPS-CERN on GitHub — Open Source Repository">
             <i class="ph ph-github-logo project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
               <div class="project-icon" style="color:#e6edf3;background:rgba(240,246,252,0.08)">
@@ -210,7 +214,7 @@
           </a>
 
           <!-- GitLab -->
-          <a href="https://gitlab.com/nips-cern" target="_blank" rel="noopener" class="project-card" style="--project-accent:#fc6d26;--project-accent-dim:rgba(252,109,38,0.08)" aria-label="NIPS-CERN on GitLab — including the Surfer fork for AURORA">
+          <a href="https://gitlab.com/nips-cern" target="_blank" rel="noopener" class="project-card glass" style="--project-accent:#fc6d26;--project-accent-dim:rgba(252,109,38,0.08)" aria-label="NIPS-CERN on GitLab — including the Surfer fork for AURORA">
             <i class="ph ph-gitlab-logo project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
               <div class="project-icon" style="color:#fc6d26;background:rgba(252,109,38,0.1)"><i class="ph ph-gitlab-logo" aria-hidden="true"></i></div>
@@ -230,7 +234,7 @@
           </a>
 
           <!-- Archived Projects -->
-          <a href="archived" class="project-card" style="--project-accent:#94a3b8;--project-accent-dim:rgba(148,163,184,0.08)" aria-label="Archived Projects — retired NIPS-CERN projects, kept on record">
+          <a href="archived" class="project-card glass" style="--project-accent:#94a3b8;--project-accent-dim:rgba(148,163,184,0.08)" aria-label="Archived Projects — retired NIPS-CERN projects, kept on record">
             <i class="ph ph-archive project-card-bg-icon" aria-hidden="true"></i>
             <div class="project-card-header">
               <div class="project-icon" style="color:var(--text-secondary);background:rgba(148,163,184,0.1)"><i class="ph ph-archive" aria-hidden="true"></i></div>
@@ -258,7 +262,7 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=1aa557f3a6"></script>
-  <script src="../assets/js/analytics.min.js?v=1aa557f3a6" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=7340b337c6"></script>
+  <script src="../assets/js/analytics.min.js?v=7340b337c6" defer></script>
 </body>
 </html>

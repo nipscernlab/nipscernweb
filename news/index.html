@@ -26,8 +26,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/news-index.css?v=1aa557f3a6">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=1aa557f3a6">
+  <link rel="stylesheet" href="../assets/css/icons/news-index.css?v=7340b337c6">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=7340b337c6">
 </head>
 <body>
 
@@ -142,10 +142,10 @@
   <footer id="footer" role="contentinfo"></footer>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=1aa557f3a6';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=1aa557f3a6';
-    import { newsPostUrl, newsKey } from '../assets/js/content-links.min.js?v=1aa557f3a6';
-    import { fetchAllCounts, tallyElement, heartSvg } from '../assets/js/hearts.min.js?v=1aa557f3a6';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=7340b337c6';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=7340b337c6';
+    import { newsPostUrl, newsKey } from '../assets/js/content-links.min.js?v=7340b337c6';
+    import { fetchAllCounts, tallyElement, heartSvg } from '../assets/js/hearts.min.js?v=7340b337c6';
 
     async function loadNews() {
       const res = await fetch('../data/news.json');
@@ -189,7 +189,7 @@
       article.innerHTML = `
         <a href="${newsPostUrl(featured)}" class="news-featured-link" aria-label="${tr.title || ''}">
           <div class="news-featured-media">
-            <span class="news-featured-ribbon"><i class="ph ph-star" aria-hidden="true"></i> ${ribbonText}</span>
+            <span class="news-featured-ribbon" role="img" aria-label="${ribbonText}" title="${ribbonText}"><i class="ph ph-star-fill" aria-hidden="true"></i></span>
             <img src="${assetUrl(featured.image)}" alt="" loading="eager"
                  onerror="this.style.display='none';
                           var ic=document.createElement('i');
@@ -258,14 +258,18 @@
         imgDiv.appendChild(icon);
       }
       if (opts.featured) {
+        // The mark is a star on a disc of glass, and the words it replaces stay
+        // on the element as its name. See .news-card-ribbon.
+        const label = t('news.featured_story');
         const ribbon = document.createElement('span');
         ribbon.className = 'news-card-ribbon';
+        ribbon.setAttribute('role', 'img');
+        ribbon.setAttribute('aria-label', label);
+        ribbon.title = label;
         const star = document.createElement('i');
-        star.className = 'ph ph-star';
+        star.className = 'ph ph-star-fill';
         star.setAttribute('aria-hidden', 'true');
         ribbon.appendChild(star);
-        const lang = getLang() || 'en';
-        ribbon.appendChild(document.createTextNode(' ' + t('news.featured_story')));
         imgDiv.appendChild(ribbon);
       }
 
@@ -514,7 +518,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=1aa557f3a6"></script>
-  <script src="../assets/js/analytics.min.js?v=1aa557f3a6" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=7340b337c6"></script>
+  <script src="../assets/js/analytics.min.js?v=7340b337c6" defer></script>
 </body>
 </html>

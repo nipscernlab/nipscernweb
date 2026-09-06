@@ -26,8 +26,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-yanc.css?v=1aa557f3a6">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=1aa557f3a6">
+  <link rel="stylesheet" href="../assets/css/icons/projects-yanc.css?v=7340b337c6">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=7340b337c6">
 
   <style>
     :root {
@@ -137,9 +137,12 @@
     }
 
     /* code cards */
+    /* Glass, with a tint dark enough to read code through. The paint, the
+       edge and the two inset hairlines come from .glass in the markup; what
+       is set here is only how much of the band shows through. */
     .code-card {
-      background: #0a0d16; border: 1px solid var(--border-subtle); border-radius: var(--r-lg);
-      overflow: hidden; box-shadow: 0 24px 60px -40px rgba(0,0,0,0.9);
+      --glass-tint: rgba(10, 13, 22, 0.86);
+      border-radius: var(--r-lg); overflow: hidden;
     }
     .code-top { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .code-top .dots { display: flex; gap: 6px; }
@@ -186,8 +189,9 @@
     /* Dirac panel */
     .dirac-panel {
       position: relative; overflow: hidden;
-      background: linear-gradient(180deg, rgba(34,211,238,0.05), transparent 36%), #0a0d16;
-      border: 1px solid var(--ync-line); border-radius: var(--r-2xl);
+      --glass-tint: rgba(10, 13, 22, 0.82);
+      --glass-edge: var(--ync-line);
+      border-color: var(--glass-edge);
       padding: var(--sp-10);
     }
     .dirac-panel::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--grad-machine); }
@@ -318,7 +322,7 @@
     </header>
 
     <!-- ── Identity strip ── -->
-    <div style="background:var(--bg-card);border-bottom:1px solid var(--border-subtle);border-top:1px solid var(--border-subtle);padding:var(--sp-4) 0">
+    <div class="seam" style="background:var(--bg-card);--seam-from:var(--bg-0);padding:var(--sp-4) 0">
       <div class="container" style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
         <span class="badge badge-green">Active development</span>
         <span class="badge badge-gray">v5.2</span>
@@ -336,7 +340,7 @@
     </div>
 
     <!-- ── 01: The name ── -->
-    <section class="section" style="background:var(--bg-0)">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-card)">
       <div class="container container--narrow">
         <div class="sec-label fade-up"><span class="n">» 01</span> The name</div>
         <p class="lede fade-up">
@@ -363,7 +367,7 @@
     </section>
 
     <!-- ── 02: Two languages, one core ── -->
-    <section class="section" style="border-top:1px solid var(--border-subtle)">
+    <section class="section seam section--lit" style="--seam-from:var(--bg-0)">
       <div class="container">
         <div class="sec-label fade-up"><span class="n">» 02</span> Two languages, one core</div>
         <div class="prose fade-up" style="max-width:68ch">
@@ -388,7 +392,7 @@
 
         <div class="converge" style="margin-top:var(--sp-8)">
           <div class="fade-up">
-            <div class="code-card">
+            <div class="code-card glass">
               <div class="code-top">
                 <span class="dots"><i></i><i></i><i></i></span>
                 <span class="fn">Sqrt.cmm</span>
@@ -423,7 +427,7 @@
           </div>
 
           <div class="fade-up">
-            <div class="code-card">
+            <div class="code-card glass">
               <div class="code-top">
                 <span class="dots"><i></i><i></i><i></i></span>
                 <span class="fn">test61.cpp</span>
@@ -463,7 +467,7 @@
     </section>
 
     <!-- ── 03: The pipeline ── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-1)">
       <div class="container">
         <div class="sec-label fade-up"><span class="n">» 03</span> The pipeline</div>
         <div class="prose fade-up" style="max-width:68ch">
@@ -489,10 +493,10 @@
     </section>
 
     <!-- ── 04: Dirac notation ── -->
-    <section class="section">
+    <section class="section seam section--lit" style="--seam-from:var(--bg-0)">
       <div class="container">
         <div class="sec-label fade-up"><span class="n">» 04</span> Native physics</div>
-        <div class="dirac-panel fade-up">
+        <div class="dirac-panel glass fade-up">
           <div class="dirac-mark" aria-hidden="true">⟨|⟩</div>
           <div class="dirac-grid">
             <div>
@@ -530,7 +534,7 @@ a <span class="op">#</span> 0.001<span class="brk">|in(0)⟩</span>;</pre>
     </section>
 
     <!-- ── 05: Source-level waves ── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-1)">
       <div class="container">
         <div class="sec-label fade-up"><span class="n">» 05</span> Watch it run</div>
         <div class="split lead">
@@ -574,7 +578,7 @@ a <span class="op">#</span> 0.001<span class="brk">|in(0)⟩</span>;</pre>
     </section>
 
     <!-- ── 06: Hardware that fits ── -->
-    <section class="section" style="border-top:1px solid var(--border-subtle)">
+    <section class="section seam" style="--seam-from:var(--bg-0)">
       <div class="container container--narrow">
         <div class="sec-label fade-up"><span class="n">» 06</span> Hardware that fits</div>
         <div class="prose fade-up">
@@ -614,9 +618,9 @@ a <span class="op">#</span> 0.001<span class="brk">|in(0)⟩</span>;</pre>
     </section>
 
     <!-- ── Get it ── -->
-    <section class="section" style="background:var(--bg-0);border-top:1px solid var(--border-subtle)">
+    <section class="section seam section--lit" style="background:var(--bg-0);--seam-from:var(--bg-1)">
       <div class="container container--narrow">
-        <div class="fade-up" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--r-2xl);padding:var(--sp-10)">
+        <div class="glass fade-up" style="padding:var(--sp-10)">
           <div class="split" style="align-items:center;gap:var(--sp-8)">
             <div class="prose">
               <h2 class="heading-md" style="margin-bottom:var(--sp-3)">Get YANC</h2>
@@ -662,7 +666,7 @@ a <span class="op">#</span> 0.001<span class="brk">|in(0)⟩</span>;</pre>
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=1aa557f3a6"></script>
-  <script src="../assets/js/analytics.min.js?v=1aa557f3a6" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=7340b337c6"></script>
+  <script src="../assets/js/analytics.min.js?v=7340b337c6" defer></script>
 </body>
 </html>
