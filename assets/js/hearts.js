@@ -9,7 +9,7 @@
  *   - set window.HEARTS_API_BASE = 'https://nipscern-hearts.<sub>.workers.dev'
  *   - or edit the constant below.
  */
-import { t, getLang } from './i18n.js?v=eec324f6b6';
+import { t, getLang } from './i18n.js?v=1aa557f3a6';
 
 const API_BASE =
   (typeof window !== 'undefined' && window.HEARTS_API_BASE) ||
@@ -114,7 +114,7 @@ export function mountPostHeart(container, post) {
 
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'heart-btn';
+  btn.className = 'heart-btn glass-btn';
   const icon = heartSvg();
   const countEl = document.createElement('span');
   countEl.className = 'heart-count';

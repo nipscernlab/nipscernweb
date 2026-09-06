@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/publications.css?v=eec324f6b6">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=eec324f6b6">
+  <link rel="stylesheet" href="assets/css/icons/publications.css?v=1aa557f3a6">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=1aa557f3a6">
 </head>
 <body style="--page-end:var(--bg-0)">
 
@@ -57,7 +57,12 @@
       </div>
     </header>
 
-    <section class="section">
+    <!-- The archive.
+         A band, with the hero's colour faded down through its first 200px
+         (.seam / --seam-from) and a pair of wide washes under it
+         (.section--lit) so the controls plate has something to blur.
+         docs/design-system.md, sections 1 and 3. -->
+    <section class="section seam section--lit" style="--seam-from:var(--bg-0)">
       <div class="container">
 
         <!-- Overview stats — populated by publications.js -->
@@ -67,20 +72,20 @@
         <div id="pub-featured" class="pub-featured fade-up" aria-label="Featured publications" hidden></div>
 
         <!-- Controls -->
-        <div class="pub-controls fade-up" role="search" aria-label="Search and filter publications">
+        <div class="pub-controls glass glass--flat fade-up" role="search" aria-label="Search and filter publications">
           <div class="search-input-wrap">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
             <input
               type="search"
               id="pub-search"
-              class="search-input"
+              class="search-input glass-btn"
               data-i18n-placeholder="publications.search_placeholder"
               placeholder="Search by title, author, or keyword…"
               aria-label="Search publications"
             >
           </div>
 
-          <select id="pub-filter-type" class="select-filter" aria-label="Filter by type" data-i18n-aria="publications.filter_type">
+          <select id="pub-filter-type" class="select-filter glass-btn" aria-label="Filter by type" data-i18n-aria="publications.filter_type">
             <option value="" data-i18n="publications.filter_all">All types</option>
             <option value="journal" data-i18n="publications.types.journal">Journal Article</option>
             <option value="conference" data-i18n="publications.types.conference">Conference</option>
@@ -94,7 +99,7 @@
             <input
               type="text"
               id="pub-author-input"
-              class="author-combo-input"
+              class="author-combo-input glass-btn"
               role="combobox"
               aria-expanded="false"
               aria-controls="pub-author-list"
@@ -108,14 +113,14 @@
             <button type="button" class="author-combo-clear" id="pub-author-clear" aria-label="Clear author filter" hidden>
               <i class="ph ph-x" aria-hidden="true"></i>
             </button>
-            <ul class="author-combo-list" id="pub-author-list" role="listbox" aria-label="Authors" hidden></ul>
+            <ul class="author-combo-list glass" id="pub-author-list" role="listbox" aria-label="Authors" hidden></ul>
           </div>
 
-          <select id="pub-filter-year" class="select-filter" aria-label="Filter by year" data-i18n-aria="publications.filter_year">
+          <select id="pub-filter-year" class="select-filter glass-btn" aria-label="Filter by year" data-i18n-aria="publications.filter_year">
             <option value="" data-i18n="publications.all_years">All years</option>
           </select>
 
-          <select id="pub-sort" class="select-filter" aria-label="Sort publications" data-i18n-aria="publications.sort">
+          <select id="pub-sort" class="select-filter glass-btn" aria-label="Sort publications" data-i18n-aria="publications.sort">
             <option value="year" data-i18n="publications.sort_year">By year</option>
             <option value="recent" data-i18n="publications.sort_recent">Most recent</option>
             <option value="featured" data-i18n="publications.sort_featured">Featured</option>
@@ -145,9 +150,9 @@
     </section>
 
     <!-- CERN Courier featured banner -->
-    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-1);padding-bottom:var(--sp-20)">
+    <section class="section seam section--lit" style="background:var(--bg-0);--seam-from:var(--bg-1);padding-bottom:var(--sp-20)">
       <div class="container">
-        <div class="courier-banner fade-up" role="region" aria-label="CERN Courier">
+        <div class="courier-banner glass fade-up" role="region" aria-label="CERN Courier">
           <div class="courier-banner-icon" aria-hidden="true">
             <i class="ph ph-newspaper-clipping"></i>
           </div>
@@ -180,15 +185,15 @@
     </section>
 
 
-    <div id="supporters"></div>
+    <div id="supporters" style="--seam-from:var(--bg-0)"></div>
   </main>
 
   <footer id="footer" role="contentinfo"></footer>
 
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
-  <script type="module" src="assets/js/main.min.js?v=eec324f6b6"></script>
+  <script type="module" src="assets/js/main.min.js?v=1aa557f3a6"></script>
   <script type="module">
-    import { initPublications } from './assets/js/publications.min.js?v=eec324f6b6';
+    import { initPublications } from './assets/js/publications.min.js?v=1aa557f3a6';
     // Defer until after DOMContentLoaded so main.js has already run
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
@@ -196,6 +201,6 @@
       setTimeout(initPublications, 50);
     }
   </script>
-  <script src="assets/js/analytics.min.js?v=eec324f6b6" defer></script>
+  <script src="assets/js/analytics.min.js?v=1aa557f3a6" defer></script>
 </body>
 </html>

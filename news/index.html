@@ -26,8 +26,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/news-index.css?v=eec324f6b6">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=eec324f6b6">
+  <link rel="stylesheet" href="../assets/css/icons/news-index.css?v=1aa557f3a6">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=1aa557f3a6">
 </head>
 <body>
 
@@ -59,12 +59,23 @@
     <!-- Featured story slot (populated dynamically) -->
     <section id="news-featured-slot" data-i18n-aria="news.featured_story" aria-label="Featured story" style="display:none"></section>
 
-    <section class="section">
+    <!-- The feed.
+         A band: the hero's colour fades down through its first 200px
+         (.seam / --seam-from), and .section--lit paints the two washes the
+         panes on it need to be worth their filter.
+         docs/design-system.md, sections 1 and 3.
+
+         Nothing here drifts. Every cover is inside a clipping frame, which is
+         the licence the system gives for movement, but a cover that drifts
+         cannot also zoom under the pointer, because GSAP writes an inline
+         transform on it every frame, and section 6 says to prefer the zoom:
+         it is the one the reader asked for. -->
+    <section class="section seam section--lit" style="--seam-from:var(--bg-0)">
       <div class="container">
 
         <!-- View switcher: cards (default) / list / grid -->
         <div class="news-toolbar">
-          <div class="news-view-toggle" role="group" aria-label="News layout" data-i18n-aria="news.view_group">
+          <div class="news-view-toggle glass glass--flat" role="group" aria-label="News layout" data-i18n-aria="news.view_group">
             <button type="button" class="news-view-btn" data-view="list" aria-pressed="false" aria-label="List view" data-i18n-aria="news.view_list" title="List view" data-i18n-title="news.view_list">
               <i class="ph ph-rows" aria-hidden="true"></i>
             </button>
@@ -93,21 +104,21 @@
 
           <!-- Sidebar -->
           <aside class="news-sidebar" aria-label="Recent awards">
-            <div class="sidebar-widget" id="mostloved-widget" style="display:none">
+            <div class="sidebar-widget glass" id="mostloved-widget" style="display:none">
               <div class="sidebar-widget-title" data-i18n="news.most_loved">Most loved</div>
               <div id="sidebar-mostloved">
                 <!-- Populated by script from heart counts -->
               </div>
             </div>
 
-            <div class="sidebar-widget">
+            <div class="sidebar-widget glass">
               <div class="sidebar-widget-title" data-i18n="news.sidebar_awards">Recent Awards</div>
               <div id="sidebar-awards">
                 <!-- Populated by script -->
               </div>
             </div>
 
-            <div class="sidebar-widget">
+            <div class="sidebar-widget glass">
               <div class="sidebar-widget-title">About the Lab</div>
               <!-- unDraw illustration — download from undraw.co, save as assets/images/undraw/undraw_news.svg -->
               <figure style="text-align:center;margin:0 auto var(--sp-4);max-width:180px;opacity:0.65" aria-hidden="true">
@@ -131,10 +142,10 @@
   <footer id="footer" role="contentinfo"></footer>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=eec324f6b6';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=eec324f6b6';
-    import { newsPostUrl, newsKey } from '../assets/js/content-links.min.js?v=eec324f6b6';
-    import { fetchAllCounts, tallyElement, heartSvg } from '../assets/js/hearts.min.js?v=eec324f6b6';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=1aa557f3a6';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=1aa557f3a6';
+    import { newsPostUrl, newsKey } from '../assets/js/content-links.min.js?v=1aa557f3a6';
+    import { fetchAllCounts, tallyElement, heartSvg } from '../assets/js/hearts.min.js?v=1aa557f3a6';
 
     async function loadNews() {
       const res = await fetch('../data/news.json');
@@ -503,7 +514,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=eec324f6b6"></script>
-  <script src="../assets/js/analytics.min.js?v=eec324f6b6" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=1aa557f3a6"></script>
+  <script src="../assets/js/analytics.min.js?v=1aa557f3a6" defer></script>
 </body>
 </html>
