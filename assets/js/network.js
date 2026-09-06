@@ -110,7 +110,7 @@ export async function initNetwork(canvas, opts = {}) {
   /* No WebGL, no canvas. The plate over it carries the figures and stays. */
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=f8d16ce7c5');
+    THREE = await import('./vendor/three.module.min.js?v=eec324f6b6');
   } catch (e) {
     return null;
   }
@@ -219,7 +219,10 @@ export async function initNetwork(canvas, opts = {}) {
     /* Narrow screens see the graph from further back, or the outer shell of it
        runs off both sides. The graph is a unit sphere, so this is the whole of
        the responsive behaviour it needs. */
-    camera.position.z = w < 600 ? 4.1 : 3.2;
+    /* Mais perto na tela larga desde 05/09/2026: a figura estava pequena
+       para o espaco que ocupa. No celular a camera continua onde estava,
+       porque ali o grafo divide a faixa com o texto. */
+    camera.position.z = w < 600 ? 4.1 : 2.75;
     camera.updateProjectionMatrix();
     draw();
   }

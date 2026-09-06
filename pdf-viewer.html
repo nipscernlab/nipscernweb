@@ -14,7 +14,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/pdf-viewer.css?v=f8d16ce7c5">
+  <link rel="stylesheet" href="assets/css/icons/pdf-viewer.css?v=eec324f6b6">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -910,7 +910,7 @@
     populateInfo();
 
     var displayTitle = pTitle || pdfFilename;
-    document.title       = displayTitle + ' — NIPS-CERN PDF Viewer';
+    document.title       = displayTitle + ' | NIPS-CERN PDF Viewer';
     docTitle.textContent = displayTitle;
 
     var resolvedUrl = new URL(pdfSrc, window.location.href).href;
@@ -931,7 +931,7 @@
             var t = meta.info.Title.trim();
             docTitle.textContent = t;
             setInfoVal('i-title', t);
-            document.title = t + ' — NIPS-CERN PDF Viewer';
+            document.title = t + ' | NIPS-CERN PDF Viewer';
           }
           if (meta.info.Author && !pAuthors) setInfoVal('i-authors', meta.info.Author);
         }
@@ -966,6 +966,6 @@
 })();
 </script>
 
-  <script src="assets/js/analytics.min.js?v=f8d16ce7c5" defer></script>
+  <script src="assets/js/analytics.min.js?v=eec324f6b6" defer></script>
 </body>
 </html>
