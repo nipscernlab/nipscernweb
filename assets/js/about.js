@@ -30,11 +30,11 @@
  * is the only literal part, and it turns over when the record is open.
  */
 
-import { t } from './i18n.js?v=f8d16ce7c5';
+import { t } from './i18n.js?v=eec324f6b6';
 /* Never scrollIntoView({behavior:'smooth'}) on this site: Lenis is driving the
    scroll position from its own ticker and the two animations fight, which
    reads as no scroll at all. scrollToEl asks the library. */
-import { scrollToEl } from './smooth-scroll.js?v=f8d16ce7c5';
+import { scrollToEl } from './smooth-scroll.js?v=eec324f6b6';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -313,21 +313,39 @@ function mountRoster(grid, members, records) {
    on the home page uses, and for the same reason: what is behind this import is
    188 KB of three.js, and a reader who never reaches the section should never
    pay for it. */
+/* A altura da placa, publicada para o CSS.
+   O palco do grafo tem de terminar acima da placa, e a placa nao tem uma
+   altura: sao 151 px numa tela larga, 263 px num telefone, onde os quatro
+   numeros viram duas colunas e a dica quebra em mais linhas. Um numero
+   fixo no CSS acertava a tela larga e deixava o desenho por cima dos
+   numeros no telefone. Isto e o mesmo que main.js faz com a faixa do topo,
+   pelo mesmo motivo, e o literal do CSS continua valendo enquanto isto nao
+   roda. */
+function publishPlateHeight() {
+  const plate = document.querySelector('.net-plate');
+  if (!plate) return;
+  const publish = () => document.documentElement.style.setProperty('--net-plate-h', plate.offsetHeight + 'px');
+  publish();
+  if ('ResizeObserver' in window) new ResizeObserver(publish).observe(plate);
+  else addEventListener('resize', publish, { passive: true });
+}
+
 function mountNetwork(net) {
   const stage = document.getElementById('net-stage');
   const canvas = document.getElementById('net-canvas');
   if (!stage || !canvas) return;
+  publishPlateHeight();
 
   let started = false;
   const start = () => {
     if (started) return;
     started = true;
-    import('./network.js?v=f8d16ce7c5').then(({ initNetwork }) =>
+    import('./network.js?v=eec324f6b6').then(({ initNetwork }) =>
       initNetwork(canvas, { tip: document.getElementById('net-tip'), data: net })
     ).then((api) => {
       if (!api) { stage.classList.add('is-flat'); return; }
       stage.classList.add('is-live');
-      import('./motion.js?v=f8d16ce7c5').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
+      import('./motion.js?v=eec324f6b6').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
     }).catch(() => stage.classList.add('is-flat'));
   };
 

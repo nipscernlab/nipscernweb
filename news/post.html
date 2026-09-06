@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">News — NIPS-CERN</title>
+  <title id="page-title">News | NIPS-CERN</title>
   <meta name="description" id="page-desc" content="News post from NIPS-CERN.">
 
   <meta property="og:type"  content="article">
@@ -25,8 +25,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=f8d16ce7c5">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=f8d16ce7c5">
+  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=eec324f6b6">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=eec324f6b6">
 </head>
 <body>
 
@@ -138,10 +138,10 @@
   </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=f8d16ce7c5';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=f8d16ce7c5';
-    import { newsPostUrl } from '../assets/js/content-links.min.js?v=f8d16ce7c5';
-    import { mountPostHeart } from '../assets/js/hearts.min.js?v=f8d16ce7c5';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=eec324f6b6';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=eec324f6b6';
+    import { newsPostUrl } from '../assets/js/content-links.min.js?v=eec324f6b6';
+    import { mountPostHeart } from '../assets/js/hearts.min.js?v=eec324f6b6';
 
     function catClass(cat) {
       const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
@@ -567,7 +567,7 @@
       const _tr = post._featured ? {} : (post.translations && post.translations[_lang]) || {};
 
       // Update meta
-      document.getElementById('page-title').textContent = (_tr.title || post.title) + ' — NIPS-CERN';
+      document.getElementById('page-title').textContent = (_tr.title || post.title) + ' | NIPS-CERN';
       document.getElementById('page-desc').content = _tr.excerpt || post.excerpt;
       document.getElementById('og-title').content = _tr.title || post.title;
       document.getElementById('og-desc').content = _tr.excerpt || post.excerpt;
@@ -759,7 +759,7 @@
         const tr = (_currentPost.translations && _currentPost.translations[lang]) || {};
         document.getElementById('post-title').textContent   = tr.title   || _currentPost.title;
         document.getElementById('post-excerpt').textContent = tr.excerpt || _currentPost.excerpt;
-        document.getElementById('page-title').textContent   = (tr.title || _currentPost.title) + ' — NIPS-CERN';
+        document.getElementById('page-title').textContent   = (tr.title || _currentPost.title) + ' | NIPS-CERN';
         const rawContent = tr.content || _currentPost.content || '';
         if (rawContent) {
           const bodyEl = document.getElementById('post-body');
@@ -793,7 +793,7 @@
         const tr = pickLang(featured);
         document.getElementById('post-title').textContent   = tr.title || '';
         document.getElementById('post-excerpt').textContent = tr.subtitle || tr.excerpt || '';
-        document.getElementById('page-title').textContent   = (tr.title || '') + ' — NIPS-CERN';
+        document.getElementById('page-title').textContent   = (tr.title || '') + ' | NIPS-CERN';
         renderEditedDate(featured.date_edited);
         renderLangFlag(featured);
         buildSharePanel(_currentPost);
@@ -814,7 +814,7 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=f8d16ce7c5"></script>
-  <script src="../assets/js/analytics.min.js?v=f8d16ce7c5" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=eec324f6b6"></script>
+  <script src="../assets/js/analytics.min.js?v=eec324f6b6" defer></script>
 </body>
 </html>

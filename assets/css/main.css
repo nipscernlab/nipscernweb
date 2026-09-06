@@ -4167,8 +4167,14 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
    true thing, because the figures are written into the markup from the same
    file the drawing reads.
    ------------------------------------------------------------ */
+/* The band is tall because the drawing is sized by the height it is given:
+   the camera's field of view is vertical, so the graph grows with the
+   stage and not with the width of the page. Bounding the stage above the
+   plate took a third of that height away, and the figure came out small.
+   The band gets the height back at the top, where there is nothing to
+   push out of the way. */
 .net-hero {
-  padding: calc(var(--nav-h) + var(--sp-24)) 0 var(--sp-16);
+  padding: calc(var(--nav-h) + var(--sp-32) + 90px) 0 var(--sp-16);
 }
 .net-stage {
   position: absolute;
@@ -4177,7 +4183,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
      how far down the plate was moved. The stage stops above the plate
      instead: the hero's own bottom padding, plus the plate's height, plus a
      margin so the faintest line still ends clear of the hairline. */
-  inset: 0 0 calc(var(--sp-16) + 190px) 0;
+  inset: 0 0 calc(var(--sp-16) + var(--net-plate-h, 190px) + var(--sp-8)) 0;
   overflow: hidden;
 }
 #net-canvas {
@@ -4190,11 +4196,21 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 }
 .net-stage.is-live #net-canvas { opacity: 1; }
 /* On a wide screen the graph steps out from under the words: the canvas is
-   wider than the band and pushed right, so its centre — where the density is —
-   sits beside the heading rather than behind it. The stage clips the excess.
-   On a phone the two stack anyway and the shift comes off. */
+   wider than the band and pushed right, so its centre, which is where the
+   density is, sits beside the heading rather than behind it. The stage clips
+   the excess. On a phone the two stack anyway and the shift comes off.
+
+   Widened and dropped on 2026-09-05: the figure was reading small and its
+   centre sat level with the heading, which put the busiest part of the drawing
+   next to the words competing with them. Wider canvas, further into the
+   corner, and pushed down so the dense middle sits below the line of the
+   heading. The stage still stops above the plate, so none of this reaches the
+   numbers. */
 @media (min-width: 900px) {
-  #net-canvas { left: auto; right: -12%; width: 78%; }
+  /* Widening and pushing right by the same share leaves the centre where it
+     was, which is what the first attempt did. The offset has to outrun the
+     width for the dense middle to move into the corner. */
+  #net-canvas { left: auto; right: -30%; width: 94%; top: 14%; }
 }
 /* Under 900px the graph is behind the text, so the text gets ground to stand
    on: the band's own colour pooled behind the column, fading to nothing. */
