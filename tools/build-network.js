@@ -28,9 +28,8 @@
    duas. Um grafo que junta duas pessoas para arredondar um número deixa de ser
    um dado.
 
-   Quatro dos dezoito membros do laboratório não aparecem: são bolsistas de
-   iniciação científica que ainda não publicaram. Não há nó para eles, e não se
-   inventa um.
+   Os bolsistas de iniciação científica que ainda não publicaram não aparecem.
+   Não há nó para eles, e não se inventa um.
 
    Uso:  node tools/build-network.js
    Também é chamado por tools/build-data-slices.js, que é o que o guard roda.

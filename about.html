@@ -27,8 +27,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/about.css?v=2629530263">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=2629530263">
+  <link rel="stylesheet" href="assets/css/icons/about.css?v=62c22c5056">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=62c22c5056">
 </head>
 <body>
 
@@ -162,15 +162,43 @@
     </section>
 
     <!-- ======================================================
+         COLLABORATING PROFESSORS
+         ------------------------------------------------------
+         Professors from other departments and other universities who co-advise
+         students here and sign work with the group. Same tiles and the same
+         record as the wall below, in a row of their own: they are not members
+         of the laboratory the way a student is, and the wall would say they
+         were. Built by about.js from the co_advisor entries of team.json.
+         ====================================================== -->
+    <section class="section seam" style="--seam-from:var(--bg-0)" aria-labelledby="collab-title">
+      <div class="container">
+        <div class="section-header fade-up">
+          <div class="eyebrow">
+            <i class="ph ph-handshake" aria-hidden="true"></i>
+            <span data-i18n="about.collaborators.eyebrow">Faculty</span>
+          </div>
+          <h2 class="heading-lg" id="collab-title" data-i18n="about.collaborators.title">Collaborating Professors</h2>
+          <p class="body-base" style="max-width:560px;margin-top:var(--sp-3)" data-i18n="about.collaborators.subtitle">
+            Professors from UFJF and partner institutions who co-advise students and sign work with the group.
+          </p>
+        </div>
+
+        <div id="collab-grid" class="tm-grid">
+          <!-- Built by about.js from data/team.json -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
          TEAM — the wall
          ------------------------------------------------------
-         Eighteen portraits, edge to edge in their tiles, the name on a pane of
+         Two dozen portraits, edge to edge in their tiles, the name on a pane of
          real glass over each. Held down in saturation at rest so they read as
          one wall; the pointer brings one to full colour. A tile opens the
          person's record in place, and a violet dot in the hero above opens the
          same record from up there. Built by about.js.
          ====================================================== -->
-    <section class="section seam" style="--seam-from:var(--bg-0)" aria-labelledby="team-title">
+    <section class="section seam" style="background:var(--bg-0);--seam-from:var(--bg-1)" aria-labelledby="team-title">
       <div class="container">
         <div class="section-header fade-up">
           <div class="eyebrow">
@@ -322,8 +350,8 @@
   <!-- The coordinator, the wall and the graph mount. This used to be 260 lines
        of module inline in this file; assets/js/about.js is the same work,
        minified and cached like every other module on the site. -->
-  <script type="module" src="assets/js/main.min.js?v=2629530263"></script>
-  <script type="module" src="assets/js/about.min.js?v=2629530263"></script>
+  <script type="module" src="assets/js/main.min.js?v=62c22c5056"></script>
+  <script type="module" src="assets/js/about.min.js?v=62c22c5056"></script>
 
   <!-- The same scroll behaviour the home page has. motion.js reads whatever the
        page declares with data-drift and applies the refresh discipline that keeps
@@ -332,7 +360,7 @@
        GSAP is fetched by motion.js, on the same rule the home page uses: ask for
        prefers-reduced-motion before asking the network. -->
   <script type="module">
-    import { ensureMotionLibs, initMotion, revealFailsafe } from "./assets/js/motion.min.js?v=2629530263";
+    import { ensureMotionLibs, initMotion, revealFailsafe } from "./assets/js/motion.min.js?v=62c22c5056";
     /* revealFailsafe first and unconditionally: this page hides everything behind
        .fade-up and an observer in main.js, and the net under that has to be there
        whether or not GSAP loaded. */
@@ -343,6 +371,6 @@
     });
   </script>
 
-  <script src="assets/js/analytics.min.js?v=2629530263" defer></script>
+  <script src="assets/js/analytics.min.js?v=62c22c5056" defer></script>
 </body>
 </html>

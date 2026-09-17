@@ -1415,7 +1415,7 @@ a:hover > .frame > [data-drift],
 /* ============================================================
    The wall — the team on the About page
    ------------------------------------------------------------
-   Eighteen photographs are the only material this page owns that no other
+   The photographs are the only material this page owns that no other
    page has, and the old roster spent them at 76px inside identical rounded
    cards with a pill reading READ MORE. This is the opposite decision: the
    photograph is the tile, edge to edge, and the name sits on a pane of glass
@@ -1424,7 +1424,7 @@ a:hover > .frame > [data-drift],
 
    There is no pill. The tile says it opens the way this site says everything:
    colour as state. At rest every portrait is held down in saturation, so
-   eighteen pictures taken in eighteen places read as one wall; under the
+   pictures taken in as many places read as one wall; under the
    pointer one comes to full colour and leans toward the reader (the tilt is
    written inline by about.js, on hover devices only). The caret on the plate
    is the only literal part, and it turns over while the record is open.
@@ -1449,20 +1449,36 @@ a:hover > .frame > [data-drift],
   background: var(--bg-card);
   cursor: pointer;
   transition: transform var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
-  /* Composited from the first frame. Without this the tile is rasterised on
-     the CPU at rest and promoted to its own layer the moment the photograph's
-     scale transition starts, and the promotion drops the rounded clip for the
-     length of the transition: square corners on the way in, rounded again when
-     it settles. Giving it a null transform keeps it on the compositor the
-     whole time, so the clip never changes hands. */
+  /* On the compositor from the first frame, so the tilt does not begin with a
+     layer promotion. This alone did not keep the corners: see .tm-photo. */
   transform: translateZ(0);
 }
+/* The rounded corners live here, not on the card's overflow clip.
+
+   The card's clip is a rounded rectangle applied by the compositor as a corner
+   filter on the card's surface, and that filter only holds while the card's
+   transform is axis-aligned. The tilt is not: the moment the transition toward
+   perspective() rotateX() rotateY() starts, the filter is dropped and the
+   photograph's square corners show until the transition ends and the clip is
+   rebuilt for the settled transform. That is the flash of straight corners
+   under the pointer. A null transform on the card did not prevent it, and a
+   headless screenshot cannot even show it, because screenshots are drawn by
+   a path that never drops the filter; it was only ever seen in a window.
+
+   A mask image is a texture, not a filter. It is rasterised once with this
+   box's own rounded corners baked in and multiplied over the photograph on
+   every frame whatever the card's transform is doing, so nothing square can
+   reach a corner. The radius is the card's less its one-pixel border, which is
+   the curve the card's own clip draws. */
 .tm-photo {
   display: block;
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   background: var(--bg-elevated);
+  border-radius: calc(var(--r-xl) - 1px);
+  -webkit-mask-image: linear-gradient(#000, #000);
+  mask-image: linear-gradient(#000, #000);
 }
 .tm-photo img {
   position: absolute;
@@ -1476,16 +1492,21 @@ a:hover > .frame > [data-drift],
   filter: saturate(0.25);
   transition: filter var(--t-slow), transform var(--t-slow);
 }
+/* The tile of a person whose photograph has not arrived: a figure, held down
+   like the portraits around it, on the tile's own ground. In the record it
+   sits in the portrait column the same way. */
 .tm-initial {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-serif);
   font-size: var(--text-6xl);
   color: var(--text-muted);
+  background: var(--bg-2);
 }
+.rd-side .tm-initial { position: absolute; }
+.rd-side { position: relative; }
 /* Focus travels the same road hover does. A keyboard reader gets the colour,
    the lift and the ring, not just the ring. */
 .tm-card:hover,
@@ -1504,7 +1525,14 @@ a:hover > .frame > [data-drift],
 .tm-card.is-open { transform: translateY(-3px); }
 
 /* The plate. A real pane: it blurs the photograph behind it, and the radius
-   steps down from the tile's own so the two read as one construction. */
+   steps down from the tile's own so the two read as one construction.
+
+   The ink is the one the captions on the CERN page use, and for the reason
+   written there: glass blurs what is behind it, it does not darken it, and
+   over a photograph taken outdoors at noon a light wash left grey type on a
+   pale ground. At 0.38 this plate was readable on the dark portraits and not
+   on the bright ones. Near-opaque ink, so every plate on the wall reads the
+   same whatever it is lying on, and the same as every caption on the site. */
 .tm-plate {
   position: absolute;
   left: var(--sp-2);
@@ -1513,7 +1541,7 @@ a:hover > .frame > [data-drift],
   display: block;
   padding: var(--sp-3) 36px var(--sp-3) var(--sp-4);
   border-radius: calc(var(--r-xl) - 6px);
-  --glass-tint: rgba(7, 10, 18, 0.38);
+  --glass-tint: rgba(5, 8, 15, 0.82);
 }
 .tm-name {
   display: block;
@@ -1531,7 +1559,9 @@ a:hover > .frame > [data-drift],
   text-transform: uppercase;
   color: var(--text-muted);
 }
-.tm-plate .rt-role { display: block; margin-top: 2px; }
+/* A step up from muted: on the ink above, muted mono at this size fell under
+   the contrast the captions hold. */
+.tm-plate .rt-role { display: block; margin-top: 2px; color: var(--text-secondary); }
 .tm-caret {
   position: absolute;
   right: var(--sp-3);
@@ -1784,6 +1814,31 @@ a:hover > .frame > [data-drift],
   margin-left: 5px;
   opacity: 0.5;
 }
+/* The address carries the laboratory's mark instead of the arrow: a mailto
+   leaves the page for nowhere the arrow could point. */
+.rd-mail::after { content: none; }
+
+/* A name that opens another record, on this page. Dressed as the links beside
+   it, because it behaves like one, and without the arrow for the same reason
+   as the address: the record it opens is on this page. The button reset is
+   here because a <button> inherits neither font nor colour. */
+.rd-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+}
+.rd-person {
+  appearance: none;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--border-mid);
+  border-radius: 0;
+  padding: 0 0 2px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  text-align: left;
+}
+.rd-person::after { content: none; }
 
 @media (max-width: 520px) {
   /* Two across. Below this a third column would put a name on a plate too
@@ -4508,7 +4563,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   margin-top: var(--sp-5);
 }
 
-/* Awards as a record, not as eighteen raised boxes. The old list gave each
+/* Awards as a record, not as a stack of raised boxes. The old list gave each
    prize its own filled, bordered card, which made the section the loudest
    thing on the page; a prize is a line in a record, and the year is the
    mono margin the eye runs down. */

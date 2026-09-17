@@ -1,9 +1,10 @@
 /**
  * NIPS-CERN — About
  * ------------------------------------------------------------------
- * The three things on that page that are built rather than written: the
- * coordinator's card, the wall of eighteen people, and the mounting of the
- * collaboration graph.
+ * The four things on that page that are built rather than written: the
+ * coordinator's card, the row of collaborating professors, the wall of
+ * everyone else, and the mounting of the collaboration graph. All of it comes
+ * out of data/team.json.
  *
  * It used to be 260 lines of module inside about.html. Out here it is minified
  * like every other module on the site, cached under the same stamp, and the
@@ -12,11 +13,11 @@
  * ------------------------------------------------------------------
  * Why the wall looks the way it does
  * ------------------------------------------------------------------
- * What was here before was eighteen identical rounded cards, each with a 76px
+ * What was here before was a grid of identical rounded cards, each with a 76px
  * circular photograph, a name, a role, two rounded chips and a pill reading
  * READ MORE. That is the shape a team section takes when nobody decides
  * anything about it, and it wasted the only material this page actually owns:
- * eighteen photographs of the people in it.
+ * the photographs of the people in it.
  *
  * So the photograph is the card. It fills the tile, and the name sits on a pane
  * of glass laid over the bottom of it, which is the one place on this page where
@@ -24,26 +25,36 @@
  *
  * The pill is gone. A tile that opens says so the way this site says everything
  * else — with colour as state. At rest every portrait is held down in
- * saturation, so eighteen photographs taken in eighteen places read as one wall;
+ * saturation, so two dozen photographs taken in two dozen places read as one wall;
  * under the pointer, one of them comes to full colour and lifts out of the
  * plane. Nothing else on the wall moves. The caret in the corner of the glass
  * is the only literal part, and it turns over when the record is open.
  */
 
-import { t } from './i18n.js?v=2629530263';
+import { t } from './i18n.js?v=62c22c5056';
 /* Never scrollIntoView({behavior:'smooth'}) on this site: Lenis is driving the
    scroll position from its own ticker and the two animations fight, which
    reads as no scroll at all. scrollToEl asks the library. */
-import { scrollToEl } from './smooth-scroll.js?v=2629530263';
+import { scrollToEl } from './smooth-scroll.js?v=62c22c5056';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const ROOT = new URL('../../', import.meta.url).href;
 const LATTES = '<img src="' + ROOT + 'assets/icons/lattes_icon.svg" alt="" width="14" height="14" aria-hidden="true">';
+/* The laboratory's own mark, the same file the favicon is, in front of the
+   address the laboratory gives each person. */
+const LAB = '<img src="' + ROOT + 'assets/icons/icon_home_nipscern.svg" alt="" width="14" height="14" aria-hidden="true">';
 
-/* Researchers, then the undergraduates. The coordinator is not in this list at
-   all: that section is above, with the card the role earns. */
-const ORDER = { researcher: 0, ic: 1 };
+/* A person who has not sent a photograph yet. A figure, not an initial: the
+   initial read as a monogram, as if the tile were designed that way, and it is
+   not. The figure says plainly that a picture is missing. */
+const PLACEHOLDER = '<span class="tm-initial" aria-hidden="true"><i class="ph ph-user"></i></span>';
+
+/* Who everyone is, by id, for the lines that name another person: a student's
+   co-advisor, a professor's students. Filled once the file lands. */
+const PEOPLE = new Map();
+
+const byName = (a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'pt', { sensitivity: 'base' });
 
 const esc = (s) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -92,6 +103,7 @@ function coordinatorHTML(m, record) {
   }).join('');
 
   const links = [
+    mailHTML(m),
     m.lattes && '<a href="' + esc(m.lattes) + '" target="_blank" rel="noopener" class="rd-ref">Lattes</a>',
     m.github && '<a href="' + esc(m.github) + '" target="_blank" rel="noopener" class="rd-ref">GitHub</a>',
     m.linkedin && '<a href="' + esc(m.linkedin) + '" target="_blank" rel="noopener" class="rd-ref">LinkedIn</a>',
@@ -112,6 +124,37 @@ function coordinatorHTML(m, record) {
     + '</div>';
 }
 
+/* The address, with the laboratory's mark in front of it. Every person in
+   team.json has one, the coordinator and the newest undergraduate alike, and
+   it is the first link in the row because it is the one a reader of this page
+   is most likely to want. No arrow after it: a mailto opens nothing to point
+   at. */
+function mailHTML(m) {
+  if (!m.email) return '';
+  return '<a href="mailto:' + esc(m.email) + '" class="rd-ref rd-mail">' + LAB + ' ' + esc(m.email) + '</a>';
+}
+
+/* The lines that name other people. A student's record names the professor
+   who co-advises them; the professor's record names the students. Both come
+   from one field, `advisor` on the student, read in both directions, so the
+   two cards can never disagree. Each name is a button that opens the other
+   record wherever on the page it lives. */
+function peopleHTML(m) {
+  const one = (p) => '<button type="button" class="rd-ref rd-person" data-open="' + esc(p.id) + '">' + esc(p.name) + '</button>';
+  const out = [];
+  const adv = m.advisor && PEOPLE.get(m.advisor);
+  if (adv) {
+    out.push('<div class="rd-block"><p class="rd-label" data-i18n="about.team.advisor">Co-advisor</p>'
+      + '<div class="rd-people">' + one(adv) + '</div></div>');
+  }
+  const students = [...PEOPLE.values()].filter((p) => p.advisor === m.id).sort(byName);
+  if (students.length) {
+    out.push('<div class="rd-block"><p class="rd-label" data-i18n="about.team.advisees">Co-advises</p>'
+      + '<div class="rd-people">' + students.map(one).join('') + '</div></div>');
+  }
+  return out.join('');
+}
+
 /* ------------------------------------------------------------------
    The wall
    ------------------------------------------------------------------ */
@@ -120,7 +163,7 @@ function cardHTML(m) {
     + '<span class="tm-photo">'
     + (m.photo
       ? '<img src="' + esc(ROOT + m.photo) + '" alt="" loading="lazy" decoding="async">'
-      : '<span class="tm-initial" aria-hidden="true">' + esc((m.name || '?').trim().charAt(0)) + '</span>')
+      : PLACEHOLDER)
     + '</span>'
     + '<span class="tm-plate glass">'
     + '<span class="tm-name">' + esc(m.name) + '</span>'
@@ -132,10 +175,9 @@ function cardHTML(m) {
 
 /* The measured line, and only when there is something measured to put in it.
    It comes out of the same file the graph above is drawn from, so a person's
-   count here and their dot up there are the same number by construction. Four
-   of the eighteen have no line at all: they are undergraduate scholars who have
-   not published yet, and a zero would be a statement where there is simply
-   nothing to say. */
+   count here and their dot up there are the same number by construction. The
+   undergraduates who have not published yet have no line at all: a zero would
+   be a statement where there is simply nothing to say. */
 function countHTML(record) {
   if (!record || !record.w) return '';
   const years = record.f && record.l
@@ -173,6 +215,7 @@ function detailHTML(m, record) {
       + '</span></li>';
   }).join('');
   const links = [
+    mailHTML(m),
     m.lattes && '<a href="' + esc(m.lattes) + '" target="_blank" rel="noopener" class="rd-ref">' + LATTES + ' Lattes</a>',
     m.github && '<a href="' + esc(m.github) + '" target="_blank" rel="noopener" class="rd-ref">GitHub</a>',
     m.linkedin && '<a href="' + esc(m.linkedin) + '" target="_blank" rel="noopener" class="rd-ref">LinkedIn</a>',
@@ -186,12 +229,12 @@ function detailHTML(m, record) {
      biography at its measure, the awards as a table. What was here before —
      one column of centred-nothing sections under a serif heading — is the
      shape every generated profile page takes, and this page is about the one
-     thing a generator does not have: eighteen actual people. */
+     thing a generator does not have: actual people. */
   return '<button type="button" class="rd-close glass-btn" data-close aria-label="'
     + esc(closeLabel === 'about.team.close' ? 'Close' : closeLabel) + '">'
     + '<i class="ph ph-x" aria-hidden="true"></i></button>'
     + '<figure class="rd-side frame">'
-    + (m.photo ? '<img src="' + esc(ROOT + m.photo) + '" alt="" loading="lazy" decoding="async">' : '')
+    + (m.photo ? '<img src="' + esc(ROOT + m.photo) + '" alt="" loading="lazy" decoding="async">' : PLACEHOLDER)
     + '</figure>'
     + '<header class="rd-head"><div class="rd-id">'
     + (m.title ? '<p class="rd-title">' + esc(m.title) + '</p>' : '')
@@ -206,6 +249,7 @@ function detailHTML(m, record) {
     + '<div class="rd-facts">'
     + (areas ? '<div class="rd-block"><p class="rd-label" data-i18n="about.team.areas">Research areas</p>'
         + '<ul class="rd-areas">' + areas + '</ul></div>' : '')
+    + peopleHTML(m)
     + (links ? '<div class="rd-links">' + links + '</div>' : '')
     + '</div>';
 }
@@ -263,6 +307,14 @@ function mountRoster(grid, members, records) {
 
   grid.addEventListener('click', (e) => {
     if (e.target.closest('[data-close]')) { close(); return; }
+    const who = e.target.closest('[data-open]');
+    if (who) {
+      /* The other record may be in this grid or in the other one; the event
+         finds it. Every roster listens, and only the one holding the card
+         answers. */
+      document.dispatchEvent(new CustomEvent('roster:open', { detail: { id: who.getAttribute('data-open') } }));
+      return;
+    }
     const card = e.target.closest('.tm-card[data-member]');
     if (card) open(card, card.getAttribute('data-member'));
   });
@@ -340,12 +392,12 @@ function mountNetwork(net) {
   const start = () => {
     if (started) return;
     started = true;
-    import('./network.js?v=2629530263').then(({ initNetwork }) =>
+    import('./network.js?v=62c22c5056').then(({ initNetwork }) =>
       initNetwork(canvas, { tip: document.getElementById('net-tip'), data: net })
     ).then((api) => {
       if (!api) { stage.classList.add('is-flat'); return; }
       stage.classList.add('is-live');
-      import('./motion.js?v=2629530263').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
+      import('./motion.js?v=62c22c5056').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
     }).catch(() => stage.classList.add('is-flat'));
   };
 
@@ -389,17 +441,27 @@ addEventListener('DOMContentLoaded', async () => {
     localise(card);
   }
 
+  for (const m of team) PEOPLE.set(m.id, m);
+
+  /* Two rosters from one file. The collaborating professors have a row of
+     their own above the wall, because a professor from another department or
+     another university is not a member of the laboratory the way a student
+     is, and a wall that mixed the two would say they were. Same tiles, same
+     record, same code: only the grid differs. */
+  const collabGrid = document.getElementById('collab-grid');
+  const collaborators = team.filter((m) => m.role === 'co_advisor').slice().sort(byName);
+  if (collabGrid && collaborators.length) mountRoster(collabGrid, collaborators, records);
+  else if (collabGrid) collabGrid.closest('section').hidden = true;
+
   const grid = document.getElementById('team-grid');
-  const members = team.filter((m) => m.role !== 'coordinator')
-    .slice()
-    .sort((a, b) => (ORDER[a.role] === undefined ? 9 : ORDER[a.role]) - (ORDER[b.role] === undefined ? 9 : ORDER[b.role]));
+  const members = team.filter((m) => m.role !== 'coordinator' && m.role !== 'co_advisor');
   if (grid && members.length) mountRoster(grid, members, records);
 
   document.addEventListener('langchange', () => {
     if (card) localise(card);
     if (grid) localise(grid);
-    const panel = document.querySelector('.tm-detail');
-    if (panel) localise(panel);
+    if (collabGrid) localise(collabGrid);
+    document.querySelectorAll('.tm-detail').forEach(localise);
   });
 
   mountNetwork(net);
