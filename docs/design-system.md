@@ -120,7 +120,7 @@ instead: every edge survives and only the shouting stops.
 ## 5. Icons
 
 `assets/css/icons.css`. Phosphor, self-hosted as CSS masks over `currentColor`,
-plus three of the laboratory's own marks. 107 icons, 14 KB gzipped, no icon
+plus three of the laboratory's own marks. 135 icons, 17 KB gzipped, no icon
 webfont and no CDN.
 
 ```html

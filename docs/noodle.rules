@@ -1,0 +1,208 @@
+// Regras do Firestore para o Noodle (nipscern.com/noodle)
+// ------------------------------------------------------------------
+// Cole este arquivo inteiro em Firestore Database > Rules, no console do
+// Firebase, e publique. O que o cliente (assets/js/noodle.js) consegue fazer é
+// exatamente o que está aqui, e nada além: a página é só interface.
+//
+// O modelo
+//
+//   polls/{pollId}                     a enquete; só a dona escreve
+//   polls/{pollId}/responses/{uid}     reunião em grupo: uma resposta por
+//                                      pessoa; o id é o uid dela
+//   polls/{pollId}/bookings/{optionId} encontro individual: uma reserva por
+//                                      horário; o id é o id da opção, e por
+//                                      isso duas pessoas não reservam o mesmo
+//   polls/{pollId}/comments/{id}       comentários; quem escreveu ou a dona apagam
+//   config/access                      opcional, só pelo console: quem pode criar
+//
+//   Quem organiza entra com o Google (e-mail verificado). Quem responde recebe
+//   uma sessão anônima do Firebase, com um uid, e só escreve no documento que
+//   tem esse uid. Ler qualquer enquete é livre para quem tem o link, como no
+//   Doodle: o id tem vinte caracteres aleatórios e é o próprio segredo.
+//
+// Para restringir quem cria enquetes, crie no console o documento
+// config/access com um destes campos (ou os dois):
+//
+//   emails:  ["fulano@cern.ch", "beltrana@gmail.com"]
+//   domains: ["cern.ch", "ufjf.br", "estudante.ufjf.br"]
+//
+// Sem esse documento, qualquer conta do Google cria. A comparação de domínio é
+// exata: "ufjf.br" não cobre "estudante.ufjf.br".
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- quem é quem -------------------------------------------------
+    function signedIn() { return request.auth != null; }
+
+    // Conta do Google: tem e-mail, e verificado. Uma sessão anônima não tem.
+    function labAccount() {
+      return signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email_verified == true;
+    }
+
+    function accessPath() { return /databases/$(database)/documents/config/access; }
+
+    function allowlisted() {
+      return !exists(accessPath())
+        || request.auth.token.email in get(accessPath()).data.get('emails', [])
+        || request.auth.token.email.split('@')[1] in get(accessPath()).data.get('domains', []);
+    }
+
+    function isOwner(pollData) { return signedIn() && pollData.ownerUid == request.auth.uid; }
+
+    function poll(pollId) { return get(/databases/$(database)/documents/polls/$(pollId)).data; }
+
+    // Aberta: status 'open' e, se houver prazo, antes dele. Um cliente não
+    // consegue responder a uma enquete encerrada mudando o relógio: request.time
+    // é o do servidor.
+    function pollOpen(pollId) {
+      let p = poll(pollId);
+      return p.status == 'open' && (p.deadline == null || request.time < p.deadline);
+    }
+
+    // ---- formas ------------------------------------------------------
+    function str(v, max) { return v is string && v.size() <= max; }
+    function nonEmpty(v, max) { return str(v, max) && v.trim().size() > 0; }
+
+    // A foto da conta do Google, opcional. Só endereços do próprio Google: uma
+    // imagem de qualquer lugar seria um rastreador de quem abre a enquete.
+    function validPhoto(m, key) {
+      return !(key in m) || m[key] == null
+        || (m[key] is string && m[key].size() <= 400
+            && m[key].matches('https://[A-Za-z0-9.-]*googleusercontent[.]com/.*'));
+    }
+
+    function pollKeys() {
+      return ['kind', 'title', 'description', 'location', 'ownerUid', 'ownerName', 'options',
+              'allowMaybe', 'deadline', 'tz', 'status', 'finalOptionId', 'createdAt', 'updatedAt'];
+    }
+
+    function validPoll(p) {
+      return p.keys().hasOnly(pollKeys().concat(['ownerPhoto'])) && p.keys().hasAll(pollKeys())
+        && validPhoto(p, 'ownerPhoto')
+        && p.kind in ['group', 'booking']
+        && nonEmpty(p.title, 120)
+        && str(p.description, 2000)
+        && str(p.location, 200)
+        && p.ownerUid is string
+        && str(p.ownerName, 80)
+        && p.options is list && p.options.size() >= 1 && p.options.size() <= 60
+        && p.allowMaybe is bool
+        && (p.deadline == null || p.deadline is timestamp)
+        && str(p.tz, 64)
+        && p.status in ['open', 'closed']
+        && (p.finalOptionId == null || str(p.finalOptionId, 16))
+        && p.createdAt is timestamp
+        && p.updatedAt == request.time;
+    }
+
+    function validResponse(r) {
+      return r.keys().hasOnly(['name', 'votes', 'photo', 'uid', 'createdAt', 'updatedAt'])
+        && r.keys().hasAll(['name', 'votes', 'uid', 'createdAt', 'updatedAt'])
+        && validPhoto(r, 'photo')
+        && nonEmpty(r.name, 60)
+        && r.votes is map && r.votes.size() <= 60
+        && r.uid == request.auth.uid
+        && r.createdAt is timestamp
+        && r.updatedAt == request.time;
+    }
+
+    function validBooking(b) {
+      return b.keys().hasOnly(['name', 'photo', 'uid', 'createdAt'])
+        && b.keys().hasAll(['name', 'uid', 'createdAt'])
+        && validPhoto(b, 'photo')
+        && nonEmpty(b.name, 60)
+        && b.uid == request.auth.uid
+        && b.createdAt == request.time;
+    }
+
+    function validComment(c) {
+      return c.keys().hasOnly(['name', 'photo', 'text', 'uid', 'createdAt'])
+        && c.keys().hasAll(['name', 'text', 'uid', 'createdAt'])
+        && validPhoto(c, 'photo')
+        && nonEmpty(c.name, 60)
+        && nonEmpty(c.text, 1000)
+        && c.uid == request.auth.uid
+        && c.createdAt == request.time;
+    }
+
+    // ---- config: só pelo console ---------------------------------------
+    // As funções acima leem config/access por dentro das regras, e isso não
+    // passa por aqui. Nenhum cliente lê nem escreve.
+    match /config/{doc} {
+      allow read, write: if false;
+    }
+
+    // ---- enquetes ------------------------------------------------------
+    match /polls/{pollId} {
+      // Quem tem o link lê. Listar, só as próprias.
+      allow get: if true;
+      allow list: if signedIn() && resource.data.ownerUid == request.auth.uid;
+
+      allow create: if labAccount() && allowlisted()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && validPoll(request.resource.data);
+
+      // A dona encerra, reabre, escolhe a opção final. Dona, tipo, data de
+      // criação e opções não mudam: respostas e reservas apontam para os ids
+      // das opções.
+      allow update: if isOwner(resource.data)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.kind == resource.data.kind
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.options == resource.data.options
+        && validPoll(request.resource.data);
+
+      allow delete: if isOwner(resource.data);
+
+      // ---- respostas (grupo): uma por pessoa, no documento com o uid dela ----
+      match /responses/{uid} {
+        allow read: if true;
+
+        allow create: if signedIn() && uid == request.auth.uid
+          && pollOpen(pollId)
+          && request.resource.data.createdAt == request.time
+          && validResponse(request.resource.data);
+
+        allow update: if signedIn() && uid == request.auth.uid
+          && pollOpen(pollId)
+          && request.resource.data.createdAt == resource.data.createdAt
+          && validResponse(request.resource.data);
+
+        // A própria pessoa, ou a dona da enquete.
+        allow delete: if signedIn() && (uid == request.auth.uid || isOwner(poll(pollId)));
+      }
+
+      // ---- reservas (individual): uma por horário, no documento com o id dele
+      // Criar só existe enquanto o documento não existe; quem chega depois
+      // tenta uma atualização, e atualização ninguém faz. É isso que garante
+      // um horário para uma pessoa só, sem transação nenhuma.
+      match /bookings/{optionId} {
+        allow read: if true;
+
+        allow create: if signedIn()
+          && poll(pollId).kind == 'booking'
+          && pollOpen(pollId)
+          && validBooking(request.resource.data);
+
+        allow update: if false;
+
+        // A própria pessoa cancela; a dona da enquete apaga qualquer uma.
+        allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isOwner(poll(pollId)));
+      }
+
+      // ---- comentários ---------------------------------------------------
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if signedIn() && pollOpen(pollId) && validComment(request.resource.data);
+        allow update: if false;
+        allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isOwner(poll(pollId)));
+      }
+    }
+  }
+}
