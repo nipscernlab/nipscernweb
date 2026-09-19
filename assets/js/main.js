@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=3fc06b9482';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=a406c633e0';
 
-import { newsPostUrl } from './content-links.js?v=3fc06b9482';
+import { newsPostUrl } from './content-links.js?v=a406c633e0';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=3fc06b9482';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=a406c633e0';
 
 // ============================================================
 // Navigation Template
@@ -139,6 +139,11 @@ function buildNav() {
         <a href="/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-cgv-link" aria-label="CGVWEB Project" title="CGVWEB">
           <img src="${ROOT}assets/icons/icon_cgv.svg" alt="" class="nav-cgv-icon">
         </a>
+        <!-- O Noodle, o marcador de horários do laboratório, ao lado do CGV. Mesma
+             classe de propósito: é o mesmo atalho de ícone, só o destino muda. -->
+        <a href="${ROOT}noodle" class="nav-cgv-link" aria-label="Noodle" title="Noodle">
+          <img src="${ROOT}assets/icons/icon_noodle.webp" alt="" class="nav-cgv-icon" width="22" height="22">
+        </a>
         <button class="nav-hamburger" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
           <i class="ph ph-list" aria-hidden="true" style="font-size:20px"></i>
         </button>
@@ -163,6 +168,10 @@ function buildNav() {
         <a href="https://www.nipscern.com/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-mobile-cgv-link">
           <img src="${ROOT}assets/icons/icon_cgv.svg" alt="" class="nav-cgv-icon">
           <span>CGVWEB</span>
+        </a>
+        <a href="${ROOT}noodle" class="nav-mobile-cgv-link">
+          <img src="${ROOT}assets/icons/icon_noodle.webp" alt="" class="nav-cgv-icon" width="22" height="22">
+          <span>Noodle</span>
         </a>
       </div>
       <div class="nav-mobile-lang">
@@ -849,7 +858,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=3fc06b9482">. Each copy would otherwise append its own
+// <script src="main.js?v=a406c633e0">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {

@@ -57,17 +57,31 @@ function catalogo() {
   return { base: base.join('\n'), icones };
 }
 
-/* Toda classe ph-* que qualquer JS do site menciona. */
+/* Módulos que só UMA página carrega. Os ícones que eles injetam entram só no
+   subconjunto dessa página, e não no de todas: noodle.js sozinho menciona
+   vinte e poucos ícones que a home nunca desenha, e a regra geral abaixo os
+   poria em cada uma das vinte e três folhas. Um módulo que passe a ser
+   carregado por uma segunda página sai desta lista. */
+const SO_NESTA_PAGINA = {
+  'assets/js/noodle.js': 'noodle.html',
+};
+
+/* Toda classe ph-* que qualquer JS do site menciona. Devolve o conjunto que
+   vale para toda página e, à parte, o que vale só para uma. */
 function iconesDoJs(icones) {
   const usados = new Set();
+  const porPagina = new Map();
   const arquivos = cp.execSync('git ls-files "assets/js/*.js"', { cwd: ROOT, encoding: 'utf8' })
     .split('\n').filter((f) => f && !f.includes('.min.') && !f.includes('/vendor/'));
   for (const f of arquivos) {
+    const pagina = SO_NESTA_PAGINA[f];
+    if (pagina && !porPagina.has(pagina)) porPagina.set(pagina, new Set());
+    const alvo = pagina ? porPagina.get(pagina) : usados;
     for (const m of ler(f).matchAll(/ph-([a-z0-9-]+)/g)) {
-      if (icones.has(m[1])) usados.add(m[1]);
+      if (icones.has(m[1])) alvo.add(m[1]);
     }
   }
-  return usados;
+  return { usados, porPagina };
 }
 
 const nomeDoArquivo = (html) =>
@@ -75,7 +89,7 @@ const nomeDoArquivo = (html) =>
 
 (async () => {
   const { base, icones } = catalogo();
-  const doJs = iconesDoJs(icones);
+  const { usados: doJs, porPagina } = iconesDoJs(icones);
 
   /* Só as páginas que de fato carregam uma folha de ícones.
      As catorze restantes são casulos de redirecionamento — os stubs de notícia
@@ -106,7 +120,7 @@ const nomeDoArquivo = (html) =>
       if (!icones.has(m[1])) problemas.push(pagina + ': usa .ph-' + m[1] + ', que não existe em ' + FONTE);
     }
 
-    const conjunto = [...new Set([...doHtml, ...doJs])].sort();
+    const conjunto = [...new Set([...doHtml, ...doJs, ...(porPagina.get(pagina) || [])])].sort();
     const saida = base + '\n' + conjunto.map((n) => icones.get(n)).join('\n') + '\n';
 
     const destino = path.posix.join(DESTINO, nomeDoArquivo(pagina));
