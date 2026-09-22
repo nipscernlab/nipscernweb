@@ -4,10 +4,10 @@
  * A página /noodle é o marcador de horários do laboratório, no molde do
  * Doodle. Dois tipos de enquete:
  *
- *   reunião em grupo     todo mundo marca sim, se precisar ou não em cada
- *                        opção, e a melhor aparece;
- *   horários individuais cada horário é de uma pessoa só, como uma agenda de
- *                        atendimento: quem chega primeiro reserva.
+ *   em grupo      todo mundo marca sim, se precisar ou não em cada opção, e
+ *                 a melhor aparece;
+ *   individual    cada horário é de uma pessoa só, como uma agenda de
+ *                 atendimento: quem chega primeiro reserva.
  *
  * O que fica onde
  *
@@ -33,7 +33,9 @@
  *   Hora, duração e prazo não usam os seletores nativos do navegador: cada um
  *   é um painel desenhado aqui (.nd-pop), renderizado dentro do próprio
  *   formulário ao lado do campo que o abriu, para sobreviver a um redesenho e
- *   ter a mesma cara em todo navegador. O estado do painel aberto é S.pop.
+ *   ter a mesma cara em todo navegador. O estado do painel aberto é S.pop, e
+ *   uma mudança dentro dele troca só o miolo (patchPop), sem redesenhar a
+ *   página: é o que impede o painel de piscar.
  *
  * Fuso horário
  *
@@ -46,8 +48,8 @@
  *   O SDK do Firebase vem do CDN do Google, por import() dinâmico, só quando a
  *   página está configurada.
  */
-import { t, getLang } from './i18n.js?v=a406c633e0';
-import { scrollToTop } from './smooth-scroll.js?v=a406c633e0';
+import { t, getLang } from './i18n.js?v=657881fd5a';
+import { scrollToTop } from './smooth-scroll.js?v=657881fd5a';
 
 const FB_VERSION = '12.19.0';
 const fbUrl = (m) => `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-${m}.js`;
@@ -72,7 +74,6 @@ const CFG = (typeof window !== 'undefined' && window.NOODLE_FIREBASE) || null;
 const CONFIGURED = !!(CFG && CFG.apiKey && CFG.projectId && !/REPLACE/i.test(String(CFG.apiKey) + String(CFG.projectId)));
 
 const root = document.getElementById('noodle-app');
-const stepsEl = document.getElementById('nd-steps');
 
 /* A primeira pintura espera as palavras. main.js carrega o i18n e dispara
    langchange quando elas chegam; até lá render() não faz nada, senão a tela
@@ -186,6 +187,8 @@ function fmtDur(m) {
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 const fmtDay = (d) => cap(d.toLocaleDateString(locale(), { weekday: 'short', day: 'numeric', month: 'short' }));
 const fmtDayLong = (d) => cap(d.toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long' }));
+const fmtWeekday = (d) => cap(d.toLocaleDateString(locale(), { weekday: 'short' }).replace(/\.$/, ''));
+const fmtDayMonth = (d) => d.toLocaleDateString(locale(), { day: 'numeric', month: 'short' }).replace(/\.$/, '');
 const fmtTime = (d) => d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
 const fmtDateTime = (d) => cap(d.toLocaleString(locale(), { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }));
 const fmtMonth = (y, m) => cap(new Date(y, m, 1).toLocaleDateString(locale(), { month: 'long', year: 'numeric' }));
@@ -214,14 +217,15 @@ const tsToDate = (v) => {
 function optionView(o) {
   if (!o.start) {
     const d = fromKey(o.date);
-    return { id: o.id, allDay: true, date: o.date, dayKey: o.date, dayLabel: fmtDay(d), dayLong: fmtDayLong(d), time: null, sort: o.date + 'T00:00' };
+    return { id: o.id, allDay: true, date: o.date, dayKey: o.date, weekday: fmtWeekday(d), dayMonth: fmtDayMonth(d), dayLabel: fmtDay(d), dayLong: fmtDayLong(d), time: null, sort: o.date + 'T00:00' };
   }
   const s = new Date(o.start);
   const e = o.end ? new Date(o.end) : null;
   return {
     id: o.id, allDay: false, start: s, end: e,
-    dayKey: dateKey(s), dayLabel: fmtDay(s), dayLong: fmtDayLong(s),
+    dayKey: dateKey(s), weekday: fmtWeekday(s), dayMonth: fmtDayMonth(s), dayLabel: fmtDay(s), dayLong: fmtDayLong(s),
     time: fmtTime(s) + (e ? '–' + fmtTime(e) : ''),
+    startLabel: fmtTime(s),
     sort: o.start,
   };
 }
@@ -236,7 +240,7 @@ function groupByDay(views) {
   for (const v of views) {
     const g = groups[groups.length - 1];
     if (g && g.dayKey === v.dayKey) g.items.push(v);
-    else groups.push({ dayKey: v.dayKey, dayLabel: v.dayLabel, dayLong: v.dayLong, items: [v] });
+    else groups.push({ dayKey: v.dayKey, weekday: v.weekday, dayMonth: v.dayMonth, dayLabel: v.dayLabel, dayLong: v.dayLong, items: [v] });
   }
   return groups;
 }
@@ -260,15 +264,24 @@ function counts(poll, responses) {
   return out;
 }
 
-function bestIds(poll, c) {
-  let best = null, ids = [];
-  for (const o of poll.options || []) {
-    const s = c[o.id]; if (!s || (s.yes === 0 && s.maybe === 0)) continue;
-    const key = s.yes * 1000 + s.maybe;
-    if (best === null || key > best) { best = key; ids = [o.id]; }
-    else if (key === best) ids.push(o.id);
+/* A coluna que vence. Se há um horário em que TODO MUNDO disse sim, é o
+   primeiro deles no calendário, e leva a coroa; se não há, é o de mais "sim"
+   (e depois mais "se precisar"), com uma estrela, e pode haver empate. As
+   opções vêm ordenadas por optionViews, então o primeiro que casa é o mais
+   cedo. */
+function bestIds(views, c, n) {
+  if (n > 0) {
+    const all = views.find((v) => c[v.id] && c[v.id].yes === n);
+    if (all) return { ids: new Set([all.id]), everyone: true };
   }
-  return new Set(ids);
+  let best = null, ids = [];
+  for (const v of views) {
+    const s = c[v.id]; if (!s || (s.yes === 0 && s.maybe === 0)) continue;
+    const key = s.yes * 1000 + s.maybe;
+    if (best === null || key > best) { best = key; ids = [v.id]; }
+    else if (key === best) ids.push(v.id);
+  }
+  return { ids: new Set(ids), everyone: false };
 }
 
 function pollOpen(poll) {
@@ -505,7 +518,8 @@ async function watchPoll(id) {
 }
 
 /* A linha "você": o que já está gravado, se houver, ou o nome lembrado. Só
-   enquanto a pessoa não mexeu; um rascunho não é sobrescrito por um snapshot. */
+   enquanto a pessoa não mexeu; um rascunho não é sobrescrito por um snapshot.
+   Quem organizou nasce marcando que pode em tudo. */
 function syncDraft() {
   if (S.draftDirty) return;
   const mine = S.user ? S.responses.find((r) => r.id === S.user.uid) : null;
@@ -737,7 +751,7 @@ async function createPoll() {
   f.error = null;
   S.pop = null;
   const title = f.title.trim().slice(0, MAX.title);
-  if (!title) { f.error = tt('no_title'); render(); return; }
+  if (!title) { f.error = tt('no_title'); render(); document.getElementById('nd-f-title')?.focus(); return; }
   if (f.selected.size === 0) { f.error = tt('no_days'); render(); return; }
   const built = buildOptions();
   if (built.error) { f.error = tt(built.error); render(); return; }
@@ -822,7 +836,6 @@ function route() {
   S.copied = false;
   unwatch();
   S.poll = null; S.pollMissing = false; S.responses = []; S.bookings = []; S.comments = [];
-  if (stepsEl) stepsEl.hidden = S.route.page !== 'home';
 
   if (S.route.page === 'poll') {
     if (!CONFIGURED) { render(); return; }
@@ -888,7 +901,7 @@ function patchPop() {
     if (!sl) { render(); return; }
     pop.innerHTML = timePopInner(sl.start, `data-day="${S.pop.day}" data-i="${S.pop.i}"`);
     const b = document.getElementById(S.pop.id);
-    if (b) { b.lastChild.textContent = ' ' + sl.start; const end = b.closest('.nd-slot-row')?.querySelector('.nd-slot-end'); if (end) end.textContent = slotEnd(sl); }
+    if (b) { b.querySelector('span').textContent = sl.start; const end = b.closest('.nd-slot-row')?.querySelector('.nd-slot-end'); if (end) end.textContent = slotEnd(sl); }
   } else if (S.pop.kind === 'duration') {
     syncDuration();
   } else if (S.pop.kind === 'deadline') {
@@ -910,7 +923,7 @@ function syncDuration() {
     const inp = pop.querySelector('#nd-dur-input'); if (inp && document.activeElement !== inp) inp.value = f.customMin;
     pop.querySelectorAll('[data-action="dur-set"]').forEach((c) => c.setAttribute('aria-pressed', String(Number(c.getAttribute('data-dur')) === f.customMin)));
   }
-  const chip = document.getElementById('nd-dur-custom'); if (chip) chip.lastChild.textContent = ' ' + v;
+  const chip = document.getElementById('nd-dur-custom'); if (chip) chip.querySelector('span').textContent = v;
   root.querySelectorAll('.nd-slot-row .nd-timebtn').forEach((b) => {
     const sl = slotsFor(b.getAttribute('data-day'))[Number(b.getAttribute('data-i'))];
     const end = b.closest('.nd-slot-row').querySelector('.nd-slot-end');
@@ -926,48 +939,40 @@ const googleG = () => `<img class="nd-g" src="${GOOGLE_G}" alt="" width="18" hei
 
 // ---- Home ----------------------------------------------------
 function renderHome() {
+  const notice = CONFIGURED ? '' : `<div class="nd-notice">${icon('ph-warning-circle')}<p>${esc(tt('not_configured_short'))}</p></div>`;
+  if (!isGoogleUser()) return `<div class="nd-single">${notice}${renderCreateForm()}</div>`;
   return `
     <div class="nd-grid nd-grid--home">
-      <div>
-        ${CONFIGURED ? '' : `<div class="nd-notice">${icon('ph-warning-circle')}<p>${esc(tt('not_configured_short'))}</p></div>`}
-        ${renderCreateForm()}
-      </div>
+      <div>${notice}${renderCreateForm()}</div>
       <aside class="nd-side">
-        ${renderAuthPane()}
+        ${renderAccount()}
         ${renderMine()}
       </aside>
     </div>`;
 }
 
-function renderAuthPane() {
-  if (!CONFIGURED) return '';
-  if (isGoogleUser()) {
-    return `
-      <div class="nd-pane glass nd-auth">
-        <p class="nd-auth-label">${esc(tt('signed_in_as'))}</p>
-        <p class="nd-auth-who">${avatar(displayName(S.user), myPhoto())}<span>${esc(displayName(S.user))}</span></p>
-        <p class="nd-auth-mail">${esc(S.user.email || '')}</p>
-        <button type="button" class="btn glass-btn nd-btn nd-btn--ghost btn-sm" data-action="signout">${icon('ph-sign-out')} ${esc(tt('sign_out'))}</button>
-      </div>`;
-  }
+function renderAccount() {
   return `
-    <div class="nd-pane glass nd-auth">
-      <button type="button" class="btn glass-btn nd-btn nd-btn--google" data-action="signin" ${S.authReady ? '' : 'disabled'}>${googleG()} ${esc(tt('sign_in'))}</button>
-      <p class="nd-hint">${esc(tt('sign_in_hint'))}</p>
+    <div class="nd-pane glass nd-account">
+      ${avatar(displayName(S.user), myPhoto())}
+      <div class="nd-account-who">
+        <b>${esc(displayName(S.user))}</b>
+        <span>${esc(S.user.email || '')}</span>
+      </div>
+      <button type="button" class="nd-link-btn nd-link-btn--quiet" data-action="signout">${esc(tt('sign_out'))}</button>
     </div>`;
 }
 
 function renderMine() {
-  if (!CONFIGURED || !isGoogleUser()) return '';
   let body;
-  if (S.mine === null) body = `<p class="nd-hint">${esc(tt('loading'))}</p>`;
-  else if (S.mine.length === 0) body = `<p class="nd-hint">${esc(tt('mine_empty'))}</p>`;
+  if (S.mine === null) body = `<p class="nd-quiet">${esc(tt('loading'))}</p>`;
+  else if (S.mine.length === 0) body = `<p class="nd-quiet">${esc(tt('mine_empty'))}</p>`;
   else body = `<ul class="nd-mine-list">${S.mine.map((p) => `
       <li>
         <a href="?p=${encodeURIComponent(p.id)}" data-nav="?p=${encodeURIComponent(p.id)}">
-          <span class="nd-mine-title">${icon(isBooking(p) ? 'ph-user' : 'ph-users')} ${esc(p.title)}</span>
+          <span class="nd-mine-title">${esc(p.title)}</span>
           <span class="nd-mine-meta">
-            ${statusBadge(p)}
+            <span class="nd-status nd-status--${statusKind(p)}"><i class="nd-dot"></i>${esc(statusText(p))}</span>
             <span class="nd-mono">${esc(tt('mine_options', { n: (p.options || []).length }))}</span>
             ${p.answers == null ? '' : `<span class="nd-mono">${esc(tt(isBooking(p) ? 'mine_bookings' : 'mine_answers', { n: p.answers }))}</span>`}
           </span>
@@ -975,106 +980,99 @@ function renderMine() {
       </li>`).join('')}</ul>`;
   return `
     <div class="nd-pane glass">
-      <h3 class="heading-sm nd-pane-title">${icon('ph-calendar-check')} ${esc(tt('mine_title'))}</h3>
+      <h3 class="nd-pane-title">${esc(tt('mine_title'))}</h3>
       ${body}
     </div>`;
 }
 
-function statusBadge(p) {
-  if (p.finalOptionId) return `<span class="nd-badge nd-badge--final">${icon('ph-crown-simple')} ${esc(tt('status_final'))}</span>`;
-  if (!pollOpen(p)) return `<span class="nd-badge nd-badge--closed">${icon('ph-lock')} ${esc(tt('status_closed'))}</span>`;
-  return `<span class="nd-badge nd-badge--open">${icon('ph-lock-open')} ${esc(tt('status_open'))}</span>`;
-}
+const statusKind = (p) => (p.finalOptionId ? 'final' : pollOpen(p) ? 'open' : 'closed');
+const statusText = (p) => tt(p.finalOptionId ? 'status_final' : pollOpen(p) ? 'status_open' : 'status_closed');
 
 function renderCreateForm() {
   const f = S.form;
   const n = f.selected.size;
   const booking = f.kind === 'booking';
-  const submitLabel = f.busy ? tt('creating') : (CONFIGURED && !isGoogleUser() ? tt('create_signin') : tt('create'));
+  const signed = isGoogleUser();
+  const submitLabel = f.busy ? tt('creating') : (CONFIGURED && !signed ? tt('create_signin') : tt('create'));
   const dlDate = f.dl.date ? localDateTime(f.dl.date, f.dl.time) : null;
   return `
     <form class="nd-pane glass nd-create" id="nd-create" novalidate>
-      <h2 class="heading-md nd-pane-title">${icon('ph-calendar-plus')} ${esc(tt('create_title'))}</h2>
+      <div class="nd-form-head">
+        <h2 class="nd-pane-title">${esc(tt('create_title'))}</h2>
+        ${CONFIGURED && !signed ? `<button type="button" class="nd-link-btn nd-link-btn--quiet" data-action="signin" ${S.authReady ? '' : 'disabled'}>${googleG()} ${esc(tt('sign_in'))}</button>` : ''}
+      </div>
 
-      <div class="nd-field">
-        <span class="nd-label" id="nd-kind-label">${icon('ph-squares-four')}${esc(tt('f_kind'))}</span>
-        <div class="nd-kind" role="group" aria-labelledby="nd-kind-label">
-          <button type="button" class="nd-kind-opt" data-action="kind" data-kind="group" aria-pressed="${!booking}">
-            ${icon('ph-users')}<span><b>${esc(tt('kind_group'))}</b><small>${esc(tt('kind_group_d'))}</small></span>
-          </button>
-          <button type="button" class="nd-kind-opt" data-action="kind" data-kind="booking" aria-pressed="${booking}">
-            ${icon('ph-user')}<span><b>${esc(tt('kind_booking'))}</b><small>${esc(tt('kind_booking_d'))}</small></span>
-          </button>
+      <div class="nd-block">
+        <input class="nd-title-input" id="nd-f-title" type="text" maxlength="${MAX.title}" autocomplete="off" placeholder="${esc(booking ? tt('f_title_ph_booking') : tt('f_title_ph'))}" value="${esc(f.title)}" data-bind="title" aria-label="${esc(tt('f_title'))}" required>
+        <div class="nd-field-row">
+          <div class="nd-field">
+            <label class="nd-label" for="nd-f-desc">${esc(tt('f_desc'))}</label>
+            <textarea class="nd-input nd-textarea" id="nd-f-desc" rows="1" maxlength="${MAX.description}" placeholder="${esc(tt('f_desc_ph'))}" data-bind="description">${esc(f.description)}</textarea>
+          </div>
+          <div class="nd-field">
+            <label class="nd-label" for="nd-f-loc">${esc(tt('f_location'))}</label>
+            <input class="nd-input" id="nd-f-loc" type="text" maxlength="${MAX.location}" autocomplete="off" placeholder="${esc(tt('f_location_ph'))}" value="${esc(f.location)}" data-bind="location">
+          </div>
         </div>
       </div>
 
-      <div class="nd-field">
-        <label for="nd-f-title">${icon('ph-text-aa')}${esc(tt('f_title'))}</label>
-        <input class="nd-input" id="nd-f-title" type="text" maxlength="${MAX.title}" autocomplete="off" placeholder="${esc(booking ? tt('f_title_ph_booking') : tt('f_title_ph'))}" value="${esc(f.title)}" data-bind="title" required>
+      <div class="nd-block nd-block--inline">
+        <span class="nd-label" id="nd-kind-label">${esc(tt('f_kind'))}</span>
+        <div class="nd-seg" role="group" aria-labelledby="nd-kind-label">
+          <button type="button" data-action="kind" data-kind="group" aria-pressed="${!booking}">${esc(tt('kind_group'))}</button>
+          <button type="button" data-action="kind" data-kind="booking" aria-pressed="${booking}">${esc(tt('kind_booking'))}</button>
+        </div>
+        <p class="nd-quiet nd-block-desc">${esc(booking ? tt('kind_booking_d') : tt('kind_group_d'))}</p>
       </div>
 
-      <div class="nd-field-row">
-        <div class="nd-field">
-          <label for="nd-f-desc">${icon('ph-file-text')}${esc(tt('f_desc'))}</label>
-          <textarea class="nd-input nd-textarea" id="nd-f-desc" rows="2" maxlength="${MAX.description}" placeholder="${esc(tt('f_desc_ph'))}" data-bind="description">${esc(f.description)}</textarea>
-        </div>
-        <div class="nd-field">
-          <label for="nd-f-loc">${icon('ph-map-pin')}${esc(tt('f_location'))}</label>
-          <input class="nd-input" id="nd-f-loc" type="text" maxlength="${MAX.location}" autocomplete="off" placeholder="${esc(tt('f_location_ph'))}" value="${esc(f.location)}" data-bind="location">
-        </div>
-      </div>
-
-      <fieldset class="nd-field nd-fieldset">
-        <legend>${icon('ph-calendar')}${esc(tt('f_dates'))}</legend>
-        <p class="nd-hint">${esc(tt('f_dates_hint'))}</p>
+      <div class="nd-block">
+        <span class="nd-label">${esc(tt('f_dates'))}</span>
         <div class="nd-dates">
           ${renderCalendar({ cal: f.cal, selected: f.selected, dayAction: 'day', monthAction: 'month' })}
           <div class="nd-dates-side">
             <span class="nd-label" id="nd-mode-label">${esc(tt('f_mode'))}</span>
             <div class="nd-seg nd-seg--stack" role="group" aria-labelledby="nd-mode-label">
-              <button type="button" data-action="mode" data-mode="days" aria-pressed="${f.mode === 'days'}">${icon('ph-calendar-blank')} ${esc(tt('mode_days'))}</button>
-              <button type="button" data-action="mode" data-mode="slots" aria-pressed="${f.mode === 'slots'}">${icon('ph-clock')} ${esc(tt('mode_slots'))}</button>
+              <button type="button" data-action="mode" data-mode="days" aria-pressed="${f.mode === 'days'}">${esc(tt('mode_days'))}</button>
+              <button type="button" data-action="mode" data-mode="slots" aria-pressed="${f.mode === 'slots'}">${esc(tt('mode_slots'))}</button>
             </div>
             ${f.mode === 'slots' ? `
-            <span class="nd-label" id="nd-dur-label">${icon('ph-clock')}${esc(tt('f_duration'))}</span>
+            <span class="nd-label" id="nd-dur-label">${esc(tt('f_duration'))}</span>
             <div class="nd-dur" role="group" aria-labelledby="nd-dur-label">
               ${DURATIONS.map((d) => `<button type="button" data-action="duration" data-dur="${d}" aria-pressed="${f.duration === d}">${esc(fmtDur(d))}</button>`).join('')}
               <span class="nd-popwrap">
-                <button type="button" id="nd-dur-custom" data-action="pop" data-pop="duration" aria-pressed="${f.duration === 'custom'}" aria-expanded="${S.pop?.kind === 'duration'}">${icon('ph-sliders')} ${esc(f.duration === 'custom' ? fmtDur(f.customMin) : tt('dur_custom'))}</button>
+                <button type="button" id="nd-dur-custom" data-action="pop" data-pop="duration" aria-pressed="${f.duration === 'custom'}" aria-expanded="${S.pop?.kind === 'duration'}"><span>${esc(f.duration === 'custom' ? fmtDur(f.customMin) : tt('dur_custom'))}</span>${icon('ph-caret-down')}</button>
                 ${S.pop?.kind === 'duration' ? renderDurationPop() : ''}
               </span>
             </div>` : ''}
-            <p class="nd-selected-count nd-mono" aria-live="polite">${n ? esc(tt('n_selected', { n })) : ''}</p>
+            <p class="nd-count nd-mono" aria-live="polite">${n ? esc(tt('n_selected', { n })) : ''}</p>
           </div>
         </div>
-      </fieldset>
+        ${f.mode === 'slots' ? (n ? renderSlots() : `<p class="nd-quiet nd-slots-empty">${esc(tt('pick_days_first'))}</p>`) : ''}
+      </div>
 
-      ${f.mode === 'slots' ? (n ? renderSlots() : `<p class="nd-hint nd-slots-empty">${icon('ph-calendar-blank')} ${esc(tt('pick_days_first'))}</p>`) : ''}
-
-      <fieldset class="nd-field nd-fieldset">
-        <legend>${icon('ph-sliders')}${esc(tt('f_settings'))}</legend>
+      <div class="nd-block nd-block--options">
         ${booking ? '' : `
         <div class="nd-switch-row">
           <button type="button" class="nd-switch" role="switch" aria-checked="${!!f.allowMaybe}" data-action="toggle-maybe" id="nd-maybe"><span class="nd-switch-knob"></span></button>
           <label for="nd-maybe">${esc(tt('allow_maybe'))}</label>
         </div>`}
-        <div class="nd-field--inline">
-          <span class="nd-label" id="nd-dl-label">${icon('ph-hourglass')}${esc(tt('deadline'))}</span>
+        <div class="nd-dl-row">
+          <span class="nd-label" id="nd-dl-label">${esc(tt('deadline'))}</span>
           <span class="nd-popwrap">
             <button type="button" class="nd-timebtn ${dlDate ? '' : 'is-empty'}" id="nd-dl" data-action="pop" data-pop="deadline" aria-labelledby="nd-dl-label" aria-expanded="${S.pop?.kind === 'deadline'}">
-              ${icon('ph-calendar-check')} <span>${esc(dlDate ? fmtDateTime(dlDate) : tt('no_deadline'))}</span>
+              <span>${esc(dlDate ? fmtDateTime(dlDate) : tt('no_deadline'))}</span>${icon('ph-caret-down')}
             </button>
             ${S.pop?.kind === 'deadline' ? renderDeadlinePop() : ''}
           </span>
           ${dlDate ? `<button type="button" class="nd-icon-btn" data-action="dl-clear" aria-label="${esc(tt('clear'))}" title="${esc(tt('clear'))}">${icon('ph-x')}</button>` : ''}
         </div>
-      </fieldset>
+      </div>
 
-      ${f.error ? `<p class="nd-error" role="alert">${icon('ph-warning-circle')} ${esc(f.error)}</p>` : ''}
+      ${f.error ? `<p class="nd-error" role="alert">${esc(f.error)}</p>` : ''}
 
-      <div class="nd-actions">
-        <button type="submit" class="btn glass-btn nd-btn ${CONFIGURED && !isGoogleUser() ? 'nd-btn--google' : 'nd-btn--primary'} btn-lg" ${f.busy || !CONFIGURED ? 'disabled' : ''}>
-          ${f.busy ? icon('ph-spinner') : CONFIGURED && !isGoogleUser() ? googleG() : icon('ph-paper-plane-tilt')} ${esc(submitLabel)}
+      <div class="nd-form-foot">
+        <button type="submit" class="btn glass-btn nd-btn ${CONFIGURED && !signed ? 'nd-btn--google' : 'nd-btn--primary'} btn-lg" ${f.busy || !CONFIGURED ? 'disabled' : ''}>
+          ${f.busy ? icon('ph-spinner') : CONFIGURED && !signed ? googleG() : ''}${esc(submitLabel)}
         </button>
       </div>
     </form>`;
@@ -1106,9 +1104,11 @@ function renderCalendar({ cal, selected, dayAction, monthAction, compact }) {
   return `
     <div class="nd-cal ${compact ? 'nd-cal--compact' : ''}">
       <div class="nd-cal-head">
-        <button type="button" class="nd-cal-nav" data-action="${monthAction}" data-dir="-1" aria-label="${esc(tt('prev_month'))}" ${atNow ? 'disabled' : ''}>${icon('ph-caret-left')}</button>
         <span class="nd-cal-month">${esc(fmtMonth(y, m))}</span>
-        <button type="button" class="nd-cal-nav" data-action="${monthAction}" data-dir="1" aria-label="${esc(tt('next_month'))}">${icon('ph-caret-right')}</button>
+        <span class="nd-cal-navs">
+          <button type="button" class="nd-cal-nav" data-action="${monthAction}" data-dir="-1" aria-label="${esc(tt('prev_month'))}" ${atNow ? 'disabled' : ''}>${icon('ph-caret-left')}</button>
+          <button type="button" class="nd-cal-nav" data-action="${monthAction}" data-dir="1" aria-label="${esc(tt('next_month'))}">${icon('ph-caret-right')}</button>
+        </span>
       </div>
       <div class="nd-cal-grid">${wd.join('')}${cells.join('')}</div>
     </div>`;
@@ -1118,7 +1118,7 @@ function renderCalendar({ cal, selected, dayAction, monthAction, compact }) {
 function timeField(id, value, data) {
   const open = S.pop && S.pop.kind === 'time' && S.pop.id === id;
   return `<span class="nd-popwrap">
-      <button type="button" class="nd-timebtn nd-mono" id="${id}" data-action="pop" data-pop="time" ${data} aria-expanded="${!!open}" aria-label="${esc(tt('hour'))}">${icon('ph-clock')} ${esc(value)}</button>
+      <button type="button" class="nd-timebtn nd-mono" id="${id}" data-action="pop" data-pop="time" ${data} aria-expanded="${!!open}" aria-label="${esc(tt('hour'))}"><span>${esc(value)}</span>${icon('ph-caret-down')}</button>
       ${open ? renderTimePop(value, data) : ''}
     </span>`;
 }
@@ -1151,7 +1151,7 @@ function renderDurationPop() {
         <button type="button" class="nd-cal-nav" data-action="dur-step" data-d="5" aria-label="+5">${icon('ph-plus')}</button>
       </div>
       <div class="nd-pop-chips">${CUSTOM_DURATIONS.map((d) => `<button type="button" class="nd-pop-cell nd-mono" data-action="dur-set" data-dur="${d}" aria-pressed="${f.customMin === d}">${esc(fmtDur(d))}</button>`).join('')}</div>
-      <div class="nd-pop-foot"><button type="button" class="btn glass-btn nd-btn nd-btn--primary btn-sm" data-action="pop-close">${icon('ph-check')} ${esc(tt('done'))}</button></div>`);
+      <div class="nd-pop-foot"><button type="button" class="btn glass-btn nd-btn nd-btn--primary btn-sm" data-action="pop-close">${esc(tt('done'))}</button></div>`);
 }
 
 function renderDeadlinePop() { return popShell('dl', tt('deadline'), deadlinePopInner()); }
@@ -1179,19 +1179,19 @@ function deadlinePopInner() {
         </div>
       </div>
       <div class="nd-pop-foot">
-        <button type="button" class="nd-link-btn" data-action="dl-clear">${icon('ph-x')} ${esc(tt('clear'))}</button>
-        <button type="button" class="btn glass-btn nd-btn nd-btn--primary btn-sm" data-action="pop-close">${icon('ph-check')} ${esc(tt('done'))}</button>
+        <button type="button" class="nd-link-btn nd-link-btn--quiet" data-action="dl-clear">${esc(tt('clear'))}</button>
+        <button type="button" class="btn glass-btn nd-btn nd-btn--primary btn-sm" data-action="pop-close">${esc(tt('done'))}</button>
       </div>`;
 }
 
 function renderSlots() {
   const keys = selectedKeys();
   return `
-    <div class="nd-field nd-slots">
-      <p class="nd-hint">${esc(tt('f_slots_hint', { tz: tzLabel(VIEWER_TZ) }))}</p>
+    <div class="nd-slots">
+      <p class="nd-quiet">${esc(tt('f_slots_hint', { tz: tzLabel(VIEWER_TZ) }))}</p>
       ${keys.map((k, di) => `
         <div class="nd-slot-day">
-          <div class="nd-slot-dayname nd-mono">${esc(fmtDay(fromKey(k)))}</div>
+          <div class="nd-slot-dayname">${esc(fmtDay(fromKey(k)))}</div>
           <div class="nd-slot-rows">
             ${slotsFor(k).map((sl, i) => `
               <div class="nd-slot-row">
@@ -1203,7 +1203,7 @@ function renderSlots() {
             <button type="button" class="nd-link-btn" data-action="slot-add" data-day="${k}">${icon('ph-plus')} ${esc(tt('add_slot'))}</button>
           </div>
         </div>`).join('')}
-      ${keys.length > 1 ? `<button type="button" class="btn glass-btn nd-btn nd-btn--outline btn-sm" data-action="slot-copy">${icon('ph-copy')} ${esc(tt('copy_slots'))}</button>` : ''}
+      ${keys.length > 1 ? `<button type="button" class="nd-link-btn nd-link-btn--quiet nd-slots-copy" data-action="slot-copy">${icon('ph-copy')} ${esc(tt('copy_slots'))}</button>` : ''}
     </div>`;
 }
 
@@ -1214,12 +1214,12 @@ function renderPoll() {
   if (!CONFIGURED) {
     return `${back}
       <div class="nd-pane glass nd-setup">
-        <h2 class="heading-md nd-pane-title">${icon('ph-warning-circle')} ${esc(tt('setup_title'))}</h2>
+        <h2 class="nd-pane-title">${esc(tt('setup_title'))}</h2>
         <p class="body-base">${esc(tt('setup_body'))}</p>
       </div>`;
   }
   if (S.pollMissing) {
-    return `${back}<div class="nd-pane glass nd-setup"><h2 class="heading-md nd-pane-title">${icon('ph-warning-circle')} ${esc(tt('err_notfound'))}</h2></div>`;
+    return `${back}<div class="nd-pane glass nd-setup"><h2 class="nd-pane-title">${esc(tt('err_notfound'))}</h2></div>`;
   }
   const poll = S.poll;
   if (!poll) return `${back}<p class="nd-loading">${icon('ph-spinner')} ${esc(tt('loading'))}</p>`;
@@ -1232,30 +1232,26 @@ function renderPoll() {
   const dl = tsToDate(poll.deadline);
   const finalView = poll.finalOptionId ? byId[poll.finalOptionId] : null;
 
-  const notes = [];
-  if (finalView) notes.push({ cls: 'nd-note--final', icon: 'ph-crown-simple', html: `${esc(tt('final_note', { when: optionLabel(finalView) }))} ${calendarLinks(poll, finalView)}` });
-  if (poll.status !== 'open') notes.push({ cls: 'nd-note--closed', icon: 'ph-lock', html: esc(tt('closed_note')) });
-  else if (dl && dl.getTime() <= Date.now()) notes.push({ cls: 'nd-note--closed', icon: 'ph-hourglass', html: esc(tt('deadline_passed')) });
-  else if (dl) notes.push({ cls: '', icon: 'ph-hourglass', html: esc(tt('deadline_note', { when: fmtDateTime(dl) })) });
+  let status = statusText(poll);
+  if (poll.status === 'open' && dl) status += ' · ' + (dl.getTime() <= Date.now() ? tt('deadline_passed') : tt('deadline_note', { when: fmtDateTime(dl) }));
+
+  let tz = '';
   if (views.some((v) => v.time)) {
-    let tz = tt('tz_note', { tz: tzLabel(VIEWER_TZ) });
+    tz = tt('tz_note', { tz: tzLabel(VIEWER_TZ) });
     if (poll.tz && poll.tz !== VIEWER_TZ) tz += ' ' + tt('tz_note_other', { tz: tzLabel(poll.tz) });
-    notes.push({ cls: '', icon: 'ph-globe', html: esc(tz) });
   }
 
   return `${back}
     <header class="nd-pane glass nd-poll-head">
-      <div class="nd-poll-badges">
-        ${statusBadge(poll)}
-        <span class="nd-badge nd-badge--kind">${icon(booking ? 'ph-user' : 'ph-users')} ${esc(tt(booking ? 'kind_booking' : 'kind_group'))}</span>
-      </div>
+      <p class="nd-status nd-status--${statusKind(poll)}"><i class="nd-dot"></i>${esc(status)}</p>
       <h2 class="display-md nd-poll-title">${esc(poll.title)}</h2>
       ${poll.description ? `<p class="body-base nd-poll-desc">${linkify(poll.description)}</p>` : ''}
       <ul class="nd-poll-meta">
-        ${poll.location ? `<li>${icon('ph-map-pin')} <span>${linkify(poll.location)}</span></li>` : ''}
-        ${poll.ownerName ? `<li>${avatar(poll.ownerName, poll.ownerPhoto, 'sm')} <span>${esc(tt('created_by', { name: poll.ownerName }))}</span></li>` : ''}
+        ${poll.ownerName ? `<li>${avatar(poll.ownerName, poll.ownerPhoto, 'sm')}<span>${esc(tt('created_by', { name: poll.ownerName }))}</span></li>` : ''}
+        ${poll.location ? `<li>${icon('ph-map-pin')}<span>${linkify(poll.location)}</span></li>` : ''}
+        ${tz ? `<li>${icon('ph-globe')}<span>${esc(tz)}</span></li>` : ''}
       </ul>
-      ${notes.length ? `<ul class="nd-notes">${notes.map((n) => `<li class="${n.cls}">${icon(n.icon)} <span>${n.html}</span></li>`).join('')}</ul>` : ''}
+      ${finalView ? `<div class="nd-final">${icon('ph-crown-simple')}<span><b>${esc(tt('final_note', { when: optionLabel(finalView) }))}</b>${calendarLinks(poll, finalView)}</span></div>` : ''}
     </header>
 
     ${booking ? renderBookingList(poll, views, open, owner) : renderGroupTable(poll, views, open, owner)}
@@ -1271,31 +1267,44 @@ function renderPoll() {
 
 function renderNameField() {
   return `<div class="nd-me-name">
-      <label for="nd-my-name">${icon('ph-user')}${esc(tt('your_name'))}</label>
+      <label class="nd-label" for="nd-my-name">${esc(tt('your_name'))}</label>
       <input class="nd-input nd-input--name" id="nd-my-name" type="text" maxlength="${MAX.name}" autocomplete="name" placeholder="${esc(tt('your_name_ph'))}" value="${esc(S.draft.name)}" data-bind-draft="name">
     </div>`;
 }
 
-const markOf = (vote) => `<span class="nd-mark v-${vote}">${icon(vote === 'yes' ? 'ph-check' : vote === 'maybe' ? 'ph-question' : 'ph-x')}</span>`;
+const markOf = (vote) => (vote === 'unset' ? '<span class="nd-mark v-unset"></span>' : `<span class="nd-mark v-${vote}">${icon(vote === 'yes' ? 'ph-check' : vote === 'maybe' ? 'ph-question' : 'ph-x')}</span>`);
+
+/* Na linha de quem responde, uma casa ainda não tocada fica vazia, e não em
+   "não": a casa vazia é o convite ao clique. Salvar sem tocar vale como não. */
+const draftVote = (id) => { const v = S.draft.votes[id]; return v === 'yes' || v === 'maybe' || v === 'no' ? v : 'unset'; };
 
 function renderGroupTable(poll, views, open, owner) {
   const groups = groupByDay(views);
   const hasTimes = views.some((v) => v.time);
   const c = counts(poll, S.responses);
-  const best = bestIds(poll, c);
+  const n = S.responses.length;
+  const { ids: best, everyone } = bestIds(views, c, n);
   const finalId = poll.finalOptionId || null;
-  const colCls = (id) => [finalId === id ? 'is-final' : '', best.has(id) && !finalId ? 'is-best' : ''].filter(Boolean).join(' ');
-  const flag = (id) => (finalId === id ? `<span class="nd-col-flag" title="${esc(tt('final_col'))}">${icon('ph-crown-simple')}</span>` : best.has(id) && !finalId ? `<span class="nd-col-flag" title="${esc(tt('best'))}">${icon('ph-star')}</span>` : '');
+  const colCls = (id) => [finalId === id ? 'is-final' : '', best.has(id) && !finalId ? (everyone ? 'is-best is-everyone' : 'is-best') : ''].filter(Boolean).join(' ');
+  const flag = (id) => {
+    if (finalId === id) return `<span class="nd-col-flag" title="${esc(tt('final_col'))}">${icon('ph-crown-simple')}</span>`;
+    if (finalId || !best.has(id)) return '';
+    return everyone
+      ? `<span class="nd-col-flag" title="${esc(tt('all_can'))}">${icon('ph-crown-simple')}</span>`
+      : `<span class="nd-col-flag nd-col-flag--soft" title="${esc(tt('best'))}">${icon('ph-star')}</span>`;
+  };
   const myUid = S.user ? S.user.uid : null;
   const mine = myUid ? S.responses.find((r) => r.id === myUid) : null;
 
+  /* Cabeçalho: dia da semana em cima, dia e mês embaixo; com horas, uma
+     terceira linha com a faixa. */
   const head1 = `<tr>
-      <th scope="col" class="nd-name-col" rowspan="${hasTimes ? 2 : 1}"><span class="nd-th-people">${icon('ph-users')} ${S.responses.length}</span></th>
-      ${groups.map((g) => `<th scope="colgroup" class="nd-th-day ${g.items.length === 1 ? colCls(g.items[0].id) : ''}" colspan="${g.items.length}">${g.items.length === 1 ? flag(g.items[0].id) : ''}${esc(g.dayLabel)}</th>`).join('')}
+      <th scope="col" class="nd-name-col" rowspan="${hasTimes ? 2 : 1}"></th>
+      ${groups.map((g) => `<th scope="colgroup" class="nd-th-day ${g.items.length === 1 ? colCls(g.items[0].id) : ''}" colspan="${g.items.length}">${g.items.length === 1 ? flag(g.items[0].id) : ''}<span class="nd-th-wd">${esc(g.weekday)}</span><span class="nd-th-dm">${esc(g.dayMonth)}</span></th>`).join('')}
     </tr>`;
   const head2 = hasTimes ? `<tr>${views.map((v) => `<th scope="col" class="nd-th-time nd-mono ${colCls(v.id)}">${groups.find((g) => g.items.includes(v)).items.length > 1 ? flag(v.id) : ''}${v.time ? esc(v.time) : esc(tt('all_day'))}</th>`).join('')}</tr>` : '';
   const countRow = `<tr class="nd-count-row">
-      <th scope="row" class="nd-name-col nd-count-label">${icon('ph-chart-bar')} <span>${esc(tt('count_label'))}</span></th>
+      <th scope="row" class="nd-name-col nd-count-label">${esc(tt('count_label'))}</th>
       ${views.map((v) => { const s = c[v.id]; return `<td class="nd-count ${colCls(v.id)}">
           <span class="nd-mono nd-count-yes">${s.yes}</span>${poll.allowMaybe && s.maybe ? `<span class="nd-mono nd-count-maybe">+${s.maybe}</span>` : ''}
         </td>`; }).join('')}
@@ -1320,7 +1329,7 @@ function renderGroupTable(poll, views, open, owner) {
         <input class="nd-input nd-input--name" id="nd-my-name" type="text" maxlength="${MAX.name}" autocomplete="name" placeholder="${esc(tt('your_name_ph'))}" aria-label="${esc(tt('your_name'))}" value="${esc(S.draft.name)}" data-bind-draft="name">
       </span></th>
       ${views.map((v) => {
-        const vote = voteOf({ votes: S.draft.votes }, v.id);
+        const vote = draftVote(v.id);
         const next = vote === 'yes' ? (poll.allowMaybe ? 'maybe' : 'no') : vote === 'maybe' ? 'no' : 'yes';
         return `<td class="nd-cell ${colCls(v.id)}">
           <button type="button" class="nd-vote" data-action="vote" data-opt="${esc(v.id)}" data-next="${next}" title="${esc(optionLabel(v))}" aria-label="${esc(optionLabel(v))}: ${esc(tt('vote_' + vote))}">${markOf(vote)}</button>
@@ -1330,19 +1339,18 @@ function renderGroupTable(poll, views, open, owner) {
 
   const actions = open ? `
     <div class="nd-actions nd-actions--vote">
-      <button type="button" class="btn glass-btn nd-btn nd-btn--primary" data-action="save" ${S.saving ? 'disabled' : ''}>${icon(S.saving ? 'ph-spinner' : 'ph-check')} ${esc(S.saving ? tt('saving') : mine ? tt('update') : tt('save'))}</button>
-      ${mine ? `<button type="button" class="btn glass-btn nd-btn nd-btn--ghost btn-sm" data-action="del-mine">${icon('ph-trash')} ${esc(tt('delete_mine'))}</button>` : ''}
-      <span class="nd-hint nd-hint--inline">${esc(tt('vote_hint'))}</span>
+      <button type="button" class="btn glass-btn nd-btn nd-btn--primary" data-action="save" ${S.saving ? 'disabled' : ''}>${S.saving ? icon('ph-spinner') : ''}${esc(S.saving ? tt('saving') : mine ? tt('update') : tt('save'))}</button>
+      ${mine ? `<button type="button" class="nd-link-btn nd-link-btn--quiet" data-action="del-mine">${esc(tt('delete_mine'))}</button>` : `<span class="nd-quiet nd-quiet--inline">${esc(tt('vote_hint'))}</span>`}
     </div>` : '';
 
   return `
     <section class="nd-pane glass nd-table-pane" aria-labelledby="nd-participants-title">
       <div class="nd-pane-head">
-        <h3 class="heading-sm nd-pane-title" id="nd-participants-title">${icon('ph-users')} ${esc(tt('participants'))}</h3>
+        <h3 class="nd-pane-title" id="nd-participants-title">${esc(tt('participants'))} <span class="nd-mono nd-count-badge">${n}</span></h3>
         <div class="nd-legend" aria-hidden="true">
-          <span>${markOf('yes')} ${esc(tt('vote_yes'))}</span>
-          ${poll.allowMaybe ? `<span>${markOf('maybe')} ${esc(tt('vote_maybe'))}</span>` : ''}
-          <span>${markOf('no')} ${esc(tt('vote_no'))}</span>
+          <span>${markOf('yes')}${esc(tt('vote_yes'))}</span>
+          ${poll.allowMaybe ? `<span>${markOf('maybe')}${esc(tt('vote_maybe'))}</span>` : ''}
+          <span>${markOf('no')}${esc(tt('vote_no'))}</span>
         </div>
       </div>
       <div class="nd-table-wrap">
@@ -1352,7 +1360,7 @@ function renderGroupTable(poll, views, open, owner) {
           <tfoot>${countRow}</tfoot>
         </table>
       </div>
-      ${!S.responses.length ? `<p class="nd-hint nd-empty">${esc(tt('no_answers'))}</p>` : ''}
+      ${!n && !open ? `<p class="nd-quiet nd-empty">${esc(tt('no_answers'))}</p>` : ''}
       ${actions}
     </section>`;
 }
@@ -1366,19 +1374,19 @@ function renderBookingList(poll, views, open, owner) {
 
   const items = groups.map((g) => `
     <li class="nd-book-day">
-      <h4 class="nd-book-dayname">${icon('ph-calendar-blank')} ${esc(g.dayLong)}</h4>
+      <h4 class="nd-book-dayname">${esc(g.dayLong)}</h4>
       <ul class="nd-book-slots">
         ${g.items.map((v) => {
           const b = byOpt[v.id];
           const mine = b && myUid && b.uid === myUid;
           const cls = ['nd-book-slot', b ? (mine ? 'is-mine' : 'is-taken') : 'is-free'].join(' ');
           let right;
-          if (mine) right = `<span class="nd-book-who">${icon('ph-check-circle')} ${esc(tt('yours'))}</span>
+          if (mine) right = `<span class="nd-book-who">${icon('ph-check-circle')}${esc(tt('yours'))}</span>
               ${calendarLinks(poll, v)}
-              ${open ? `<button type="button" class="nd-link-btn nd-link-btn--danger" data-action="unbook" data-opt="${esc(v.id)}">${icon('ph-x')} ${esc(tt('cancel_booking'))}</button>` : ''}`;
-          else if (b) right = `<span class="nd-book-who">${avatar(b.name, b.photo, 'sm')} ${esc(b.name)}</span>
+              ${open ? `<button type="button" class="nd-link-btn nd-link-btn--quiet" data-action="unbook" data-opt="${esc(v.id)}">${esc(tt('cancel_booking'))}</button>` : ''}`;
+          else if (b) right = `<span class="nd-book-who">${avatar(b.name, b.photo, 'sm')}${esc(b.name)}</span>
               ${owner ? `<button type="button" class="nd-icon-btn" data-action="unbook-any" data-opt="${esc(v.id)}" aria-label="${esc(tt('remove_booking', { name: b.name }))}" title="${esc(tt('remove_booking', { name: b.name }))}">${icon('ph-trash')}</button>` : ''}`;
-          else if (open) right = `<button type="button" class="btn glass-btn nd-btn nd-btn--primary btn-sm" data-action="book" data-opt="${esc(v.id)}" ${S.booking || mineBooking ? 'disabled' : ''}>${icon(S.booking === v.id ? 'ph-spinner' : 'ph-hand-waving')} ${esc(S.booking === v.id ? tt('saving') : tt('book'))}</button>`;
+          else if (open) right = `<button type="button" class="btn glass-btn nd-btn nd-btn--outline btn-sm" data-action="book" data-opt="${esc(v.id)}" ${S.booking || mineBooking ? 'disabled' : ''}>${S.booking === v.id ? icon('ph-spinner') : ''}${esc(S.booking === v.id ? tt('saving') : tt('book'))}</button>`;
           else right = `<span class="nd-book-who nd-book-free">${esc(tt('free'))}</span>`;
           return `<li class="${cls}">
             <span class="nd-book-time nd-mono">${v.time ? esc(v.time) : esc(tt('all_day'))}</span>
@@ -1391,11 +1399,11 @@ function renderBookingList(poll, views, open, owner) {
   return `
     <section class="nd-pane glass nd-book-pane" aria-labelledby="nd-book-title">
       <div class="nd-pane-head">
-        <h3 class="heading-sm nd-pane-title" id="nd-book-title">${icon('ph-hand-waving')} ${esc(tt('book_title'))}</h3>
-        <span class="nd-mono nd-book-count">${esc(tt('booked_count', { n: taken, m: views.length }))}</span>
+        <h3 class="nd-pane-title" id="nd-book-title">${esc(tt('book_title'))} <span class="nd-mono nd-count-badge">${taken}/${views.length}</span></h3>
+        ${open && !mineBooking ? `<p class="nd-quiet">${esc(tt('book_hint'))}</p>` : ''}
+        ${open && mineBooking ? `<p class="nd-quiet">${esc(tt('one_booking'))}</p>` : ''}
       </div>
-      ${open && !mineBooking ? `<p class="nd-hint">${esc(tt('book_hint'))}</p>${renderNameField()}` : ''}
-      ${open && mineBooking ? `<p class="nd-hint">${esc(tt('one_booking'))}</p>` : ''}
+      ${open && !mineBooking ? renderNameField() : ''}
       <ul class="nd-book-days">${items}</ul>
     </section>`;
 }
@@ -1408,7 +1416,7 @@ function renderComments(poll, owner) {
   const nameHere = open && isBooking(poll) && S.bookings.some((b) => myUid && b.uid === myUid);
   return `
     <section class="nd-pane glass nd-comments" aria-labelledby="nd-comments-title">
-      <h3 class="heading-sm nd-pane-title" id="nd-comments-title">${icon('ph-chat-circle-text')} ${esc(tt('comments'))} ${S.comments.length ? `<span class="nd-mono nd-count-badge">${S.comments.length}</span>` : ''}</h3>
+      <h3 class="nd-pane-title" id="nd-comments-title">${esc(tt('comments'))}${S.comments.length ? ` <span class="nd-mono nd-count-badge">${S.comments.length}</span>` : ''}</h3>
       ${S.comments.length ? `<ul class="nd-comment-list">${S.comments.map((cm) => {
         const d = tsToDate(cm.createdAt);
         const canDel = (myUid && cm.uid === myUid) || owner;
@@ -1423,12 +1431,12 @@ function renderComments(poll, owner) {
             <p>${linkify(cm.text)}</p>
           </div>
         </li>`;
-      }).join('')}</ul>` : `<p class="nd-hint">${esc(tt('no_comments'))}</p>`}
+      }).join('')}</ul>` : `<p class="nd-quiet">${esc(tt('no_comments'))}</p>`}
       ${open ? `
       <form class="nd-comment-form" id="nd-comment-form">
         ${nameHere ? renderNameField() : ''}
         <textarea class="nd-input nd-textarea" id="nd-comment-text" rows="1" maxlength="${MAX.comment}" placeholder="${esc(tt('comment_ph'))}" data-bind-comment>${esc(S.comment.text)}</textarea>
-        <button type="submit" class="btn glass-btn nd-btn nd-btn--outline btn-sm" ${S.comment.busy || !S.comment.text.trim() ? 'disabled' : ''}>${icon(S.comment.busy ? 'ph-spinner' : 'ph-paper-plane-tilt')} ${esc(tt('send'))}</button>
+        <button type="submit" class="btn glass-btn nd-btn nd-btn--outline btn-sm" ${S.comment.busy || !S.comment.text.trim() ? 'disabled' : ''}>${S.comment.busy ? icon('ph-spinner') : ''}${esc(tt('send'))}</button>
       </form>` : ''}
     </section>`;
 }
@@ -1441,11 +1449,11 @@ function renderShare(poll) {
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
   return `
     <div class="nd-pane glass nd-share">
-      <h3 class="heading-sm nd-pane-title">${icon('ph-share-network')} ${esc(tt('share_title'))}</h3>
-      <p class="nd-hint">${esc(tt('share_hint'))}</p>
+      <h3 class="nd-pane-title">${esc(tt('share_title'))}</h3>
+      <p class="nd-quiet">${esc(tt('share_hint'))}</p>
       <div class="nd-share-row">
         <input class="nd-input nd-mono" id="nd-share-url" type="text" readonly value="${esc(url)}" aria-label="${esc(tt('share_title'))}">
-        <button type="button" class="btn glass-btn nd-btn nd-btn--primary btn-sm" data-action="copy">${icon(S.copied ? 'ph-check' : 'ph-copy')} ${esc(S.copied ? tt('copied') : tt('copy_link'))}</button>
+        <button type="button" class="btn glass-btn nd-btn nd-btn--primary btn-sm" data-action="copy">${esc(S.copied ? tt('copied') : tt('copy_link'))}</button>
       </div>
       <div class="nd-share-more">
         <a class="nd-chip" href="${mailto}">${icon('ph-paper-plane-tilt')} ${esc(tt('share_email'))}</a>
@@ -1459,25 +1467,24 @@ function renderAdmin(poll, views) {
   const booking = isBooking(poll);
   return `
     <div class="nd-pane glass nd-admin">
-      <h3 class="heading-sm nd-pane-title">${icon('ph-crown-simple')} ${esc(tt('admin_title'))}</h3>
-      <p class="nd-hint">${esc(tt('admin_hint'))}</p>
+      <h3 class="nd-pane-title">${esc(tt('admin_title'))}</h3>
       <div class="nd-admin-actions">
         ${poll.status === 'open'
-          ? `<button type="button" class="btn glass-btn nd-btn nd-btn--outline btn-sm" data-action="status" data-status="closed">${icon('ph-lock')} ${esc(tt('close_poll'))}</button>`
-          : `<button type="button" class="btn glass-btn nd-btn nd-btn--outline btn-sm" data-action="status" data-status="open">${icon('ph-lock-open')} ${esc(tt('reopen_poll'))}</button>`}
-        <button type="button" class="btn glass-btn nd-btn nd-btn--danger btn-sm" data-action="del-poll">${icon('ph-trash')} ${esc(tt('delete_poll'))}</button>
+          ? `<button type="button" class="btn glass-btn nd-btn nd-btn--outline btn-sm" data-action="status" data-status="closed">${esc(tt('close_poll'))}</button>`
+          : `<button type="button" class="btn glass-btn nd-btn nd-btn--outline btn-sm" data-action="status" data-status="open">${esc(tt('reopen_poll'))}</button>`}
+        <button type="button" class="nd-link-btn nd-link-btn--danger" data-action="del-poll">${esc(tt('delete_poll'))}</button>
       </div>
       ${booking ? '' : `
-      <p class="nd-label">${icon('ph-crown-simple')}${esc(tt('pick_final'))}</p>
+      <span class="nd-label">${esc(tt('pick_final'))}</span>
       <ul class="nd-final-list">
         ${views.map((v) => `<li>
           <button type="button" class="nd-final-opt ${finalId === v.id ? 'is-on' : ''}" data-action="final" data-opt="${esc(v.id)}" aria-pressed="${finalId === v.id}">
-            ${icon(finalId === v.id ? 'ph-crown-simple' : 'ph-calendar-blank')}
-            <span>${esc(v.dayLabel)}${v.time ? `<span class="nd-mono nd-final-time">${esc(v.time)}</span>` : ''}</span>
+            <span class="nd-final-day">${esc(v.dayLabel)}</span>${v.time ? `<span class="nd-mono nd-final-time">${esc(v.time)}</span>` : ''}
+            ${finalId === v.id ? icon('ph-crown-simple') : ''}
           </button>
         </li>`).join('')}
       </ul>
-      ${finalId ? `<button type="button" class="nd-link-btn" data-action="final" data-opt="">${icon('ph-arrow-clockwise')} ${esc(tt('unpick_final'))}</button>` : ''}`}
+      ${finalId ? `<button type="button" class="nd-link-btn nd-link-btn--quiet" data-action="final" data-opt="">${esc(tt('unpick_final'))}</button>` : ''}`}
     </div>`;
 }
 
@@ -1672,6 +1679,10 @@ if (root) {
   window.addEventListener('popstate', route);
   window.addEventListener('resize', placePops);
   document.addEventListener('langchange', () => render());
+
+  /* Em localhost, o estado e o redesenho ficam à mão para se testar a página
+     da enquete com dados fictícios, sem banco. Em produção não existe. */
+  if (location.hostname === 'localhost') window.__noodle = { S, render, unwatch };
 
   if (CONFIGURED) fb().catch((e) => { console.error('[noodle] Firebase failed to load:', e); toast(tt('err_generic')); });
   route();
