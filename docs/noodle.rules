@@ -121,7 +121,7 @@ service cloud.firestore {
     }
 
     function validComment(c) {
-      return c.keys().hasOnly(['name', 'photo', 'text', 'uid', 'createdAt'])
+      return c.keys().hasOnly(['name', 'photo', 'text', 'uid', 'createdAt', 'editedAt'])
         && c.keys().hasAll(['name', 'text', 'uid', 'createdAt'])
         && validPhoto(c, 'photo')
         && nonEmpty(c.name, 60)
@@ -200,7 +200,15 @@ service cloud.firestore {
       match /comments/{commentId} {
         allow read: if true;
         allow create: if signedIn() && pollOpen(pollId) && validComment(request.resource.data);
-        allow update: if false;
+
+        // Quem escreveu edita o texto, e só o texto; a data de edição fica
+        // gravada, e a página mostra que foi editado.
+        allow update: if signedIn() && resource.data.uid == request.auth.uid
+          && pollOpen(pollId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'editedAt'])
+          && nonEmpty(request.resource.data.text, 1000)
+          && request.resource.data.editedAt == request.time;
+
         allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isOwner(poll(pollId)));
       }
     }

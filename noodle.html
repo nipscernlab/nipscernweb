@@ -27,8 +27,8 @@
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/plex-mono-500-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/noodle.css?v=657881fd5a">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=657881fd5a">
+  <link rel="stylesheet" href="assets/css/icons/noodle.css?v=52b6de4b3d">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=52b6de4b3d">
 
   <!-- O SDK do Firebase vem daqui. Avisar o navegador cedo poupa uma ida e
        volta na hora do import(). -->
@@ -131,7 +131,7 @@
     .nd-block--inline .nd-label { margin: 0; }
     .nd-block-desc { margin: 0; }
     .nd-block--options { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4) var(--sp-8); flex-wrap: wrap; }
-    .nd-form-foot { padding-top: var(--sp-4); border-top: 1px solid var(--border-subtle); }
+    .nd-form-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; padding-top: var(--sp-4); border-top: 1px solid var(--border-subtle); }
 
     /* O nome da reunião é o campo grande: sem caixa, só a linha embaixo. */
     .nd-title-input {
@@ -210,8 +210,12 @@
     .nd-timebtn:hover { border-color: var(--border-mid); background: rgba(255, 255, 255, 0.06); }
     .nd-timebtn[aria-expanded="true"] { border-color: var(--nd-y-deep); box-shadow: 0 0 0 3px rgba(247, 201, 72, 0.16); }
     .nd-timebtn.is-empty { color: var(--text-secondary); }
+    /* O painel do prazo pende da borda direita da linha, não do botão: o botão
+       muda de largura com o texto, a linha não. */
     .nd-dl-row { display: flex; align-items: center; gap: var(--sp-3); }
     .nd-dl-row .nd-label { margin: 0; }
+    .nd-dl-row > .nd-pop { left: auto; right: 0; }
+    #nd-dl { min-width: 12.5em; justify-content: space-between; }
 
     /* O painel: um vidro escuro logo abaixo do campo, alinhado à esquerda, ou à
        direita quando sairia da janela; para cima quando não cabe embaixo. Anima
@@ -230,6 +234,20 @@
     .nd-pop--right { left: auto; right: 0; }
     .nd-pop--up { top: auto; bottom: calc(100% + 8px); }
     .nd-pop--dl { min-width: 360px; }
+    .nd-pop--tz { min-width: 320px; }
+    .nd-pop--tz .nd-input { margin-bottom: var(--sp-2); }
+    .nd-tz-list { display: grid; gap: 2px; max-height: 260px; overflow-y: auto; }
+    .nd-tz-item {
+      display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+      padding: 7px 10px; border-radius: 6px; text-align: left;
+      background: transparent; border: 1px solid transparent; color: var(--text-secondary); font-size: var(--text-sm); cursor: pointer;
+    }
+    .nd-tz-item .nd-mono { font-size: var(--text-xs); color: var(--text-muted); }
+    .nd-tz-item:hover { background: rgba(255, 255, 255, 0.04); color: var(--text-primary); }
+    .nd-tz-item[aria-pressed="true"] { background: var(--nd-y); color: var(--nd-ink); font-weight: 600; }
+    .nd-tz-item[aria-pressed="true"] .nd-mono { color: var(--nd-ink); }
+    .nd-tz-line { flex-wrap: wrap; }
+    .nd-tz-line .nd-timebtn { padding: 4px 8px 4px 10px; font-size: var(--text-xs); }
     .nd-pop-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-3); }
     .nd-pop-value { font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); }
     .nd-pop-h { display: block; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
@@ -329,7 +347,8 @@
     .nd-slots-empty { margin: var(--sp-4) 0 0; }
     .nd-slot-day { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: var(--sp-3); padding: var(--sp-3) 0; }
     .nd-slot-day + .nd-slot-day { border-top: 1px solid var(--border-subtle); }
-    .nd-slot-dayname { font-size: var(--text-sm); font-weight: 500; color: var(--text-primary); padding-top: 8px; }
+    .nd-slot-dayname { display: flex; align-items: center; gap: 4px; font-size: var(--text-sm); font-weight: 500; color: var(--text-primary); padding-top: 4px; }
+    .nd-icon-btn--sm { width: 24px; height: 24px; }
     .nd-slot-rows { display: grid; gap: var(--sp-2); justify-items: start; }
     .nd-slot-row { display: flex; align-items: center; gap: var(--sp-2); }
     .nd-slot-sep { color: var(--text-muted); }
@@ -527,7 +546,10 @@
     .nd-comment-list li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--sp-3); }
     .nd-comment-head { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: 2px; font-size: var(--text-xs); color: var(--text-muted); }
     .nd-comment-name { font-weight: 600; color: var(--text-primary); font-size: var(--text-sm); }
-    .nd-comment-head .nd-icon-btn { margin-left: auto; width: 26px; height: 26px; }
+    .nd-comment-tools { margin-left: auto; display: inline-flex; gap: 2px; }
+    .nd-comment-head .nd-icon-btn { width: 26px; height: 26px; }
+    .nd-comment-edited { color: var(--text-muted); font-style: italic; }
+    .nd-comment-edit { display: grid; gap: var(--sp-2); margin-top: 4px; }
     .nd-comment-body p { margin: 0; font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; }
     .nd-comment-form { display: grid; gap: var(--sp-3); justify-items: end; }
     .nd-comment-form .nd-input, .nd-comment-form .nd-me-name { justify-self: stretch; }
@@ -551,6 +573,9 @@
     .nd-final-day { flex: 1; }
     .nd-final-time { font-size: var(--text-xs); }
     .nd-final-opt.is-on .nd-final-time, .nd-final-opt.is-on .ph { color: var(--nd-ink); }
+
+    /* O crédito, no pé da seção */
+    .nd-credit { margin: var(--sp-8) 0 0; font-size: var(--text-xs); color: var(--text-muted); text-align: right; }
 
     /* Recado no rodapé da tela */
     .nd-toast {
@@ -657,6 +682,7 @@
         <div id="noodle-app">
           <p class="nd-loading"><i class="ph ph-spinner" aria-hidden="true"></i> <span data-i18n="noodle.loading">Loading…</span></p>
         </div>
+        <p class="nd-credit" data-i18n="noodle.credit">A tool by Kristoffer and Eder Kapisch.</p>
       </div>
     </section>
 
@@ -664,8 +690,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=657881fd5a"></script>
-  <script type="module" src="assets/js/noodle.min.js?v=657881fd5a"></script>
-  <script src="assets/js/analytics.min.js?v=657881fd5a" defer></script>
+  <script type="module" src="assets/js/main.min.js?v=52b6de4b3d"></script>
+  <script type="module" src="assets/js/noodle.min.js?v=52b6de4b3d"></script>
+  <script src="assets/js/analytics.min.js?v=52b6de4b3d" defer></script>
 </body>
 </html>

@@ -48,14 +48,22 @@
  *   O SDK do Firebase vem do CDN do Google, por import() dinâmico, só quando a
  *   página está configurada.
  */
-import { t, getLang } from './i18n.js?v=657881fd5a';
-import { scrollToTop } from './smooth-scroll.js?v=657881fd5a';
+import { t, getLang } from './i18n.js?v=52b6de4b3d';
+import { scrollToTop } from './smooth-scroll.js?v=52b6de4b3d';
 
 const FB_VERSION = '12.19.0';
 const fbUrl = (m) => `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-${m}.js`;
 
 const DATE_LOCALES = { en: 'en-GB', pt: 'pt-BR', fr: 'fr-FR', no: 'nb-NO' };
 const LS_NAME = 'nipscern:noodle:name';
+const LS_FORM = 'nipscern:noodle:form';        // o formulário de criar, guardado a cada mudança
+const LS_VOTE = 'nipscern:noodle:vote:';       // + id da enquete: a resposta ainda não salva
+const LS_TZ = 'nipscern:noodle:tz';            // o fuso que a pessoa escolheu ver
+
+/* Os fusos das duas salas e dos lugares por onde o laboratório passa vêm
+   primeiro; o resto da lista do navegador aparece quando se busca. */
+const COMMON_TZ = ['America/Sao_Paulo', 'Europe/Zurich', 'Europe/Paris', 'Europe/London', 'Europe/Lisbon', 'Europe/Oslo',
+  'America/New_York', 'America/Chicago', 'America/Los_Angeles', 'Asia/Tokyo', 'UTC'];
 const GOOGLE_G = 'assets/icons/google-g.svg';
 
 /* Os mesmos limites que as regras impõem. Repetidos aqui para a pessoa ver o
@@ -97,6 +105,7 @@ function freshForm() {
     selected: new Set(),          // 'YYYY-MM-DD'
     slots: new Map(),             // 'YYYY-MM-DD' -> [{ start: 'HH:MM' }]
     allowMaybe: true,
+    tz: storedTz() || VIEWER_TZ,          // o fuso em que os horários são digitados
     dl: { date: null, time: '18:00' },   // prazo para responder
     cal: thisMonth(),
     dlCal: thisMonth(),
@@ -111,7 +120,9 @@ const S = {
   fbPromise: null,
   authReady: false,
   user: null,
-  form: freshForm(),
+  form: null, // preenchido no arranque: o rascunho guardado, ou um formulário novo
+  tz: null,   // o fuso em que a enquete é lida; preenchido no arranque
+  editing: null,                  // comentário em edição: { id, text, busy }
   pop: null,                      // painel aberto: { kind: 'time'|'duration'|'deadline', id, day?, i? }
   popAnim: false,                 // true só no redesenho em que o painel acaba de abrir
   poll: null,
@@ -185,13 +196,46 @@ function fmtDur(m) {
 /* pt-BR e fr escrevem mês e dia da semana em minúscula; no início de um rótulo
    sobe só a primeira letra, e nada mais (um capitalize no CSS subia o "de"). */
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
-const fmtDay = (d) => cap(d.toLocaleDateString(locale(), { weekday: 'short', day: 'numeric', month: 'short' }));
-const fmtDayLong = (d) => cap(d.toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long' }));
-const fmtWeekday = (d) => cap(d.toLocaleDateString(locale(), { weekday: 'short' }).replace(/\.$/, ''));
-const fmtDayMonth = (d) => d.toLocaleDateString(locale(), { day: 'numeric', month: 'short' }).replace(/\.$/, '');
-const fmtTime = (d) => d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
+/* Com tz, no fuso pedido; sem, no do navegador (datas de dia inteiro e do
+   prazo, que não se convertem). */
+const inTz = (o, tz) => (tz ? { ...o, timeZone: tz } : o);
+const fmtDay = (d, tz) => cap(d.toLocaleDateString(locale(), inTz({ weekday: 'short', day: 'numeric', month: 'short' }, tz)));
+const fmtDayLong = (d, tz) => cap(d.toLocaleDateString(locale(), inTz({ weekday: 'long', day: 'numeric', month: 'long' }, tz)));
+const fmtWeekday = (d, tz) => cap(d.toLocaleDateString(locale(), inTz({ weekday: 'short' }, tz)).replace(/\.$/, ''));
+const fmtDayMonth = (d, tz) => d.toLocaleDateString(locale(), inTz({ day: 'numeric', month: 'short' }, tz)).replace(/\.$/, '');
+const fmtTime = (d, tz) => d.toLocaleTimeString(locale(), inTz({ hour: '2-digit', minute: '2-digit' }, tz));
 const fmtDateTime = (d) => cap(d.toLocaleString(locale(), { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }));
 const fmtMonth = (y, m) => cap(new Date(y, m, 1).toLocaleDateString(locale(), { month: 'long', year: 'numeric' }));
+
+function validTz(tz) {
+  try { new Intl.DateTimeFormat('en', { timeZone: tz }); return typeof tz === 'string' && tz.length <= 64; } catch (_) { return false; }
+}
+function storedTz() { try { const v = localStorage.getItem(LS_TZ); return v && validTz(v) ? v : null; } catch (_) { return null; } }
+function storeTz(tz) { try { localStorage.setItem(LS_TZ, tz); } catch (_) {} }
+let TZ_ALL = null;
+function allTimeZones() {
+  if (TZ_ALL) return TZ_ALL;
+  try { TZ_ALL = Intl.supportedValuesOf('timeZone'); } catch (_) { TZ_ALL = COMMON_TZ.slice(); }
+  return TZ_ALL;
+}
+
+/* Quanto um fuso adianta ou atrasa do UTC num dado instante, em ms. */
+function tzOffsetMs(utcMs, tz) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    .formatToParts(new Date(utcMs)).map((x) => [x.type, x.value]));
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second) - Math.floor(utcMs / 1000) * 1000;
+}
+/* 'YYYY-MM-DD' + 'HH:MM' lidos no fuso dado, como instante. Duas voltas bastam
+   para acertar o dia em que o horário de verão muda. */
+function zonedToUtc(k, hm, tz) {
+  const [y, m, d] = k.split('-').map(Number);
+  const [hh, mm] = hm.split(':').map(Number);
+  const wall = Date.UTC(y, m - 1, d, hh, mm);
+  let guess = wall;
+  for (let i = 0; i < 3; i++) { const next = wall - tzOffsetMs(guess, tz); if (next === guess) break; guess = next; }
+  return new Date(guess);
+}
+const dateKeyIn = (d, tz) => new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 
 /* "America/Sao_Paulo" vira "America/Sao Paulo (GMT-3)": o nome sozinho não diz
    a quem está em Genebra quantas horas separam as duas salas. */
@@ -221,11 +265,12 @@ function optionView(o) {
   }
   const s = new Date(o.start);
   const e = o.end ? new Date(o.end) : null;
+  const tz = S.tz;
   return {
     id: o.id, allDay: false, start: s, end: e,
-    dayKey: dateKey(s), weekday: fmtWeekday(s), dayMonth: fmtDayMonth(s), dayLabel: fmtDay(s), dayLong: fmtDayLong(s),
-    time: fmtTime(s) + (e ? '–' + fmtTime(e) : ''),
-    startLabel: fmtTime(s),
+    dayKey: dateKeyIn(s, tz), weekday: fmtWeekday(s, tz), dayMonth: fmtDayMonth(s, tz), dayLabel: fmtDay(s, tz), dayLong: fmtDayLong(s, tz),
+    time: fmtTime(s, tz) + (e ? '–' + fmtTime(e, tz) : ''),
+    startLabel: fmtTime(s, tz),
     sort: o.start,
   };
 }
@@ -321,6 +366,61 @@ const isGoogleUser = () => !!(S.user && !S.user.isAnonymous);
 
 function storedName() { try { return localStorage.getItem(LS_NAME) || ''; } catch (_) { return ''; } }
 function storeName(n) { try { localStorage.setItem(LS_NAME, n); } catch (_) {} }
+
+/* O formulário de criar fica guardado no navegador a cada mudança, e volta
+   inteiro depois de um reload ou de fechar a aba. Some quando a enquete é
+   criada ou quando a pessoa limpa tudo. Dias que já passaram não voltam. */
+function saveForm() {
+  const f = S.form;
+  if (!formHasContent()) { clearForm(); return; }
+  try {
+    localStorage.setItem(LS_FORM, JSON.stringify({
+      v: 1, kind: f.kind, title: f.title, description: f.description, location: f.location,
+      mode: f.mode, duration: f.duration, customMin: f.customMin,
+      selected: [...f.selected], slots: [...f.slots], allowMaybe: f.allowMaybe, tz: f.tz, dl: f.dl, cal: f.cal, at: Date.now(),
+    }));
+  } catch (_) {}
+}
+function loadForm() {
+  try {
+    const o = JSON.parse(localStorage.getItem(LS_FORM) || 'null');
+    if (!o || o.v !== 1) return null;
+    const f = freshForm();
+    const isKey = (k) => /^\d{4}-\d{2}-\d{2}$/.test(String(k)) && k >= todayKey;
+    f.kind = o.kind === 'booking' ? 'booking' : 'group';
+    f.title = String(o.title || '').slice(0, MAX.title);
+    f.description = String(o.description || '').slice(0, MAX.description);
+    f.location = String(o.location || '').slice(0, MAX.location);
+    f.mode = o.mode === 'slots' ? 'slots' : 'days';
+    f.duration = o.duration === 'custom' ? 'custom' : (DURATIONS.includes(Number(o.duration)) ? Number(o.duration) : 60);
+    f.customMin = clampMin(o.customMin || 25);
+    f.selected = new Set((Array.isArray(o.selected) ? o.selected : []).filter(isKey));
+    f.slots = new Map((Array.isArray(o.slots) ? o.slots : []).filter(([k]) => isKey(k))
+      .map(([k, list]) => [k, (Array.isArray(list) ? list : []).filter((s) => s && validHm(s.start)).map((s) => ({ start: s.start }))]));
+    f.allowMaybe = o.allowMaybe !== false;
+    if (validTz(o.tz)) f.tz = o.tz;
+    f.dl = o.dl && isKey(o.dl.date) ? { date: o.dl.date, time: validHm(o.dl.time) ? o.dl.time : '18:00' } : { date: null, time: '18:00' };
+    if (o.cal && Number.isInteger(o.cal.y) && Number.isInteger(o.cal.m)) f.cal = { y: o.cal.y, m: o.cal.m };
+    return f;
+  } catch (_) { return null; }
+}
+function clearForm() { try { localStorage.removeItem(LS_FORM); } catch (_) {} }
+const formHasContent = () => { const f = S.form; return !!(f.title || f.description || f.location || f.selected.size || f.dl.date); };
+
+/* A resposta que a pessoa está montando numa enquete também fica guardada,
+   até ela salvar. */
+function saveVoteDraft() {
+  if (!S.poll) return;
+  try { localStorage.setItem(LS_VOTE + S.poll.id, JSON.stringify({ name: S.draft.name, votes: S.draft.votes })); } catch (_) {}
+}
+function loadVoteDraft(id) {
+  try {
+    const o = JSON.parse(localStorage.getItem(LS_VOTE + id) || 'null');
+    if (!o || typeof o !== 'object') return null;
+    return { name: String(o.name || '').slice(0, MAX.name), votes: o.votes && typeof o.votes === 'object' ? o.votes : {} };
+  } catch (_) { return null; }
+}
+function clearVoteDraft(id) { try { localStorage.removeItem(LS_VOTE + id); } catch (_) {} }
 
 function pollUrl(id) {
   const u = new URL(location.href);
@@ -524,6 +624,7 @@ function syncDraft() {
   if (S.draftDirty) return;
   const mine = S.user ? S.responses.find((r) => r.id === S.user.uid) : null;
   if (mine) { S.draft = { name: mine.name || '', votes: { ...(mine.votes || {}) } }; return; }
+  if (S.poll) { const d = loadVoteDraft(S.poll.id); if (d && (d.name || Object.keys(d.votes).length)) { S.draft = d; S.draftDirty = true; return; } }
   if (!S.draft.name) S.draft.name = storedName() || (isGoogleUser() ? displayName(S.user) : '');
   if (isOwner() && S.poll && !Object.keys(S.draft.votes).length) S.draft.votes = Object.fromEntries((S.poll.options || []).map((o) => [o.id, 'yes']));
 }
@@ -566,6 +667,7 @@ async function saveVote() {
     if (exists) await Fs.updateDoc(ref, { name, votes, photo, updatedAt: Fs.serverTimestamp() });
     else await Fs.setDoc(ref, { name, votes, photo, uid: user.uid, createdAt: Fs.serverTimestamp(), updatedAt: Fs.serverTimestamp() });
     storeName(name);
+    clearVoteDraft(S.poll.id);
     S.draftDirty = false;
     toast(tt('saved'));
   } catch (e) {
@@ -581,7 +683,7 @@ async function deleteResponse(uid, confirmKey) {
   try {
     const { db, Fs } = await fb();
     await Fs.deleteDoc(Fs.doc(db, 'polls', S.poll.id, 'responses', uid));
-    if (S.user && uid === S.user.uid) { S.draft = { name: S.draft.name, votes: {} }; S.draftDirty = false; }
+    if (S.user && uid === S.user.uid) { clearVoteDraft(S.poll.id); S.draft = { name: S.draft.name, votes: {} }; S.draftDirty = false; }
   } catch (e) { toast(errMsg(e)); }
 }
 
@@ -627,6 +729,20 @@ async function addComment() {
     S.comment.text = '';
   } catch (e) { toast(errMsg(e, 'write')); }
   finally { S.comment.busy = false; render(); }
+}
+
+/* Só quem escreveu edita, e o comentário passa a dizer que foi editado. */
+async function saveCommentEdit() {
+  if (!S.poll || !S.editing || S.editing.busy) return;
+  const text = S.editing.text.trim().slice(0, MAX.comment);
+  if (!text) return;
+  S.editing.busy = true; render();
+  try {
+    const { db, Fs } = await fb();
+    await Fs.updateDoc(Fs.doc(db, 'polls', S.poll.id, 'comments', S.editing.id), { text, editedAt: Fs.serverTimestamp() });
+    S.editing = null;
+  } catch (e) { toast(errMsg(e, 'write')); if (S.editing) S.editing.busy = false; }
+  render();
 }
 
 async function deleteComment(id) {
@@ -735,7 +851,7 @@ function buildOptions() {
       for (const sl of slotsFor(k)) {
         const end = slotEnd(sl);
         if (!validHm(sl.start) || !validHm(end)) return { error: 'bad_slot' };
-        const s = localDateTime(k, sl.start), e = localDateTime(k, end);
+        const s = zonedToUtc(k, sl.start, S.form.tz), e = zonedToUtc(k, end, S.form.tz);
         if (!(e > s)) return { error: 'bad_slot' };
         out.push({ id: '', date: k, start: s.toISOString(), end: e.toISOString() });
       }
@@ -780,7 +896,7 @@ async function createPoll() {
       options: built.options,
       allowMaybe: f.kind === 'booking' ? false : !!f.allowMaybe,
       deadline: dlv ? Fs.Timestamp.fromDate(new Date(dlv)) : null,
-      tz: VIEWER_TZ,
+      tz: f.tz,
       status: 'open',
       finalOptionId: null,
       createdAt: Fs.serverTimestamp(),
@@ -800,6 +916,7 @@ async function createPoll() {
       } catch (e) { console.warn('[noodle] own answer not saved:', e); }
     }
     S.form = freshForm();
+    clearForm();
     S.mine = null;
     navigate('?p=' + encodeURIComponent(ref.id));
   } catch (e) {
@@ -830,6 +947,7 @@ function navigate(search) {
 function route() {
   S.route = parseRoute();
   S.pop = null;
+  S.editing = null;
   S.draft = { name: storedName(), votes: {} };
   S.draftDirty = false;
   S.comment = { text: '', busy: false };
@@ -879,14 +997,21 @@ function autosize(el) {
 /* Um painel que nasceria fora da janela pela direita alinha-se pela direita, e
    um que não cabe embaixo do campo abre para cima. Medido depois de pintar. */
 function placePops() {
-  for (const pop of root.querySelectorAll('.nd-pop')) {
+  const pop = root.querySelector('.nd-pop');
+  if (!pop || !S.pop) return;
+  /* Decidido uma vez, ao abrir, e guardado no estado: recalcular a cada
+     mudança de conteúdo fazia o painel pular de lado quando a altura mudava. */
+  if (!S.pop.placed) {
     pop.classList.remove('nd-pop--right', 'nd-pop--up');
     const r = pop.getBoundingClientRect();
-    if (r.right > document.documentElement.clientWidth - 12) pop.classList.add('nd-pop--right');
     const a = pop.parentElement.getBoundingClientRect();
     const below = window.innerHeight - a.bottom, above = a.top;
-    if (r.height + 16 > below && above > below) pop.classList.add('nd-pop--up');
+    S.pop.right = S.pop.kind === 'deadline' || r.right > document.documentElement.clientWidth - 12;
+    S.pop.up = r.height + 16 > below && above > below;
+    S.pop.placed = true;
   }
+  pop.classList.toggle('nd-pop--right', !!S.pop.right);
+  pop.classList.toggle('nd-pop--up', !!S.pop.up);
 }
 
 /* O painel aberto muda de conteúdo sem redesenhar a página: o elemento fica, o
@@ -1044,7 +1169,10 @@ function renderCreateForm() {
                 ${S.pop?.kind === 'duration' ? renderDurationPop() : ''}
               </span>
             </div>` : ''}
-            <p class="nd-count nd-mono" aria-live="polite">${n ? esc(tt('n_selected', { n })) : ''}</p>
+            ${f.mode === 'slots' ? `
+            <span class="nd-label" id="nd-tz-label">${esc(tt('tz_label'))}</span>
+            ${tzField('nd-tz-form', f.tz, 'form')}` : ''}
+            <p class="nd-count nd-mono" aria-live="polite">${n ? esc(n === 1 ? tt('n_selected_one') : tt('n_selected', { n })) : ''}</p>
           </div>
         </div>
         ${f.mode === 'slots' ? (n ? renderSlots() : `<p class="nd-quiet nd-slots-empty">${esc(tt('pick_days_first'))}</p>`) : ''}
@@ -1056,15 +1184,13 @@ function renderCreateForm() {
           <button type="button" class="nd-switch" role="switch" aria-checked="${!!f.allowMaybe}" data-action="toggle-maybe" id="nd-maybe"><span class="nd-switch-knob"></span></button>
           <label for="nd-maybe">${esc(tt('allow_maybe'))}</label>
         </div>`}
-        <div class="nd-dl-row">
+        <div class="nd-dl-row nd-popwrap">
           <span class="nd-label" id="nd-dl-label">${esc(tt('deadline'))}</span>
-          <span class="nd-popwrap">
-            <button type="button" class="nd-timebtn ${dlDate ? '' : 'is-empty'}" id="nd-dl" data-action="pop" data-pop="deadline" aria-labelledby="nd-dl-label" aria-expanded="${S.pop?.kind === 'deadline'}">
-              <span>${esc(dlDate ? fmtDateTime(dlDate) : tt('no_deadline'))}</span>${icon('ph-caret-down')}
-            </button>
-            ${S.pop?.kind === 'deadline' ? renderDeadlinePop() : ''}
-          </span>
+          <button type="button" class="nd-timebtn ${dlDate ? '' : 'is-empty'}" id="nd-dl" data-action="pop" data-pop="deadline" aria-labelledby="nd-dl-label" aria-expanded="${S.pop?.kind === 'deadline'}">
+            <span>${esc(dlDate ? fmtDateTime(dlDate) : tt('no_deadline'))}</span>${icon('ph-caret-down')}
+          </button>
           ${dlDate ? `<button type="button" class="nd-icon-btn" data-action="dl-clear" aria-label="${esc(tt('clear'))}" title="${esc(tt('clear'))}">${icon('ph-x')}</button>` : ''}
+          ${S.pop?.kind === 'deadline' ? renderDeadlinePop() : ''}
         </div>
       </div>
 
@@ -1074,6 +1200,7 @@ function renderCreateForm() {
         <button type="submit" class="btn glass-btn nd-btn ${CONFIGURED && !signed ? 'nd-btn--google' : 'nd-btn--primary'} btn-lg" ${f.busy || !CONFIGURED ? 'disabled' : ''}>
           ${f.busy ? icon('ph-spinner') : CONFIGURED && !signed ? googleG() : ''}${esc(submitLabel)}
         </button>
+        <button type="button" class="nd-link-btn nd-link-btn--quiet" data-action="clear-form" ${formHasContent() ? '' : 'hidden'}>${esc(tt('clear_all'))}</button>
       </div>
     </form>`;
 }
@@ -1114,6 +1241,29 @@ function renderCalendar({ cal, selected, dayAction, monthAction, compact }) {
     </div>`;
 }
 
+/* O campo de fuso: o mesmo botão-campo, e um painel com busca. target diz se
+   muda o fuso do formulário ou o da leitura. */
+function tzField(id, tz, target) {
+  const open = S.pop && S.pop.kind === 'tz' && S.pop.id === id;
+  return `<span class="nd-popwrap">
+      <button type="button" class="nd-timebtn" id="${id}" data-action="pop" data-pop="tz" data-target="${target}" aria-expanded="${!!open}" aria-label="${esc(tt('tz_label'))}"><span>${esc(tzLabel(tz))}</span>${icon('ph-caret-down')}</button>
+      ${open ? renderTzPop(tz, target) : ''}
+    </span>`;
+}
+function renderTzPop(tz, target) { return popShell('tz', tt('tz_label'), tzPopInner(tz, target, '')); }
+function tzPopInner(tz, target, q) {
+  const query = q.trim().toLowerCase().replace(/ /g, '_');
+  const item = (z) => `<button type="button" class="nd-tz-item" data-action="tz-set" data-tz="${esc(z)}" data-target="${target}" aria-pressed="${z === tz}"><span>${esc(z.replace(/_/g, ' '))}</span><span class="nd-mono">${esc(tzLabel(z).replace(/^.*\((.*)\)$/, '$1'))}</span></button>`;
+  const first = [VIEWER_TZ, ...COMMON_TZ.filter((z) => z !== VIEWER_TZ)];
+  const list = query
+    ? allTimeZones().filter((z) => z.toLowerCase().includes(query)).slice(0, 40)
+    : first;
+  return `
+      <div class="nd-pop-head"><span class="nd-pop-value">${esc(tzLabel(tz))}</span><button type="button" class="nd-icon-btn" data-action="pop-close" aria-label="${esc(tt('done'))}">${icon('ph-x')}</button></div>
+      <input class="nd-input" id="nd-tz-q" type="search" autocomplete="off" placeholder="${esc(tt('tz_search'))}" value="${esc(q)}" data-bind-tzq="${target}" data-tz-current="${esc(tz)}">
+      <div class="nd-tz-list">${list.length ? list.map(item).join('') : `<p class="nd-quiet">${esc(tt('tz_none'))}</p>`}</div>`;
+}
+
 /* O campo de hora: um botão com o valor, e o painel embaixo quando aberto. */
 function timeField(id, value, data) {
   const open = S.pop && S.pop.kind === 'time' && S.pop.id === id;
@@ -1123,7 +1273,7 @@ function timeField(id, value, data) {
     </span>`;
 }
 
-const popShell = (kind, label, inner) => `<div class="nd-pop nd-pop--${kind} glass" role="dialog" aria-label="${esc(label)}">${inner}</div>`;
+const popShell = (kind, label, inner) => `<div class="nd-pop nd-pop--${kind} glass${S.pop?.placed ? (S.pop.right ? ' nd-pop--right' : '') + (S.pop.up ? ' nd-pop--up' : '') : ''}" role="dialog" aria-label="${esc(label)}">${inner}</div>`;
 
 function renderTimePop(value, data) { return popShell('time', tt('hour'), timePopInner(value, data)); }
 function timePopInner(value, data) {
@@ -1188,10 +1338,10 @@ function renderSlots() {
   const keys = selectedKeys();
   return `
     <div class="nd-slots">
-      <p class="nd-quiet">${esc(tt('f_slots_hint', { tz: tzLabel(VIEWER_TZ) }))}</p>
+      <p class="nd-quiet">${esc(tt('f_slots_hint', { tz: tzLabel(S.form.tz) }))}</p>
       ${keys.map((k, di) => `
         <div class="nd-slot-day">
-          <div class="nd-slot-dayname">${esc(fmtDay(fromKey(k)))}</div>
+          <div class="nd-slot-dayname"><span>${esc(fmtDay(fromKey(k)))}</span><button type="button" class="nd-icon-btn nd-icon-btn--sm" data-action="day" data-day="${k}" aria-label="${esc(tt('remove_day'))}" title="${esc(tt('remove_day'))}">${icon('ph-x')}</button></div>
           <div class="nd-slot-rows">
             ${slotsFor(k).map((sl, i) => `
               <div class="nd-slot-row">
@@ -1235,11 +1385,8 @@ function renderPoll() {
   let status = statusText(poll);
   if (poll.status === 'open' && dl) status += ' · ' + (dl.getTime() <= Date.now() ? tt('deadline_passed') : tt('deadline_note', { when: fmtDateTime(dl) }));
 
-  let tz = '';
-  if (views.some((v) => v.time)) {
-    tz = tt('tz_note', { tz: tzLabel(VIEWER_TZ) });
-    if (poll.tz && poll.tz !== VIEWER_TZ) tz += ' ' + tt('tz_note_other', { tz: tzLabel(poll.tz) });
-  }
+  const hasTimes = views.some((v) => v.time);
+  const tzNote = hasTimes && poll.tz && poll.tz !== S.tz ? tt('tz_note_other', { tz: tzLabel(poll.tz) }) : '';
 
   return `${back}
     <header class="nd-pane glass nd-poll-head">
@@ -1249,7 +1396,7 @@ function renderPoll() {
       <ul class="nd-poll-meta">
         ${poll.ownerName ? `<li>${avatar(poll.ownerName, poll.ownerPhoto, 'sm')}<span>${esc(tt('created_by', { name: poll.ownerName }))}</span></li>` : ''}
         ${poll.location ? `<li>${icon('ph-map-pin')}<span>${linkify(poll.location)}</span></li>` : ''}
-        ${tz ? `<li>${icon('ph-globe')}<span>${esc(tz)}</span></li>` : ''}
+        ${hasTimes ? `<li class="nd-tz-line">${icon('ph-globe')}<span>${esc(tt('tz_note'))}</span>${tzField('nd-tz-view', S.tz, 'view')}${tzNote ? `<span class="nd-quiet--inline">${esc(tzNote)}</span>` : ''}</li>` : ''}
       </ul>
       ${finalView ? `<div class="nd-final">${icon('ph-crown-simple')}<span><b>${esc(tt('final_note', { when: optionLabel(finalView) }))}</b>${calendarLinks(poll, finalView)}</span></div>` : ''}
     </header>
@@ -1419,16 +1566,29 @@ function renderComments(poll, owner) {
       <h3 class="nd-pane-title" id="nd-comments-title">${esc(tt('comments'))}${S.comments.length ? ` <span class="nd-mono nd-count-badge">${S.comments.length}</span>` : ''}</h3>
       ${S.comments.length ? `<ul class="nd-comment-list">${S.comments.map((cm) => {
         const d = tsToDate(cm.createdAt);
-        const canDel = (myUid && cm.uid === myUid) || owner;
+        const isMine = myUid && cm.uid === myUid;
+        const canDel = isMine || owner;
+        const editing = S.editing && S.editing.id === cm.id;
         return `<li>
           ${avatar(cm.name, cm.photo)}
           <div class="nd-comment-body">
             <div class="nd-comment-head">
               <span class="nd-comment-name">${esc(cm.name)}</span>
               ${d ? `<time class="nd-mono" datetime="${d.toISOString()}">${esc(fmtDateTime(d))}</time>` : ''}
-              ${canDel ? `<button type="button" class="nd-icon-btn" data-action="del-comment" data-id="${esc(cm.id)}" aria-label="${esc(tt('delete'))}" title="${esc(tt('delete'))}">${icon('ph-trash')}</button>` : ''}
+              ${cm.editedAt ? `<span class="nd-comment-edited">${esc(tt('edited'))}</span>` : ''}
+              <span class="nd-comment-tools">
+                ${isMine && open && !editing ? `<button type="button" class="nd-icon-btn" data-action="edit-comment" data-id="${esc(cm.id)}" aria-label="${esc(tt('edit'))}" title="${esc(tt('edit'))}">${icon('ph-pencil-simple')}</button>` : ''}
+                ${canDel && !editing ? `<button type="button" class="nd-icon-btn" data-action="del-comment" data-id="${esc(cm.id)}" aria-label="${esc(tt('delete'))}" title="${esc(tt('delete'))}">${icon('ph-trash')}</button>` : ''}
+              </span>
             </div>
-            <p>${linkify(cm.text)}</p>
+            ${editing ? `
+            <form class="nd-comment-edit" id="nd-comment-edit">
+              <textarea class="nd-input nd-textarea" id="nd-comment-edit-text" rows="1" maxlength="${MAX.comment}" data-bind-edit>${esc(S.editing.text)}</textarea>
+              <div class="nd-actions">
+                <button type="submit" class="btn glass-btn nd-btn nd-btn--primary btn-sm" ${S.editing.busy || !S.editing.text.trim() ? 'disabled' : ''}>${S.editing.busy ? icon('ph-spinner') : ''}${esc(tt('save'))}</button>
+                <button type="button" class="nd-link-btn nd-link-btn--quiet" data-action="edit-cancel">${esc(tt('cancel'))}</button>
+              </div>
+            </form>` : `<p>${linkify(cm.text)}</p>`}
           </div>
         </li>`;
       }).join('')}</ul>` : `<p class="nd-quiet">${esc(tt('no_comments'))}</p>`}
@@ -1504,6 +1664,9 @@ function onClick(e) {
   const f = S.form;
   const slotOf = () => slotsFor(btn.getAttribute('data-day'))[Number(btn.getAttribute('data-i'))];
 
+  /* Um clique em qualquer controle fora do painel aberto fecha o painel. */
+  if (S.pop && !btn.closest('.nd-popwrap')) S.pop = null;
+
   switch (a) {
     case 'kind': {
       f.kind = btn.getAttribute('data-kind') === 'booking' ? 'booking' : 'group';
@@ -1543,6 +1706,7 @@ function onClick(e) {
       }
       render();
       if (S.pop && S.pop.kind === 'duration') { const inp = document.getElementById('nd-dur-input'); if (inp) { inp.focus(); inp.select(); } }
+      if (S.pop && S.pop.kind === 'tz') document.getElementById('nd-tz-q')?.focus();
       break;
     }
     case 'pop-close': { const id = S.pop && S.pop.id; S.pop = null; render(); if (id) document.getElementById(id)?.focus(); break; }
@@ -1568,9 +1732,32 @@ function onClick(e) {
 
     case 'slot-add': { const list = slotsFor(btn.getAttribute('data-day')); list.push(nextSlot(list)); render(); break; }
     case 'slot-del': {
-      const list = slotsFor(btn.getAttribute('data-day'));
-      list.splice(Number(btn.getAttribute('data-i')), 1);
-      if (!list.length) list.push(nextSlot([]));
+      /* Tirar o único horário de um dia é tirar o dia. Antes, um horário novo
+         nascia no lugar, e o botão parecia não fazer nada. */
+      const k = btn.getAttribute('data-day');
+      const list = slotsFor(k);
+      if (list.length <= 1) { f.selected.delete(k); f.slots.delete(k); }
+      else list.splice(Number(btn.getAttribute('data-i')), 1);
+      S.pop = null;
+      render();
+      break;
+    }
+    case 'clear-form': {
+      if (formHasContent() && !confirm(tt('confirm_clear'))) break;
+      S.form = freshForm(); S.pop = null; clearForm(); render();
+      break;
+    }
+    case 'edit-comment': {
+      const cm = S.comments.find((c) => c.id === btn.getAttribute('data-id'));
+      if (cm) { S.editing = { id: cm.id, text: cm.text || '', busy: false }; render(); document.getElementById('nd-comment-edit-text')?.focus(); }
+      break;
+    }
+    case 'edit-cancel': S.editing = null; render(); break;
+    case 'tz-set': {
+      const tz = btn.getAttribute('data-tz');
+      if (!validTz(tz)) break;
+      if (btn.getAttribute('data-target') === 'form') f.tz = tz; else S.tz = tz;
+      storeTz(tz);
       S.pop = null;
       render();
       break;
@@ -1588,6 +1775,7 @@ function onClick(e) {
       const id = btn.getAttribute('data-opt');
       S.draft.votes[id] = btn.getAttribute('data-next');
       S.draftDirty = true;
+      saveVoteDraft();
       render();
       break;
     }
@@ -1620,6 +1808,7 @@ function onClick(e) {
     }
     default: break;
   }
+  if (S.route.page === 'home') saveForm();
 }
 
 function onInput(e) {
@@ -1630,6 +1819,26 @@ function onInput(e) {
   if (bind) {
     S.form[bind] = el.value;
     if (S.form.error) { S.form.error = null; const p = root.querySelector('.nd-error'); if (p) p.remove(); }
+    saveForm();
+    /* Nada de redesenhar no meio da digitação: o navegador rejeita trocar o
+       innerHTML enquanto processa o input do campo, e o texto se perde. */
+    const clear = root.querySelector('[data-action="clear-form"]');
+    if (clear) clear.hidden = !formHasContent();
+    return;
+  }
+  if (el.hasAttribute('data-bind-tzq')) {
+    /* A busca filtra a lista no lugar; o campo continua com o foco. */
+    const pop = root.querySelector('.nd-pop--tz');
+    if (pop) {
+      const box = pop.querySelector('.nd-tz-list');
+      const tmp = document.createElement('div');
+      tmp.innerHTML = tzPopInner(el.getAttribute('data-tz-current'), el.getAttribute('data-bind-tzq'), el.value);
+      box.innerHTML = tmp.querySelector('.nd-tz-list').innerHTML;
+    }
+    return;
+  }
+  if (el.hasAttribute('data-bind-edit')) {
+    if (S.editing) { S.editing.text = el.value; const b = root.querySelector('#nd-comment-edit button[type=submit]'); if (b) b.disabled = S.editing.busy || !el.value.trim(); }
     return;
   }
   if (el.hasAttribute('data-bind-custom')) {
@@ -1637,7 +1846,7 @@ function onInput(e) {
     if (v >= 5) { S.form.customMin = clampMin(v); syncDuration(); }
     return;
   }
-  if (el.hasAttribute('data-bind-draft')) { S.draft.name = el.value; S.draftDirty = true; return; }
+  if (el.hasAttribute('data-bind-draft')) { S.draft.name = el.value; S.draftDirty = true; saveVoteDraft(); return; }
   if (el.hasAttribute('data-bind-comment')) {
     S.comment.text = el.value;
     const b = root.querySelector('#nd-comment-form button[type=submit]');
@@ -1650,6 +1859,7 @@ function onSubmit(e) {
   e.preventDefault();
   if (e.target.id === 'nd-create') createPoll();
   else if (e.target.id === 'nd-comment-form') addComment();
+  else if (e.target.id === 'nd-comment-edit') saveCommentEdit();
 }
 
 /* Clicar fora de um painel, ou Esc, fecha o painel. */
@@ -1677,12 +1887,14 @@ if (root) {
   document.addEventListener('click', onDocClick);
   document.addEventListener('keydown', onKey);
   window.addEventListener('popstate', route);
-  window.addEventListener('resize', placePops);
   document.addEventListener('langchange', () => render());
 
   /* Em localhost, o estado e o redesenho ficam à mão para se testar a página
      da enquete com dados fictícios, sem banco. Em produção não existe. */
   if (location.hostname === 'localhost') window.__noodle = { S, render, unwatch };
+
+  S.tz = storedTz() || VIEWER_TZ;
+  S.form = loadForm() || freshForm();
 
   if (CONFIGURED) fb().catch((e) => { console.error('[noodle] Firebase failed to load:', e); toast(tt('err_generic')); });
   route();

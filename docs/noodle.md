@@ -13,9 +13,13 @@ enquete:
   mesmo horário é recusada pelas regras, sem transação nenhuma, porque o
   documento da reserva tem o id do horário.
 
-Faixas de horário têm duração fixa (15 a 120 minutos, ou outra), links na
-descrição e no lugar viram clicáveis, e o link da enquete sai por cópia,
-e-mail ou pelo compartilhar do celular.
+Faixas de horário têm duração fixa (15 a 120 minutos, ou outra) e um fuso
+escolhido por quem cria, gravado na enquete; quem lê escolhe o fuso em que vê
+os horários, e a escolha fica no navegador. Links na descrição e no lugar viram
+clicáveis; o link da enquete sai por cópia, e-mail ou pelo compartilhar do
+celular. O formulário de criar e a resposta ainda não salva ficam guardados no
+navegador, e voltam depois de um reload. Comentários podem ser editados por quem
+os escreveu, e passam a dizer que foram editados.
 
 É um Doodle para vinte pessoas, não para vinte mil. Tudo abaixo foi escolhido
 com isso em mente.
