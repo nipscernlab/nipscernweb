@@ -73,16 +73,34 @@
     @media (max-width: 768px) { .nd-mascot img { width: 140px; height: 140px; } }
 
     /* O palco e a sua luz. A seção fica acima do rodapé para um painel que
-       desce além dela passar por cima do que vem depois, não por baixo. */
+       desce além dela passar por cima do que vem depois, não por baixo.
+
+       A luz é mais larga que a caixa que a carrega: cada mancha tem raio visível
+       de ~500px e o centro ficava a ~240px da borda, então o degradê ainda
+       estava aceso onde a caixa acabava e o corte desenhava uma linha reta — à
+       esquerda na mancha de cima, à direita na de baixo. Duas coisas
+       consertam isso: a caixa passa a ir de ponta a ponta da janela, e é `html`
+       e `body` (overflow-x: clip) que aparam a sobra, fora do campo de visão; e
+       a máscara dissolve nos quatro lados, não só em cima e embaixo.
+
+       Os centros passam de 14%/86% para 18%/82% porque a caixa cresceu: medidos
+       sobre a janela, esses números põem a luz onde ela já estava. */
     .nd-section { position: relative; z-index: 3; }
     .nd-stage { position: relative; isolation: isolate; }
     .nd-stage::after {
-      content: ''; position: absolute; inset: -140px -10vw; z-index: -1; pointer-events: none;
+      content: ''; position: absolute; z-index: -1; pointer-events: none;
+      top: -140px; bottom: -140px; left: calc(50% - 50vw); right: calc(50% - 50vw);
       background:
-        radial-gradient(720px 480px at 14% 10%, rgba(247, 201, 72, 0.085), transparent 70%),
-        radial-gradient(640px 460px at 86% 70%, rgba(247, 201, 72, 0.045), transparent 70%);
-      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 180px, #000 calc(100% - 180px), transparent);
-      mask-image: linear-gradient(to bottom, transparent, #000 180px, #000 calc(100% - 180px), transparent);
+        radial-gradient(720px 480px at 18% 10%, rgba(247, 201, 72, 0.085), transparent 70%),
+        radial-gradient(640px 460px at 82% 70%, rgba(247, 201, 72, 0.045), transparent 70%);
+      -webkit-mask-image:
+        linear-gradient(to bottom, transparent, #000 180px, #000 calc(100% - 180px), transparent),
+        linear-gradient(to right, transparent, #000 220px, #000 calc(100% - 220px), transparent);
+      -webkit-mask-composite: source-in;
+      mask-image:
+        linear-gradient(to bottom, transparent, #000 180px, #000 calc(100% - 180px), transparent),
+        linear-gradient(to right, transparent, #000 220px, #000 calc(100% - 220px), transparent);
+      mask-composite: intersect;
     }
 
     /* Painéis e grade */
