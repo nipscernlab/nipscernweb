@@ -19,7 +19,9 @@ os horários, e a escolha fica no navegador. Links na descrição e no lugar vir
 clicáveis; o link da enquete sai por cópia, e-mail ou pelo compartilhar do
 celular. O formulário de criar e a resposta ainda não salva ficam guardados no
 navegador, e voltam depois de um reload. Comentários podem ser editados por quem
-os escreveu, e passam a dizer que foram editados.
+os escreveu, e passam a dizer que foram editados. Antes de apagar ou limpar, a
+pergunta é da própria página, não do navegador: nada trava a aba nem a tela do
+celular.
 
 É um Doodle para vinte pessoas, não para vinte mil. Tudo abaixo foi escolhido
 com isso em mente.

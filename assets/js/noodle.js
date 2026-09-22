@@ -48,8 +48,8 @@
  *   O SDK do Firebase vem do CDN do Google, por import() dinâmico, só quando a
  *   página está configurada.
  */
-import { t, getLang } from './i18n.js?v=52b6de4b3d';
-import { scrollToTop } from './smooth-scroll.js?v=52b6de4b3d';
+import { t, getLang } from './i18n.js?v=401f3a63bd';
+import { scrollToTop } from './smooth-scroll.js?v=401f3a63bd';
 
 const FB_VERSION = '12.19.0';
 const fbUrl = (m) => `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-${m}.js`;
@@ -486,6 +486,53 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('is-on'), 4800);
 }
 
+/* Uma pergunta na própria página, no lugar do confirm() do navegador, que
+   trava a aba inteira até se responder e, no celular, a tela toda. Devolve uma
+   promessa com true ou false; Cancelar, Esc e o fundo escuro são "não". Vive
+   fora do #noodle-app, como o recado, para um redesenho não a derrubar. */
+function ask({ text, ok, danger = false }) {
+  return new Promise((resolve) => {
+    document.getElementById('nd-dialog-wrap')?.remove();
+    const was = document.activeElement;
+    const wrap = document.createElement('div');
+    wrap.id = 'nd-dialog-wrap';
+    wrap.className = 'nd-dim';
+    wrap.innerHTML = `<div class="nd-dialog glass" role="alertdialog" aria-modal="true" aria-describedby="nd-dialog-text">
+      <p id="nd-dialog-text" class="nd-dialog-text">${esc(text)}</p>
+      <div class="nd-dialog-actions">
+        <button type="button" class="btn glass-btn nd-btn nd-btn--outline btn-sm" data-dialog="no">${esc(tt('cancel'))}</button>
+        <button type="button" class="btn glass-btn nd-btn ${danger ? 'nd-btn--danger' : 'nd-btn--primary'} btn-sm" data-dialog="yes">${esc(ok)}</button>
+      </div>
+    </div>`;
+    const close = (answer) => {
+      document.removeEventListener('keydown', onDialogKey, true);
+      wrap.classList.remove('is-on');
+      wrap.addEventListener('transitionend', () => wrap.remove(), { once: true });
+      setTimeout(() => wrap.remove(), 300);
+      if (was && was.isConnected && typeof was.focus === 'function') was.focus({ preventScroll: true });
+      resolve(answer);
+    };
+    /* O foco fica preso nos dois botões enquanto a pergunta está aberta. */
+    const onDialogKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(false); return; }
+      if (e.key !== 'Tab') return;
+      const btns = [...wrap.querySelectorAll('button')];
+      const i = btns.indexOf(document.activeElement);
+      e.preventDefault();
+      btns[(i + (e.shiftKey ? -1 : 1) + btns.length) % btns.length].focus();
+    };
+    wrap.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-dialog]');
+      if (b) close(b.getAttribute('data-dialog') === 'yes');
+      else if (e.target === wrap) close(false);
+    });
+    document.addEventListener('keydown', onDialogKey, true);
+    document.body.appendChild(wrap);
+    /* Apagar começa com o foco em Cancelar; limpar, no botão que faz. */
+    requestAnimationFrame(() => { wrap.classList.add('is-on'); wrap.querySelector(danger ? '[data-dialog="no"]' : '[data-dialog="yes"]').focus(); });
+  });
+}
+
 function errMsg(e, ctx) {
   const code = (e && e.code) || '';
   console.error('[noodle]', e);
@@ -679,7 +726,8 @@ async function saveVote() {
 
 async function deleteResponse(uid, confirmKey) {
   if (!S.poll) return;
-  if (!confirm(tt(confirmKey))) return;
+  if (!(await ask({ text: tt(confirmKey), ok: tt('delete'), danger: true }))) return;
+  if (!S.poll) return;
   try {
     const { db, Fs } = await fb();
     await Fs.deleteDoc(Fs.doc(db, 'polls', S.poll.id, 'responses', uid));
@@ -706,9 +754,10 @@ async function book(optionId) {
   finally { S.booking = null; render(); }
 }
 
-async function cancelBooking(optionId, confirmKey) {
+async function cancelBooking(optionId, confirmKey, okKey) {
   if (!S.poll) return;
-  if (!confirm(tt(confirmKey))) return;
+  if (!(await ask({ text: tt(confirmKey), ok: tt(okKey), danger: true }))) return;
+  if (!S.poll) return;
   try {
     const { db, Fs } = await fb();
     await Fs.deleteDoc(Fs.doc(db, 'polls', S.poll.id, 'bookings', optionId));
@@ -747,6 +796,8 @@ async function saveCommentEdit() {
 
 async function deleteComment(id) {
   if (!S.poll) return;
+  if (!(await ask({ text: tt('confirm_delete_comment'), ok: tt('delete'), danger: true }))) return;
+  if (!S.poll) return;
   try {
     const { db, Fs } = await fb();
     await Fs.deleteDoc(Fs.doc(db, 'polls', S.poll.id, 'comments', id));
@@ -776,7 +827,8 @@ async function setFinal(optionId) {
    quem é o dono lendo a enquete como ela está ANTES do lote. */
 async function deletePoll() {
   if (!S.poll) return;
-  if (!confirm(tt('confirm_delete_poll'))) return;
+  if (!(await ask({ text: tt('confirm_delete_poll'), ok: tt('delete_poll'), danger: true }))) return;
+  if (!S.poll) return;
   const id = S.poll.id;
   try {
     const { db, Fs } = await fb();
@@ -1743,8 +1795,9 @@ function onClick(e) {
       break;
     }
     case 'clear-form': {
-      if (formHasContent() && !confirm(tt('confirm_clear'))) break;
-      S.form = freshForm(); S.pop = null; clearForm(); render();
+      const wipe = () => { S.form = freshForm(); S.pop = null; clearForm(); render(); };
+      if (formHasContent()) ask({ text: tt('confirm_clear'), ok: tt('clear_all') }).then((yes) => { if (yes) wipe(); });
+      else wipe();
       break;
     }
     case 'edit-comment': {
@@ -1783,8 +1836,8 @@ function onClick(e) {
     case 'del-mine': if (S.user) deleteResponse(S.user.uid, 'confirm_delete_answer'); break;
     case 'del-resp': deleteResponse(btn.getAttribute('data-uid'), 'confirm_delete_answer'); break;
     case 'book': book(btn.getAttribute('data-opt')); break;
-    case 'unbook': cancelBooking(btn.getAttribute('data-opt'), 'confirm_cancel_booking'); break;
-    case 'unbook-any': cancelBooking(btn.getAttribute('data-opt'), 'confirm_remove_booking'); break;
+    case 'unbook': cancelBooking(btn.getAttribute('data-opt'), 'confirm_cancel_booking', 'cancel_booking'); break;
+    case 'unbook-any': cancelBooking(btn.getAttribute('data-opt'), 'confirm_remove_booking', 'delete'); break;
     case 'del-comment': deleteComment(btn.getAttribute('data-id')); break;
     case 'status': setStatus(btn.getAttribute('data-status')); break;
     case 'final': {
@@ -1873,6 +1926,7 @@ function onDocClick(e) {
   render();
 }
 function onKey(e) {
+  if (document.getElementById('nd-dialog-wrap')) return;
   if (e.key === 'Escape' && S.pop) { const id = S.pop.id; S.pop = null; render(); if (id) document.getElementById(id)?.focus(); }
 }
 

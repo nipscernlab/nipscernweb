@@ -31,11 +31,11 @@
  * is the only literal part, and it turns over when the record is open.
  */
 
-import { t } from './i18n.js?v=52b6de4b3d';
+import { t } from './i18n.js?v=401f3a63bd';
 /* Never scrollIntoView({behavior:'smooth'}) on this site: Lenis is driving the
    scroll position from its own ticker and the two animations fight, which
    reads as no scroll at all. scrollToEl asks the library. */
-import { scrollToEl } from './smooth-scroll.js?v=52b6de4b3d';
+import { scrollToEl } from './smooth-scroll.js?v=401f3a63bd';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -392,12 +392,12 @@ function mountNetwork(net) {
   const start = () => {
     if (started) return;
     started = true;
-    import('./network.js?v=52b6de4b3d').then(({ initNetwork }) =>
+    import('./network.js?v=401f3a63bd').then(({ initNetwork }) =>
       initNetwork(canvas, { tip: document.getElementById('net-tip'), data: net })
     ).then((api) => {
       if (!api) { stage.classList.add('is-flat'); return; }
       stage.classList.add('is-live');
-      import('./motion.js?v=52b6de4b3d').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
+      import('./motion.js?v=401f3a63bd').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
     }).catch(() => stage.classList.add('is-flat'));
   };
 

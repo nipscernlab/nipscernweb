@@ -27,8 +27,8 @@
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/plex-mono-500-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/noodle.css?v=52b6de4b3d">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=52b6de4b3d">
+  <link rel="stylesheet" href="assets/css/icons/noodle.css?v=401f3a63bd">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=401f3a63bd">
 
   <!-- O SDK do Firebase vem daqui. Avisar o navegador cedo poupa uma ida e
        volta na hora do import(). -->
@@ -405,6 +405,12 @@
       --glass-edge-hover: #c4c7c5;
       color: #E3E3E3; font-weight: 500;
     }
+    .nd-btn--danger {
+      --glass-tint: rgba(229, 83, 61, 0.2);
+      --glass-edge: rgba(255, 157, 139, 0.42);
+      --glass-edge-hover: var(--nd-red);
+      color: #ffe3dd;
+    }
     .nd-g { width: 18px; height: 18px; display: block; flex-shrink: 0; }
     .nd-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
     .nd-actions { display: flex; align-items: center; gap: var(--sp-5); flex-wrap: wrap; }
@@ -590,6 +596,26 @@
     }
     .nd-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
 
+    /* A pergunta antes de apagar ou limpar: um vidro no meio da tela sobre a
+       página escurecida, no lugar do confirm() do navegador. Fica abaixo do
+       recado, que ainda precisa aparecer por cima dela. */
+    .nd-dim {
+      position: fixed; inset: 0; z-index: 1250;
+      display: grid; place-items: center; padding: 16px;
+      background: rgba(4, 6, 12, 0.6);
+      opacity: 0; transition: opacity var(--t-base);
+    }
+    .nd-dim.is-on { opacity: 1; }
+    .nd-dialog {
+      --glass-tint: rgba(9, 12, 20, 0.9);
+      width: min(100%, 400px); padding: var(--sp-6);
+      border-radius: var(--r-xl) !important; box-shadow: var(--shadow-xl);
+      transform: translateY(10px) scale(0.98); transition: transform var(--t-base);
+    }
+    .nd-dim.is-on .nd-dialog { transform: none; }
+    .nd-dialog-text { margin: 0 0 var(--sp-5); font-size: var(--text-base); line-height: 1.5; color: var(--text-primary); }
+    .nd-dialog-actions { display: flex; justify-content: flex-end; gap: var(--sp-3); flex-wrap: wrap; }
+
     @media (max-width: 1024px) {
       .nd-grid--home, .nd-grid--poll { grid-template-columns: 1fr; }
     }
@@ -624,10 +650,16 @@
       .nd-input--name { min-width: 0; width: 100%; }
       .nd-cell { min-width: 56px; }
       .nd-avatar--sm { display: none; }
+      /* A pergunta também vira uma folha presa embaixo, com os dois botões à
+         mão do polegar. */
+      .nd-dim { align-items: end; padding: 12px; }
+      .nd-dialog { width: 100%; }
+      .nd-dialog-actions .nd-btn { flex: 1 1 0; justify-content: center; min-height: 44px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .nd-cal-day, .nd-vote .nd-mark, .nd-toast, .nd-switch, .nd-switch-knob { transition: none; }
       .nd-pop.is-new { animation: none; }
+      .nd-dim, .nd-dialog { transition: none; }
       .ph-spinner { animation: none; }
     }
   </style>
@@ -690,8 +722,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=52b6de4b3d"></script>
-  <script type="module" src="assets/js/noodle.min.js?v=52b6de4b3d"></script>
-  <script src="assets/js/analytics.min.js?v=52b6de4b3d" defer></script>
+  <script type="module" src="assets/js/main.min.js?v=401f3a63bd"></script>
+  <script type="module" src="assets/js/noodle.min.js?v=401f3a63bd"></script>
+  <script src="assets/js/analytics.min.js?v=401f3a63bd" defer></script>
 </body>
 </html>
