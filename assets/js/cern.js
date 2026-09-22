@@ -23,7 +23,7 @@
  * in the repository for the day it is wanted back.
  */
 
-import { ensureMotionLibs, initMotion } from './motion.js?v=a406c633e0';
+import { ensureMotionLibs, initMotion } from './motion.js?v=657881fd5a';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 

@@ -78,7 +78,7 @@ export function initSmoothScroll() {
      home, the CERN page and SAPHO, which are the three with a scrub. */
   if (!document.documentElement.hasAttribute('data-smooth-scroll')) return;
 
-  import('./vendor/lenis.mjs?v=a406c633e0').then(({ default: Lenis }) => {
+  import('./vendor/lenis.mjs?v=657881fd5a').then(({ default: Lenis }) => {
     lenis = new Lenis({
       /* Higher is snappier. The default 0.1 leaves the page still settling well
          after the wheel has stopped, which on a site with a fixed navigation and
