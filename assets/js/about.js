@@ -75,6 +75,16 @@ const ROLE_EN = {
 };
 const roleText = (role) => ROLE_EN[role] || role || '';
 
+/* A linha sob o nome: a instituição da pessoa quando o team.json traz uma, e o
+   papel dela quando não traz. Pedido de Luciano em 23/09, olhando os cartões dos
+   colaboradores: num cartão de quem vem de fora, "de onde ele é" informa mais do
+   que "coorientador", que os três colaboradores da UERJ são igualmente.
+   A afiliação sai SEM data-i18n de propósito: é nome próprio, não se traduz, e o
+   passe do i18n reescreveria o texto a cada troca de idioma. */
+const roleLine = (m, tag) => (m.affiliation
+  ? '<' + tag + ' class="rt-role">' + esc(m.affiliation) + '</' + tag + '>'
+  : '<' + tag + ' class="rt-role" data-i18n="' + roleKey(m.role) + '">' + esc(roleText(m.role)) + '</' + tag + '>');
+
 /* t() answers with the key itself until the language file has landed, and this
    module can render before that. So every generated label carries data-i18n,
    this walks the subtree it just wrote, and the same walk runs again whenever
@@ -115,7 +125,7 @@ function coordinatorHTML(m, record) {
     + '<div class="cd-body">'
     + (m.title ? '<p class="cd-title">' + esc(m.title) + '</p>' : '')
     + '<h3 class="cd-name">' + esc(m.name) + '</h3>'
-    + '<p class="rt-role" data-i18n="' + roleKey(m.role) + '">' + esc(roleText(m.role)) + '</p>'
+    + roleLine(m, 'p')
     + (record ? countHTML(record) : '')
     + '<p class="cd-bio">' + esc(m.bio) + '</p>'
     + (awards ? '<div class="rd-block"><p class="rd-label" data-i18n="about.team.awards">Awards</p>'
@@ -167,7 +177,7 @@ function cardHTML(m) {
     + '</span>'
     + '<span class="tm-plate glass">'
     + '<span class="tm-name">' + esc(m.name) + '</span>'
-    + '<span class="rt-role" data-i18n="' + roleKey(m.role) + '">' + esc(roleText(m.role)) + '</span>'
+    + roleLine(m, 'span')
     + '<i class="ph ph-caret-down tm-caret" aria-hidden="true"></i>'
     + '</span>'
     + '</button>';
@@ -239,7 +249,7 @@ function detailHTML(m, record) {
     + '<header class="rd-head"><div class="rd-id">'
     + (m.title ? '<p class="rd-title">' + esc(m.title) + '</p>' : '')
     + '<p class="rd-name">' + esc(m.name) + '</p>'
-    + '<p class="rt-role" data-i18n="' + roleKey(m.role) + '">' + esc(roleText(m.role)) + '</p>'
+    + roleLine(m, 'p')
     + '</div>' + countHTML(record) + '</header>'
     + '<div class="rd-body">'
     + (m.bio ? '<p class="rd-bio">' + esc(m.bio) + '</p>' : '')
