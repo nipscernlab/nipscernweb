@@ -31,11 +31,11 @@
  * is the only literal part, and it turns over when the record is open.
  */
 
-import { t } from './i18n.js?v=401f3a63bd';
+import { t, getLang } from './i18n.js?v=4874cf29d2';
 /* Never scrollIntoView({behavior:'smooth'}) on this site: Lenis is driving the
    scroll position from its own ticker and the two animations fight, which
    reads as no scroll at all. scrollToEl asks the library. */
-import { scrollToEl } from './smooth-scroll.js?v=401f3a63bd';
+import { scrollToEl } from './smooth-scroll.js?v=4874cf29d2';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -85,6 +85,31 @@ const roleLine = (m, tag) => (m.affiliation
   ? '<' + tag + ' class="rt-role">' + esc(m.affiliation) + '</' + tag + '>'
   : '<' + tag + ' class="rt-role" data-i18n="' + roleKey(m.role) + '">' + esc(roleText(m.role)) + '</' + tag + '>');
 
+/* A BIO DE CADA PESSOA POR IDIOMA.
+   O texto de uma pessoa vive no team.json, não no arquivo de idioma: é conteúdo,
+   não rótulo de interface, e quem o escreve é quem cuida do team.json. Até 23/09
+   ele existia só em inglês, e a página continuava em inglês com a bandeira do
+   Brasil escolhida, que foi o que Luciano viu. Agora, quando a ficha traz a
+   versão do idioma corrente (bio_pt, bio_fr, bio_no), é ela que aparece; quando
+   não traz, fica a inglesa, que toda ficha tem.
+   As versões viajam no próprio elemento, em data-bio-<lang>, para a troca de
+   idioma não ter de reconstruir cartão nenhum: o mesmo passe que traduz os
+   rótulos reescreve a bio. */
+const BIO_LANGS = ['en', 'pt', 'fr', 'no'];
+const bioIn = (m, lang) => (lang === 'en' ? m.bio : m['bio_' + lang]) || '';
+const bioText = (m) => bioIn(m, getLang()) || m.bio || '';
+const bioAttrs = (m) => BIO_LANGS
+  .map((l) => (bioIn(m, l) ? 'data-bio-' + l + '="' + esc(bioIn(m, l)) + '"' : ''))
+  .filter(Boolean).join(' ');
+
+function applyBios(root) {
+  const lang = getLang();
+  root.querySelectorAll('[data-bio-en], [data-bio-pt], [data-bio-fr], [data-bio-no]').forEach((el) => {
+    const txt = el.getAttribute('data-bio-' + lang) || el.getAttribute('data-bio-en');
+    if (txt) el.textContent = txt;
+  });
+}
+
 /* t() answers with the key itself until the language file has landed, and this
    module can render before that. So every generated label carries data-i18n,
    this walks the subtree it just wrote, and the same walk runs again whenever
@@ -95,6 +120,7 @@ function localise(root) {
     const val = t(key);
     if (val && val !== key) el.textContent = val;
   });
+  applyBios(root);
 }
 
 const json = (path) => fetch(ROOT + path).then((r) => (r.ok ? r.json() : null)).catch(() => null);
@@ -127,7 +153,7 @@ function coordinatorHTML(m, record) {
     + '<h3 class="cd-name">' + esc(m.name) + '</h3>'
     + roleLine(m, 'p')
     + (record ? countHTML(record) : '')
-    + '<p class="cd-bio">' + esc(m.bio) + '</p>'
+    + '<p class="cd-bio" ' + bioAttrs(m) + '>' + esc(bioText(m)) + '</p>'
     + (awards ? '<div class="rd-block"><p class="rd-label" data-i18n="about.team.awards">Awards</p>'
         + '<ul class="cd-awards">' + awards + '</ul></div>' : '')
     + (links ? '<div class="rd-links">' + links + '</div>' : '')
@@ -252,7 +278,7 @@ function detailHTML(m, record) {
     + roleLine(m, 'p')
     + '</div>' + countHTML(record) + '</header>'
     + '<div class="rd-body">'
-    + (m.bio ? '<p class="rd-bio">' + esc(m.bio) + '</p>' : '')
+    + (m.bio ? '<p class="rd-bio" ' + bioAttrs(m) + '>' + esc(bioText(m)) + '</p>' : '')
     + (awards ? '<div class="rd-block"><p class="rd-label" data-i18n="about.team.awards">Awards</p>'
         + '<ul class="rd-awards">' + awards + '</ul></div>' : '')
     + '</div>'
@@ -402,12 +428,12 @@ function mountNetwork(net) {
   const start = () => {
     if (started) return;
     started = true;
-    import('./network.js?v=401f3a63bd').then(({ initNetwork }) =>
+    import('./network.js?v=4874cf29d2').then(({ initNetwork }) =>
       initNetwork(canvas, { tip: document.getElementById('net-tip'), data: net })
     ).then((api) => {
       if (!api) { stage.classList.add('is-flat'); return; }
       stage.classList.add('is-live');
-      import('./motion.js?v=401f3a63bd').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
+      import('./motion.js?v=4874cf29d2').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
     }).catch(() => stage.classList.add('is-flat'));
   };
 
