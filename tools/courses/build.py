@@ -237,6 +237,11 @@ class Curso:
         self.slug = self.cfg["slug"]
         repo = Path(args.source) if args.source else (RAIZ / self.cfg["fonte"]["repositorio"]).resolve()
         self.fonte = Fonte(repo, args.ref or self.cfg["fonte"]["ref"], buscar=not args.no_fetch)
+        # As correções que o site faz no texto do curso, antes de qualquer
+        # leitura: o deck, o roteiro e o README já saem corrigidos daqui.
+        for a in self.cfg["aulas"]:
+            for c in a.get("correcoes", []):
+                self.fonte.corrige(c["arquivo"], c["de"], c["para"])
         self.raiz = f"library/courses/{self.slug}/"
         self.media = SAIDA / self.slug / "media"
         self.cdn = midia.Cdn(AQUI / f"{self.slug}.cdn.json", f"courses/{self.slug}", args.assets)
@@ -408,6 +413,8 @@ class Curso:
         n_videos = sum(1 for _, h_ in traduzidos if "data-video=" in h_)
 
         pdf_slides = f.ler(f"{pasta}/{a['pdf_dos_slides']}")
+        for c in a.get("correcoes_pdf", []):
+            pdf_slides = midia.corrige_pdf(pdf_slides, c["pagina"], c["trocas"], f)
         url_pdf = self.cdn.publica(f"{pasta}/{a['pdf_dos_slides']}", pdf_slides, f"{self.slug}-aula-{a['n']:02d}-slides.pdf")
         capa_aula = self.poe_midia(("capa-aula", a["n"]), midia.primeira_pagina(pdf_slides, 1280),
                                    f"{self.slug}-aula-{a['n']:02d}-capa", "webp")

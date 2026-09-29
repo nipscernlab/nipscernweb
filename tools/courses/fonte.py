@@ -52,6 +52,21 @@ class Fonte:
         # com CRLF; tudo o que é texto passa a LF aqui, uma vez.
         return self.ler(caminho).decode("utf-8").replace("\r\n", "\n")
 
+    def corrige(self, caminho, de, para):
+        """Troca um trecho de um arquivo do curso, só na cópia em memória.
+
+        É para o que o site publica diferente do repositório do curso, por
+        decisão de quem dá o curso, enquanto o repositório não é corrigido. O
+        trecho tem de aparecer exatamente uma vez: se o curso mudar o texto, a
+        correção para de valer e a rodada falha, em vez de publicar a versão
+        antiga sem aviso.
+        """
+        texto = self.texto(caminho)
+        n = texto.count(de)
+        if n != 1:
+            raise SystemExit(f"correção em {caminho}: o trecho aparece {n} vez(es), e tem de aparecer uma: {de[:70]!r}")
+        self.arquivos[caminho] = texto.replace(de, para).encode("utf-8")
+
     def lista(self, prefixo):
         """Os arquivos logo abaixo de `prefixo`, sem descer em subpastas."""
         prefixo = prefixo.rstrip("/") + "/"

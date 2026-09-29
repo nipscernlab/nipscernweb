@@ -132,6 +132,61 @@ def primeira_pagina(pdf, largura, indice=0):
     return webp(png, grafico=False)
 
 
+def corrige_pdf(pdf, pagina, trocas, fonte_do_curso):
+    """Troca linhas de texto numa página do PDF dos slides, no mesmo lugar e com a mesma letra.
+
+    O PDF sai do Edge com as letras em fontes Type 3, que não servem para
+    escrever texto novo. Cada linha a trocar é achada pelo texto, apagada por
+    redação, só o texto, sem tocar nas imagens nem nos traços do slide, e
+    reescrita na mesma linha de base, com o mesmo corpo e a mesma cor, na fonte
+    do infra/fontes do curso que o slide usa.
+
+    trocas: [{"de": [linhas], "para": [linhas], "fonte": caminho do .ttf no
+      curso, "fundo": cor que fica no lugar do texto apagado}]
+    O resultado é o mesmo byte a byte a cada rodada: o PyMuPDF não carimba
+    data nem troca o /ID ao salvar assim.
+    """
+    import tempfile
+    import fitz  # PyMuPDF
+    fitz.TOOLS.mupdf_display_errors(False)
+    doc = fitz.open(stream=pdf, filetype="pdf")
+    pg = doc[pagina - 1]
+    # Cada linha da página com o texto dela inteiro. A busca do PyMuPDF não
+    # serve aqui: com as fontes Type 3 do Edge, cada palavra é um trecho à
+    # parte, e ela devolve um retângulo por palavra.
+    linhas = []
+    for b in pg.get_text("dict")["blocks"]:
+        for l in b.get("lines", []):
+            texto = "".join(s["text"] for s in l["spans"]).strip()
+            primeiro = next((s for s in l["spans"] if s["text"].strip()), None)
+            if texto and primeiro:
+                linhas.append((texto, fitz.Rect(l["bbox"]), primeiro))
+    novos = []
+    for tr in trocas:
+        if len(tr["de"]) != len(tr["para"]):
+            raise SystemExit("correção de PDF: 'de' e 'para' precisam do mesmo número de linhas")
+        cor_fundo = tuple(int(tr["fundo"][k:k + 2], 16) / 255 for k in (1, 3, 5))
+        for de, para in zip(tr["de"], tr["para"]):
+            achados = [(r, s) for texto, r, s in linhas if texto == de]
+            if len(achados) != 1:
+                raise SystemExit(f"correção de PDF, página {pagina}: a linha {de!r} aparece {len(achados)} vez(es)")
+            r, s = achados[0]
+            novos.append((s["origin"], s["size"], s["color"], para, tr["fonte"]))
+            pg.add_redact_annot(r + (-1, -1, 1, 1), fill=cor_fundo)
+    pg.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE, graphics=fitz.PDF_REDACT_LINE_ART_NONE)
+    with tempfile.TemporaryDirectory() as tmp:
+        nomes = {}
+        for origem, tam, cor, texto, fonte in novos:
+            if fonte not in nomes:
+                caminho = Path(tmp) / f"f{len(nomes)}.ttf"
+                caminho.write_bytes(fonte_do_curso.ler(fonte))
+                nomes[fonte] = (f"F{len(nomes)}", str(caminho))
+            nome, arquivo = nomes[fonte]
+            rgb = tuple(((cor >> k) & 255) / 255 for k in (16, 8, 0))
+            pg.insert_text(origem, texto, fontsize=tam, fontname=nome, fontfile=arquivo, color=rgb)
+        return doc.tobytes(garbage=3, deflate=True, no_new_id=True)
+
+
 def youtube(video_id):
     """Título, canal e miniatura de um vídeo, pelo oEmbed do próprio YouTube.
 
