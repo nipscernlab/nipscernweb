@@ -505,6 +505,9 @@ class Curso:
 
     def item_de_estudo(self, item, ren, pasta, rel):
         if item["tipo"] == "texto":
+            partes = texto.leitura(item["md"])
+            if partes:
+                return {"tipo": "leitura", **partes}
             return {"tipo": "texto", "html": ren.html(item["md"], f"{pasta}/README.md")}
         v = midia.youtube(item["id"])
         if v["canal"] != item["canal_citado"]:
@@ -523,6 +526,10 @@ class Curso:
         # as dos vizinhos. Com src direto, as seções, que estão todas no DOM,
         # baixariam o deck inteiro na abertura, quadro parado de vídeo incluído.
         corpo = "\n".join(re.sub(r'(<img\b[^>]*?)\ssrc="', r'\1 data-src="', s) for _, s in slides)
+        # A anotação do <aside> vira parágrafos, com os vetores pelo KaTeX: é o
+        # HTML que o slides.js põe no painel de anotações.
+        notas_html = iter(texto.notas_em_html(re.findall(r"<aside>(.*?)</aside>", corpo, re.S)))
+        corpo = re.sub(r"<aside>(.*?)</aside>", lambda m: f"<aside>{next(notas_html)}</aside>", corpo, flags=re.S)
         barra = f"""  <div class="deck-progress" aria-hidden="true"><span id="progresso"></span></div>
   <div class="deck-bar" id="barra" role="toolbar" {aria("slides")}>
     <a class="deck-btn" href="../" {aria("back_to_class")}><i class="ph ph-arrow-left" aria-hidden="true"></i></a>
@@ -553,7 +560,8 @@ class Curso:
         js = f'  <script type="module" src="{p}assets/js/slides.min.js?v={self.token}"></script>\n'
         return esqueleto(rel, f"{indice['title']} | NIPS-CERN",
                          f"Slides of class {a['n']} of Limiar, the NIPS-CERN neural networks course, in Portuguese, with the presenter notes.",
-                         miolo, self.token, css=("assets/css/slides.min.css",), sem_moldura=True, js=js, corpo_classe="deck")
+                         miolo, self.token, css=("assets/css/slides.min.css", "assets/css/vendor/katex.min.css"),
+                         sem_moldura=True, js=js, corpo_classe="deck")
 
     # ---------------------------------------------------------- o roteiro
 
@@ -688,6 +696,19 @@ class Curso:
                     f'<span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">{e(it["serie"][0].upper() + it["serie"][1:])}, capítulo {e(it["capitulo"])}</span>'
                     f'<span class="cr-video-title" lang="en">{e(it["titulo"])}</span>'
                     f'<span class="cr-video-channel">{e(it["canal"])} · <span class="cr-wave">{rotulo("watch")}</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a>')
+            elif it["tipo"] == "leitura":
+                # O texto com a mesma forma do vídeo ao lado: no lugar da miniatura, o
+                # livro, com o título e o autor, e embaixo o capítulo, o título dele e o link.
+                resto = f', {e(it["resto"])}' if it.get("resto") else ""
+                cartoes.append(
+                    f'<a class="cr-video cr-reading glass glass--flat" href="{e(it["url"])}" target="_blank" rel="noopener">'
+                    f'<span class="frame cr-video-thumb cr-book" aria-hidden="true"><span class="cr-book-inner">'
+                    f'<span class="cr-book-title" lang="en">{e(it["obra"])}</span>'
+                    f'<span class="cr-book-author">{e(it["autor"])} · {e(it["ano"])}</span></span></span>'
+                    f'<span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">{e(it["parte"][0].upper() + it["parte"][1:])}{resto}</span>'
+                    f'<span class="cr-video-title" lang="en">{e(it["titulo"])}</span>'
+                    f'<span class="cr-video-channel"><span class="cr-wave">{rotulo("read_online")}</span>'
+                    f'<i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a>')
             else:
                 cartoes.append(f'<div class="cr-read glass glass--flat"><i class="ph ph-book-open" aria-hidden="true"></i>'
                                f'<div class="cr-prose" lang="pt-BR">{it["html"]}</div></div>')
@@ -742,13 +763,26 @@ class Curso:
                 f'<figcaption lang="pt-BR">{e(cfg["capa"]["credito"])}</figcaption></figure>')
         topo = hero(self.url_midia(self.fundo, rel), crumbs, texto_hero, capa, classe="cr-hero--course")
 
+        # Daqui para baixo, a página se lê como um programa de curso impresso: o
+        # nome de cada parte na margem, em serifa, e o conteúdo ao lado, com um
+        # fio entre uma parte e outra. Sem painel, sem ícone em título: o que
+        # organiza é a tipografia.
+        def linha(chave, id_, miolo, nota=""):
+            return (f'<section class="cr-ed" aria-labelledby="{id_}">'
+                    f'<div class="cr-ed-side fade-up"><h2 class="cr-ed-label" id="{id_}">{rotulo(chave)}</h2>{nota}</div>'
+                    f'<div class="cr-ed-body fade-up">{miolo}</div></section>')
+
+        def itens(md_lista):
+            """As linhas "- ..." de uma lista em Markdown, cada uma já em HTML, sem o <p>."""
+            return [re.sub(r"^<p>|</p>\s*$", "", md(l[2:]).strip())
+                    for l in md_lista.split("\n") if l.startswith("- ")]
+
         # O nome, em três sentidos, como o slide 3 da aula 1 os mostra.
         n = s["nome"]
-        sentidos = "".join(f'<li class="cr-sense glass fade-up"><span class="cr-sense-n cr-mono">{k}</span>'
-                           f'<h3 class="cr-sense-t">{e(rot)}</h3><p>{e(frase)}</p></li>'
-                           for k, (rot, frase) in enumerate(n["sentidos"], 1))
-        banda_nome = banda(titulo("text-aa", "s_name", "nome-t", f'<span class="cr-h2-note" lang="pt-BR">{e(n["abertura"])}</span>')
-                           + f'<ol class="cr-senses" lang="pt-BR">{sentidos}</ol>', "nome-t", classe="cr-band--first")
+        sentidos = "".join(f'<li><span class="cr-meaning-n">{k}</span><span class="cr-meaning-t">{e(rot)}</span>'
+                           f'<p>{e(frase)}</p></li>' for k, (rot, frase) in enumerate(n["sentidos"], 1))
+        nome = (f'<p class="cr-ed-lede" lang="pt-BR">{e(n["abertura"])}</p>'
+                f'<ol class="cr-meanings" lang="pt-BR">{sentidos}</ol>')
 
         # As aulas publicadas.
         cartoes = []
@@ -759,48 +793,37 @@ class Curso:
                 f'<span class="frame cr-class-cover"><img src="{self.url_midia(aula["capa"], rel)}" alt="" width="1280" height="720" loading="lazy" decoding="async"></span>'
                 f'<span class="cr-class-body"><span class="cr-class-n">{rotulo("class")} <span class="cr-mono">{c["n"]}</span></span>'
                 f'<span class="cr-class-title" lang="pt-BR">{e(aula["titulo"])}</span>'
-                f'<span class="cr-class-meta" lang="pt-BR"><i class="ph ph-calendar-blank" aria-hidden="true"></i>{e(c["quando"])}</span>'
-                f'<span class="cr-class-meta" lang="pt-BR"><i class="ph ph-map-pin" aria-hidden="true"></i>{e(c["onde"])}</span>'
+                f'<span class="cr-class-meta" lang="pt-BR">{e(c["quando"])}</span>'
+                f'<span class="cr-class-meta" lang="pt-BR">{e(c["onde"])}</span>'
                 f'</span></a>')
-        contagem = (f'<span class="cr-h2-note">{rotulo("classes_online")} <span class="cr-mono">'
-                    f'{len(self.aulas)} / {cfg["aulas_previstas"]}</span></span>')
-        banda_aulas = banda(titulo("calendar", "s_classes", "aulas-t", contagem)
-                            + f'<div class="cr-grid cr-grid--classes fade-up">{"".join(cartoes)}</div>', "aulas-t", lit=False)
+        contagem = (f'<p class="cr-ed-note">{rotulo("classes_online")}<br><span class="cr-mono">'
+                    f'{len(self.aulas)} / {cfg["aulas_previstas"]}</span></p>')
+        aulas = f'<div class="cr-grid cr-grid--classes">{"".join(cartoes)}</div>'
 
-        # Aonde o curso chega, com o artigo do projeto ao lado.
-        banda_aonde = banda(titulo("graph", "s_goes", "aonde-t")
-                            + f'<div class="cr-split"><div class="cr-prose cr-prose--lg fade-up" lang="pt-BR">{md(s["aonde"])}</div>'
-                              f'<aside class="cr-split-side fade-up"><p class="cr-side-label"><i class="ph ph-star-four" aria-hidden="true"></i>'
-                              f'{rotulo("project_paper")}</p><ol class="cr-refs cr-refs--one">'
-                              f'{self.referencia(cfg["artigo_do_projeto"], rel, grande=True)}</ol></aside></div>', "aonde-t")
+        # Aonde o curso chega, com o artigo do projeto embaixo do texto que o cita.
+        aonde = (f'<div class="cr-prose cr-prose--lg" lang="pt-BR">{md(s["aonde"])}</div>'
+                 f'<div class="cr-ed-ref"><p class="cr-ed-sub">{rotulo("project_paper")}</p>'
+                 f'<ol class="cr-refs cr-refs--one">{self.referencia(cfg["artigo_do_projeto"], rel, grande=True)}</ol></div>')
 
-        # Objetivos e o jeito de uma aula, lado a lado.
-        linhas = "".join(f'<li><span class="cr-mono">{e(tempo)}</span><span>{e(oque)}</span></li>' for tempo, oque in s["aula"])
-        banda_forma = banda(
-            f'<div class="cr-duo cr-duo--even">'
-            f'<article class="cr-panel glass fade-up" aria-labelledby="objetivos-t">'
-            f'<h2 class="cr-panel-title" id="objetivos-t"><i class="ph ph-check-circle" aria-hidden="true"></i>{rotulo("s_goals")}</h2>'
-            f'<div class="cr-prose cr-goals" lang="pt-BR">{md(s["objetivos"])}</div></article>'
-            f'<article class="cr-panel glass fade-up" aria-labelledby="formato-t">'
-            f'<h2 class="cr-panel-title" id="formato-t"><i class="ph ph-clock" aria-hidden="true"></i>{rotulo("s_format")}</h2>'
-            f'<ol class="cr-timeline" lang="pt-BR">{linhas}</ol>'
-            f'<h3 class="cr-kit-sub">{rotulo("s_between")}</h3><div class="cr-prose" lang="pt-BR">{md(s["entre_aulas"])}</div></article>'
-            f'</div>', lit=False)
+        objetivos = f'<ul class="cr-goal-list" lang="pt-BR">{"".join(f"<li>{x}</li>" for x in itens(s["objetivos"]))}</ul>'
 
-        banda_dados = banda(
-            f'<div class="cr-duo cr-duo--even">'
-            f'<article class="cr-panel glass fade-up" aria-labelledby="dados-t">'
-            f'<h2 class="cr-panel-title" id="dados-t"><i class="ph ph-database" aria-hidden="true"></i>{rotulo("s_data")}</h2>'
-            f'<div class="cr-prose" lang="pt-BR">{md(s["dados"])}</div></article>'
-            f'<article class="cr-panel glass fade-up" aria-labelledby="ferramentas-t">'
-            f'<h2 class="cr-panel-title" id="ferramentas-t"><i class="ph ph-terminal-window" aria-hidden="true"></i>{rotulo("s_tools")}</h2>'
-            f'<div class="cr-prose" lang="pt-BR">{md(s["ferramentas"])}</div>'
-            f'<div class="cr-actions">{botao(self.url_guia, "file-pdf", "install_guide", fora=True, pequeno=True)}'
-            f'<a class="btn btn-sm btn-ghost glass-btn" href="{self.site(rel, self.req)}" download><i class="ph ph-download-simple" aria-hidden="true"></i>'
-            f'<span class="cr-mono">requirements.txt</span></a></div></article>'
-            f'</div>', classe="cr-band--last")
+        agenda = "".join(f'<li><span class="cr-agenda-t">{e(tempo)}</span><span>{e(oque)}</span></li>'
+                         for tempo, oque in s["aula"])
+        formato = (f'<ol class="cr-agenda" lang="pt-BR">{agenda}</ol>'
+                   f'<p class="cr-ed-sub">{rotulo("s_between")}</p><div class="cr-prose" lang="pt-BR">{md(s["entre_aulas"])}</div>')
 
-        corpo = topo + banda_nome + banda_aulas + banda_aonde + banda_forma + banda_dados
+        dados = f'<div class="cr-prose" lang="pt-BR">{md(s["dados"])}</div>'
+        ferramentas = (f'<div class="cr-prose" lang="pt-BR">{md(s["ferramentas"])}</div>'
+                       f'<div class="cr-actions">{botao(self.url_guia, "file-pdf", "install_guide", fora=True, pequeno=True)}'
+                       f'<a class="btn btn-sm btn-ghost glass-btn" href="{self.site(rel, self.req)}" download>'
+                       f'<i class="ph ph-download-simple" aria-hidden="true"></i><span class="cr-mono">requirements.txt</span></a></div>')
+
+        banda_1 = banda(linha("s_name", "nome-t", nome) + linha("s_classes", "aulas-t", aulas, contagem)
+                        + linha("s_goes", "aonde-t", aonde), classe="cr-band--first cr-band--ed")
+        banda_2 = banda(linha("s_goals", "objetivos-t", objetivos) + linha("s_format", "formato-t", formato)
+                        + linha("s_data", "dados-t", dados) + linha("s_tools", "ferramentas-t", ferramentas),
+                        lit=False, classe="cr-band--last cr-band--ed")
+        corpo = topo + banda_1 + banda_2
         self.escrita.grava(RAIZ / rel, esqueleto(
             rel, f"{cfg['nome']}: {cfg['subtitulo'].lower()} | NIPS-CERN",
             f"{cfg['nome']}, the NIPS-CERN neural networks course, taught in Portuguese at UFJF: classes, slides, study guides, code and readings.",
@@ -899,6 +922,112 @@ def copia_katex(escrita):
     escrita.grava(destino / "LICENSE", (RAIZ / "node_modules" / "katex" / "LICENSE").read_bytes())
 
 
+# Os endereços de /library/ que já são de outro dono: os Workers do manual do
+# SAPHO e da TWiki do CGVWeb. Um curso com um desses nomes tomaria a rota deles.
+ROTAS_DE_WORKER = {"sapho", "cgvweb"}
+
+
+def atalho(slug, escrita):
+    """/library/<curso>/ leva a /library/courses/<curso>/.
+
+    É o endereço que se digita de memória, e sem isto ele dá 404. O GitHub Pages
+    não redireciona do lado do servidor, então a página faz o que um 301 faria:
+    refresh imediato, o canonical apontando para o endereço de verdade, e o
+    location.replace, que leva junto o #n de quem digitou um slide. O noindex
+    deixa o buscador com um endereço só.
+    """
+    if slug in ROTAS_DE_WORKER or slug == "courses":
+        raise SystemExit(f"o curso {slug!r} teria o atalho /library/{slug}/, que já é de outra coisa")
+    destino = f"/library/courses/{slug}/"
+    pagina = f"""<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py: o atalho de /library/{slug}/ para {destino}. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>{e(slug.capitalize())} | NIPS-CERN</title>
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="{SITE}library/courses/{slug}/">
+  <meta http-equiv="refresh" content="0; url={destino}">
+  <script>location.replace({json.dumps(destino)} + location.search + location.hash);</script>
+</head>
+<body>
+  <p><a href="{destino}">{SITE}library/courses/{slug}/</a></p>
+</body>
+</html>
+"""
+    escrita.grava(RAIZ / "library" / slug / "index.html", pagina)
+
+
+def confere_links(cursos):
+    """Todo endereço das páginas geradas tem de levar a alguma coisa.
+
+    Abre cada .html de library/courses/ e resolve href, src, data-src,
+    data-video e poster como o navegador resolveria a partir da página, com as
+    URLs limpas do GitHub Pages: pasta vira index.html, e caminho sem extensão
+    vira .html. O que é do site tem de existir no repositório; o que é do CDN
+    tem de ser um arquivo que esta rodada publicou; e a âncora tem de existir na
+    página de destino. Nos slides, #n é o número do slide, que o slides.js lê,
+    e vale de 1 ao total. Endereço de fora não se confere aqui, porque depende
+    da rede; é o que o relatório do PR conta. Devolve a lista dos problemas.
+    """
+    import urllib.parse
+    cdn = {c.cdn.BASE + caminho for c in cursos for caminho in c.cdn.usados}
+    paginas = {}
+    for arq in sorted(SAIDA.rglob("*.html")):
+        paginas[arq.resolve()] = arq.read_text(encoding="utf-8")
+
+    def ids(texto_html):
+        return set(re.findall(r'\sid="([^"]+)"', texto_html))
+
+    def arquivo_de(caminho_url):
+        alvo = (RAIZ / caminho_url.lstrip("/")).resolve()
+        if caminho_url.endswith("/"):
+            alvo = alvo / "index.html"
+        elif not alvo.suffix:
+            html_ = alvo.with_suffix(".html")
+            alvo = html_ if html_.exists() else alvo / "index.html"
+        return alvo
+
+    problemas = []
+    for arq, texto_html in paginas.items():
+        rel = arq.relative_to(RAIZ.resolve()).as_posix()
+        base = "/" + rel.rsplit("/", 1)[0] + "/"
+        for attr, valor in re.findall(r'\s(href|src|data-src|data-video|poster)="([^"]*)"', texto_html):
+            valor = html.unescape(valor)
+            if not valor or valor.startswith(("mailto:", "tel:", "data:")):
+                continue
+            if valor.startswith(("http://", "https://")):
+                if valor.startswith(SITE):
+                    valor = "/" + valor[len(SITE):]
+                elif valor.startswith("https://cdn.nipscern.com/"):
+                    if valor.split("#")[0] not in cdn:
+                        problemas.append(f"{rel}: {valor} não é um arquivo publicado no CDN nesta rodada")
+                    continue
+                else:
+                    continue
+            if valor == "#" and attr == "href":
+                continue      # o link do aviso de vídeo, que o slides.js preenche
+            destino, _, ancora = valor.partition("#")
+            if destino:
+                caminho = urllib.parse.urljoin(base, destino.split("?")[0])
+                alvo = arquivo_de(caminho)
+                if not alvo.exists():
+                    problemas.append(f"{rel}: {attr}={valor} leva a {caminho}, que não existe")
+                    continue
+            else:
+                alvo = arq
+            if ancora:
+                if alvo.name == "index.html" and alvo.parent.name == "slides" and ancora.isdigit():
+                    n = paginas.get(alvo.resolve(), "").count('<section id="')
+                    if not 1 <= int(ancora) <= n:
+                        problemas.append(f"{rel}: {valor} pede o slide {ancora}, e o deck tem {n}")
+                elif alvo.suffix == ".html":
+                    texto_alvo = paginas.get(alvo.resolve()) or alvo.read_text(encoding="utf-8")
+                    if ancora not in ids(texto_alvo):
+                        problemas.append(f"{rel}: {valor} aponta para #{ancora}, que não existe no destino")
+    return problemas
+
+
 def atualiza_sitemap(cursos):
     """As URLs da library/courses, num bloco marcado do sitemap.xml que só esta ferramenta mexe."""
     arq = RAIZ / "sitemap.xml"
@@ -950,6 +1079,8 @@ def main():
         cursos.append(c)
 
     escrita.grava(SAIDA / "index.html", pagina_da_colecao(cursos, token))
+    for c in cursos:
+        atalho(c.slug, escrita)
     copia_katex(escrita)
     atualiza_sitemap(cursos)
 
@@ -962,7 +1093,15 @@ def main():
         print(f"\n{c.cfg['nome']}, arquivos do CDN (https://cdn.nipscern.com/):")
         for caminho, n, estado in c.cdn.grava():
             print(f"  {caminho}  {n / 1e6:.2f} MB  {estado}")
-    print("\nfeito.")
+
+    problemas = confere_links(cursos)
+    if problemas:
+        print(f"\n{len(problemas)} endereço(s) sem destino:")
+        for p in problemas:
+            print("  " + p)
+        raise SystemExit(1)
+    print("\ntodos os endereços internos das páginas geradas levam a algum lugar.")
+    print("feito.")
 
 
 if __name__ == "__main__":

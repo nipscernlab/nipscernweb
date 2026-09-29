@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=0ce0a739f0';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=5153a5b847';
 
-import { newsPostUrl } from './content-links.js?v=0ce0a739f0';
+import { newsPostUrl } from './content-links.js?v=5153a5b847';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=0ce0a739f0';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=5153a5b847';
 
 // ============================================================
 // Navigation Template
@@ -25,6 +25,10 @@ const NAV_LINKS = [
   { key: 'nav.cern',         label: 'CERN',         href: 'cern.html',  paths: ['/cern', '/cern.html'] },
   { key: 'nav.projects',     label: 'Projects',     href: 'projects/',  paths: ['/projects/', '/projects/index.html', '/projects', '/projects/sapho', '/projects/sapho.html', '/projects/yanc', '/projects/yanc.html', '/projects/hits', '/projects/hits.html', '/projects/polaris', '/projects/polaris.html', '/projects/aurora', '/projects/aurora.html', '/projects/cgv', '/projects/cgv.html', '/projects/archived', '/projects/archived.html'] },
   { key: 'nav.publications', label: 'Publications', href: 'publications.html', paths: ['/publications', '/publications/', '/publications.html'] },
+  /* Os cursos da library. `prefix` porque as páginas são geradas e crescem a
+     cada aula: toda página abaixo de /library/courses/ acende o item, sem uma
+     lista de caminhos para manter aqui. */
+  { key: 'nav.courses',      label: 'Courses',      href: 'library/courses/', paths: [], prefix: '/library/courses/' },
   { key: 'nav.news',         label: 'News',         href: 'news/',      paths: ['/news/', '/news/index.html', '/news', '/news/post', '/news/post.html'] },
 ];
 
@@ -66,6 +70,7 @@ function buildNav() {
 
   // Fixed active detection: home must not match subdirectory index.html files
   function isActivePath(link) {
+    if (link.prefix && path.startsWith(link.prefix)) return true;
     return link.paths.some(p => {
       if (p === '/') {
         const segs = path.split('/').filter(s => s && s !== 'index.html' && s !== 'index');
@@ -858,7 +863,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=0ce0a739f0">. Each copy would otherwise append its own
+// <script src="main.js?v=5153a5b847">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {

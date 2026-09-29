@@ -17,7 +17,7 @@
    deslizar para os lados na tela de toque; e as imagens carregando só no slide
    atual e nos vizinhos, porque as 23 seções estão todas no DOM e, com src
    direto, a abertura baixaria o deck inteiro. */
-import { initI18n, t } from './i18n.js?v=0ce0a739f0';
+import { initI18n, t } from './i18n.js?v=5153a5b847';
 
 const palco = document.getElementById('palco');
 const slides = [...palco.children].filter((el) => el.tagName === 'SECTION');
@@ -120,16 +120,13 @@ function toca(v) {
 
 /* ---------------------------------------------------------------- navegação */
 
-/* A anotação vem do <aside> do slide como texto, um parágrafo por linha. */
+/* A anotação vem do <aside> do slide já em parágrafos, com os vetores desenhados
+   pelo KaTeX no build (tools/courses/texto.py, notas_em_html). É HTML gerado
+   por nós, a partir do deck do curso, e vai para o painel como está. */
 function mostraNotas() {
   const a = slides[atual].querySelector('aside');
-  const linhas = (a ? a.textContent : '').split('\n').map((l) => l.trim()).filter(Boolean);
-  notasTexto.replaceChildren(...linhas.map((l) => {
-    const p = document.createElement('p');
-    p.textContent = l;
-    return p;
-  }));
-  notasVazio.hidden = linhas.length > 0;
+  notasTexto.innerHTML = a ? a.innerHTML : '';
+  notasVazio.hidden = !!(a && a.textContent.trim());
   notas.scrollTop = 0;
 }
 
