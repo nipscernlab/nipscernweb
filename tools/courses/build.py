@@ -4,6 +4,8 @@
     python tools/courses/build.py                      # todos os cursos de catalogo.json
     python tools/courses/build.py --assets ../nipscern-assets
     python tools/courses/build.py --no-fetch           # sem git fetch no repositório do curso
+    python tools/courses/build.py --assets ../nipscern-assets \\
+        --material eletronica-analogica-1=apostila.zip # PDF novo de um curso em apostila
 
 Tudo o que está em library/courses/ sai daqui e não se edita à mão: rodar de novo
 sobre o mesmo commit do curso dá os mesmos bytes, e um arquivo que esta
@@ -18,11 +20,13 @@ import io
 import json
 import re
 import sys
+import zipfile
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
 
+import apostila  # noqa: E402
 import deck  # noqa: E402
 import midia  # noqa: E402
 import texto  # noqa: E402
@@ -114,7 +118,7 @@ def url_publica(rel):
     return SITE + str(Path(rel).parent.as_posix()) + "/"
 
 
-def esqueleto(rel, titulo, descricao, corpo, token, css=(), sem_moldura=False, js=None, corpo_classe=""):
+def esqueleto(rel, titulo, descricao, corpo, token, css=(), sem_moldura=False, js=None, corpo_classe="", corpo_estilo=""):
     p = prefixo(rel)
     canon = url_publica(rel)
     estilos = "".join(f'\n  <link rel="stylesheet" href="{p}{c}?v={token}">' for c in css)
@@ -131,6 +135,9 @@ def esqueleto(rel, titulo, descricao, corpo, token, css=(), sem_moldura=False, j
                    '  <main id="main">\n')
     moldura_fim = "" if sem_moldura else '  </main>\n\n  <footer id="footer" role="contentinfo"></footer>\n\n'
     cls = f' class="{corpo_classe}"' if corpo_classe else ""
+    # A cor de um curso que não é a do Limiar, a de fábrica de courses.css, vem
+    # no estilo do corpo: as variáveis --cr-accent passam para tudo embaixo.
+    cls += f' style="{corpo_estilo}"' if corpo_estilo else ""
     return f"""<!DOCTYPE html>
 <!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
 <html lang="en">
@@ -169,6 +176,7 @@ def esqueleto(rel, titulo, descricao, corpo, token, css=(), sem_moldura=False, j
 # ------------------------------------------------------------------ peças das páginas
 
 IDIOMA = '<span class="content-lang-badge" data-content-lang="pt"></span>'
+LANG_PT = ' lang="pt-BR"'
 
 
 def migalhas(itens):
@@ -184,11 +192,21 @@ def migalhas(itens):
 def fichas(itens):
     """Os fatos numa linha, cada um com o ícone e o rótulo para leitor de tela: [(ícone, chave, valor)].
 
-    O último item é o selo da língua do conteúdo, o português, que o main.js
-    preenche com a bandeira e o nome."""
+    O valor é texto do curso, em português. Um quarto elemento False diz que
+    ele é número com rótulo do site, que o i18n.js traduz, e aí não leva o
+    lang do português. O último item é o selo da língua do conteúdo, que o
+    main.js preenche com a bandeira e o nome."""
     lis = "".join(f'<li><i class="ph ph-{ic}" aria-hidden="true"></i>{rotulo(ch, classe="sr-only")}'
-                  f'<span lang="pt-BR">{valor}</span></li>' for ic, ch, valor in itens)
+                  f'<span{LANG_PT if (resto[0] if resto else True) else ""}>{valor}</span></li>'
+                  for ic, ch, valor, *resto in itens)
     return f'<ul class="cr-facts fade-up">{lis}<li class="cr-facts-lang">{IDIOMA}</li></ul>'
+
+
+def programa(chave, id_, miolo, nota=""):
+    """Uma parte da página do curso, lida como programa impresso: o nome na margem, o conteúdo ao lado."""
+    return (f'<section class="cr-ed" aria-labelledby="{id_}">'
+            f'<div class="cr-ed-side fade-up"><h2 class="cr-ed-label" id="{id_}">{rotulo(chave)}</h2>{nota}</div>'
+            f'<div class="cr-ed-body fade-up">{miolo}</div></section>')
 
 
 def titulo(icone, chave, id_, extra=""):
@@ -774,10 +792,7 @@ class Curso:
         # nome de cada parte na margem, em serifa, e o conteúdo ao lado, com um
         # fio entre uma parte e outra. Sem painel, sem ícone em título: o que
         # organiza é a tipografia.
-        def linha(chave, id_, miolo, nota=""):
-            return (f'<section class="cr-ed" aria-labelledby="{id_}">'
-                    f'<div class="cr-ed-side fade-up"><h2 class="cr-ed-label" id="{id_}">{rotulo(chave)}</h2>{nota}</div>'
-                    f'<div class="cr-ed-body fade-up">{miolo}</div></section>')
+        linha = programa
 
         def itens(md_lista):
             """As linhas "- ..." de uma lista em Markdown, cada uma já em HTML, sem o <p>."""
@@ -836,22 +851,451 @@ class Curso:
             f"{cfg['nome']}, the NIPS-CERN neural networks course, taught in Portuguese at UFJF: classes, slides, study guides, code and readings.",
             corpo, self.token, css=("assets/css/courses.min.css",)))
 
+    # ---------------------------------------------------------- o que a library inteira pede de cada curso
+
+    estilo = ""   # a cor do curso, para o curso que não usa a de fábrica
+
+    @property
+    def data(self):
+        return self.fonte.data
+
+    def origem(self):
+        return f"{self.fonte.ref} = {self.fonte.sha[:10]} ({self.fonte.data})"
+
+    def paginas_do_sitemap(self):
+        """(caminho, prioridade, frequência) de cada página do curso, para o sitemap."""
+        yield self.raiz, "0.7", "weekly"
+        for a in self.aulas:
+            base = f"{self.raiz}{a['cfg']['slug']}/"
+            yield base, "0.6", "monthly"
+            yield base + "slides/", "0.5", "monthly"
+            yield base + "study-guide/", "0.5", "monthly"
+            yield base + "code/", "0.4", "monthly"
+
+    def fatos_do_cartao(self):
+        """Os fatos do cartão na coletânea: (chave do rótulo, valor, se o valor é texto em português)."""
+        return [("period", self.cfg["periodo"]["texto"], True),
+                ("classes_online", f"{len(self.aulas)} / {self.cfg['aulas_previstas']}", False)]
+
     def cartao_da_colecao(self, rel):
         cfg = self.cfg
-        return (f'<a class="cr-card glass" href="{self.slug}/">'
+        fatos = "".join(f'<span><span class="cr-card-k">{rotulo(k)}</span>'
+                        f'<span class="cr-mono"{LANG_PT if pt else ""}>{e(v)}</span></span>'
+                        for k, v, pt in self.fatos_do_cartao())
+        estilo = f' style="{self.estilo}"' if self.estilo else ""
+        return (f'<a class="cr-card glass" href="{self.slug}/"{estilo}>'
                 f'<span class="frame cr-card-cover"><img src="{self.url_midia(self.capa, rel)}" alt="{e(cfg["capa"]["alt"])}" '
                 f'width="780" height="975" loading="lazy" decoding="async"></span>'
                 f'<span class="cr-card-body"><span class="cr-card-eyebrow">{rotulo("course")}</span>'
                 f'<span class="cr-card-title">{e(cfg["nome"])}</span>'
                 f'<span class="cr-card-sub" lang="pt-BR">{e(cfg["subtitulo"])}</span>'
                 f'<span class="cr-card-line" lang="pt-BR">{e(cfg["linha"])}</span>'
-                f'<span class="cr-card-facts"><span><span class="cr-card-k">{rotulo("period")}</span>'
-                f'<span class="cr-mono" lang="pt-BR">{e(cfg["periodo"]["texto"])}</span></span>'
-                f'<span><span class="cr-card-k">{rotulo("classes_online")}</span>'
-                f'<span class="cr-mono">{len(self.aulas)} / {cfg["aulas_previstas"]}</span></span></span>'
+                f'<span class="cr-card-facts">{fatos}</span>'
                 f'<span class="cr-card-go"><span class="cr-wave">{rotulo("open_course")}</span><i class="ph ph-arrow-right" aria-hidden="true"></i></span>'
                 f'<span class="cr-card-credit" lang="pt-BR">{e(cfg["capa"]["credito"])}</span>'
                 f'</span></a>')
+
+
+# ------------------------------------------------------------------ o curso em apostila
+
+ROMANOS = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
+
+
+def _data_br(iso):
+    return f"{iso[8:10]}/{iso[5:7]}/{iso[:4]}"
+
+
+def _maiuscula(texto_):
+    return texto_[:1].upper() + texto_[1:]
+
+
+def _capitulos(ap):
+    """Capítulo 3, ou Capítulos 1 e 2: os números dos capítulos de uma parte, em português."""
+    n = [c.numero for c in ap.capitulos]
+    return f"Capítulo {n[0]}" if len(n) == 1 else f"Capítulos {', '.join(n[:-1])} e {n[-1]}"
+
+
+class CursoDeApostila(Curso):
+    """Um curso que chega como apostila em PDF, dividida em partes, sem repositório.
+
+    A fonte de cada parte é o PDF publicado no CDN, que o manifesto
+    <curso>.cdn.json localiza e cujo resumo ele confere: rodar de novo lê o que
+    está publicado e dá os mesmos bytes, em qualquer máquina. Um PDF novo entra
+    por --material <curso>=<zip, pasta ou PDF>, ganha no CDN a versão seguinte,
+    e a página da parte se refaz a partir dele, do sumário à data. O que o
+    .json escreve à mão, a tabela de modelos e as citações, é conferido contra
+    o PDF a cada rodada.
+    """
+
+    def __init__(self, arquivo, args, material=None):
+        self.arquivo = Path(arquivo)
+        self.cfg = json.loads(self.arquivo.read_text(encoding="utf-8"))
+        self.slug = self.cfg["slug"]
+        self.raiz = f"library/courses/{self.slug}/"
+        self.media = SAIDA / self.slug / "media"
+        self.cdn = midia.Cdn(AQUI / f"{self.slug}.cdn.json", f"courses/{self.slug}", args.assets)
+        self.midias = {}
+        self.aulas = []
+        self.partes = []
+        self.material = material or {}
+        esperados = {p["arquivo"] for p in self.cfg["partes"]}
+        sobra = sorted(set(self.material) - esperados)
+        if sobra:
+            raise SystemExit(f"o material de {self.slug} traz {', '.join(sobra)}, que não é de parte nenhuma em "
+                             f"{self.arquivo.name}; as partes esperam {', '.join(sorted(esperados))}")
+        cor = self.cfg["cor"]
+        r, g, b = (int(cor[k:k + 2], 16) for k in (1, 3, 5))
+        self.estilo = (f"--cr-accent:{cor};--cr-accent-dim:rgba({r}, {g}, {b}, 0.14);"
+                       f"--cr-accent-edge:rgba({r}, {g}, {b}, 0.32)")
+
+    @property
+    def data(self):
+        """A lastmod do sitemap: a data do PDF mais novo, que o LaTeX grava nos metadados."""
+        return max(x["ap"].data for x in self.partes)
+
+    def origem(self):
+        return ("PDFs novos: " + ", ".join(sorted(self.material))) if self.material else "os PDFs publicados no CDN"
+
+    def parte(self, n):
+        return next(x for x in self.partes if x["cfg"]["n"] == n)
+
+    def pdf(self, x, indice):
+        """O endereço do PDF de uma parte aberto na página `indice`, contada de 0."""
+        return f"{x['url']}#page={indice + 1}"
+
+    # ---------------------------------------------------------- a rodada
+
+    def gera(self, escrita, token):
+        self.escrita = escrita
+        self.token = token
+        cfg = self.cfg
+        for p in cfg["partes"]:
+            origem = f"parte-{p['n']}"
+            if p["arquivo"] in self.material:
+                pdf = self.material[p["arquivo"]]
+            elif origem in self.cdn.dados:
+                pdf = self.cdn.le_publicado(origem)
+            else:
+                raise SystemExit(f"a parte {p['n']} de {cfg['nome']} ainda não tem PDF publicado: rode com "
+                                 f"--material {self.slug}=<zip, pasta ou PDF com {p['arquivo']}>")
+            ap = apostila.Apostila(pdf, f"{cfg['nome']}, parte {p['n']}")
+            if ap.numeral != ROMANOS[p["n"]]:
+                raise SystemExit(f"{p['arquivo']} é a parte {ap.numeral} pelos marcadores, e o .json diz {p['n']}")
+            url = self.cdn.publica(origem, pdf, f"{self.slug}-apostila-parte-{p['n']}.pdf")
+            self.partes.append({"cfg": p, "ap": ap, "url": url, "versao": self.cdn.dados[origem]["versao"],
+                                "rel": f"{self.raiz}{p['slug']}/index.html"})
+        self.confere_textos()
+        self.gera_imagens()
+        for x in self.partes:
+            escrita.grava(RAIZ / x["rel"], self.pagina_da_parte(x))
+        self.gera_pagina_do_curso()
+
+    def confere_textos(self):
+        """O que o .json cita da apostila tem de estar nela, e a tabela de modelos avisa quando a seção dela muda."""
+        s = self.cfg["secoes"]
+        m = s["modelos"]
+        ap = self.parte(m["parte"])["ap"]
+        secao = ap.texto_da_secao(m["secao"])
+        h = midia.resumo(secao.encode("utf-8"), 16)
+        if h != m["resumo_da_leitura"]:
+            print(f"AVISO: a seção {m['secao']} da parte {m['parte']} mudou desde a curadoria da tabela de modelos "
+                  f"(resumo {h}); revise secoes.modelos em {self.arquivo.name} e atualize resumo_da_leitura.")
+        if m["abertura"] not in secao:
+            raise SystemExit(f"a frase de abertura de secoes.modelos não está mais na seção {m['secao']} da apostila")
+        self.indice_do_modelo = ap.indice_da_secao(m["secao"])
+        self.citacoes = {}
+        for c in s["metodo"] + [s["evolucao"]]:
+            indice = self.parte(c["parte"])["ap"].pagina_da_citacao(c["citacao"])
+            if indice is None:
+                raise SystemExit(f"a citação {c['citacao'][:60]!r}, em {self.arquivo.name}, não está mais na parte {c['parte']}")
+            self.citacoes[c["citacao"]] = indice
+
+    def gera_imagens(self):
+        """A capa do curso, o fundo do hero, e de cada parte a capa dela e uma figura para o cartão.
+
+        Tudo sai do PDF, desenhado aqui, e nada é imagem feita à parte: a capa
+        do curso é a capa da apostila, cortada em 4:5 a partir do alto; o fundo
+        é a faixa colorida dessa capa, pequena e desfocada; a figura do cartão
+        é a do .json, recortada da página e posta num quadro 16:9."""
+        from PIL import Image, ImageFilter
+
+        def png(im):
+            b = io.BytesIO()
+            im.save(b, "PNG")
+            return b.getvalue()
+
+        primeira = self.partes[0]["ap"]
+        im = Image.open(io.BytesIO(primeira.pagina_png(0, 1040))).convert("RGB")
+        self.capa = self.poe_midia(("capa",), midia.webp(png(im.crop((0, 0, 1040, 1300))), grafico=True),
+                                   f"{self.slug}-capa", "webp")
+        im = Image.open(io.BytesIO(primeira.faixa_da_capa(720))).convert("RGB").filter(ImageFilter.GaussianBlur(18))
+        b = io.BytesIO()
+        im.save(b, "WEBP", quality=70, method=6)
+        self.fundo = self.poe_midia(("fundo",), b.getvalue(), f"{self.slug}-fundo", "webp")
+        for x in self.partes:
+            n, ap = x["cfg"]["n"], x["ap"]
+            x["capa"] = self.poe_midia(("capa-parte", n), midia.webp(ap.pagina_png(0, 760), grafico=True),
+                                       f"{self.slug}-parte-{n}-capa", "webp")
+            x["figura"] = self.poe_midia(("figura", n), midia.webp(ap.figura(x["cfg"]["figura"]), grafico=True),
+                                         f"{self.slug}-parte-{n}-figura", "webp")
+
+    # ---------------------------------------------------------- a página de uma parte
+
+    def pagina_da_parte(self, x):
+        cfg, p, ap, rel, url = self.cfg, x["cfg"], x["ap"], x["rel"], x["url"]
+        fora = ' target="_blank" rel="noopener"'
+        seta = '<i class="ph ph-arrow-square-out" aria-hidden="true"></i>'
+        mb = f"{ap.bytes / 1e6:.1f}".replace(".", ",")
+        crumbs = migalhas([(rotulo("title"), prefixo(rel) + "library/courses/"), (e(cfg["nome"]), "../"),
+                           (f'{rotulo("part")} {p["n"]}', None)])
+
+        # O hero: o título da parte e os fatos de um lado, a capa dela do outro.
+        texto_hero = (
+            f'<p class="eyebrow fade-up"><i class="ph ph-books" aria-hidden="true"></i>'
+            f'{e(cfg["nome"])} · {rotulo("part")} {p["n"]}</p>'
+            f'<h1 class="display-md cr-class-h1 fade-up" lang="pt-BR">{e(ap.titulo)}</h1>'
+            + fichas([("book-open-text", "chapters", e(_capitulos(ap))),
+                      ("file-text", "pages", f'<span class="cr-mono">{ap.paginas}</span> {rotulo("n_pages")}', False),
+                      ("clock-counter-clockwise", "version",
+                       f'{rotulo("version")} <span class="cr-mono">{x["versao"]}</span>, '
+                       f'<time class="cr-mono" datetime="{ap.data}">{_data_br(ap.data)}</time>', False),
+                      ("user", "taught_by", e(cfg["quem_da"]))])
+            + f'<div class="cr-actions fade-up">{botao(url, "file-pdf", "open_handout", primario=True, fora=True)}'
+              f'{botao("#sumario-t", "list", "contents")}{botao("../", "arrow-left", "back_to_course")}</div>')
+        capa = (f'<a class="cr-cover cr-cover--page frame fade-up" href="{e(url)}"{fora} {aria("open_handout")}>'
+                f'<img src="{self.url_midia(x["capa"], rel)}" alt="" width="760" height="1075" decoding="async">'
+                f'<span class="cr-cover-tag" aria-hidden="true"><span><span class="cr-mono">{ap.paginas}</span> {rotulo("n_pages")}</span>'
+                f'<span><span class="cr-mono">{mb}</span> MB</span></span></a>'
+                f'<p class="cr-cover-hint fade-up">{rotulo("pdf_hint")}</p>')
+        topo = hero(self.url_midia(self.fundo, rel), crumbs, texto_hero, capa, classe="cr-hero--part")
+
+        # A parte e o material, lado a lado: a abertura de cada capítulo, nas
+        # palavras da apostila, e o que se abre dela.
+        def link(indice, miolo):
+            return (f'<a class="cr-ref-link" href="{self.pdf(x, indice)}"{fora}>{miolo}'
+                    f' <span class="cr-muted">{rotulo("page_abbr")} {e(ap.rotulo(indice))}</span>{seta}</a>')
+
+        blocos = []
+        for c in ap.capitulos:
+            exercicios = next((s for s in c.secoes if not s.numero and s.titulo.startswith("Exercícios")), None)
+            resumo = next((s for s in c.secoes if not s.numero and s.titulo.startswith("Resumo")), None)
+            links = [link(c.indice, f'<span class="cr-wave">{rotulo("read_chapter")}</span>')]
+            if exercicios:
+                respostas = (f' · <span class="cr-mono">{c.respondidos}</span> {rotulo("with_answer")}'
+                             if c.respondidos < c.exercicios else "")
+                links.append(link(exercicios.indice, f'<span class="cr-wave"><span class="cr-mono">{c.exercicios}</span> '
+                                                     f'{rotulo("n_exercises")}{respostas}</span>'))
+            if resumo:
+                links.append(link(resumo.indice, f'<span class="cr-wave">{rotulo("chapter_summary")}</span>'))
+            abertura = "".join(f"<p>{e(t)}</p>" for t in c.abertura)
+            blocos.append(f'<section class="cr-block" id="capitulo-{c.numero}">'
+                          f'<h3 class="cr-block-title">{rotulo("chapter")} <span class="cr-mono">{c.numero}</span></h3>'
+                          f'<p class="cr-ch-title" lang="pt-BR">{e(c.titulo)}</p>'
+                          f'<div class="cr-prose" lang="pt-BR">{abertura}</div>'
+                          f'<p class="cr-ref-links cr-ch-links">{"".join(links)}</p></section>')
+        plano = (f'<article class="cr-panel cr-plan glass fade-up" aria-labelledby="parte-t">'
+                 f'<h2 class="cr-panel-title" id="parte-t"><i class="ph ph-notebook" aria-hidden="true"></i>{rotulo("the_part")}</h2>'
+                 f'{"".join(blocos)}</article>')
+
+        def linha(href, icone, forte, fraco, externo=True):
+            return (f'<li><a class="cr-row" href="{e(href)}"{fora if externo else ""}>'
+                    f'<i class="ph ph-{icone}" aria-hidden="true"></i><span class="cr-row-text"><strong>{forte}</strong>'
+                    f'<span>{fraco}</span></span><i class="ph ph-{"arrow-square-out" if externo else "arrow-right"} cr-row-go" aria-hidden="true"></i></a></li>')
+
+        itens = [linha(url, "file-pdf", rotulo("handout_pdf"),
+                       f'<span class="cr-mono">{ap.paginas}</span> {rotulo("n_pages")} · <span class="cr-mono">{mb}</span> MB · '
+                       f'{rotulo("version")} <span class="cr-mono">{x["versao"]}</span>'),
+                 linha(self.pdf(x, ap.gabarito.indice), "check-circle", rotulo("answer_key"), rotulo("answer_key_desc"))]
+        for c in ap.capitulos:
+            resumo = next((s for s in c.secoes if not s.numero and s.titulo.startswith("Resumo")), None)
+            if resumo:
+                itens.append(linha(self.pdf(x, resumo.indice), "file-text",
+                                   f'{rotulo("chapter_summary")} <span class="cr-mono">{c.numero}</span>', rotulo("chapter_summary_desc")))
+        lt = cfg["ltspice"]
+        outras = "".join(linha(f'../{y["cfg"]["slug"]}/', "books", f'{rotulo("part")} <span class="cr-mono">{y["cfg"]["n"]}</span>',
+                               f'<span lang="pt-BR">{e(y["ap"].titulo)}</span>', externo=False)
+                         for y in self.partes if y is not x)
+        material = (f'<aside class="cr-panel cr-kit glass fade-up" aria-labelledby="material-t">'
+                    f'<h2 class="cr-panel-title" id="material-t"><i class="ph ph-package" aria-hidden="true"></i>{rotulo("part_materials")}</h2>'
+                    f'<ul class="cr-rows">{"".join(itens)}</ul>'
+                    f'<h3 class="cr-kit-sub"><i class="ph ph-wave-sine" aria-hidden="true"></i>{rotulo("simulation")}</h3>'
+                    f'<ul class="cr-rows">{linha(lt["link"], "wave-sine", "LTspice", rotulo("ltspice_desc"))}</ul>'
+                    + (f'<h3 class="cr-kit-sub"><i class="ph ph-books" aria-hidden="true"></i>{rotulo("s_parts")}</h3>'
+                       f'<ul class="cr-rows">{outras}</ul>' if outras else "")
+                    + '</aside>')
+        banda_parte = banda(f'<div class="cr-duo">{plano}{material}</div>', lit=True, classe="cr-band--first")
+
+        # O sumário, dos marcadores do PDF: cada linha abre o PDF na página dela.
+        colunas = []
+        for c in ap.capitulos:
+            secoes = "".join(
+                f'<li><a href="{self.pdf(x, s.indice)}"{fora}><span class="cr-toc2-n">{e(s.numero or "")}</span>'
+                f'<span class="cr-toc2-t">{e(s.titulo)}</span><span class="cr-toc2-p">{e(s.rotulo)}</span></a></li>'
+                for s in c.secoes)
+            colunas.append(f'<section class="cr-toc2-ch" aria-labelledby="sumario-{c.numero}">'
+                           f'<h3 class="cr-toc2-title" id="sumario-{c.numero}"><a href="{self.pdf(x, c.indice)}"{fora}>'
+                           f'<span class="cr-toc2-cap">{rotulo("chapter")} <span class="cr-mono">{c.numero}</span></span>'
+                           f'<span class="cr-toc2-name" lang="pt-BR">{e(c.titulo)}</span></a></h3>'
+                           f'<ol lang="pt-BR">{secoes}</ol></section>')
+        gab = ap.gabarito
+        gabarito = (f'<p class="cr-toc2-end"><a href="{self.pdf(x, gab.indice)}"{fora}><i class="ph ph-check-circle" aria-hidden="true"></i>'
+                    f'<span class="cr-toc2-t" lang="pt-BR">{e(gab.titulo)}</span><span class="cr-toc2-p">{e(gab.rotulo)}</span></a></p>')
+        tem_praticas = bool(ap.praticas)
+        banda_sumario = banda(titulo("list", "contents", "sumario-t")
+                              + f'<p class="cr-intro fade-up">{rotulo("contents_intro")}</p>'
+                              + f'<div class="cr-toc2 fade-up">{"".join(colunas)}</div>{gabarito}',
+                              "sumario-t", lit=False, classe="" if tem_praticas else "cr-band--last")
+
+        # As práticas de laboratório, com o objetivo que a caixa de cada uma dá.
+        banda_lab = ""
+        if tem_praticas:
+            abrir = f'<span class="cr-wave">{rotulo("open_handout")}</span>'
+            praticas = "".join(
+                f'<li id="pratica-{q.n}"><span class="cr-agenda-t">{rotulo("practice")} {q.n}</span>'
+                f'<div class="cr-lab"><p class="cr-lab-title" lang="pt-BR">{e(_maiuscula(q.titulo))}</p>'
+                f'<p lang="pt-BR">{e(q.objetivo)}</p>'
+                f'<p class="cr-ref-links">{link(q.indice, abrir)}</p></div></li>'
+                for q in ap.praticas)
+            banda_lab = banda(titulo("flask", "lab_practices", "praticas-t")
+                              + f'<p class="cr-intro fade-up">{rotulo("lab_intro")}</p>'
+                              + f'<ol class="cr-agenda cr-labs fade-up">{praticas}</ol>',
+                              "praticas-t", lit=True, classe="cr-band--last")
+
+        corpo = topo + banda_parte + banda_sumario + banda_lab
+        return esqueleto(rel, f"Parte {p['n']}: {ap.titulo} | {cfg['nome']} | NIPS-CERN",
+                         f"Part {p['n']} of the {cfg['nome']} handout, the analog electronics course of the UFJF Faculty of "
+                         f"Engineering, in Portuguese: contents, lab practices and exercises.",
+                         corpo, self.token, css=("assets/css/courses.min.css",), corpo_estilo=self.estilo)
+
+    # ---------------------------------------------------------- a página do curso
+
+    def gera_pagina_do_curso(self):
+        cfg, s = self.cfg, self.cfg["secoes"]
+        rel = self.raiz + "index.html"
+        fora = ' target="_blank" rel="noopener"'
+        seta = '<i class="ph ph-arrow-square-out" aria-hidden="true"></i>'
+        ren = texto.Renderizador({})
+        md = lambda t: ren.html(t, self.arquivo.name)  # noqa: E731
+        crumbs = migalhas([(rotulo("title"), "../"), (e(cfg["nome"]), None)])
+        texto_hero = (f'<p class="eyebrow fade-up"><i class="ph ph-books" aria-hidden="true"></i>{rotulo("course")}</p>'
+                      f'<h1 class="cr-course-name cr-course-name--long fade-up">{e(cfg["nome"])}</h1>'
+                      f'<p class="cr-subtitle fade-up" lang="pt-BR">{e(cfg["subtitulo"])}</p>'
+                      f'<p class="cr-lede fade-up" lang="pt-BR">{e(cfg["apresentacao"])}</p>'
+                      + fichas([("user", "taught_by", e(cfg["quem_da"])), ("map-pin", "where", e(cfg["onde"])),
+                                ("notebook", "course_code", e(cfg["disciplina"]))])
+                      + f'<div class="cr-actions fade-up">'
+                        f'{botao(self.partes[0]["cfg"]["slug"] + "/", "book-open-text", "open_first_part", primario=True)}'
+                        f'{botao("#partes-t", "list", "s_parts")}</div>')
+        capa = (f'<figure class="cr-course-cover fade-up"><div class="frame"><img src="{self.url_midia(self.capa, rel)}" '
+                f'alt="{e(cfg["capa"]["alt"])}" width="780" height="975" decoding="async"></div>'
+                f'<figcaption lang="pt-BR">{e(cfg["capa"]["credito"])}</figcaption></figure>')
+        topo = hero(self.url_midia(self.fundo, rel), crumbs, texto_hero, capa, classe="cr-hero--course")
+
+        def cita(parte, citacao, onde):
+            return (f'<p class="cr-ed-cite" lang="pt-BR"><a class="cr-ref-link" href="{self.pdf(self.parte(parte), self.citacoes[citacao])}"{fora}>'
+                    f'<span class="cr-wave">{e(onde)}</span>{seta}</a></p>')
+
+        # As partes, cada uma com uma figura dela no cartão.
+        cartoes = []
+        for x in self.partes:
+            caps = "".join(f'<span class="cr-class-meta" lang="pt-BR"><span class="cr-mono">{c.numero}</span> · {e(c.titulo)}</span>'
+                           for c in x["ap"].capitulos)
+            cartoes.append(
+                f'<a class="cr-class glass glass--flat" href="{x["cfg"]["slug"]}/">'
+                f'<span class="frame cr-class-cover"><img src="{self.url_midia(x["figura"], rel)}" alt="" width="1280" height="720" loading="lazy" decoding="async"></span>'
+                f'<span class="cr-class-body"><span class="cr-class-n">{rotulo("part")} <span class="cr-mono">{x["cfg"]["n"]}</span></span>'
+                f'<span class="cr-class-title" lang="pt-BR">{e(x["ap"].titulo)}</span>{caps}'
+                f'<span class="cr-class-meta"><span class="cr-mono">{x["ap"].paginas}</span> {rotulo("n_pages")} · '
+                f'{rotulo("version")} <span class="cr-mono">{x["versao"]}</span></span></span></a>')
+        contagem = (f'<p class="cr-ed-note">{rotulo("parts_online")}<br><span class="cr-mono">'
+                    f'{len(self.partes)} / {cfg["partes_previstas"]}</span></p>')
+        partes = f'<div class="cr-grid cr-grid--parts">{"".join(cartoes)}</div>'
+
+        # Os modelos: a tabela da seção 1.1.3, que é o mapa do curso.
+        m = s["modelos"]
+        tabela = ("| " + " | ".join(m["colunas"]) + " |\n|" + "---|" * len(m["colunas"]) + "\n"
+                  + "\n".join("| " + " | ".join(l) + " |" for l in m["linhas"]))
+        modelos = (f'<p class="cr-ed-lede" lang="pt-BR">“{e(m["abertura"])}.”</p>'
+                   f'<div class="cr-prose cr-models" lang="pt-BR">{md(tabela)}</div>'
+                   f'<p class="cr-ed-cite" lang="pt-BR"><a class="cr-ref-link" href="{self.pdf(self.parte(m["parte"]), self.indice_do_modelo)}"{fora}>'
+                   f'<span class="cr-wave">{e(m["onde"])}</span>{seta}</a></p>')
+
+        # Como estudar: três frases da apostila, cada uma com a página de onde veio.
+        metodo = ('<ul class="cr-goal-list cr-quotes">'
+                  + "".join(f'<li><blockquote lang="pt-BR"><p>“{e(c["citacao"])}”</p></blockquote>'
+                            f'{cita(c["parte"], c["citacao"], c["onde"])}</li>' for c in s["metodo"])
+                  + '</ul>')
+
+        # O laboratório: as práticas de todas as partes, e o simulador.
+        praticas = "".join(
+            f'<li><span class="cr-agenda-t">{rotulo("practice")} {q.n}</span>'
+            f'<span><a href="{x["cfg"]["slug"]}/#pratica-{q.n}"><span class="cr-wave cr-wave--quiet" lang="pt-BR">{e(_maiuscula(q.titulo))}</span></a>'
+            f' <span class="cr-muted">· {rotulo("part")} {x["cfg"]["n"]}</span></span></li>'
+            for x in self.partes for q in x["ap"].praticas)
+        lab = (f'<ol class="cr-agenda">{praticas}</ol>'
+               f'<p class="cr-ed-sub">{rotulo("simulation")}</p><div class="cr-prose" lang="pt-BR">{md(s["simulacao"])}</div>'
+               f'<div class="cr-actions"><a class="btn btn-sm btn-ghost glass-btn" href="{e(cfg["ltspice"]["link"])}"{fora}>'
+               f'<i class="ph ph-wave-sine" aria-hidden="true"></i><span>LTspice</span></a></div>')
+
+        # A apostila: cada parte com a versão e a data do PDF publicado.
+        ev = s["evolucao"]
+        linhas = "".join(
+            f'<tr><td><a href="{x["cfg"]["slug"]}/">{rotulo("part")} {x["cfg"]["n"]}</a></td>'
+            f'<td lang="pt-BR">{e(", ".join(c.numero for c in x["ap"].capitulos))}</td>'
+            f'<td class="cr-mono">{x["ap"].paginas}</td><td class="cr-mono">{x["versao"]}</td>'
+            f'<td><time class="cr-mono" datetime="{x["ap"].data}">{_data_br(x["ap"].data)}</time></td>'
+            f'<td><a class="cr-ref-link" href="{e(x["url"])}"{fora}><span class="cr-wave">PDF</span>'
+            f'<i class="ph ph-file-pdf" aria-hidden="true"></i></a></td></tr>' for x in self.partes)
+        apostila_ = (f'<p class="cr-ed-lede" lang="pt-BR">“{e(ev["citacao"])}”</p>'
+                     + cita(ev["parte"], ev["citacao"], ev["onde"])
+                     + f'<div class="cr-prose cr-versions"><table><thead><tr><th>{rotulo("part")}</th><th>{rotulo("chapters")}</th>'
+                       f'<th>{rotulo("pages")}</th><th>{rotulo("version")}</th><th>{rotulo("date")}</th>'
+                       f'<th><span class="sr-only">PDF</span></th></tr></thead><tbody>{linhas}</tbody></table></div>'
+                     + f'<p class="cr-ed-note">{rotulo("versions_note")}</p>')
+
+        banda_1 = banda(programa("s_parts", "partes-t", partes, contagem) + programa("s_models", "modelos-t", modelos),
+                        classe="cr-band--first cr-band--ed")
+        banda_2 = banda(programa("s_method", "metodo-t", metodo) + programa("s_lab", "lab-t", lab)
+                        + programa("s_handout", "apostila-t", apostila_),
+                        lit=False, classe="cr-band--last cr-band--ed")
+        self.escrita.grava(RAIZ / rel, esqueleto(
+            rel, f"{cfg['nome']}: {cfg['subtitulo'].lower()} | NIPS-CERN",
+            f"{cfg['nome']}, the analog electronics course of the UFJF Faculty of Engineering, in Portuguese: the handout by "
+            f"{cfg['quem_da']} in {len(self.partes)} parts, with contents, lab practices and exercises.",
+            topo + banda_1 + banda_2, self.token, css=("assets/css/courses.min.css", "assets/css/vendor/katex.min.css"),
+            corpo_estilo=self.estilo))
+
+    # ---------------------------------------------------------- o que a library pede
+
+    def paginas_do_sitemap(self):
+        yield self.raiz, "0.7", "weekly"
+        for x in self.partes:
+            yield f"{self.raiz}{x['cfg']['slug']}/", "0.6", "monthly"
+
+    def fatos_do_cartao(self):
+        return [("course_code", self.cfg["disciplina"], False),
+                ("parts_online", f"{len(self.partes)} / {self.cfg['partes_previstas']}", False)]
+
+
+def le_material(caminho):
+    """Os PDFs de um .zip, de uma pasta ou um .pdf só: {nome do arquivo: bytes}."""
+    p = Path(caminho)
+    if p.is_dir():
+        nomes = [(f.name, f.read_bytes()) for f in sorted(p.glob("*.pdf"))]
+    elif p.suffix.lower() == ".zip" and p.is_file():
+        with zipfile.ZipFile(p) as z:
+            nomes = [(Path(n).name, z.read(n)) for n in z.namelist()
+                     if n.lower().endswith(".pdf") and not n.startswith("__MACOSX/")]
+    elif p.suffix.lower() == ".pdf" and p.is_file():
+        nomes = [(p.name, p.read_bytes())]
+    else:
+        raise SystemExit(f"--material: {caminho} não é pasta, .zip nem .pdf")
+    pdfs = dict(nomes)
+    if not pdfs:
+        raise SystemExit(f"--material: {caminho} não tem PDF nenhum")
+    if len(pdfs) != len(nomes):
+        raise SystemExit(f"--material: {caminho} tem dois PDFs com o mesmo nome em pastas diferentes")
+    return pdfs
 
 
 def _id_arquivo(nome):
@@ -899,7 +1343,7 @@ def pagina_da_colecao(cursos, token):
     cartoes = "".join(c.cartao_da_colecao(rel) for c in cursos)
     corpo = topo + banda(f'<div class="cr-grid cr-grid--courses fade-up">{cartoes}</div>', classe="cr-band--first cr-band--last")
     return esqueleto(rel, "Courses | Library | NIPS-CERN",
-                     "The courses NIPS-CERN teaches, with the slides, study guides, code and readings of every class.",
+                     "Courses by NIPS-CERN and by the people who work with it, with their slides, handouts, study guides, code and readings.",
                      corpo, token, css=("assets/css/courses.min.css",))
 
 
@@ -934,7 +1378,7 @@ def copia_katex(escrita):
 ROTAS_DE_WORKER = {"sapho", "cgvweb"}
 
 
-def atalho(slug, escrita):
+def atalho(slug, escrita, nome):
     """/library/<curso>/ leva a /library/courses/<curso>/.
 
     É o endereço que se digita de memória, e sem isto ele dá 404. O GitHub Pages
@@ -951,7 +1395,7 @@ def atalho(slug, escrita):
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>{e(slug.capitalize())} | NIPS-CERN</title>
+  <title>{e(nome)} | NIPS-CERN</title>
   <meta name="robots" content="noindex">
   <link rel="canonical" href="{SITE}library/courses/{slug}/">
   <meta http-equiv="refresh" content="0; url={destino}">
@@ -1045,15 +1489,10 @@ def atualiza_sitemap(cursos):
         entradas.append(f"  <url>\n    <loc>{SITE}{caminho}</loc>\n    <lastmod>{lastmod}</lastmod>\n"
                         f"    <changefreq>{freq}</changefreq>\n    <priority>{prioridade}</priority>\n  </url>\n")
 
-    url("library/courses/", max(c.fonte.data for c in cursos), "0.7")
+    url("library/courses/", max(c.data for c in cursos), "0.7")
     for c in cursos:
-        url(c.raiz, c.fonte.data, "0.7", "weekly")
-        for a in c.aulas:
-            base = f"{c.raiz}{a['cfg']['slug']}/"
-            url(base, c.fonte.data, "0.6")
-            url(base + "slides/", c.fonte.data, "0.5")
-            url(base + "study-guide/", c.fonte.data, "0.5")
-            url(base + "code/", c.fonte.data, "0.4")
+        for caminho, prioridade, freq in c.paginas_do_sitemap():
+            url(caminho, c.data, prioridade, freq)
     bloco = "  <!-- courses: gerado por tools/courses/build.py -->\n\n" + "\n".join(entradas) + "\n  <!-- /courses -->\n"
     if "<!-- courses:" in xml:
         xml = re.sub(r"  <!-- courses: .*?<!-- /courses -->\n", lambda _: bloco, xml, flags=re.S)
@@ -1069,27 +1508,47 @@ def main():
     ap.add_argument("--ref", help="o commit ou a referência a ler, no lugar do ref do .json")
     ap.add_argument("--no-fetch", action="store_true", help="não roda git fetch no repositório do curso")
     ap.add_argument("--assets", help="clone do nipscern-assets, para onde vão os arquivos novos do CDN")
+    ap.add_argument("--material", action="append", default=[], metavar="CURSO=CAMINHO",
+                    help="os PDFs novos de um curso em apostila: um .zip, uma pasta ou um .pdf")
     args = ap.parse_args()
 
     catalogo = json.loads((AQUI / "catalogo.json").read_text(encoding="utf-8"))
     if args.course and args.course not in catalogo["cursos"]:
         raise SystemExit(f"{args.course} não está em catalogo.json")
+    materiais = {}
+    for m in args.material:
+        slug, _, caminho = m.partition("=")
+        if slug not in catalogo["cursos"] or not caminho:
+            raise SystemExit(f"--material {m}: o formato é CURSO=CAMINHO, com um curso de catalogo.json")
+        materiais[slug] = le_material(caminho)
     escrita = Escrita()
     token = token_de_cache()
     cursos = []
     for slug in catalogo["cursos"]:
         if args.course and slug != args.course:
             continue
-        c = Curso(AQUI / f"{slug}.json", args)
-        print(f"{c.cfg['nome']}: {c.fonte.ref} = {c.fonte.sha[:10]} ({c.fonte.data})")
+        arquivo = AQUI / f"{slug}.json"
+        if json.loads(arquivo.read_text(encoding="utf-8")).get("formato") == "apostila":
+            c = CursoDeApostila(arquivo, args, materiais.get(slug))
+        elif slug in materiais:
+            raise SystemExit(f"--material é para curso em apostila, e {slug} lê o repositório dele")
+        else:
+            c = Curso(arquivo, args)
+        print(f"{c.cfg['nome']}: {c.origem()}")
         c.gera(escrita, token)
         cursos.append(c)
 
-    escrita.grava(SAIDA / "index.html", pagina_da_colecao(cursos, token))
+    # A coletânea e o sitemap listam todos os cursos. Com --course, só um foi
+    # gerado, e reescrever os dois com ele apagaria os outros de lá.
+    if not args.course:
+        escrita.grava(SAIDA / "index.html", pagina_da_colecao(cursos, token))
     for c in cursos:
-        atalho(c.slug, escrita)
+        atalho(c.slug, escrita, c.cfg["nome"])
     copia_katex(escrita)
-    atualiza_sitemap(cursos)
+    if not args.course:
+        atualiza_sitemap(cursos)
+    else:
+        print("com --course, a coletânea e o sitemap ficam como estavam; rode sem --course para atualizá-los")
 
     # A limpeza só com todos os cursos gerados: com --course, as páginas dos
     # outros não foram escritas nesta rodada e seriam apagadas.

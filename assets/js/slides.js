@@ -17,7 +17,7 @@
    deslizar para os lados na tela de toque; e as imagens carregando só no slide
    atual e nos vizinhos, porque as 23 seções estão todas no DOM e, com src
    direto, a abertura baixaria o deck inteiro. */
-import { initI18n, t } from './i18n.js?v=5153a5b847';
+import { initI18n, t } from './i18n.js?v=e5c0a3de6f';
 
 const palco = document.getElementById('palco');
 const slides = [...palco.children].filter((el) => el.tagName === 'SECTION');

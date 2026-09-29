@@ -235,6 +235,25 @@ class Cdn:
         self.usados[entrada["caminho"]] = conteudo
         return self.BASE + entrada["caminho"]
 
+    def le_publicado(self, origem):
+        """O arquivo que o manifesto diz ter sido publicado para `origem`, byte a byte.
+
+        É a fonte de um curso que não tem repositório, como o de apostila: o PDF
+        que está no CDN é o que as páginas descrevem. Vem do clone do
+        nipscern-assets, se ele foi dado e tem o arquivo, e do CDN se não; nos
+        dois casos, o resumo tem de ser o do manifesto."""
+        entrada = self.dados.get(origem)
+        if not entrada:
+            raise SystemExit(f"{origem} não está em {self.caminho.name}: não há versão publicada para ler")
+        local = self.clone / entrada["caminho"] if self.clone else None
+        if local and local.exists():
+            conteudo = local.read_bytes()
+        else:
+            conteudo = baixa(self.BASE + entrada["caminho"], "cdn-" + entrada["caminho"].replace("/", "-"))
+        if hashlib.sha256(conteudo).hexdigest() != entrada["sha256"]:
+            raise SystemExit(f"{entrada['caminho']} não tem o resumo que {self.caminho.name} registrou")
+        return conteudo
+
     def grava(self):
         """Grava o manifesto e, com o clone do nipscern-assets, copia para lá o que faltar.
 

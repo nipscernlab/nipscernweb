@@ -1,0 +1,82 @@
+{
+  "slug": "eletronica-analogica-1",
+  "formato": "apostila",
+  "nome": "Eletrônica Analógica I",
+  "subtitulo": "Amplificadores, diodos e transistores",
+  "linha": "A disciplina CEL114 / CE5114 da Faculdade de Engenharia da UFJF, na apostila de aulas do professor Victor Mendes Ribeiro.",
+  "disciplina": "CEL114 / CE5114",
+  "quem_da": "Prof. Victor Mendes Ribeiro",
+  "onde": "Departamento de Circuitos Elétricos da Faculdade de Engenharia da UFJF",
+  "cor": "#77c587",
+  "nota_da_cor": "O verde das caixas de prática de laboratório da apostila, #2e6b3a, no mesmo matiz e clareado até o contraste de 9,5:1 sobre o fundo do site. O azul-marinho da capa ficou de fora porque, no site, azul é o que se clica.",
+  "apresentacao": "É a disciplina de eletrônica analógica da Faculdade de Engenharia da UFJF, na apostila que o professor Victor Mendes Ribeiro escreveu para as turmas dele: do amplificador descrito por fora ao que há dentro dele, AmpOps, diodos e transistores, com as práticas de laboratório e o gabarito dos exercícios.",
+  "partes_previstas": 3,
+  "capa": {
+    "alt": "A capa da apostila de Eletrônica Analógica I, na parte 1",
+    "credito": "Capa e figuras: a apostila do Prof. Victor Mendes Ribeiro"
+  },
+  "partes": [
+    {
+      "n": 1,
+      "slug": "part-1",
+      "arquivo": "Apostila_EletronicaAnalogicaI_Parte1.pdf",
+      "figura": "Figura 1.4"
+    },
+    {
+      "n": 2,
+      "slug": "part-2",
+      "arquivo": "Apostila_EletronicaAnalogicaI_Parte2.pdf",
+      "figura": "Figura 3.7"
+    },
+    {
+      "n": 3,
+      "slug": "part-3",
+      "arquivo": "Apostila_EletronicaAnalogicaI_Parte3.pdf",
+      "figura": "Figura 4.3"
+    }
+  ],
+  "ltspice": {
+    "link": "https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html",
+    "nota": "O site da Analog Devices responde 403 a robô, mesmo com agente de navegador; o endereço é o da página oficial do LTspice, conferido por busca em 29/09/2026, e abre no navegador."
+  },
+  "secoes": {
+    "modelos": {
+      "parte": 1,
+      "secao": "1.1.3",
+      "onde": "Seção 1.1.3 da apostila",
+      "resumo_da_leitura": "3ed5e82e311767d9",
+      "abertura": "Ao longo da disciplina, o mesmo dispositivo será representado por modelos de complexidade crescente, e escolher entre eles será parte da resolução de cada problema",
+      "colunas": ["Dispositivo", "Modelo mais simples", "Refinamentos"],
+      "linhas": [
+        ["Transdutor de entrada", "fonte ideal $v_s$", "fonte com resistência interna (Thévenin ou Norton)"],
+        ["Amplificador", "ganho $A_v$ (bloco ideal)", "$R_i$ e $R_o$ finitas; capacitâncias (resposta em frequência); saturação"],
+        ["AmpOp", "ideal: $A = \\infty$, curto virtual", "$A$ finito, banda limitada, slew rate, offset, polarização"],
+        ["Diodo (Parte 2)", "chave ideal", "queda constante; segmentos lineares; exponencial; pequenos sinais"],
+        ["Transistor (Parte 3)", "chave (corte e saturação)", "grandes sinais ($\\pi$ e T); efeito Early; pequenos sinais"]
+      ]
+    },
+    "metodo": [
+      {
+        "parte": 1,
+        "citacao": "O modelo adequado é o mais simples que responde à pergunta feita com a precisão necessária.",
+        "onde": "Seção 1.1.2, sobre a escolha do modelo"
+      },
+      {
+        "parte": 1,
+        "citacao": "Em todas as práticas desta apostila, faça primeiro os cálculos e a simulação no LTspice.",
+        "onde": "Seção 1.10, antes de ir para a bancada"
+      },
+      {
+        "parte": 1,
+        "citacao": "Tente resolver antes de consultar: a resposta confirma o resultado, mas o que se aprende está no caminho até ela.",
+        "onde": "Gabarito dos exercícios"
+      }
+    ],
+    "simulacao": "As listas e o trabalho da disciplina usam o LTspice, e a seção 1.9 da apostila mostra as análises que cobrem quase tudo: `.tran`, no tempo; `.ac`, a resposta em frequência; `.op`, o ponto de operação; e `.dc`, a varredura que desenha a curva característica.",
+    "evolucao": {
+      "parte": 1,
+      "citacao": "Esta apostila, como qualquer material de ensino, está sempre em evolução.",
+      "onde": "Agradecimentos"
+    }
+  }
+}

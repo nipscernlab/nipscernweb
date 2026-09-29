@@ -653,6 +653,75 @@ a:hover .cr-wave--quiet, a:focus-visible .cr-wave--quiet { color: var(--brand); 
 .cr-code .o { color: #89ddff; }
 .cr-code .err { color: #ff6b6b; }
 
+/* ---------------------------------------------------------------- o curso em apostila
+
+   O curso que chega como apostila em PDF usa as peças de cima e mais três: a
+   capa da parte em pé, na proporção da folha A4; o sumário, tirado dos
+   marcadores do PDF, com o número da seção e o da página nas pontas, como no
+   sumário impresso; e, na página do curso, as frases da apostila, cada uma com
+   a página de onde veio. A cor é a do curso, que a ferramenta põe no estilo do
+   corpo, e todo o resto é o que já estava aqui. */
+
+.cr-course-name--long { font-size: clamp(3rem, 1.6rem + 4.6vw, 5.75rem); line-height: 1; }
+/* As partes são poucas e cabem numa linha, e não duas por linha como as aulas. */
+.cr-grid--parts { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+
+.cr-cover--page { --frame-ratio: 760 / 1075; max-width: 340px; margin-left: auto; border-radius: var(--r-md); }
+.cr-hero--part .cr-cover-hint { max-width: 340px; margin-left: auto; }
+
+.cr-ch-title {
+  margin: calc(-1 * var(--sp-1)) 0 var(--sp-3);
+  font-family: var(--font-serif);
+  font-variation-settings: 'opsz' 32;
+  font-size: var(--text-2xl);
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+.cr-ch-links { margin-top: var(--sp-4); gap: var(--sp-2) var(--sp-6); }
+
+.cr-toc2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: var(--sp-10) var(--sp-12); align-items: start; }
+.cr-toc2:not(:has(> :nth-child(2))) { max-width: 640px; }
+.cr-toc2-title a { display: grid; gap: var(--sp-1); padding: 0 var(--sp-2) var(--sp-3); margin-bottom: var(--sp-2); border-bottom: 1px solid var(--border-mid); }
+.cr-toc2-cap { font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cr-accent); }
+.cr-toc2-name { font-family: var(--font-serif); font-variation-settings: 'opsz' 32; font-weight: 400; font-size: var(--text-2xl); line-height: 1.25; color: var(--text-primary); transition: color var(--t-base); }
+.cr-toc2-title a:hover .cr-toc2-name { color: var(--brand); }
+.cr-toc2 ol li + li { border-top: 1px solid var(--border-subtle); }
+.cr-toc2 ol a,
+.cr-toc2-end a {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  gap: var(--sp-3);
+  align-items: baseline;
+  padding: var(--sp-2);
+  border-radius: var(--r-md);
+  transition: background var(--t-base);
+}
+.cr-toc2 ol a:hover, .cr-toc2-end a:hover { background: rgba(255, 255, 255, 0.05); }
+.cr-toc2-n, .cr-toc2-p { font-family: var(--font-mono); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+.cr-toc2-n { color: var(--cr-accent); }
+.cr-toc2-p { color: var(--text-muted); }
+.cr-toc2-t { font-size: var(--text-sm); line-height: 1.45; color: var(--text-secondary); transition: color var(--t-base); }
+.cr-toc2 a:hover .cr-toc2-t, .cr-toc2-end a:hover .cr-toc2-t { color: var(--text-primary); }
+.cr-toc2-end { max-width: 400px; margin-top: var(--sp-8); padding-top: var(--sp-2); border-top: 1px solid var(--border-mid); }
+.cr-toc2-end .ph { color: var(--cr-accent); font-size: 18px; align-self: center; }
+
+/* As práticas, na grade da agenda: o número na coluna da esquerda. */
+.cr-labs .cr-agenda-t { padding-top: 3px; }
+.cr-lab { display: grid; gap: var(--sp-2); max-width: 72ch; }
+.cr-lab-title { font-size: var(--text-lg); font-weight: 600; line-height: 1.35; color: var(--text-primary); }
+
+/* As frases da apostila, em serifa, com a origem embaixo. */
+.cr-quotes blockquote { margin: 0; font-family: var(--font-serif); font-variation-settings: 'opsz' 32; font-size: var(--text-xl); line-height: 1.45; color: var(--text-primary); }
+.cr-ed-cite { margin-top: var(--sp-2); }
+.cr-ed-lede + .cr-ed-cite { margin: calc(-1 * var(--sp-6)) 0 var(--sp-8); }
+
+/* As tabelas rolam dentro da caixa delas, e a página não. */
+.cr-models, .cr-versions { overflow-x: auto; }
+.cr-models table { min-width: 36rem; }
+.cr-models td:first-child { color: var(--text-primary); white-space: nowrap; }
+.cr-versions table { min-width: 28rem; }
+.cr-ed-body > .cr-versions { margin-top: var(--sp-6); }
+
 /* ---------------------------------------------------------------- telas médias e estreitas */
 
 @media (max-width: 1100px) {
@@ -664,6 +733,7 @@ a:hover .cr-wave--quiet, a:focus-visible .cr-wave--quiet { color: var(--brand); 
   .cr-hero-grid { gap: var(--sp-8); }
   .cr-course-cover { justify-self: start; max-width: 360px; }
   .cr-course-cover figcaption { text-align: left; }
+  .cr-cover--page, .cr-hero--part .cr-cover-hint { margin-left: 0; max-width: 280px; }
   .cr-ed { grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); padding: var(--sp-10) 0; }
   .cr-meanings { grid-template-columns: minmax(0, 1fr); gap: var(--sp-6); }
   .cr-meanings li { padding: 0; border-left: 0; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--sp-4); }

@@ -12,6 +12,7 @@ e apaga de `library/courses/` o que não escreveu naquela rodada.
 | `/library/courses/<curso>/class-NN/slides/` | o deck, com vídeos e anotações |
 | `/library/courses/<curso>/class-NN/study-guide/` | o roteiro, com as equações |
 | `/library/courses/<curso>/class-NN/code/` | o código da aula, com destaque e download |
+| `/library/courses/<curso>/part-N/` | a página de uma parte, no curso que chega como apostila |
 
 Os PDFs e os vídeos vão para o nipscern-assets e são servidos em
 `https://cdn.nipscern.com/courses/<curso>/`. O endereço curto `/library/<curso>/`,
@@ -44,6 +45,8 @@ python tools/courses/build.py --assets ../nipscern-assets
 A ferramenta roda `git fetch` no clone do curso e lê o `origin/main` por
 `git archive`, sem tocar no working tree nem no branch de lá. `--no-fetch` pula o
 fetch; `--ref <commit>` lê outro commit; `--source <pasta>` aponta outro clone.
+`--course <curso>` gera só um curso e deixa a coletânea e o sitemap como estavam,
+porque os dois listam todos os cursos; para atualizá-los, rode sem `--course`.
 
 Rodar duas vezes sobre o mesmo commit dá os mesmos bytes. O que ela baixa da rede,
 os PDFs abertos das obras e o oEmbed e as miniaturas do YouTube, fica em
@@ -67,6 +70,58 @@ vídeos do estudo, do oEmbed do YouTube, e a ferramenta avisa quando o título o
 canal não batem com o que o README cita. O deck sai de `slides/project/`, com o
 mapa de `/_blob/` lido do `ARQUIVOS` e do `VIDEOS` do `slides.py` da aula, pela
 árvore sintática, sem executar o arquivo.
+
+## Curso em apostila
+
+Eletrônica Analógica I, a disciplina CEL114 / CE5114 do professor Victor Mendes
+Ribeiro, não tem repositório: chega como apostila em PDF, feita em LaTeX, em
+partes. O `.json` dela diz `"formato": "apostila"`, e a ferramenta usa outra
+classe, `CursoDeApostila`, com as mesmas peças de página.
+
+A fonte de cada parte é o PDF que já está no CDN. O manifesto
+`<curso>.cdn.json` diz onde ele está e qual o resumo dele; a ferramenta lê do
+clone do nipscern-assets, se ele foi dado, ou baixa de `cdn.nipscern.com`, e
+confere o resumo. Por isso uma rodada comum refaz as páginas do curso em
+qualquer máquina, sem pasta nenhuma ao lado.
+
+PDF novo, de uma parte ou de todas, entra assim:
+
+```bash
+python tools/courses/build.py --assets ../nipscern-assets \
+    --material eletronica-analogica-1=C:/caminho/apostila.zip
+```
+
+`--material` aceita um `.zip`, uma pasta ou um `.pdf` só, e casa cada arquivo
+com a parte pelo nome que está em `partes[].arquivo`; arquivo que não é de parte
+nenhuma para a rodada. A parte que mudou ganha `-v2`, `-v3` no CDN, a anterior
+continua onde estava, e a página dela se refaz a partir do PDF novo.
+
+O que a página diz de cada parte sai do PDF, e não do `.json`
+(`tools/courses/apostila.py`):
+
+- o título da parte, os capítulos e o sumário, dos marcadores que o hyperref
+  grava, com o número de página impresso, que é o rótulo da página no PDF;
+- a abertura de cada capítulo, os parágrafos entre o título e a primeira seção;
+- cada prática de laboratório, com o texto embaixo de OBJETIVOS na caixa dela;
+- quantos exercícios cada capítulo propõe e quantos o gabarito responde (na
+  versão 1, os de simulação do fim dos capítulos 2 e 3 não têm resposta);
+- a data, dos metadados, e o número de páginas;
+- a capa do curso, que é a capa da parte 1 cortada em 4:5; o fundo do hero, que
+  é a faixa colorida dessa capa desfocada; a capa de cada parte; e a figura do
+  cartão de cada parte, recortada da página pela legenda (`partes[].figura`).
+
+O `.json` guarda só o que não dá para ler assim: a apresentação do curso, a
+tabela de modelos da seção 1.1.3, que no PDF não tem fios e não se lê como
+tabela, e as frases citadas em "Como estudar" e "A apostila". Cada citação tem
+de estar no PDF palavra por palavra, ou a rodada falha; a tabela tem o resumo do
+texto da seção em `resumo_da_leitura`, e a rodada avisa quando a seção muda.
+Quando o desenho da apostila mudar (a caixa da prática sem OBJETIVOS, o
+gabarito sem o número sozinho na linha, uma legenda renumerada), a leitura para
+com erro e diz o que não achou.
+
+A cor do curso vem do `.json`, em `cor`, e a ferramenta a põe no estilo do
+`<body>` e do cartão na coletânea; o Limiar fica com a de fábrica do
+`courses.css`.
 
 ## Quando o site publica diferente do curso
 
