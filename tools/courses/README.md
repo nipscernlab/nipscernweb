@@ -123,6 +123,9 @@ A cor do curso vem do `.json`, em `cor`, e a ferramenta a põe no estilo do
 `<body>` e do cartão na coletânea; o Limiar fica com a de fábrica do
 `courses.css`.
 
+O que apareceu ao montar o curso, na apostila, na ferramenta e na leitura do
+PDF, está em [docs/curso-eletronica-analogica-1.md](../../docs/curso-eletronica-analogica-1.md).
+
 ## Quando o site publica diferente do curso
 
 `correcoes`, na entrada da aula, troca um trecho de um arquivo do curso (o HTML de
