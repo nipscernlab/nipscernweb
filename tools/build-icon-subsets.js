@@ -87,6 +87,22 @@ function iconesDoJs(icones) {
 const nomeDoArquivo = (html) =>
   html.replace(/\.html$/, '').replace(/[\/\\]/g, '-') + '.css';
 
+/* Páginas geradas em família dividem uma folha.
+   As páginas de library/courses/ saem de tools/courses/build.py, e cada aula
+   nova acrescenta quatro delas. Com uma folha por página, cada aula nova
+   pediria também linhas novas na lista ASSETS do hook, escritas à mão, e um
+   arquivo fora daquela lista é exatamente o que congela o ?v=. Uma folha para
+   a família inteira, com a união dos ícones de todas as páginas dela, entra na
+   lista uma vez e acompanha sozinha as aulas que chegarem. Toda página da
+   família tem de carregar a folha da família, e não uma com o próprio nome. */
+const FAMILIAS = [
+  { prefixo: 'library/courses/', folha: 'library-courses.css' },
+];
+const folhaDaPagina = (pagina) => {
+  const familia = FAMILIAS.find((f) => pagina.startsWith(f.prefixo));
+  return familia ? familia.folha : nomeDoArquivo(pagina);
+};
+
 (async () => {
   const { base, icones } = catalogo();
   const { usados: doJs, porPagina } = iconesDoJs(icones);
@@ -106,6 +122,7 @@ const nomeDoArquivo = (html) =>
   const problemas = [];
   let defasados = 0;
   const linhas = [];
+  const porFolha = new Map();   // folha -> ícones de todas as páginas que a carregam
 
   for (const pagina of paginas) {
     const html = ler(pagina);
@@ -120,10 +137,16 @@ const nomeDoArquivo = (html) =>
       if (!icones.has(m[1])) problemas.push(pagina + ': usa .ph-' + m[1] + ', que não existe em ' + FONTE);
     }
 
-    const conjunto = [...new Set([...doHtml, ...doJs, ...(porPagina.get(pagina) || [])])].sort();
+    const folha = folhaDaPagina(pagina);
+    if (!porFolha.has(folha)) porFolha.set(folha, new Set());
+    for (const n of [...doHtml, ...doJs, ...(porPagina.get(pagina) || [])]) porFolha.get(folha).add(n);
+  }
+
+  for (const [folha, ics] of porFolha) {
+    const conjunto = [...ics].sort();
     const saida = base + '\n' + conjunto.map((n) => icones.get(n)).join('\n') + '\n';
 
-    const destino = path.posix.join(DESTINO, nomeDoArquivo(pagina));
+    const destino = path.posix.join(DESTINO, folha);
     const abs = path.join(ROOT, destino);
     const atual = fs.existsSync(abs) ? fs.readFileSync(abs, 'utf8') : null;
     const mudou = atual !== saida;

@@ -60,6 +60,36 @@ function resolveFile(fsPath) {
   return fsPath;
 }
 
+/* /_cdn/<caminho>: o clone do nipscern-assets ao lado deste repositório, no
+   lugar de https://cdn.nipscern.com/<caminho>. É o que deixa ver aqui o que
+   acabou de ser gerado e ainda não chegou ao CDN, como os vídeos de uma aula
+   nova: as páginas de library/courses/ só pedem este endereço quando abertas
+   em localhost (assets/js/slides.js e courses.js). Arquivo que não está no clone
+   vai para o CDN de verdade. Com Range, porque é assim que o navegador pede
+   vídeo, e sem ele não dá para pular para o meio de um. */
+const ASSETS = path.resolve(ROOT, '..', 'nipscern-assets');
+function cdnLocal(req, res, rest) {
+  const file = path.normalize(path.join(ASSETS, rest));
+  if (!file.startsWith(ASSETS + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
+    res.writeHead(302, { Location: 'https://cdn.nipscern.com/' + rest });
+    res.end();
+    return;
+  }
+  const size = fs.statSync(file).size;
+  const type = TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream';
+  const range = /bytes=(\d*)-(\d*)/.exec(String(req.headers.range || ''));
+  if (range) {
+    const start = range[1] ? parseInt(range[1], 10) : Math.max(0, size - parseInt(range[2], 10));
+    const end = range[1] && range[2] ? Math.min(parseInt(range[2], 10), size - 1) : size - 1;
+    res.writeHead(206, { 'Content-Type': type, 'Accept-Ranges': 'bytes', 'Cache-Control': 'no-store',
+      'Content-Range': `bytes ${start}-${end}/${size}`, 'Content-Length': end - start + 1 });
+    fs.createReadStream(file, { start, end }).pipe(res);
+    return;
+  }
+  res.writeHead(200, { 'Content-Type': type, 'Accept-Ranges': 'bytes', 'Cache-Control': 'no-store', 'Content-Length': size });
+  fs.createReadStream(file).pipe(res);
+}
+
 function handler(req, res) {
   let pathname;
   try {
@@ -67,6 +97,7 @@ function handler(req, res) {
   } catch (e) {
     pathname = '/';
   }
+  if (pathname.startsWith('/_cdn/')) return cdnLocal(req, res, pathname.slice('/_cdn/'.length));
   // Resolve under ROOT and block path traversal.
   const fsPath = path.normalize(path.join(ROOT, pathname));
   if (fsPath !== ROOT && !fsPath.startsWith(ROOT + path.sep)) {

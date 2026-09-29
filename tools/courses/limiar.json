@@ -1,0 +1,470 @@
+{
+  "slug": "limiar",
+  "fonte": {
+    "repositorio": "../redes-neurais",
+    "ref": "origin/main",
+    "leitura_da_raiz": "README.md",
+    "resumo_da_leitura": "e5194305a291d41a"
+  },
+  "nome": "Limiar",
+  "subtitulo": "Redes neurais, do neurônio ao fractal",
+  "linha": "O curso de redes neurais do SIENA, do neurônio artificial ao perceptron multicamadas.",
+  "periodo": {
+    "inicio": "2026-09-25",
+    "fim": "2026-12-11",
+    "texto": "25/09 a 11/12/2026"
+  },
+  "aulas_previstas": 10,
+  "quem_da": "Chrysthofer A. A. Afonso",
+  "quando": "10 encontros às sextas, das 12h às 14h, de 25/09 a 11/12/2026",
+  "onde": "Segundo andar do PPEE, o Programa de Pós-graduação em Engenharia Elétrica da UFJF",
+  "capa": {
+    "arquivo": "aulas/01-neuronio/figuras/buddhabrot.jpg",
+    "alt": "O Buddhabrot, o conjunto de Mandelbrot desenhado pelos caminhos dos pontos que fogem",
+    "credito": "Buddhabrot: Johann Korndoerfer, Wikimedia Commons, CC BY 3.0 DE"
+  },
+  "apresentacao": "É o curso de redes neurais do SIENA, o projeto do NIPS-CERN que leva a rede de reconstrução de energia do TileCal para outros calorímetros.",
+  "secoes": {
+    "nome": {
+      "abertura": "O nome tem três sentidos.",
+      "sentidos": [
+        [
+          "Neurônio",
+          "O neurônio artificial de McCulloch e Pitts, de 1943, dispara quando a soma das entradas passa de um limiar."
+        ],
+        [
+          "Projeto",
+          "O projeto final desenha o limiar entre o treino que converge e o que diverge."
+        ],
+        [
+          "Pesquisa",
+          "Para quem acabou de entrar na graduação, o curso é o limiar da pesquisa."
+        ]
+      ]
+    },
+    "aonde": "O curso vai do neurônio artificial ao perceptron multicamadas, o MLP, a rede de camadas empilhadas que está dentro de quase toda arquitetura moderna. No meio está a retropropagação, o algoritmo que calcula quanto cada peso contribuiu para o erro.\n\nO projeto final vem de um artigo de Jascha Sohl-Dickstein, de 2024, \"The boundary of neural network trainability is fractal\". Treinar uma rede é repetir um passo de correção muitas vezes, e o tamanho desse passo é a taxa de aprendizado: grande demais, o treino diverge; pequena demais, não chega. Sohl-Dickstein deu uma taxa diferente para cada camada, treinou a mesma rede para milhões de pares de taxas e pintou cada par conforme o treino convergiu ou divergiu. A fronteira entre as duas regiões é um fractal, uma figura que continua cheia de detalhe por mais que se amplie. O projeto refaz isso com uma rede treinada em dados reais do CERN. O curso é de redes neurais; o fractal entra só no projeto.",
+    "objetivos": "- o hábito do método científico e da colaboração, do jeito que se trabalha no CERN;\n- autonomia para estudar sozinhos e para ler artigo científico;\n- o MLP, a base de toda rede neural, e o vocabulário da área: neurônio, camada, peso, treino, perda;\n- a ideia de que uma rede neural reconhece padrões e é uma ferramenta, que serve na agricultura, na engenharia, na astronomia e onde mais houver dado;\n- confiança para apresentar o que fizeram, e o projeto do fractal pronto.",
+    "aula": [
+      [
+        "15 min",
+        "Revisão falada da aula anterior, de memória"
+      ],
+      [
+        "15 a 30 min",
+        "Seminário em duas partes: o estudo da semana, em vídeo ou texto, e o código da entrega, explicado linha a linha por quem o escreveu; um ou dois apresentadores, combinados na sexta anterior, e uma pergunta de cada um dos demais"
+      ],
+      [
+        "30 a 45 min",
+        "Conteúdo, com história, definição e pergunta"
+      ],
+      [
+        "30 a 45 min",
+        "Código no laptop de cada um"
+      ]
+    ],
+    "entre_aulas": "Entre uma sexta e outra: o estudo da semana, em vídeo ou texto, e uma entrega, o código no GitHub de cada aluno e uma pergunta sobre o estudo. A aula 10 revisa o curso inteiro e tem a apresentação do projeto.",
+    "dados": "O projeto usa dados públicos do CERN: 100 mil eventos com dois múons registrados pelo CMS em 2010, com massa invariante de 2 a 110 GeV. É o [registro 303](https://opendata.cern.ch/record/303) do portal de dados abertos do CERN, [doi:10.7483/OPENDATA.CMS.4M97.3SQ9](https://doi.org/10.7483/OPENDATA.CMS.4M97.3SQ9), com licença CC0. O histograma da massa mostra os picos de partículas descobertas entre 1974 e 1983, e a massa tem fórmula, então dá para conferir o que a rede aprendeu. Para aprender o MLP, nas aulas 6 e 7, entra o MNIST, um conjunto de dígitos escritos à mão.",
+    "ferramentas": "Python no laptop de cada um, sem Google Colab. NumPy até a aula 6 e PyTorch a partir da aula 7. Git e GitHub para as entregas. O Claude Code para escrever código, com a regra de que quem usa responde por cada bloco. A instalação está no [guia de instalação](guia).\n\nConta pesada, como a janela grande do fractal, roda no PC do laboratório, um Dell Aurora R15 com Core i9-13900K e GeForce RTX 4070 Ti. Os resultados se mostram no laboratório."
+  },
+  "artigo_do_projeto": "sohl-dickstein-2024",
+  "materiais_do_curso": {
+    "guia": "infra/guia-de-instalacao.pdf",
+    "requirements": "infra/requirements.txt"
+  },
+  "fontes": {
+    "infra/fontes/IBMPlexSans-Regular.ttf": {
+      "site": "assets/fonts/plex-sans-400.woff2",
+      "sha256": "975dcda37d80f038dcd143c22e33ca2d97a0cc5a929aace1c749153b0fe1afa5"
+    },
+    "infra/fontes/IBMPlexSans-SemiBold.ttf": {
+      "site": "assets/fonts/plex-sans-600.woff2",
+      "sha256": "a20caf8286023a6a7a85e40b1d2a4ae9fc3e3b1f9eda8f4c542dd4986af67bb1"
+    },
+    "infra/fontes/SourceSerif4-Semibold.ttf": {
+      "site": "assets/fonts/source-serif-4-600.woff2",
+      "sha256": "36db62940cb5728b12b1802476dc7fcf4c6c519a7bdd476ba23a4e555fc4655f"
+    },
+    "infra/fontes/LICENCA-IBM-Plex.txt": {
+      "site": "assets/fonts/OFL-IBMPlex.txt",
+      "sha256": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da"
+    },
+    "infra/fontes/LICENCA-Source-Serif.md": {
+      "site": "assets/fonts/OFL-SourceSerif4.txt",
+      "sha256": "717a22f1bd2e30d49c21a2a6f548819aacd0ade1adf854533f4d42a01bb4f910"
+    }
+  },
+  "obras": {
+    "mcculloch-pitts-1943": {
+      "autores": "Warren S. McCulloch e Walter Pitts",
+      "ano": 1943,
+      "titulo": "A logical calculus of the ideas immanent in nervous activity",
+      "onde": "Bulletin of Mathematical Biophysics 5(4):115-133",
+      "tipo": "artigo",
+      "link": "https://doi.org/10.1007/BF02478259",
+      "rotulo_link": "doi:10.1007/BF02478259"
+    },
+    "rosenblatt-1958": {
+      "autores": "Frank Rosenblatt",
+      "ano": 1958,
+      "titulo": "The perceptron: a probabilistic model for information storage and organization in the brain",
+      "onde": "Psychological Review 65(6):386-408",
+      "tipo": "artigo",
+      "link": "https://doi.org/10.1037/h0042519",
+      "rotulo_link": "doi:10.1037/h0042519"
+    },
+    "rosenblatt-1961": {
+      "autores": "Frank Rosenblatt",
+      "ano": 1961,
+      "titulo": "Principles of Neurodynamics: Perceptrons and the Theory of Brain Mechanisms",
+      "onde": "Cornell Aeronautical Laboratory, relatório VG-1196-G-8, 15/03/1961; em livro pela Spartan Books em 1962",
+      "tipo": "relatório",
+      "link": "https://doi.org/10.21236/AD0256582",
+      "rotulo_link": "doi:10.21236/AD0256582"
+    },
+    "nyt-1958": {
+      "autores": "The New York Times, da agência UPI",
+      "ano": 1958,
+      "titulo": "New Navy device learns by doing; psychologist shows embryo of computer designed to read and grow wiser",
+      "onde": "The New York Times, 8/7/1958, página 25",
+      "tipo": "jornal",
+      "link": "https://www.nytimes.com/1958/07/08/archives/new-navy-device-learns-by-doing-psychologist-shows-embryo-of.html",
+      "rotulo_link": "nytimes.com, arquivo de 1958"
+    },
+    "minsky-papert-1969": {
+      "autores": "Marvin Minsky e Seymour Papert",
+      "ano": 1969,
+      "titulo": "Perceptrons",
+      "onde": "MIT Press",
+      "tipo": "livro",
+      "link": "https://mitpress.mit.edu/9780262630221/perceptrons/",
+      "rotulo_link": "MIT Press, a edição de 1969"
+    },
+    "rumelhart-hinton-williams-1986": {
+      "autores": "David E. Rumelhart, Geoffrey E. Hinton e Ronald J. Williams",
+      "ano": 1986,
+      "titulo": "Learning representations by back-propagating errors",
+      "onde": "Nature 323(6088):533-536",
+      "tipo": "artigo",
+      "link": "https://doi.org/10.1038/323533a0",
+      "rotulo_link": "doi:10.1038/323533a0",
+      "pdf_aberto": "https://www.cs.toronto.edu/~hinton/absps/naturebp.pdf",
+      "pdf_link": "https://www.cs.toronto.edu/~hinton/absps/naturebp.pdf",
+      "nota": "O PDF é a cópia das páginas da Nature que Hinton mantém no site da Universidade de Toronto."
+    },
+    "bishop-2006": {
+      "autores": "Christopher M. Bishop",
+      "ano": 2006,
+      "titulo": "Pattern Recognition and Machine Learning",
+      "onde": "Springer; a página citada no roteiro é a 196",
+      "tipo": "livro",
+      "link": "https://link.springer.com/book/9780387310732",
+      "rotulo_link": "Springer, ISBN 978-0-387-31073-2",
+      "pdf_aberto": "https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf",
+      "pdf_link": "https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/",
+      "nota": "O PDF é o que a Microsoft Research oferece de graça; o direito autoral continua da Springer."
+    },
+    "mohanty-hughes-salathe-2016": {
+      "autores": "Sharada P. Mohanty, David P. Hughes e Marcel Salathé",
+      "ano": 2016,
+      "titulo": "Using deep learning for image-based plant disease detection",
+      "onde": "Frontiers in Plant Science 7:1419; CC BY 4.0",
+      "tipo": "artigo",
+      "link": "https://doi.org/10.3389/fpls.2016.01419",
+      "rotulo_link": "doi:10.3389/fpls.2016.01419",
+      "pdf_aberto": "https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2016.01419/pdf",
+      "pdf_link": "https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2016.01419/pdf"
+    },
+    "shallue-vanderburg-2018": {
+      "autores": "Christopher J. Shallue e Andrew Vanderburg",
+      "ano": 2018,
+      "titulo": "Identifying exoplanets with deep learning: a five-planet resonant chain around Kepler-80 and an eighth planet around Kepler-90",
+      "onde": "The Astronomical Journal 155(2):94; CC BY 3.0",
+      "tipo": "artigo",
+      "link": "https://doi.org/10.3847/1538-3881/aa9e09",
+      "rotulo_link": "doi:10.3847/1538-3881/aa9e09",
+      "pdf_aberto": "https://arxiv.org/pdf/1712.05044v1",
+      "pdf_link": "https://iopscience.iop.org/article/10.3847/1538-3881/aa9e09/pdf",
+      "nota": "A primeira página é a da versão do arXiv, 1712.05044; o PDF do link é o da revista."
+    },
+    "cardinot-2026": {
+      "autores": "Diogo Alves Cardinot, Bernardo Sotto-Maior Peralva, Gustavo Barbosa Libotte e Luciano Manhães de Andrade Filho",
+      "ano": 2026,
+      "titulo": "Convolutional neural networks for signal reconstruction in high-energy calorimetry",
+      "onde": "Applied Sciences 16(13):6414; CC BY 4.0",
+      "tipo": "artigo",
+      "link": "https://doi.org/10.3390/app16136414",
+      "rotulo_link": "doi:10.3390/app16136414",
+      "pdf_aberto": "https://mdpi-res.com/d_attachment/applsci/applsci-16-06414/article_deploy/applsci-16-06414.pdf",
+      "pdf_link": "https://www.mdpi.com/2076-3417/16/13/6414/pdf"
+    },
+    "nielsen-2015": {
+      "autores": "Michael A. Nielsen",
+      "ano": 2015,
+      "titulo": "Neural Networks and Deep Learning",
+      "onde": "Determination Press, livro online; CC BY-NC 3.0",
+      "tipo": "livro",
+      "link": "http://neuralnetworksanddeeplearning.com/chap1.html",
+      "rotulo_link": "neuralnetworksanddeeplearning.com",
+      "nota": "O endereço só abre em http: o certificado do servidor é de outro domínio."
+    },
+    "sohl-dickstein-2024": {
+      "autores": "Jascha Sohl-Dickstein",
+      "ano": 2024,
+      "titulo": "The boundary of neural network trainability is fractal",
+      "onde": "arXiv:2402.06184; CC BY 4.0",
+      "tipo": "artigo",
+      "link": "https://arxiv.org/abs/2402.06184",
+      "rotulo_link": "arXiv:2402.06184",
+      "pdf_aberto": "https://arxiv.org/pdf/2402.06184",
+      "pdf_link": "https://arxiv.org/pdf/2402.06184"
+    },
+    "cauchy-1847": {
+      "autores": "Augustin-Louis Cauchy",
+      "ano": 1847,
+      "lingua": "fr",
+      "titulo": "Méthode générale pour la résolution des systèmes d'équations simultanées",
+      "onde": "Comptes rendus hebdomadaires des séances de l'Académie des sciences 25:536-538, sessão de 18/10/1847",
+      "tipo": "nota",
+      "link": "https://gallica.bnf.fr/ark:/12148/bpt6k2982c/f540.item",
+      "rotulo_link": "Gallica, BnF, tomo 25, página 536",
+      "capa_imagem": "https://gallica.bnf.fr/iiif/ark:/12148/bpt6k2982c/f540/full/700,/0/native.jpg",
+      "nota": "Domínio público. A capa é a página 536, a primeira da nota."
+    },
+    "widrow-hoff-1960": {
+      "autores": "Bernard Widrow e Marcian E. Hoff",
+      "ano": 1960,
+      "titulo": "Adaptive switching circuits",
+      "onde": "IRE WESCON Convention Record, parte 4, 96-104",
+      "tipo": "artigo",
+      "link": "https://isl.stanford.edu/~widrow/papers/c1960adaptiveswitching.pdf",
+      "rotulo_link": "isl.stanford.edu, o PDF no site de Widrow",
+      "pdf_aberto": "https://isl.stanford.edu/~widrow/papers/c1960adaptiveswitching.pdf",
+      "nota": "O Record da WESCON não tem página de editora nem DOI; o PDF é o que Widrow mantém em Stanford."
+    },
+    "widrow-1963": {
+      "autores": "Bernard Widrow",
+      "ano": 1963,
+      "titulo": "ADALINE: Smarter than Sweet",
+      "onde": "Stanford Today, série 1, número 6, setembro de 1963",
+      "tipo": "revista",
+      "link": "https://isl.stanford.edu/~widrow/papers/j1963adalinesmarter.pdf",
+      "rotulo_link": "isl.stanford.edu, o PDF no site de Widrow",
+      "pdf_aberto": "https://isl.stanford.edu/~widrow/papers/j1963adalinesmarter.pdf",
+      "nota": "De onde vêm as duas fotos da Adaline dos slides."
+    },
+    "lemarechal-2012": {
+      "autores": "Claude Lemaréchal",
+      "ano": 2012,
+      "titulo": "Cauchy and the gradient method",
+      "onde": "Documenta Mathematica, volume extra ISMP, 251-254",
+      "tipo": "artigo",
+      "link": "https://doi.org/10.4171/DMS/6/27",
+      "rotulo_link": "doi:10.4171/DMS/6/27",
+      "pdf_aberto": "https://ems.press/content/book-chapter-files/27368",
+      "pdf_link": "https://ems.press/content/book-chapter-files/27368"
+    }
+  },
+  "aulas": [
+    {
+      "n": 1,
+      "slug": "class-01",
+      "pasta": "aulas/01-neuronio",
+      "data": "2026-09-25",
+      "quando": "Sexta, 25/09/2026, das 12h às 14h",
+      "onde": "Segundo andar do PPEE",
+      "pdf_dos_slides": "slides/limiar-aula-01.pdf",
+      "codigo_retido": {
+        "codigo/perceptron.py": "É a solução de referência da entrega da aula 1, com prazo em 02/10; o roteiro diz que o arquivo não vai para a turma."
+      },
+      "obras": [
+        "mcculloch-pitts-1943",
+        "rosenblatt-1958",
+        "rosenblatt-1961",
+        "nyt-1958",
+        "minsky-papert-1969",
+        "rumelhart-hinton-williams-1986",
+        "bishop-2006",
+        "mohanty-hughes-salathe-2016",
+        "shallue-vanderburg-2018",
+        "cardinot-2026",
+        "nielsen-2015",
+        "sohl-dickstein-2024"
+      ],
+      "outras_fontes": [
+        {
+          "titulo": "Perceptron",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Perceptron"
+        },
+        {
+          "titulo": "Dot products and duality",
+          "onde": "3Blue1Brown, álgebra linear, capítulo 9, no YouTube",
+          "link": "https://www.youtube.com/watch?v=LyGKycYT2v0"
+        },
+        {
+          "titulo": "Vectors, what even are they?",
+          "onde": "3Blue1Brown, álgebra linear, capítulo 1, no YouTube",
+          "link": "https://www.youtube.com/watch?v=fNk_zzaMoSs"
+        },
+        {
+          "titulo": "Frank Rosenblatt",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Frank_Rosenblatt"
+        },
+        {
+          "titulo": "Foto 330-PSA-80-60 (USN 710739), o Mark I Perceptron",
+          "onde": "Wikimedia Commons, com a legenda dos 85%",
+          "link": "https://commons.wikimedia.org/wiki/File:330-PSA-80-60_(USN_710739)_(20897323365).jpg"
+        },
+        {
+          "titulo": "Perceptrons (book)",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Perceptrons_(book)"
+        },
+        {
+          "titulo": "PurkinjeCell.jpg, o desenho de Cajal de 1899",
+          "onde": "Wikimedia Commons",
+          "link": "https://commons.wikimedia.org/wiki/File:PurkinjeCell.jpg"
+        },
+        {
+          "titulo": "Action potential",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Action_potential"
+        },
+        {
+          "titulo": "Neuron",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Neuron"
+        },
+        {
+          "titulo": "Fractal",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Fractal"
+        },
+        {
+          "titulo": "Buddhabrot",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Buddhabrot"
+        },
+        {
+          "titulo": "limiar",
+          "onde": "Dicionário Priberam",
+          "link": "https://dicionario.priberam.org/limiar"
+        },
+        {
+          "titulo": "perceptron",
+          "onde": "Wiktionary",
+          "link": "https://en.wiktionary.org/wiki/perceptron"
+        },
+        {
+          "titulo": "-tron",
+          "onde": "Wiktionary",
+          "link": "https://en.wiktionary.org/wiki/-tron"
+        },
+        {
+          "titulo": "The Nobel Prize in Physics 2024",
+          "onde": "NobelPrize.org",
+          "link": "https://www.nobelprize.org/prizes/physics/2024/summary/"
+        },
+        {
+          "titulo": "Muon",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Muon"
+        },
+        {
+          "titulo": "Cloud chamber",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Cloud_chamber"
+        },
+        {
+          "titulo": "Seth Neddermeyer",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Seth_Neddermeyer"
+        },
+        {
+          "titulo": "Compact Muon Solenoid",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Compact_Muon_Solenoid"
+        },
+        {
+          "titulo": "Solenoid",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Solenoid"
+        },
+        {
+          "titulo": "Detecting muons",
+          "onde": "CMS, cms.cern",
+          "link": "https://cms.cern/detector/detecting-muons"
+        },
+        {
+          "titulo": "Cosmic ray",
+          "onde": "Wikipedia, verbete, com a legenda da foto dos múons",
+          "link": "https://en.wikipedia.org/wiki/Cosmic_ray"
+        },
+        {
+          "titulo": "Hard-component-muon-868x1024.png",
+          "onde": "Wikimedia Commons",
+          "link": "https://commons.wikimedia.org/wiki/File:Hard-component-muon-868x1024.png"
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "slug": "class-02",
+      "pasta": "aulas/02-gradiente",
+      "data": "2026-10-02",
+      "quando": "Sexta, 02/10/2026, das 12h às 14h",
+      "onde": "Segundo andar do PPEE",
+      "pdf_dos_slides": "slides/limiar-aula-02.pdf",
+      "codigo_retido": {
+        "codigo/reta.py": "É a solução de referência da entrega da aula 2, que não sai antes de 16/10, e depois só com o ok do Chrysthofer.",
+        "codigo/animacoes.py": "Traz a regra do perceptron treinando o E, a mesma solução da entrega da aula 1, com prazo em 02/10."
+      },
+      "obras": [
+        "cauchy-1847",
+        "widrow-hoff-1960",
+        "widrow-1963",
+        "lemarechal-2012",
+        "nielsen-2015",
+        "sohl-dickstein-2024"
+      ],
+      "outras_fontes": [
+        {
+          "titulo": "Gradient descent",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Gradient_descent"
+        },
+        {
+          "titulo": "ADALINE",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/ADALINE"
+        },
+        {
+          "titulo": "Least mean squares filter",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Least_mean_squares_filter"
+        },
+        {
+          "titulo": "Adaptive filter",
+          "onde": "Wikipedia, verbete",
+          "link": "https://en.wikipedia.org/wiki/Adaptive_filter"
+        },
+        {
+          "titulo": "gradiente",
+          "onde": "Wiktionary em português",
+          "link": "https://pt.wiktionary.org/wiki/gradiente"
+        },
+        {
+          "titulo": "degrau",
+          "onde": "Wiktionary em português",
+          "link": "https://pt.wiktionary.org/wiki/degrau"
+        },
+        {
+          "titulo": "Parque Estadual do Ibitipoca",
+          "onde": "Wikipedia em português, verbete",
+          "link": "https://pt.wikipedia.org/wiki/Parque_Estadual_do_Ibitipoca"
+        }
+      ]
+    }
+  ]
+}

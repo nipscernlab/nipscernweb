@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <title>Aula 1: O neurônio e o perceptron | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Class 1 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-01/">
+  <meta property="og:title" content="Aula 1: O neurônio e o perceptron | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Class 1 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-01/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../../../assets/css/icons/library-courses.css?v=0ce0a739f0">
+  <link rel="stylesheet" href="../../../../assets/css/main.min.css?v=0ce0a739f0">
+  <link rel="stylesheet" href="../../../../assets/css/courses.min.css?v=0ce0a739f0">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero ">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.class">Class</span> 1</span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-books" aria-hidden="true"></i>Limiar · <span data-i18n="courses.class">Class</span> 1</p><h1 class="display-md cr-class-h1 fade-up" lang="pt-BR">O neurônio e o perceptron</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 25/09/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">Segundo andar do PPEE</span></li><li><i class="ph ph-user" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.taught_by">Taught by</span><span lang="pt-BR">Chrysthofer A. A. Afonso</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></a><a class="btn glass-btn btn-ghost" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-01-slides-v1.pdf" target="_blank" rel="noopener"><i class="ph ph-file-pdf" aria-hidden="true"></i><span data-i18n="courses.slides_pdf">Slides as PDF</span></a></div>
+          </div>
+          <div class="cr-hero-side"><a class="cr-cover frame fade-up" href="slides/" aria-label="Open the slides" title="Open the slides" data-i18n-aria="courses.open_slides" data-i18n-title="courses.open_slides"><img src="../../../../library/courses/limiar/media/limiar-aula-01-capa.f50b8a9247.webp" alt="" width="1280" height="720" decoding="async"><span class="cr-play" aria-hidden="true"><i class="ph ph-play"></i></span><span class="cr-cover-tag" aria-hidden="true"><span><span class="cr-mono">23</span> <span data-i18n="courses.n_slides">slides</span></span></span></a><p class="cr-cover-hint fade-up"><span data-i18n="courses.keys_hint">In the slides: → moves on, F is full screen, N shows the notes, H lists every key.</span> <span data-i18n="courses.pdf_no_notes">The PDF has no notes: it is the one handed to the class.</span></p></div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band section--lit cr-band--first" style="--seam-from:var(--bg-0)">
+      <div class="container">
+<div class="cr-duo"><article class="cr-panel cr-plan glass fade-up" aria-labelledby="aula-t"><h2 class="cr-panel-title" id="aula-t"><i class="ph ph-notebook" aria-hidden="true"></i><span data-i18n="courses.the_class">The class</span></h2><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.topic">Topic</span></h3><div class="cr-prose" lang="pt-BR"><p>O que é aprender com dados: em vez de escrever a regra, mostrar exemplos com a
+resposta certa e deixar a máquina ajustar os próprios números. O neurônio
+artificial de McCulloch e Pitts, de 1943, soma as entradas, cada uma multiplicada
+por um peso, e dispara se a soma passar de um limiar. O perceptron de Rosenblatt,
+de 1958, é esse neurônio com uma regra que corrige os pesos a cada erro: o
+primeiro neurônio que aprende. A matemática do neurônio: vetor, produto escalar e
+somatório, porque o neurônio calcula z = w·x + b. Rede neural como reconhecimento de padrões, com
+exemplos na agricultura, na engenharia e na astronomia. O CERN e o jeito de
+trabalhar em colaboração. Como o curso funciona.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.in_class">Practice in class</span></h3><div class="cr-prose" lang="pt-BR"><p>Perceptron à mão, no quadro, para as funções lógicas E e OU. Depois o XOR, o &quot;ou
+exclusivo&quot;, que dá 1 quando só uma das entradas é 1. Nenhum perceptron sozinho
+resolve o XOR, e essa pergunta fica aberta até a aula 3.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.assignment">Assignment</span><span class="cr-due"><i class="ph ph-calendar-check" aria-hidden="true"></i><span data-i18n="courses.due">Due</span> <time datetime="2026-10-02" class="cr-mono">02/10</time></span></h3><div class="cr-prose" lang="pt-BR"><ul>
+<li>Python, Git, VS Code e Claude Code instalados, pelo guia em <a href="https://cdn.nipscern.com/courses/limiar/limiar-guia-de-instalacao-v1.pdf" target="_blank" rel="noopener">infra/</a>.</li>
+<li>Conta no GitHub e um repositório para o curso.</li>
+<li>Um perceptron que aprende E e OU, em NumPy, no repositório. O programa imprime,
+a cada época, os pesos e o viés, como a tabela do slide, para a comparação ser
+direta.</li>
+<li>Uma pergunta sobre o estudo da semana.</li>
+</ul>
+<p>Sem pressa: quem não terminar entrega o que fez. O que conta é explicar cada
+linha do que entregou.</p>
+</div></section></article><aside class="cr-panel cr-kit glass fade-up" aria-labelledby="material-t"><h2 class="cr-panel-title" id="material-t"><i class="ph ph-package" aria-hidden="true"></i><span data-i18n="courses.class_materials">Class material</span></h2><ul class="cr-rows"><li><a class="cr-row" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.study_guide">Study guide</span></strong><span><span data-i18n="courses.study_guide_desc">The topics of the class, with the study notes under each one and the equations.</span></span></span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-01-folha-de-topicos-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.topic_sheet">Topic sheet</span></strong><span><span data-i18n="courses.topic_sheet_desc">The topics on one page, to print.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-guia-de-instalacao-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.install_guide">Installation guide</span></strong><span><span data-i18n="courses.install_guide_desc">Python, Git, VS Code and Claude Code on each student&#x27;s laptop.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="../../../../library/courses/limiar/materials/requirements.txt" download><i class="ph ph-file-text" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">requirements.txt</strong><span><span data-i18n="courses.requirements_desc">The Python packages of the course, for pip.</span></span></span><i class="ph ph-download-simple cr-row-go" aria-hidden="true"></i></a></li></ul><h3 class="cr-kit-sub"><i class="ph ph-code" aria-hidden="true"></i><span data-i18n="courses.code">Code</span></h3><ul class="cr-rows"><li><a class="cr-row" href="code/#figuras-slides-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">figuras_slides.py</strong><span lang="pt-BR">Figuras dos slides da aula 1.</span></span><span class="cr-mono cr-muted cr-row-n">180</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li></ul><p class="cr-withheld"><i class="ph ph-lock" aria-hidden="true"></i><span data-i18n="courses.withheld">Not published here: the reference solution of an assignment that is still open.</span></p></aside></div>
+      </div>
+    </section>
+    <section class="section seam cr-band" style="--seam-from:var(--bg-0)" aria-labelledby="estudo-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="estudo-t"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.study">Study for the week</span></h2><div class="cr-intro cr-prose fade-up" lang="pt-BR"><p>Nesta ordem, porque o terceiro usa a derivada do segundo:</p>
+</div><div class="cr-grid cr-grid--videos fade-up"><a class="cr-video glass glass--flat" href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank" rel="noopener"><span class="frame cr-video-thumb"><img src="../../../../library/courses/limiar/media/yt-aircaruvnkk.fc07ae0cbc.webp" alt="" width="600" height="338" loading="lazy" decoding="async"><span class="cr-play cr-play--sm" aria-hidden="true"><i class="ph ph-play"></i></span></span><span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">Série sobre redes neurais, capítulo 1</span><span class="cr-video-title" lang="en">But what is a neural network? | Deep learning chapter 1</span><span class="cr-video-channel">3Blue1Brown · <span class="cr-wave"><span data-i18n="courses.watch">Watch on YouTube</span></span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a><a class="cr-video glass glass--flat" href="https://www.youtube.com/watch?v=9vKqVkMQHKk" target="_blank" rel="noopener"><span class="frame cr-video-thumb"><img src="../../../../library/courses/limiar/media/yt-9vkqvkmqhkk.abb1bd5569.webp" alt="" width="600" height="338" loading="lazy" decoding="async"><span class="cr-play cr-play--sm" aria-hidden="true"><i class="ph ph-play"></i></span></span><span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">Série sobre cálculo, capítulo 2</span><span class="cr-video-title" lang="en">The paradox of the derivative | Chapter 2, Essence of calculus</span><span class="cr-video-channel">3Blue1Brown · <span class="cr-wave"><span data-i18n="courses.watch">Watch on YouTube</span></span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a><a class="cr-video glass glass--flat" href="https://www.youtube.com/watch?v=IHZwWFHWa-w" target="_blank" rel="noopener"><span class="frame cr-video-thumb"><img src="../../../../library/courses/limiar/media/yt-ihzwwfhwa-w.208e71f366.webp" alt="" width="600" height="338" loading="lazy" decoding="async"><span class="cr-play cr-play--sm" aria-hidden="true"><i class="ph ph-play"></i></span></span><span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">Série sobre redes neurais, capítulo 2</span><span class="cr-video-title" lang="en">Gradient descent, how neural networks learn | Deep Learning Chapter 2</span><span class="cr-video-channel">3Blue1Brown · <span class="cr-wave"><span data-i18n="courses.watch">Watch on YouTube</span></span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a></div>
+      </div>
+    </section>
+    <section class="section seam cr-band section--lit" style="--seam-from:var(--bg-0)" aria-labelledby="obras-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="obras-t"><i class="ph ph-books" aria-hidden="true"></i><span data-i18n="courses.papers">Papers and books</span></h2><p class="cr-intro fade-up"><span data-i18n="courses.papers_intro">Every work cited in the class material, with the official link. The first page appears where the PDF is open access.</span></p><ol class="cr-refs fade-up"><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.1007/BF02478259" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">A logical calculus of the ideas immanent in nervous activity</span></a></p><p class="cr-ref-by">Warren S. McCulloch e Walter Pitts · <span class="cr-mono">1943</span></p><p class="cr-ref-venue">Bulletin of Mathematical Biophysics 5(4):115-133</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.1007/BF02478259" target="_blank" rel="noopener"><span class="cr-wave">doi:10.1007/BF02478259</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.1037/h0042519" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">The perceptron: a probabilistic model for information storage and organization in the brain</span></a></p><p class="cr-ref-by">Frank Rosenblatt · <span class="cr-mono">1958</span></p><p class="cr-ref-venue">Psychological Review 65(6):386-408</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.1037/h0042519" target="_blank" rel="noopener"><span class="cr-wave">doi:10.1037/h0042519</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.21236/AD0256582" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Principles of Neurodynamics: Perceptrons and the Theory of Brain Mechanisms</span></a></p><p class="cr-ref-by">Frank Rosenblatt · <span class="cr-mono">1961</span></p><p class="cr-ref-venue">Cornell Aeronautical Laboratory, relatório VG-1196-G-8, 15/03/1961; em livro pela Spartan Books em 1962</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.21236/AD0256582" target="_blank" rel="noopener"><span class="cr-wave">doi:10.21236/AD0256582</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://www.nytimes.com/1958/07/08/archives/new-navy-device-learns-by-doing-psychologist-shows-embryo-of.html" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">New Navy device learns by doing; psychologist shows embryo of computer designed to read and grow wiser</span></a></p><p class="cr-ref-by">The New York Times, da agência UPI · <span class="cr-mono">1958</span></p><p class="cr-ref-venue">The New York Times, 8/7/1958, página 25</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://www.nytimes.com/1958/07/08/archives/new-navy-device-learns-by-doing-psychologist-shows-embryo-of.html" target="_blank" rel="noopener"><span class="cr-wave">nytimes.com, arquivo de 1958</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://mitpress.mit.edu/9780262630221/perceptrons/" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Perceptrons</span></a></p><p class="cr-ref-by">Marvin Minsky e Seymour Papert · <span class="cr-mono">1969</span></p><p class="cr-ref-venue">MIT Press</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://mitpress.mit.edu/9780262630221/perceptrons/" target="_blank" rel="noopener"><span class="cr-wave">MIT Press, a edição de 1969</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-rumelhart-hinton-williams-1986.b6164a7daf.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Learning representations by back-propagating errors</span></a></p><p class="cr-ref-by">David E. Rumelhart, Geoffrey E. Hinton e Ronald J. Williams · <span class="cr-mono">1986</span></p><p class="cr-ref-venue">Nature 323(6088):533-536</p><p class="cr-ref-note">O PDF é a cópia das páginas da Nature que Hinton mantém no site da Universidade de Toronto.</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener"><span class="cr-wave">doi:10.1038/323533a0</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://www.cs.toronto.edu/~hinton/absps/naturebp.pdf" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://link.springer.com/book/9780387310732" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-bishop-2006.a3b02c7775.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://link.springer.com/book/9780387310732" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Pattern Recognition and Machine Learning</span></a></p><p class="cr-ref-by">Christopher M. Bishop · <span class="cr-mono">2006</span></p><p class="cr-ref-venue">Springer; a página citada no roteiro é a 196</p><p class="cr-ref-note">O PDF é o que a Microsoft Research oferece de graça; o direito autoral continua da Springer.</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://link.springer.com/book/9780387310732" target="_blank" rel="noopener"><span class="cr-wave">Springer, ISBN 978-0-387-31073-2</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://doi.org/10.3389/fpls.2016.01419" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-mohanty-hughes-salathe-2016.ab50daae7a.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.3389/fpls.2016.01419" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Using deep learning for image-based plant disease detection</span></a></p><p class="cr-ref-by">Sharada P. Mohanty, David P. Hughes e Marcel Salathé · <span class="cr-mono">2016</span></p><p class="cr-ref-venue">Frontiers in Plant Science 7:1419; CC BY 4.0</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.3389/fpls.2016.01419" target="_blank" rel="noopener"><span class="cr-wave">doi:10.3389/fpls.2016.01419</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2016.01419/pdf" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://doi.org/10.3847/1538-3881/aa9e09" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-shallue-vanderburg-2018.7a1dbd5b80.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.3847/1538-3881/aa9e09" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Identifying exoplanets with deep learning: a five-planet resonant chain around Kepler-80 and an eighth planet around Kepler-90</span></a></p><p class="cr-ref-by">Christopher J. Shallue e Andrew Vanderburg · <span class="cr-mono">2018</span></p><p class="cr-ref-venue">The Astronomical Journal 155(2):94; CC BY 3.0</p><p class="cr-ref-note">A primeira página é a da versão do arXiv, 1712.05044; o PDF do link é o da revista.</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.3847/1538-3881/aa9e09" target="_blank" rel="noopener"><span class="cr-wave">doi:10.3847/1538-3881/aa9e09</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://iopscience.iop.org/article/10.3847/1538-3881/aa9e09/pdf" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://doi.org/10.3390/app16136414" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-cardinot-2026.edf8c5bbe8.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.3390/app16136414" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Convolutional neural networks for signal reconstruction in high-energy calorimetry</span></a></p><p class="cr-ref-by">Diogo Alves Cardinot, Bernardo Sotto-Maior Peralva, Gustavo Barbosa Libotte e Luciano Manhães de Andrade Filho · <span class="cr-mono">2026</span></p><p class="cr-ref-venue">Applied Sciences 16(13):6414; CC BY 4.0</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.3390/app16136414" target="_blank" rel="noopener"><span class="cr-wave">doi:10.3390/app16136414</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://www.mdpi.com/2076-3417/16/13/6414/pdf" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Neural Networks and Deep Learning</span></a></p><p class="cr-ref-by">Michael A. Nielsen · <span class="cr-mono">2015</span></p><p class="cr-ref-venue">Determination Press, livro online; CC BY-NC 3.0</p><p class="cr-ref-note">O endereço só abre em http: o certificado do servidor é de outro domínio.</p><p class="cr-ref-links"><a class="cr-ref-link" href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener"><span class="cr-wave">neuralnetworksanddeeplearning.com</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-sohl-dickstein-2024.acf21d8bd9.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">The boundary of neural network trainability is fractal</span></a></p><p class="cr-ref-by">Jascha Sohl-Dickstein · <span class="cr-mono">2024</span></p><p class="cr-ref-venue">arXiv:2402.06184; CC BY 4.0</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener"><span class="cr-wave">arXiv:2402.06184</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://arxiv.org/pdf/2402.06184" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li></ol><details class="cr-more glass glass--flat fade-up"><summary><i class="ph ph-link" aria-hidden="true"></i><span data-i18n="courses.other_sources">Other sources</span> <span class="cr-mono cr-muted">23</span><i class="ph ph-caret-down cr-more-caret" aria-hidden="true"></i></summary><ul class="cr-sources" lang="pt-BR"><li><a href="https://en.wikipedia.org/wiki/Perceptron" target="_blank" rel="noopener">Perceptron</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://www.youtube.com/watch?v=LyGKycYT2v0" target="_blank" rel="noopener">Dot products and duality</a> <span class="cr-muted">3Blue1Brown, álgebra linear, capítulo 9, no YouTube</span></li><li><a href="https://www.youtube.com/watch?v=fNk_zzaMoSs" target="_blank" rel="noopener">Vectors, what even are they?</a> <span class="cr-muted">3Blue1Brown, álgebra linear, capítulo 1, no YouTube</span></li><li><a href="https://en.wikipedia.org/wiki/Frank_Rosenblatt" target="_blank" rel="noopener">Frank Rosenblatt</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://commons.wikimedia.org/wiki/File:330-PSA-80-60_(USN_710739)_(20897323365).jpg" target="_blank" rel="noopener">Foto 330-PSA-80-60 (USN 710739), o Mark I Perceptron</a> <span class="cr-muted">Wikimedia Commons, com a legenda dos 85%</span></li><li><a href="https://en.wikipedia.org/wiki/Perceptrons_(book)" target="_blank" rel="noopener">Perceptrons (book)</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://commons.wikimedia.org/wiki/File:PurkinjeCell.jpg" target="_blank" rel="noopener">PurkinjeCell.jpg, o desenho de Cajal de 1899</a> <span class="cr-muted">Wikimedia Commons</span></li><li><a href="https://en.wikipedia.org/wiki/Action_potential" target="_blank" rel="noopener">Action potential</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Neuron" target="_blank" rel="noopener">Neuron</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Fractal" target="_blank" rel="noopener">Fractal</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Buddhabrot" target="_blank" rel="noopener">Buddhabrot</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://dicionario.priberam.org/limiar" target="_blank" rel="noopener">limiar</a> <span class="cr-muted">Dicionário Priberam</span></li><li><a href="https://en.wiktionary.org/wiki/perceptron" target="_blank" rel="noopener">perceptron</a> <span class="cr-muted">Wiktionary</span></li><li><a href="https://en.wiktionary.org/wiki/-tron" target="_blank" rel="noopener">-tron</a> <span class="cr-muted">Wiktionary</span></li><li><a href="https://www.nobelprize.org/prizes/physics/2024/summary/" target="_blank" rel="noopener">The Nobel Prize in Physics 2024</a> <span class="cr-muted">NobelPrize.org</span></li><li><a href="https://en.wikipedia.org/wiki/Muon" target="_blank" rel="noopener">Muon</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Cloud_chamber" target="_blank" rel="noopener">Cloud chamber</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Seth_Neddermeyer" target="_blank" rel="noopener">Seth Neddermeyer</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Compact_Muon_Solenoid" target="_blank" rel="noopener">Compact Muon Solenoid</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Solenoid" target="_blank" rel="noopener">Solenoid</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://cms.cern/detector/detecting-muons" target="_blank" rel="noopener">Detecting muons</a> <span class="cr-muted">CMS, cms.cern</span></li><li><a href="https://en.wikipedia.org/wiki/Cosmic_ray" target="_blank" rel="noopener">Cosmic ray</a> <span class="cr-muted">Wikipedia, verbete, com a legenda da foto dos múons</span></li><li><a href="https://commons.wikimedia.org/wiki/File:Hard-component-muon-868x1024.png" target="_blank" rel="noopener">Hard-component-muon-868x1024.png</a> <span class="cr-muted">Wikimedia Commons</span></li></ul></details>
+      </div>
+    </section>
+    <section class="section seam cr-band cr-band--last" style="--seam-from:var(--bg-0)" aria-labelledby="creditos-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="creditos-t"><i class="ph ph-images" aria-hidden="true"></i><span data-i18n="courses.credits">Image credits</span></h2><div class="cr-credits fade-up cr-prose" lang="pt-BR"><p>Todas do Wikimedia Commons, menos a foto do laboratório e as figuras geradas pelo
+código desta pasta.</p>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>O que mostra</th>
+<th>Autor</th>
+<th>Licença</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/buddhabrot.11b782f918.webp">buddhabrot.jpg</a></td>
+<td>o Buddhabrot, na capa; arquivo &quot;Large Buddhabrot.jpg&quot;</td>
+<td>Johann Korndoerfer</td>
+<td>CC BY 3.0 DE</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/cms.893a6be0b9.webp">cms.jpg</a></td>
+<td>o detector CMS; &quot;Compact Muon Solenoid detector, LHC (2014).jpg&quot;</td>
+<td>Vineet Menon</td>
+<td>CC BY-SA 2.0</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/muon-camara-de-nuvens.ec588951bb.webp">muon-camara-de-nuvens.jpg</a></td>
+<td>duas fotos de câmara de nuvens com uma placa de metal no meio, um múon em cada; &quot;Hard-component-muon-868x1024.png&quot;, convertido para JPEG</td>
+<td>não identificado</td>
+<td>declarada CC BY-SA 4.0, sem confirmação; ver a nota abaixo</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/mnist.8c2b11e992.webp">mnist.png</a></td>
+<td>dígitos do conjunto de teste do MNIST; &quot;MnistExamples.png&quot;</td>
+<td>Josef Steppan</td>
+<td>CC BY-SA 4.0</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/folha.7ace0c325c.webp">folha.jpg</a></td>
+<td>folha de hibisco com mancha bacteriana; &quot;Hibiscus Bacterial leaf spot (19101655946).jpg&quot;</td>
+<td>Scot Nelson</td>
+<td>CC0</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/curva-de-luz.31b7a6bb14.webp">curva-de-luz.jpg</a></td>
+<td>planeta passando na frente da estrela e a queda no brilho; &quot;Mapping Stellar 'Polka Dots' (SVS14883 - ExoplanetTransitLightCurve).jpg&quot;</td>
+<td>NASA, Goddard Space Flight Center</td>
+<td>domínio público</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/tilecal.4889ee6886.webp">tilecal.png</a></td>
+<td>o barril estendido A do TileCal, montado na caverna do ATLAS; &quot;ATLAS Tile Calorimeter.png&quot;</td>
+<td>Argonne National Laboratory</td>
+<td>CC BY-SA 2.0</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/cajal-purkinje.11406aef0a.webp">cajal-purkinje.jpg</a></td>
+<td>células de Purkinje e granulares do cerebelo de pombo, 1899; &quot;PurkinjeCell.jpg&quot;</td>
+<td>Santiago Ramón y Cajal</td>
+<td>domínio público</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/mark1-foto.c3c9ff51e4.webp">mark1-foto.jpg</a></td>
+<td>o Mark I Perceptron diante de uma letra C, foto divulgada em 24/6/1960; &quot;330-PSA-80-60 (USN 710739) (20897323365).jpg&quot;</td>
+<td>National Museum of the U.S. Navy</td>
+<td>domínio público</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/nipscern-no-cern.31e740c24b.webp">nipscern-no-cern.jpg</a></td>
+<td>o NIPS-CERN no CERN</td>
+<td>NIPS-CERN</td>
+<td>foto do laboratório</td>
+</tr>
+</tbody>
+</table>
+<p>A foto dos múons está no Commons como obra própria de Jino john1996, enviada em
+25/07/2022 com licença CC BY-SA 4.0. Pelo aspecto, com a retícula da impressão e
+as duas fotos lado a lado, é o escaneamento de uma foto antiga impressa, e não uma
+foto tirada em 2022: a autoria e a licença declaradas não se sustentam. A origem
+não foi encontrada no Commons, no histórico das edições da Wikipedia que usam a
+imagem nem nas páginas de ensino do CERN. Por isso o slide diz &quot;foto antiga, autor
+não identificado&quot;. Se a origem aparecer, o crédito se corrige aqui e no slide.</p>
+</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../assets/js/main.min.js?v=0ce0a739f0"></script>
+  <script type="module" src="../../../../assets/js/courses.min.js?v=0ce0a739f0"></script>
+  <script src="../../../../assets/js/analytics.min.js?v=0ce0a739f0" defer></script>
+</body>
+</html>

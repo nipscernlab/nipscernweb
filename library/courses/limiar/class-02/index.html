@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <title>Aula 2: Derivada, gradiente e gradiente descendente | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Class 2 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-02/">
+  <meta property="og:title" content="Aula 2: Derivada, gradiente e gradiente descendente | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Class 2 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-02/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../../../assets/css/icons/library-courses.css?v=0ce0a739f0">
+  <link rel="stylesheet" href="../../../../assets/css/main.min.css?v=0ce0a739f0">
+  <link rel="stylesheet" href="../../../../assets/css/courses.min.css?v=0ce0a739f0">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero ">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.class">Class</span> 2</span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-books" aria-hidden="true"></i>Limiar · <span data-i18n="courses.class">Class</span> 2</p><h1 class="display-md cr-class-h1 fade-up" lang="pt-BR">Derivada, gradiente e gradiente descendente</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 02/10/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">Segundo andar do PPEE</span></li><li><i class="ph ph-user" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.taught_by">Taught by</span><span lang="pt-BR">Chrysthofer A. A. Afonso</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></a><a class="btn glass-btn btn-ghost" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-02-slides-v1.pdf" target="_blank" rel="noopener"><i class="ph ph-file-pdf" aria-hidden="true"></i><span data-i18n="courses.slides_pdf">Slides as PDF</span></a></div>
+          </div>
+          <div class="cr-hero-side"><a class="cr-cover frame fade-up" href="slides/" aria-label="Open the slides" title="Open the slides" data-i18n-aria="courses.open_slides" data-i18n-title="courses.open_slides"><img src="../../../../library/courses/limiar/media/limiar-aula-02-capa.163f5200cd.webp" alt="" width="1280" height="720" decoding="async"><span class="cr-play" aria-hidden="true"><i class="ph ph-play"></i></span><span class="cr-cover-tag" aria-hidden="true"><span><span class="cr-mono">23</span> <span data-i18n="courses.n_slides">slides</span></span><span><span class="cr-mono">7</span> <span data-i18n="courses.n_videos">videos</span></span></span></a><p class="cr-cover-hint fade-up"><span data-i18n="courses.keys_hint">In the slides: → moves on, F is full screen, N shows the notes, H lists every key.</span> <span data-i18n="courses.pdf_no_notes">The PDF has no notes: it is the one handed to the class.</span></p></div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band section--lit cr-band--first" style="--seam-from:var(--bg-0)">
+      <div class="container">
+<div class="cr-duo"><article class="cr-panel cr-plan glass fade-up" aria-labelledby="aula-t"><h2 class="cr-panel-title" id="aula-t"><i class="ph ph-notebook" aria-hidden="true"></i><span data-i18n="courses.the_class">The class</span></h2><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.topic">Topic</span></h3><div class="cr-prose" lang="pt-BR"><p>A derivada como taxa de variação: quanto a saída muda quando a entrada muda um
+pouco. A derivada parcial, a derivada em relação a uma variável com as outras
+paradas. O gradiente, o vetor das derivadas parciais, que aponta para onde a
+função mais cresce. O gradiente descendente, que anda contra o gradiente para
+diminuir o erro, visto numa superfície em 3D. O erro quadrático médio, a média
+dos quadrados das diferenças entre o previsto e o certo. A taxa de aprendizado,
+o tamanho de cada passo. Na história, Cauchy, 1847, que criou o método para
+calcular órbitas, e Widrow e Hoff, 1960: a Adaline, um neurônio linear treinado
+assim, é o começo dos filtros adaptativos. Filtro adaptativo fica como
+caixa-preta: entra só a história.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.in_class">Practice in class</span></h3><div class="cr-prose" lang="pt-BR"><p>Ajustar uma reta a um conjunto de pontos por gradiente descendente, em NumPy, e
+variar a taxa de aprendizado. Pequena demais, o erro quase não cai; grande
+demais, o erro explode. É o primeiro contato com o limiar do projeto final.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.assignment">Assignment</span><span class="cr-due"><i class="ph ph-calendar-check" aria-hidden="true"></i><span data-i18n="courses.due">Due</span> <time datetime="2026-10-16" class="cr-mono">16/10</time></span></h3><div class="cr-prose" lang="pt-BR"><ul>
+<li>O gráfico do erro a cada passo, para várias taxas, e a taxa a partir da qual o
+treino diverge.</li>
+<li>Uma pergunta sobre o estudo da semana.</li>
+</ul>
+</div></section></article><aside class="cr-panel cr-kit glass fade-up" aria-labelledby="material-t"><h2 class="cr-panel-title" id="material-t"><i class="ph ph-package" aria-hidden="true"></i><span data-i18n="courses.class_materials">Class material</span></h2><ul class="cr-rows"><li><a class="cr-row" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.study_guide">Study guide</span></strong><span><span data-i18n="courses.study_guide_desc">The topics of the class, with the study notes under each one and the equations.</span></span></span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-02-folha-de-topicos-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.topic_sheet">Topic sheet</span></strong><span><span data-i18n="courses.topic_sheet_desc">The topics on one page, to print.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-guia-de-instalacao-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.install_guide">Installation guide</span></strong><span><span data-i18n="courses.install_guide_desc">Python, Git, VS Code and Claude Code on each student&#x27;s laptop.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="../../../../library/courses/limiar/materials/requirements.txt" download><i class="ph ph-file-text" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">requirements.txt</strong><span><span data-i18n="courses.requirements_desc">The Python packages of the course, for pip.</span></span></span><i class="ph ph-download-simple cr-row-go" aria-hidden="true"></i></a></li></ul><h3 class="cr-kit-sub"><i class="ph ph-code" aria-hidden="true"></i><span data-i18n="courses.code">Code</span></h3><ul class="cr-rows"><li><a class="cr-row" href="code/#figuras-slides-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">figuras_slides.py</strong><span lang="pt-BR">Figuras dos slides da aula 2.</span></span><span class="cr-mono cr-muted cr-row-n">286</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li></ul><p class="cr-withheld"><i class="ph ph-lock" aria-hidden="true"></i><span data-i18n="courses.withheld">Not published here: the reference solution of an assignment that is still open.</span></p></aside></div>
+      </div>
+    </section>
+    <section class="section seam cr-band" style="--seam-from:var(--bg-0)" aria-labelledby="estudo-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="estudo-t"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.study">Study for the week</span></h2><div class="cr-intro cr-prose fade-up" lang="pt-BR"><p>Duas semanas, porque 09/10 não tem aula.</p>
+</div><div class="cr-grid cr-grid--videos fade-up"><a class="cr-video glass glass--flat" href="https://www.youtube.com/watch?v=kYB8IZa5AuE" target="_blank" rel="noopener"><span class="frame cr-video-thumb"><img src="../../../../library/courses/limiar/media/yt-kyb8iza5aue.ea6301fb0c.webp" alt="" width="600" height="338" loading="lazy" decoding="async"><span class="cr-play cr-play--sm" aria-hidden="true"><i class="ph ph-play"></i></span></span><span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">Série sobre álgebra linear, capítulo 3</span><span class="cr-video-title" lang="en">Linear transformations and matrices | Chapter 3, Essence of linear algebra</span><span class="cr-video-channel">3Blue1Brown · <span class="cr-wave"><span data-i18n="courses.watch">Watch on YouTube</span></span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a><a class="cr-video glass glass--flat" href="https://www.youtube.com/watch?v=XkY2DOUCWMU" target="_blank" rel="noopener"><span class="frame cr-video-thumb"><img src="../../../../library/courses/limiar/media/yt-xky2doucwmu.cd977f7e4c.webp" alt="" width="600" height="338" loading="lazy" decoding="async"><span class="cr-play cr-play--sm" aria-hidden="true"><i class="ph ph-play"></i></span></span><span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">Série sobre álgebra linear, capítulo 4</span><span class="cr-video-title" lang="en">Matrix multiplication as composition | Chapter 4, Essence of linear algebra</span><span class="cr-video-channel">3Blue1Brown · <span class="cr-wave"><span data-i18n="courses.watch">Watch on YouTube</span></span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a><div class="cr-read glass glass--flat"><i class="ph ph-book-open" aria-hidden="true"></i><div class="cr-prose" lang="pt-BR"><p>Michael Nielsen, 2015, <em>Neural Networks and Deep Learning</em>, capítulo 1, &quot;Using neural nets to recognize handwritten digits&quot;, até a seção sobre a arquitetura das redes: <a href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener">neuralnetworksanddeeplearning.com/chap1.html</a>.</p>
+</div></div></div>
+      </div>
+    </section>
+    <section class="section seam cr-band section--lit" style="--seam-from:var(--bg-0)" aria-labelledby="obras-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="obras-t"><i class="ph ph-books" aria-hidden="true"></i><span data-i18n="courses.papers">Papers and books</span></h2><p class="cr-intro fade-up"><span data-i18n="courses.papers_intro">Every work cited in the class material, with the official link. The first page appears where the PDF is open access.</span></p><ol class="cr-refs fade-up"><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://gallica.bnf.fr/ark:/12148/bpt6k2982c/f540.item" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-cauchy-1847.20e0063737.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="fr"><a href="https://gallica.bnf.fr/ark:/12148/bpt6k2982c/f540.item" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Méthode générale pour la résolution des systèmes d&#x27;équations simultanées</span></a></p><p class="cr-ref-by">Augustin-Louis Cauchy · <span class="cr-mono">1847</span></p><p class="cr-ref-venue">Comptes rendus hebdomadaires des séances de l&#x27;Académie des sciences 25:536-538, sessão de 18/10/1847</p><p class="cr-ref-note">Domínio público. A capa é a página 536, a primeira da nota.</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://gallica.bnf.fr/ark:/12148/bpt6k2982c/f540.item" target="_blank" rel="noopener"><span class="cr-wave">Gallica, BnF, tomo 25, página 536</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://isl.stanford.edu/~widrow/papers/c1960adaptiveswitching.pdf" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-widrow-hoff-1960.a640a7e263.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://isl.stanford.edu/~widrow/papers/c1960adaptiveswitching.pdf" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Adaptive switching circuits</span></a></p><p class="cr-ref-by">Bernard Widrow e Marcian E. Hoff · <span class="cr-mono">1960</span></p><p class="cr-ref-venue">IRE WESCON Convention Record, parte 4, 96-104</p><p class="cr-ref-note">O Record da WESCON não tem página de editora nem DOI; o PDF é o que Widrow mantém em Stanford.</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://isl.stanford.edu/~widrow/papers/c1960adaptiveswitching.pdf" target="_blank" rel="noopener"><span class="cr-wave">isl.stanford.edu, o PDF no site de Widrow</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://isl.stanford.edu/~widrow/papers/j1963adalinesmarter.pdf" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-widrow-1963.e1c66322aa.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://isl.stanford.edu/~widrow/papers/j1963adalinesmarter.pdf" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">ADALINE: Smarter than Sweet</span></a></p><p class="cr-ref-by">Bernard Widrow · <span class="cr-mono">1963</span></p><p class="cr-ref-venue">Stanford Today, série 1, número 6, setembro de 1963</p><p class="cr-ref-note">De onde vêm as duas fotos da Adaline dos slides.</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://isl.stanford.edu/~widrow/papers/j1963adalinesmarter.pdf" target="_blank" rel="noopener"><span class="cr-wave">isl.stanford.edu, o PDF no site de Widrow</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://doi.org/10.4171/DMS/6/27" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-lemarechal-2012.b6642b7031.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.4171/DMS/6/27" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Cauchy and the gradient method</span></a></p><p class="cr-ref-by">Claude Lemaréchal · <span class="cr-mono">2012</span></p><p class="cr-ref-venue">Documenta Mathematica, volume extra ISMP, 251-254</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.4171/DMS/6/27" target="_blank" rel="noopener"><span class="cr-wave">doi:10.4171/DMS/6/27</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://ems.press/content/book-chapter-files/27368" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Neural Networks and Deep Learning</span></a></p><p class="cr-ref-by">Michael A. Nielsen · <span class="cr-mono">2015</span></p><p class="cr-ref-venue">Determination Press, livro online; CC BY-NC 3.0</p><p class="cr-ref-note">O endereço só abre em http: o certificado do servidor é de outro domínio.</p><p class="cr-ref-links"><a class="cr-ref-link" href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener"><span class="cr-wave">neuralnetworksanddeeplearning.com</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-sohl-dickstein-2024.acf21d8bd9.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">The boundary of neural network trainability is fractal</span></a></p><p class="cr-ref-by">Jascha Sohl-Dickstein · <span class="cr-mono">2024</span></p><p class="cr-ref-venue">arXiv:2402.06184; CC BY 4.0</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener"><span class="cr-wave">arXiv:2402.06184</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://arxiv.org/pdf/2402.06184" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li></ol><details class="cr-more glass glass--flat fade-up"><summary><i class="ph ph-link" aria-hidden="true"></i><span data-i18n="courses.other_sources">Other sources</span> <span class="cr-mono cr-muted">7</span><i class="ph ph-caret-down cr-more-caret" aria-hidden="true"></i></summary><ul class="cr-sources" lang="pt-BR"><li><a href="https://en.wikipedia.org/wiki/Gradient_descent" target="_blank" rel="noopener">Gradient descent</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/ADALINE" target="_blank" rel="noopener">ADALINE</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Least_mean_squares_filter" target="_blank" rel="noopener">Least mean squares filter</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Adaptive_filter" target="_blank" rel="noopener">Adaptive filter</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://pt.wiktionary.org/wiki/gradiente" target="_blank" rel="noopener">gradiente</a> <span class="cr-muted">Wiktionary em português</span></li><li><a href="https://pt.wiktionary.org/wiki/degrau" target="_blank" rel="noopener">degrau</a> <span class="cr-muted">Wiktionary em português</span></li><li><a href="https://pt.wikipedia.org/wiki/Parque_Estadual_do_Ibitipoca" target="_blank" rel="noopener">Parque Estadual do Ibitipoca</a> <span class="cr-muted">Wikipedia em português, verbete</span></li></ul></details>
+      </div>
+    </section>
+    <section class="section seam cr-band cr-band--last" style="--seam-from:var(--bg-0)" aria-labelledby="creditos-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="creditos-t"><i class="ph ph-images" aria-hidden="true"></i><span data-i18n="courses.credits">Image credits</span></h2><div class="cr-credits fade-up cr-prose" lang="pt-BR"><p>As três fotos são do Wikimedia Commons; as outras imagens saem do código desta
+pasta.</p>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>O que mostra</th>
+<th>Autor</th>
+<th>Licença</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/knobby-adaline.758435081a.webp">knobby-adaline.jpg</a></td>
+<td>a Knobby Adaline dos Stanford Electronics Labs, na capa; &quot;Knobby ADALINE.jpg&quot;, reduzida</td>
+<td>Stanford Today, 1963</td>
+<td>domínio público nos Estados Unidos, direito autoral não renovado</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/widrow-adaline.198ba25113.webp">widrow-adaline.jpg</a></td>
+<td>Bernard Widrow com uma Adaline; &quot;Bernard Widrow with ADALINE.jpg&quot;, reduzida</td>
+<td>Stanford Today, 1963</td>
+<td>domínio público nos Estados Unidos, direito autoral não renovado</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/cauchy.be8bedcea7.webp">cauchy.jpg</a></td>
+<td>retrato de Augustin-Louis Cauchy, litografia, por volta de 1840; &quot;Cauchy Augustin Louis dibner coll SIL14-C2-03a.jpg&quot;, coleção Dibner do Smithsonian, reduzido</td>
+<td>Louis Grégoire e Deneux</td>
+<td>domínio público</td>
+</tr>
+</tbody>
+</table>
+<p>As fontes dos vídeos, IBM Plex Sans e Source Serif 4, as mesmas dos slides, estão
+em <a href="../../../../credits.html">infra/fontes/</a>, com as licenças, a SIL Open Font License.</p>
+</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../assets/js/main.min.js?v=0ce0a739f0"></script>
+  <script type="module" src="../../../../assets/js/courses.min.js?v=0ce0a739f0"></script>
+  <script src="../../../../assets/js/analytics.min.js?v=0ce0a739f0" defer></script>
+</body>
+</html>
