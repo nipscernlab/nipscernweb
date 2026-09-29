@@ -68,6 +68,17 @@ canal não batem com o que o README cita. O deck sai de `slides/project/`, com o
 mapa de `/_blob/` lido do `ARQUIVOS` e do `VIDEOS` do `slides.py` da aula, pela
 árvore sintática, sem executar o arquivo.
 
+## Quando o site publica diferente do curso
+
+`correcoes`, na entrada da aula, troca um trecho de um arquivo do curso (o HTML de
+um slide, o roteiro) antes de qualquer leitura; `correcoes_pdf` troca linhas de
+texto numa página do PDF dos slides, no mesmo lugar e com a fonte do
+`infra/fontes/` que o slide usa. Cada trecho tem de aparecer exatamente uma vez:
+quando o repositório do curso for corrigido, a rodada falha por não achar o
+trecho, e a entrada sai do `.json`. A primeira é a do slide 8 da aula 1, que dizia
+"cada célula do TileCal" e agora diz o que o artigo citado fez, em sinais
+simulados de calorímetro.
+
 ## O que nunca sai
 
 - `mensagens/` e `__pycache__`, e todo arquivo de `codigo_retido`.
