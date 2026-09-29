@@ -14,7 +14,17 @@ e apaga de `library/courses/` o que não escreveu naquela rodada.
 | `/library/courses/<curso>/class-NN/code/` | o código da aula, com destaque e download |
 
 Os PDFs e os vídeos vão para o nipscern-assets e são servidos em
-`https://cdn.nipscern.com/courses/<curso>/`.
+`https://cdn.nipscern.com/courses/<curso>/`. O endereço curto `/library/<curso>/`,
+o que se digita de memória, é uma página de redirecionamento para
+`/library/courses/<curso>/`, gravada pela mesma ferramenta; por isso um curso não
+pode se chamar `sapho` nem `cgvweb`, que são rotas de Worker em `/library/`. A
+navegação do site tem o item "Cursos", que acende em toda página abaixo de
+`/library/courses/`.
+
+No fim de cada rodada, a ferramenta abre as páginas que gerou e confere cada
+`href`, `src`, `data-src`, `data-video` e pôster: o que é do site tem de existir, o
+que é do CDN tem de ter sido publicado na rodada, e a âncora tem de existir no
+destino. Endereço quebrado faz a rodada falhar.
 
 ## Rodar
 

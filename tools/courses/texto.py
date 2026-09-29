@@ -64,6 +64,56 @@ def _vetores(md):
     return "".join(p if p.startswith(("`", "$")) else troca(p) for p in partes)
 
 
+def notas_em_html(notas):
+    """As anotações do apresentador, do texto do <aside> para parágrafos com os vetores desenhados.
+
+    A anotação é texto corrido, um parágrafo por linha, com o vetor escrito w⃗,
+    a letra e a seta combinada. A fonte do painel de anotações não tem a seta,
+    como nenhuma do site, e ela saía torta; aqui cada w⃗ vira \\vec{w} pelo KaTeX,
+    a mesma seta do roteiro. Todas as anotações de um deck numa chamada só.
+    Devolve, na ordem, o HTML de cada uma.
+    """
+    marcas, pedidos = [], []
+    for texto_nota in notas:
+        paragrafos = []
+        for linha in html.unescape(texto_nota).split("\n"):
+            linha = linha.strip()
+            if not linha:
+                continue
+            partes = re.split(r"([A-Za-z]|∇)⃗", linha)
+            saida = html.escape(partes[0])
+            for k in range(1, len(partes), 2):
+                letra = "\\nabla" if partes[k] == "∇" else partes[k]
+                pedidos.append((f"\\vec{{{letra}}}", False))
+                saida += f"\x00{len(pedidos) - 1}\x00" + html.escape(partes[k + 1])
+            paragrafos.append(f"<p>{saida}</p>")
+        marcas.append("".join(paragrafos))
+    desenhos = katex(pedidos)
+    return [re.sub("\x00(\\d+)\x00", lambda m: desenhos[int(m.group(1))], h) for h in marcas]
+
+
+_LEITURA = re.compile(r'^(?P<autor>[^,]+), (?P<ano>\d{4}), \*(?P<obra>[^*]+)\*, (?P<parte>capítulo \d+), '
+                      r'"(?P<titulo>[^"]+)"(?:, (?P<resto>[^:]+))?: (?P<url>\S+?)\.?$')
+
+
+def leitura(linha):
+    """Um texto do estudo da semana, como o README escreve o do Nielsen, em partes.
+
+    'Michael Nielsen, 2015, *Neural Networks and Deep Learning*, capítulo 1,
+    "Using neural nets...", até a seção sobre a arquitetura das redes:
+    neuralnetworksanddeeplearning.com/chap1.html.' Com as partes, o cartão do
+    texto tem a mesma forma dos cartões de vídeo ao lado. Fora desse formato,
+    devolve None, e o texto aparece como o README escreve.
+    """
+    m = _LEITURA.match(linha)
+    if not m:
+        return None
+    url = m.group("url")
+    if not url.startswith("http"):
+        url = ("http://" if url.split("/")[0] in SO_HTTP else "https://") + url
+    return {**m.groupdict(), "url": url}
+
+
 def _conserta_tabelas(md):
     linhas = md.split("\n")
     saida = []
