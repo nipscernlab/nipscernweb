@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <title>Aula 2: derivada, gradiente e gradiente descendente | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Study guide of class 2 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-02/study-guide/">
+  <meta property="og:title" content="Aula 2: derivada, gradiente e gradiente descendente | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Study guide of class 2 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-02/study-guide/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=0ce0a739f0">
+  <link rel="stylesheet" href="../../../../../assets/css/main.min.css?v=0ce0a739f0">
+  <link rel="stylesheet" href="../../../../../assets/css/courses.min.css?v=0ce0a739f0">
+  <link rel="stylesheet" href="../../../../../assets/css/vendor/katex.min.css?v=0ce0a739f0">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero cr-hero--slim">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../"><span data-i18n="courses.class">Class</span> 2</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.study_guide">Study guide</span></span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></p><h1 class="display-md fade-up" lang="pt-BR">Aula 2: derivada, gradiente e gradiente descendente</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 02/10/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">Segundo andar do PPEE</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="../slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="../"><i class="ph ph-arrow-left" aria-hidden="true"></i><span data-i18n="courses.back_to_class">Back to the class</span></a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band cr-band--guide" style="--seam-from:var(--bg-0)">
+      <div class="container cr-guide-grid">
+        <nav class="cr-toc" aria-labelledby="toc-t"><p class="cr-toc-title" id="toc-t"><span data-i18n="courses.on_this_page">On this page</span></p><ol lang="pt-BR"><li><a href="#os-topicos">Os tópicos</a></li><li><a href="#notacao">Notação</a></li><li><a href="#1-revisao-da-aula-1">1. Revisão da aula 1</a></li><li><a href="#2-seminario-os-videos-e-o-perceptron">2. Seminário: os vídeos e o perceptron</a></li><li><a href="#3-o-neuronio-sem-o-degrau-e-a-perda">3. O neurônio sem o degrau e a perda</a></li><li><a href="#4-a-derivada">4. A derivada</a></li><li><a href="#5-derivada-parcial-e-gradiente">5. Derivada parcial e gradiente</a></li><li><a href="#6-gradiente-descendente-e-a-taxa-de-aprendizado">6. Gradiente descendente e a taxa de aprendizado</a></li><li><a href="#7-de-onde-vem-cauchy-widrow-e-hoff">7. De onde vem: Cauchy, Widrow e Hoff</a></li><li><a href="#8-o-codigo">8. O código</a></li><li><a href="#9-fechamento">9. Fechamento</a></li><li><a href="#perguntas-que-podem-aparecer">Perguntas que podem aparecer</a></li><li><a href="#para-estudar">Para estudar</a></li><li><a href="#fontes-dos-fatos-citados">Fontes dos fatos citados</a></li></ol></nav>
+        <article class="cr-prose cr-guide" lang="pt-BR">
+<p>Material de estudo para acompanhar os slides. Sexta, 02/10/2026, das 12h às 14h, no
+segundo andar do PPEE.</p>
+<p>O objetivo da aula é saber dizer o que é a derivada e calculá-la pela definição, montar
+a perda de um neurônio linear, derivar a perda em relação a cada parâmetro, dar um passo
+de gradiente descendente à mão e explicar por que uma taxa grande demais faz o treino
+divergir.</p>
+<h2 id="os-topicos">Os tópicos</h2>
+<p>Sem horário marcado: o que não couber hoje entra na aula 3.</p>
+<ol>
+<li>Revisão da aula 1</li>
+<li>Seminário: os vídeos e o perceptron</li>
+<li>O neurônio sem o degrau e a perda</li>
+<li>A derivada</li>
+<li>Derivada parcial e gradiente</li>
+<li>Gradiente descendente e a taxa de aprendizado</li>
+<li>De onde vem: Cauchy, Widrow e Hoff</li>
+<li>O código</li>
+<li>Fechamento</li>
+</ol>
+<h2 id="notacao">Notação</h2>
+<p>Os símbolos novos dos slides, na ordem em que aparecem. Cada um também é definido na
+nota do slide em que aparece primeiro; os da aula 1 estão no roteiro dela.</p>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Lê-se</th>
+<th>Quer dizer</th>
+<th>Slide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mi>w</mi><mtext> </mtext><mi>x</mi><mo>+</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">y = w\,x + b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span></td>
+<td>y é igual a w x mais b</td>
+<td>o neurônio sem o degrau, com uma entrada: w e b são números, e a saída é a própria soma</td>
+<td>6</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>t</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(x_i,\ t_i)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td>x i, t i</td>
+<td>o exemplo número i: a entrada e a resposta certa</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo separator="true">,</mo><mtext> </mtext><mi>N</mi></mrow><annotation encoding="application/x-tex">i,\ N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span></td>
+<td>i, N</td>
+<td>i conta os exemplos, de 1 a N, o número de exemplos</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo stretchy="false">(</mo><mi>w</mi><mo separator="true">,</mo><mtext> </mtext><mi>b</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">L(w,\ b)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">L</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span></span></span></span></td>
+<td>L de w e b</td>
+<td>a perda, que depende do peso e do viés; L de loss, perda em inglês</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></msubsup></mrow><annotation encoding="application/x-tex">\sum_{i=1}^{N}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.2809em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9812em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>somatório de i igual a 1 até N</td>
+<td>soma o termo seguinte para i = 1, 2, …, N</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span></td>
+<td>f de x</td>
+<td>a saída da função f para a entrada x</td>
+<td>10</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>f</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">f&#x27;(x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span></td>
+<td>f linha de x</td>
+<td>a derivada de f em x: a inclinação da tangente</td>
+<td>10</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi>lim</mi><mo>⁡</mo></mrow><mrow><mi>h</mi><mo>→</mo><mn>0</mn></mrow></msub></mrow><annotation encoding="application/x-tex">\lim_{h \to 0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mop"><span class="mop">lim</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">h</span><span class="mrel mtight">→</span><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>limite quando h tende a zero</td>
+<td>o valor de que a conta se aproxima quando h fica cada vez menor</td>
+<td>10</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span></td>
+<td>h</td>
+<td>a variação pequena da entrada</td>
+<td>10</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>L</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>w</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">L&#x27;(w)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mclose">)</span></span></span></span></td>
+<td>L linha de w</td>
+<td>a derivada da perda em relação ao peso, quando a perda só depende dele</td>
+<td>12</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>w</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.2251em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal mtight" style="margin-right:0.0269em;">w</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td>derivada parcial de L em relação a w</td>
+<td>a derivada de L quando só w varia e o resto fica parado</td>
+<td>13</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal">∇</mi><mo>⃗</mo></mover><mi>L</mi></mrow><annotation encoding="application/x-tex">\vec{\nabla} L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9663em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">∇</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span><span class="mord mathnormal">L</span></span></span></span></td>
+<td>nabla L, o gradiente de L</td>
+<td>o vetor das derivadas parciais; aponta para onde L mais cresce</td>
+<td>13</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo></mrow><annotation encoding="application/x-tex">\approx</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mrel">≈</span></span></span></span></td>
+<td>aproximadamente igual</td>
+<td>os dois lados quase iguais, e mais iguais quanto menor o passo</td>
+<td>18</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><mi>a</mi><mi mathvariant="normal">∣</mi></mrow><annotation encoding="application/x-tex">\vert a\vert </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal">a</span><span class="mord">∣</span></span></span></span></td>
+<td>valor absoluto de a</td>
+<td>o número sem o sinal: |−1,1| = 1,1</td>
+<td>17</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span></td>
+<td>teta</td>
+<td>o tamanho do passo na nota de Cauchy, o η de hoje</td>
+<td>19</td>
+</tr>
+</tbody>
+</table>
+<p>Na prática, estas peças do NumPy e do matplotlib resolvem quase tudo:</p>
+<ul>
+<li><code>rng = np.random.default_rng(2)</code>: o gerador de números aleatórios, com a semente 2;
+<code>rng.uniform(0, 2, 20)</code> sorteia 20 números entre 0 e 2, e <code>rng.normal(0, 0.3, 20)</code>,
+20 números da curva normal com média 0 e desvio-padrão 0,3.</li>
+<li><code>np.mean(v)</code>: a média dos elementos de v, o (1/N) Σ das fórmulas.</li>
+<li><code>w * x + b</code>: com x um array, a conta vale elemento a elemento, e sai a saída dos
+20 pontos de uma vez.</li>
+<li><code>(y - t) ** 2</code>: eleva cada erro ao quadrado; <code>**</code> é a potência, e <code>^</code> não é.</li>
+<li><code>plt.semilogy(passos, perdas)</code>: gráfico com o eixo vertical em escala logarítmica,
+para a perda que explode caber junto com a que cai.</li>
+</ul>
+<h2 id="1-revisao-da-aula-1">1. Revisão da aula 1</h2>
+<h3 id="slide-1-a-capa">Slide 1: A capa <a class="cg-slide-link" href="../slides/#1" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A aula 2 trata de como um neurônio acha os próprios pesos quando a resposta é um número, e não só 0 ou 1: a derivada, a derivada parcial, o gradiente e o gradiente descendente, o método que treina as redes neurais.</p>
+<p>A foto é da Knobby Adaline, a Adaline dos botões, dos Stanford Electronics Labs, publicada na revista Stanford Today em 1963. É um neurônio de verdade, em circuito, que aprendia pelo gradiente: os botões guardam os pesos, o medidor mostra o erro, e as 16 chaves embaixo formam a entrada. A mão que gira um botão faz, à mão, um passo do gradiente descendente. A máquina volta no fim da aula, com a história de Widrow e Hoff.</p>
+<h3 id="slide-2-revisao-de-memoria">Slide 2: Revisão, de memória <a class="cg-slide-link" href="../slides/#2" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A revisão começa de memória, antes de qualquer vídeo: quatro perguntas, e a turma responde falando. O que o neurônio calcula? A soma ponderada das entradas mais o viés, z = <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> · <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + b, e o degrau decide: dispara, saída 1, se z ≥ 0. O que a regra faz quando erra? Soma ou subtrai a entrada dos pesos, conforme o sinal de t − y, e mexe o viés do mesmo jeito: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> ← <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + η (t − y) <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> e b ← b + η (t − y). Por que o treino do E termina? Porque o E é linearmente separável: existe uma reta com os pontos de resposta 1 de um lado e os de resposta 0 do outro, e o teorema garante que a regra acha uma reta assim num número finito de correções. E no XOR? Nenhuma reta separa, a prova da aula 1, e a regra corrige para sempre.</p>
+<p>Depois das respostas, os dois vídeos dos slides seguintes mostram as mesmas coisas acontecendo.</p>
+<h3 id="slide-3-revisao-o-perceptron-no-e">Slide 3: Revisão: o perceptron no E <a class="cg-slide-link" href="../slides/#3" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo é o perceptron da aula 1 aprendendo o E, com os números do perceptron.py: pesos e viés começam em zero, η = 1, e os quatro exemplos vêm sempre na mesma ordem. À esquerda, o plano (x₁, x₂) com os quatro pontos, a reta z = 0, a região azul, onde o neurônio dispara, e a seta azul, o vetor dos pesos, perpendicular à reta e apontando para o lado que dispara, com o comprimento proporcional ao tamanho de <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>. A cada correção, a seta desliza pela reta até um ponto longe dos quatro exemplos.</p>
+<p>Na primeira época, cada exemplo aparece com a conta inteira: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> e t, o z, a saída y e, quando erra, as letras das regras viram os números, pedaço por pedaço. Na segunda, a conta entra escrita, mais depressa. Da terceira em diante, a conta dá lugar à tabela das épocas, a que o perceptron.py imprime: quantos erros em cada época e os pesos no fim dela. Os erros por época são 2, 3, 3, 2, 1 e 0. Na sexta, nenhum exemplo erra, com <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (2, 1) e b = −3.</p>
+<p>O primeiro exemplo mostra um detalhe: com tudo zero, z = 0 em todo ponto, o degrau dá 1, e o neurônio dispara no plano inteiro. Por isso a entrada (0, 0), de resposta 0, já dá erro, e a regra do viés baixa b para −1; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> não muda, porque <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (0, 0). Com <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (0, 0) não há reta, e a seta só aparece na primeira correção que muda os pesos, a do exemplo 4.</p>
+<h3 id="slide-4-revisao-o-perceptron-no-xor">Slide 4: Revisão: o perceptron no XOR <a class="cg-slide-link" href="../slides/#4" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A mesma regra, começando do mesmo jeito, no XOR, o ou exclusivo: resposta 1 em (0, 1) e (1, 0), resposta 0 em (0, 0) e (1, 1). O plano vai de −1,5 a 2,5, porque as retas desse treino passam por x₁ = −1 e por x₂ = −1. À direita, a época, os erros dela e os pesos; embaixo, o gráfico dos erros por época.</p>
+<p>As duas primeiras épocas têm 3 erros cada; da terceira em diante, os quatro exemplos erram em toda época. No fim de toda época a partir da segunda, os pesos voltam a <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (−1, 0) e o viés a b = 0, e dentro de cada época a reta passa pelas mesmas quatro posições: x₁ = −1, a diagonal x₂ = x₁, x₂ = −1 e x₁ = 0. A regra anda em círculo. É o que o perceptron.py imprimiu na aula 1: depois de 20 épocas ainda erra, com os mesmos pesos em todas as linhas. Da quinta época em diante, o vídeo acelera e tira da tela os erros e os pesos, que mudariam rápido demais para ler; o gráfico conta os erros.</p>
+<p>Por que não para: a regra só fica parada quando nenhum exemplo erra, e isso pede uma reta que separe os pontos. No XOR, nenhuma reta separa, então toda época tem pelo menos um erro e uma correção. Os pesos, porém, não crescem sem limite: giram entre os mesmos valores. Divergir, no gradiente descendente desta aula, é a perda crescer sem parar; no XOR, o treino não diverge, ele não converge.</p>
+<p>A aula 3 resolve o XOR com uma camada de dois neurônios no meio.</p>
+<h2 id="2-seminario-os-videos-e-o-perceptron">2. Seminário: os vídeos e o perceptron</h2>
+<h3 id="slide-5-seminario">Slide 5: Seminário <a class="cg-slide-link" href="../slides/#5" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O seminário tem duas partes. Na primeira, a turma responde às três perguntas sobre os vídeos. No vídeo do 3Blue1Brown, cada neurônio guarda um número entre 0 e 1, e não só 0 ou 1: com a saída contínua, uma mudança pequena nos pesos muda pouco a saída, e dá para corrigir aos poucos; com o degrau, a saída pula de 0 para 1 e não diz quanto falta. O que o vídeo chama de custo, cost, é o que aqui se chama de perda: um número só que mede o quanto a rede erra. E a derivada num instante parece um paradoxo porque variação pede dois instantes; o vídeo resolve olhando para onde vai a razão entre as variações quando o intervalo encolhe, a ideia do slide da derivada.</p>
+<p>Na segunda parte, quem apresenta explica o próprio perceptron de E e OU, linha a linha, e compara a tabela que o programa imprime com a do slide das épocas da aula 1. Cada um dos demais traz uma pergunta.</p>
+<h2 id="3-o-neuronio-sem-o-degrau-e-a-perda">3. O neurônio sem o degrau e a perda</h2>
+<h3 id="slide-6-o-neuronio-sem-o-degrau">Slide 6: O neurônio sem o degrau <a class="cg-slide-link" href="../slides/#6" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O neurônio desta aula é o da aula 1 sem o degrau: a saída é a própria soma, y = w x + b. Com uma entrada só, x, o neurônio desenha uma reta: w é a inclinação, e b é a altura em que a reta corta o eixo vertical. Ajustar o neurônio a exemplos é ajustar uma reta a pontos, o que a estatística chama de regressão linear: prever um número a partir de outro com uma reta.</p>
+<p>Sem o degrau, a saída é um número qualquer, e o erro passa a ter tamanho: y − t diz quanto e para que lado o neurônio errou, e não só se errou. É esse tamanho que a derivada usa. Um neurônio assim, treinado pelo gradiente, é a Adaline de Widrow e Hoff, de 1960, que aparece no fim da aula.</p>
+<h3 id="slide-7-o-erro-quadratico-medio">Slide 7: O erro quadrático médio <a class="cg-slide-link" href="../slides/#7" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Os dados são 20 exemplos (xᵢ, tᵢ), sorteados em volta da reta t = 2x + 1, com x entre 0 e 2 e um ruído somado a cada t, um erro aleatório como o de uma medida. A semente do sorteio, o número que fixa a sequência sorteada, é 2: com ela, os pontos saem sempre os mesmos. O índice i conta os exemplos, de 1 a N = 20, como o k contava as entradas na aula 1.</p>
+<p>A perda desta aula é o erro quadrático médio, o EQM: L(w, b) = (1/N) Σ (yᵢ − tᵢ)², com yᵢ = w xᵢ + b, a média dos quadrados dos erros. A letra L vem de loss, perda em inglês; no vídeo, a mesma ideia se chama custo e usa C. O E ficou de fora porque, desde a aula 1, o E é a função lógica.</p>
+<p>Elevar ao quadrado faz duas coisas. Todo erro vira positivo, e um erro para cima não cancela outro para baixo. E um erro grande pesa bem mais que um pequeno: o dobro do erro dá o quádruplo do quadrado.</p>
+<p>Na figura, a reta y = x + 1,5, ruim de propósito, tem perda 0,556; os segmentos laranja são os erros de cada ponto. A melhor reta possível tem w = 2,056 e b = 0,967, com perda 0,087; ela não é exatamente t = 2x + 1 por causa do ruído. Com w = b = 0, a perda é 9,198. Treinar é achar o w e o b que deixam L no mínimo.</p>
+<h3 id="slide-8-a-perda-depende-do-peso">Slide 8: A perda depende do peso <a class="cg-slide-link" href="../slides/#8" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A perda é uma função dos parâmetros: cada par (w, b) dá uma reta, e cada reta dá um número, a perda. O vídeo mostra isso com um parâmetro só. O viés fica parado em b = 0,967, o da melhor reta, e só w muda, de 0,2 a 4. À esquerda, a reta gira em volta do ponto em que corta o eixo vertical, e os segmentos laranja, os erros de cada ponto, encolhem e crescem; à direita, a perda de cada w vai desenhando a curva L(w). Com w = 0,2, L = 3,813; com w = 4, L = 4,178.</p>
+<p>A curva é uma parábola, com um fundo só: com b parado, cada erro, yᵢ − tᵢ = w xᵢ + b − tᵢ, é do primeiro grau em w, e a média dos quadrados é do segundo grau. No fim, o ponto volta ao fundo, em w = 2,056, com L = 0,087, e a reta do fundo é a que melhor passa pelos pontos. Que o fundo com b parado no melhor valor caia no mesmo w da melhor reta é dedução: no mínimo, as duas derivadas parciais, cujas fórmulas vêm mais adiante, são zero.</p>
+<p>Treinar é achar esse fundo. Com a curva inteira desenhada, é fácil; o neurônio não vê a curva, só o ponto em que está. A pergunta do slide seguinte é como achar o fundo vendo só a vizinhança do ponto.</p>
+<h3 id="slide-9-para-que-lado-mexer">Slide 9: Para que lado mexer? <a class="cg-slide-link" href="../slides/#9" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A pergunta da aula. Com dois parâmetros, dá até para testar valores ao acaso; com os milhões de pesos de uma rede de hoje, não. A resposta está na inclinação da perda: se, mexendo w um pouco para cima, a perda sobe, o certo é mexer para baixo, e quanto mais íngreme, maior pode ser o passo. Medir essa inclinação é o que a derivada faz.</p>
+<h2 id="4-a-derivada">4. A derivada</h2>
+<h3 id="slide-10-a-derivada">Slide 10: A derivada <a class="cg-slide-link" href="../slides/#10" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A derivada mede quanto a saída de uma função muda quando a entrada muda um pouco. Função, no curso, é uma regra que leva cada número de entrada a um número de saída, como f(x) = x².</p>
+<p>A razão (f(x + h) − f(x))/h é a inclinação da reta secante, a que liga dois pontos do gráfico separados por h na horizontal. Quando h encolhe, a secante gira e se aproxima da reta tangente, a que só encosta no gráfico naquele ponto; a inclinação da tangente é a derivada, f′(x), que se lê f linha de x. Na figura, f(x) = x² e x = 1: com h = 1, a secante tem inclinação 3; com h = 0,5, 2,5; a tangente, 2.</p>
+<p>O lim, de limite, se lê limite quando h tende a zero: é o valor de que a razão se aproxima quando h fica cada vez menor, sem precisar chegar a zero, onde a conta daria 0/0. É assim que o vídeo do 3Blue1Brown desfaz o paradoxo da derivada num instante: não se divide por zero; olha-se para onde a razão vai. A outra notação comum, df/dx, de Leibniz, lembra a mesma razão, uma variação pequena de f dividida por uma variação pequena de x.</p>
+<p>O vídeo do slide faz h encolher de 1 até 0,01, com h e a inclinação escritos ao lado; a perna azul do degrau é h, e a laranja, f(1 + h) − f(1). Com h = 0,01, o degrau fica pequeno demais para se ver, e a câmera se aproxima 200 vezes do ponto (1, 1). De perto, a curva é quase uma reta, e o degrau aparece: anda 0,01 e sobe 0,0201, e 0,0201/0,01 = 2,01. É outro jeito de dizer o que é a derivada: de perto, uma curva lisa, sem bico, parece uma reta, e a inclinação dessa reta é a derivada. Na volta, a tangente, de inclinação 2, e o limite.</p>
+<p>No dia a dia, derivado é o que vem de outra coisa, como os derivados do leite; no curso, a derivada é só a taxa de variação.</p>
+<h3 id="slide-11-a-derivada-de-x2">Slide 11: A derivada de x² <a class="cg-slide-link" href="../slides/#11" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A derivada de x² sai da definição, com álgebra de ensino médio. Como (x + h)² = x² + 2xh + h², a razão fica ((x + h)² − x²)/h = (2xh + h²)/h = 2x + h. Quando h tende a zero, sobra 2x: a derivada de x² é 2x. Em x = 1, dá 2, a inclinação da tangente do slide anterior.</p>
+<p>A tabela faz a mesma conta com números, em x = 1: a razão vale 2 + h, e dá 3, 2,5, 2,1 e 2,01 para h = 1, 0,5, 0,1 e 0,01. É a derivada numérica: trocar o limite por um h pequeno. O computador faz assim quando não tem a fórmula, e é assim que o código confere o gradiente.</p>
+<p>Três regras saem da definição do mesmo jeito e bastam para a aula. A derivada de uma constante é 0, porque ela não varia. A de c·w, com c constante, é c, porque (c(w + h) − c w)/h = c. E a de uma soma é a soma das derivadas. Com elas e a derivada de w², sai a derivada da perda.</p>
+<h3 id="slide-12-a-derivada-diz-para-onde-descer">Slide 12: A derivada diz para onde descer <a class="cg-slide-link" href="../slides/#12" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A derivada diz para que lado fica o fundo. Na parábola L(w) = (w − 2)², o fundo, a menor perda, fica em w = 2. A derivada é 2(w − 2): expandindo, (w − 2)² = w² − 4w + 4, e as regras do slide anterior dão 2w − 4.</p>
+<p>Em w = 0,5, à esquerda do fundo, a inclinação é L′ = 2(0,5 − 2) = −3: negativa, a perda cai para a direita, e descer é aumentar w. Em w = 3,5, L′ = +3, e descer é diminuir w. Nos dois casos, o passo certo tem o sinal contrário ao da derivada.</p>
+<p>Daí a regra: w ← w − η L′(w). O η, a taxa de aprendizado da aula 1, dá o tamanho do passo; com η = 0,25, w vai de 0,5 para 1,25 e de 3,5 para 2,75, as setas da figura. Longe do fundo, a inclinação é grande e o passo também; perto, a inclinação encolhe, e os passos encolhem sozinhos.</p>
+<h2 id="5-derivada-parcial-e-gradiente">5. Derivada parcial e gradiente</h2>
+<h3 id="slide-13-derivada-parcial-um-corte-na-superficie">Slide 13: Derivada parcial: um corte na superfície <a class="cg-slide-link" href="../slides/#13" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A perda da reta depende de dois números, w e b, e o gráfico dela é uma superfície: cada ponto do chão é um par (w, b), e a altura é a perda daquele par. O ponto P é (w, b) = (0,5; −0,3), com perda 7,88.</p>
+<p>A derivada parcial em relação a w é a derivada que se obtém segurando b parado. No desenho, segurar b = −0,3 é cortar a superfície com o plano vertical b = −0,3, o laranja: o corte é uma parábola em w, e a derivada parcial ∂L/∂w é a inclinação da tangente a essa parábola em P, −5,66. Negativa: no sentido em que w cresce, a perda desce. Depois, o plano azul, w = 0,5, corta a superfície numa parábola em b, e ∂L/∂b é a inclinação da tangente a ela em P, −5,36. O ∂ é um d arredondado, que se lê de ou del, e avisa que as outras variáveis estão paradas.</p>
+<p>No fim, a câmera sobe, e o chão aparece de cima, com as curvas de nível, as linhas de mesma perda, como as de altitude num mapa. As duas inclinações viram duas setas no chão: a laranja, ao longo de w, e a azul, ao longo de b. Juntas, formam o gradiente, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal">∇</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{\nabla}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9663em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">∇</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>L = (−5,66; −5,36), a seta escura, que aponta para onde a perda mais sobe e sai em ângulo reto da curva de nível que passa por P. A seta vermelha, contra ele, aponta para onde a perda mais desce. As setas estão em 12% do tamanho: o gradiente mede 7,8, e inteiro sairia do desenho.</p>
+<h3 id="slide-14-as-derivadas-parciais-da-perda">Slide 14: As derivadas parciais da perda <a class="cg-slide-link" href="../slides/#14" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo do slide anterior mostrou as derivadas parciais como inclinações de cortes; aqui estão as fórmulas.</p>
+<p>Para o EQM, as duas saem das regras da derivada, sem nada novo. Com b parado, cada termo (w xᵢ + b − tᵢ)² é uma parábola em w: expandindo, w² xᵢ² + 2w xᵢ (b − tᵢ) + (b − tᵢ)², cuja derivada em w é 2w xᵢ² + 2xᵢ (b − tᵢ) = 2(yᵢ − tᵢ) xᵢ. A média dá ∂L/∂w = (2/N) Σ (yᵢ − tᵢ) xᵢ. Do mesmo jeito, com w parado, ∂L/∂b = (2/N) Σ (yᵢ − tᵢ).</p>
+<p>As fórmulas se leem assim: cada ponto puxa o parâmetro na proporção do próprio erro; em ∂L/∂w, o erro vem multiplicado pela entrada xᵢ, porque o peso só age através dela. Andar contra essa derivada dá w ← w + η (2/N) Σ (tᵢ − yᵢ) xᵢ: a forma da regra do perceptron, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> ← <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + η (t − y) <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>, agora com um erro de tamanho qualquer e com a média de todos os pontos.</p>
+<p>A derivada numérica confere: no código, em (w, b) = (0,5; −0,3), a fórmula dá (−5,6643; −5,3552), e a derivada numérica, os mesmos números até a sexta casa. A regra da cadeia, que deriva uma função dentro de outra, chega nas aulas 3 e 4 e encurta essas contas; aqui ela não é necessária.</p>
+<h3 id="slide-15-o-gradiente">Slide 15: O gradiente <a class="cg-slide-link" href="../slides/#15" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O gradiente junta as derivadas parciais num vetor: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal">∇</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{\nabla}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9663em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">∇</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>L = (∂L/∂w, ∂L/∂b). O símbolo ∇ se chama nabla e leva seta, como todo vetor nos slides. O gradiente aponta para onde a perda mais cresce, e o tamanho dele diz quão íngreme é a subida.</p>
+<p>O porquê: num passo pequeno (Δw, Δb), a perda muda aproximadamente ∂L/∂w · Δw + ∂L/∂b · Δb, que é o produto escalar <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal">∇</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{\nabla}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9663em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">∇</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>L · (Δw, Δb), o da aula 1; o ≈ se lê aproximadamente igual, e o Δ, delta, marca uma variação. Entre os passos de um mesmo tamanho, o produto escalar é máximo quando o passo aponta na direção do gradiente, e mínimo, o mais negativo, na direção oposta. Descer o mais depressa possível é andar contra o gradiente. Foi esse o argumento de Cauchy, em 1847.</p>
+<p>Na figura, as curvas de nível ligam os pontos de mesma perda, como as linhas de altitude de um mapa. As setas são o gradiente em pontos da curva de perda 1,5, e saem dela em ângulo reto: andando ao longo de uma curva de nível, a perda não muda, e o produto escalar do gradiente com esse deslocamento é zero, que é o que perpendicular quer dizer.</p>
+<p>É a promessa da aula 1. Em z = <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> · <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + b, a derivada parcial de z em relação a cada entrada é ∂z/∂xₖ = wₖ, então o gradiente de z em relação às entradas é o próprio <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>: por isso <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> é perpendicular à reta z = 0 e aponta para o lado em que z cresce.</p>
+<p>Gradiente vem do latim gradiens, que anda, particípio de gradior, dar passos, de gradus, passo. Degrau, a função da aula 1, vem da mesma raiz, gradus.</p>
+<h2 id="6-gradiente-descendente-e-a-taxa-de-aprendizado">6. Gradiente descendente e a taxa de aprendizado</h2>
+<h3 id="slide-16-gradiente-descendente">Slide 16: Gradiente descendente <a class="cg-slide-link" href="../slides/#16" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O gradiente descendente repete um passo: (w, b) ← (w, b) − η <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi mathvariant="normal">∇</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{\nabla}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9663em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">∇</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>L, isto é, w ← w − η ∂L/∂w e b ← b − η ∂L/∂b. Os dois parâmetros andam juntos, com o gradiente calculado antes de qualquer um mudar.</p>
+<p>A figura mostra a perda como superfície: cada ponto do chão é um par (w, b), e a altura é a perda daquele par. A superfície é uma tigela, um paraboloide, porque a perda é uma soma de quadrados; Widrow e Hoff já a descreviam assim em 1960. O caminho laranja começa em (0, 0), com perda 9,2, e em 100 passos com η = 0,1 chega a w = 2,022 e b = 1,002, com perda 0,0874, perto do mínimo, 0,0871.</p>
+<p>O vídeo do slide mostra os primeiros 60 passos. À direita, fixos na tela, os 20 pontos e a reta do passo atual, com o passo e a perda escritos em cima. No passo 0, w = b = 0, a reta é y = 0 e a perda é 9,198; no passo 4, 0,317; no passo 60, 0,090. Cada ponto do chão da tigela é uma reta, e descer a tigela é a reta chegar aos pontos. No fim, a superfície some, a câmera sobe, e a mesma descida aparece vista de cima, sobre as curvas de nível: o desenho do slide do gradiente, agora com o caminho.</p>
+<p>O caminho faz uma curva: primeiro desce a parede íngreme da tigela, depois anda devagar pelo fundo do vale, que é comprido e quase plano numa direção. Vale assim é comum em problemas reais, e é uma das razões de haver métodos que corrigem o gradiente puro, como o Adam, que entra no estudo da aula 6.</p>
+<h3 id="slide-17-a-taxa-de-aprendizado">Slide 17: A taxa de aprendizado <a class="cg-slide-link" href="../slides/#17" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A taxa de aprendizado decide se o treino chega. Na parábola L(w) = (w − 2)², começando em w = 0, cada passo multiplica a distância até o fundo por (1 − 2η): o passo é −η · 2(w − 2), e w − 2 vira (w − 2) − 2η (w − 2).</p>
+<p>Com η = 0,1, o fator é 0,8: a distância cai 20% por passo, e w chega devagar. Com η = 0,9, o fator é −0,8: w pula para o outro lado do fundo a cada passo, mas cada pulo é menor que o anterior, e chega. Com η = 1,05, o fator é −1,1: cada pulo é maior que o anterior, e o treino diverge, a perda cresce sem parar.</p>
+<p>O limite fica em |1 − 2η| = 1, isto é, η = 1; as barras em volta de um número são o valor absoluto, o número sem o sinal. Abaixo de 1, converge; acima, diverge. Com η = 0,5, o fator é zero, e w chega ao fundo num passo só. Widrow e Hoff escreveram essa conta em 1960, para a parábola y = a(x − b)² + c: o processo é estável quando o passo fica abaixo de 1/a, e acaba num passo quando é 1/(2a). Aqui, a = 1.</p>
+<p>O vídeo do slide faz os três casos, um depois do outro, com três passos cada, e escreve a distância até o fundo com o sinal, w − 2, a cada passo: −2; −1,6; −1,28; −1,02 com η = 0,1, sempre do mesmo lado; −2; 1,6; −1,28; 1,02 com η = 0,9, trocando de lado a cada passo; e −2; 2,2; −2,42; 2,66 com η = 1,05, trocando de lado e crescendo. As setas do último caso ficam na tela, com a condição para convergir embaixo.</p>
+<h3 id="slide-18-um-limiar-de-novo">Slide 18: Um limiar de novo <a class="cg-slide-link" href="../slides/#18" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Com dois parâmetros, a ideia é a mesma. A figura treina a reta com taxas de 0,005 a 0,6, de 0,0025 em 0,0025, 100 passos cada, e marca a perda do fim. Até perto de 0,5, a taxa chega à menor perda, 0,087; as bem pequenas ainda não chegaram em 100 passos. A partir de η = 0,514, a perda explode.</p>
+<p>Para quem já viu autovalores: a hessiana, a tabela das derivadas segundas da perda, é H = (2/N) [[Σ xᵢ², Σ xᵢ], [Σ xᵢ, N]] e não depende de w nem de b. A tigela tem duas direções principais, com curvaturas iguais aos autovalores de H, 0,27 e 3,90; em cada uma, um passo multiplica a distância até o mínimo por (1 − η λ), em que λ, lambda, é o autovalor. O treino converge se |1 − η λ| &lt; 1 nas duas, isto é, se η &lt; 2/3,90 = 0,513. A varredura acha 0,514, com a precisão de 0,001 dela. Para quem não viu álgebra linear, a conta fica como caixa-preta: entra o conjunto dos x, sai o limiar, e ela não se abre agora porque pede autovalor; a turma acha o limiar pela varredura.</p>
+<p>É o limiar do projeto de dezembro. Lá, a mesma varredura se faz com duas taxas, uma por camada, e a fronteira entre convergir e divergir, que aqui é um ponto numa reta, vira uma curva no plano das duas taxas; no artigo de Sohl-Dickstein, essa curva é fractal.</p>
+<h2 id="7-de-onde-vem-cauchy-widrow-e-hoff">7. De onde vem: Cauchy, Widrow e Hoff</h2>
+<h3 id="slide-19-1847-cauchy">Slide 19: 1847: Cauchy <a class="cg-slide-link" href="../slides/#19" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O método é de 1847. Augustin-Louis Cauchy, matemático francês, publicou nos Comptes rendus da Academia de Ciências de Paris, em 18 de outubro de 1847, uma nota de três páginas, &quot;Méthode générale pour la résolution des systèmes d'équations simultanées&quot;. O problema dele era de astronomia: calcular a órbita de um astro, com os seis elementos da órbita como incógnitas. O jeito usual, reduzir o sistema a uma equação só por eliminações sucessivas, muitas vezes não funcionava ou dava uma equação complicada demais.</p>
+<p>A ideia está numa frase da nota, traduzida no slide: para achar os valores que satisfazem u = 0, com u uma função que nunca fica negativa, basta fazer u decrescer até que ela se anule. O passo que ele propõe é x − θX, y − θY, z − θZ, em que X, Y e Z são as derivadas parciais de u e θ, a letra grega teta, é um número positivo pequeno: é o gradiente descendente, com θ no papel de η. Para um sistema de várias equações, u = 0, v = 0, w = 0, ele aplica o método à soma dos quadrados, u² + v² + w², uma perda quadrática, como o EQM.</p>
+<p>Cauchy prometeu voltar ao assunto num trabalho seguinte, que, segundo Lemaréchal, nunca saiu. A escolha de um θ pequeno o bastante, que ele deixou em aberto, é a escolha da taxa de aprendizado.</p>
+<p>O retrato é de Louis Grégoire e Deneux, de por volta de 1840, da coleção Dibner do Smithsonian; é o mesmo que ilustra a nota de Lemaréchal.</p>
+<h3 id="slide-20-1960-a-adaline-de-widrow-e-hoff">Slide 20: 1960: a Adaline de Widrow e Hoff <a class="cg-slide-link" href="../slides/#20" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Em 1960, Bernard Widrow, professor de engenharia elétrica em Stanford, e Marcian Hoff, o primeiro doutorando dele, publicaram &quot;Adaptive switching circuits&quot;. A máquina do artigo se chamava Adaline, de adaptive linear, linear adaptativo, e tinha o tamanho de uma lancheira, nas palavras deles. Um painel de 4 por 4 chaves formava a entrada, cada chave em +1 ou −1; 17 botões guardavam os pesos, 16 das entradas e um de nível, que faz o papel do viés; um medidor mostrava o erro; e uma chave de referência dava a resposta certa. A cada padrão, um operador girava os 17 botões, cada um no sentido que diminuía o erro, até zerar o erro daquele padrão: uma rotina mecânica, sem pensar.</p>
+<p>A regra é a do gradiente com um exemplo por vez. A derivada do erro ao quadrado de um exemplo em relação a um peso é −2 sⱼ ε, a equação 13 do artigo, com sⱼ a entrada e ε o erro da soma, antes do degrau: a derivada se mede sem elevar ao quadrado nem tirar média. Na notação do curso, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> ← <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + η (t − z) <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>, com o fator 2 dentro de η: a regra do perceptron com z, a soma antes do degrau, no lugar de y, a saída depois dele. É a diferença entre as duas máquinas: o perceptron corrige só quando a saída erra; a Adaline corrige pelo tamanho do erro da soma, mesmo quando a saída acerta.</p>
+<p>O mesmo artigo descreve o erro quadrático médio como um paraboloide e dá a condição de estabilidade do passo, a do slide da taxa. A regra ganhou o nome de LMS, de least mean squares, mínimos quadrados médios, e foi levada para os filtros adaptativos, filtros que ajustam os próprios coeficientes enquanto funcionam e hoje estão em celulares e outros aparelhos de comunicação. Filtro adaptativo fica como caixa-preta: entra só a história.</p>
+<p>A foto é de Widrow com uma Adaline, publicada na revista Stanford Today em 1963, no artigo &quot;ADALINE: Smarter than Sweet&quot;, assinado por ele; a da capa, a Knobby Adaline, é do mesmo artigo. As duas estão em domínio público nos Estados Unidos porque o direito autoral não foi renovado.</p>
+<h2 id="8-o-codigo">8. O código</h2>
+<h3 id="slide-21-no-laptop">Slide 21: No laptop <a class="cg-slide-link" href="../slides/#21" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A prática é escrever, no laptop, o ajuste da reta por gradiente descendente, em NumPy, em passos: sortear os pontos com uma semente fixa; escrever a perda; escrever as duas derivadas parciais e conferir cada uma com a derivada numérica; escrever o laço dos passos, guardando a perda de cada um; e treinar com várias taxas.</p>
+<p>Quatro coisas do NumPy resolvem quase tudo: np.random.default_rng(semente) cria o gerador de números aleatórios com a semente; rng.uniform e rng.normal sorteiam; np.mean tira a média, o (1/N) Σ das fórmulas; e, com arrays, w * x + b calcula a saída dos 20 pontos de uma vez, sem laço.</p>
+<p>O que conferir antes de seguir: com uma taxa pequena, a perda cai a cada passo; o w e o b do fim chegam perto de 2 e de 1; e uma taxa grande demais faz a perda crescer.</p>
+<h3 id="slide-22-o-que-a-entrega-pede">Slide 22: O que a entrega pede <a class="cg-slide-link" href="../slides/#22" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A entrega pede o gráfico da perda a cada passo, uma curva por taxa, e a taxa a partir da qual o treino diverge. A figura é a do código de referência, com os pontos da semente 2: com η = 0,01, a perda ainda está em 0,131 no passo 100; com η = 0,1, chega a 0,0874, perto da menor possível, 0,0871; com η = 0,53, passa de três milhões. O eixo da perda está em escala logarítmica, em que cada marca vale dez vezes a de baixo, para caber 0,1 e um milhão na mesma figura.</p>
+<p>Cada um usa os próprios pontos, e o limiar muda com eles: pela conta da hessiana, com x entre 0 e 2 ele fica perto de 0,5, e com x entre 0 e 10 os passos precisam ser bem menores. A entrega é achar o seu e explicar por que a curva sobe. O código de referência não vai para a turma antes de 16/10.</p>
+<h2 id="9-fechamento">9. Fechamento</h2>
+<h3 id="slide-23-ate-16-10">Slide 23: Até 16/10 <a class="cg-slide-link" href="../slides/#23" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>São duas semanas até a aula 3, porque 09/10 não tem aula: o professor estará em viagem. O estudo são dois capítulos da série sobre álgebra linear do 3Blue1Brown, o 3, sobre transformações lineares e matrizes, e o 4, sobre multiplicação de matrizes como composição, e o capítulo 1 do livro de Michael Nielsen até a seção sobre a arquitetura das redes. Os vídeos preparam a aula 3, em que uma matriz junta os pesos de uma camada inteira. O Nielsen revê o perceptron e apresenta o neurônio sigmoide, que dá saída entre 0 e 1 de forma suave.</p>
+<p>A entrega, até 16/10: o gráfico da perda a cada passo para várias taxas, a taxa a partir da qual o treino diverge e uma pergunta sobre o estudo.</p>
+<p>O seminário da aula 3 tem o código da entrega, linha a linha, e três perguntas sobre o estudo: o que é uma transformação linear; por que uma matriz guarda uma transformação; e por que multiplicar matrizes é aplicar uma transformação depois da outra.</p>
+<h2 id="perguntas-que-podem-aparecer">Perguntas que podem aparecer</h2>
+<ul>
+<li>Por que elevar ao quadrado, e não usar o erro sem sinal? O quadrado tem derivada
+em todo ponto; o valor absoluto tem um bico em zero, onde a derivada não existe.
+E o quadrado pesa mais os erros grandes. Somar quadrados para resolver equações
+já era usado antes de Cauchy: é o método dos mínimos quadrados, de Legendre e
+Gauss, do começo do século 19.</li>
+<li>Por que não resolver direto, sem descer? Para a reta, dá: os mínimos quadrados
+têm fórmula fechada, e o código usa essa fórmula como gabarito. Para uma rede com
+camadas, não há fórmula, e o gradiente é o que resta.</li>
+<li>O gradiente descendente sempre acha o mínimo? Nesta perda, uma tigela com um
+fundo só, sim, com a taxa abaixo do limiar. Numa rede com camadas, a perda tem
+muitos vales, e ele acha um vale, não necessariamente o mais fundo.</li>
+<li>E com a taxa exatamente no limiar? Na parábola, com η = 1, w pula entre 0 e 4
+para sempre: nem converge nem explode.</li>
+<li>Por que o degrau não serve para o gradiente? Ele é plano em quase todo lugar: a
+derivada é zero, e o passo, −η · 0, não sai do lugar. Por isso a Adaline aprende
+com a soma, antes do degrau, e as redes modernas usam funções suaves, como a
+sigmoide do Nielsen.</li>
+</ul>
+<h2 id="para-estudar">Para estudar</h2>
+<p>O estudo da turma, para as duas semanas até 16/10, que é também o seu:</p>
+<ul>
+<li>3Blue1Brown, série sobre álgebra linear, capítulo 3, &quot;Linear transformations and
+matrices&quot;, <a href="https://www.youtube.com/watch?v=kYB8IZa5AuE" target="_blank" rel="noopener">youtube.com/watch?v=kYB8IZa5AuE</a>.</li>
+<li>3Blue1Brown, série sobre álgebra linear, capítulo 4, &quot;Matrix multiplication as
+composition&quot;, <a href="https://www.youtube.com/watch?v=XkY2DOUCWMU" target="_blank" rel="noopener">youtube.com/watch?v=XkY2DOUCWMU</a>.</li>
+<li>Michael Nielsen, 2015, <em>Neural Networks and Deep Learning</em>, capítulo 1, até a
+seção &quot;The architecture of neural networks&quot;: <a href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener">neuralnetworksanddeeplearning.com/chap1.html</a>.</li>
+</ul>
+<p>Além dele, para preparar a aula:</p>
+<ul>
+<li>Michael Nielsen, o mesmo capítulo 1, a seção &quot;Learning with gradient descent&quot;: o
+gradiente descendente com a notação dele, a mesma ideia desta aula.</li>
+<li>Bernard Widrow e Marcian Hoff, 1960, &quot;Adaptive switching circuits&quot;, o artigo
+original da Adaline, em nove páginas: <a href="https://isl.stanford.edu/~widrow/papers/c1960adaptiveswitching.pdf" target="_blank" rel="noopener">isl.stanford.edu/~widrow/papers/c1960adaptiveswitching.pdf</a>.
+A seção C descreve a máquina; a seção D, a conta da estabilidade do passo.</li>
+</ul>
+<h2 id="fontes-dos-fatos-citados">Fontes dos fatos citados</h2>
+<p>Só para conferência; o estudo é a lista de cima.</p>
+<ul>
+<li>Augustin-Louis Cauchy, 1847, &quot;Méthode générale pour la résolution des systèmes
+d'équations simultanées&quot;, Comptes rendus de l'Académie des sciences de Paris
+25:536-538; Claude Lemaréchal, 2012, &quot;Cauchy and the gradient method&quot;, Documenta
+Mathematica, volume extra ISMP, 251-254, sobre a data, a motivação astronômica, o
+passo θ e o trabalho prometido que não saiu.</li>
+<li>Bernard Widrow e Marcian Hoff, 1960, &quot;Adaptive switching circuits&quot;, IRE WESCON
+Convention Record, parte 4, 96-104: a Adaline, a lancheira, as 16 chaves e os 17
+pesos, o paraboloide, a estabilidade do passo e a equação 13.</li>
+<li>Bernard Widrow, 1963, &quot;ADALINE: Smarter than Sweet&quot;, Stanford Today, série 1,
+número 6: a foto da Knobby Adaline e Hoff como primeiro doutorando de Widrow.</li>
+<li>Verbetes &quot;Gradient descent&quot;, &quot;ADALINE&quot;, &quot;Least mean squares filter&quot; e &quot;Adaptive
+filter&quot; da Wikipedia; verbetes portugueses &quot;gradiente&quot; e &quot;degrau&quot; do Wiktionary;
+verbete &quot;Parque Estadual do Ibitipoca&quot; da Wikipedia em português.</li>
+<li>Jascha Sohl-Dickstein, 2024, &quot;The boundary of neural network trainability is
+fractal&quot;, <a href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener">arXiv:2402.06184</a>.</li>
+<li>Os números da reta, da perda, do gradiente e do limiar: codigo/reta.py, semente 2.</li>
+</ul>
+
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../../assets/js/main.min.js?v=0ce0a739f0"></script>
+  <script type="module" src="../../../../../assets/js/courses.min.js?v=0ce0a739f0"></script>
+  <script src="../../../../../assets/js/analytics.min.js?v=0ce0a739f0" defer></script>
+</body>
+</html>

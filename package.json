@@ -14,10 +14,13 @@
     "test": "node tools/test-drawer-flash.js && node tools/test-cgv-defer.js && node tools/test-sky-identical.js && node tools/test-icons-complete.js",
     "build:icons": "node tools/build-icon-subsets.js",
     "check:icons": "node tools/build-icon-subsets.js --check",
-    "test:icons": "node tools/test-icons-complete.js"
+    "test:icons": "node tools/test-icons-complete.js",
+    "build:courses": "python tools/courses/build.py",
+    "test:courses": "node tools/test-courses.js"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
+    "katex": "0.18.9",
     "puppeteer-core": "^24.0.0"
   }
 }

@@ -1,0 +1,208 @@
+/* O deck de uma aula, no site
+   ------------------------------------------------------------------
+   A página do deck não carrega main.css, e isso é de propósito. Os slides
+   foram desenhados no tipo Slides do Artifact, com todo o estilo inline e o
+   resto deixado ao navegador; main.css redefine h1, h2, p, listas e tabelas do
+   site inteiro, e qualquer uma dessas regras entraria no slide. O que está
+   abaixo é o pouco que o formato faz sozinho, igual ao CSS_PDF de
+   infra/slides.py e à implementação de referência, mais a barra e os painéis
+   em volta do palco.
+
+   As fontes dos slides: IBM Plex Sans e Source Serif 4, as do infra/fontes do
+   curso, e a IBM Plex Mono, que o site já tinha. As três sob a SIL Open Font
+   License; os textos das licenças estão ao lado delas, em assets/fonts/. */
+
+@font-face { font-family: 'IBM Plex Sans'; font-weight: 400; font-style: normal; font-display: swap;
+  src: url('../fonts/plex-sans-400.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Sans'; font-weight: 600; font-style: normal; font-display: swap;
+  src: url('../fonts/plex-sans-600.woff2') format('woff2'); }
+@font-face { font-family: 'Source Serif 4'; font-weight: 400; font-style: normal; font-display: swap;
+  src: url('../fonts/source-serif-4-400.woff2') format('woff2'); }
+@font-face { font-family: 'Source Serif 4'; font-weight: 600; font-style: normal; font-display: swap;
+  src: url('../fonts/source-serif-4-600.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-weight: 400; font-style: normal; font-display: swap;
+  src: url('../fonts/plex-mono-400-latin.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-weight: 700; font-style: normal; font-display: swap;
+  src: url('../fonts/plex-mono-700-latin.woff2') format('woff2'); }
+
+/* ---------------------------------------------------------------- o palco */
+
+.deck, .deck * { margin: 0; padding: 0; box-sizing: border-box; }
+html:has(body.deck), body.deck {
+  width: 100%;
+  height: 100%;
+  background: #05070d;
+  overflow: hidden;
+  /* sem o menu de contexto de toque e sem a seleção azul quando se desliza */
+  -webkit-tap-highlight-color: transparent;
+}
+/* O palco mede 1920 por 1080 no layout, e o transform que o encolhe não muda
+   isso: solto no body, ele estendia a página, e o Chrome do celular ampliava o
+   viewport de layout para caber o palco inteiro, com a barra caindo três telas
+   abaixo do que se via. Dentro de uma camada fixa do tamanho da janela e com o
+   excesso cortado, o tamanho dele não vaza para a página. */
+.deck-view { position: fixed; inset: 0; overflow: hidden; touch-action: pan-y; }
+.deck-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  touch-action: pan-y;
+}
+.deck-stage > section {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s ease, visibility 0s linear .35s;
+}
+.deck-stage > section.atual { opacity: 1; visibility: visible; transition: opacity .35s ease; }
+.deck-stage > section[data-transition="none"] { transition: none; }
+.deck-stage section aside { display: none; }
+.deck-stage ul { padding-left: 40px; }
+.deck-stage hr { border: 0; height: 0; }
+.deck-stage table { border-collapse: collapse; }
+.deck-stage th, .deck-stage td { border-bottom: 1px solid #DCDFE4; padding: 0.35em 0.6em; }
+.deck-stage [data-video], .deck-stage video { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) {
+  .deck-stage > section, .deck-stage > section.atual { transition: none; }
+}
+
+/* ---------------------------------------------------------------- a barra
+   O vidro do site em tamanho de controle (.glass-btn de main.css), escrito de
+   novo aqui porque esta página não carrega main.css. Ele tem o que desfocar: o
+   slide inteiro passa por baixo. */
+
+.deck-bar {
+  position: fixed;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 999px;
+  font: 600 14px/1 'IBM Plex Sans', Arial, sans-serif;
+  color: #e4e8f2;
+  background:
+    linear-gradient(148deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.05) 46%, rgba(255,255,255,.08) 100%),
+    rgba(10, 14, 26, .55);
+  backdrop-filter: blur(16px) saturate(170%) brightness(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(170%) brightness(1.1);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 -1px 0 rgba(255,255,255,.05), 0 8px 28px rgba(0,0,0,.45);
+  transition: opacity .4s ease, transform .4s ease;
+}
+body.ocioso .deck-bar { opacity: 0; transform: translate(-50%, 12px); pointer-events: none; }
+body.ocioso { cursor: none; }
+.deck-bar:focus-within { opacity: 1 !important; transform: translateX(-50%) !important; pointer-events: auto !important; }
+
+.deck-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font-size: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+}
+.deck-btn:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); }
+.deck-btn:focus-visible { outline: 2px solid #5b9cf6; outline-offset: 2px; }
+.deck-btn[aria-pressed="true"], .deck-btn[aria-expanded="true"] { background: rgba(91,156,246,.35); border-color: rgba(150,195,255,.5); }
+.deck-btn[hidden] { display: none; }
+.deck-count { min-width: 62px; text-align: center; font-variant-numeric: tabular-nums; font-family: 'IBM Plex Mono', monospace; font-weight: 400; }
+.deck-sep { width: 1px; height: 22px; background: rgba(255,255,255,.16); margin: 0 4px; }
+
+/* A linha do progresso, no alto: quanto do deck já passou, no cobre do curso. */
+.deck-progress { position: fixed; left: 0; right: 0; top: 0; height: 3px; z-index: 25; background: rgba(255,255,255,.06); }
+.deck-progress span { display: block; height: 100%; background: #f0915a; transform-origin: 0 50%; transform: scaleX(0); transition: transform .35s ease; }
+body.ocioso .deck-progress { opacity: .5; }
+
+/* ---------------------------------------------------------------- as anotações */
+
+.deck-notes {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  max-height: 38vh;
+  overflow: auto;
+  padding: 18px max(22px, env(safe-area-inset-right)) 76px max(22px, env(safe-area-inset-left));
+  background: rgba(12, 16, 28, .94);
+  border-top: 1px solid rgba(255,255,255,.12);
+  color: #e4e8f2;
+  font: 17px/1.55 'IBM Plex Sans', Arial, sans-serif;
+  overscroll-behavior: contain;
+}
+.deck-notes[hidden] { display: none; }
+.deck-notes-text { max-width: 1100px; margin: 0 auto; }
+.deck-notes-text p + p { margin-top: 0.7em; }
+.deck-notes-vazio { color: #8b95ad; max-width: 1100px; margin: 0 auto; }
+
+/* O aviso de vídeo que não carregou: no alto, sem mexer no slide. */
+.deck-aviso {
+  position: fixed; left: 50%; top: 16px; transform: translateX(-50%); z-index: 40;
+  display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 32px);
+  padding: 10px 16px; border-radius: 12px;
+  font: 14px/1.4 'IBM Plex Sans', Arial, sans-serif; color: #fde7d9;
+  background: rgba(60, 24, 10, .92); border: 1px solid rgba(240, 145, 90, .5);
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+.deck-aviso[hidden] { display: none; }
+.deck-aviso .ph { font-size: 18px; color: #f0915a; flex-shrink: 0; }
+.deck-aviso a { color: #ffd2b5; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------------------------------------------------------------- as teclas */
+
+.deck-help {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  padding: 20px 24px 22px;
+  border-radius: 20px;
+  color: #e4e8f2;
+  font: 15px/1.6 'IBM Plex Sans', Arial, sans-serif;
+  background:
+    linear-gradient(148deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.04) 42%, rgba(255,255,255,.07) 100%),
+    rgba(10, 14, 26, .72);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 16px 48px rgba(0,0,0,.5);
+}
+.deck-help[hidden] { display: none; }
+.deck-help-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.deck-help h2 { font: 600 18px/1.3 'IBM Plex Sans', Arial, sans-serif; }
+.deck-help ul { list-style: none; display: grid; gap: 6px; }
+.deck-help li { padding-left: 14px; position: relative; }
+.deck-help li::before { content: ''; position: absolute; left: 0; top: .72em; width: 5px; height: 5px; border-radius: 50%; background: #5b9cf6; }
+
+.deck-noscript { position: fixed; inset: auto 0 20px; text-align: center; font: 16px 'IBM Plex Sans', Arial, sans-serif; }
+.deck-noscript a { color: #5b9cf6; }
+
+@media (max-width: 520px) {
+  .deck-bar { gap: 0; padding: 4px; }
+  .deck-btn { width: 36px; height: 36px; font-size: 18px; }
+  .deck-count { min-width: 54px; font-size: 13px; }
+  .deck-notes { font-size: 15px; max-height: 46vh; }
+}

@@ -286,6 +286,17 @@ have drifted.
 - **2 MB per file**, enforced in CI. Heavier media goes to the
   `nipscern-assets` repository and is served from `cdn.nipscern.com`, with a
   smaller fallback committed here so a local checkout still works.
+- **Generated pages.** `library/courses/` is written by
+  `tools/courses/build.py` and never by hand; the tool deletes from that tree
+  whatever it did not write in the run. Its pages share one icon sheet,
+  `assets/css/icons/library-courses.css`, declared in `FAMILIAS` in
+  `tools/build-icon-subsets.js`, so a new class adds pages without adding lines
+  to the hook list. A new family of generated pages goes there the same way.
+- **The CDN before it has the files.** `npm run dev` serves the
+  `nipscern-assets` clone next to this one at `/_cdn/`, and the course pages,
+  opened on localhost, ask for their videos and PDFs there. That is how a class
+  is seen working before its files are merged into nipscern-assets; in
+  production nothing changes.
 - **The Architect is not in this repository.** It lives at
   `kristoffer.nipscern.com`, served from `Chrysthofer/the-architect`, and
   `/kristoffer` on this site is a Worker route on the zone, not a folder.

@@ -41,6 +41,11 @@ Our mission is **high-level scientific outreach**, providing accurate, accessibl
   [cgv-web](https://github.com/nipscernlab/cgv-web), and served at
   `nipscern.com/projects/cgvweb` through a Cloudflare Worker
   (see [workers/](workers/)).
+- The course collection at `nipscern.com/library/courses/` is generated, not
+  written: [tools/courses/build.py](tools/courses/build.py) reads each course
+  from its own repository and writes every page under `library/courses/`, with
+  the slides, videos and PDFs going to nipscern-assets. How to add a class is in
+  [tools/courses/README.md](tools/courses/README.md).
 
 ## Contributing
 
