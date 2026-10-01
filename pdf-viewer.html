@@ -14,7 +14,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/pdf-viewer.css?v=e5c0a3de6f">
+  <link rel="stylesheet" href="assets/css/icons/pdf-viewer.css?v=5422482445">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -160,19 +160,24 @@
       overflow: auto; background: var(--bg-0);
       display: flex; flex-direction: column; align-items: center;
     }
+    /* flex: none on both, because a frame waiting for its drawing is an empty
+       div, and a flex item with no content shrinks to nothing. */
     #pages-wrap {
       padding: 24px 16px;
       display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
-      width: 100%; min-height: 100%;
+      width: 100%; min-height: 100%; flex: none;
     }
     .pdf-page {
       position: relative;
       background: #fff;
       box-shadow: 0 4px 32px rgba(0,0,0,0.55);
       margin: 0 auto;
+      flex: none;
     }
     .pdf-canvas {
       display: block;
+      width: 100%;
+      height: 100%;
     }
 
     /* ===== TEXT LAYER (selectable / copyable text) ===== */
@@ -452,7 +457,21 @@
   var scale        = 1.0;
   var continuous   = true;
   var pdfFilename  = pdfSrc ? (pdfSrc.split('/').pop() || 'document.pdf') : 'document.pdf';
-  var pageObserver  = null;
+  var pages        = [];   // the PDFPageProxy of every page, by index
+  var frames       = [];   // one .pdf-page per page, sized from the start
+
+  /* ---------- Where the document opens ----------
+     #page=N, and #page=N&view=FitH,top for a point on that page (top in PDF
+     units, counted from the bottom), as in the PDF open parameters: a link into
+     a PDF reads the same here as in the browser's own reader, which does not
+     always obey it. The Adobe Acrobat extension for Chrome opens on page 1, and
+     a phone downloads the file. ?page=N works too. */
+  function placeFromUrl() {
+    var h = new URLSearchParams(window.location.hash.slice(1));
+    var n = parseInt(h.get('page') || P.get('page') || '', 10);
+    var v = /^fitb?h,(-?\d+(?:\.\d+)?)$/i.exec(h.get('view') || '');
+    return { page: n > 0 ? n : 1, top: v ? parseFloat(v[1]) : null };
+  }
 
   function samePublication(pub, key) {
     if (!pub || !key) return false;
@@ -565,176 +584,207 @@
     while (el.firstChild) { el.removeChild(el.firstChild); }
   }
 
-  /* ---------- Build one page (canvas + selectable text layer) ---------- */
-  /* The canvas is drawn at device-pixel resolution for sharpness, while the
-     text layer is positioned in CSS pixels (scale, no DPR) and overlaid on top
-     so the underlying PDF text can be selected and copied. The wrapper is
-     attached to the DOM *before* rendering the text layer, because PDF.js reads
-     the `--scale-factor` CSS variable via getComputedStyle(container). */
-  async function buildPage(n, container) {
-    var page     = await pdfDoc.getPage(n);
-    var DPR      = window.devicePixelRatio || 1;
-    var cssVp    = page.getViewport({ scale: scale });
-    var renderVp = page.getViewport({ scale: scale * DPR });
-    var cw = Math.floor(cssVp.width), ch = Math.floor(cssVp.height);
+  /* ---------- Pages: a frame for each, a drawing for the ones near ----------
+     Every page has its frame from the start, at its own size, so the scroll
+     bar is the whole document's and any page can be shown before the ones
+     above it are drawn. Only the frames near the screen hold a drawing, the
+     nearest first and one at a time, and a frame that falls far behind gives
+     its canvas back: a long thesis drawn whole holds hundreds of megabytes of
+     canvas, more than a phone lets a page have. */
+  function layoutFrames() {
+    for (var i = 0; i < frames.length; i++) {
+      var vp = pages[i].getViewport({ scale: scale });
+      frames[i].style.width  = Math.floor(vp.width) + 'px';
+      frames[i].style.height = Math.floor(vp.height) + 'px';
+      fitText(frames[i]);
+    }
+  }
 
-    var wrap = document.createElement('div');
-    wrap.className       = 'pdf-page';
-    wrap.dataset.pageNum = String(n);
-    wrap.dataset.cssW    = String(cw);
-    wrap.dataset.cssH    = String(ch);
-    wrap.style.width     = cw + 'px';
-    wrap.style.height    = ch + 'px';
+  /* The canvas fills its frame by CSS. The text layer is laid out for the scale
+     it was drawn at, and until the page is redrawn it follows the frame by a
+     transform. */
+  function fitText(f) {
+    var t = f.querySelector('.textLayer');
+    if (!t) return;
+    var k = scale / parseFloat(f.dataset.drawn);
+    t.style.transformOrigin = '0 0';
+    t.style.transform = (Math.abs(k - 1) < 0.001) ? '' : 'scale(' + k + ')';
+  }
 
+  /* Zeroing the size gives the memory back at once; Safari holds a detached
+     canvas's pixels for a while otherwise. */
+  function release(canvas) {
+    canvas.width = 0;
+    canvas.height = 0;
+    canvas.remove();
+  }
+
+  function undraw(f) {
+    var c = f.querySelector('.pdf-canvas'), t = f.querySelector('.textLayer');
+    if (c) release(c);
+    if (t) t.remove();
+    delete f.dataset.drawn;
+  }
+
+  /* The canvas is drawn at device-pixel resolution for sharpness, off the page,
+     and takes the old drawing's place in one step, so a page being redrawn
+     after a zoom never goes blank. The text layer is positioned in CSS pixels
+     and overlaid on top so the PDF text can be selected and copied; it is
+     attached *before* PDF.js fills it, because PDF.js reads the
+     `--scale-factor` CSS variable via getComputedStyle(container). */
+  async function draw(f) {
+    var n    = parseInt(f.dataset.pageNum, 10);
+    var page = pages[n - 1];
+    var at   = scale;
+    var DPR  = window.devicePixelRatio || 1;
+    var renderVp = page.getViewport({ scale: at * DPR });
     var canvas = document.createElement('canvas');
-    canvas.className    = 'pdf-canvas';
-    canvas.width        = Math.floor(renderVp.width);
-    canvas.height       = Math.floor(renderVp.height);
-    canvas.style.width  = cw + 'px';
-    canvas.style.height = ch + 'px';
-    wrap.appendChild(canvas);
-
-    var textDiv = document.createElement('div');
-    textDiv.className = 'textLayer';
-    textDiv.style.setProperty('--scale-factor', String(scale));
-    wrap.appendChild(textDiv);
-
-    (container || pagesWrap).appendChild(wrap);
-
+    canvas.className = 'pdf-canvas';
+    canvas.width  = Math.floor(renderVp.width);
+    canvas.height = Math.floor(renderVp.height);
     try {
       await page.render({ canvasContext: canvas.getContext('2d'), viewport: renderVp }).promise;
     } catch(e) {
       if (e.name !== 'RenderingCancelledException') console.warn('[pdf] render p' + n, e);
+      release(canvas);
+      return;
     }
-
+    undraw(f);
+    var textDiv = document.createElement('div');
+    textDiv.className = 'textLayer';
+    textDiv.style.setProperty('--scale-factor', String(at));
+    f.appendChild(canvas);
+    f.appendChild(textDiv);
+    f.dataset.drawn = String(at);
+    fitText(f);
     try {
       var textContent = await page.getTextContent();
       await pdfjsLib.renderTextLayer({
         textContentSource: textContent,
         container: textDiv,
-        viewport: cssVp,
+        viewport: page.getViewport({ scale: at }),
       }).promise;
     } catch(e) {
       if (e.name !== 'RenderingCancelledException') console.warn('[pdf] text layer p' + n, e);
     }
-
-    return wrap;
   }
 
-  /* ---------- Visible-page tracking (continuous mode) ---------- */
-  function wireObserver() {
-    if (pageObserver) { pageObserver.disconnect(); pageObserver = null; }
-    if (!continuous) return;
-    var pages = pagesWrap.querySelectorAll('.pdf-page');
-    pageObserver = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          var n = parseInt(entry.target.dataset.pageNum, 10);
-          if (n && n !== curPage) { curPage = n; refreshPageUI(); }
-        }
-      });
-    }, { root: viewer, threshold: 0.4 });
-    pages.forEach(function(p) { pageObserver.observe(p); });
+  /* ---------- What the screen shows decides what is drawn ----------
+     Drawn: the frames from one screen above to two below, nearest first.
+     Kept: up to three screens away. The current page is the one with the most
+     of itself on screen, the first of a tie, and the last at the end. */
+  var drawing    = false;   // one page at a time
+  var zooming    = false;   // no redraw while a zoom gesture goes on
+  var queued     = false;
+  /* A page chosen by link, button or key stays the current one while the
+     smooth scroll to it runs and for as long as the view rests where that
+     scroll put it, even if the next page shows more of itself there: the link
+     asked for that page. The reader's own hand on the scroll takes over. */
+  var steerTop     = -1;      // where the scroll was sent, or -1
+  var steerArrived = false;   // it got there
+  var steerUntil   = 0;       // and if it never does, it lets go at this time
+
+  function letGo() {
+    if (steerTop < 0) return;
+    steerTop = -1;
+    queueUpdate();
   }
 
-  /* ---------- Render all pages (first paint) ---------- */
-  async function renderAllPages() {
+  function queueUpdate() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(update);
+  }
+
+  function update() {
+    queued = false;
     if (!pdfDoc) return;
-    if (pageObserver) { pageObserver.disconnect(); pageObserver = null; }
-    clearWrap(pagesWrap);
-    for (var i = 1; i <= totalPages; i++) {
-      await buildPage(i);
+    var top = viewer.scrollTop, h = viewer.clientHeight;
+    var next = null, nextDist = Infinity, seen = 0, seenVis = 0;
+    for (var i = 0; i < frames.length; i++) {
+      var f = frames[i];
+      if (!f.isConnected) { if (f.dataset.drawn) undraw(f); continue; }
+      var y0 = f.offsetTop, y1 = y0 + f.offsetHeight;
+      var vis = Math.min(y1, top + h) - Math.max(y0, top);
+      if (vis > seenVis + 0.5) { seen = i + 1; seenVis = vis; }
+      if (y1 < top - 3 * h || y0 > top + 4 * h) { if (f.dataset.drawn) undraw(f); continue; }
+      if (y1 < top - h || y0 > top + 3 * h || f.dataset.drawn === String(scale)) continue;
+      var d = Math.abs((y0 + y1) / 2 - (top + h / 2));
+      if (d < nextDist) { next = f; nextDist = d; }
     }
-    renderedScale = scale;
-    wireObserver();
+    if (steerTop >= 0) {
+      if (Math.abs(top - steerTop) < 2) steerArrived = true;
+      else if (steerArrived || performance.now() > steerUntil) steerTop = -1;
+    }
+    if (continuous && seen && steerTop < 0) {
+      var n = (top + h >= viewer.scrollHeight - 2) ? totalPages : seen;
+      if (n !== curPage) { curPage = n; refreshPageUI(); markUrl(); }
+    }
+    if (next && !drawing && !zooming) {
+      drawing = true;
+      draw(next).catch(function(e) { console.warn('[pdf] draw', e); })
+        .then(function() { drawing = false; queueUpdate(); });
+    }
   }
 
-  /* ---------- Navigate ---------- */
-  async function goTo(n) {
+  /* The address follows the page, as #page=N, so a reload or a shared link
+     opens where the reader was. */
+  var urlTimer = null;
+  function markUrl() {
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function() {
+      try { history.replaceState(history.state, '', '#page=' + curPage); } catch(e) { /* sandboxed */ }
+    }, 400);
+  }
+
+  /* ---------- Navigate ----------
+     `top`, in PDF units from the bottom of the page, puts that point of the
+     page at the top of the screen. `instant` skips the smooth scroll, for the
+     first placement and for a change of mode. */
+  function goTo(n, top, instant) {
+    if (!pdfDoc) return;
     n = Math.max(1, Math.min(totalPages, n));
-    if (continuous) {
-      var c = pagesWrap.querySelector('[data-page-num="' + n + '"]');
-      if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      curPage = n; refreshPageUI();
+    if (n !== curPage && !instant) markUrl();
+    curPage = n;
+    refreshPageUI();
+    if (!continuous) {
+      clearWrap(pagesWrap);
+      pagesWrap.appendChild(frames[n - 1]);
+      viewer.scrollTop = 0;
     } else {
-      curPage = n; refreshPageUI();
-      await rerenderCrisp();
+      var f = frames[n - 1];
+      var y = n === 1 ? 0 : f.offsetTop - 12;   // a strip of the gap above, to show where the page starts
+      if (top != null) y = f.offsetTop + pages[n - 1].getViewport({ scale: scale }).convertToViewportPoint(0, top)[1];
+      y = Math.max(0, Math.min(y, viewer.scrollHeight - viewer.clientHeight));
+      steerTop = y;
+      steerArrived = false;
+      steerUntil = performance.now() + 3000;
+      viewer.scrollTo({ top: y, behavior: instant ? 'auto' : 'smooth' });
     }
+    queueUpdate();
+  }
+
+  /* The frames in the page: all of them, or the current one alone. */
+  function showFrames() {
+    clearWrap(pagesWrap);
+    if (continuous) frames.forEach(function(f) { pagesWrap.appendChild(f); });
+    goTo(curPage, null, true);
   }
 
   /* ---------- Zoom ---------- */
   var STEPS    = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0, 4.0];
   var ZOOM_MIN = STEPS[0], ZOOM_MAX = STEPS[STEPS.length - 1];
-  var renderedScale = 1.0;  // escala em que as paginas do DOM foram de fato renderizadas
-  var renderGen     = 0;    // invalida re-renderizacoes que ficaram obsoletas
-  var hqTimer       = null;
+  var zoomTimer = null;
 
   function clampScale(s)   { return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, s)); }
   function nextStepUp(s)   { return STEPS.find(function(x){ return x > s + 0.01; }); }
   function nextStepDown(s) { var p = null; STEPS.forEach(function(x){ if (x < s - 0.01) p = x; }); return p; }
 
-  /* Zoom visual instantaneo: as paginas ja renderizadas sao apenas
-     redimensionadas via CSS (o bitmap escala junto), entao o conteudo
-     nunca sai da tela durante o gesto. A nitidez plena volta no
-     re-render agendado para quando o zoom termina. */
-  function applyVisualScale() {
-    var k = scale / renderedScale;
-    var pages = pagesWrap.querySelectorAll('.pdf-page');
-    for (var i = 0; i < pages.length; i++) {
-      var w  = pages[i];
-      var cw = parseFloat(w.dataset.cssW) * k;
-      var ch = parseFloat(w.dataset.cssH) * k;
-      w.style.width  = cw + 'px';
-      w.style.height = ch + 'px';
-      var c = w.querySelector('.pdf-canvas');
-      if (c) { c.style.width = cw + 'px'; c.style.height = ch + 'px'; }
-      var t = w.querySelector('.textLayer');
-      if (t) {
-        t.style.transformOrigin = '0 0';
-        t.style.transform = (Math.abs(k - 1) < 0.001) ? '' : 'scale(' + k + ')';
-      }
-    }
-  }
-
-  /* Re-render de alta qualidade sem nunca apagar a tela: as paginas novas
-     nascem num container oculto e substituem as antigas numa unica troca,
-     com o scroll preservado (as dimensoes ja batem, porque o zoom visual
-     usa a mesma escala-alvo). */
-  async function rerenderCrisp() {
-    if (!pdfDoc) return;
-    var gen = ++renderGen;
-    var staging = document.createElement('div');
-    staging.style.cssText = 'position:absolute;left:-100000px;top:0;visibility:hidden;';
-    viewer.appendChild(staging);
-    try {
-      var first = continuous ? 1 : curPage;
-      var last  = continuous ? totalPages : curPage;
-      for (var i = first; i <= last; i++) {
-        if (gen !== renderGen) return;
-        await buildPage(i, staging);
-      }
-      if (gen !== renderGen) return;
-      var sl = viewer.scrollLeft, st = viewer.scrollTop;
-      clearWrap(pagesWrap);
-      while (staging.firstChild) { pagesWrap.appendChild(staging.firstChild); }
-      renderedScale = scale;
-      viewer.scrollLeft = sl;
-      viewer.scrollTop  = st;
-      wireObserver();
-    } finally {
-      staging.remove();
-    }
-  }
-
-  async function rerender() { await rerenderCrisp(); }
-
-  function scheduleCrisp() {
-    clearTimeout(hqTimer);
-    hqTimer = setTimeout(function(){ rerenderCrisp().catch(console.warn); }, 280);
-  }
-
-  /* Zoom suave e continuo: aplica o alvo imediatamente via CSS, mantendo o
-     ponto sob (focalX, focalY) parado, e agenda a renderizacao nitida. */
+  /* Zoom suave e continuo: os quadros tomam o tamanho novo na hora, e o
+     desenho que ja estava neles escala junto por CSS, entao o conteudo nunca
+     sai da tela durante o gesto; o ponto sob (focalX, focalY) fica parado. A
+     nitidez plena volta quando o gesto para, redesenhando as paginas perto da
+     tela, a mais perto primeiro. */
   function setZoom(target, focalX, focalY) {
     if (!pdfDoc) return;
     target = clampScale(target);
@@ -744,20 +794,21 @@
     var offY  = (focalY == null ? rect.height / 2 : focalY - rect.top);
     var ratio = target / scale;
     scale = target;
-    applyVisualScale();
+    layoutFrames();
     viewer.scrollLeft = (viewer.scrollLeft + offX) * ratio - offX;
     viewer.scrollTop  = (viewer.scrollTop  + offY) * ratio - offY;
     refreshZoomUI();
-    scheduleCrisp();
+    zooming = true;
+    clearTimeout(zoomTimer);
+    zoomTimer = setTimeout(function(){ zooming = false; queueUpdate(); }, 280);
   }
 
   function zoomIn()  { var n = nextStepUp(scale);   if (n !== undefined) setZoom(n); }
   function zoomOut() { var p = nextStepDown(scale); if (p !== null)      setZoom(p); }
 
-  async function fitWidth() {
+  function fitWidth() {
     if (!pdfDoc) return;
-    var page = await pdfDoc.getPage(curPage);
-    var vp   = page.getViewport({ scale: 1 });
+    var vp = pages[curPage - 1].getViewport({ scale: 1 });
     setZoom((viewer.clientWidth - 48) / vp.width);
   }
 
@@ -846,7 +897,21 @@
       if (lbl) lbl.textContent = 'Continuous';
       btnMode.classList.remove('active');
     }
-    rerender().catch(console.warn);
+    showFrames();
+  });
+
+  viewer.addEventListener('scroll', queueUpdate, { passive: true });
+  window.addEventListener('resize', queueUpdate);
+  ['wheel', 'touchstart', 'pointerdown'].forEach(function(t) {
+    viewer.addEventListener(t, letGo, { passive: true });
+  });
+  document.addEventListener('keydown', function(e) {
+    if (/^(PageUp|PageDown|Home|End| )$/.test(e.key)) letGo();
+  });
+  /* A link that changes only the #page= of an open viewer moves it there. */
+  window.addEventListener('hashchange', function() {
+    var at = placeFromUrl();
+    goTo(at.page, at.top);
   });
 
   var btnInfo = document.getElementById('btn-info');
@@ -938,16 +1003,28 @@
       }).catch(function(){}).then(function(){ return pdf; });
 
     }).then(function(pdf) {
+      var all = [];
+      for (var i = 1; i <= totalPages; i++) all.push(pdf.getPage(i));
+      return Promise.all(all);
+
+    }).then(function(list) {
+      pages = list;
       showState('viewer');
       setDisabled(true);
-      refreshPageUI();
 
-      return pdf.getPage(1).then(function(page) {
-        var vp = page.getViewport({ scale: 1 });
-        scale  = Math.max(0.5, Math.min(2.0, (viewer.clientWidth - 48) / vp.width));
-        refreshZoomUI();
-        return renderAllPages();
+      var vp = pages[0].getViewport({ scale: 1 });
+      scale  = Math.max(0.5, Math.min(2.0, (viewer.clientWidth - 48) / vp.width));
+      refreshZoomUI();
+      frames = pages.map(function(page, k) {
+        var f = document.createElement('div');
+        f.className = 'pdf-page';
+        f.dataset.pageNum = String(k + 1);
+        pagesWrap.appendChild(f);
+        return f;
       });
+      layoutFrames();
+      var at = placeFromUrl();
+      goTo(at.page, at.top, true);
 
     }).catch(function(err) {
       console.error('[pdf] load error:', err);
@@ -966,6 +1043,6 @@
 })();
 </script>
 
-  <script src="assets/js/analytics.min.js?v=e5c0a3de6f" defer></script>
+  <script src="assets/js/analytics.min.js?v=5422482445" defer></script>
 </body>
 </html>

@@ -31,16 +31,27 @@ CABECALHO = re.compile(r"^[A-ZÀ-Ý][A-ZÀ-Ý \-]{3,}$")
 
 @dataclass
 class Entrada:
-    """Um marcador do PDF: o número, se tem, o título e a página."""
+    """Um marcador do PDF: o número, se tem, o título, a página e o ponto dela."""
     numero: str | None
     titulo: str
     indice: int          # a página, contada de 0
     rotulo: str          # o número impresso na página, que é o que o leitor vê
+    topo: float | None = None   # a altura do destino na página, em pontos do PDF, contada de baixo
 
     @property
     def pagina(self):
         """A página para o #page= do endereço do PDF, contada de 1."""
         return self.indice + 1
+
+
+def _topo(destino):
+    """A altura do ponto para onde o marcador leva, como o #view=FitH,topo do PDF pede, ou None.
+
+    O hyperref grava cada marcador como destino com nome, chapter.1 ou
+    subsection.1.1.3, que aponta um /XYZ um pouco acima do título; o PyMuPDF
+    resolve o nome e devolve o ponto em coordenadas do PDF, com o zero embaixo."""
+    ponto = destino.get("to") if destino.get("kind") in (fitz.LINK_GOTO, fitz.LINK_NAMED) else None
+    return round(ponto.y, 1) if ponto is not None else None
 
 
 @dataclass
@@ -127,34 +138,34 @@ class Apostila:
     def rotulo(self, indice):
         return self.doc[indice].get_label() or str(indice + 1)
 
-    def entrada(self, texto, indice, classe=Entrada, **extra):
+    def entrada(self, texto, indice, classe=Entrada, topo=None, **extra):
         m = NUMERO_E_TITULO.match(texto)
         numero, titulo = (m.group(1), m.group(2)) if m else (None, texto)
-        return classe(numero, titulo.strip(), indice, self.rotulo(indice), **extra)
+        return classe(numero, titulo.strip(), indice, self.rotulo(indice), topo, **extra)
 
     # ---------------------------------------------------------- os marcadores
 
     def _marcadores(self):
-        toc = self.doc.get_toc()
+        toc = self.doc.get_toc(simple=False)
         partes = [t for t in toc if t[0] == 1]
         if len(partes) != 1 or not ROMANOS.match(partes[0][1]):
             self.erro("o primeiro nível dos marcadores tem de ser um só, o da parte, como 'I Fundamentos ...'")
         self.numeral, self.titulo = ROMANOS.match(partes[0][1]).groups()
         self.capitulos, self.gabarito = [], None
         atual = None
-        for nivel, texto, pagina in toc:
+        for nivel, texto, pagina, destino in toc:
             texto = _junta(texto)
             if nivel == 2:
                 if texto.startswith("Gabarito"):
-                    self.gabarito = self.entrada(texto, pagina - 1)
+                    self.gabarito = self.entrada(texto, pagina - 1, topo=_topo(destino))
                     atual = None
                     continue
-                atual = self.entrada(texto, pagina - 1, Capitulo)
+                atual = self.entrada(texto, pagina - 1, Capitulo, _topo(destino))
                 if not atual.numero or "." in atual.numero:
                     self.erro(f"o marcador de capítulo {texto!r} não começa pelo número do capítulo")
                 self.capitulos.append(atual)
             elif nivel == 3 and atual:
-                atual.secoes.append(self.entrada(texto, pagina - 1))
+                atual.secoes.append(self.entrada(texto, pagina - 1, topo=_topo(destino)))
         if not self.capitulos:
             self.erro("os marcadores não têm capítulo nenhum")
         if not self.gabarito:
@@ -218,7 +229,7 @@ class Apostila:
                     k += 1
                 if not objetivo:
                     self.erro(f"o objetivo da prática {m.group(1)} saiu vazio")
-                self.praticas.append(Pratica(s.numero, m.group(2), s.indice, s.rotulo, n=int(m.group(1)),
+                self.praticas.append(Pratica(s.numero, m.group(2), s.indice, s.rotulo, s.topo, n=int(m.group(1)),
                                              objetivo=_costura(objetivo, self.vocabulario)))
 
     def _exercicios(self):
@@ -277,11 +288,11 @@ class Apostila:
                 return texto[ini:fim if fim > ini else None]
         self.erro(f"os marcadores não têm a seção {numero}")
 
-    def indice_da_secao(self, numero):
-        """A página de uma seção ou subseção pelos marcadores, contada de 0."""
-        for _, titulo, pagina in self.doc.get_toc():
+    def destino_da_secao(self, numero):
+        """A página de uma seção ou subseção pelos marcadores, contada de 0, e a altura do título nela."""
+        for _, titulo, pagina, destino in self.doc.get_toc(simple=False):
             if _junta(titulo).startswith(numero + " "):
-                return pagina - 1
+                return pagina - 1, _topo(destino)
         self.erro(f"os marcadores não têm a seção {numero}")
 
     def pagina_da_citacao(self, citacao):
@@ -296,6 +307,20 @@ class Apostila:
         for i in range(self.paginas - 1):
             if citacao in _costura(paginas[i] + paginas[i + 1], self.vocabulario):
                 return i
+        return None
+
+    def topo_da_citacao(self, citacao, indice):
+        """A altura da linha em que a citação começa na página `indice`, em pontos do PDF, contada de baixo.
+
+        Procura as primeiras palavras da citação na página, e sobe um pouco, para
+        a linha não colar no alto da tela. Sem achar, como quando a primeira
+        palavra vem partida em sílabas, dá None, e o link abre no alto da página."""
+        pg = self.doc[indice]
+        palavras = citacao.split()
+        for n in (6, 4, 3):
+            achados = pg.search_for(" ".join(palavras[:n]))
+            if achados:
+                return round((achados[0].tl * ~pg.transformation_matrix).y + 12, 1)
         return None
 
     # ---------------------------------------------------------- imagens

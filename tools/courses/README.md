@@ -11,7 +11,7 @@ e apaga de `library/courses/` o que não escreveu naquela rodada.
 | `/library/courses/<curso>/class-NN/` | a página da aula |
 | `/library/courses/<curso>/class-NN/slides/` | o deck, com vídeos e anotações |
 | `/library/courses/<curso>/class-NN/study-guide/` | o roteiro, com as equações |
-| `/library/courses/<curso>/class-NN/code/` | o código da aula, com destaque e download |
+| `/library/courses/<curso>/class-NN/code/` | o código da aula, com destaque e download, e no alto a lista dos arquivos quando há mais de um |
 | `/library/courses/<curso>/part-N/` | a página de uma parte, no curso que chega como apostila |
 
 Os PDFs e os vídeos vão para o nipscern-assets e são servidos em
@@ -25,7 +25,8 @@ navegação do site tem o item "Cursos", que acende em toda página abaixo de
 No fim de cada rodada, a ferramenta abre as páginas que gerou e confere cada
 `href`, `src`, `data-src`, `data-video` e pôster: o que é do site tem de existir, o
 que é do CDN tem de ter sido publicado na rodada, e a âncora tem de existir no
-destino. Endereço quebrado faz a rodada falhar.
+destino. O link para o leitor de PDF do site, `pdf-viewer.html`, tem de abrir um
+PDF desta rodada numa página que ele tem. Endereço quebrado faz a rodada falhar.
 
 ## Rodar
 
@@ -100,7 +101,8 @@ O que a página diz de cada parte sai do PDF, e não do `.json`
 (`tools/courses/apostila.py`):
 
 - o título da parte, os capítulos e o sumário, dos marcadores que o hyperref
-  grava, com o número de página impresso, que é o rótulo da página no PDF;
+  grava, com o número de página impresso, que é o rótulo da página no PDF, e o
+  ponto da página para onde cada marcador leva;
 - a abertura de cada capítulo, os parágrafos entre o título e a primeira seção;
 - cada prática de laboratório, com o texto embaixo de OBJETIVOS na caixa dela;
 - quantos exercícios cada capítulo propõe e quantos o gabarito responde (na
@@ -118,6 +120,17 @@ texto da seção em `resumo_da_leitura`, e a rodada avisa quando a seção muda.
 Quando o desenho da apostila mudar (a caixa da prática sem OBJETIVOS, o
 gabarito sem o número sozinho na linha, uma legenda renumerada), a leitura para
 com erro e diz o que não achou.
+
+O link para um lugar da apostila (o sumário, cada capítulo, os exercícios, o
+resumo, o gabarito, cada prática, as citações e a tabela de modelos) abre o PDF
+no leitor do site, `/pdf-viewer.html?src=<PDF no CDN>#page=N&view=FitH,<topo>`,
+com a página e o ponto do marcador, que o PDF.js de lá obedece em qualquer
+navegador. O endereço direto com `#page=` depende do leitor do navegador: a
+extensão do Adobe Acrobat no Chrome abre na primeira página, e o celular baixa
+o arquivo. A apostila inteira, no botão, na capa e na tabela de versões, continua
+indo direto ao PDF. As citações não são marcadores: o ponto delas é a linha em
+que as primeiras palavras aparecem na página, e sem achá-las o link abre no
+alto da página.
 
 A cor do curso vem do `.json`, em `cor`, e a ferramenta a põe no estilo do
 `<body>` e do cartão na coletânea; o Limiar fica com a de fábrica do

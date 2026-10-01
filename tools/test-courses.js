@@ -1,8 +1,11 @@
 /* As páginas dos cursos, abertas num navegador de verdade.
    ------------------------------------------------------------------
    Cada página de library/courses/ é aberta em tela de computador e de celular,
-   e reprova se o console acusar erro, se algum pedido falhar ou se a página
-   rolar para os lados. Em cada deck, o teste faz o que quem apresenta faz:
+   e reprova se o console acusar erro, se algum pedido falhar, se a página
+   rolar para os lados ou se, depois de descer por ela inteira, alguma entrada
+   animada continuar invisível. Na página que leva à apostila pelo leitor de
+   PDF do site, o primeiro e o último desses links são abertos, e o leitor tem
+   de chegar à página pedida. Em cada deck, o teste faz o que quem apresenta faz:
    anda com a seta, abre o slide pelo #n, toca o vídeo no primeiro toque e
    confere que ele está andando, abre as anotações e as teclas, e no celular
    desliza o dedo para trocar de slide.
@@ -16,7 +19,10 @@
      1) npm run dev
      2) msedge --headless=new --remote-debugging-port=9222 \
                --user-data-dir=<pasta temporária> about:blank
-     3) node tools/test-courses.js [--shots <pasta>]
+     3) node tools/test-courses.js [--shots <pasta>] [--only <trecho do caminho>]
+
+   --only testa só as páginas cujo caminho tem o trecho, como
+   --only eletronica-analogica-1 ou --only class-02/slides.
 */
 const puppeteer = require('puppeteer-core');
 const fs = require('fs');
@@ -28,6 +34,8 @@ const ROOT = path.join(__dirname, '..');
 const ASSETS = path.resolve(ROOT, process.env.ASSETS_DIR || '../nipscern-assets');
 const i = process.argv.indexOf('--shots');
 const SHOTS = i > -1 ? path.resolve(process.argv[i + 1]) : null;
+const j = process.argv.indexOf('--only');
+const SO = j > -1 ? process.argv[j + 1] : '';
 
 const TELAS = {
   computador: { width: 1440, height: 900, deviceScaleFactor: 1 },
@@ -43,7 +51,7 @@ function paginas() {
       else if (nome === 'index.html') lista.push(path.relative(ROOT, p).split(path.sep).join('/'));
     }
   })(path.join(ROOT, 'library', 'courses'));
-  return lista.sort();
+  return lista.filter((p) => p.includes(SO)).sort();
 }
 
 const TIPOS = { '.mp4': 'video/mp4', '.pdf': 'application/pdf', '.webp': 'image/webp' };
@@ -86,6 +94,52 @@ async function abre(browser, pagina, tela, hash = '') {
   await page.goto(BASE + pagina.replace(/index\.html$/, '') + hash, { waitUntil: 'networkidle0' });
   await new Promise((r) => setTimeout(r, 900));
   return { page, erros };
+}
+
+/* Um link para o leitor de PDF do site, aberto como quem clica nele. O campo de
+   página diz a pedida, o quadro dela está desenhado, e o alto da tela cai dentro
+   dela, no ponto do #view=FitH ou no começo, a menos que o fim do documento não
+   deixe a rolagem chegar lá. Devolve os problemas. */
+async function testaLeitor(browser, href, tela) {
+  const page = await browser.newPage();
+  await page.emulate({ viewport: TELAS[tela], userAgent: await browser.userAgent() });
+  const erros = [];
+  page.on('console', (m) => { if (m.type() === 'error') erros.push('leitor, console: ' + m.text()); });
+  page.on('pageerror', (e) => erros.push('leitor, exceção: ' + e.message));
+  /* O PDF.js cancela o próprio pedido do arquivo inteiro quando o servidor é da
+     mesma origem e diz que aceita pedaços, como o /_cdn/ do dev-server: o
+     cancelamento é dele, e o PDF abre do mesmo jeito. */
+  page.on('requestfailed', (r) => {
+    const erro = (r.failure() || {}).errorText;
+    if (erro === 'net::ERR_ABORTED' && /\.pdf$/.test(new URL(r.url()).pathname)) return;
+    erros.push('leitor, falhou: ' + r.url() + ' ' + erro);
+  });
+  await comCdnLocal(page);
+  const n = +new URLSearchParams(new URL(href).hash.slice(1)).get('page');
+  await page.goto(href, { waitUntil: 'domcontentloaded' });
+  try {
+    await page.waitForFunction((k) => {
+      const f = document.querySelector(`.pdf-page[data-page-num="${k}"]`);
+      return f && f.querySelector('.pdf-canvas');
+    }, { timeout: 20000 }, n);
+  } catch (e) {
+    erros.push(`o leitor não desenhou a página ${n} de ${href}`);
+    await page.close();
+    return erros;
+  }
+  await new Promise((r) => setTimeout(r, 400));
+  const r = await page.evaluate((k) => {
+    const viewer = document.getElementById('viewer');
+    const f = document.querySelector(`.pdf-page[data-page-num="${k}"]`);
+    return { campo: +document.getElementById('page-input').value, dentro: viewer.scrollTop - f.offsetTop,
+      altura: f.offsetHeight, noFim: viewer.scrollTop >= viewer.scrollHeight - viewer.clientHeight - 2 };
+  }, n);
+  if (r.campo !== n) erros.push(`o leitor abriu ${href} com o campo na página ${r.campo}`);
+  if (!r.noFim && (r.dentro < -20 || r.dentro >= r.altura)) {
+    erros.push(`o leitor abriu ${href} com o alto da tela a ${Math.round(r.dentro)}px do começo da página ${n}, que tem ${r.altura}px`);
+  }
+  await page.close();
+  return erros;
 }
 
 const estado = (page) => page.evaluate(() => {
@@ -189,6 +243,10 @@ async function testaDeck(browser, pagina, tela, falhas) {
 }
 
 (async () => {
+  if (!paginas().length) {
+    console.error(`nenhuma página de library/courses/ tem ${JSON.stringify(SO)} no caminho`);
+    process.exit(1);
+  }
   if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
   const browser = await puppeteer.connect({ browserURL: BROWSER });
   const falhas = [];
@@ -203,13 +261,26 @@ async function testaDeck(browser, pagina, tela, falhas) {
       const r = await page.evaluate(async () => {
         /* desce a página inteira, para as entradas .fade-up e as imagens lazy virem */
         for (let y = 0; y < document.body.scrollHeight; y += innerHeight * 0.8) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 120)); }
+        await new Promise((r) => setTimeout(r, 400));
+        /* e nada fica para trás invisível: um bloco mais alto que dez telas nunca
+           mostrava um décimo de si, e o animacoes.py da aula 2 ficou assim */
+        const apagados = [...document.querySelectorAll('.fade-up, .fade-in, .stagger-children')]
+          .filter((el) => !el.classList.contains('visible'))
+          .map((el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}, ${Math.round(el.offsetHeight)}px`);
         scrollTo(0, 0);
         const quebradas = [...document.images].filter((im) => im.complete && im.naturalWidth === 0 && im.src).map((im) => im.src);
-        return { largura: document.documentElement.scrollWidth, janela: innerWidth, quebradas };
+        const leitor = [...document.querySelectorAll('a[href*="pdf-viewer.html"]')].map((a) => a.href);
+        return { largura: document.documentElement.scrollWidth, janela: innerWidth, quebradas, apagados, leitor };
       });
       if (r.largura > r.janela + 1) erros.push(`rola para o lado: ${r.largura}px numa janela de ${r.janela}px`);
       r.quebradas.forEach((s) => erros.push('imagem quebrada: ' + s));
+      r.apagados.forEach((s) => erros.push('ficou invisível depois de rolar: ' + s));
       if (SHOTS) await page.screenshot({ path: path.join(SHOTS, `${pagina}-${tela}.png`.replace(/[\/]+/g, '_')), fullPage: true });
+      /* O primeiro e o último link para o leitor de PDF do site: abre na página
+         pedida, com o ponto do #view=FitH no alto da tela. */
+      for (const href of [...new Set([r.leitor[0], r.leitor[r.leitor.length - 1]])].filter(Boolean)) {
+        (await testaLeitor(browser, href, tela)).forEach((x) => erros.push(x));
+      }
       erros.forEach((x) => falhas.push(`${pagina} [${tela}]: ${x}`));
       console.log(`  ${erros.length ? 'FALHA' : 'ok   '}  ${pagina} [${tela}]`);
       await page.close();

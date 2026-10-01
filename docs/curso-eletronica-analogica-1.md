@@ -88,6 +88,21 @@ isso não aparecia; com dois, apagaria o outro dos dois arquivos. Corrigido no
 commit `eee115e`: com `--course`, a coletânea e o sitemap ficam como estavam, e
 a ferramenta avisa.
 
+**O `#page=` não vale em todo leitor de PDF.** O sumário e os outros links
+para um lugar da apostila iam direto ao arquivo com `#page=N`. O leitor do
+Chrome obedece; a extensão do Adobe Acrobat no Chrome abre na primeira página,
+como apontou o Chrysthofer em 30/09/2026, e o celular baixa o arquivo e perde a
+página. Agora esses links passam pelo leitor de PDF do site, `pdf-viewer.html`,
+com a página e o ponto do marcador (`#page=N&view=FitH,topo`), e o PDF abre já
+no título da seção. O leitor passou a desenhar só as páginas perto da tela. Antes
+desenhava todas: na parte 1, a 200% numa tela comum, são 70 canvas de
+1190 × 1683 pixels, uns 560 MB pela conta de 4 bytes por pixel. É conta, não
+medida, e o Safari do iPhone limita a memória de canvas de uma página, então as
+últimas páginas, onde fica o gabarito, arriscavam sair em branco lá; isso é
+dedução, não foi testado num iPhone. Com a mudança, o teste contou no máximo 4
+páginas desenhadas ao mesmo tempo no computador e 11 no celular, rolando a
+parte 1 inteira.
+
 **O atalho levava o slug no título.** A página de `/library/<curso>/` tinha
 como título `slug.capitalize()`, o que dava "Eletronica-analogica-1". Agora é o
 nome do curso; o do Limiar continua "Limiar".
