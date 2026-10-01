@@ -20,6 +20,7 @@ import io
 import json
 import re
 import sys
+import urllib.parse
 import zipfile
 from pathlib import Path
 
@@ -620,11 +621,23 @@ class Curso:
         p = prefixo(rel)
         crumbs = migalhas([(rotulo("title"), p + "library/courses/"), (e(self.cfg["nome"]), "../../"),
                            (f'{rotulo("class")} {a["n"]}', "../"), (rotulo("code"), None)])
+        # Com mais de um arquivo, a lista deles no alto, cada um levando ao seu:
+        # o primeiro pode ter mil linhas, e o segundo fica longe.
+        arquivos = ""
+        if len(codigo) > 1:
+            arquivos = (f'<nav class="cr-actions cr-files fade-up" aria-label="{e(t("courses.on_this_page"))}" '
+                        f'data-i18n-aria="courses.on_this_page">'
+                        + "".join(f'<a class="btn btn-sm btn-ghost glass-btn" href="#{_id_arquivo(c["nome"])}">'
+                                  f'<i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-mono">{e(c["nome"])}</span>'
+                                  f'<span class="cr-muted"><span class="cr-mono">{c["linhas"]}</span> {rotulo("lines")}</span></a>'
+                                  for c in codigo)
+                        + '</nav>')
         topo = hero(self.url_midia(self.fundo, rel), crumbs,
                     f'<p class="eyebrow fade-up"><i class="ph ph-code" aria-hidden="true"></i>{rotulo("code")}</p>'
                     f'<h1 class="display-md fade-up" lang="pt-BR">Aula {a["n"]}: {e(tema_da_aula)}</h1>'
                     f'<p class="body-lg fade-up">{rotulo("code_intro")}</p>'
-                    f'<div class="cr-actions fade-up">{botao("../", "arrow-left", "back_to_class")}{IDIOMA}</div>',
+                    f'<div class="cr-actions fade-up">{botao("../", "arrow-left", "back_to_class")}{IDIOMA}</div>'
+                    + arquivos,
                     classe="cr-hero--slim")
         blocos = []
         for c in codigo:
@@ -959,9 +972,17 @@ class CursoDeApostila(Curso):
     def parte(self, n):
         return next(x for x in self.partes if x["cfg"]["n"] == n)
 
-    def pdf(self, x, indice):
-        """O endereço do PDF de uma parte aberto na página `indice`, contada de 0."""
-        return f"{x['url']}#page={indice + 1}"
+    def pdf(self, x, rel, indice, topo=None):
+        """O endereço que abre o PDF de uma parte na página `indice`, contada de 0, e no ponto `topo` dela.
+
+        Vai pelo leitor de PDF do site, /pdf-viewer.html, e não direto ao
+        arquivo, porque o leitor do navegador nem sempre obedece ao #page=: a
+        extensão do Adobe Acrobat no Chrome abre na primeira página, e o celular
+        baixa o arquivo. O endereço leva os parâmetros de abertura do PDF,
+        #page=N e #view=FitH,topo, que o leitor do site lê como o do navegador
+        leria; `rel` é a página onde o link fica."""
+        ancora = f"page={indice + 1}" + (f"&view=FitH,{topo:g}" if topo is not None else "")
+        return f"{prefixo(rel)}pdf-viewer.html?src={urllib.parse.quote(x['url'], safe=':/')}#{ancora}"
 
     # ---------------------------------------------------------- a rodada
 
@@ -1002,13 +1023,14 @@ class CursoDeApostila(Curso):
                   f"(resumo {h}); revise secoes.modelos em {self.arquivo.name} e atualize resumo_da_leitura.")
         if m["abertura"] not in secao:
             raise SystemExit(f"a frase de abertura de secoes.modelos não está mais na seção {m['secao']} da apostila")
-        self.indice_do_modelo = ap.indice_da_secao(m["secao"])
+        self.destino_do_modelo = ap.destino_da_secao(m["secao"])
         self.citacoes = {}
         for c in s["metodo"] + [s["evolucao"]]:
-            indice = self.parte(c["parte"])["ap"].pagina_da_citacao(c["citacao"])
+            ap_ = self.parte(c["parte"])["ap"]
+            indice = ap_.pagina_da_citacao(c["citacao"])
             if indice is None:
                 raise SystemExit(f"a citação {c['citacao'][:60]!r}, em {self.arquivo.name}, não está mais na parte {c['parte']}")
-            self.citacoes[c["citacao"]] = indice
+            self.citacoes[c["citacao"]] = (indice, ap_.topo_da_citacao(c["citacao"], indice))
 
     def gera_imagens(self):
         """A capa do curso, o fundo do hero, e de cada parte a capa dela e uma figura para o cartão.
@@ -1071,22 +1093,26 @@ class CursoDeApostila(Curso):
 
         # A parte e o material, lado a lado: a abertura de cada capítulo, nas
         # palavras da apostila, e o que se abre dela.
-        def link(indice, miolo):
-            return (f'<a class="cr-ref-link" href="{self.pdf(x, indice)}"{fora}>{miolo}'
-                    f' <span class="cr-muted">{rotulo("page_abbr")} {e(ap.rotulo(indice))}</span>{seta}</a>')
+        def na(entrada):
+            """O endereço que abre a apostila no marcador `entrada`, na página e na altura dele."""
+            return self.pdf(x, rel, entrada.indice, entrada.topo)
+
+        def link(entrada, miolo):
+            return (f'<a class="cr-ref-link" href="{e(na(entrada))}"{fora}>{miolo}'
+                    f' <span class="cr-muted">{rotulo("page_abbr")} {e(entrada.rotulo)}</span>{seta}</a>')
 
         blocos = []
         for c in ap.capitulos:
             exercicios = next((s for s in c.secoes if not s.numero and s.titulo.startswith("Exercícios")), None)
             resumo = next((s for s in c.secoes if not s.numero and s.titulo.startswith("Resumo")), None)
-            links = [link(c.indice, f'<span class="cr-wave">{rotulo("read_chapter")}</span>')]
+            links = [link(c, f'<span class="cr-wave">{rotulo("read_chapter")}</span>')]
             if exercicios:
                 respostas = (f' · <span class="cr-mono">{c.respondidos}</span> {rotulo("with_answer")}'
                              if c.respondidos < c.exercicios else "")
-                links.append(link(exercicios.indice, f'<span class="cr-wave"><span class="cr-mono">{c.exercicios}</span> '
-                                                     f'{rotulo("n_exercises")}{respostas}</span>'))
+                links.append(link(exercicios, f'<span class="cr-wave"><span class="cr-mono">{c.exercicios}</span> '
+                                              f'{rotulo("n_exercises")}{respostas}</span>'))
             if resumo:
-                links.append(link(resumo.indice, f'<span class="cr-wave">{rotulo("chapter_summary")}</span>'))
+                links.append(link(resumo, f'<span class="cr-wave">{rotulo("chapter_summary")}</span>'))
             abertura = "".join(f"<p>{e(t)}</p>" for t in c.abertura)
             blocos.append(f'<section class="cr-block" id="capitulo-{c.numero}">'
                           f'<h3 class="cr-block-title">{rotulo("chapter")} <span class="cr-mono">{c.numero}</span></h3>'
@@ -1105,11 +1131,11 @@ class CursoDeApostila(Curso):
         itens = [linha(url, "file-pdf", rotulo("handout_pdf"),
                        f'<span class="cr-mono">{ap.paginas}</span> {rotulo("n_pages")} · <span class="cr-mono">{mb}</span> MB · '
                        f'{rotulo("version")} <span class="cr-mono">{x["versao"]}</span>'),
-                 linha(self.pdf(x, ap.gabarito.indice), "check-circle", rotulo("answer_key"), rotulo("answer_key_desc"))]
+                 linha(na(ap.gabarito), "check-circle", rotulo("answer_key"), rotulo("answer_key_desc"))]
         for c in ap.capitulos:
             resumo = next((s for s in c.secoes if not s.numero and s.titulo.startswith("Resumo")), None)
             if resumo:
-                itens.append(linha(self.pdf(x, resumo.indice), "file-text",
+                itens.append(linha(na(resumo), "file-text",
                                    f'{rotulo("chapter_summary")} <span class="cr-mono">{c.numero}</span>', rotulo("chapter_summary_desc")))
         lt = cfg["ltspice"]
         outras = "".join(linha(f'../{y["cfg"]["slug"]}/', "books", f'{rotulo("part")} <span class="cr-mono">{y["cfg"]["n"]}</span>',
@@ -1125,20 +1151,20 @@ class CursoDeApostila(Curso):
                     + '</aside>')
         banda_parte = banda(f'<div class="cr-duo">{plano}{material}</div>', lit=True, classe="cr-band--first")
 
-        # O sumário, dos marcadores do PDF: cada linha abre o PDF na página dela.
+        # O sumário, dos marcadores do PDF: cada linha abre o PDF no lugar dela.
         colunas = []
         for c in ap.capitulos:
             secoes = "".join(
-                f'<li><a href="{self.pdf(x, s.indice)}"{fora}><span class="cr-toc2-n">{e(s.numero or "")}</span>'
+                f'<li><a href="{e(na(s))}"{fora}><span class="cr-toc2-n">{e(s.numero or "")}</span>'
                 f'<span class="cr-toc2-t">{e(s.titulo)}</span><span class="cr-toc2-p">{e(s.rotulo)}</span></a></li>'
                 for s in c.secoes)
             colunas.append(f'<section class="cr-toc2-ch" aria-labelledby="sumario-{c.numero}">'
-                           f'<h3 class="cr-toc2-title" id="sumario-{c.numero}"><a href="{self.pdf(x, c.indice)}"{fora}>'
+                           f'<h3 class="cr-toc2-title" id="sumario-{c.numero}"><a href="{e(na(c))}"{fora}>'
                            f'<span class="cr-toc2-cap">{rotulo("chapter")} <span class="cr-mono">{c.numero}</span></span>'
                            f'<span class="cr-toc2-name" lang="pt-BR">{e(c.titulo)}</span></a></h3>'
                            f'<ol lang="pt-BR">{secoes}</ol></section>')
         gab = ap.gabarito
-        gabarito = (f'<p class="cr-toc2-end"><a href="{self.pdf(x, gab.indice)}"{fora}><i class="ph ph-check-circle" aria-hidden="true"></i>'
+        gabarito = (f'<p class="cr-toc2-end"><a href="{e(na(gab))}"{fora}><i class="ph ph-check-circle" aria-hidden="true"></i>'
                     f'<span class="cr-toc2-t" lang="pt-BR">{e(gab.titulo)}</span><span class="cr-toc2-p">{e(gab.rotulo)}</span></a></p>')
         tem_praticas = bool(ap.praticas)
         banda_sumario = banda(titulo("list", "contents", "sumario-t")
@@ -1154,7 +1180,7 @@ class CursoDeApostila(Curso):
                 f'<li id="pratica-{q.n}"><span class="cr-agenda-t">{rotulo("practice")} {q.n}</span>'
                 f'<div class="cr-lab"><p class="cr-lab-title" lang="pt-BR">{e(_maiuscula(q.titulo))}</p>'
                 f'<p lang="pt-BR">{e(q.objetivo)}</p>'
-                f'<p class="cr-ref-links">{link(q.indice, abrir)}</p></div></li>'
+                f'<p class="cr-ref-links">{link(q, abrir)}</p></div></li>'
                 for q in ap.praticas)
             banda_lab = banda(titulo("flask", "lab_practices", "praticas-t")
                               + f'<p class="cr-intro fade-up">{rotulo("lab_intro")}</p>'
@@ -1192,7 +1218,7 @@ class CursoDeApostila(Curso):
         topo = hero(self.url_midia(self.fundo, rel), crumbs, texto_hero, capa, classe="cr-hero--course")
 
         def cita(parte, citacao, onde):
-            return (f'<p class="cr-ed-cite" lang="pt-BR"><a class="cr-ref-link" href="{self.pdf(self.parte(parte), self.citacoes[citacao])}"{fora}>'
+            return (f'<p class="cr-ed-cite" lang="pt-BR"><a class="cr-ref-link" href="{e(self.pdf(self.parte(parte), rel, *self.citacoes[citacao]))}"{fora}>'
                     f'<span class="cr-wave">{e(onde)}</span>{seta}</a></p>')
 
         # As partes, cada uma com uma figura dela no cartão.
@@ -1217,7 +1243,7 @@ class CursoDeApostila(Curso):
                   + "\n".join("| " + " | ".join(l) + " |" for l in m["linhas"]))
         modelos = (f'<p class="cr-ed-lede" lang="pt-BR">“{e(m["abertura"])}.”</p>'
                    f'<div class="cr-prose cr-models" lang="pt-BR">{md(tabela)}</div>'
-                   f'<p class="cr-ed-cite" lang="pt-BR"><a class="cr-ref-link" href="{self.pdf(self.parte(m["parte"]), self.indice_do_modelo)}"{fora}>'
+                   f'<p class="cr-ed-cite" lang="pt-BR"><a class="cr-ref-link" href="{e(self.pdf(self.parte(m["parte"]), rel, *self.destino_do_modelo))}"{fora}>'
                    f'<span class="cr-wave">{e(m["onde"])}</span>{seta}</a></p>')
 
         # Como estudar: três frases da apostila, cada uma com a página de onde veio.
@@ -1419,16 +1445,29 @@ def confere_links(cursos):
     tem de ser um arquivo que esta rodada publicou; e a âncora tem de existir na
     página de destino. Nos slides, #n é o número do slide, que o slides.js lê,
     e vale de 1 ao total. Endereço de fora não se confere aqui, porque depende
-    da rede; é o que o relatório do PR conta. Devolve a lista dos problemas.
+    da rede; é o que o relatório do PR conta. O link para o leitor de PDF do
+    site, pdf-viewer.html, tem de abrir um PDF desta rodada, numa página que ele
+    tem. Devolve a lista dos problemas.
     """
-    import urllib.parse
     cdn = {c.cdn.BASE + caminho for c in cursos for caminho in c.cdn.usados}
+    paginas_do_pdf = {x["url"]: x["ap"].paginas for c in cursos for x in getattr(c, "partes", [])}
+    leitor = (RAIZ / "pdf-viewer.html").resolve()
     paginas = {}
     for arq in sorted(SAIDA.rglob("*.html")):
         paginas[arq.resolve()] = arq.read_text(encoding="utf-8")
 
     def ids(texto_html):
         return set(re.findall(r'\sid="([^"]+)"', texto_html))
+
+    def no_leitor(rel, valor, destino, ancora):
+        src = (urllib.parse.parse_qs(urllib.parse.urlsplit(destino).query).get("src") or [""])[0]
+        if src not in cdn:
+            return [f"{rel}: {valor} abre no leitor {src or 'nada'}, que não é um PDF publicado no CDN nesta rodada"]
+        pagina = (urllib.parse.parse_qs(ancora).get("page") or ["1"])[0]
+        total = paginas_do_pdf.get(src)
+        if not pagina.isdigit() or (total and not 1 <= int(pagina) <= total):
+            return [f"{rel}: {valor} pede a página {pagina}, e o PDF tem {total}"]
+        return []
 
     def arquivo_de(caminho_url):
         alvo = (RAIZ / caminho_url.lstrip("/")).resolve()
@@ -1467,6 +1506,9 @@ def confere_links(cursos):
                     continue
             else:
                 alvo = arq
+            if alvo == leitor:
+                problemas += no_leitor(rel, valor, destino, ancora)
+                continue
             if ancora:
                 if alvo.name == "index.html" and alvo.parent.name == "slides" and ancora.isdigit():
                     n = paginas.get(alvo.resolve(), "").count('<section id="')

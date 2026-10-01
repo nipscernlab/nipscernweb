@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=e5c0a3de6f';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=5422482445';
 
-import { newsPostUrl } from './content-links.js?v=e5c0a3de6f';
+import { newsPostUrl } from './content-links.js?v=5422482445';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=e5c0a3de6f';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=5422482445';
 
 // ============================================================
 // Navigation Template
@@ -560,14 +560,22 @@ function initSupporters() {
 // Intersection Observer — Entrance animations
 // ============================================================
 function initAnimations() {
+  /* The cue is a tenth of the element on screen, which an element taller than
+     ten screens never shows: the code page of a class whose file runs to 1,800
+     lines kept that file at opacity 0 for good, and anything taller than the
+     screen sat blank for a while before its tenth came up. So the observer also
+     listens at the first pixel, and an element taller than the screen comes in
+     there; the rest keep the tenth. */
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
+      if (!entry.isIntersecting) return;
+      const screen = entry.rootBounds ? entry.rootBounds.height : window.innerHeight;
+      if (entry.intersectionRatio >= 0.1 || entry.boundingClientRect.height > screen) {
         entry.target.classList.add('visible');
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: [0, 0.1], rootMargin: '0px 0px -40px 0px' });
 
   document.querySelectorAll('.fade-up, .fade-in, .stagger-children').forEach(el => {
     observer.observe(el);
@@ -863,7 +871,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=e5c0a3de6f">. Each copy would otherwise append its own
+// <script src="main.js?v=5422482445">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {

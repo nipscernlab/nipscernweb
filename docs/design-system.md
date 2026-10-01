@@ -212,7 +212,11 @@ writes `opacity:0` inline the moment the tween is built and clears it only when
 the trigger fires. One trigger that does not fire and the section is blank with
 no way for a reader to recover, which happened. Entrances are CSS —
 `.fade-up`, `.fade-in`, `.stagger-children`, marked `.visible` by the observer
-in main.js — with `revealFailsafe()` two seconds behind them. Everything in
+in main.js — with `revealFailsafe()` two seconds behind them on the home page.
+The observer's cue is a tenth of the element on screen, except for an element
+taller than the screen, which comes in at its first pixel: one taller than ten
+screens never shows a tenth of itself, and the 1,800-line file on a course's
+code page stayed blank for good until that rule. Everything in
 motion.js animates transforms alone: if none of it runs, the page is exactly
 what the stylesheet laid out.
 

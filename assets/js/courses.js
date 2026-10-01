@@ -10,14 +10,23 @@
 
    O foco vai junto para o destino, como iria num link comum: sem isso, o próximo
    Tab voltaria para o topo da página. */
-import { scrollToEl } from './smooth-scroll.js?v=e5c0a3de6f';
+import { scrollToEl } from './smooth-scroll.js?v=5422482445';
 
 /* Aberta em localhost, a página troca os links para o CDN pelo /_cdn/ do
    dev-server, que serve o clone do nipscern-assets: o PDF de uma aula nova abre
-   antes de chegar ao CDN. Em produção, nada muda. */
+   antes de chegar ao CDN. Vale também para o PDF que o leitor do site abre, no
+   src= do link para o pdf-viewer.html. Em produção, nada muda. */
 if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
-  document.querySelectorAll('a[href^="https://cdn.nipscern.com/"]').forEach((a) => {
-    a.href = '/_cdn/' + a.getAttribute('href').slice('https://cdn.nipscern.com/'.length);
+  const CDN = 'https://cdn.nipscern.com/';
+  document.querySelectorAll(`a[href^="${CDN}"]`).forEach((a) => {
+    a.href = '/_cdn/' + a.getAttribute('href').slice(CDN.length);
+  });
+  document.querySelectorAll('a[href*="pdf-viewer.html?src="]').forEach((a) => {
+    const u = new URL(a.href);
+    const src = u.searchParams.get('src') || '';
+    if (!src.startsWith(CDN)) return;
+    u.searchParams.set('src', '/_cdn/' + src.slice(CDN.length));
+    a.href = u.href;
   });
 }
 

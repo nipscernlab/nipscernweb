@@ -54,7 +54,7 @@ Comandos disponíveis:
 | `npm run build:icons` | regenera os subconjuntos (o hook já faz) |
 | `npm run check:min` / `check:icons` | falham se algo estiver defasado — é o que o CI roda |
 | `npm run build:courses` | gera `library/courses/` a partir do repositório de cada curso; o passo a passo está em `tools/courses/README.md` |
-| `npm run test:courses` | abre cada página dos cursos no computador e no celular e toca todos os vídeos de cada deck |
+| `npm run test:courses` | abre cada página dos cursos no computador e no celular, confere que nada fica invisível depois de rolar, abre os links de página da apostila no leitor de PDF do site e toca todos os vídeos de cada deck |
 | `bash tools/check-edge.sh` | pergunta à borda o que ela devolve; hoje 13 ok, 0 pendente |
 
 ---
