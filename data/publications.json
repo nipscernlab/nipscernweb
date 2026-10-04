@@ -22,7 +22,7 @@
     "doi": "10.1109/INSCIT72361.2026.11707206",
     "abstract": "The trigger and data acquisition systems of the LHC experiments rely on reconfigurable architectures based on FPGA (Field Programmable Gate Arrays) to accommodate design updates and increasing of the detectors complexity. However, this flexibility comes at the cost of longer development and validation cycles, particularly for large real-time systems operating under strict latency and throughput constraints. This work presents the HLS-based firmware redesign of the back-end system from the ATLAS Liquid Argon Calorimeter, where the introduction of a parallel switch matrix on REMAP block significantly simplifies the architecture and reduces the use of firmware resources. The proposed methodology allows systematic design exploration without modifying the source code, shortens verification time, and provides a more efficient workflow for creating and maintaining large-scale FPGA firmware in modern trigger systems.",
     "tags": ["HLS", "FPGA", "ATLAS", "LAr", "Calorimeter", "Trigger", "LATOME", "REMAP", "INSCIT"],
-    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-deconvolution-pseudoinverse-energy-reconstruction.pdf"
+    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-hls-lar-trigger-firmware.pdf"
   },
   {
     "id": "pub-2026-inscit-deconvolution-pseudoinverse",
@@ -34,7 +34,7 @@
     "doi": "10.1109/INSCIT72361.2026.11707220",
     "abstract": "Modern High-Energy Physics (HEP) experiments face significant challenges in data processing due to high-luminosity environments where the overlapping of signals, known as pile-up, degrades detector resolution. Traditionally, the Optimal Filter (OF) algorithm is employed for amplitude estimation. However, its performance is limited in high-occupancy scenarios because the filter weights must be specifically recalculated for different pile-up levels to maintain accuracy. This paper proposes an alternative online energy reconstruction technique based on deconvolutional filtering using the Moore-Penrose pseudoinverse. By treating the signal reconstruction as an inverse problem, the proposed method relies solely on the knowledge of the system's impulse response to effectively separate overlapping pulses across varying pile-up conditions. Unlike the OF approach, which typically requires an additional peak detection stage combined with a phase filter, the deconvolution output directly provides the energy values at the precise time of the collision. The approach was validated using the Lorenzetti Showers framework, simulating Liquid Argon (LArg) calorimeter responses under severe multi-hit conditions. Results demonstrate that the deconvolution method significantly reduces the Root Mean Square Error (RMSE) from approximately 200 MeV in the conventional OF to values between 50 and 100 MeV, representing a reduction of up to 62.5% in reconstruction error. Also, it maintains high detection efficiency compared to the conventional OF. The proposed architecture is suitable for low-latency implementation in Field Programmable Gate Arrays (FPGAs), offering a streamlined and robust solution for real-time trigger systems.",
     "tags": ["Deconvolution", "Calorimetry", "HEP", "Energy reconstruction", "Pile-up", "FPGA", "Lorenzetti", "Pseudoinverse", "INSCIT"],
-    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-hls-firmware-lar-trigger.pdf"
+    "pdf": "https://cdn.nipscern.com/publications/inscit-2026-pseudoinverse-deconvolution-energy.pdf"
   },
   {
     "id": "pub-2026-inscit-pzc-wiener",
