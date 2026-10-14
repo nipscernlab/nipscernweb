@@ -278,8 +278,8 @@
     <header class="project-hero" aria-labelledby="yanc-title">
       <div class="ync-bg" aria-hidden="true">
         <div class="op-stream r1"><span>LOD SET PSH POP INN OUT JMP JIZ CAL RET ADD MLT DIV MOD F_ADD F_MLT F_DIV I2F F2I F_ROT NRM PST XPO F_SCL LDI STI ILI ISI &nbsp; LOD SET PSH POP INN OUT JMP JIZ CAL RET ADD MLT DIV MOD F_ADD F_MLT F_DIV I2F F2I F_ROT NRM PST XPO F_SCL LDI STI ILI ISI &nbsp;</span></div>
-        <div class="op-stream r2"><span>#PRNAME #NUBITS #NBMANT #NBEXPO #NDSTAC #SDEPTH #NUIOIN #NUIOOU #NUGAIN #FFTSIZ &nbsp; #PRNAME #NUBITS #NBMANT #NBEXPO #NDSTAC #SDEPTH #NUIOIN #NUIOOU #NUGAIN #FFTSIZ &nbsp;</span></div>
-        <div class="op-stream r3"><span>cmmcomp cppcomp asmcomp cpppp appcomp iverilog vvp verilator surfer &nbsp; cmmcomp cppcomp asmcomp cpppp appcomp iverilog vvp verilator surfer &nbsp;</span></div>
+        <div class="op-stream r2"><span>#NUBITS #NBMANT #NBEXPO #NDSTAC #SDEPTH #NUIOIN #NUIOOU #NUGAIN #FFTSIZ #LKSYNC &nbsp; #NUBITS #NBMANT #NBEXPO #NDSTAC #SDEPTH #NUIOIN #NUIOOU #NUGAIN #FFTSIZ #LKSYNC &nbsp;</span></div>
+        <div class="op-stream r3"><span>yanc cmmcomp cppcomp asmcomp iverilog vvp verilator surfer &nbsp; yanc cmmcomp cppcomp asmcomp iverilog vvp verilator surfer &nbsp;</span></div>
       </div>
       <div class="project-hero-inner" style="position:relative;z-index:1">
         <img class="ync-emblem" src="../assets/icons/yanc.svg" alt="YANC emblem: three chevrons pointing forward" width="132" height="132">
@@ -398,12 +398,9 @@
                 <span class="fn">Sqrt.cmm</span>
                 <span class="lang">C±</span>
               </div>
-<pre class="code-body"><span class="dir">#PRNAME</span> Sqrt
-<span class="dir">#NUBITS</span> <span class="num">32</span>
+<pre class="code-body"><span class="dir">#NUBITS</span> <span class="num">32</span>
 <span class="dir">#NBMANT</span> <span class="num">23</span>
 <span class="dir">#NBEXPO</span> <span class="num">8</span>
-<span class="dir">#NDSTAC</span> <span class="num">5</span>
-<span class="dir">#SDEPTH</span> <span class="num">5</span>
 
 <span class="typ">float</span> <span class="kw">my_sqrt</span>(<span class="typ">float</span> num)
 {
@@ -422,7 +419,7 @@
     <span class="kw">return</span> x;
 }</pre>
             </div>
-            <p class="code-cap">From the test suite, trimmed. The header is the hardware; the body is a square root by
+            <p class="code-cap">From the test suite, trimmed. The file's name is the processor's name, the header is the hardware; the body is a square root by
             Newton's method, seeded by a bit-trick on the float's exponent.</p>
           </div>
 
@@ -433,8 +430,7 @@
                 <span class="fn">test61.cpp</span>
                 <span class="lang">C++</span>
               </div>
-<pre class="code-body"><span class="dir">#pragma</span> yanc prname test61
-<span class="dir">#include</span> <span class="num">&lt;array&gt;</span>
+<pre class="code-body"><span class="dir">#include</span> <span class="num">&lt;array&gt;</span>
 
 <span class="kw">constexpr</span> <span class="typ">int</span> M_PULSE = <span class="num">15</span>;
 <span class="kw">constexpr</span> <span class="typ">int</span> C_PEAK  = <span class="num">5</span>;
@@ -471,12 +467,14 @@
       <div class="container">
         <div class="sec-label fade-up"><span class="n">» 03</span> The pipeline</div>
         <div class="prose fade-up" style="max-width:68ch">
-          <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">Five binaries, <span class="grad-machine">one descent</span></h2>
+          <h2 class="heading-lg" style="margin-bottom:var(--sp-4)">One driver, <span class="grad-machine">one descent</span></h2>
           <p>
-            Each stage is a separate program with one job, in the old Unix way. The front-ends translate your language
-            into SAPHO assembly. <span class="ic">appcomp</span> makes a first pass over that assembly and resolves
-            every variable and label to an address. <span class="ic">asmcomp</span> then writes the hardware: the
-            processor, its memories, its testbench. From there it is simulation and reading waves.
+            Each stage is a separate program with one job, in the old Unix way, and <span class="ic">yanc</span>
+            drives them. The front-ends, <span class="ic">cmmcomp</span> for C± and <span class="ic">cppcomp</span>
+            for C++, translate your language into SAPHO assembly. <span class="ic">asmcomp</span> makes a first pass
+            over that assembly to resolve every variable and label to an address, then writes the hardware: the
+            processor, its memories, its testbench. The processor takes the name of the source file. From there it
+            is simulation and reading waves.
           </p>
         </div>
 

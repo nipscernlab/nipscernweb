@@ -364,8 +364,8 @@
               tailored to run it. The first lines of a
               C± file are not comments or setup; they tune that hardware. <span class="ic">#NUBITS</span> sets the width of
               the datapath. <span class="ic">#NBMANT</span> and <span class="ic">#NBEXPO</span> define the
-              floating-point format the silicon will use. <span class="ic">#NDSTAC</span> and
-              <span class="ic">#SDEPTH</span> size the stacks; <span class="ic">#NUIOIN</span> and
+              floating-point format the silicon will use. The compiler sizes the stacks from the program, and
+              <span class="ic">#NDSTAC</span> and <span class="ic">#SDEPTH</span> override it; <span class="ic">#NUIOIN</span> and
               <span class="ic">#NUIOOU</span> set the I/O ports. Change a number, and you get a different processor.
             </p>
             <p style="margin-top:var(--sp-4)">
@@ -384,16 +384,13 @@
                 <span class="dots"><i></i><i></i><i></i></span>
                 <span class="fn">sqrt_newton.cmm</span>
               </div>
-<pre class="code-body"><span class="dir">#PRNAME</span>  sqrt_newton
-<span class="dir">#NUBITS</span>  <span class="num">32</span>      <span class="cm">// datapath width (the silicon itself)</span>
+<pre class="code-body"><span class="dir">#NUBITS</span>  <span class="num">32</span>      <span class="cm">// datapath width (the silicon itself)</span>
 <span class="dir">#NBMANT</span>  <span class="num">23</span>      <span class="cm">// float: mantissa bits</span>
 <span class="dir">#NBEXPO</span>  <span class="num">8</span>       <span class="cm">// float: exponent bits</span>
-<span class="dir">#NDSTAC</span>  <span class="num">5</span>       <span class="cm">// data-stack depth</span>
-<span class="dir">#SDEPTH</span>  <span class="num">5</span>       <span class="cm">// call-stack depth</span>
 <span class="dir">#NUIOIN</span>  <span class="num">1</span>       <span class="cm">// input ports</span>
 <span class="dir">#NUIOOU</span>  <span class="num">1</span>       <span class="cm">// output ports</span></pre>
             </div>
-            <p class="code-cap">The header is the processor's hardware spec. The body, plain C±, is the program it runs.</p>
+            <p class="code-cap">The file's name is the processor's name, and the header is its hardware spec. The body, plain C±, is the program it runs.</p>
           </div>
         </div>
       </div>
@@ -411,7 +408,7 @@
           <p>
             The platform comes in two halves. <strong>AURORA</strong> is the IDE you see and click: the editor, the file
             tree, the terminals, the simulators, the RTL viewer. <strong>YANC</strong> is the compiler suite underneath
-            it (<span class="ic">cmmcomp</span>, <span class="ic">asmcomp</span>, <span class="ic">appcomp</span>). You
+            it (<span class="ic">cmmcomp</span>, <span class="ic">cppcomp</span>, <span class="ic">asmcomp</span>). You
             work in AURORA; YANC does the translating. Together they are SAPHO.
           </p>
         </div>
