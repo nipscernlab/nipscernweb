@@ -34,7 +34,6 @@ const MAPA = {
   "articles/CBA_2024_Análise_de_Influência.pdf": "https://cdn.nipscern.com/publications/cba-2024-analise-de-influencia.pdf",
   "articles/CBA_2024_Avanços_na_Estimação.pdf": "https://cdn.nipscern.com/publications/cba-2024-avancos-na-estimacao.pdf",
   "articles/CBA_2024_Estudo_de_um_Método.pdf": "https://cdn.nipscern.com/publications/cba-2024-estudo-de-um-metodo.pdf",
-  "articles/CBA_2026_AURORA_Compilação_e_Simulação.pdf": "https://cdn.nipscern.com/publications/cba-2026-aurora-compilacao-e-simulacao.pdf",
   "articles/CBA_2026_Modernização_do_CGV.pdf": "https://cdn.nipscern.com/publications/cba-2026-modernizacao-do-cgv.pdf",
   "articles/CBIC_2015_Correção_Não_Linear.pdf": "https://cdn.nipscern.com/publications/cbic-2015-correcao-nao-linear.pdf",
   "articles/CBIC_2021_Estimativa_de_Energia.pdf": "https://cdn.nipscern.com/publications/cbic-2021-estimativa-de-energia.pdf",
