@@ -101,7 +101,7 @@
     "id": "pub-2026-cba-cgvweb",
     "featured": true,
     "title": "CGVWeb: Modernização do Calorimeter Geometry Viewer do ATLAS para Plataforma Web",
-    "authors": ["Chrysthofer A. A. Afonso", "Luciano Manhães de Andrade Filho", "Carvalho, M. A.", "Leonardo, R. L."],
+    "authors": ["Chrysthofer Arthur Amaro Afonso", "Roberta Luchini Leonardo", "Luciano Manhães de Andrade Filho", "Mateus Araujo Carvalho"],
     "journal": "Congresso Brasileiro de Automática — CBA 2026",
     "year": 2026,
     "type": "conference",
@@ -109,6 +109,54 @@
     "abstract": "O detector ATLAS no CERN opera um dos sistemas de calorimetria mais complexos da física de altas energias. O CaloGeoView (CGV), ferramenta de visualização tridimensional de eventos desenvolvida sobre o framework ROOT, foi amplamente utilizada durante o comissionamento do ATLAS. Dificuldades de manutenção decorrentes da dependência do ROOT levaram à sua retirada da Sala de Controle. Este trabalho apresenta o CGVWeb, uma modernização completa do CGV para plataforma web, com renderização em Three.js/WebGL, decodificação de identificadores em WebAssembly e dois modos de operação: offline, com carregamento local de eventos, e online, com busca automática do evento mais recente no ATLAS Live. O sistema atual oferece visualização completa para os subdetectores TileCal, LAr, HEC e FCAL, sendo que este último não estava presente na versão legada.",
     "tags": ["CGVWeb", "ATLAS", "CERN", "Calorímetro", "Three.js", "WebAssembly", "Rust", "Run 4", "CBA"],
     "pdf": "https://cdn.nipscern.com/publications/cba-2026-modernizacao-do-cgv.pdf"
+  },
+  {
+    "id": "pub-2026-cba-deconvolucao-pseudoinversa-lar",
+    "title": "Reconstrução Online de Energia para o Calorímetro de Argônio Líquido do Experimento ATLAS utilizando Deconvolução por Pseudoinversa",
+    "authors": ["Melissa Santos Aguiar", "Eder Barboza Kapisch", "Ualison Rodrigo Ferreira Dias", "Marcos Vinícius Silva Oliveira", "Luciano Manhães de Andrade Filho"],
+    "journal": "Congresso Brasileiro de Automática — CBA 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "Experimentos modernos de Física de Altas Energias enfrentam desafios no processamento de dados devido à alta luminosidade, onde a sobreposição de sinais degrada a resolução dos detectores. O Filtro Ótimo (OF), tradicionalmente empregado para a estimação de amplitude dos pulsos, tem seu desempenho limitado em cenários de alta ocupação. Este trabalho propõe uma técnica de reconstrução de energia online baseada em filtragem por deconvolução utilizando a pseudoinversa de Moore-Penrose. Ao tratar a reconstrução como um problema inverso, o método baseia-se apenas na resposta ao impulso do sistema para separar pulsos sobrepostos sob diferentes condições de pile-up, e sua saída fornece diretamente os valores de energia no instante da colisão, sem a etapa adicional de detecção de pico exigida pelo OF. Os resultados obtidos para a leitura do calorímetro de Argônio Líquido mostram que, na maior ocupação avaliada, a deconvolução reduz a raiz do erro quadrático médio (RMSE) de aproximadamente 200 MeV no OF convencional para menos de 75 MeV, mantendo alta eficiência de detecção a um custo de hardware equivalente. A arquitetura proposta é adequada para implementação de baixa latência em Field Programmable Gate Arrays (FPGA), oferecendo uma solução simplificada e robusta para sistemas de trigger em tempo real.",
+    "tags": ["Deconvolução", "Pseudoinversa", "Calorimetria", "LAr", "ATLAS", "Pile-up", "FPGA", "CBA"],
+    "pdf": "https://cdn.nipscern.com/publications/cba-2026-deconvolucao-pseudoinversa-lar.pdf"
+  },
+  {
+    "id": "pub-2026-cba-validacao-firmware-latome",
+    "title": "Validação Funcional da Nova Arquitetura do Firmware do Calorímetro do ATLAS",
+    "authors": ["Dabson Ferreira dos Santos", "Melissa Santos Aguiar", "Marcos Vinícius Silva Oliveira", "Luciano Manhães de Andrade Filho"],
+    "journal": "Congresso Brasileiro de Automática — CBA 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "O experimento ATLAS do Large Hadron Collider (LHC) requer um sistema de trigger eficiente para selecionar eventos fisicamente relevantes dentre os dados gerados à frequência de 40 MHz. Em busca de novas descobertas, o LHC vem elevando sua taxa de colisão de partículas. Os módulos LATOME são responsáveis pela reconstrução de energia a partir de 320 Super Células com restrições rígidas de latência. Três módulos centrais (REMAP, USERCODE e OSUM) foram redesenhados usando High-Level Synthesis (HLS), substituindo uma arquitetura serial em VHDL por uma paralela a 160 MHz. Este trabalho emprega uma metodologia de verificação multicamada para garantir que o bloco de reconstrução de energia mantenha consistência funcional entre o novo firmware HLS e a implementação de referência. A estratégia compreende três camadas progressivas: L0, para validar o novo bloco via testbench em C++ e co-simulação SystemC/SCVerify; L1, que integra os módulos em um único domínio de clock e é realizada em duas implementações complementares, com Cocotb, ciclo a ciclo, e com SCVerify, para acelerar a varredura dos 116 mapeamentos do detector; e L2, que simula todos os blocos em conjunto com interfaces que permitem o acoplamento de arquitetura serial e paralela. Em L1 e L2 é empregado o ambiente Cocotb com QuestaSim, cobrindo uma órbita completa de 3564 cruzamentos de feixe. A validação apoia-se em dois modelos de referência em Python: um ciente do firmware, que replica seu comportamento interno, e um agnóstico, que descreve o comportamento esperado de alto nível. Os resultados confirmam a eficácia das atualizações propostas.",
+    "tags": ["LATOME", "HLS", "Verificação de firmware", "Trigger", "LAr", "ATLAS", "FPGA", "CBA"],
+    "pdf": "https://cdn.nipscern.com/publications/cba-2026-validacao-funcional-firmware-latome.pdf"
+  },
+  {
+    "id": "pub-2026-cba-fluxo-continuo-lorenzetti",
+    "title": "Simulação de Fluxo Contínuo de Sinais de Front-End em Instrumentação Nuclear Usando o Framework Lorenzetti",
+    "authors": ["Nelson Cevidanes Nascimento de Assis", "Guilherme Barroso Morett", "Luciano Manhães de Andrade Filho", "Tiago Aparecido Teixeira", "Bernardo Sotto-Maior Peralva", "Gustavo Barbosa Libotte"],
+    "journal": "Congresso Brasileiro de Automática — CBA 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "Simuladores de detectores de partículas, como o framework Lorenzetti, são essenciais para o estudo e projeto de novas arquiteturas de aquisição de dados para instrumentação nuclear. Geralmente, esses simuladores contemplam toda a cadeia de leitura, passando pela digitalização do pulso até o armazenamento de amostras. Embora bem estabelecida, essa filosofia de simulação apresenta limitações no estudo de algoritmos de trigger de primeiro nível (L1), nos quais os dados recebidos são contínuos. Atualmente, não é possível utilizar tais simuladores para analisar de forma direta esse processamento em tempo real. O presente trabalho faz uma reinterpretação dos dados de simulação de Minimum Bias, tratando-os como uma sequência contínua de colisões, e propõe um método para a geração de dados no regime free-running. Esta abordagem viabiliza o projeto e o desenvolvimento de sistemas de processamento de dados de calorimetria em tempo real, servindo como base para a validação de triggers de baixo nível no Lorenzetti.",
+    "tags": ["Lorenzetti", "Simulação", "Pile-up", "Free-running", "Trigger", "Calorimetria", "CBA"],
+    "pdf": "https://cdn.nipscern.com/publications/cba-2026-fluxo-continuo-lorenzetti.pdf"
+  },
+  {
+    "id": "pub-2026-cba-pzc-wiener",
+    "title": "Abordagem Combinada de PZC e Filtro de Wiener para Reconstrução de Energia em Ambientes com Alto Pile-Up",
+    "authors": ["Leandro da Graça Ribeiro", "Thiago Campos Acácio Paschoalin", "Tiago Motta Quirino", "Luciano Manhães de Andrade Filho", "Ualison Rodrigo Ferreira Dias"],
+    "journal": "Congresso Brasileiro de Automática — CBA 2026",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "A reconstrução de energia em sistemas de calorimetria de altas energias é fortemente influenciada pelos circuitos de condicionamento de sinal, especialmente em ambientes com alta taxa de eventos. No Tile Calorimeter (TileCal) do experimento ATLAS, o estágio de conformação introduz componentes de cauda longa na forma de pulso, resultando em deslocamentos da linha de base e degradação do desempenho em condições do High Luminosity Large Hadron Collider (HL-LHC). Este trabalho investiga a combinação de cancelamento de polos e zeros (Pole-Zero Cancellation, PZC) com o filtro de Wiener para reconstrução de energia. O PZC compensa a componente exponencial introduzida pela eletrônica de front-end, estabilizando a linha de base antes da estimação da amplitude. Os resultados mostram que, embora ambos os métodos apresentem desempenho semelhante em baixa ocupação, o filtro de Wiener isolado degrada significativamente em alta ocupação. A abordagem proposta PZC + Wiener reduz o erro e melhora a robustez em ambientes com elevado pile-up.",
+    "tags": ["Filtro de Wiener", "PZC", "Reconstrução de energia", "TileCal", "HL-LHC", "Pile-up", "CBA"],
+    "pdf": "https://cdn.nipscern.com/publications/cba-2026-pzc-wiener-pile-up.pdf"
   },
 {
     "id": "pub-2005-ieee-tdc-detector",
