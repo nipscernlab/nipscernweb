@@ -49,7 +49,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="assets/css/icons/index.css?v=e6d8b76a0e" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="assets/css/icons/index.css?v=e6d8b76a0e"></noscript>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="assets/css/icons/index.css?v=e699da6931" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="assets/css/icons/index.css?v=e699da6931"></noscript>
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -155,8 +155,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.min.css?v=e6d8b76a0e" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=e6d8b76a0e"></noscript>
+  <link rel="preload" href="assets/css/main.min.css?v=e699da6931" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=e699da6931"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -219,6 +219,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       </div>
       <div class="hero-content">
         <h1 class="hero-title" id="hero-title">NIPS<span class="hero-atom" aria-hidden="true"></span>CERN</h1>
+        <script>/* O halo do título (ver initHeroHold em main.js), montado aqui, logo depois do título e antes do primeiro desenho. Montado depois, pelo main.js, ele era desenhado já na fonte final e maior que o título, que no 4G lento ainda estava na fonte reserva, e o PageSpeed o tomava pelo maior conteúdo da página: LCP de 5,1 s no celular em 16/10/2026. */(function(){var t=document.getElementById('hero-title');if(!t||t.parentNode.className==='hero-title-wrap')return;var w=document.createElement('div');w.className='hero-title-wrap';t.parentNode.insertBefore(w,t);['low','high'].forEach(function(e){var g=document.createElement('div');g.className='hero-title hero-glow hero-glow--'+e;g.setAttribute('aria-hidden','true');g.innerHTML=t.innerHTML;w.appendChild(g)});w.appendChild(t);t.classList.add('has-glow')})();</script>
         <p class="hero-subtitle" data-i18n="home.hero.subtitle">
           High energy physics, scientific computing, 3D visualisation, hardware systems and artificial intelligence. Two laboratories: NIPS at UFJF, in Brazil, and Route Salam, at CERN, in Switzerland.
         </p>
@@ -427,52 +428,19 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
               <dd>WebGL&nbsp;2</dd>
             </div>
             </dl>
-            <a href="projects/cgvweb/" target="_blank" rel="noopener noreferrer"
-               class="btn btn-primary btn-sm cgv-open glass-btn" data-i18n="home.cgv.btn_fullcgv">
-              <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
-              Open Full CGV
-            </a>
+            <div class="cgv-actions">
+              <a href="projects/cgvweb/" target="_blank" rel="noopener noreferrer"
+                 class="btn btn-primary btn-sm cgv-open glass-btn" data-i18n="home.cgv.btn_fullcgv">
+                <i class="ph ph-arrow-square-out" aria-hidden="true"></i>
+                Open Full CGV
+              </a>
+              <a href="news/cgvweb-atlas-control-room" class="btn btn-ghost btn-sm glass-btn">
+                <i class="ph ph-newspaper" aria-hidden="true"></i>
+                <span data-i18n="home.cgv.btn_story">Read the story</span>
+              </a>
+            </div>
           </div>
 
-          <!-- Where to go next, rather than one button reading "Open Full CGV"
-               in body size with nothing beside it. Every one of these already
-               existed somewhere on the site and none of it was reachable from
-               the section that shows the thing.
-
-               The three papers are the point. The viewer is nineteen years old:
-               a ROOT tool in 2007, a journal paper in 2012, and the rewrite for
-               the browser in 2026. Laying them out by year says that in one line
-               and says it with the group's own publications. -->
-          <nav class="cgv-links" aria-label="More about CGV Web">
-            <a href="projects/cgv" target="_blank" rel="noopener" class="glass-btn">
-              <i class="ph ph-cube" aria-hidden="true"></i>
-              <span data-i18n="home.cgv.l_project">How it is built</span>
-            </a>
-            <a href="https://www.nipscern.com/library/cgvweb/twiki" target="_blank" rel="noopener" class="glass-btn">
-              <i class="ph ph-book-open-text" aria-hidden="true"></i>
-              <span data-i18n="home.cgv.l_docs">Documentation</span>
-            </a>
-            <a href="news/cgvweb-atlas-control-room" target="_blank" rel="noopener" class="glass-btn">
-              <i class="ph ph-newspaper" aria-hidden="true"></i>
-              <span data-i18n="home.cgv.l_story">The day it went up in the ATLAS control room</span>
-            </a>
-
-            <span class="cgv-links-sep" aria-hidden="true"></span>
-
-            <span class="cgv-links-label" data-i18n="home.cgv.l_papers">The papers behind it</span>
-            <a href="/pdf-viewer.html?id=pub-2007-acat-A-ROOT-Tool" target="_blank" rel="noopener" class="glass-btn">
-              <i class="ph ph-file-pdf" aria-hidden="true"></i>
-              <b>2007</b> <span>ACAT</span>
-            </a>
-            <a href="/pdf-viewer.html?id=pub-2012-Three-dimensional-event" target="_blank" rel="noopener" class="glass-btn">
-              <i class="ph ph-file-pdf" aria-hidden="true"></i>
-              <b>2012</b> <span>Comput. Phys. Commun.</span>
-            </a>
-            <a href="/pdf-viewer.html?id=pub-2026-cba-cgvweb" target="_blank" rel="noopener" class="glass-btn">
-              <i class="ph ph-file-pdf" aria-hidden="true"></i>
-              <b>2026</b> <span>CBA</span>
-            </a>
-          </nav>
         </div>
       </div>
     </section>
@@ -492,8 +460,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
            Video by Nicola Narracci, from Pexels. Credited in credits.html. -->
       <div class="cube-rail" aria-hidden="true">
         <video muted loop playsinline preload="none" width="720" height="1280"
-               poster="assets/images/about-light-waves-poster.webp?v=e6d8b76a0e"
-               data-src="assets/videos/about-light-waves-loop.mp4?v=e6d8b76a0e"></video>
+               poster="assets/images/about-light-waves-poster.webp?v=e699da6931"
+               data-src="assets/videos/about-light-waves-loop.mp4?v=e699da6931"></video>
       </div>
 
       <div class="container">
@@ -661,8 +629,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/sapho" class="pc-card pc-card--dark" style="--pc:var(--accent-sapho)">
             <div class="pc-media pc-media--sapho" aria-hidden="true">
               <video data-media="sapho-loop"
-                     data-src="assets/videos/sapho-circuit-loop.mp4?v=e6d8b76a0e"
-                     poster="assets/images/projects/sapho-circuit-poster.webp?v=e6d8b76a0e"
+                     data-src="assets/videos/sapho-circuit-loop.mp4?v=e699da6931"
+                     poster="assets/images/projects/sapho-circuit-poster.webp?v=e699da6931"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -717,9 +685,9 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    be indistinguishable — for 435 KB less. The H.264 is what
                    every browser without an AV1 decoder gets, unchanged. -->
               <video data-media="aurora-loop"
-                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=e6d8b76a0e"
-                     data-src="assets/videos/aurora-borealis-loop.mp4?v=e6d8b76a0e"
-                     poster="assets/images/projects/aurora-borealis-poster.webp?v=e6d8b76a0e"
+                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=e699da6931"
+                     data-src="assets/videos/aurora-borealis-loop.mp4?v=e699da6931"
+                     poster="assets/images/projects/aurora-borealis-poster.webp?v=e699da6931"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -777,8 +745,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    the old one. v2 is already live and cached, hence v3. -->
               <video data-media="cgv-loop"
                      data-src="https://cdn.nipscern.com/videos/cgv-geometry-loop-v6.mp4"
-                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=e6d8b76a0e"
-                     poster="assets/images/projects/cgv-geometry-poster.webp?v=e6d8b76a0e"
+                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=e699da6931"
+                     poster="assets/images/projects/cgv-geometry-poster.webp?v=e699da6931"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -811,8 +779,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/ai" class="pc-card" style="--pc:var(--accent-ai)">
             <div class="pc-media pc-media--ai" aria-hidden="true">
               <video data-media="ai-loop"
-                     data-src="assets/videos/ai-hand-loop.mp4?v=e6d8b76a0e"
-                     poster="assets/images/projects/ai-hand-poster.webp?v=e6d8b76a0e"
+                     data-src="assets/videos/ai-hand-loop.mp4?v=e699da6931"
+                     poster="assets/images/projects/ai-hand-poster.webp?v=e699da6931"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -867,7 +835,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.min.js?v=e6d8b76a0e";
+    import { sky } from "./assets/js/sky.min.js?v=e699da6931";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -996,8 +964,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        114 KB of parsing should not happen for them either. Everything else is
        unchanged — it still arrives well after first paint, because home.js is a
        module and modules run after the document is parsed. -->
-  <script type="module" src="assets/js/main.min.js?v=e6d8b76a0e"></script>
-  <script type="module" src="assets/js/home.min.js?v=e6d8b76a0e"></script>
+  <script type="module" src="assets/js/main.min.js?v=e699da6931"></script>
+  <script type="module" src="assets/js/home.min.js?v=e699da6931"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -1045,6 +1013,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.min.js?v=e6d8b76a0e" defer></script>
+  <script src="assets/js/analytics.min.js?v=e699da6931" defer></script>
 </body>
 </html>

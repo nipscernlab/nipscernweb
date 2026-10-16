@@ -31,8 +31,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../assets/css/icons/news-post.css?v=e6d8b76a0e" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../assets/css/icons/news-post.css?v=e6d8b76a0e"></noscript>
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=e6d8b76a0e">
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../assets/css/icons/news-post.css?v=e699da6931" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../assets/css/icons/news-post.css?v=e699da6931"></noscript>
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=e699da6931">
 </head>
 <body class="post-featured">
 
@@ -277,7 +277,13 @@
   <p>
     <a class="btn btn-primary" href="/projects/cgvweb/"><img src="../assets/icons/icon_cgv.svg" alt="" loading="lazy" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;flex-shrink:0">Open CGVWeb →</a>
     <a class="btn btn-ghost" href="/library/cgvweb/twiki/"><img src="../assets/icons/icon_twiki.png" alt="" loading="lazy" style="width:auto;height:16px;vertical-align:middle;margin-right:6px;flex-shrink:0">Read the TWiki</a>
-    <a class="btn btn-ghost" href="/pdf-viewer?id=pub-2026-cba-cgvweb"><i class="ph ph-file-pdf" aria-hidden="true"></i>CBA 2026 paper</a>
+    <a class="btn btn-ghost" href="/projects/cgv"><i class="ph ph-cube" aria-hidden="true"></i>How it is built</a>
+  </p>
+  <div class="story-cta-sub">The papers behind it</div>
+  <p>
+    <a class="btn btn-ghost" href="/pdf-viewer?id=pub-2007-acat-A-ROOT-Tool"><i class="ph ph-file-pdf" aria-hidden="true"></i>2007 · ACAT</a>
+    <a class="btn btn-ghost" href="/pdf-viewer?id=pub-2012-Three-dimensional-event" title="Computer Physics Communications"><i class="ph ph-file-pdf" aria-hidden="true"></i>2012 · CPC</a>
+    <a class="btn btn-ghost" href="/pdf-viewer?id=pub-2026-cba-cgvweb"><i class="ph ph-file-pdf" aria-hidden="true"></i>2026 · CBA</a>
   </p>
 </section><div class="pub-tags" style="margin-top:var(--sp-8)"><span class="pub-tag">CGVWeb</span><span class="pub-tag">ATLAS</span><span class="pub-tag">CERN</span><span class="pub-tag">Calorimeter</span><span class="pub-tag">Control Room</span><span class="pub-tag">Three.js</span><span class="pub-tag">WebAssembly</span><span class="pub-tag">Run 4</span><span class="pub-tag">CBA 2026</span><span class="pub-tag">Approved</span></div></div>
     </div>
@@ -352,11 +358,11 @@
   </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=e6d8b76a0e';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=e6d8b76a0e';
-    import { newsPostUrl } from '../assets/js/content-links.min.js?v=e6d8b76a0e';
-    import { mountPostHeart } from '../assets/js/hearts.min.js?v=e6d8b76a0e';
-    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=e6d8b76a0e';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=e699da6931';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=e699da6931';
+    import { newsPostUrl } from '../assets/js/content-links.min.js?v=e699da6931';
+    import { mountPostHeart } from '../assets/js/hearts.min.js?v=e699da6931';
+    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=e699da6931';
 
     /* The cover drifts inside the frame it is clipped by, and nothing else on
        this page moves: a story is running text, and running text is the case
@@ -521,7 +527,13 @@
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
 
-      // Wrap body + sidebar in the flex layout container
+      // Wrap body + sidebar in the flex layout container. Replacing any wrapper
+      // already there, never nesting inside it: the first render and the
+      // language switch can both get here, in either order, and a second
+      // wrapper inside the first halved the column (640 px to 320 px, seen on
+      // the CGVWeb story in Portuguese in October 2026).
+      const old = bodyEl.closest('.post-featured-layout');
+      if (old) { old.parentNode.insertBefore(bodyEl, old); old.remove(); }
       const layout = document.createElement('div');
       layout.className = 'post-featured-layout';
       bodyEl.parentNode.insertBefore(layout, bodyEl);
@@ -992,7 +1004,9 @@
 
       // Build the chapter sidebar last, after all body edits, so it sees the
       // final DOM and its handlers don't get wiped by later innerHTML writes.
-      if (isFeatured && !keep) {
+      // The table of contents sits beside the body, outside what the build
+      // copies into the page, so it is built here either way.
+      if (isFeatured) {
         injectToc(bodyEl);
       }
 
@@ -1099,8 +1113,8 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=e6d8b76a0e"></script>
+  <script type="module" src="../assets/js/main.min.js?v=e699da6931"></script>
 
-  <script src="../assets/js/analytics.min.js?v=e6d8b76a0e" defer></script>
+  <script src="../assets/js/analytics.min.js?v=e699da6931" defer></script>
 </body>
 </html>

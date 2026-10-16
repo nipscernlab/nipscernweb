@@ -6,10 +6,10 @@
  * by default and revealed per item with a toggle.
  */
 
-import { t, getLang } from './i18n.js?v=e6d8b76a0e';
-import { pubLangFlag } from './main.js?v=e6d8b76a0e';
-import { publicationUrl } from './content-links.js?v=e6d8b76a0e';
-import { renderGrouped, renderFlat, renderStats, renderFeaturedStrip, featuredList, publicationPagePath } from './pub-render.js?v=e6d8b76a0e';
+import { t, getLang } from './i18n.js?v=e699da6931';
+import { pubLangFlag } from './main.js?v=e699da6931';
+import { publicationUrl } from './content-links.js?v=e699da6931';
+import { renderGrouped, renderFlat, renderStats, renderFeaturedStrip, featuredList, publicationPagePath } from './pub-render.js?v=e699da6931';
 
 /* What the shared renderer needs from this page. The same functions draw the
    list at build time (tools/build-publications.js), so a reader without

@@ -4011,7 +4011,11 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   gap: var(--sp-6);
 }
 .cgv-specs-row .cgv-specs { flex: 1; min-width: 0; }
-.cgv-open { flex: none; }
+/* The way in and the story of the day it reached the control room, side by
+   side. The links that used to sit on a rule under the figures (how it is
+   built, the documentation, the three papers) live at the end of that story
+   now, where a reader who wants them is already reading about it. */
+.cgv-actions { flex: none; display: flex; flex-wrap: wrap; gap: var(--sp-3); }
 /* Stacked, the button becomes the last thing in the row, and the rule that
    opens the links below arrives immediately under its bottom edge — close
    enough to read as a bar stuck to the button rather than as the start of the
@@ -4024,64 +4028,9 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
     gap: var(--sp-5);
     padding-bottom: var(--sp-5);
   }
-  .cgv-open { align-self: flex-start; }
+  .cgv-actions { align-self: flex-start; }
 }
 
-/* Where to read more, on one rule under the figures. Set small on purpose: this
-   is apparatus, not a call to action, and the button it replaces was body size
-   with nothing beside it to give it a job. Every entry carries an icon, because
-   a row of bare links makes the reader work out for themselves which one is a
-   paper and which one opens a program. */
-.cgv-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-2) var(--sp-3);
-  padding: var(--sp-5) 0 var(--sp-6);
-  border-top: 1px solid var(--border-subtle);
-  font-size: 12px;
-  line-height: 1.4;
-}
-.cgv-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 13px;
-  border-radius: var(--r-full);
-  color: var(--text-muted);
-  transition: color var(--t-fast), border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
-}
-.cgv-links a:hover { color: var(--text-primary); }
-.cgv-links i { font-size: 14px; flex: none; color: var(--accent-cgv); }
-.cgv-links a:hover i { color: #6ea8e8; }
-/* The year carries its own colour, so it needs its own hover: without this the
-   label beside it lit up and the year, which is the thing you are aiming at,
-   stayed grey. */
-.cgv-links a:hover b { color: var(--text-primary); }
-/* The year leads, because the three papers are there to be read as a span. */
-.cgv-links b {
-  transition: color var(--t-fast);
-  font-family: var(--font-mono);
-  font-weight: 500;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-}
-.cgv-links-label {
-  color: var(--text-muted);
-  opacity: 0.72;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-size: 10.5px;
-}
-.cgv-links-sep {
-  width: 1px;
-  height: 14px;
-  background: var(--border-mid);
-}
-@media (max-width: 640px) {
-  .cgv-links-sep { display: none; }
-  .cgv-links { gap: var(--sp-3) var(--sp-4); }
-}
 .cgv-specs {
   flex: 1;
   min-width: 0;
@@ -7076,6 +7025,17 @@ body.post-featured .post-excerpt {
   font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+/* The second row, the papers behind the viewer, under a label set like the
+   section's own heading: kept out of the grid, so the three papers fill its
+   three columns. */
+.post-body-featured .story-cta .story-cta-sub {
+  margin: var(--sp-8) 0 var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-muted);
