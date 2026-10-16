@@ -57,6 +57,7 @@ Comandos disponíveis:
 | `npm run test:courses` | abre cada página dos cursos no computador e no celular, confere que nada fica invisível depois de rolar, abre os links de página da apostila no leitor de PDF do site e toca todos os vídeos de cada deck |
 | `bash tools/check-edge.sh` | pergunta à borda o que ela devolve; hoje 13 ok, 0 pendente |
 | `node tools/build-publications.js` | depois de mudar `data/publications.json`: a lista pronta em `publications.html`, uma página por publicação em `publications/p/` (com as meta tags do Google Acadêmico) e o bloco delas no sitemap; o CI confere com `--check` |
+| `node tools/build-news.js` | depois de mudar `data/news.json`, `data/news-featured.json` ou `news/post.html`: desenha cada notícia em `news/<slug>.html` (precisa do Edge) e atualiza o bloco delas no sitemap |
 | `node tools/perf/measure.js --label <nome>` | mede carga, trabalho com a página parada, rolagem e toque, no computador e no celular; `compare.js` compara duas medições (docs/perf/README.md) |
 
 ---

@@ -30,8 +30,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=8dda3137e8">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=8dda3137e8">
+  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=7b9b92b5da">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=7b9b92b5da">
 </head>
 <body>
 
@@ -158,11 +158,11 @@
   </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=8dda3137e8';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=8dda3137e8';
-    import { newsPostUrl } from '../assets/js/content-links.min.js?v=8dda3137e8';
-    import { mountPostHeart } from '../assets/js/hearts.min.js?v=8dda3137e8';
-    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=8dda3137e8';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=7b9b92b5da';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=7b9b92b5da';
+    import { newsPostUrl } from '../assets/js/content-links.min.js?v=7b9b92b5da';
+    import { mountPostHeart } from '../assets/js/hearts.min.js?v=7b9b92b5da';
+    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=7b9b92b5da';
 
     /* The cover drifts inside the frame it is clipped by, and nothing else on
        this page moves: a story is running text, and running text is the case
@@ -583,11 +583,20 @@
 
     let _currentPost = null;
 
+    /* Each post has a page of its own, news/<slug>, drawn at build time by
+       tools/build-news.js from this file: the header, cover and text are
+       already in the HTML, and <html data-post> names the post. There, in
+       English, the script keeps what is drawn and only adds the parts that
+       live at runtime (the heart, the related posts, the share panel); in
+       another language it draws over it, as before. This file itself, opened
+       as news/post?id=..., now only sends the reader to that page. */
+    const PRE = document.documentElement.dataset.post || '';
+
     async function loadPost() {
       const params = new URLSearchParams(window.location.search);
-      const id = params.get('id') || params.get('slug');
+      const id = params.get('id') || params.get('slug') || PRE;
 
-      document.getElementById('post-loading').style.display = 'block';
+      if (!PRE) document.getElementById('post-loading').style.display = 'block';
 
       let posts;
       let featured = null;
@@ -614,6 +623,11 @@
         document.getElementById('post-not-found').style.display = 'block';
         return;
       }
+      // render=1 is the build asking for the drawing (tools/build-news.js).
+      if (!PRE && !params.has('render')) {
+        location.replace('/news/' + encodeURIComponent(post.slug || post.id) + location.hash);
+        return;
+      }
 
       // Mark <body> for featured-only styling
       if (post._featured) {
@@ -634,6 +648,9 @@
       document.getElementById('og-url').content = _canon;
       document.getElementById('canonical').href = _canon;
 
+      const keep = !!PRE && (getLang() || 'en') === 'en';
+
+      if (!keep) {
       // Render header
       const badge = document.getElementById('post-category-badge');
       badge.className = 'badge ' + catClass(post.category);
@@ -727,11 +744,14 @@
         coverEl.style.display = 'block';
         document.getElementById('post-header').classList.add('has-cover');
       }
+      }
 
       // Render body — featured stories carry rich HTML, regular posts carry plain text
       const bodyEl = document.getElementById('post-body');
       const isFeatured = post._featured && post.content_html;
-      if (isFeatured) {
+      if (keep) {
+        if (isFeatured) initLightbox(bodyEl);
+      } else if (isFeatured) {
         bodyEl.classList.add('post-body-featured');
         bodyEl.innerHTML = post.content_html;
         initLightbox(bodyEl);
@@ -754,7 +774,7 @@
       // Embedded video (YouTube). insertAdjacentHTML appends without
       // re-parsing existing children, so anything we touch afterwards keeps
       // working (handlers, observers, references).
-      if (post.video) {
+      if (post.video && !keep) {
         const ytId = post.video.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
         if (ytId) {
           bodyEl.insertAdjacentHTML('beforeend', `
@@ -772,13 +792,13 @@
       }
 
       // Tags
-      if (post.tags && post.tags.length) {
+      if (post.tags && post.tags.length && !keep) {
         bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${post.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
       }
 
       // Build the chapter sidebar last, after all body edits, so it sees the
       // final DOM and its handlers don't get wiped by later innerHTML writes.
-      if (isFeatured) {
+      if (isFeatured && !keep) {
         injectToc(bodyEl);
       }
 
@@ -858,7 +878,7 @@
         if (!res.ok) return;
         const featured = await res.json();
         const params = new URLSearchParams(window.location.search);
-        const currentId = params.get('id') || params.get('slug');
+        const currentId = params.get('id') || params.get('slug') || PRE;
         if (![featured.id, featured.slug].includes(currentId)) return;
         const tr = pickLang(featured);
         document.getElementById('post-title').textContent   = tr.title || '';
@@ -885,8 +905,8 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=8dda3137e8"></script>
+  <script type="module" src="../assets/js/main.min.js?v=7b9b92b5da"></script>
 
-  <script src="../assets/js/analytics.min.js?v=8dda3137e8" defer></script>
+  <script src="../assets/js/analytics.min.js?v=7b9b92b5da" defer></script>
 </body>
 </html>

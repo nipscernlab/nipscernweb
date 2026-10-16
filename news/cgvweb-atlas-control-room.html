@@ -1,30 +1,1106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-post="cgvweb-atlas-control-room">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CGVWeb on the ATLAS Control Room Screen: A Milestone in History — NIPS-CERN</title>
-<meta name="description" content="Five months. Two clocks. Two hundred thousand calorimeter cells rebuilt in a browser. After successful Run 3 testing, CGVWeb is now in active use in the ATLAS Control Room.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://www.nipscern.com/news/cgvweb-atlas-control-room">
-<meta property="og:title" content="CGVWeb on the ATLAS Control Room Screen: A Milestone in History — NIPS-CERN">
-<meta property="og:description" content="Five months. Two clocks. Two hundred thousand calorimeter cells rebuilt in a browser. After successful Run 3 testing, CGVWeb is now in active use in the ATLAS Control Room.">
-<meta property="og:image" content="https://cdn.nipscern.com/share/cgvweb-atlas-control-room/og-en.jpg?v=12">
-<meta property="og:image:secure_url" content="https://cdn.nipscern.com/share/cgvweb-atlas-control-room/og-en.jpg?v=12">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="CGVWeb on the ATLAS Control Room Screen: A Milestone in History — NIPS-CERN">
-<meta property="og:site_name" content="NIPS-CERN">
-<meta property="og:locale" content="en_US">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CGVWeb on the ATLAS Control Room Screen: A Milestone in History — NIPS-CERN">
-<meta name="twitter:description" content="Five months. Two clocks. Two hundred thousand calorimeter cells rebuilt in a browser. After successful Run 3 testing, CGVWeb is now in active use in the ATLAS Control Room.">
-<meta name="twitter:image" content="https://cdn.nipscern.com/share/cgvweb-atlas-control-room/og-en.jpg?v=12">
-<link rel="canonical" href="https://www.nipscern.com/news/cgvweb-atlas-control-room">
-<script>location.replace('/news/post?id=cgvweb-atlas-control-room' + location.hash);</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title id="page-title">CGVWeb on the ATLAS Control Room Screen: A Milestone in History | NIPS-CERN</title>
+  <meta name="description" id="page-desc" content="Five months. Two clocks. Two hundred thousand calorimeter cells rebuilt in a browser. After Run 3 tests that succeeded on every front, CGVWeb is now in active use in the ATLAS Control Room during Run 3. The story of how it travelled from a graduate-school classroom in Juiz de Fora to the main wall of the ATLAS Control Room at CERN.">
+
+  <meta property="og:type"  content="article">
+  <meta property="og:url"   id="og-url" content="https://www.nipscern.com/news/cgvweb-atlas-control-room">
+  <!-- Gerada por tools/build-news.js a partir de news/post.html e de data/. Não edite à mão. -->
+  <!-- The canonical of a post is its static page, news/<slug>: the one in the
+       sitemap, with the Open Graph tags, that sends readers here. Set when
+       the post loads; until then it names the news index. -->
+  <link rel="canonical" id="canonical" href="https://www.nipscern.com/news/cgvweb-atlas-control-room">
+  <meta property="og:title" id="og-title" content="CGVWeb on the ATLAS Control Room Screen: A Milestone in History">
+  <meta property="og:description" id="og-desc" content="Five months. Two clocks. Two hundred thousand calorimeter cells rebuilt in a browser. After Run 3 tests that succeeded on every front, CGVWeb is now in active use in the ATLAS Control Room during Run 3. The story of how it travelled from a graduate-school classroom in Juiz de Fora to the main wall of the ATLAS Control Room at CERN.">
+  <meta property="og:image" id="og-image" content="https://cdn.nipscern.com/share/cgvweb-atlas-control-room/og-en.jpg?v=15">
+
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <!-- Self-hosted typefaces. Preloaded because the @font-face rules live
+       in main.css, which on some pages loads asynchronously; without this
+       the fetch could not start until that stylesheet parsed. -->
+  <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=7b9b92b5da">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=7b9b92b5da">
 </head>
-<body style="background:#070a12;color:#c9d4e6;font-family:system-ui,sans-serif;padding:2rem">
-<p>Redirecting to <a href="/news/post?id=cgvweb-atlas-control-room" style="color:#7cb5ff">CGVWeb on the ATLAS Control Room Screen: A Milestone in History — NIPS-CERN</a>…</p>
+<body class="post-featured">
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <!-- Post header (populated dynamically) -->
+    <header class="post-header has-cover" id="post-header" aria-labelledby="post-title" style="display: block;">
+      <div class="post-header-inner">
+        <div class="post-meta">
+          <a href="./" class="btn btn-ghost btn-sm" data-i18n="news.back">
+            <i class="ph ph-arrow-left" aria-hidden="true"></i>Back to News </a>
+          <span class="badge cat-milestone" id="post-category-badge" data-i18n="news.categories.milestone">milestone</span>
+          <time id="post-date" class="news-date" datetime="2026-04-30">30 Apr 2026</time>
+          <time id="post-date-edited" class="news-date news-date-edited" style="" datetime="2026-05-29">Updated 29 May 2026</time>
+        <span id="post-lang-flag" style="display: inline-flex; align-items: center;"><span class="news-lang-flags" aria-label="English, Português"><span class="pub-lang-flag" role="img" title="English" aria-label="English"><img class="flag" src="http://127.0.0.1:3017/assets/icons/flag-for-united-kingdom.svg" alt="" loading="lazy" decoding="async" aria-hidden="true" title="English"></span><span class="pub-lang-flag" role="img" title="Português" aria-label="Português"><img class="flag" src="http://127.0.0.1:3017/assets/icons/flag-for-brazil.svg" alt="" loading="lazy" decoding="async" aria-hidden="true" title="Português"></span></span></span><span class="post-author"><i class="ph ph-user-circle" aria-hidden="true"></i> the Director</span></div>
+        <h1 class="post-title" id="post-title">CGVWeb on the ATLAS Control Room Screen: A Milestone in History</h1>
+        <p class="post-excerpt" id="post-excerpt">Five months. Two clocks. Two hundred thousand calorimeter cells rebuilt in a browser. After Run 3 tests that succeeded on every front, CGVWeb is now in active use in the ATLAS Control Room during Run 3. The story of how it travelled from a graduate-school classroom in Juiz de Fora to the main wall of the ATLAS Control Room at CERN.</p>
+      </div>
+    </header>
+
+    <!-- Post not found -->
+    <div id="post-not-found" style="display:none;text-align:center;padding:var(--sp-32) var(--container-pad)">
+      <i class="ph ph-file-x" style="font-size:60px;color:var(--text-muted);margin-bottom:var(--sp-6)" aria-hidden="true"></i>
+      <h1 class="heading-lg" style="margin-bottom:var(--sp-4)" data-i18n="news.post_not_found_title">Post not found</h1>
+      <p class="body-base" style="margin-bottom:var(--sp-8)" data-i18n="news.post_not_found_desc">The news post you are looking for does not exist or has been removed.</p>
+      <a href="./" class="btn btn-primary" data-i18n="news.back">
+        <i class="ph ph-arrow-left" aria-hidden="true"></i>
+        Back to News
+      </a>
+    </div>
+
+    <!-- Loading state -->
+    <div id="post-loading" style="display:none;text-align:center;padding:var(--sp-32) var(--container-pad);color:var(--text-muted)">
+      <div class="cgv-spinner" style="margin:0 auto var(--sp-4)" aria-hidden="true"></div>
+      <span data-i18n="common.loading">Loading…</span>
+    </div>
+
+    <!-- The reading band. The header above ends on --bg-0 and this fades out
+         of it over its first 200px, which is what .seam does; .section--lit
+         puts the two washes under the chapter sidebar so the pane has
+         something to blur. The cover is pulled up out of this band by 80px so
+         the header's colour bleeds behind its top edge. -->
+    <div class="post-stage seam section--lit" style="--seam-from:var(--bg-0)">
+
+      <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
+      <div id="post-cover" style="display: block; max-width: 720px; margin-right: ; margin-bottom: ; margin-left: ; margin-top: -80px; padding: 0 var(--container-pad); position: relative; z-index: 1;"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/cgv/big_screen_and_computers_with_cgv_open_cut.webp" alt="CGVWeb on the ATLAS Control Room Screen: A Milestone in History" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 2.1333%) translate3d(0px, 0px, 0px);"></div></div>
+
+      <!-- Post body (and TOC injected alongside it for featured posts) -->
+      <div class="post-body post-body-featured" id="post-body" style="display: block;"><section class="story-section">
+  <p class="story-lead">Late 2025. The PPEE building at UFJF. A NIPS-CERN undergraduate sits in on a class taught by one of the lab's senior researchers. The topic: what actually happens inside the world's most powerful particle accelerator. Five months later, the code that grew out of that class runs on the main wall of the ATLAS Control Room at CERN, and Run 3 tests have gone well enough that CGVWeb is now in active use inside the experiment.</p>
+</section>
+
+<div class="story-context">
+  <div class="story-context-title">The machine and the mystery</div>
+  <p>The ATLAS detector at CERN is 46 metres long, 25 metres tall, and weighs 7,000 tonnes. It sits 100 metres underground at Point 1 of the Large Hadron Collider, a 27-kilometre ring where proton beams collide at nearly the speed of light, 40 million times per second. Each collision produces hundreds of particles. ATLAS records them all.</p>
+  <p>Physics describes matter through the Standard Model: 17 fundamental particles, between quarks, leptons, and the bosons that carry the forces between them. In 2012, ATLAS and CMS confirmed the Higgs boson, the last missing piece. The Higgs field is what gives particles their mass; without it, electrons and quarks would fly apart at the speed of light and atoms could not form. Nothing would exist, no chemistry, no stars, no life.</p>
+  <p>But the Standard Model is incomplete. It says nothing about gravity at the quantum scale, nothing about dark matter, nothing about the matter–antimatter asymmetry of the universe. The hypothetical graviton, the quantum carrier of gravity, has never been observed. Run 4 of the LHC, with expanded luminosity and refurbished detectors, may be the chance to find it. And that is exactly where CGVWeb comes in: bringing every collision the detector records, in real time, into any browser tab.</p>
+</div>
+
+<section class="story-section">
+  <h2 id="ch-0">I. A class</h2>
+  <p>The course was the genesis. End of 2025, Programa de Pós-Graduação em Engenharia Elétrica (PPEE) at UFJF; the instructor, Prof. Dr. Luciano Manhães de Andrade Filho. Sitting in on the class, Chrysthofer Arthur Amaro Afonso, a NIPS-CERN undergraduate, and Roberta L. Leonardo. It was the kind of class a senior researcher gives when he wants the next generation to understand the field for real: the history of <a href="https://home.cern/" target="_blank" rel="noopener">CERN</a>, of the LHC and of ATLAS itself, the geometry of every sub-detector, how particle showers develop, the layers that make up each calorimeter, which particles cross which regions and what each one leaves behind, E=mc² written on the board with the weight the equation deserves.</p>
+  <p>Toward the end, a footnote: in 2008, as part of his doctoral thesis, Luciano had written the Calorimeter Geometry Viewer, the CGV, that ran on Linux in the ATLAS Control Room at the start of Run 1. It worked, it served the shifters of that era, and when he came home to Brazil the tool fell silent.</p>
+  <p>Walking out of the room, one thought took hold of the group and would not let go: that tool could run in a browser. And it should.</p>
+</section>
+
+<figure class="story-figure story-figure--full story-figure--historical">
+  <img src="../assets/images/news/cgv/cgv_control_room_2008.png" alt="The Calorimeter Geometry Viewer running in the ATLAS Control Room, 2008" loading="lazy" class="lightbox-trigger" style="cursor: zoom-in;">
+  <figcaption>The Calorimeter Geometry Viewer (CGV), 2008, running in the ATLAS Control Room during the early LHC operations. Luciano's doctoral work.</figcaption>
+</figure>
+
+<section class="story-section">
+  <h2 id="ch-1">II. A first prototype</h2>
+  <p>The very first version was not even the detector. Before any real geometry, there was a cruder question: could a browser draw two hundred thousand cubes at once and still move? Chrysthofer built a throwaway concept to find out, coloured cubes and a density slider, no physics, and pushed the count up. It held. The browser rendered the whole field in real time, and the central feasibility was settled before the real work began.</p>
+  <p>Within four weeks, a stripped-down piece of the TileCal long barrel was already rotating inside a WebGL2 canvas. <a href="https://threejs.org/" target="_blank" rel="noopener">Three.js</a> handled the renderer. The proportions were off and the cell scaling was wrong, but the central claim, that the ATLAS calorimeter geometry could live, end to end, in a browser tab, was no longer theoretical.</p>
+  <p>From there on, Luciano and Chrysthofer set the real goal: rebuild the entire calorimeter, cell by cell, in the browser. TileCal first, then LAr, then HEC and FCAL, and finally the inactive ATLAS-Ghost envelopes for spatial context. The project grew quickly over the following months. Every meeting with the shifters surfaced new requests that went straight into the next version: momentum vectors drawn for every particle, energy labels in real time, electron and positron tagging, reconstructed positions, and the entire muon system entering the display alongside the calorimeters.</p>
+</section>
+
+<figure class="story-video">
+  <video controls="" preload="none" aria-label="The original CGVWeb concept — rendering two hundred thousand cubes in a browser" poster="https://cdn.nipscern.com/videos/cgv-concept-200k-cells-browser-test-poster.webp">
+    <source src="https://cdn.nipscern.com/videos/cgv-concept-200k-cells-browser-test.mp4" type="video/mp4">
+  </video>
+  <figcaption>The original concept, January 2026. A raw feasibility test, before any real geometry: could a browser render roughly two hundred thousand cells at once? It could, and it held a smooth frame rate. This is where CGVWeb began.</figcaption>
+</figure>
+
+<figure class="story-figure story-figure--full">
+  <img src="../assets/images/news/cgv/CGVWEB_2560x1440_2026-04-30T22-09-10.webp" alt="CGVWeb rendering the full ATLAS calorimeter, captured directly from the application" loading="lazy" class="lightbox-trigger" style="cursor: zoom-in;">
+  <figcaption>CGVWeb, captured directly from the application on 30 April 2026. The full ATLAS calorimeter, rendered cell by cell at 60 fps in a browser. Click to expand.</figcaption>
+</figure>
+
+<section class="story-section">
+  <h2 id="ch-2">III. Two clocks</h2>
+  <p>In late March, Luciano flew to Geneva <svg width="16" height="12" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-label="Switzerland" role="img" style="display:inline-block;vertical-align:middle;margin:0 4px"><path d="m0 0h32v32h-32z" fill="#f00"></path><path d="m13 6h6v7h7v6h-7v7h-6v-7h-7v-6h7z" fill="#fff"></path></svg>. From offices near the experimental cavern at Point 1, he continued the work on the CERN side while Chrysthofer coordinated from Juiz de Fora. Five hours of time difference. An Atlantic Ocean between them. Five months of work that would only end when Luciano flew home in late April, by which point CGVWeb was already running on the Control Room wall.</p>
+  <p>There was never a split between the political and the technical sides of the work. Luciano gathered missing ATLAS geometry parameters directly from CERN's internal databases, from the experiment's technical documentation, and from the source code of the previous CGV; he worked out how particles should be represented in the display, how Feynman-diagram topology would translate into the 3D view, and which decay products and signal signatures should come first. In parallel, he wrote code actively, in step with Chrysthofer, through every hour of those standing meetings.</p>
+  <p>Chrysthofer, in turn, built most of the main geometry in parallel with Luciano, TILE, LAr, HEC and MBTS, and took on everything that held the application together outside of the sub-detectors themselves: the production server, the .rpm packaging for CERN's internal infrastructure, the full colour scheme of the interface and the temperature map of the cells, the user interface end to end, and the running contact with the ATLAS Control Room operations team that would become essential the moment the tool needed to run inside Point 1. Meetings at five in the morning, Juiz de Fora time. At midnight. Sometimes for five straight hours.</p>
+</section>
+
+<section class="story-section">
+  <h2 id="ch-3">IV. The geometry, rebuilt</h2>
+  <p>The ATLAS calorimeter geometry was lifted from the ATLAS GeoModel database and converted through a custom ROOT-to-glTF pipeline, then packed into a single compressed binary, <code>CaloGeometry.glb.gz</code>, about 45 MB, that loads on page open. What the user sees is the actual detector:</p>
+  <ul>
+    <li>TileCal long barrel (~2,900 cells) and two extended barrels (~2,400 each);</li>
+    <li>LAr EM barrel (~109,000 cells) and EM end-caps (~63,000);</li>
+    <li>HEC (~5,600); FCAL 1/2/3 (~3,500);</li>
+    <li>nine inactive ATLAS-Ghost envelopes (cryostats, support structures, shells), rendered at 15% opacity to provide spatial context without competing with the data.</li>
+  </ul>
+  <p>Roughly two hundred thousand active cells, all enabled at once, running above 60 frames per second on the Dell Alienware AURORA we keep at the NIPS lab in Brazil. The browser sandbox was stretched to its limit. The application operates at the edge of what a modern browser can deliver, supported by Three.js, WebGPU, Rust and WebAssembly, the strongest web technologies for graphics and intensive computation available today.</p>
+</section>
+
+<figure class="story-figure story-figure--right">
+  <img src="../assets/lab/cern/Modulo_TileCal.webp" alt="A physical TileCal module, the kind of sampling cell CGVWeb reconstructs in the browser" loading="lazy" class="lightbox-trigger" style="cursor: zoom-in;">
+  <figcaption>A TileCal module. Each sampling cell like this one is reconstructed individually inside CGVWeb.</figcaption>
+</figure>
+
+<section class="story-section">
+  <h2 id="ch-4">V. Innovation: a decoder in Rust</h2>
+  <p>Rendering was only half the question. The other half was computation: could a browser run a real compiled binary, fast, without grinding to a halt? Chrysthofer answered it with a second throwaway site, <a href="https://nipscernlab.github.io/aol/" target="_blank" rel="noopener">AOL</a> — <em>Ansikt Over Lyset</em>. You uploaded an image and it stamped the ATLAS emblem over it, the pixel work done by a binary compiled to WebAssembly. Crude on the surface, decisive underneath: it proved that heavy computation could live in the browser through WASM. That discovery is what made the decoder below possible.</p>
+  <p>Each ATLAS calorimeter cell carries a unique 32-bit barcode, the compact ATLAS-ID, encoding sub-detector, side, sampling layer, and position in η and φ. To turn a live event into a coloured calorimeter, the browser has to decode hundreds of thousands of these barcodes per event, in real time, without ever pausing the animation.</p>
+  <p>The decoder is written in Rust, compiled to WebAssembly, and runs in a background worker thread so it never touches the main render loop. It is the same class of technology found today in video editors and demanding games, now applied to an experimental physics event display.</p>
+</section>
+
+<figure class="story-figure story-figure--right">
+  <img src="../assets/images/news/cgv/atlas_emblem.svg" alt="The ATLAS emblem, stamped onto images by AOL, the WebAssembly experiment that preceded CGVWeb" loading="lazy" style="aspect-ratio: auto; object-fit: contain; background: transparent; border: 0px; cursor: zoom-in;" class="lightbox-trigger">
+  <figcaption>The ATLAS emblem. AOL (<em>Ansikt Over Lyset</em>) overlaid it onto any uploaded image, the pixel work done by a WebAssembly binary, the experiment that proved heavy computation could run in a browser.</figcaption>
+</figure>
+
+<section class="story-section">
+  <h2 id="ch-5">VI. The LAr in the right proportions</h2>
+  <p>The TileCal geometry was forgiving of early approximations. The Liquid Argon calorimeter, with 170,000 cells arranged in an accordion structure spanning both ends of the detector, was not. Layer heights, η segmentation, and sampling depths had to match the real detector with precision, or the rendered picture would silently lie in the worst possible way.</p>
+  <p>Mateus A. Carvalho and Roberta L. Leonardo took on the LAr layer measurements and delivered the per-layer, per-sampling heights that went directly into the geometry pipeline.</p>
+</section>
+
+<section class="story-section">
+  <h2 id="ch-6">VII. A paper</h2>
+  <p>The work crystallised, as serious work tends to, into a peer-reviewed paper.</p>
+  <div class="story-citation">
+    <strong>CGVWeb: Modernização do Calorimeter Geometry Viewer do ATLAS para Plataforma Web</strong>
+    Chrysthofer A. A. Afonso; Andrade Filho, L. M.; Carvalho, M. A.; Leonardo, R. L., <em>Congresso Brasileiro de Automática</em> (CBA 2026). <a href="/pdf-viewer?id=pub-2026-cba-cgvweb">Read the paper</a> →
+  </div>
+  <p>The first peer-reviewed contribution from the project. In Portuguese. With an undergraduate as lead author. Out of Juiz de Fora.</p>
+</section>
+
+<section class="story-section">
+  <h2 id="ch-7">VIII. Geneva sees it</h2>
+  <p>With Luciano at CERN, CGVWeb began to reach the people who mattered. The first inside ATLAS to look at it and say <em>yes</em> was Oleg Solovyanov. Interest spread from there. Two people carried the tool into the meetings where tools get adopted or forgotten: Melissa, from NIPS-CERN, and Daniela, who coordinates the ATLAS experiment itself. They presented at the calorimeter coordinators meeting, at the LAr group meeting, at the sessions where the experiment's working-group leaders decide what is worth building. They presented, fielded questions, took notes, and came back with the next set of corrections.</p>
+  <p>Interest grew. Then it grew faster.</p>
+</section>
+
+<section class="story-section">
+  <h2 id="ch-8">IX. A wall outside cern.ch</h2>
+  <p>The next obstacle was not technical. The Point 1 network, where the shifters run the detector, has no path to the open internet. Any address that doesn't end in <code>cern.ch</code> is unreachable from that room.</p>
+  <p>Getting CGVWeb onto the Control Room wall meant packaging the application as an RPM for CERN's internal infrastructure, provisioning a virtual machine inside the CERN General Purpose Network, and crossing the review chain that keeps Point 1 stable. The production deployment runs as a Python static-file server behind an Apache reverse proxy, reachable inside CERN at <code>pc-atlas-www.cern.ch/cgv-web/</code>. The VM, <code>vm-calo-web-01</code>, also mounts the Point 1 event file area at <code>/atlas/EventDisplayEvents</code>, giving the tool direct access to JiveXML files as the detector records them.</p>
+  <p>At the end of that chain, Fabio Pigozzi and Nikiforos Nikiforou at CERN, neither of them ours and both decisive, handled the VM provisioning and the RPM installation. On the coordination side, Diana Scannicchio from ATLAS operations carried the approvals through. Months of testing, paperwork, and patient correspondence. The Point 1 VM came up in late April 2026.</p>
+  <blockquote class="story-pull">
+    <p>Nikephoros, from the Greek: bearer of victory. Christopher: bearer of Christ. Two bearers, six thousand miles apart, carrying the same project across a line that had been seventeen years away.</p>
+    <cite>An aside</cite>
+  </blockquote>
+</section>
+
+<figure class="story-video">
+  <video controls="" preload="none" aria-label="Tour of the ATLAS Control Room with CGVWeb on the main wall" poster="https://cdn.nipscern.com/videos/tour-atlas-control-room-cgv-big-screen-poster.webp">
+    <source src="https://cdn.nipscern.com/videos/tour-atlas-control-room-cgv-big-screen.mp4" type="video/mp4">
+  </video>
+  <figcaption>Tour of the ATLAS Control Room, CGVWeb on the main wall. Filmed at Point 1, CERN, 28 April 2026.</figcaption>
+</figure>
+
+<figure class="story-figure story-figure--full">
+  <img src="../assets/images/news/cgv/big_screen_and_computers_with_cgv_open.webp" alt="CGVWeb open on the operator consoles and the main wall of the ATLAS Control Room" loading="lazy" class="lightbox-trigger" style="cursor: zoom-in;">
+  <figcaption>ATLAS Control Room, CGVWeb open on the operator workstations and on the main wall, simultaneously. 28 April 2026.</figcaption>
+</figure>
+
+<section class="story-section">
+  <h2 id="ch-9">X. 28 April 2026, 18h50 BRT</h2>
+  <p>At 18h50 Brasília time, the phone rang in Juiz de Fora. Luciano. A video came first: a single shifter workstation in the Control Room, six thousand miles away, the ATLAS calorimeter rotating live on the screen. Nineteen minutes later, at 19h09, a second video. The detector was no longer on a workstation. It was on the main wall of the ATLAS Control Room, the same wall where, eighteen years earlier, the CGV had run for the first time.</p>
+</section>
+
+<figure class="story-video">
+  <video controls="" preload="none" aria-label="CGVWeb on the main wall of the ATLAS Control Room, 28 April 2026" poster="https://cdn.nipscern.com/videos/horizontal-low-res-atlas-control-room-with-cgv-big-screen-poster.webp">
+    <source src="https://cdn.nipscern.com/videos/horizontal-low-res-atlas-control-room-with-cgv-big-screen.mp4" type="video/mp4">
+  </video>
+  <figcaption>The moment, ATLAS Control Room, 28 April 2026. CGVWeb on the main wall.</figcaption>
+</figure>
+
+<section class="story-section">
+  <h2 id="ch-10">XI. The calls</h2>
+  <p>There was a bug. The static display worked: ATLAS rotating, cells highlighted, geometry correct. But in <em>online</em> mode, the path that should auto-load a fresh collision event the moment ATLAS records it simply was not bringing the data through. Chrysthofer called the Control Room directly. The shifter on duty, John Brian, took the call. Something happened on that call that, as far as anyone in the lab can recall, had not happened before: an undergraduate student was sending remote commands to a Point 1 shifter, walking him through how to handle the ATLAS event infrastructure. They went through the pipeline together, step by step, until the failure point was isolated. The call ended. The fix was written.</p>
+  <p>The next morning, around 8h00 BRT, a second call. This time, Fábio Luna and Gustavo Libotte were physically in the Control Room alongside Luciano. Together, they walked through the event XML loop in real time: pulling the most recent JiveXML files from the Point 1 event area, testing the online pipeline live on the floor where ATLAS runs, verifying that the fix held under actual detector conditions. It held. By the end of the day, online mode was up, stable, and responding to every fresh event ATLAS recorded. CGVWeb was working end to end, inside Point 1.</p>
+</section>
+
+<figure class="story-figure story-figure--right">
+  <img src="../assets/images/news/cgv/low_res_shifter_screen_with_cgv.jpg" alt="CGVWeb running in online mode on a shifter workstation at the ATLAS Control Room" loading="lazy" class="lightbox-trigger" style="cursor: zoom-in;">
+  <figcaption>Online mode, a fresh JiveXML event loaded automatically the moment ATLAS records it. Shifter workstation, Point 1.</figcaption>
+</figure>
+
+<section class="story-section">
+  <h2 id="ch-11">XII. Documentation</h2>
+  <p>For CGVWeb to be more than a demonstration, it had to be usable by any shifter who came after. A complete <a href="/library/cgvweb/twiki/">TWiki</a> was written: overview, getting-started guide, full UI reference, all data modes (Live WEB, with long-poll on <code>atlas-live.cern.ch</code>; Live SERVER, reading the Point 1 event files at <code>/atlas/EventDisplayEvents</code>; bundled sample events; user-supplied files), per-sub-detector energy thresholds, geometry provenance, JiveXML payload format, ATLAS-ID encoding, keyboard shortcuts, troubleshooting, glossary, and references. Thirteen topics, end-user grade. The TWiki is now the canonical entry point for any shifter approaching CGVWeb for the first time.</p>
+</section>
+
+<section class="story-section">
+  <h2 id="ch-12">XIII. Into the LHC pipeline</h2>
+  <p>AAfter reviews by the LAr group, the calorimeter coordinators, and the ATLAS executive board, and with Run 3 testing that succeeded on every front, the decision was taken: <strong>CGVWeb is now in active use within the ATLAS Control Room, where it brings the calorimeter to life in real time for the people operating one of the most complex experiments ever built.</strong></p>
+  <p>That sentence is worth sitting with. ATLAS publishes roughly a hundred papers per year, on Higgs decays, on top quark pairs, on searches for supersymmetry, dark matter candidates, and possibly the graviton. Each one may need to show the detector responding to a collision: tracks bending through the solenoid, energy deposits lighting up calorimeter cells, jets punching through material. Until now, producing those images required specialised offline tools. From Run 4 onward, <strong>a browser will be enough.</strong></p>
+  <p>More than that: in online mode, CGVWeb stays permanently connected to the detector. Every proton–proton collision that ATLAS records can appear in the display within seconds. The tool is no longer a viewer; it is part of the operational infrastructure of one of the largest and most expensive scientific instruments in human history. NIPS-CERN entered the LHC pipeline.</p>
+  <p class="story-emphasis">A Brazilian laboratory, a federal university, and a browser tab, now at the centre of the search for new physics.</p>
+</section>
+
+<section class="story-section">
+  <h2 id="ch-13">XIV. What comes next, xCGV</h2>
+  <p>CGVWeb shows calorimeter energy deposits. It answers the question: <em>where did the energy go?</em></p>
+  <p>The next step answers a harder one: <em>who caused it?</em></p>
+  <p>The xCGV project, currently in early development, will consume XAOD files: the ATLAS Analysis Object Data format that carries the full reconstructed event. Not just calorimeter deposits, but charged-particle tracks curving through the solenoid field, identified electrons and muons, hadronic jets, displaced vertices, and missing transverse energy, the signature of particles that left the detector without being seen, including dark matter candidates. Every decay product of every collision, reconstructed and rendered.</p>
+  <p>Where CGVWeb shows the calorimeter lighting up, xCGV will show the physics behind it: the full picture of what happened inside the detector the moment the protons met.</p>
+</section>
+
+<section class="story-section">
+  <h2 id="ch-14">XV. Run 4</h2>
+  <p>The Large Hadron Collider is entering its long shutdown, roughly four years of upgrades to the machine and detectors before Run 4 begins, currently scheduled for around 2029–2030. New electronics, higher luminosity, a significantly expanded physics reach. The searches for the graviton, for dark matter, for physics beyond the Standard Model will resume at an intensity not seen before.</p>
+  <p>CGVWeb will be there. The mandate is clear and the runway is long. Four years to make the next version: faster, more particles, more modes, tighter integration with the ATLAS infrastructure. The intention is to use every one of them.</p>
+</section>
+
+<section class="story-section story-thanks">
+  <h2 id="ch-15">Acknowledgements</h2>
+  <p>To the <span class="thanks-name">NIPS-CERN</span> laboratory at <span class="thanks-name">UFJF</span>, for being a team in the full sense: the opinions that sharpened the ideas, the criticisms that caught the mistakes, the encouragement that kept the work moving, and the people who showed up. This project grew in that environment.</p>
+  <p>To <span class="thanks-name">Mateus A. Carvalho</span> and <span class="thanks-name">Roberta L. Leonardo</span>, for the LAr layer measurements and for their authorship on the CBA paper.</p>
+  <p>To <span class="thanks-name">Melissa</span> and <span class="thanks-name">Daniela</span>, for taking CGVWeb into the ATLAS meetings where it mattered and carrying it through to adoption.</p>
+  <p>To <span class="thanks-name">Gustavo Libotte</span> and <span class="thanks-name">Fábio Luna</span>, for the Control Room testing, including being on the floor when it counted most.</p>
+  <p>To <span class="thanks-name">John Brian</span>, the shifter who took the call.</p>
+  <p>To <span class="thanks-name">Fabio Pigozzi</span> and <span class="thanks-name">Nikiforos Nikiforou</span> at CERN, for the VM, the RPM, the deployment, and the patience with the review chain.</p>
+  <p>To <span class="thanks-name">Diana Scannicchio</span>, for the coordination on the ATLAS operations side.</p>
+  <p>To <span class="thanks-name">Oleg Solovyanov</span>, for being the first inside ATLAS to say <em>yes</em>.</p>
+  <p>To the <span class="thanks-name">ATLAS Collaboration</span>, the Control Room team, the LAr group, and the ATLAS executive board, for the welcome, the rigour, and the trust.</p>
+  <p>To <span class="thanks-name">UFJF</span>, the <span class="thanks-name">INCT CERN-Brasil</span>, <span class="thanks-name">CNPq</span>, <span class="thanks-name">CAPES</span>, and <span class="thanks-name">FAPEMIG</span>, for making this possible from the Brazilian side.</p>
+  <p>To <span class="thanks-name">Prof. Dr. Luciano Manhães de Andrade Filho</span>, for the class that started everything and for the shoulder-to-shoulder work in the months that followed. To <span class="thanks-name">Chrysthofer Arthur Amaro Afonso</span>, for recognising, inside that very class, the tool that needed to exist, and for carrying it together with Luciano all the way to the main wall of the Control Room.</p>
+</section>
+
+<section class="story-section story-cta">
+  <h2 id="ch-16">Try it</h2>
+  <p>
+    <a class="btn btn-primary" href="/projects/cgvweb/"><img src="../assets/icons/icon_cgv.svg" alt="" loading="lazy" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;flex-shrink:0">Open CGVWeb →</a>
+    <a class="btn btn-ghost" href="/library/cgvweb/twiki/"><img src="../assets/icons/icon_twiki.png" alt="" loading="lazy" style="width:auto;height:16px;vertical-align:middle;margin-right:6px;flex-shrink:0">Read the TWiki</a>
+    <a class="btn btn-ghost" href="/pdf-viewer?id=pub-2026-cba-cgvweb"><i class="ph ph-file-pdf" aria-hidden="true"></i>CBA 2026 paper</a>
+  </p>
+</section><div class="pub-tags" style="margin-top:var(--sp-8)"><span class="pub-tag">CGVWeb</span><span class="pub-tag">ATLAS</span><span class="pub-tag">CERN</span><span class="pub-tag">Calorimeter</span><span class="pub-tag">Control Room</span><span class="pub-tag">Three.js</span><span class="pub-tag">WebAssembly</span><span class="pub-tag">Run 4</span><span class="pub-tag">CBA 2026</span><span class="pub-tag">Approved</span></div></div>
+    </div>
+
+    <!-- The closing band: appreciation, related, share. One band, one seam,
+         rather than three blocks each ruled off from the last with a hairline.
+         Hidden until the post has rendered, so an empty page never paints a
+         seam over nothing. -->
+    <div class="post-close seam section--lit" id="post-close" hidden style="--seam-from:var(--bg-1)">
+
+      <!-- Appreciation / heart control (populated by hearts.js) -->
+      <div class="post-hearts" id="post-hearts" style="display:none"></div>
+
+      <!-- Related articles (populated by JS) -->
+      <div id="post-related" style="display:none;padding:var(--sp-8) var(--container-pad)">
+        <div style="max-width:720px;margin:0 auto">
+          <p style="font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--sp-4)" data-i18n="news.related">Related</p>
+          <div id="post-related-list" style="display:flex;flex-direction:column;gap:var(--sp-3)"></div>
+        </div>
+      </div>
+
+      <!-- Post footer / share -->
+      <div id="post-footer" style="display:none;padding:var(--sp-8) var(--container-pad)">
+        <div style="max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-4)">
+          <a href="./" class="btn btn-ghost" data-i18n="news.back">
+            <i class="ph ph-arrow-left" aria-hidden="true"></i>
+            Back to News
+          </a>
+          <!-- Generic share panel — deep links open the visitor's own apps
+               (WhatsApp/X/Telegram/LinkedIn), plus copy-link, native Web Share
+               on mobile and a ready-made LinkedIn caption. Populated by JS. -->
+          <div id="post-share" class="share-panel"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Lightbox (shared, same as About Us) -->
+  <div id="story-lightbox" class="story-lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button class="story-lightbox__close" type="button" aria-label="Close">&times;</button>
+    <img class="story-lightbox__img" alt="">
+  </div>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <!-- Lightbox logic -->
+  <script>
+  (function(){
+    const lb    = document.getElementById('story-lightbox');
+    const lbImg = lb.querySelector('.story-lightbox__img');
+    const lbClose = lb.querySelector('.story-lightbox__close');
+    function open(src, alt){
+      lbImg.src = src; lbImg.alt = alt || '';
+      lb.classList.add('is-open'); lb.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    function close(){
+      lb.classList.remove('is-open'); lb.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      setTimeout(function(){ lbImg.src = ''; }, 300);
+    }
+    document.addEventListener('click', function(e){
+      const t = e.target.closest('.lightbox-trigger');
+      if(t){ e.preventDefault(); open(t.currentSrc || t.src, t.alt); return; }
+      if(e.target === lb || e.target === lbClose) close();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && lb.classList.contains('is-open')) close();
+    });
+  })();
+  </script>
+
+  <script type="module">
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=7b9b92b5da';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=7b9b92b5da';
+    import { newsPostUrl } from '../assets/js/content-links.min.js?v=7b9b92b5da';
+    import { mountPostHeart } from '../assets/js/hearts.min.js?v=7b9b92b5da';
+    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=7b9b92b5da';
+
+    /* The cover drifts inside the frame it is clipped by, and nothing else on
+       this page moves: a story is running text, and running text is the case
+       parallax must never touch. docs/design-system.md, section 7.
+
+       This runs at the end of loadPost rather than on `load`, because the
+       cover is written by loadPost itself and the window load event arrives
+       while the article is still being fetched. motion.js fetches GSAP on its
+       own, and only after asking for prefers-reduced-motion. */
+    let _motionStarted = false;
+    async function startCoverDrift() {
+      if (_motionStarted || !document.querySelector('[data-drift]')) return;
+      _motionStarted = true;
+      if (await ensureMotionLibs()) initMotion();
+    }
+
+    function catClass(cat) {
+      const m = { publication:'cat-publication', award:'cat-award', event:'cat-event', milestone:'cat-milestone' };
+      return m[cat] || 'badge-gray';
+    }
+
+    /** Show a flag marking the language this article is displayed in. */
+    function renderLangFlag(post) {
+      const metaEl = document.querySelector('.post-meta');
+      if (!metaEl) return;
+      let holder = document.getElementById('post-lang-flag');
+      if (!holder) {
+        holder = document.createElement('span');
+        holder.id = 'post-lang-flag';
+        holder.style.display = 'inline-flex';
+        holder.style.alignItems = 'center';
+        metaEl.appendChild(holder);
+      }
+      holder.innerHTML = newsLangFlag(post);
+    }
+
+    /** Show an "Updated on <date>" stamp when the post carries an edit date. */
+    function renderEditedDate(dateEdited) {
+      const el = document.getElementById('post-date-edited');
+      if (!el) return;
+      if (dateEdited) {
+        const prefix = t('news.updated');
+        el.textContent = prefix + formatDate(dateEdited);
+        el.setAttribute('datetime', dateEdited);
+        el.style.display = '';
+      } else {
+        el.textContent = '';
+        el.style.display = 'none';
+      }
+    }
+
+    function pickLang(featured) {
+      const lang = getLang() || 'en';
+      const t = featured.translations || {};
+      return t[lang] || t.en || t.pt || Object.values(t)[0] || {};
+    }
+
+    /** Adapt the featured-story JSON shape to the regular post shape used by the renderer. */
+    function adaptFeatured(featured) {
+      const tr = pickLang(featured);
+      return {
+        ...featured,
+        title: tr.title || '',
+        excerpt: tr.subtitle || tr.excerpt || '',
+        content_html: tr.content_html || '',
+        _featured: true,
+        _author: featured.author || ''
+      };
+    }
+
+    /** Compute the offset to clear the sticky top navigation when scrolling. */
+    function getHeaderOffset() {
+      const nav = document.getElementById('nav');
+      let navH = 0;
+      if (nav) {
+        const r = nav.getBoundingClientRect();
+        // The nav is fixed; its rect height reflects the rendered height.
+        navH = r.height || nav.offsetHeight || 0;
+      }
+      if (!navH) {
+        const cssVar = getComputedStyle(document.documentElement).getPropertyValue('--nav-h').trim();
+        navH = parseInt(cssVar, 10) || 68;
+      }
+      return navH + 16; // small visual breathing room above the heading
+    }
+
+    /** Smooth-scroll the page so the heading sits below the sticky nav. */
+    function scrollToHeading(id) {
+      const target = document.getElementById(id);
+      if (!target) return false;
+      const rect = target.getBoundingClientRect();
+      const top = rect.top + window.scrollY - getHeaderOffset();
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      return true;
+    }
+
+    /** Build the table of contents sidebar for featured posts. */
+    function injectToc(bodyEl) {
+      const headings = Array.from(bodyEl.querySelectorAll('.story-section h2'));
+      if (headings.length < 3) return;
+
+      // Give each heading a stable ID
+      headings.forEach((h, i) => { if (!h.id) h.id = 'ch-' + i; });
+
+      // Snapshot the IDs into the closure — the actual elements may be
+      // replaced later (innerHTML edits, language re-render). We always
+      // resolve by id at click/observe time.
+      const headingIds = headings.map(h => h.id);
+
+      // Build sidebar DOM
+      const sidebar = document.createElement('nav');
+      sidebar.className = 'post-toc-sidebar';
+      sidebar.setAttribute('aria-label', 'Story chapters');
+
+      const label = document.createElement('div');
+      label.className = 'post-toc-label';
+      label.textContent = t('news.chapters');
+      sidebar.appendChild(label);
+
+      // Mobile toggle button
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'post-toc-toggle';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.innerHTML = t('news.chapters') + ' <i class="ph ph-list" aria-hidden="true"></i>';
+      sidebar.appendChild(toggle);
+
+      const list = document.createElement('ol');
+      list.className = 'post-toc-list';
+      headings.forEach(function(h) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.className = 'post-toc-link';
+        a.textContent = h.textContent;
+        a.dataset.targetId = h.id;
+        li.appendChild(a);
+        list.appendChild(li);
+      });
+      sidebar.appendChild(list);
+
+      // Single delegated click handler on the list — keeps working on touch
+      // devices and survives any later DOM swaps inside the body.
+      list.addEventListener('click', function(e) {
+        const a = e.target.closest('.post-toc-link');
+        if (!a || !list.contains(a)) return;
+        e.preventDefault();
+        const id = a.dataset.targetId;
+        if (scrollToHeading(id)) {
+          history.replaceState(null, '', '#' + id);
+        }
+        // Auto-collapse the mobile chip-list once the user picks a chapter.
+        if (list.classList.contains('is-open')) {
+          list.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Mobile toggle behaviour
+      toggle.addEventListener('click', function() {
+        const open = list.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+
+      // Wrap body + sidebar in the flex layout container
+      const layout = document.createElement('div');
+      layout.className = 'post-featured-layout';
+      bodyEl.parentNode.insertBefore(layout, bodyEl);
+      layout.appendChild(sidebar);
+      layout.appendChild(bodyEl);
+
+      // Intersection observer: highlight active section. Resolve elements by
+      // id so the observer survives later body re-renders.
+      const links = list.querySelectorAll('.post-toc-link');
+      const obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            links.forEach(function(link) { link.classList.remove('is-active'); });
+            const active = list.querySelector('a[data-target-id="' + entry.target.id + '"]');
+            if (active) active.classList.add('is-active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px' });
+      headingIds.forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) obs.observe(el);
+      });
+
+      // If the URL already carries a chapter hash, honour it once layout has
+      // settled (so we land below the sticky nav rather than under it).
+      if (location.hash && location.hash.length > 1) {
+        const targetId = location.hash.slice(1);
+        if (headingIds.includes(targetId)) {
+          requestAnimationFrame(function() { scrollToHeading(targetId); });
+        }
+      }
+    }
+
+    /**
+     * Put a mark on the paper link in the Try it block.
+     *
+     * The three links there are one set and read as one, so all three carry a
+     * symbol. Two of them carry the destination's own logo, written into the
+     * article as <img>: the CGV octagon and the TWiki mark. The third goes to
+     * this site's own PDF viewer and has no logo to carry, so it gets the icon
+     * the publications archive uses for exactly that action.
+     *
+     * Added to the rendered DOM rather than to the article, which does not
+     * change by a word, and taken from assets/css/icons.css by class, so no
+     * Phosphor path is copied anywhere.
+     */
+    function markPaperLink(bodyEl) {
+      bodyEl.querySelectorAll('.story-cta a[href*="pdf-viewer"]').forEach(function (a) {
+        if (a.querySelector('.ph')) return;
+        const icon = document.createElement('i');
+        icon.className = 'ph ph-file-pdf';
+        icon.setAttribute('aria-hidden', 'true');
+        a.prepend(icon);
+      });
+    }
+
+    /** Make all .story-figure img elements clickable lightbox triggers. */
+    function initLightbox(bodyEl) {
+      bodyEl.querySelectorAll('.story-figure img').forEach(function(img) {
+        img.classList.add('lightbox-trigger');
+        img.style.cursor = 'zoom-in';
+      });
+    }
+
+    /** Copy text to clipboard with a legacy fallback. Returns a Promise. */
+    function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+      return new Promise((resolve) => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+        document.body.removeChild(ta);
+        resolve();
+      });
+    }
+
+    /**
+     * Build the share panel for the current post. Deep links open the visitor's
+     * own apps (WhatsApp/X/Telegram/LinkedIn) — no lab account involved. The
+     * shared URL is always the canonical production URL of the post, and every
+     * share text carries that link. Title/excerpt are read from the live DOM so
+     * the panel stays correct across language changes; call again to rebuild.
+     */
+    function buildSharePanel(post) {
+      const container = document.getElementById('post-share');
+      if (!container || !post) return;
+
+      const slug    = post.slug || post.id;
+      // Share the per-post Open Graph page (static, generated by tools/share-gen)
+      // so link unfurls on LinkedIn/WhatsApp/X are rich. It redirects humans to
+      // the SPA post while crawlers read its OG tags.
+      const url     = 'https://www.nipscern.com/news/' + encodeURIComponent(slug);
+      const title   = (document.getElementById('post-title')?.textContent || post.title || '').trim();
+      const excerpt = (document.getElementById('post-excerpt')?.textContent || post.excerpt || '').trim();
+      const enc     = encodeURIComponent;
+      const caption = [title, excerpt, url].filter(Boolean).join('\n\n');
+
+      // Instagram caption: PT title + excerpt + "link in bio" + hashtags from the
+      // post's tags. URLs aren't clickable on Instagram, so we drop the raw URL
+      // (kept in the generic caption above for LinkedIn/WhatsApp unfurls). Language
+      // is forced to PT (the account posts in Portuguese; see site/instagram.md in
+      // the gestao repo). EN is added by hand only on flagship posts.
+      const toHashtag = (tag) => {
+        const s = (tag || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+          .replace(/[^A-Za-z0-9 ]/g, ' ').trim();
+        if (!s) return '';
+        return '#' + s.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+      };
+      const igTr      = (post.translations && post.translations.pt) || {};
+      const igTitle   = (igTr.title || title || '').trim();
+      const igExcerpt = (igTr.excerpt || excerpt || '').trim();
+      const igTags    = (post.tags || []).map(toHashtag).filter(Boolean).join(' ');
+      const igCaption = [igTitle, igExcerpt, 'Link na bio', igTags].filter(Boolean).join('\n\n');
+
+      // Official brand marks (Simple Icons, CC0) drawn on a 24×24 grid — crisp
+      // and correctly shaped, unlike the generic icon-font logos.
+      const BRAND_SVG = {
+        wa: 'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z',
+        x:  'M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z',
+        tg: 'M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z',
+        li: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z',
+      };
+      const svgIcon = (k) => `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="${BRAND_SVG[k]}"/></svg>`;
+
+      // Brand deep links. On mobile these open the installed app directly.
+      const socials = [
+        { cls: 'share-wa', icon: 'wa', key: 'news.share_wa', href: `https://wa.me/?text=${enc(title + ': ' + url)}` },
+        { cls: 'share-x',  icon: 'x',  key: 'news.share_x',  href: `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}` },
+        { cls: 'share-tg', icon: 'tg', key: 'news.share_tg', href: `https://t.me/share/url?url=${enc(url)}&text=${enc(title)}` },
+        { cls: 'share-li', icon: 'li', key: 'news.share_li', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
+      ];
+      const socialsHtml = socials.map(s =>
+        `<a class="share-social glass-btn ${s.cls}" href="${s.href}" target="_blank" rel="noopener noreferrer" aria-label="${t(s.key)}" data-i18n-aria="${s.key}">${svgIcon(s.icon)}</a>`
+      ).join('');
+
+      container.innerHTML = `
+        <span class="share-panel-label" data-i18n="news.share">${t('news.share')}</span>
+        <div class="share-social-row">
+          ${socialsHtml}
+          <button type="button" class="share-social glass-btn share-copy" aria-label="${t('news.copy_link')}" data-i18n-aria="news.copy_link"><i class="ph ph-link" aria-hidden="true"></i></button>
+          <button type="button" class="share-social glass-btn share-download" aria-expanded="false" aria-label="${t('news.share_download')}" data-i18n-aria="news.share_download"><i class="ph ph-images" aria-hidden="true"></i></button>
+          <button type="button" class="share-social glass-btn share-native" aria-label="${t('news.share_native')}" data-i18n-aria="news.share_native" hidden><i class="ph ph-share-network" aria-hidden="true"></i></button>
+        </div>
+        <button type="button" class="share-caption-btn" data-i18n="news.share_caption">${t('news.share_caption')}</button>
+        <span class="share-caption-sep" aria-hidden="true"></span>
+        <button type="button" class="share-caption-btn share-caption-ig-btn" data-i18n="news.share_caption_ig">${t('news.share_caption_ig')}</button>
+        <span class="share-toast" role="status" aria-live="polite" hidden></span>`;
+
+      const toast = container.querySelector('.share-toast');
+      let toastTimer;
+      const showToast = (msg) => {
+        toast.textContent = msg;
+        toast.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.hidden = true; }, 2500);
+      };
+
+      container.querySelector('.share-copy').addEventListener('click', () => {
+        copyText(url).then(() => showToast(t('news.link_copied')));
+      });
+      container.querySelector('.share-caption-btn').addEventListener('click', () => {
+        copyText(caption).then(() => showToast(t('news.caption_copied')));
+      });
+      container.querySelector('.share-caption-ig-btn').addEventListener('click', () => {
+        copyText(igCaption).then(() => showToast(t('news.caption_copied')));
+      });
+
+      // Native Web Share — touch devices only (opens the OS sheet: Instagram,
+      // etc.). Hidden on desktop so it isn't confused with "copy link".
+      const nativeBtn = container.querySelector('.share-native');
+      if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
+        nativeBtn.hidden = false;
+        nativeBtn.addEventListener('click', () => {
+          navigator.share({ title, text: title, url }).catch(() => { /* user cancelled */ });
+        });
+      }
+
+      // -- Download-images section (images hosted on cdn.nipscern.com/share) --
+      // CDN_VER busts Cloudflare's 1-year image cache — bump on every image
+      // regeneration to match IMG_VER in tools/share-gen/src/main.rs.
+      const CDN_SHARE = 'https://cdn.nipscern.com/share';
+      const CDN_VER = '15';
+      const trans = post.translations || {};
+      const dlLangs = Array.from(new Set(['en', ...Object.keys(trans)]))
+        .filter(l => l === 'en' ? true : (trans[l] && (trans[l].title || trans[l].subtitle)));
+      // format key → {aspect label, with-text?}. Mirrors tools/share-gen FORMATS.
+      const DL_FORMATS = [
+        { key: 'og',       label: 'Link · 1.91:1',  text: true  },
+        { key: 'portrait', label: 'Feed · 4:5',     text: true  },
+        { key: 'grid',     label: 'Grid · 3:4',     text: true  },
+        { key: 'story',    label: 'Story · 9:16',   text: true  },
+        { key: 'raw',      label: 'Cover · 1.91:1', text: false },
+        { key: 'rawgrid',  label: 'Cover · 3:4',    text: false },
+        { key: 'rawstory', label: 'Cover · 9:16',   text: false },
+      ];
+      // The grid lives as a full-width sibling of the button panel (so it can
+      // span the whole footer, not just the right-aligned button cluster).
+      const footerRow = container.parentElement;
+      footerRow.querySelectorAll('.share-downloads').forEach(n => n.remove());
+      const dlEl = document.createElement('div');
+      dlEl.className = 'share-downloads';
+      dlEl.hidden = true;
+      footerRow.appendChild(dlEl);
+      const toggle = container.querySelector('.share-download');
+      let built = false;
+      const activeLang = () => (dlLangs.includes(getLang && getLang()) ? getLang() : 'en');
+
+      function card(fmt, lang) {
+        const name = fmt.text ? `${fmt.key}-${lang}` : fmt.key;
+        const href = `${CDN_SHARE}/${encodeURIComponent(slug)}/${name}.jpg?v=${CDN_VER}`;
+        const cap = fmt.label + (fmt.text ? ` · ${lang.toUpperCase()}` : '');
+        return `<figure class="share-dl-card" data-lang="${fmt.text ? lang : 'raw'}">
+          <a class="share-dl-thumb" href="${href}" download="nipscern-${slug}-${name}.jpg" target="_blank" rel="noopener" aria-label="${cap}">
+            <img loading="lazy" src="${href}" alt="" onerror="this.closest('.share-dl-card').classList.add('is-missing')">
+            <span class="share-dl-badge"><i class="ph ph-download-simple" aria-hidden="true"></i></span>
+          </a>
+          <figcaption>${cap}</figcaption>
+        </figure>`;
+      }
+
+      function buildDownloads() {
+        const tabs = dlLangs.length > 1
+          ? `<div class="share-dl-tabs" role="tablist">${dlLangs.map(l =>
+              `<button type="button" class="share-dl-tab${l === activeLang() ? ' is-active' : ''}" data-lang="${l}">${l.toUpperCase()}</button>`).join('')}</div>`
+          : '';
+        const cards = DL_FORMATS.map(f => f.text ? dlLangs.map(l => card(f, l)).join('') : card(f)).join('');
+        dlEl.innerHTML = `<p class="share-dl-hint" data-i18n="news.dl_hint">${t('news.dl_hint')}</p>${tabs}<div class="share-dl-grid">${cards}</div>`;
+        applyLangFilter(activeLang());
+        dlEl.querySelectorAll('.share-dl-tab').forEach(btn => btn.addEventListener('click', () => {
+          dlEl.querySelectorAll('.share-dl-tab').forEach(b => b.classList.toggle('is-active', b === btn));
+          applyLangFilter(btn.dataset.lang);
+        }));
+      }
+      function applyLangFilter(lang) {
+        dlEl.querySelectorAll('.share-dl-card').forEach(c => {
+          const dl = c.getAttribute('data-lang');
+          c.style.display = (dl === 'raw' || dl === lang) ? '' : 'none';
+        });
+      }
+
+      toggle.addEventListener('click', () => {
+        const open = dlEl.hasAttribute('hidden');
+        if (open && !built) { buildDownloads(); built = true; }
+        if (open) dlEl.removeAttribute('hidden'); else dlEl.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
+
+    let _currentPost = null;
+
+    /* Each post has a page of its own, news/<slug>, drawn at build time by
+       tools/build-news.js from this file: the header, cover and text are
+       already in the HTML, and <html data-post> names the post. There, in
+       English, the script keeps what is drawn and only adds the parts that
+       live at runtime (the heart, the related posts, the share panel); in
+       another language it draws over it, as before. This file itself, opened
+       as news/post?id=..., now only sends the reader to that page. */
+    const PRE = document.documentElement.dataset.post || '';
+
+    async function loadPost() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id') || params.get('slug') || PRE;
+
+      if (!PRE) document.getElementById('post-loading').style.display = 'block';
+
+      let posts;
+      let featured = null;
+      try {
+        const [resPosts, resFeat] = await Promise.all([
+          fetch('../data/news.json'),
+          fetch('../data/news-featured.json')
+        ]);
+        posts = resPosts.ok ? await resPosts.json() : [];
+        featured = resFeat.ok ? await resFeat.json() : null;
+      } catch (e) {
+        posts = posts || [];
+      }
+
+      document.getElementById('post-loading').style.display = 'none';
+
+      let post;
+      if (featured && [featured.id, featured.slug].includes(id)) {
+        post = adaptFeatured(featured);
+      } else {
+        post = posts.find(p => p.id === id || p.slug === id);
+      }
+      if (!post) {
+        document.getElementById('post-not-found').style.display = 'block';
+        return;
+      }
+      // render=1 is the build asking for the drawing (tools/build-news.js).
+      if (!PRE && !params.has('render')) {
+        location.replace('/news/' + encodeURIComponent(post.slug || post.id) + location.hash);
+        return;
+      }
+
+      // Mark <body> for featured-only styling
+      if (post._featured) {
+        document.body.classList.add('post-featured');
+      }
+
+      // Resolve translations for regular (non-featured) posts
+      _currentPost = post;
+      const _lang = getLang() || 'en';
+      const _tr = post._featured ? {} : (post.translations && post.translations[_lang]) || {};
+
+      // Update meta
+      document.getElementById('page-title').textContent = (_tr.title || post.title) + ' | NIPS-CERN';
+      document.getElementById('page-desc').content = _tr.excerpt || post.excerpt;
+      document.getElementById('og-title').content = _tr.title || post.title;
+      document.getElementById('og-desc').content = _tr.excerpt || post.excerpt;
+      const _canon = 'https://www.nipscern.com/news/' + encodeURIComponent(post.slug || post.id);
+      document.getElementById('og-url').content = _canon;
+      document.getElementById('canonical').href = _canon;
+
+      const keep = !!PRE && (getLang() || 'en') === 'en';
+
+      if (!keep) {
+      // Render header
+      const badge = document.getElementById('post-category-badge');
+      badge.className = 'badge ' + catClass(post.category);
+      badge.setAttribute('data-i18n', 'news.categories.' + post.category);
+      badge.textContent = post.category;
+
+      document.getElementById('post-date').textContent = formatDate(post.date);
+      document.getElementById('post-date').setAttribute('datetime', post.date);
+      renderEditedDate(post.date_edited);
+      renderLangFlag(post);
+      document.getElementById('post-title').textContent = _tr.title || post.title;
+      document.getElementById('post-excerpt').textContent = _tr.excerpt || post.excerpt;
+      document.getElementById('post-header').style.display = 'block';
+
+      // Author byline (featured stories carry an explicit author)
+      if (post._featured && post._author) {
+        const meta = document.querySelector('.post-meta');
+        if (meta && !meta.querySelector('.post-author')) {
+          const author = document.createElement('span');
+          author.className = 'post-author';
+          author.innerHTML = '<i class="ph ph-user-circle" aria-hidden="true"></i> ' + post._author;
+          meta.appendChild(author);
+        }
+      }
+
+      // Cover image — overlaps post-header so the dark bg bleeds ~15% behind the image top
+      if (post.image) {
+        const coverEl = document.getElementById('post-cover');
+        // Absolute URLs (CDN) pass through; repo-relative paths get the ../ prefix
+        const coverSrc = /^(https?:)?\/\//.test(post.image) ? post.image : '../' + post.image;
+        const people = Array.isArray(post.people)
+          ? post.people.filter(p => p && (typeof p === 'string' || p.name))
+          : [];
+        if (people.length) {
+          // Annotated group photo: the cover is shown uncropped (so the hotspots
+          // stay aligned) with one focusable dot per person. The name appears on
+          // hover (desktop) or tap/focus (mobile). See .people-photo in main.css.
+          const wrap = document.createElement('div');
+          wrap.className = 'people-photo';
+          const img = document.createElement('img');
+          img.src = coverSrc;
+          img.alt = post.title;
+          img.loading = 'eager';
+          wrap.appendChild(img);
+          people.forEach(p => {
+            // A tag name may be a plain string (people) or a per-language object
+            // (e.g. the bilingual food-table tag): { pt: '…', en: '…' }.
+            const name = (p && typeof p.name === 'object')
+              ? (p.name[getLang() || 'en'] || p.name.en || p.name.pt || Object.values(p.name)[0] || '')
+              : (typeof p === 'string' ? p : (p.name || ''));
+            const px = (typeof p === 'object' && p.x != null) ? p.x : 50;
+            const py = (typeof p === 'object' && p.y != null) ? p.y : 50;
+            const tag = document.createElement('button');
+            tag.type = 'button';
+            tag.className = 'people-tag';
+            // Dots near the left/right edge would have their centred label clipped
+            // by the screen on mobile — flag them so the CSS anchors the label
+            // inward (the dot itself stays put). See .people-tag--edge-* in main.css.
+            if (px <= 25) tag.classList.add('people-tag--edge-left');
+            else if (px >= 75) tag.classList.add('people-tag--edge-right');
+            tag.style.left = px + '%';
+            tag.style.top  = py + '%';
+            tag.setAttribute('aria-label', name);
+            const dot = document.createElement('span');
+            dot.className = 'people-tag-dot';
+            dot.setAttribute('aria-hidden', 'true');
+            const label = document.createElement('span');
+            label.className = 'people-tag-label';
+            label.textContent = name;
+            tag.appendChild(dot);
+            tag.appendChild(label);
+            wrap.appendChild(tag);
+          });
+          coverEl.appendChild(wrap);
+        } else {
+          // A frame, because that is the only thing on this site a picture is
+          // allowed to move inside: it clips, so the travel is bounded and the
+          // far edge can never be pulled into view. motion.js reads the two
+          // attributes and needs nothing written here. See .post-cover-frame.
+          const frame = document.createElement('div');
+          frame.className = 'frame post-cover-frame';
+          frame.setAttribute('data-drift-frame', '');
+          const img = document.createElement('img');
+          img.src = coverSrc;
+          img.alt = post.title;
+          img.loading = 'eager';
+          img.setAttribute('data-drift', '6');
+          frame.appendChild(img);
+          coverEl.appendChild(frame);
+        }
+        coverEl.style.display = 'block';
+        document.getElementById('post-header').classList.add('has-cover');
+      }
+      }
+
+      // Render body — featured stories carry rich HTML, regular posts carry plain text
+      const bodyEl = document.getElementById('post-body');
+      const isFeatured = post._featured && post.content_html;
+      if (keep) {
+        if (isFeatured) initLightbox(bodyEl);
+      } else if (isFeatured) {
+        bodyEl.classList.add('post-body-featured');
+        bodyEl.innerHTML = post.content_html;
+        initLightbox(bodyEl);
+        markPaperLink(bodyEl);
+      } else {
+        const rawContent = _tr.content || post.content || '';
+        const paragraphs = rawContent.split('\n\n').map(p => p.trim().startsWith('<') ? p.trim() : `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+        bodyEl.innerHTML = paragraphs;
+      }
+      bodyEl.style.display = 'block';
+
+      // Appreciation heart — interactive, with click feedback (see hearts.js).
+      const heartsEl = document.getElementById('post-hearts');
+      if (heartsEl) {
+        heartsEl.replaceChildren();
+        mountPostHeart(heartsEl, post);
+        heartsEl.style.display = 'block';
+      }
+
+      // Embedded video (YouTube). insertAdjacentHTML appends without
+      // re-parsing existing children, so anything we touch afterwards keeps
+      // working (handlers, observers, references).
+      if (post.video && !keep) {
+        const ytId = post.video.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
+        if (ytId) {
+          bodyEl.insertAdjacentHTML('beforeend', `
+            <div class="post-video-wrap" style="margin:var(--sp-10) 0">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/${ytId}"
+                title="Video: ${post.title}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                loading="lazy"
+                style="width:100%;aspect-ratio:16/9;border:0;border-radius:var(--r-xl);display:block"
+              ></iframe>
+            </div>`);
+        }
+      }
+
+      // Tags
+      if (post.tags && post.tags.length && !keep) {
+        bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${post.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
+      }
+
+      // Build the chapter sidebar last, after all body edits, so it sees the
+      // final DOM and its handlers don't get wiped by later innerHTML writes.
+      if (isFeatured && !keep) {
+        injectToc(bodyEl);
+      }
+
+      // Related articles
+      if (post.related_ids && post.related_ids.length) {
+        const relatedPosts = post.related_ids.map(rid => posts.find(p => p.id === rid)).filter(Boolean);
+        if (relatedPosts.length) {
+          const listEl = document.getElementById('post-related-list');
+          relatedPosts.forEach(rp => {
+            const a = document.createElement('a');
+            a.href = newsPostUrl(rp);
+            a.className = 'post-related-item glass';
+            const badgeEl = document.createElement('span');
+            badgeEl.className = 'badge ' + catClass(rp.category);
+            badgeEl.textContent = rp.category;
+            const titleEl = document.createElement('span');
+            titleEl.className = 'post-related-title';
+            titleEl.textContent = rp.title;
+            const arrow = document.createElement('i');
+            arrow.className = 'ph ph-arrow-right';
+            a.appendChild(badgeEl);
+            a.appendChild(titleEl);
+            a.appendChild(arrow);
+            listEl.appendChild(a);
+          });
+          document.getElementById('post-related').style.display = 'block';
+        }
+      }
+
+      document.getElementById('post-footer').style.display = 'block';
+      document.getElementById('post-close').hidden = false;
+
+      // Generic share panel (deep links + copy + native Web Share + LinkedIn caption)
+      buildSharePanel(post);
+
+      startCoverDrift();
+    }
+
+    revealFailsafe();
+    document.addEventListener('DOMContentLoaded', loadPost);
+
+    // If the user changes language while reading the featured story, re-render
+    document.addEventListener('langchange', async () => {
+      // Regular (non-featured) posts: swap title, excerpt and body on language change
+      if (!document.body.classList.contains('post-featured')) {
+        if (!_currentPost) return;
+        const lang = getLang() || 'en';
+        const tr = (_currentPost.translations && _currentPost.translations[lang]) || {};
+        document.getElementById('post-title').textContent   = tr.title   || _currentPost.title;
+        document.getElementById('post-excerpt').textContent = tr.excerpt || _currentPost.excerpt;
+        document.getElementById('page-title').textContent   = (tr.title || _currentPost.title) + ' | NIPS-CERN';
+        const rawContent = tr.content || _currentPost.content || '';
+        if (rawContent) {
+          const bodyEl = document.getElementById('post-body');
+          bodyEl.innerHTML = rawContent.split('\n\n').map(p => p.trim().startsWith('<') ? p.trim() : `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+          if (_currentPost.tags && _currentPost.tags.length) {
+            bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${_currentPost.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
+          }
+        }
+        // Refresh people-tag labels (e.g. the bilingual food-table tag) for the new language
+        if (Array.isArray(_currentPost.people)) {
+          const labels = document.querySelectorAll('#post-cover .people-tag-label');
+          const tags   = document.querySelectorAll('#post-cover .people-tag');
+          _currentPost.people.forEach((p, i) => {
+            const nm = (p && typeof p.name === 'object')
+              ? (p.name[lang] || p.name.en || p.name.pt || Object.values(p.name)[0] || '')
+              : (typeof p === 'string' ? p : (p.name || ''));
+            if (labels[i]) labels[i].textContent = nm;
+            if (tags[i]) tags[i].setAttribute('aria-label', nm);
+          });
+        }
+        buildSharePanel(_currentPost);
+        return;
+      }
+      try {
+        const res = await fetch('../data/news-featured.json');
+        if (!res.ok) return;
+        const featured = await res.json();
+        const params = new URLSearchParams(window.location.search);
+        const currentId = params.get('id') || params.get('slug') || PRE;
+        if (![featured.id, featured.slug].includes(currentId)) return;
+        const tr = pickLang(featured);
+        document.getElementById('post-title').textContent   = tr.title || '';
+        document.getElementById('post-excerpt').textContent = tr.subtitle || tr.excerpt || '';
+        document.getElementById('page-title').textContent   = (tr.title || '') + ' | NIPS-CERN';
+        renderEditedDate(featured.date_edited);
+        renderLangFlag(featured);
+        buildSharePanel(_currentPost);
+        const bodyEl = document.getElementById('post-body');
+        // Remove any existing TOC layout wrapper before re-rendering
+        const layout = document.querySelector('.post-featured-layout');
+        if (layout) {
+          layout.parentNode.insertBefore(bodyEl, layout);
+          layout.remove();
+        }
+        bodyEl.innerHTML = tr.content_html || '';
+        if (featured.tags && featured.tags.length) {
+          bodyEl.insertAdjacentHTML('beforeend', `<div class="pub-tags" style="margin-top:var(--sp-8)">${featured.tags.map(t => `<span class="pub-tag">${t}</span>`).join('')}</div>`);
+        }
+        initLightbox(bodyEl);
+        markPaperLink(bodyEl);
+        injectToc(bodyEl);
+      } catch (e) { /* keep current rendering on failure */ }
+    });
+  </script>
+
+  <script type="module" src="../assets/js/main.min.js?v=7b9b92b5da"></script>
+
+  <script src="../assets/js/analytics.min.js?v=7b9b92b5da" defer></script>
 </body>
 </html>

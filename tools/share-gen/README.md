@@ -12,10 +12,10 @@ Para cada notícia (de `data/news.json` e `data/news-featured.json`):
   `og` (1200×630), `portrait` (1080×1350, 4:5), `grid` (1080×1440, 3:4 — grade
   do Instagram 2026), `story` (1080×1920, 9:16) com título em `pt`/`en`, e `raw`,
   `rawgrid`, `rawstory` (capa limpa, sem texto). → **subir para o CDN**.
-- **Página de OG** em `../../news/<slug>.html` — HTML mínimo com as tags
-  `og:*`/`twitter:*`/`canonical` corretas (imagem apontando pro CDN). Redireciona
-  humanos pro SPA (`/news/post?id=<slug>`) e entrega o preview certo pros crawlers
-  do LinkedIn/WhatsApp/X. → **commitar no repo**.
+A página da notícia, `news/<slug>.html`, não é mais daqui. Desde outubro de 2026
+ela sai de `tools/build-news.js`, com o post inteiro já desenhado no HTML e as
+tags de Open Graph e Twitter apontando para a imagem `og-en.jpg` desta
+ferramenta, na versão `IMG_VER` de `src/main.rs`.
 
 ## Capa vertical opcional (`image_vertical`)
 
@@ -57,14 +57,14 @@ cargo run --release -- <slug>    # só uma (ou várias) notícia(s)
 
 Saída:
 - `tools/share-gen/dist/share/<slug>/*.jpg`  (git-ignored — vai pro CDN)
-- `news/<slug>.html`                          (commitar)
 
 ## Fluxo ao publicar/editar uma notícia
 
 1. `cargo run --release` (ou passe o slug da notícia nova).
 2. **Suba** `dist/share/<slug>/*.jpg` para o CDN, em
    `cdn.nipscern.com/share/<slug>/…` (o mesmo repositório de assets das capas).
-3. **Commite** o novo `news/<slug>.html` e dê push (GitHub Pages, grátis).
+3. Rode `node tools/build-news.js`, na raiz do site, e commite as páginas de
+   `news/` que ele escrever.
 
 Pronto: o link `https://www.nipscern.com/news/<slug>` fica com preview bonito, e
 a seção "Baixar imagens" da notícia passa a servir os formatos a partir do CDN.

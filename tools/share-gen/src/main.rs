@@ -21,11 +21,11 @@ use image::imageops::FilterType;
 use resvg::{tiny_skia, usvg};
 use serde_json::Value;
 
-const SITE: &str = "https://www.nipscern.com";
-const CDN: &str = "https://cdn.nipscern.com/share";
 // Cache-buster: the CDN (Cloudflare) caches images for a year, so bump this on
 // every image regeneration to force fresh delivery. MUST match CDN_VER in
-// news/post.html. See tools/share-gen/README.md.
+// news/post.html. See tools/share-gen/README.md. Not used in this file any
+// more: tools/build-news.js reads it from here for the og:image of each post.
+#[allow(dead_code)]
 const IMG_VER: &str = "15";
 const BRAND: &str = "#7cb5ff";
 const BRAND_DEEP: &str = "#5b9cf6";
@@ -126,34 +126,6 @@ fn title_for(post: &Value, lang: &str) -> String {
         .to_string()
 }
 
-fn excerpt_for(post: &Value, lang: &str) -> String {
-    if lang != "en" {
-        if let Some(e) = post
-            .get("translations")
-            .and_then(|t| t.get(lang))
-            .and_then(|x| x.get("excerpt").or_else(|| x.get("subtitle")))
-            .and_then(Value::as_str)
-        {
-            if !e.is_empty() {
-                return e.to_string();
-            }
-        }
-    }
-    // Featured posts (data/news-featured.json) keep everything under
-    // translations, English included, and leave the top level empty: without
-    // this the English OG page of the CGVWeb post went out with an empty
-    // description (seen in October 2026).
-    let top = s(post, "excerpt");
-    if !top.is_empty() {
-        return top.to_string();
-    }
-    post.get("translations")
-        .and_then(|t| t.get(lang).or_else(|| t.get("en")))
-        .and_then(|x| x.get("excerpt").or_else(|| x.get("subtitle")))
-        .and_then(Value::as_str)
-        .unwrap_or("")
-        .to_string()
-}
 
 fn available_langs(post: &Value) -> Vec<String> {
     let mut langs = vec!["en".to_string()];
@@ -477,50 +449,10 @@ fn render_jpeg(svg: &str, w: u32, h: u32, opt: &usvg::Options) -> Result<Vec<u8>
 
 // ---- per-post Open Graph page (static, for crawlers) ----
 
-fn og_page(slug: &str, title: &str, desc: &str) -> String {
-    let t = xml_escape(&format!("{} — NIPS-CERN", title));
-    let d = xml_escape(&desc.chars().take(300).collect::<String>());
-    let url = format!("{SITE}/news/{slug}");
-    let img = format!("{CDN}/{slug}/og-en.jpg?v={IMG_VER}");
-    let spa = format!("/news/post?id={slug}");
-    format!(
-        r##"<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{t}</title>
-<meta name="description" content="{d}">
-<meta property="og:type" content="article">
-<meta property="og:url" content="{url}">
-<meta property="og:title" content="{t}">
-<meta property="og:description" content="{d}">
-<meta property="og:image" content="{img}">
-<meta property="og:image:secure_url" content="{img}">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="{t}">
-<meta property="og:site_name" content="NIPS-CERN">
-<meta property="og:locale" content="en_US">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{t}">
-<meta name="twitter:description" content="{d}">
-<meta name="twitter:image" content="{img}">
-<link rel="canonical" href="{url}">
-<script>location.replace('{spa}' + location.hash);</script>
-</head>
-<body style="background:#070a12;color:#c9d4e6;font-family:system-ui,sans-serif;padding:2rem">
-<p>Redirecting to <a href="{spa}" style="color:#7cb5ff">{t}</a>…</p>
-</body>
-</html>
-"##
-    )
-}
 
 // ---- driver ----
 
-fn process_post(post: &Value, opt: &usvg::Options, dist: &Path, news_dir: &Path, repo: &Path) -> Result<(), Box<dyn Error>> {
+fn process_post(post: &Value, opt: &usvg::Options, dist: &Path, repo: &Path) -> Result<(), Box<dyn Error>> {
     let slug = slug_of(post);
     if slug.is_empty() {
         return Ok(());
@@ -567,10 +499,9 @@ fn process_post(post: &Value, opt: &usvg::Options, dist: &Path, news_dir: &Path,
         }
     }
 
-    // Static OG page (English default), committed to the site.
-    let og = og_page(&slug, &title_for(post, "en"), &excerpt_for(post, "en"));
-    fs::write(news_dir.join(format!("{slug}.html")), og)?;
-    println!("  → news/{slug}.html (OG page)");
+    // A página da notícia, news/<slug>.html, com as tags de Open Graph e o
+    // texto inteiro, é de tools/build-news.js desde outubro de 2026; aqui só
+    // as imagens. A versão delas (IMG_VER) é a que aquela ferramenta lê.
     Ok(())
 }
 
@@ -578,7 +509,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let repo = manifest.join("..").join("..");
     let dist = manifest.join("dist");
-    let news_dir = repo.join("news");
     fs::create_dir_all(&dist)?;
 
     // Fonts once.
@@ -603,7 +533,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         if !args.is_empty() && !args.iter().any(|a| a == &slug || Some(a.as_str()) == post.get("id").and_then(Value::as_str)) {
             continue;
         }
-        process_post(post, &opt, &dist, &news_dir, &repo)?;
+        process_post(post, &opt, &dist, &repo)?;
         count += 1;
     }
 

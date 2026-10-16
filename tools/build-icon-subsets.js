@@ -102,6 +102,11 @@ const FAMILIAS = [
   { prefixo: 'library/talks/', folha: 'library-courses.css' },
   /* As páginas de cada publicação, geradas por tools/build-publications.js. */
   { prefixo: 'publications/p/', folha: 'publications-p.css' },
+  /* Cada notícia é uma cópia de news/post.html desenhada por
+     tools/build-news.js, e carrega a folha dela; a lista fica com a sua. A
+     primeira entrada que casa vale, por isso a lista vem antes. */
+  { prefixo: 'news/index.html', folha: 'news-index.css' },
+  { prefixo: 'news/', folha: 'news-post.css' },
 ];
 const folhaDaPagina = (pagina) => {
   const familia = FAMILIAS.find((f) => pagina.startsWith(f.prefixo));
