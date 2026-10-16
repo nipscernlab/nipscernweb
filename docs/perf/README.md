@@ -59,7 +59,9 @@ em `<html>`:
 | `min` | o de `lite`, mais GSAP (coreografia e parallax), loops de vídeo e o giro do grafo do About |
 | `no-sky`, `no-foil`, `no-halo`, `no-shimmer`, `no-glass`, `no-lenis`, `no-motion`, `no-video` | um efeito só, para medir quanto ele custa |
 
-Sem `?fx=`, o padrão é decidido pelo aparelho:
+Sem `?fx=`, vale a escolha do botão "Efeitos leves" do rodapé, guardada em
+`localStorage` (`nipscern_fx`: `lite` ou `full`). Sem as duas, o padrão é
+decidido pelo aparelho:
 
 - **economia de dados ligada** (`Save-Data`) ou **até 2 GB de memória**
   (`navigator.deviceMemory`, só nos navegadores Chromium): `lite`;

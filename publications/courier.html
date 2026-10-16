@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
   <title>CERN Courier | NIPS-CERN</title>
   <meta name="description" content="CERN Courier digital editions, the international journal of high energy physics, from January/February 2013 to May/June 2026. Curated by NIPS-CERN.">
 
@@ -26,8 +26,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/publications-courier.css?v=6b109fbd8f">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=6b109fbd8f">
+  <link rel="stylesheet" href="../assets/css/icons/publications-courier.css?v=8dda3137e8">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=8dda3137e8">
 
   <style>
     .courier-grid {
@@ -279,7 +279,7 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=6b109fbd8f"></script>
+  <script type="module" src="../assets/js/main.min.js?v=8dda3137e8"></script>
 
   <script>
     // ============================================================
@@ -623,6 +623,6 @@
     });
   </script>
 
-  <script src="../assets/js/analytics.min.js?v=6b109fbd8f" defer></script>
+  <script src="../assets/js/analytics.min.js?v=8dda3137e8" defer></script>
 </body>
 </html>

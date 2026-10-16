@@ -7476,3 +7476,10 @@ html.fx-no-foil .hero-title.hero-glow--high { opacity: 0; }
 .pub-item-title a { color: inherit; text-decoration: none; }
 .pub-item-title a:hover,
 .pub-item-title a:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+
+/* The light-effects switch in the footer (initFxToggle in main.js), lit while
+   the light effects are on. */
+.fx-toggle[aria-pressed="true"] {
+  color: var(--brand);
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+}

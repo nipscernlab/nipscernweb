@@ -3,16 +3,16 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=6b109fbd8f';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=8dda3137e8';
 
-import { newsPostUrl } from './content-links.js?v=6b109fbd8f';
-import { detectLang } from './pub-render.js?v=6b109fbd8f';
+import { newsPostUrl } from './content-links.js?v=8dda3137e8';
+import { detectLang } from './pub-render.js?v=8dda3137e8';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=6b109fbd8f';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=8dda3137e8';
 
 // ============================================================
 // Navigation Template
@@ -445,6 +445,12 @@ function buildFooter() {
         <a href="${ROOT}qa.html" class="btn btn-ghost btn-sm glass-btn">
           <i class="ph ph-chats-circle" aria-hidden="true"></i> <span data-i18n="footer.qa">Q&amp;A</span>
         </a>
+        <!-- Light effects: the sky still, the wordmark at rest, no glass blur, no
+             smooth scrolling. Kept in nipscern_fx (see the <head> of each page
+             and the privacy policy); pressed means light. -->
+        <button type="button" class="btn btn-ghost btn-sm glass-btn fx-toggle" id="fx-toggle" aria-pressed="false">
+          <i class="ph ph-gauge" aria-hidden="true"></i> <span data-i18n="footer.fx_lite">Light effects</span>
+        </button>
         <a href="${ROOT}projects/archived" class="btn btn-ghost btn-sm glass-btn" aria-label="Archived Projects">
           <i class="ph ph-archive" aria-hidden="true"></i> <span data-i18n="footer.archived">Archived Projects</span>
         </a>
@@ -487,6 +493,23 @@ function initFooter() {
   const footer = document.getElementById('footer');
   if (!footer) return;
   footer.innerHTML = buildFooter();
+  initFxToggle(footer);
+}
+
+/* The effects switch in the footer. The <head> of every page reads the choice
+   from localStorage (nipscern_fx) before the first paint, so the page is
+   reloaded to apply it: the sky, the wordmark, Lenis and the glass are all set
+   up once, at load, and none of them has a way back that is worth the code.
+   A ?fx= in the address still wins over the stored choice, for measuring. */
+function initFxToggle(footer) {
+  const btn = footer.querySelector('#fx-toggle');
+  if (!btn) return;
+  const lite = document.documentElement.getAttribute('data-fx') === 'lite';
+  btn.setAttribute('aria-pressed', String(lite));
+  btn.addEventListener('click', () => {
+    try { localStorage.setItem('nipscern_fx', lite ? 'full' : 'lite'); } catch (e) { return; }
+    location.reload();
+  });
 }
 
 /* Where one band ends and the next begins
@@ -937,7 +960,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=6b109fbd8f">. Each copy would otherwise append its own
+// <script src="main.js?v=8dda3137e8">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {
