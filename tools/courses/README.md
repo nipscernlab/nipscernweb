@@ -48,6 +48,9 @@ A ferramenta roda `git fetch` no clone do curso e lê o `origin/main` por
 fetch; `--ref <commit>` lê outro commit; `--source <pasta>` aponta outro clone.
 `--course <curso>` gera só um curso e deixa a coletânea e o sitemap como estavam,
 porque os dois listam todos os cursos; para atualizá-los, rode sem `--course`.
+A conferência de endereços continua abrindo todas as páginas, e nas dos cursos
+que a rodada não gerou vale, para o CDN, o que o `<curso>.cdn.json` deles
+registra.
 
 Rodar duas vezes sobre o mesmo commit dá os mesmos bytes. O que ela baixa da rede,
 os PDFs abertos das obras e o oEmbed e as miniaturas do YouTube, fica em
@@ -94,7 +97,9 @@ python tools/courses/build.py --assets ../nipscern-assets \
 
 `--material` aceita um `.zip`, uma pasta ou um `.pdf` só, e casa cada arquivo
 com a parte pelo nome que está em `partes[].arquivo`; arquivo que não é de parte
-nenhuma para a rodada. A parte que mudou ganha `-v2`, `-v3` no CDN, a anterior
+nenhuma para a rodada. O nome tem de ser exato: um PDF baixado de novo chega
+como `Apostila_EletronicaAnalogicaI_Parte2 (3).pdf`, e precisa voltar ao nome
+da parte antes. A parte que mudou ganha `-v2`, `-v3` no CDN, a anterior
 continua onde estava, e a página dela se refaz a partir do PDF novo.
 
 O que a página diz de cada parte sai do PDF, e não do `.json`
@@ -106,7 +111,8 @@ O que a página diz de cada parte sai do PDF, e não do `.json`
 - a abertura de cada capítulo, os parágrafos entre o título e a primeira seção;
 - cada prática de laboratório, com o texto embaixo de OBJETIVOS na caixa dela;
 - quantos exercícios cada capítulo propõe e quantos o gabarito responde (na
-  versão 1, os de simulação do fim dos capítulos 2 e 3 não têm resposta);
+  versão 1 da parte 1 e na versão 2 da parte 2, os de simulação do fim dos
+  capítulos 2 e 3 não têm resposta);
 - a data, dos metadados, e o número de páginas;
 - a capa do curso, que é a capa da parte 1 cortada em 4:5; o fundo do hero, que
   é a faixa colorida dessa capa desfocada; a capa de cada parte; e a figura do

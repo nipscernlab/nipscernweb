@@ -1448,8 +1448,16 @@ def confere_links(cursos):
     da rede; é o que o relatório do PR conta. O link para o leitor de PDF do
     site, pdf-viewer.html, tem de abrir um PDF desta rodada, numa página que ele
     tem. Devolve a lista dos problemas.
+
+    Com --course, as páginas dos outros cursos ficam como estavam e apontam
+    para o que eles já publicaram; para elas, vale o manifesto do CDN deles.
     """
     cdn = {c.cdn.BASE + caminho for c in cursos for caminho in c.cdn.usados}
+    gerados = {c.slug for c in cursos}
+    for slug in json.loads((AQUI / "catalogo.json").read_text(encoding="utf-8"))["cursos"]:
+        manifesto = AQUI / f"{slug}.cdn.json"
+        if slug not in gerados and manifesto.exists():
+            cdn |= {midia.Cdn.BASE + e["caminho"] for e in json.loads(manifesto.read_text(encoding="utf-8")).values()}
     paginas_do_pdf = {x["url"]: x["ap"].paginas for c in cursos for x in getattr(c, "partes", [])}
     leitor = (RAIZ / "pdf-viewer.html").resolve()
     paginas = {}

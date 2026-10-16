@@ -1,8 +1,11 @@
 # Eletrônica Analógica I na library: o que se achou
 
-Estado em 29/09/2026: publicado, com a versão 1 das três partes da apostila do
-Prof. Victor Mendes Ribeiro. Site no commit `eee115e`; PDFs no nipscern-assets
-pelo PR #2. Endereço: https://www.nipscern.com/library/courses/eletronica-analogica-1/
+Estado em 16/10/2026: publicado, com a apostila do Prof. Victor Mendes Ribeiro
+nas versões 1 da parte 1 (25/09/2026), 2 da parte 2 (16/10/2026) e 1 da parte 3
+(29/09/2026). A versão 1 das três entrou no site no commit `eee115e`, com os
+PDFs no nipscern-assets pelo PR #2; o que mudou na versão 2 da parte 2 está em
+"A versão 2 da parte 2", abaixo. Endereço:
+https://www.nipscern.com/library/courses/eletronica-analogica-1/
 
 Este arquivo registra o que apareceu ao montar o curso: o que vale levar ao
 professor, o que ainda falta saber, e o que se descobriu na ferramenta e no
@@ -25,8 +28,11 @@ LTspice:
 | Exercício | Onde | Começa com |
 |---|---|---|
 | 2.14 | parte 1, p. 59 | "Monte no LTspice o circuito da prática de laboratório..." |
-| 3.16 | parte 2, p. 31 | "Para os exercícios 3.1, 3.2 e 3.5, simule o circuito do modelo..." |
-| 3.17 | parte 2, p. 31 | "Monte uma fonte completa, com transformador..." |
+| 3.19 | parte 2, p. 35 | "Para os exercícios 3.1, 3.2 e 3.5, simule o circuito do modelo..." |
+| 3.20 | parte 2, p. 35 | "Monte uma fonte completa, com transformador..." |
+
+Na versão 1 da parte 2, os dois eram o 3.16 e o 3.17, na página 31; a versão 2
+pôs três exercícios novos antes deles, todos com resposta.
 
 O gabarito abre dizendo "Respostas dos exercícios propostos ao final de cada
 capítulo". Se a falta é de propósito, por serem abertos, uma frase no gabarito
@@ -57,7 +63,7 @@ sem endereço. A página do site também não dá um.
 **O que a página lê do PDF, para a apostila continuar se atualizando sozinha.**
 A ferramenta tira do PDF o sumário, a abertura dos capítulos, as práticas, a
 contagem de exercícios, a data e as figuras dos cartões. Para isso depende de
-alguns hábitos que a versão 1 tem:
+alguns hábitos que a versão 1 tem e que a versão 2 da parte 2 manteve:
 
 - os marcadores do hyperref: a parte no primeiro nível, com o numeral romano; os
   capítulos no segundo; as seções no terceiro; o gabarito no segundo;
@@ -78,7 +84,54 @@ disso restringe o professor: basta avisar quem publica.
 - **"Ao lado do Limiar".** A coletânea continuou em lista, um curso embaixo do
   outro, como já era. Se o pedido era lado a lado, é uma mudança do layout da
   coletânea.
-- **A autorização e os termos de uso**, como acima.
+- **A autorização e os termos de uso**, como acima. A versão 2 da parte 2
+  também não traz licença nem nota de direitos.
+
+## A versão 2 da parte 2
+
+O professor mandou a parte 2 atualizada em 16/10/2026, com essa data nos
+metadados do PDF. Comparada com a versão 1, de 29/09/2026:
+
+- tem 44 páginas, eram 40;
+- a seção 3.3 ganhou duas subseções, 3.3.1 "Tensão por década" e 3.3.2
+  "Tensão térmica e temperatura", que desenvolvem o que antes eram dois
+  parágrafos curtos; a antiga 3.3.1, "Análise de um circuito com o modelo
+  exponencial", virou 3.3.3, e as equações a partir da (3.4) andaram duas
+  posições;
+- há desenhos novos sem legenda numerada, como a curva que se desloca com a
+  temperatura, em 3.3.2, e a decomposição do sinal em CC e CA, em 3.5; as dez
+  legendas numeradas têm o mesmo texto, e a Figura 3.7, do cartão da parte,
+  saiu igual;
+- os exercícios passaram de 17 para 20: os novos 3.16 a 3.18, "adaptados da
+  lista de exemplos sobre diodos do Prof. Henrique A. C. Braga (UFJF)", segundo
+  a nota de rodapé, entraram antes dos dois de simulação, que viraram 3.19 e
+  3.20; o gabarito responde os três novos, e a página mostra "20 exercícios ·
+  18 com resposta";
+- as citações do Sedra continuam as mesmas seis.
+
+A página da parte 2 se refez a partir do PDF novo, com o sumário nas páginas
+novas (a seção 3.4 foi da 16 para a 17, a prática de 27 para 29, o gabarito de
+33 para 37). O sumário da página mostra só as seções, então as subseções novas
+de 3.3 não aparecem nele, como nenhuma subseção aparecia. O PDF novo está no
+CDN como `eletronica-analogica-1-apostila-parte-2-v2.pdf`, e o `-v1` continua
+no lugar.
+
+O arquivo chegou como `Apostila_EletronicaAnalogicaI_Parte2 (3).pdf`, com o
+sufixo que o navegador põe em download repetido. O `--material` casa pelo nome
+exato de `partes[].arquivo`, então ele entrou copiado para uma pasta com o nome
+`Apostila_EletronicaAnalogicaI_Parte2.pdf`.
+
+Sem `--course`, a ferramenta refaz de uma vez os dois cursos do site, o Limiar
+(o de redes neurais) e este, e essa rodada completa não rodou nesta máquina. O
+Limiar baixa da Gallica, a biblioteca digital da Biblioteca Nacional da França,
+a primeira página da nota de Cauchy de 1847 que a aula 2 dele cita, e a Gallica
+respondeu 403 a todo pedido daqui, com o agente da ferramenta e com um de
+navegador; o `tools/courses/.cache/` desta máquina não tinha a imagem. Por isso
+a rodada foi só deste curso, com `--course eletronica-analogica-1`, e nenhuma
+página do Limiar mudou. O que a rodada completa faria além disso se fez à mão:
+o `lastmod` do sitemap, que vai a 2026-10-16 na coletânea e nas quatro páginas
+da apostila. A coletânea não tem nada que dependa da parte 2, e nenhum arquivo
+de `media/` mudou de nome, então não sobrou arquivo para a limpeza apagar.
 
 ## Na ferramenta e no repositório do site
 
@@ -87,6 +140,14 @@ curso só e reescrevia a coletânea e o sitemap com ele. Com um curso no catálo
 isso não aparecia; com dois, apagaria o outro dos dois arquivos. Corrigido no
 commit `eee115e`: com `--course`, a coletânea e o sitemap ficam como estavam, e
 a ferramenta avisa.
+
+**`--course` reprovava pelos links do outro curso.** A conferência de
+endereços abre todas as páginas de `library/courses/`, e cada endereço do CDN
+tinha de ser um arquivo publicado na rodada. Com `--course`, os arquivos do
+outro curso não entram na rodada, e a ferramenta terminava com erro: na
+atualização da parte 2, foram 18 endereços do Limiar, nenhum da apostila.
+Corrigido em 16/10/2026: para as páginas dos cursos que a rodada não gerou,
+vale o que o manifesto `<curso>.cdn.json` deles registra como publicado.
 
 **O `#page=` não vale em todo leitor de PDF.** O sumário e os outros links
 para um lugar da apostila iam direto ao arquivo com `#page=N`. O leitor do
