@@ -31,7 +31,33 @@ const puppeteer = require('puppeteer-core');
 
 const ROOT = path.resolve(__dirname, '..');
 const SITE = 'https://www.nipscern.com/';
-const EDGE = process.env.EDGE_PATH || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
+/* Qualquer Chromium serve: Edge, Chrome ou o próprio Chromium. Procura nos
+   lugares de instalação comuns de Windows, macOS e Linux; CHROME_PATH (ou
+   EDGE_PATH) aponta outro. Em 16/10/2026 o Edge não abriu na máquina do
+   Luciano e a notícia nova saiu no formato antigo: daí a busca e a mensagem. */
+function navegador() {
+  const dado = process.env.CHROME_PATH || process.env.EDGE_PATH;
+  if (dado) return dado;
+  const local = process.env.LOCALAPPDATA || '';
+  const lista = process.platform === 'win32' ? [
+    'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+    'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
+    'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+    path.join(local, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+  ] : process.platform === 'darwin' ? [
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+  ] : [
+    '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium',
+    '/usr/bin/chromium-browser', '/usr/bin/microsoft-edge', '/snap/bin/chromium',
+  ];
+  const achado = lista.find((x) => fs.existsSync(x));
+  if (!achado) throw new Error('não achei Edge, Chrome nem Chromium. Instale um deles, ou diga onde está: CHROME_PATH=/caminho/do/executavel node tools/build-news.js');
+  return achado;
+}
+const EDGE = navegador();
 const PORTA = 3017;
 const CR = String.fromCharCode(13);
 
@@ -82,7 +108,13 @@ function trocaAtributo(html, id, attr, valor) {
   for (const s of slugs) if (!/^[a-z0-9][a-z0-9-]*$/.test(s)) throw new Error(`slug que não serve de nome de arquivo: ${s}`);
 
   const servidor = spawn(process.execPath, [path.join(ROOT, 'tools', 'dev-server.js'), String(PORTA)], { cwd: ROOT, stdio: 'ignore', windowsHide: true });
-  const browser = await puppeteer.launch({ executablePath: EDGE, headless: true, args: ['--lang=en-US', '--no-first-run'] });
+  let browser;
+  try {
+    browser = await puppeteer.launch({ executablePath: EDGE, headless: true, args: ['--lang=en-US', '--no-first-run'] });
+  } catch (e) {
+    servidor.kill();
+    throw new Error(`o navegador ${EDGE} não abriu (${String(e.message || e).split('\n')[0]}). Feche outras janelas dele e tente de novo, ou aponte outro com CHROME_PATH. Sem isso a página da notícia fica no formato antigo: não commite news/ antes de rodar este gerador com sucesso.`);
+  }
   try {
     await espera(`http://127.0.0.1:${PORTA}/`, 15000);
     for (const slug of slugs) {
