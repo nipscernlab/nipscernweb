@@ -74,8 +74,13 @@ function espera(url, ms) {
   });
 }
 
-/* Troca o elemento com aquele id, inteiro, pelo html dado. Conta a
-   profundidade das tags do mesmo nome para achar o fechamento certo. */
+/* Põe no elemento com aquele id o conteúdo e as classes que o script da
+   página desenhou, mantendo a etiqueta do modelo, com display:none trocado por
+   display:block. A etiqueta não é a do navegador porque o Chrome, ao
+   reescrever o estilo de um elemento que o script mexeu, perde as margens
+   escritas com var() dentro de um atalho (margin: 0 auto var(--sp-8) virava
+   margin-left: ;), e a capa saía encostada na esquerda. Conta a profundidade
+   das tags do mesmo nome para achar o fechamento certo. */
 function trocaElemento(html, id, novo) {
   const abre = html.search(new RegExp(`<([a-z]+)[^>]*\\sid="${id}"`));
   if (abre < 0) throw new Error(`news/post.html não tem #${id}`);
@@ -85,7 +90,13 @@ function trocaElemento(html, id, novo) {
   let nivel = 0, m;
   while ((m = re.exec(html))) {
     nivel += m[0][1] === '/' ? -1 : 1;
-    if (nivel === 0) return html.slice(0, abre) + novo + html.slice(m.index + m[0].length);
+    if (nivel === 0) {
+      const fimAbre = html.indexOf('>', abre) + 1;
+      let etiqueta = html.slice(abre, fimAbre).replace('style="display:none', 'style="display:block');
+      if (/\sclass="[^"]*"/.test(etiqueta)) etiqueta = etiqueta.replace(/\sclass="[^"]*"/, () => ` class="${esc(novo.classe)}"`);
+      else if (novo.classe) etiqueta = etiqueta.replace(/^<([a-z]+)/, (t) => `${t} class="${esc(novo.classe)}"`);
+      return html.slice(0, abre) + etiqueta + novo.dentro + html.slice(m.index);
+    }
   }
   throw new Error(`#${id} não fecha`);
 }
@@ -132,7 +143,7 @@ function trocaAtributo(html, id, attr, valor) {
       if (erros.length) throw new Error(`${slug}: erro na página: ${erros[0]}`);
 
       const d = await page.evaluate(() => {
-        const o = (id) => document.getElementById(id).outerHTML;
+        const o = (id) => { const e = document.getElementById(id); return { dentro: e.innerHTML, classe: e.className }; };
         return {
           titulo: document.getElementById('page-title').textContent,
           descricao: document.getElementById('page-desc').content,

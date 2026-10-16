@@ -42,7 +42,7 @@
   <main id="main">
 
     <!-- Post header (populated dynamically) -->
-    <header class="post-header has-cover" id="post-header" aria-labelledby="post-title" style="display: block;">
+    <header class="post-header has-cover" id="post-header" aria-labelledby="post-title" style="display:block">
       <div class="post-header-inner">
         <div class="post-meta">
           <a href="./" class="btn btn-ghost btn-sm" data-i18n="news.back">
@@ -81,10 +81,10 @@
     <div class="post-stage seam section--lit" style="--seam-from:var(--bg-0)">
 
       <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
-      <div id="post-cover" style="display: block; max-width: 720px; margin-right: ; margin-bottom: ; margin-left: ; margin-top: -80px; padding: 0 var(--container-pad); position: relative; z-index: 1;"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/boasvindas-ic-2026-mosaico.webp" alt="Eleven New Undergraduate Researchers Join NIPS-CERN" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 1.6857%) translate3d(0px, 0px, 0px);"></div></div>
+      <div id="post-cover" style="display:block;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/boasvindas-ic-2026-mosaico.webp" alt="Eleven New Undergraduate Researchers Join NIPS-CERN" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 1.6857%) translate3d(0px, 0px, 0px);"></div></div>
 
       <!-- Post body (and TOC injected alongside it for featured posts) -->
-      <div class="post-body" id="post-body" style="display: block;"><p>In September 2026 NIPS-CERN welcomed eleven new undergraduate researchers. Each of them started with a task of their own, on one of the group's research lines.</p><p>On <a href="/projects/sapho">SAPHO</a>, the processor developed here, Sabrina de Oliveira Amaral and Pedro Henrique Sereno Romeu dos Santos will test the processor on the laboratory's FPGA kits, and Dênis Magno Carvalho de Oliveira works on connecting SAPHO to peripherals, starting with a video output.</p><p>On HITS, the real-time simulator of the calorimeter readout chain, come Ana Luiza Bernardes Pereira de Carvalho, Felipe Augusto de Oliveira França and Carlos Eduardo da Costa Oliveira.</p><p>On CGV, the three-dimensional event viewer, Daniela Mendes Nepomuceno and João Pedro de Souza Salomé take on the rewrite of the tool in native graphics.</p><p>On the energy reconstruction lines, Ana Luíza Gonçalves Figueiredo works on training neural networks over simulation data, and Leon Felipe Guedim Millani and Heitor Duarte Balthazar compare the Wiener method with neural networks for time measurement, supervised by Prof. Éder Kapisch.</p><p>The group thanks Roberta Luchini Leonardo, Gabriel de Aquino Torres and Mateus Araujo Carvalho, who finished their undergraduate research at the end of the previous cycle, for the work they leave behind.</p><div class="pub-tags" style="margin-top:var(--sp-8)"><span class="pub-tag">Undergraduate Research</span><span class="pub-tag">UFJF</span><span class="pub-tag">SAPHO</span><span class="pub-tag">HITS</span><span class="pub-tag">CGV</span><span class="pub-tag">Neural Networks</span><span class="pub-tag">Team</span></div></div>
+      <div class="post-body" id="post-body" style="display:block"><p>In September 2026 NIPS-CERN welcomed eleven new undergraduate researchers. Each of them started with a task of their own, on one of the group's research lines.</p><p>On <a href="/projects/sapho">SAPHO</a>, the processor developed here, Sabrina de Oliveira Amaral and Pedro Henrique Sereno Romeu dos Santos will test the processor on the laboratory's FPGA kits, and Dênis Magno Carvalho de Oliveira works on connecting SAPHO to peripherals, starting with a video output.</p><p>On HITS, the real-time simulator of the calorimeter readout chain, come Ana Luiza Bernardes Pereira de Carvalho, Felipe Augusto de Oliveira França and Carlos Eduardo da Costa Oliveira.</p><p>On CGV, the three-dimensional event viewer, Daniela Mendes Nepomuceno and João Pedro de Souza Salomé take on the rewrite of the tool in native graphics.</p><p>On the energy reconstruction lines, Ana Luíza Gonçalves Figueiredo works on training neural networks over simulation data, and Leon Felipe Guedim Millani and Heitor Duarte Balthazar compare the Wiener method with neural networks for time measurement, supervised by Prof. Éder Kapisch.</p><p>The group thanks Roberta Luchini Leonardo, Gabriel de Aquino Torres and Mateus Araujo Carvalho, who finished their undergraduate research at the end of the previous cycle, for the work they leave behind.</p><div class="pub-tags" style="margin-top:var(--sp-8)"><span class="pub-tag">Undergraduate Research</span><span class="pub-tag">UFJF</span><span class="pub-tag">SAPHO</span><span class="pub-tag">HITS</span><span class="pub-tag">CGV</span><span class="pub-tag">Neural Networks</span><span class="pub-tag">Team</span></div></div>
     </div>
 
     <!-- The closing band: appreciation, related, share. One band, one seam,
@@ -684,6 +684,10 @@
       // Cover image — overlaps post-header so the dark bg bleeds ~15% behind the image top
       if (post.image) {
         const coverEl = document.getElementById('post-cover');
+        // Empty first: on a page built by tools/build-news.js the cover is
+        // already there, and a reader in another language gets the post drawn
+        // again over it, which used to stack a second cover under the first.
+        coverEl.replaceChildren();
         // Absolute URLs (CDN) pass through; repo-relative paths get the ../ prefix
         const coverSrc = /^(https?:)?\/\//.test(post.image) ? post.image : '../' + post.image;
         const people = Array.isArray(post.people)

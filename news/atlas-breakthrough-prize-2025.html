@@ -42,7 +42,7 @@
   <main id="main">
 
     <!-- Post header (populated dynamically) -->
-    <header class="post-header has-cover" id="post-header" aria-labelledby="post-title" style="display: block;">
+    <header class="post-header has-cover" id="post-header" aria-labelledby="post-title" style="display:block">
       <div class="post-header-inner">
         <div class="post-meta">
           <a href="./" class="btn btn-ghost btn-sm" data-i18n="news.back">
@@ -81,10 +81,10 @@
     <div class="post-stage seam section--lit" style="--seam-from:var(--bg-0)">
 
       <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
-      <div id="post-cover" style="display: block; max-width: 720px; margin-right: ; margin-bottom: ; margin-left: ; margin-top: -80px; padding: 0 var(--container-pad); position: relative; z-index: 1;"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/breakthrough-prize-2025.webp" alt="ATLAS Collaboration Awarded 2025 Breakthrough Prize in Fundamental Physics" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 2.2%) translate3d(0px, 0px, 0px);"></div></div>
+      <div id="post-cover" style="display:block;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/breakthrough-prize-2025.webp" alt="ATLAS Collaboration Awarded 2025 Breakthrough Prize in Fundamental Physics" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 2.2%) translate3d(0px, 0px, 0px);"></div></div>
 
       <!-- Post body (and TOC injected alongside it for featured posts) -->
-      <div class="post-body" id="post-body" style="display: block;"><p>The Breakthrough Prize Foundation has awarded the 2025 Breakthrough Prize in Fundamental Physics to the ATLAS Collaboration at CERN. Widely regarded as the most valuable prize in science, the Breakthrough Prize recognises transformative contributions to fundamental research.</p><p>The ATLAS Collaboration, comprising more than 5,900 physicists from 181 institutions across 42 countries, was recognised for decades of discoveries at the Large Hadron Collider, including the 2012 discovery of the Higgs boson, precision measurements of the Standard Model, and searches for physics beyond it.</p><p>We are profoundly proud to announce that NIPS-CERN's Dr. Luciano Manhães de Andrade Filho, coordinator of our laboratory and a long-standing ATLAS member, is among the collaboration members sharing this honour. His contributions span calorimeter instrumentation, the TileCal data readout system, and the development of event display tools, including the CaloGeoView and CGV-WEB software that allow physicists worldwide to visualise ATLAS collision data.</p><p>This recognition affirms the global impact of the collaborative effort to which NIPS-CERN has contributed for over a decade through its partnerships with CERN, FAPEMIG, CNPq, CAPES, and UFJF.</p><p>The Breakthrough Prize ceremony takes place in November 2025 at the NASA Ames Research Center in Silicon Valley.</p><div class="pub-tags" style="margin-top:var(--sp-8)"><span class="pub-tag">Breakthrough Prize</span><span class="pub-tag">ATLAS</span><span class="pub-tag">CERN</span><span class="pub-tag">Award</span><span class="pub-tag">Luciano</span></div></div>
+      <div class="post-body" id="post-body" style="display:block"><p>The Breakthrough Prize Foundation has awarded the 2025 Breakthrough Prize in Fundamental Physics to the ATLAS Collaboration at CERN. Widely regarded as the most valuable prize in science, the Breakthrough Prize recognises transformative contributions to fundamental research.</p><p>The ATLAS Collaboration, comprising more than 5,900 physicists from 181 institutions across 42 countries, was recognised for decades of discoveries at the Large Hadron Collider, including the 2012 discovery of the Higgs boson, precision measurements of the Standard Model, and searches for physics beyond it.</p><p>We are profoundly proud to announce that NIPS-CERN's Dr. Luciano Manhães de Andrade Filho, coordinator of our laboratory and a long-standing ATLAS member, is among the collaboration members sharing this honour. His contributions span calorimeter instrumentation, the TileCal data readout system, and the development of event display tools, including the CaloGeoView and CGV-WEB software that allow physicists worldwide to visualise ATLAS collision data.</p><p>This recognition affirms the global impact of the collaborative effort to which NIPS-CERN has contributed for over a decade through its partnerships with CERN, FAPEMIG, CNPq, CAPES, and UFJF.</p><p>The Breakthrough Prize ceremony takes place in November 2025 at the NASA Ames Research Center in Silicon Valley.</p><div class="pub-tags" style="margin-top:var(--sp-8)"><span class="pub-tag">Breakthrough Prize</span><span class="pub-tag">ATLAS</span><span class="pub-tag">CERN</span><span class="pub-tag">Award</span><span class="pub-tag">Luciano</span></div></div>
     </div>
 
     <!-- The closing band: appreciation, related, share. One band, one seam,
@@ -684,6 +684,10 @@
       // Cover image — overlaps post-header so the dark bg bleeds ~15% behind the image top
       if (post.image) {
         const coverEl = document.getElementById('post-cover');
+        // Empty first: on a page built by tools/build-news.js the cover is
+        // already there, and a reader in another language gets the post drawn
+        // again over it, which used to stack a second cover under the first.
+        coverEl.replaceChildren();
         // Absolute URLs (CDN) pass through; repo-relative paths get the ../ prefix
         const coverSrc = /^(https?:)?\/\//.test(post.image) ? post.image : '../' + post.image;
         const people = Array.isArray(post.people)

@@ -685,6 +685,10 @@
       // Cover image — overlaps post-header so the dark bg bleeds ~15% behind the image top
       if (post.image) {
         const coverEl = document.getElementById('post-cover');
+        // Empty first: on a page built by tools/build-news.js the cover is
+        // already there, and a reader in another language gets the post drawn
+        // again over it, which used to stack a second cover under the first.
+        coverEl.replaceChildren();
         // Absolute URLs (CDN) pass through; repo-relative paths get the ../ prefix
         const coverSrc = /^(https?:)?\/\//.test(post.image) ? post.image : '../' + post.image;
         const people = Array.isArray(post.people)

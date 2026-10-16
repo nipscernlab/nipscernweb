@@ -42,7 +42,7 @@
   <main id="main">
 
     <!-- Post header (populated dynamically) -->
-    <header class="post-header has-cover" id="post-header" aria-labelledby="post-title" style="display: block;">
+    <header class="post-header has-cover" id="post-header" aria-labelledby="post-title" style="display:block">
       <div class="post-header-inner">
         <div class="post-meta">
           <a href="./" class="btn btn-ghost btn-sm" data-i18n="news.back">
@@ -81,10 +81,10 @@
     <div class="post-stage seam section--lit" style="--seam-from:var(--bg-0)">
 
       <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
-      <div id="post-cover" style="display: block; max-width: 720px; margin-right: ; margin-bottom: ; margin-left: ; margin-top: -80px; padding: 0 var(--container-pad); position: relative; z-index: 1;"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/cgv/big_screen_and_computers_with_cgv_open_cut.webp" alt="CGVWeb on the ATLAS Control Room Screen: A Milestone in History" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 2.1333%) translate3d(0px, 0px, 0px);"></div></div>
+      <div id="post-cover" style="display:block;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/cgv/big_screen_and_computers_with_cgv_open_cut.webp" alt="CGVWeb on the ATLAS Control Room Screen: A Milestone in History" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 2.1333%) translate3d(0px, 0px, 0px);"></div></div>
 
       <!-- Post body (and TOC injected alongside it for featured posts) -->
-      <div class="post-body post-body-featured" id="post-body" style="display: block;"><section class="story-section">
+      <div class="post-body post-body-featured" id="post-body" style="display:block"><section class="story-section">
   <p class="story-lead">Late 2025. The PPEE building at UFJF. A NIPS-CERN undergraduate sits in on a class taught by one of the lab's senior researchers. The topic: what actually happens inside the world's most powerful particle accelerator. Five months later, the code that grew out of that class runs on the main wall of the ATLAS Control Room at CERN, and Run 3 tests have gone well enough that CGVWeb is now in active use inside the experiment.</p>
 </section>
 
@@ -885,6 +885,10 @@
       // Cover image — overlaps post-header so the dark bg bleeds ~15% behind the image top
       if (post.image) {
         const coverEl = document.getElementById('post-cover');
+        // Empty first: on a page built by tools/build-news.js the cover is
+        // already there, and a reader in another language gets the post drawn
+        // again over it, which used to stack a second cover under the first.
+        coverEl.replaceChildren();
         // Absolute URLs (CDN) pass through; repo-relative paths get the ../ prefix
         const coverSrc = /^(https?:)?\/\//.test(post.image) ? post.image : '../' + post.image;
         const people = Array.isArray(post.people)
