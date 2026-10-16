@@ -90,6 +90,7 @@ function trocaEntre(texto, inicio, fim, novo, arq) {
     flag: flagHtml(SITE),
     pdfUrl: (p) => '/pdf-viewer.html?id=' + encodeURIComponent(p.id),
     pageUrl: (p) => '/' + R.publicationPagePath(p),
+    lazyAbstracts: true,
   };
   const arqLista = path.join(ROOT, 'publications.html');
   let html = fs.readFileSync(arqLista, 'utf8').replace(/\r\n/g, '\n');
@@ -174,7 +175,7 @@ ${JSON.stringify(ld, null, 2).split('\n').map((l) => '  ' + l).join('\n')}
   <link rel="manifest" href="/site.webmanifest">
   <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=${versao}">
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=${versao}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=${versao}"></noscript>
   <link rel="stylesheet" href="../../assets/css/main.min.css?v=${versao}">
   <style>
     .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }

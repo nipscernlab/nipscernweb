@@ -164,7 +164,7 @@ def esqueleto(rel, titulo, descricao, corpo, token, css=(), sem_moldura=False, j
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
   <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">{fontes}
-  <link rel="stylesheet" href="{p}assets/css/icons/library-courses.css?v={token}">{base}{estilos}
+  <style>.ph{{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}}</style><link rel="stylesheet" href="{p}assets/css/icons/library-courses.css?v={token}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="{p}assets/css/icons/library-courses.css?v={token}"></noscript>{base}{estilos}
 </head>
 <body{cls}>
 

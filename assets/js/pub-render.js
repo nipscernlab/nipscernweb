@@ -10,7 +10,10 @@
  *
  * The page-specific parts come in through `ctx`: t (the i18n lookup), flag
  * (the language badge, which needs the site root), pdfUrl (the PDF viewer
- * link) and pageUrl (the publication's own page).
+ * link) and pageUrl (the publication's own page). With lazyAbstracts the
+ * abstracts are left out (the build does this: they are 44 KB of the 62 KB the
+ * page would carry, and every one of them is on the publication's own page);
+ * publications.js fills one in when its toggle is opened.
  */
 
 // ============================================================
@@ -98,7 +101,7 @@ export function renderItem(pub, { showYear } = {}, ctx) {
       </button>
       <div class="pub-abstract-panel" id="pub-${pub.id}-abs">
         <div class="pub-abstract-inner">
-          <p class="pub-item-abstract">${pub.abstract}</p>
+          <p class="pub-item-abstract">${ctx.lazyAbstracts ? '' : pub.abstract}</p>
           ${doi}
         </div>
       </div>

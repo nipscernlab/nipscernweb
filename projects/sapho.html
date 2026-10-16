@@ -26,8 +26,8 @@
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=7b9b92b5da">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=7b9b92b5da">
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=e6d8b76a0e" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=e6d8b76a0e"></noscript>
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=e6d8b76a0e">
 
   <style>
     /* ==================================================================
@@ -733,16 +733,16 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=7b9b92b5da"></script>
-  <script src="../assets/js/analytics.min.js?v=7b9b92b5da" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=e6d8b76a0e"></script>
+  <script src="../assets/js/analytics.min.js?v=e6d8b76a0e" defer></script>
 
   <script type="module">
     /* Sem JavaScript a pagina fica inteira: o programa padrao esta no HTML,
        o die ja acende as celulas dele, os tracos da onda estao completos.
        O script so troca estados. Bibliotecas: GSAP da casa e anime.js 4,
        ambos vendorizados. */
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=7b9b92b5da';
-    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=7b9b92b5da';
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=e6d8b76a0e';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=e6d8b76a0e';
 
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
@@ -840,7 +840,7 @@
       const canvas = document.getElementById('die-canvas');
       if (!canvas) return;
       let T;
-      try { T = await import('../assets/js/vendor/three.module.min.js?v=7b9b92b5da'); }
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=e6d8b76a0e'); }
       catch (_) { stage.remove(); return; }
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
@@ -1011,7 +1011,11 @@
          quadro. O hover levanta o bloco e o faz brilhar de verdade; o
          pulso chega do codigo, quando um token e apontado na secao 01. */
       let hovered = null;
+      /* Se algum bloco ainda esta mudando (brilho, hover, pulso): enquanto
+         estiver, o laco abaixo desenha a sessenta por segundo. */
+      let mudando = true;
       function paint(dt) {
+        mudando = false;
         const kLerp = Math.min(1, dt * 3.4);
         const kHover = Math.min(1, dt * 11);
         for (const m of CELLS) {
@@ -1026,6 +1030,7 @@
           m.material.color.copy(dimC).lerp(goldC, Math.max(g, wave * 0.8));
           const e = g * (0.32 + u.h * 2.4 + wave * 1.9) + (1 - g) * (u.h * 0.35 + wave * 0.45);
           m.material.emissive.setRGB(0.85 * e, 0.63 * e, 0.10 * e);
+          if (Math.abs(target - g) > 0.004 || u.h > 0.004 || u.pulse > 0) mudando = true;
         }
         for (const f of FIXED) {
           const u = f.userData;
@@ -1124,14 +1129,19 @@
 
       let raf = 0, last = 0, t = 0;
       /* Trinta quadros por segundo enquanto o chip so balanca, sessenta enquanto
-         alguem arrasta, passa o ponteiro ou o giro ainda tem inercia.
+         algum bloco muda, alguem arrasta, passa o ponteiro ou o giro ainda tem
+         inercia.
          requestAnimationFrame segue a tela, e numa tela de 165 Hz esta cena era
          renderizada 165 vezes por segundo para um balanco de 0,07 rad a cada
          meio minuto (docs/perf/plano-2026-10.md). */
-      const LENTO = 1000 / 30 - 1, RAPIDO = 1000 / 60 - 1;
+      /* Na tela de toque nao ha ponteiro passando, e o balanco sozinho cabe em
+         doze quadros por segundo sem degrau visivel: o chip parado era a maior
+         parte da thread principal da pagina no celular (medido com o profiler
+         em outubro de 2026). */
+      const LENTO = 1000 / (matchMedia('(pointer: coarse)').matches ? 12 : 30) - 1, RAPIDO = 1000 / 60 - 1;
       function frame(now) {
         raf = requestAnimationFrame(frame);
-        const ativo = dragging || overCanvas || Math.abs(yawVel) > 1e-4 || Math.abs(userYaw) > 1e-3 || Math.abs(userPitch) > 1e-3;
+        const ativo = mudando || dragging || overCanvas || Math.abs(yawVel) > 1e-4 || Math.abs(userYaw) > 1e-3 || Math.abs(userPitch) > 1e-3;
         if (last && now - last < (ativo ? RAPIDO : LENTO)) return;
         const dt = Math.min(0.05, (now - last) / 1000 || 0); last = now;
         t += dt;

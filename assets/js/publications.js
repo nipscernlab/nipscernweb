@@ -6,10 +6,10 @@
  * by default and revealed per item with a toggle.
  */
 
-import { t, getLang } from './i18n.js?v=7b9b92b5da';
-import { pubLangFlag } from './main.js?v=7b9b92b5da';
-import { publicationUrl } from './content-links.js?v=7b9b92b5da';
-import { renderGrouped, renderFlat, renderStats, renderFeaturedStrip, featuredList, publicationPagePath } from './pub-render.js?v=7b9b92b5da';
+import { t, getLang } from './i18n.js?v=e6d8b76a0e';
+import { pubLangFlag } from './main.js?v=e6d8b76a0e';
+import { publicationUrl } from './content-links.js?v=e6d8b76a0e';
+import { renderGrouped, renderFlat, renderStats, renderFeaturedStrip, featuredList, publicationPagePath } from './pub-render.js?v=e6d8b76a0e';
 
 /* What the shared renderer needs from this page. The same functions draw the
    list at build time (tools/build-publications.js), so a reader without
@@ -83,6 +83,7 @@ export async function initPublications() {
   // Featured strip: explicit `featured` flags if present, otherwise the first
   // three of the manual order (which the editor curates at the top of the JSON).
   const featList = featuredList(publications);
+  const byId = new Map(publications.map((p) => [String(p.id), p]));
 
   // Populate year filter
   if (yearEl) {
@@ -228,6 +229,13 @@ export async function initPublications() {
     const panel = btn.nextElementSibling;
     if (!panel || !panel.classList.contains('pub-abstract-panel')) return;
     const open = btn.getAttribute('aria-expanded') === 'true';
+
+    // The list drawn at build time leaves the abstracts out; fill one in on demand.
+    const abs = panel.querySelector('.pub-item-abstract');
+    if (!open && abs && !abs.textContent.trim()) {
+      const pub = byId.get(panel.id.replace(/^pub-/, '').replace(/-abs$/, ''));
+      if (pub) abs.innerHTML = pub.abstract;
+    }
 
     if (!open) {
       listEl.querySelectorAll('.pub-abstract-toggle.is-open').forEach(other => {
