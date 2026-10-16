@@ -58,7 +58,9 @@
  * of it runs, the page is exactly what the stylesheet already laid out.
  */
 
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* The effects flag (fx-no-motion, set in the <head>) asks for what reduced
+   motion asks for: no GSAP, no choreography, no parallax. */
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('fx-no-motion');
 
 /* ------------------------------------------------------------------
    Entrances
@@ -109,6 +111,39 @@ export function whileVisible(el, play, hold, margin = '120px') {
    already on window by the time this is called and it resolves at once. */
 let libsPromise = null;
 
+/* ScrollTrigger 3.13 starts, the moment it is registered, a loop that asks for
+   a frame on every frame for as long as the page is open: an empty callback
+   named _rafBugFix, kept by GSAP because some browsers (Firefox, by their note)
+   repaint unevenly during a scroll unless something is queued. Empty as it is,
+   it makes the browser build a frame on every refresh of the screen with the
+   page standing still: on a phone with the effects off it was 26% of the main
+   thread, against 1% without it (measured in October 2026, docs/perf).
+
+   So it runs while there is scrolling and for half a second after, which is
+   when it was written for, and is held otherwise: the callback is kept, not
+   dropped, and goes back into requestAnimationFrame at the next scroll, wheel,
+   touch or key. Matched by its name; if a future ScrollTrigger renames it,
+   this matches nothing and the library runs as shipped. Installed before the
+   library loads, because it registers itself, and starts the loop, on load. */
+function holdIdleFrames() {
+  if (window.__holdIdleFrames) return;
+  window.__holdIdleFrames = true;
+  const raf = window.requestAnimationFrame.bind(window);
+  let held = null, last = 0;
+  const wake = () => {
+    last = performance.now();
+    if (held) { const cb = held; held = null; raf(cb); }
+  };
+  for (const type of ['scroll', 'wheel', 'touchmove', 'pointerdown', 'keydown']) {
+    addEventListener(type, wake, { passive: true, capture: true });
+  }
+  const wrapped = window.requestAnimationFrame;
+  window.requestAnimationFrame = function (cb) {
+    if (cb && cb.name === '_rafBugFix' && performance.now() - last > 500) { held = cb; return 0; }
+    return wrapped.call(window, cb);
+  };
+}
+
 export function ensureMotionLibs(base) {
   if (REDUCED) return Promise.resolve(false);
   if (window.gsap && window.ScrollTrigger) return Promise.resolve(true);
@@ -129,6 +164,8 @@ export function ensureMotionLibs(base) {
     s.onerror = () => resolve(false);
     document.head.appendChild(s);
   });
+
+  holdIdleFrames();
 
   /* Both are requested now and run in order, so the second is not waiting on a
      round trip that could have been in flight. If either fails to arrive the

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
   <title>CERN & ATLAS | NIPS-CERN</title>
   <meta name="description" content="CERN, the LHC and the ATLAS detector, and where NIPS-CERN sits inside them: the TileCal calorimeter, its readout, and the group's own work on both.">
 
@@ -28,8 +29,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/cern.css?v=5422482445">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=5422482445">
+  <link rel="stylesheet" href="assets/css/icons/cern.css?v=fedd4abe5e">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=fedd4abe5e">
 
   <style>
     /* LHC Status banner — a pane of glass pulled up over the control-room
@@ -69,9 +70,14 @@
     @media (max-width: 640px) { .lhc-status-divider { display: none; } .lhc-status-banner { gap: var(--sp-4); } }
 
     /* Live indicator — pulsing dot + "LIVE" text next to the status label */
-    .lhc-live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #10b981; }
-    .lhc-live-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 0 rgba(16,185,129,0.5); animation: lhc-live-pulse 1.8s infinite; }
-    @keyframes lhc-live-pulse { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); } 70% { box-shadow: 0 0 0 6px rgba(16,185,129,0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); } }
+    .lhc-live-badge { position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #10b981; }
+    .lhc-live-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
+    /* The pulse is a disc behind the dot that grows and fades. It was a
+       box-shadow animated from 0 to 6px, which repaints on every frame of the
+       screen; transform and opacity are animated by the compositor. Same
+       ring: 7px grown to 19px (2.714x), from half opacity to none by 70%. */
+    .lhc-live-badge::after { content: ''; position: absolute; left: 0; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: rgba(16,185,129,0.5); z-index: -1; animation: lhc-live-pulse 1.8s infinite; }
+    @keyframes lhc-live-pulse { 0% { transform: scale(1); opacity: 1; } 70% { transform: scale(2.714); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
     /* Ticking countdown uses tabular figures so the digits don't jitter. */
     .lhc-countdown { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
     /* LS3 progress bar — spans the full banner width on its own row. */
@@ -1099,8 +1105,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=5422482445"></script>
-  <script type="module" src="assets/js/cern.min.js?v=5422482445"></script>
+  <script type="module" src="assets/js/main.min.js?v=fedd4abe5e"></script>
+  <script type="module" src="assets/js/cern.min.js?v=fedd4abe5e"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
@@ -1205,6 +1211,6 @@
     })();
   </script>
 
-  <script src="assets/js/analytics.min.js?v=5422482445" defer></script>
+  <script src="assets/js/analytics.min.js?v=fedd4abe5e" defer></script>
 </body>
 </html>

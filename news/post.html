@@ -3,11 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
   <title id="page-title">News | NIPS-CERN</title>
   <meta name="description" id="page-desc" content="News post from NIPS-CERN.">
 
   <meta property="og:type"  content="article">
   <meta property="og:url"   id="og-url" content="https://www.nipscern.com/news/post">
+  <!-- The canonical of a post is its static page, news/<slug>: the one in the
+       sitemap, with the Open Graph tags, that sends readers here. Set when
+       the post loads; until then it names the news index. -->
+  <link rel="canonical" id="canonical" href="https://www.nipscern.com/news/">
   <meta property="og:title" id="og-title" content="News | NIPS-CERN">
   <meta property="og:description" id="og-desc" content="News post from NIPS-CERN.">
   <meta property="og:image" id="og-image" content="https://www.nipscern.com/assets/images/og-news.jpg">
@@ -25,8 +30,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=5422482445">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=5422482445">
+  <link rel="stylesheet" href="../assets/css/icons/news-post.css?v=fedd4abe5e">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=fedd4abe5e">
 </head>
 <body>
 
@@ -153,11 +158,11 @@
   </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=5422482445';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=5422482445';
-    import { newsPostUrl } from '../assets/js/content-links.min.js?v=5422482445';
-    import { mountPostHeart } from '../assets/js/hearts.min.js?v=5422482445';
-    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=5422482445';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=fedd4abe5e';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=fedd4abe5e';
+    import { newsPostUrl } from '../assets/js/content-links.min.js?v=fedd4abe5e';
+    import { mountPostHeart } from '../assets/js/hearts.min.js?v=fedd4abe5e';
+    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=fedd4abe5e';
 
     /* The cover drifts inside the frame it is clipped by, and nothing else on
        this page moves: a story is running text, and running text is the case
@@ -625,7 +630,9 @@
       document.getElementById('page-desc').content = _tr.excerpt || post.excerpt;
       document.getElementById('og-title').content = _tr.title || post.title;
       document.getElementById('og-desc').content = _tr.excerpt || post.excerpt;
-      document.getElementById('og-url').content = 'https://www.nipscern.com/' + newsPostUrl(post, 'news/post');
+      const _canon = 'https://www.nipscern.com/news/' + encodeURIComponent(post.slug || post.id);
+      document.getElementById('og-url').content = _canon;
+      document.getElementById('canonical').href = _canon;
 
       // Render header
       const badge = document.getElementById('post-category-badge');
@@ -878,8 +885,8 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=5422482445"></script>
+  <script type="module" src="../assets/js/main.min.js?v=fedd4abe5e"></script>
 
-  <script src="../assets/js/analytics.min.js?v=5422482445" defer></script>
+  <script src="../assets/js/analytics.min.js?v=fedd4abe5e" defer></script>
 </body>
 </html>

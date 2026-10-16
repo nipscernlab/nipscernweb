@@ -27,6 +27,8 @@
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let lenis = null;
+/* Wakes the frame loop below; a no-op until Lenis is running. */
+let wake = () => {};
 
 /* Public surface, used by the three places on the site that move the scroll
    position themselves. Each works with or without Lenis running, so no call
@@ -34,7 +36,7 @@ let lenis = null;
 
 /** Scroll to the top, or to an element, however the page is currently scrolled. */
 export function scrollToTop() {
-  if (lenis) { lenis.scrollTo(0); return; }
+  if (lenis) { wake(); lenis.scrollTo(0); return; }
   window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' });
 }
 
@@ -44,7 +46,7 @@ export function scrollToTop() {
  */
 export function scrollToEl(el, offset = 0) {
   if (!el) return;
-  if (lenis) { lenis.scrollTo(el, { offset }); return; }
+  if (lenis) { wake(); lenis.scrollTo(el, { offset }); return; }
   el.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
 }
 
@@ -61,6 +63,8 @@ export function holdScroll(on) {
 
 export function initSmoothScroll() {
   if (REDUCED) return;
+  /* The effects flag (fx-no-lenis, set in the <head>) keeps the native scroll. */
+  if (document.documentElement.classList.contains('fx-no-lenis')) return;
   /* Coarse pointer means touch, and touch keeps the platform's own momentum. */
   if (matchMedia('(pointer: coarse)').matches) return;
   /* And only where something is actually hung off the scroll position.
@@ -78,7 +82,7 @@ export function initSmoothScroll() {
      home, the CERN page and SAPHO, which are the three with a scrub. */
   if (!document.documentElement.hasAttribute('data-smooth-scroll')) return;
 
-  import('./vendor/lenis.mjs?v=5422482445').then(({ default: Lenis }) => {
+  import('./vendor/lenis.mjs?v=fedd4abe5e').then(({ default: Lenis }) => {
     lenis = new Lenis({
       /* Higher is snappier. The default 0.1 leaves the page still settling well
          after the wheel has stopped, which on a site with a fixed navigation and
@@ -111,6 +115,7 @@ export function initSmoothScroll() {
          past the navigation in one keystroke, and half a second of gliding is
          the opposite of that. */
       const instant = a.classList.contains('skip-link');
+      wake();
       lenis.scrollTo(target, { offset: -(navH + 24), immediate: instant });
       history.pushState(null, '', id);
       /* Following an anchor natively moves focus to the target, and preventing
@@ -133,13 +138,37 @@ export function initSmoothScroll() {
        frame loop and nothing else needs to know. */
     const gsap = window.gsap;
     const ST = window.ScrollTrigger;
+    /* Awake only while there is scrolling to do. The loop used to run for the
+       whole visit, a frame on every refresh of the screen (165 a second on a
+       fast laptop) with the page standing still, which kept the main thread
+       from ever going idle. It wakes on anything that can start a scroll (a
+       wheel, a key, a press, a call to scrollTo) and goes back to sleep when
+       Lenis has been still for 400 ms. A scroll the browser does by itself, from
+       the scrollbar, still reaches ScrollTrigger: Lenis reports native scrolls
+       through the same 'scroll' event without needing a frame of its own. */
+    let awake = false, still = 0;
+    const tick = (ms) => {
+      lenis.raf(ms);
+      if (lenis.isScrolling) { still = 0; return; }
+      if (!still) still = ms;
+      else if (ms - still > 400) sleep();
+    };
+    let sleep;
     if (gsap && ST) {
       lenis.on('scroll', ST.update);
-      gsap.ticker.add((time) => lenis.raf(time * 1000));
       gsap.ticker.lagSmoothing(0);
+      const onTick = (time) => tick(time * 1000);
+      wake = () => { if (awake) return; awake = true; still = 0; gsap.ticker.add(onTick); };
+      sleep = () => { if (!awake) return; awake = false; gsap.ticker.remove(onTick); };
     } else {
-      const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
-      requestAnimationFrame(raf);
+      let id = 0;
+      const loop = (t) => { if (!awake) return; tick(t); if (awake) id = requestAnimationFrame(loop); };
+      wake = () => { if (awake) return; awake = true; still = 0; id = requestAnimationFrame(loop); };
+      sleep = () => { awake = false; cancelAnimationFrame(id); };
     }
+    for (const type of ['wheel', 'keydown', 'pointerdown', 'touchstart']) {
+      addEventListener(type, () => wake(), { passive: true, capture: true });
+    }
+    wake();
   }).catch(() => { /* plain scrolling, which is what the page had before */ });
 }

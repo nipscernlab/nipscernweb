@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
   <title>Noodle | NIPS-CERN</title>
   <meta name="description" content="Noodle is the laboratory's scheduling tool: pick the days, share one link, and each person marks the times that suit them, or books the one slot that is theirs.">
   <!-- Ferramenta interna, com nomes de gente nas enquetes. Não entra em busca nem no sitemap. -->
@@ -27,8 +28,8 @@
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/plex-mono-500-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/noodle.css?v=5422482445">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=5422482445">
+  <link rel="stylesheet" href="assets/css/icons/noodle.css?v=fedd4abe5e">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=fedd4abe5e">
 
   <!-- O SDK do Firebase vem daqui. Avisar o navegador cedo poupa uma ida e
        volta na hora do import(). -->
@@ -740,8 +741,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=5422482445"></script>
-  <script type="module" src="assets/js/noodle.min.js?v=5422482445"></script>
-  <script src="assets/js/analytics.min.js?v=5422482445" defer></script>
+  <script type="module" src="assets/js/main.min.js?v=fedd4abe5e"></script>
+  <script type="module" src="assets/js/noodle.min.js?v=fedd4abe5e"></script>
+  <script src="assets/js/analytics.min.js?v=fedd4abe5e" defer></script>
 </body>
 </html>

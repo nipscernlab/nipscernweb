@@ -3,15 +3,15 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=5422482445';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=fedd4abe5e';
 
-import { newsPostUrl } from './content-links.js?v=5422482445';
+import { newsPostUrl } from './content-links.js?v=fedd4abe5e';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=5422482445';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=fedd4abe5e';
 
 // ============================================================
 // Navigation Template
@@ -247,10 +247,102 @@ function initNav() {
    the whole title every frame for as long as it runs. */
 function initHeroHold() {
   const title = document.querySelector('.hero-title');
-  if (!title || !('IntersectionObserver' in window)) return;
+  if (!title) return;
+  /* The halo, moved off the title. It was a drop-shadow filter animated on
+     the title itself, and the shimmer repaints the title every frame, so every
+     frame re-ran a 30 px blur over the whole wordmark: with the page standing
+     still, that one element kept the GPU and the main thread busy (the home
+     went from 35% to 13% of the main thread and from 60% to 22% of the GPU
+     without it, measured in October 2026; see docs/perf). The halo is now two
+     copies of the wordmark behind it, painted once as a text shadow, one at
+     each end of the breath, crossfaded with opacity, which the compositor does
+     without repainting anything. The shimmer runs on the title with no filter
+     over it. Copies made here and not in the HTML, so the page source and a
+     reader without JavaScript keep the one title and the original animation.
+     The copies are siblings of the title, in a wrapper, and not children of it:
+     Chrome counts the text of every descendant, positioned or not, in the
+     shape that background-clip: text cuts the title's gradient to, and on a
+     phone, where the wordmark breaks into three lines, a copy inside it showed
+     through as a ghost of CERN over NIPS. */
+  let wrap = title.parentElement;
+  if (!wrap.classList.contains('hero-title-wrap')) {
+    wrap = document.createElement('div');
+    wrap.className = 'hero-title-wrap';
+    title.before(wrap);
+    for (const end of ['low', 'high']) {
+      const glow = document.createElement('div');
+      glow.className = 'hero-title hero-glow hero-glow--' + end;
+      glow.setAttribute('aria-hidden', 'true');
+      glow.innerHTML = title.innerHTML;
+      wrap.append(glow);
+    }
+    wrap.append(title);
+    title.classList.add('has-glow');
+  }
+  const shimmer = driveShimmer(title);
+  if (!('IntersectionObserver' in window)) return;
   new IntersectionObserver((entries) => {
-    entries.forEach((e) => title.classList.toggle('is-held', !e.isIntersecting));
+    entries.forEach((e) => {
+      title.classList.toggle('is-held', !e.isIntersecting);
+      wrap.classList.toggle('is-held', !e.isIntersecting);
+      if (shimmer) shimmer(e.isIntersecting);
+    });
   }, { rootMargin: '120px' }).observe(title);
+}
+
+/* The shimmer, at a rate of its own. As a CSS animation of background-position
+   it repainted the wordmark on every refresh of the screen: 165 times a second
+   on a fast laptop, and on a phone the repaint alone held most of the main
+   thread with the page standing still. Driven from here it is 60 updates a
+   second where there is a mouse, which is what a common screen showed anyway,
+   and 30 on a touch screen, where the band, smaller, moves a few pixels per
+   step. Between updates nothing asks for a frame, so the page can sit idle.
+   Same curve (the CSS ease-in-out), same 7 s, same alternate-reverse sweep
+   from -100% to 100%. Returns the switch the observer uses, or nothing where
+   the title does not move (reduced motion, or the effects flag). */
+function driveShimmer(title) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+  if (document.documentElement.classList.contains('fx-no-foil')) return null;
+  const ease = cubicBezier(0.42, 0, 0.58, 1);
+  const step = 1000 / (matchMedia('(pointer: coarse)').matches ? 30 : 60);
+  const T = 7000;
+  const t0 = performance.now();
+  let on = true, timer = 0;
+  const paint = (now) => {
+    if (!on) return;
+    const k = (now - t0) / T, i = Math.floor(k), p = k - i;
+    const d = i % 2 === 0 ? 1 - p : p;
+    title.style.setProperty('--shimmer', (-100 + 200 * ease(d)).toFixed(2) + '%');
+    timer = setTimeout(() => requestAnimationFrame(paint), step);
+  };
+  title.classList.add('js-shimmer');
+  requestAnimationFrame(paint);
+  return (visible) => {
+    if (visible === on) return;
+    on = visible;
+    clearTimeout(timer);
+    if (on) requestAnimationFrame(paint);
+  };
+}
+
+/* CSS cubic-bezier() as a function of x, by Newton's method on the x curve. */
+function cubicBezier(x1, y1, x2, y2) {
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+  const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  const x = (t) => ((ax * t + bx) * t + cx) * t;
+  const dx = (t) => (3 * ax * t + 2 * bx) * t + cx;
+  const y = (t) => ((ay * t + by) * t + cy) * t;
+  return (v) => {
+    let t = v;
+    for (let n = 0; n < 8; n++) {
+      const e = x(t) - v;
+      if (Math.abs(e) < 1e-5) break;
+      const s = dx(t);
+      if (Math.abs(s) < 1e-6) break;
+      t -= e / s;
+    }
+    return y(Math.min(1, Math.max(0, t)));
+  };
 }
 
 function initTopBanner() {
@@ -871,7 +963,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=5422482445">. Each copy would otherwise append its own
+// <script src="main.js?v=fedd4abe5e">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {

@@ -14,12 +14,12 @@
 
 /* The same URL builders the publications and news pages use, so a paper opened
    from the home lands in the site's own viewer rather than on a raw PDF. */
-import { publicationUrl, newsPostUrl } from './content-links.js?v=5422482445';
-import { scrollToEl } from './smooth-scroll.js?v=5422482445';
+import { publicationUrl, newsPostUrl } from './content-links.js?v=fedd4abe5e';
+import { scrollToEl } from './smooth-scroll.js?v=fedd4abe5e';
 /* The scroll machinery every page shares: entrance failsafe, run-while-visible,
    and the ScrollTrigger setup with the refresh discipline that took three bugs
    to get right. What stays in this file is what only the home page has. */
-import { initMotion, revealFailsafe, stopDrift, ensureMotionLibs } from './motion.js?v=5422482445';
+import { initMotion, revealFailsafe, stopDrift, ensureMotionLibs } from './motion.js?v=fedd4abe5e';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -447,6 +447,9 @@ function hitsPulse(canvas) {
   };
 
   const draw = (ts) => {
+    /* Sixty frames a second at most, as in sky.js: the screen may ask for 165,
+       and each of these frames walks the whole width of the card. */
+    if (running && lastTs && ts - lastTs < 1000 / 60 - 1) { raf = requestAnimationFrame(draw); return; }
     if (!lastTs) lastTs = ts;
     elapsed += Math.min((ts - lastTs) / 1000, 0.05);
     lastTs = ts;
@@ -665,7 +668,8 @@ function videoLoop(video) {
   let wanted = false;
   const card = video.closest('.pc-card, .cube-rail, .frame') || video.parentElement;
 
-  const start = () => { arm(); const p = video.play(); if (p) p.catch(() => {}); };
+  /* The effects flag (fx-no-video, set in the <head>) leaves the posters. */
+  const start = () => { if (document.documentElement.classList.contains('fx-no-video')) return; arm(); const p = video.play(); if (p) p.catch(() => {}); };
   const stop = () => video.pause();
 
   whileVisibleCard(video,

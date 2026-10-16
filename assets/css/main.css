@@ -7360,3 +7360,125 @@ body.post-featured .post-excerpt {
     border-left: none;
   }
 }
+
+/* ------------------------------------------------------------------
+   Effects flags. The <head> of each page reads ?fx= and puts fx-no-<effect>
+   on <html> before the first paint: ?fx=lite, ?fx=min, or a list such as
+   ?fx=no-sky,no-foil. They exist to measure what each effect costs and to
+   give a lighter site to whoever needs one. The JavaScript side reads the
+   same classes (sky.js, smooth-scroll.js, motion.js, home.js).
+   ------------------------------------------------------------------ */
+html.fx-no-foil .hero-title,
+html.fx-no-foil .hero-atom { animation: none; }
+/* Without the blur, the panes take the look they already have where the
+   browser has no backdrop-filter (the @supports not blocks above). */
+html.fx-no-glass *,
+html.fx-no-glass *::before,
+html.fx-no-glass *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html.fx-no-glass .glass {
+  background:
+    linear-gradient(148deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.06) 42%, rgba(255, 255, 255, 0.08) 100%),
+    var(--glass-tint, transparent);
+}
+html.fx-no-glass .glass-btn {
+  background:
+    linear-gradient(148deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 46%, rgba(255, 255, 255, 0.09) 100%),
+    var(--glass-tint, transparent);
+}
+/* Half of the wordmark at a time, to measure which half costs: the halo held
+   at the middle of its breath, or the shimmer held where it starts. */
+html.fx-no-halo .hero-title {
+  animation: foil-shimmer 7s ease-in-out infinite alternate-reverse;
+  filter: drop-shadow(0 0 24px rgba(135, 187, 255, 0.21)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.13));
+}
+html.fx-no-halo .hero-atom {
+  animation: foil-shimmer 7s ease-in-out infinite alternate-reverse;
+  filter: drop-shadow(0 0 15px rgba(135, 187, 255, 0.42)) drop-shadow(0 0 5px rgba(255, 255, 255, 0.28));
+}
+html.fx-no-shimmer .hero-title { animation: foil-halo 5s ease-in-out infinite; }
+html.fx-no-shimmer .hero-atom { animation: foil-halo-atom 5s ease-in-out infinite; }
+
+/* Space held for what arrives after the page has painted, so nothing the
+   reader is looking at jumps. Measured with Lighthouse in October 2026, these
+   were the largest layout shifts on the site.
+
+   Publications: the stats and featured strips are filled by publications.js
+   once the JSON arrives, above the search plate, which used to drop 240 px on
+   a desktop and 620 px on a phone (CLS 0.54 and 0.38). The heights are the
+   ones the strips end with at each width where the grid changes; a few pixels
+   off is a shift too small to count. */
+.pub-stats:empty { min-height: 31px; }
+.pub-featured.is-pending { min-height: 242px; }
+@media (max-width: 899px) { .pub-featured.is-pending { min-height: 435px; } }
+@media (max-width: 767px) {
+  .pub-stats:empty { min-height: 67px; }
+  .pub-featured.is-pending { min-height: 471px; }
+}
+@media (max-width: 599px) { .pub-featured.is-pending { min-height: 620px; } }
+/* Pages whose content is written by JavaScript (a news post, the Noodle
+   board) began with the footer in the middle of the screen and pushed it out
+   when the content came in (CLS 0.54 to 0.74). With the main column at least
+   a screen tall, the footer starts below the fold, where its move does not
+   count and nobody sees it. */
+#main { min-height: 100vh; min-height: 100svh; }
+
+/* The wordmark with its halo behind it, built by initHeroHold() in main.js.
+   The title keeps only the shimmer, which repaints the text and nothing else;
+   the halo is two copies of the wordmark underneath, siblings of the title in
+   .hero-title-wrap, one at each end of the old foil-halo breath, drawn once as
+   text shadows and crossfaded by opacity. They carry .hero-title for the type
+   (size, line height and the phone's three-line break all come with it) and
+   drop its gradient, animation and filter. The atom is not text, so each
+   copy's atom is the atom shape in a solid colour with the old drop-shadow on
+   its box; static, it is drawn once like the shadows. */
+.hero-title-wrap { position: relative; }
+/* With JavaScript the shimmer is set from main.js (driveShimmer), at a rate of
+   its own, through --shimmer; the atom inherits the property from the title. */
+.hero-title.has-glow.js-shimmer,
+.hero-title.has-glow.js-shimmer > .hero-atom { animation: none; background-position: var(--shimmer, -100%) center; }
+.hero-title.has-glow,
+.hero-title.has-glow > .hero-atom { animation: foil-shimmer 7s ease-in-out infinite alternate-reverse; }
+.hero-title.hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  margin: 0;
+  pointer-events: none;
+  background: none;
+  filter: none;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: glow-low 5s ease-in-out infinite;
+}
+.hero-glow--low { text-shadow: 0 0 18px rgba(120, 177, 255, 0.16), 0 0 3px rgba(255, 255, 255, 0.10); }
+.hero-title.hero-glow--high {
+  text-shadow: 0 0 30px rgba(150, 197, 255, 0.26), 0 0 5px rgba(255, 255, 255, 0.16);
+  opacity: 0;
+  animation-name: glow-high;
+}
+.hero-glow .hero-atom {
+  background: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+  animation: none;
+}
+.hero-glow .hero-atom::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #b8d6ff;
+  -webkit-mask: url('../icons/atom.svg') center / contain no-repeat;
+  mask: url('../icons/atom.svg') center / contain no-repeat;
+}
+.hero-glow--low .hero-atom { filter: drop-shadow(0 0 10px rgba(120, 177, 255, 0.35)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.22)); }
+.hero-glow--high .hero-atom { filter: drop-shadow(0 0 20px rgba(150, 197, 255, 0.50)) drop-shadow(0 0 7px rgba(255, 255, 255, 0.34)); }
+@keyframes glow-low { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes glow-high { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+.hero-title-wrap.is-held .hero-glow { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .hero-title.hero-glow { display: none; } }
+/* Lite: the halo stays, at rest, and the shimmer stops on the title and the
+   atom (these selectors outrank .hero-title.has-glow > .hero-atom). */
+html.fx-no-foil .hero-title.has-glow,
+html.fx-no-foil .hero-title.has-glow > .hero-atom,
+html.fx-no-foil .hero-title.hero-glow { animation: none; }
+html.fx-no-foil .hero-title.hero-glow--high { opacity: 0; }

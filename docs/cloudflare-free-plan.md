@@ -7,6 +7,43 @@ tempo procurando.
 > **Estado em 2026-08-10: 13 de 13 conferidos, nada pendente.**
 > `bash tools/check-edge.sh` dá o estado atual a qualquer momento.
 
+## Atualização de 16/10/2026
+
+Lido pela API, com o token CLAUDE-ACCESS (o valor fica em
+`~/.romanova/cloudflare-token.json`, fora dos repositórios; as permissões são
+de leitura da zona, configurações, Cache Rules, Cache Purge, Transform Rules,
+Zaraz, Analytics, DNS e Workers Routes, além das de e-mail do romanova).
+
+- **Zaraz: Google Analytics 4 e Bing desligados, e a injeção do script do
+  Zaraz nas páginas também** (`autoInjectScript: false`), a pedido do
+  Chrysthofer: a análise de visitas fica com o GoatCounter e o Cloudflare Web
+  Analytics. O Zaraz está em modo de publicação imediata (`workflow:
+  realtime`), então a mudança valeu na hora. O Google Tag Manager, que trazia o
+  Bing Ads, saiu do `index.html` no mesmo dia. A seção 6 abaixo fica como
+  registro.
+- **A purga no deploy nunca rodou.** As execuções do `purge-cache.yml` duram de
+  6 a 9 s, e o job espera 90 s antes de purgar: o segredo
+  `CLOUDFLARE_PURGE_TOKEN` não está configurado no GitHub. O job passou a
+  purgar só as URLs que o push mudou, e não mais a zona inteira, que inclui
+  `cdn.nipscern.com`: com o segredo, cada push esvaziaria o cache de um ano dos
+  vídeos e PDFs. Sem ele, o HTML continua aparecendo em até 5 minutos.
+- **O resto confere com este documento:** as três Cache Rules ativas
+  (assets com `?v=`, assets sem carimbo, HTML a 5 minutos) e a do CDN
+  (`cdn.nipscern.com`, um ano, 404 sem cache), os quatro cabeçalhos de
+  segurança, HTTP/3, Early Hints, 0-RTT, Brotli e o Tiered Cache ligados.
+  Há três regras antigas desligadas na lista (*Long-cache static assets*,
+  *CGVWEB*, *Cache rules nipscern*), sem efeito.
+- **Regra nova, *fontes - 1 ano no navegador*:** `/assets/fonts/` com um ano
+  na borda e no navegador. Elas saíam com um dia, pela regra dos assets sem
+  `?v=`, e o PageSpeed de 16/10 contava 85 KB a ganhar numa segunda visita,
+  quase tudo fonte. **Uma fonte que muda de conteúdo muda de nome**, como já
+  acontece com `katex-0.18.9/`, porque o navegador de quem já visitou guarda a
+  antiga por um ano. A regra fica **depois** da dos assets sem `?v=`: quando
+  duas Cache Rules valem para o mesmo endereço, a última da lista vence, e
+  antes dela a regra nova não tinha efeito. Os ícones continuam com um dia:
+  os de `assets/icons/` não têm carimbo nem convenção de nome, e um ícone
+  trocado no mesmo nome ficaria velho por um ano.
+
 ---
 
 ## O que foi encontrado ao aplicar, e que este documento não previa

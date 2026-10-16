@@ -114,6 +114,11 @@ export function sky(canvas) {
     || (navigator.deviceMemory || 8) <= 4;
   const DPR = Math.min(window.devicePixelRatio || 1, MODEST ? 1 : 2);
   let W = 0, H = 0, statik = null, twinklers = [], shooting = null, shootTimer = 0;
+  /* A still sky is drawn once and left alone: under reduced motion nothing in
+     it moves, and with the effects flag off (fx-no-sky, see the <head>) it is
+     asked not to. It used to be redrawn every frame anyway, the same picture
+     sixty times a second. */
+  const STILL = REDUCED || document.documentElement.classList.contains('fx-no-sky');
   let stars = null, view = randomView();
 
   /* Stereographic projection. It keeps the shapes of constellations intact out
@@ -328,6 +333,7 @@ export function sky(canvas) {
     canvas.height = Math.round(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     build();
+    if (STILL) requestAnimationFrame(frame);
   }
 
   /* The sky stops when it leaves the screen. Every other animated thing on this
@@ -337,7 +343,16 @@ export function sky(canvas) {
      changes; it simply stops being drawn when nobody is looking at it. */
   let running = true, raf = 0;
   let last = 0;
+  /* Sixty frames a second at most. requestAnimationFrame follows the screen,
+     and on a 165 Hz laptop it asked for 165 skies a second, every one of them
+     re-rasterising the twinklers and re-running the blur of every pane of glass
+     in front of them. Sixty is what a common screen shows, so for most readers
+     nothing changes, and on a fast screen the twinkle reads the same. A frame
+     skipped here touches nothing, so nothing is repainted. */
+  const FRAME_MS = 1000 / 60 - 1;
   function frame(ts) {
+    if (running && !STILL) raf = requestAnimationFrame(frame);
+    if (!STILL && ts - last < FRAME_MS) return;
     const dt = Math.min((ts - last) / 1000, 0.05);
     last = ts;
     const t = ts * 0.001;
@@ -367,7 +382,6 @@ export function sky(canvas) {
         if (shooting.life <= 0 || shooting.x > W + 40 || shooting.y > H + 40) shooting = null;
       }
     }
-    if (running) raf = requestAnimationFrame(frame);
   }
 
   /* The random field the catalogue replaces, kept as the way this fails. */

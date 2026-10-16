@@ -35,7 +35,7 @@
  * asked for at the moment they did it.
  */
 
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('fx-no-motion');
 
 const DATA = new URL('../../data/collab-network.json', import.meta.url).href;
 
@@ -110,7 +110,7 @@ export async function initNetwork(canvas, opts = {}) {
   /* No WebGL, no canvas. The plate over it carries the figures and stays. */
   let THREE;
   try {
-    THREE = await import('./vendor/three.module.min.js?v=5422482445');
+    THREE = await import('./vendor/three.module.min.js?v=fedd4abe5e');
   } catch (e) {
     return null;
   }
@@ -362,15 +362,22 @@ export async function initNetwork(canvas, opts = {}) {
      this should read as something you noticed had moved, not as something
      moving. */
   let last = 0, raf = 0, running = false, wanted = false;
+  /* Thirty frames a second while it only turns, sixty while the camera is
+     still following the pointer. requestAnimationFrame follows the screen, and
+     on a 165 Hz laptop this rendered the whole scene 165 times a second to move
+     it 0.0003 rad each time. At 30 the step is 0.0017 rad, which no one sees. */
+  const SLOW_MS = 1000 / 30 - 1, FAST_MS = 1000 / 60 - 1;
   function frame(now) {
     if (!running) return;
+    raf = requestAnimationFrame(frame);
+    const settling = Math.abs(tx - px) + Math.abs(ty - py) > 0.002;
+    if (last && now - last < (settling ? FAST_MS : SLOW_MS)) return;
     const dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
     last = now;
     spin.rotation.y += dt * 0.052;
     px += (tx - px) * Math.min(1, dt * 3);
     py += (ty - py) * Math.min(1, dt * 3);
     draw();
-    raf = requestAnimationFrame(frame);
   }
   /* Two conditions, one switch. The caller says whether the stage is on screen
      and the browser says whether the tab is; an earlier version had the tab

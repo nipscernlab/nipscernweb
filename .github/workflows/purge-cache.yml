@@ -24,6 +24,13 @@ name: Purga o cache do Cloudflare
 # vermelho a cada push por causa de uma otimização opcional é pior que a
 # otimização não estar ligada.
 
+# Purga por URL, só o que o push mudou. Purgava a zona inteira
+# (purge_everything), e a zona nipscern.com inclui cdn.nipscern.com: cada push
+# teria esvaziado também o cache de um ano dos vídeos e PDFs e de todo asset
+# carimbado com ?v=, que não mudaram. Conferido em 16/10/2026 pela API do
+# GitHub: até aqui o job nunca purgou, porque o segredo não está configurado
+# (cada execução durou de 6 a 9 s, e ele espera 90 s antes de purgar).
+
 on:
   push:
     branches: [main]
@@ -39,10 +46,15 @@ jobs:
   purge:
     runs-on: ubuntu-latest
     steps:
-      - name: Esvazia o cache da borda
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Purga as URLs que mudaram
         env:
           TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
           ZONE: 1020c6fd80f416f40f78f4721be81adf
+          BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
 
@@ -52,24 +64,58 @@ jobs:
             exit 0
           fi
 
+          # Sem o commit anterior (disparo manual, primeiro push), compara com o pai.
+          if [ -z "${BEFORE:-}" ] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            BEFORE=$(git rev-parse HEAD~1)
+          fi
+
+          # O que o navegador pede por esse nome: página nas formas limpa, com
+          # barra e com .html; o resto pelo caminho. O que tem ?v= já é URL nova
+          # e não precisa de purga; o caminho sem carimbo, sim.
+          git diff --name-only "$BEFORE" HEAD | python3 -c '
+          import sys
+          site = "https://www.nipscern.com/"
+          fora = ("tools/", "docs/", ".github/", ".githooks/", "node_modules/")
+          urls = []
+          for p in sys.stdin.read().split():
+              if p.startswith(fora) or p.startswith(".") or p.endswith(".md"):
+                  continue
+              if p == "index.html":
+                  urls += [site, site + "index.html"]
+              elif p.endswith("/index.html"):
+                  d = p[: -len("index.html")]
+                  urls += [site + d, site + d.rstrip("/"), site + p]
+              elif p.endswith(".html"):
+                  urls += [site + p[:-5], site + p]
+              else:
+                  urls.append(site + p)
+          print(chr(10).join(dict.fromkeys(urls)))
+          ' > urls.txt
+          echo "$(wc -l < urls.txt) URL(s) para purgar"
+          [ -s urls.txt ] || exit 0
+
           # O Pages leva algum tempo entre o push e a publicação. Purgar antes
           # disso é pior que não purgar: a borda vai à origem, encontra a versão
-          # velha e a guarda de novo, agora fresquinha.
+          # velha e a guarda de novo.
           echo "Aguardando o deploy do Pages assentar..."
           sleep 90
 
-          resposta=$(curl -sS -X POST \
-            "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
-            -H "Authorization: Bearer ${TOKEN}" \
-            -H "Content-Type: application/json" \
-            --data '{"purge_everything":true}')
-
-          echo "$resposta"
-          if ! echo "$resposta" | grep -q '"success":true'; then
-            echo "::error::A purga falhou. Confira se o token tem 'Cache Purge: Purge' na zona."
-            exit 1
-          fi
-          echo "::notice::Cache da borda esvaziado."
+          # O plano gratuito aceita 30 URLs por pedido.
+          split -l 30 urls.txt lote_
+          for f in lote_*; do
+            corpo=$(python3 -c 'import json,sys; print(json.dumps({"files": [l for l in open(sys.argv[1]).read().split() if l]}))' "$f")
+            resposta=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
+              -H "Authorization: Bearer ${TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data "$corpo")
+            if ! echo "$resposta" | grep -q '"success":true'; then
+              echo "$resposta"
+              echo "::error::A purga falhou. Confira se o token tem 'Cache Purge: Purge' na zona."
+              exit 1
+            fi
+          done
+          echo "::notice::$(wc -l < urls.txt) URL(s) purgadas da borda."
 
       - name: Confere que o site responde
         run: |

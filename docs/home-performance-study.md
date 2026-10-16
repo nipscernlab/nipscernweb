@@ -1,5 +1,10 @@
 # Otimização da Home — estudo
 
+> **Outubro de 2026:** este estudo tratou o peso da página. O travamento com a
+> página parada (o título, o céu, o laço do ScrollTrigger, o vidro), a retirada
+> do Google Tag Manager e as flags de efeitos estão em
+> [perf/plano-2026-10.md](perf/plano-2026-10.md).
+
 Status: **implementado em 2026-08-10, em duas rodadas.** A seção 0 traz o que
 foi feito, o que foi medido depois, e — em três correções numeradas — onde este
 documento errou, com os números que o desmentiram. As configurações de

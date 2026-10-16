@@ -6,9 +6,9 @@
  * by default and revealed per item with a toggle.
  */
 
-import { t } from './i18n.js?v=5422482445';
-import { pubLangFlag } from './main.js?v=5422482445';
-import { publicationUrl } from './content-links.js?v=5422482445';
+import { t } from './i18n.js?v=fedd4abe5e';
+import { pubLangFlag } from './main.js?v=fedd4abe5e';
+import { publicationUrl } from './content-links.js?v=fedd4abe5e';
 
 const TYPE_BADGE = {
   article:      'badge-blue',
@@ -364,6 +364,7 @@ export async function initPublications() {
 
   function renderFeatured(active) {
     if (!featuredEl) return;
+    featuredEl.classList.remove('is-pending');
     // Hide the showcase while the visitor is searching or filtering
     if (active || featList.length === 0) {
       featuredEl.hidden = true;

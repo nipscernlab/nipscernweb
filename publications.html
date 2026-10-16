@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
   <title>Publications | NIPS-CERN</title>
   <meta name="description" content="Scientific articles, conference papers, dissertations and theses from NIPS-CERN: 147 publications between 2001 and 2026.">
 
@@ -27,8 +28,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/icons/publications.css?v=5422482445">
-  <link rel="stylesheet" href="assets/css/main.min.css?v=5422482445">
+  <link rel="stylesheet" href="assets/css/icons/publications.css?v=fedd4abe5e">
+  <link rel="stylesheet" href="assets/css/main.min.css?v=fedd4abe5e">
 </head>
 <body>
 
@@ -69,7 +70,7 @@
         <div id="pub-stats" class="pub-stats fade-up" aria-hidden="true"></div>
 
         <!-- Featured strip — populated by publications.js, hidden while filtering -->
-        <div id="pub-featured" class="pub-featured fade-up" aria-label="Featured publications" hidden></div>
+        <div id="pub-featured" class="pub-featured fade-up is-pending" aria-label="Featured publications"></div>
 
         <!-- Controls -->
         <div class="pub-controls glass glass--flat fade-up" role="search" aria-label="Search and filter publications">
@@ -203,9 +204,9 @@
   <footer id="footer" role="contentinfo"></footer>
 
   <!-- Publications initialiser: runs after main.js (and therefore i18n) is ready -->
-  <script type="module" src="assets/js/main.min.js?v=5422482445"></script>
+  <script type="module" src="assets/js/main.min.js?v=fedd4abe5e"></script>
   <script type="module">
-    import { initPublications } from './assets/js/publications.min.js?v=5422482445';
+    import { initPublications } from './assets/js/publications.min.js?v=fedd4abe5e';
     // Defer until after DOMContentLoaded so main.js has already run
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => setTimeout(initPublications, 50));
@@ -213,6 +214,6 @@
       setTimeout(initPublications, 50);
     }
   </script>
-  <script src="assets/js/analytics.min.js?v=5422482445" defer></script>
+  <script src="assets/js/analytics.min.js?v=fedd4abe5e" defer></script>
 </body>
 </html>

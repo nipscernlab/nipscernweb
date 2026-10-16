@@ -139,7 +139,20 @@ fn excerpt_for(post: &Value, lang: &str) -> String {
             }
         }
     }
-    s(post, "excerpt").to_string()
+    // Featured posts (data/news-featured.json) keep everything under
+    // translations, English included, and leave the top level empty: without
+    // this the English OG page of the CGVWeb post went out with an empty
+    // description (seen in October 2026).
+    let top = s(post, "excerpt");
+    if !top.is_empty() {
+        return top.to_string();
+    }
+    post.get("translations")
+        .and_then(|t| t.get(lang).or_else(|| t.get("en")))
+        .and_then(|x| x.get("excerpt").or_else(|| x.get("subtitle")))
+        .and_then(Value::as_str)
+        .unwrap_or("")
+        .to_string()
 }
 
 fn available_langs(post: &Value) -> Vec<String> {

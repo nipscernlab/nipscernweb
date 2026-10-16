@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
   <title>SAPHO | Scalable-Architecture Processor for Hardware Optimization | NIPS-CERN</title>
   <meta name="description" content="Write an algorithm in C±. SAPHO builds the processor around it: word width, memories and ALU blocks all follow from your program. Toolchain, IDE, simulators and waveform viewers in one installer. Built at NIPS-CERN/UFJF, running at CERN.">
 
@@ -25,8 +26,8 @@
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=5422482445">
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=5422482445">
+  <link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=fedd4abe5e">
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=fedd4abe5e">
 
   <style>
     /* ==================================================================
@@ -732,16 +733,16 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=5422482445"></script>
-  <script src="../assets/js/analytics.min.js?v=5422482445" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=fedd4abe5e"></script>
+  <script src="../assets/js/analytics.min.js?v=fedd4abe5e" defer></script>
 
   <script type="module">
     /* Sem JavaScript a pagina fica inteira: o programa padrao esta no HTML,
        o die ja acende as celulas dele, os tracos da onda estao completos.
        O script so troca estados. Bibliotecas: GSAP da casa e anime.js 4,
        ambos vendorizados. */
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=5422482445';
-    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=5422482445';
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=fedd4abe5e';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=fedd4abe5e';
 
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
@@ -839,7 +840,7 @@
       const canvas = document.getElementById('die-canvas');
       if (!canvas) return;
       let T;
-      try { T = await import('../assets/js/vendor/three.module.min.js?v=5422482445'); }
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=fedd4abe5e'); }
       catch (_) { stage.remove(); return; }
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
@@ -1122,8 +1123,16 @@
       }
 
       let raf = 0, last = 0, t = 0;
+      /* Trinta quadros por segundo enquanto o chip so balanca, sessenta enquanto
+         alguem arrasta, passa o ponteiro ou o giro ainda tem inercia.
+         requestAnimationFrame segue a tela, e numa tela de 165 Hz esta cena era
+         renderizada 165 vezes por segundo para um balanco de 0,07 rad a cada
+         meio minuto (docs/perf/plano-2026-10.md). */
+      const LENTO = 1000 / 30 - 1, RAPIDO = 1000 / 60 - 1;
       function frame(now) {
         raf = requestAnimationFrame(frame);
+        const ativo = dragging || overCanvas || Math.abs(yawVel) > 1e-4 || Math.abs(userYaw) > 1e-3 || Math.abs(userPitch) > 1e-3;
+        if (last && now - last < (ativo ? RAPIDO : LENTO)) return;
         const dt = Math.min(0.05, (now - last) / 1000 || 0); last = now;
         t += dt;
         if (!dragging) {
