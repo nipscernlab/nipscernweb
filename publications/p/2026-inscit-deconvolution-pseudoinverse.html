@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>A Deconvolutional Technique Based on Pseudoinverse for Online Energy Reconstruction | NIPS-CERN</title>
+  <meta name="description" content="Modern High-Energy Physics (HEP) experiments face significant challenges in data processing due to high-luminosity environments where the overlapping of signals, known as pile-up, degrades…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/2026-inscit-deconvolution-pseudoinverse">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/2026-inscit-deconvolution-pseudoinverse">
+  <meta property="og:title" content="A Deconvolutional Technique Based on Pseudoinverse for Online Energy Reconstruction">
+  <meta property="og:description" content="Modern High-Energy Physics (HEP) experiments face significant challenges in data processing due to high-luminosity environments where the overlapping of signals, known as pile-up, degrades…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="A Deconvolutional Technique Based on Pseudoinverse for Online Energy Reconstruction">
+  <meta name="citation_author" content="Melissa Santos Aguiar">
+  <meta name="citation_author" content="Eder Barboza Kapisch">
+  <meta name="citation_author" content="Ualison R. F. Dias">
+  <meta name="citation_author" content="Huacheng Cai">
+  <meta name="citation_author" content="Denis O. Damazio">
+  <meta name="citation_author" content="Marcos Vinícius Silva Oliveira">
+  <meta name="citation_author" content="Luciano Manhães de Andrade Filho">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="10th International Symposium on Instrumentation Systems, Circuits, and Transducers — INSCIT 2026">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/inscit-2026-pseudoinverse-deconvolution-energy.pdf">
+  <meta name="citation_doi" content="10.1109/INSCIT72361.2026.11707220">
+  <meta name="citation_language" content="en">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/2026-inscit-deconvolution-pseudoinverse">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "A Deconvolutional Technique Based on Pseudoinverse for Online Energy Reconstruction",
+    "name": "A Deconvolutional Technique Based on Pseudoinverse for Online Energy Reconstruction",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Melissa Santos Aguiar"
+      },
+      {
+        "@type": "Person",
+        "name": "Eder Barboza Kapisch"
+      },
+      {
+        "@type": "Person",
+        "name": "Ualison R. F. Dias"
+      },
+      {
+        "@type": "Person",
+        "name": "Huacheng Cai"
+      },
+      {
+        "@type": "Person",
+        "name": "Denis O. Damazio"
+      },
+      {
+        "@type": "Person",
+        "name": "Marcos Vinícius Silva Oliveira"
+      },
+      {
+        "@type": "Person",
+        "name": "Luciano Manhães de Andrade Filho"
+      }
+    ],
+    "datePublished": "2026",
+    "inLanguage": "en",
+    "abstract": "Modern High-Energy Physics (HEP) experiments face significant challenges in data processing due to high-luminosity environments where the overlapping of signals, known as pile-up, degrades detector resolution. Traditionally, the Optimal Filter (OF) algorithm is employed for amplitude estimation. However, its performance is limited in high-occupancy scenarios because the filter weights must be specifically recalculated for different pile-up levels to maintain accuracy. This paper proposes an alternative online energy reconstruction technique based on deconvolutional filtering using the Moore-Penrose pseudoinverse. By treating the signal reconstruction as an inverse problem, the proposed method relies solely on the knowledge of the system's impulse response to effectively separate overlapping pulses across varying pile-up conditions. Unlike the OF approach, which typically requires an additional peak detection stage combined with a phase filter, the deconvolution output directly provides the energy values at the precise time of the collision. The approach was validated using the Lorenzetti Showers framework, simulating Liquid Argon (LArg) calorimeter responses under severe multi-hit conditions. Results demonstrate that the deconvolution method significantly reduces the Root Mean Square Error (RMSE) from approximately 200 MeV in the conventional OF to values between 50 and 100 MeV, representing a reduction of up to 62.5% in reconstruction error. Also, it maintains high detection efficiency compared to the conventional OF. The proposed architecture is suitable for low-latency implementation in Field Programmable Gate Arrays (FPGAs), offering a streamlined and robust solution for real-time trigger systems.",
+    "url": "https://www.nipscern.com/publications/p/2026-inscit-deconvolution-pseudoinverse",
+    "sameAs": "https://doi.org/10.1109/INSCIT72361.2026.11707220",
+    "isPartOf": {
+      "@type": "Event",
+      "name": "10th International Symposium on Instrumentation Systems, Circuits, and Transducers — INSCIT 2026"
+    },
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/inscit-2026-pseudoinverse-deconvolution-energy.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "keywords": "Deconvolution, Calorimetry, HEP, Energy reconstruction, Pile-up, FPGA, Lorenzetti, Pseudoinverse, INSCIT",
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6b109fbd8f">
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6b109fbd8f">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Conference · 2026</span>
+          </div>
+          <h1 class="display-md" id="pub-title">A Deconvolutional Technique Based on Pseudoinverse for Online Energy Reconstruction</h1>
+          <p class="pubp-meta">Melissa Santos Aguiar, Eder Barboza Kapisch, Ualison R. F. Dias, Huacheng Cai, Denis O. Damazio, Marcos Vinícius Silva Oliveira, Luciano Manhães de Andrade Filho</p>
+          <p class="pubp-meta"><strong>10th International Symposium on Instrumentation Systems, Circuits, and Transducers — INSCIT 2026</strong></p>
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=pub-2026-inscit-deconvolution-pseudoinverse"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            <a class="btn btn-ghost glass-btn" href="https://doi.org/10.1109/INSCIT72361.2026.11707220" target="_blank" rel="noopener"><i class="ph ph-link" aria-hidden="true"></i><span>DOI 10.1109/INSCIT72361.2026.11707220</span></a>
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body">
+      <h2>Abstract</h2>
+      <p>Modern High-Energy Physics (HEP) experiments face significant challenges in data processing due to high-luminosity environments where the overlapping of signals, known as pile-up, degrades detector resolution. Traditionally, the Optimal Filter (OF) algorithm is employed for amplitude estimation. However, its performance is limited in high-occupancy scenarios because the filter weights must be specifically recalculated for different pile-up levels to maintain accuracy. This paper proposes an alternative online energy reconstruction technique based on deconvolutional filtering using the Moore-Penrose pseudoinverse. By treating the signal reconstruction as an inverse problem, the proposed method relies solely on the knowledge of the system's impulse response to effectively separate overlapping pulses across varying pile-up conditions. Unlike the OF approach, which typically requires an additional peak detection stage combined with a phase filter, the deconvolution output directly provides the energy values at the precise time of the collision. The approach was validated using the Lorenzetti Showers framework, simulating Liquid Argon (LArg) calorimeter responses under severe multi-hit conditions. Results demonstrate that the deconvolution method significantly reduces the Root Mean Square Error (RMSE) from approximately 200 MeV in the conventional OF to values between 50 and 100 MeV, representing a reduction of up to 62.5% in reconstruction error. Also, it maintains high detection efficiency compared to the conventional OF. The proposed architecture is suitable for low-latency implementation in Field Programmable Gate Arrays (FPGAs), offering a streamlined and robust solution for real-time trigger systems.</p>
+      <div class="pubp-tags"><span class="badge badge-gray">Deconvolution</span><span class="badge badge-gray">Calorimetry</span><span class="badge badge-gray">HEP</span><span class="badge badge-gray">Energy reconstruction</span><span class="badge badge-gray">Pile-up</span><span class="badge badge-gray">FPGA</span><span class="badge badge-gray">Lorenzetti</span><span class="badge badge-gray">Pseudoinverse</span><span class="badge badge-gray">INSCIT</span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6b109fbd8f"></script>
+  <script src="../../assets/js/analytics.min.js?v=6b109fbd8f" defer></script>
+</body>
+</html>

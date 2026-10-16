@@ -3,15 +3,16 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=fedd4abe5e';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=6b109fbd8f';
 
-import { newsPostUrl } from './content-links.js?v=fedd4abe5e';
+import { newsPostUrl } from './content-links.js?v=6b109fbd8f';
+import { detectLang } from './pub-render.js?v=6b109fbd8f';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=fedd4abe5e';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=6b109fbd8f';
 
 // ============================================================
 // Navigation Template
@@ -695,35 +696,8 @@ async function fetchJSON(path) {
   }
 }
 
-// ============================================================
-// Publication language detection (title + abstract heuristic)
-// ============================================================
-const LANG_WORDS = {
-  pt: ['que','não','são','uma','um','com','para','do','da','dos','das','também','é','às','mais','como','pelo','pela','este','esta','esse','essa','foram','foi','utilizados','trabalho','sistema','através','desenvolvimento','aplicação','dados','partir','ao','os','as','no','na','nos','nas','sua','seu','por','em'],
-  en: ['the','and','of','this','was','with','for','which','based','are','we','that','system','present','results','using','these','from','an','is','to','in','on','by','as','were','paper','work','detector'],
-  fr: ['le','les','des','une','et','est','pour','avec','dans','cette','qui','sur','nous','au','aux','été','par','plus','ce','sont','leur','être'],
-  no: ['og','av','som','er','til','på','med','det','ikke','denne','et','for','har','ble','blir','disse'],
-};
-const LANG_DIA = { pt: ['ã','õ'], fr: ['ê','è','ù','œ'], no: ['ø','å'] };
-
-/** Detect the language of a publication from its title + abstract. */
-export function detectLang(title, abstract) {
-  const text = ((title || '') + ' ' + (abstract || '')).toLowerCase();
-  const tokens = text.match(/[a-zàâçéèêëîïôûùüÿñæœãõáíóú]+/g) || [];
-  if (tokens.length < 3) return 'en';
-  const n = tokens.length;
-  const scores = {};
-  for (const lang in LANG_WORDS) {
-    const wset = new Set(LANG_WORDS[lang]);
-    let c = 0;
-    for (const tok of tokens) if (wset.has(tok)) c++;
-    scores[lang] = c / n;
-  }
-  for (const lang in LANG_DIA) {
-    if (LANG_DIA[lang].some(ch => text.includes(ch))) scores[lang] += 0.02;
-  }
-  return Object.keys(scores).reduce((a, b) => (scores[b] > scores[a] ? b : a), 'en');
-}
+/* Publication language detection lives in pub-render.js, shared with the
+   build (tools/build-publications.js), which has no DOM to run this file in. */
 
 /** Build the small flag badge HTML for a publication's detected language. */
 export function pubLangFlag(title, abstract) {
@@ -963,7 +937,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=fedd4abe5e">. Each copy would otherwise append its own
+// <script src="main.js?v=6b109fbd8f">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {

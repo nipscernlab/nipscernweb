@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>An FPGA-based parallel deconvolution application envisaging high-energy calorimeters operating under severe pile-up conditions | NIPS-CERN</title>
+  <meta name="description" content="Signal pileup may arise when the system response time is larger than what would be required by the event rate in the application. In this condition, information superposition occurs, and signal…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/2024-jinst-an-fpga-based-parallel-deconvolution">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/2024-jinst-an-fpga-based-parallel-deconvolution">
+  <meta property="og:title" content="An FPGA-based parallel deconvolution application envisaging high-energy calorimeters operating under severe pile-up conditions">
+  <meta property="og:description" content="Signal pileup may arise when the system response time is larger than what would be required by the event rate in the application. In this condition, information superposition occurs, and signal…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="An FPGA-based parallel deconvolution application envisaging high-energy calorimeters operating under severe pile-up conditions">
+  <meta name="citation_author" content="Igo A. dos S. Luz">
+  <meta name="citation_author" content="Eduardo Furtado de Simas Filho">
+  <meta name="citation_author" content="Paulo C. M. A. Farias">
+  <meta name="citation_author" content="Luciano Manhães de Andrade Filho">
+  <meta name="citation_author" content="José Manoel de Seixas">
+  <meta name="citation_publication_date" content="2024">
+  <meta name="citation_journal_title" content="Journal of Instrumentation">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/jinst-2024-an-fpga-based-parallel-deconvolution.pdf">
+  <meta name="citation_language" content="en">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/2024-jinst-an-fpga-based-parallel-deconvolution">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "An FPGA-based parallel deconvolution application envisaging high-energy calorimeters operating under severe pile-up conditions",
+    "name": "An FPGA-based parallel deconvolution application envisaging high-energy calorimeters operating under severe pile-up conditions",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Igo A. dos S. Luz"
+      },
+      {
+        "@type": "Person",
+        "name": "Eduardo Furtado de Simas Filho"
+      },
+      {
+        "@type": "Person",
+        "name": "Paulo C. M. A. Farias"
+      },
+      {
+        "@type": "Person",
+        "name": "Luciano Manhães de Andrade Filho"
+      },
+      {
+        "@type": "Person",
+        "name": "José Manoel de Seixas"
+      }
+    ],
+    "datePublished": "2024",
+    "inLanguage": "en",
+    "abstract": "Signal pileup may arise when the system response time is larger than what would be required by the event rate in the application. In this condition, information superposition occurs, and signal estimation is deteriorated due to such information distortion. For online applications, mitigating such a pileup distortion usually requires embedded digital signal processing, which often involves FPGA-based designs when high event rates are a concern. Recently, high-energy particle experiments started facing an unprecedented increase in pileup conditions, which demanded new approaches for signal estimation. This work proposes a dedicated parallel signal processing system embedded on an FPGA platform that implements different filtering techniques for online energy reconstruction in calorimeters (energy measurement) operating under severe pileup conditions. Each designed filter is an inverse approximation of the calorimeter readout channel’s impulse response, performing deconvolution of the incoming signals. Such a deconvolution approach for energy estimation was recently introduced, and the proposed filters were implemented in this work. Evaluation of the digital system design was performed using a data set that considers a typical high-energy calorimeter front-end response, as high-luminosity particle collider experiments produce high pileup distortions in calorimeter signals when processing the subproducts of the collisions. As the Large Hadron Collider (LHC) provides the most demanding conditions in terms of signal pileup, the acquisition system of the proposed solution is synchronous with its collision rate (40 MHz). The results showed that the proposed implementation may be applied as a preprocessing (pileup reduction) step in calorimeter instrumentation and could reduce the signal pileup within the fast response time required by such experiments.",
+    "url": "https://www.nipscern.com/publications/p/2024-jinst-an-fpga-based-parallel-deconvolution",
+    "isPartOf": {
+      "@type": "Periodical",
+      "name": "Journal of Instrumentation"
+    },
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/jinst-2024-an-fpga-based-parallel-deconvolution.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6b109fbd8f">
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6b109fbd8f">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Journal Article · 2024</span>
+          </div>
+          <h1 class="display-md" id="pub-title">An FPGA-based parallel deconvolution application envisaging high-energy calorimeters operating under severe pile-up conditions</h1>
+          <p class="pubp-meta">Igo A. dos S. Luz, Eduardo Furtado de Simas Filho, Paulo C. M. A. Farias, Luciano Manhães de Andrade Filho, José Manoel de Seixas</p>
+          <p class="pubp-meta"><strong>Journal of Instrumentation</strong></p>
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=pub-2024-JINST-An-FPGA-based-parallel-deconvolution"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body">
+      <h2>Abstract</h2>
+      <p>Signal pileup may arise when the system response time is larger than what would be required by the event rate in the application. In this condition, information superposition occurs, and signal estimation is deteriorated due to such information distortion. For online applications, mitigating such a pileup distortion usually requires embedded digital signal processing, which often involves FPGA-based designs when high event rates are a concern. Recently, high-energy particle experiments started facing an unprecedented increase in pileup conditions, which demanded new approaches for signal estimation. This work proposes a dedicated parallel signal processing system embedded on an FPGA platform that implements different filtering techniques for online energy reconstruction in calorimeters (energy measurement) operating under severe pileup conditions. Each designed filter is an inverse approximation of the calorimeter readout channel’s impulse response, performing deconvolution of the incoming signals. Such a deconvolution approach for energy estimation was recently introduced, and the proposed filters were implemented in this work. Evaluation of the digital system design was performed using a data set that considers a typical high-energy calorimeter front-end response, as high-luminosity particle collider experiments produce high pileup distortions in calorimeter signals when processing the subproducts of the collisions. As the Large Hadron Collider (LHC) provides the most demanding conditions in terms of signal pileup, the acquisition system of the proposed solution is synchronous with its collision rate (40 MHz). The results showed that the proposed implementation may be applied as a preprocessing (pileup reduction) step in calorimeter instrumentation and could reduce the signal pileup within the fast response time required by such experiments.</p>
+      <div class="pubp-tags"><span class="badge badge-gray"></span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6b109fbd8f"></script>
+  <script src="../../assets/js/analytics.min.js?v=6b109fbd8f" defer></script>
+</body>
+</html>

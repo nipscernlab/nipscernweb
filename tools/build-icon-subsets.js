@@ -97,6 +97,11 @@ const nomeDoArquivo = (html) =>
    família tem de carregar a folha da família, e não uma com o próprio nome. */
 const FAMILIAS = [
   { prefixo: 'library/courses/', folha: 'library-courses.css' },
+  /* A fala do CBA 2026 é um deck das aulas e carrega a folha delas. Sem esta
+     linha o gerador escrevia library-talks-cba-2026-index.css, que ninguém pede. */
+  { prefixo: 'library/talks/', folha: 'library-courses.css' },
+  /* As páginas de cada publicação, geradas por tools/build-publications.js. */
+  { prefixo: 'publications/p/', folha: 'publications-p.css' },
 ];
 const folhaDaPagina = (pagina) => {
   const familia = FAMILIAS.find((f) => pagina.startsWith(f.prefixo));

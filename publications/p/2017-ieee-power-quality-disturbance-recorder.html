@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>Gapless Power-Quality Disturbance Recorder | NIPS-CERN</title>
+  <meta name="description" content="This paper presents and discusses the concepts of a gapless power quality disturbance recorder (G-PQDR) and a novelty detector. In the G-PQDR, power signals are divided into continuous frames, and…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/2017-ieee-power-quality-disturbance-recorder">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/2017-ieee-power-quality-disturbance-recorder">
+  <meta property="og:title" content="Gapless Power-Quality Disturbance Recorder">
+  <meta property="og:description" content="This paper presents and discusses the concepts of a gapless power quality disturbance recorder (G-PQDR) and a novelty detector. In the G-PQDR, power signals are divided into continuous frames, and…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="Gapless Power-Quality Disturbance Recorder">
+  <meta name="citation_author" content="Leandro Rodrigues Manso Silva">
+  <meta name="citation_author" content="Eder Barboza Kapisch">
+  <meta name="citation_author" content="Carlos Henrique Nascimento Martins">
+  <meta name="citation_author" content="Luciano Manhães de Andrade Filho">
+  <meta name="citation_author" content="Augusto Santiago Cerqueira">
+  <meta name="citation_author" content="Carlos Augusto Duque">
+  <meta name="citation_author" content="Paulo Fernando Ribeiro">
+  <meta name="citation_publication_date" content="2017">
+  <meta name="citation_journal_title" content="IEEE Transactions on Power Delivery">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/ieee-2017-power-quality-disturbance-recorder.pdf">
+  <meta name="citation_language" content="en">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/2017-ieee-power-quality-disturbance-recorder">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Gapless Power-Quality Disturbance Recorder",
+    "name": "Gapless Power-Quality Disturbance Recorder",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Leandro Rodrigues Manso Silva"
+      },
+      {
+        "@type": "Person",
+        "name": "Eder Barboza Kapisch"
+      },
+      {
+        "@type": "Person",
+        "name": "Carlos Henrique Nascimento Martins"
+      },
+      {
+        "@type": "Person",
+        "name": "Luciano Manhães de Andrade Filho"
+      },
+      {
+        "@type": "Person",
+        "name": "Augusto Santiago Cerqueira"
+      },
+      {
+        "@type": "Person",
+        "name": "Carlos Augusto Duque"
+      },
+      {
+        "@type": "Person",
+        "name": "Paulo Fernando Ribeiro"
+      }
+    ],
+    "datePublished": "2017",
+    "inLanguage": "en",
+    "abstract": "This paper presents and discusses the concepts of a gapless power quality disturbance recorder (G-PQDR) and a novelty detector. In the G-PQDR, power signals are divided into continuous frames, and the energy difference between a current frame and a reference frame is used for comparison. If the current frame differs from the reference frame, it is recorded and becomes the new reference; otherwise, the frame is discarded and only the frequency of the fundamental component is stored. The G-PQDR is capable of detecting and recording both previously known PQ disturbance waveforms and those not yet observed in power systems, thanks to the novelty detection concept. This feature is particularly important in the context of smart grids, where hidden disturbances can be identified using this methodology. To ensure efficient data storage by minimizing the volume of stored data, the G-PQDR employs both lossy and lossless compression techniques. This paper describes the complete process of detection and compression and compares the performance of the proposed method with that of a commercial power quality data recorder. Additionally, details of the prototype implementation are presented.",
+    "url": "https://www.nipscern.com/publications/p/2017-ieee-power-quality-disturbance-recorder",
+    "isPartOf": {
+      "@type": "Periodical",
+      "name": "IEEE Transactions on Power Delivery"
+    },
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/ieee-2017-power-quality-disturbance-recorder.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6b109fbd8f">
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6b109fbd8f">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Journal Article · 2017</span>
+          </div>
+          <h1 class="display-md" id="pub-title">Gapless Power-Quality Disturbance Recorder</h1>
+          <p class="pubp-meta">Leandro Rodrigues Manso Silva, Eder Barboza Kapisch, Carlos Henrique Nascimento Martins, Luciano Manhães de Andrade Filho, Augusto Santiago Cerqueira, Carlos Augusto Duque, Paulo Fernando Ribeiro</p>
+          <p class="pubp-meta"><strong>IEEE Transactions on Power Delivery</strong></p>
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=pub-2017-ieee-Power-Quality-Disturbance-Recorder"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body">
+      <h2>Abstract</h2>
+      <p>This paper presents and discusses the concepts of a gapless power quality disturbance recorder (G-PQDR) and a novelty detector. In the G-PQDR, power signals are divided into continuous frames, and the energy difference between a current frame and a reference frame is used for comparison. If the current frame differs from the reference frame, it is recorded and becomes the new reference; otherwise, the frame is discarded and only the frequency of the fundamental component is stored. The G-PQDR is capable of detecting and recording both previously known PQ disturbance waveforms and those not yet observed in power systems, thanks to the novelty detection concept. This feature is particularly important in the context of smart grids, where hidden disturbances can be identified using this methodology. To ensure efficient data storage by minimizing the volume of stored data, the G-PQDR employs both lossy and lossless compression techniques. This paper describes the complete process of detection and compression and compares the performance of the proposed method with that of a commercial power quality data recorder. Additionally, details of the prototype implementation are presented.</p>
+      <div class="pubp-tags"><span class="badge badge-gray"></span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6b109fbd8f"></script>
+  <script src="../../assets/js/analytics.min.js?v=6b109fbd8f" defer></script>
+</body>
+</html>

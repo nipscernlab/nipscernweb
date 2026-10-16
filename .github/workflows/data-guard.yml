@@ -28,3 +28,8 @@ jobs:
             git diff --stat -- data/
             exit 1
           fi
+      - name: As paginas das publicacoes batem com data/publications.json
+        run: |
+          # A lista em publications.html, as paginas de publications/p/ e o
+          # bloco delas no sitemap.xml saem de tools/build-publications.js.
+          node tools/build-publications.js --check

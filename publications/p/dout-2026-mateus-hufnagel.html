@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>Desenvolvimento de um Simulador e Estudo de Mitigação de Crosstalk para Calorímetros Eletromagnéticos | NIPS-CERN</title>
+  <meta name="description" content="A instrumentação eletrônica para experimentos de física de altas energias demanda sensores com elevada densidade de canais e precisão na aquisição de sinais. Neste contexto, o crosstalk surge como…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/dout-2026-mateus-hufnagel">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/dout-2026-mateus-hufnagel">
+  <meta property="og:title" content="Desenvolvimento de um Simulador e Estudo de Mitigação de Crosstalk para Calorímetros Eletromagnéticos">
+  <meta property="og:description" content="A instrumentação eletrônica para experimentos de física de altas energias demanda sensores com elevada densidade de canais e precisão na aquisição de sinais. Neste contexto, o crosstalk surge como…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="Desenvolvimento de um Simulador e Estudo de Mitigação de Crosstalk para Calorímetros Eletromagnéticos">
+  <meta name="citation_author" content="Mateus Hufnagel Maranha de Faria">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/dout-2026-mateus-hufnagel.pdf">
+  <meta name="citation_language" content="pt">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/dout-2026-mateus-hufnagel">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Thesis",
+    "headline": "Desenvolvimento de um Simulador e Estudo de Mitigação de Crosstalk para Calorímetros Eletromagnéticos",
+    "name": "Desenvolvimento de um Simulador e Estudo de Mitigação de Crosstalk para Calorímetros Eletromagnéticos",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Mateus Hufnagel Maranha de Faria"
+      }
+    ],
+    "datePublished": "2026",
+    "inLanguage": "pt",
+    "abstract": "A instrumentação eletrônica para experimentos de física de altas energias demanda sensores com elevada densidade de canais e precisão na aquisição de sinais. Neste contexto, o crosstalk surge como um fenômeno crítico, caracterizado pela interferência eletromagnética entre canais de leitura adjacentes, que degrada a estimativa de energia e tempo das partículas detectadas. Esta tese tem como objetivo principal o desenvolvimento de um ambiente computacional para simulação e estudo de métodos de mitigação de crosstalk em calorímetros eletromagnéticos, tomando como referência o calorímetro de argônio líquido (LAr) do experimento ATLAS. A metodologia empregada baseia-se na extensão do framework Lorenzetti Showers, no qual foram implementados módulos inéditos para a simulação do tempo de voo das partículas e para a modelagem do crosstalk em nível de sinal, considerando os acoplamentos capacitivo e indutivo. A partir deste ambiente, foram gerados conjuntos de dados compostos por elétrons de 50 GeV e eventos de decaimento Z → e⁻e⁺, com e sem a presença de ruído eletrônico, compondo eventos distribuídos em diferentes configurações geométricas de incidência dos chuveiros. Os resultados apresentados demonstram que a calibração do tempo de voo implementada removeu satisfatoriamente o viés temporal nas células, evidenciado pela convergência das distribuições de tempo para valores próximos de zero nas camadas EM1 e EM2. A simulação do crosstalk reproduziu as distorções esperadas nas formas de onda, resultando em vieses sistemáticos na reconstrução de energia e do tempo de voo. Para a mitigação desses efeitos, foram propostas e avaliadas arquiteturas de redes neurais do tipo perceptron multicamadas (MLP) com estratégias de otimização baseadas em erro quadrático médio (MSE) e erro quadrático médio normalizado (NMSE). Os modelos com uma camada oculta e 75 neurônios treinados com MSE, apresentaram os melhores compromissos entre desempenho e complexidade, alcançando coeficientes de determinação (R²) superiores a 0,95 para a energia reconstruída na célula central, enquanto o NMSE mostrou-se mais eficaz na recuperação de células periféricas com baixa relação sinal-ruído. Conclui-se que a plataforma desenvolvida constitui uma ferramenta robusta para investigação do crosstalk e que as abordagens de aprendizado de máquina propostas apresentam potencial para a correção seletiva dos sinais, orientando o desenvolvimento futuro de modelos que integrem a estimativa direta de energia e tempo à correção dos pulsos.",
+    "url": "https://www.nipscern.com/publications/p/dout-2026-mateus-hufnagel",
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/dout-2026-mateus-hufnagel.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6b109fbd8f">
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6b109fbd8f">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Doctoral Thesis · 2026</span>
+          </div>
+          <h1 class="display-md" id="pub-title" lang="pt">Desenvolvimento de um Simulador e Estudo de Mitigação de Crosstalk para Calorímetros Eletromagnéticos</h1>
+          <p class="pubp-meta">Mateus Hufnagel Maranha de Faria</p>
+          
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=dout-2026-Mateus-Hufnagel"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body" lang="pt">
+      <h2>Abstract</h2>
+      <p>A instrumentação eletrônica para experimentos de física de altas energias demanda sensores com elevada densidade de canais e precisão na aquisição de sinais. Neste contexto, o crosstalk surge como um fenômeno crítico, caracterizado pela interferência eletromagnética entre canais de leitura adjacentes, que degrada a estimativa de energia e tempo das partículas detectadas. Esta tese tem como objetivo principal o desenvolvimento de um ambiente computacional para simulação e estudo de métodos de mitigação de crosstalk em calorímetros eletromagnéticos, tomando como referência o calorímetro de argônio líquido (LAr) do experimento ATLAS. A metodologia empregada baseia-se na extensão do framework Lorenzetti Showers, no qual foram implementados módulos inéditos para a simulação do tempo de voo das partículas e para a modelagem do crosstalk em nível de sinal, considerando os acoplamentos capacitivo e indutivo. A partir deste ambiente, foram gerados conjuntos de dados compostos por elétrons de 50 GeV e eventos de decaimento Z → e⁻e⁺, com e sem a presença de ruído eletrônico, compondo eventos distribuídos em diferentes configurações geométricas de incidência dos chuveiros. Os resultados apresentados demonstram que a calibração do tempo de voo implementada removeu satisfatoriamente o viés temporal nas células, evidenciado pela convergência das distribuições de tempo para valores próximos de zero nas camadas EM1 e EM2. A simulação do crosstalk reproduziu as distorções esperadas nas formas de onda, resultando em vieses sistemáticos na reconstrução de energia e do tempo de voo. Para a mitigação desses efeitos, foram propostas e avaliadas arquiteturas de redes neurais do tipo perceptron multicamadas (MLP) com estratégias de otimização baseadas em erro quadrático médio (MSE) e erro quadrático médio normalizado (NMSE). Os modelos com uma camada oculta e 75 neurônios treinados com MSE, apresentaram os melhores compromissos entre desempenho e complexidade, alcançando coeficientes de determinação (R²) superiores a 0,95 para a energia reconstruída na célula central, enquanto o NMSE mostrou-se mais eficaz na recuperação de células periféricas com baixa relação sinal-ruído. Conclui-se que a plataforma desenvolvida constitui uma ferramenta robusta para investigação do crosstalk e que as abordagens de aprendizado de máquina propostas apresentam potencial para a correção seletiva dos sinais, orientando o desenvolvimento futuro de modelos que integrem a estimativa direta de energia e tempo à correção dos pulsos.</p>
+      <div class="pubp-tags"><span class="badge badge-gray"></span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6b109fbd8f"></script>
+  <script src="../../assets/js/analytics.min.js?v=6b109fbd8f" defer></script>
+</body>
+</html>

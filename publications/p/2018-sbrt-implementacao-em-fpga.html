@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>Implementação em FPGA de um Método Recursivo de Deconvolução Aplicado em Calorímetros Operando a Alta Taxa de Eventos | NIPS-CERN</title>
+  <meta name="description" content="The LHC particle accelerator has undergone an update process, leading to the effect known as pile-up (overlapping signals) in the experiment front-end electronics. Since the algorithm currently…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/2018-sbrt-implementacao-em-fpga">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/2018-sbrt-implementacao-em-fpga">
+  <meta property="og:title" content="Implementação em FPGA de um Método Recursivo de Deconvolução Aplicado em Calorímetros Operando a Alta Taxa de Eventos">
+  <meta property="og:description" content="The LHC particle accelerator has undergone an update process, leading to the effect known as pile-up (overlapping signals) in the experiment front-end electronics. Since the algorithm currently…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="Implementação em FPGA de um Método Recursivo de Deconvolução Aplicado em Calorímetros Operando a Alta Taxa de Eventos">
+  <meta name="citation_author" content="Tiago Aparecido Teixeira">
+  <meta name="citation_author" content="João Paulo Bittencourt da Silveira Duarte">
+  <meta name="citation_author" content="Luciano Manhães de Andrade Filho">
+  <meta name="citation_author" content="José Manoel de Seixas">
+  <meta name="citation_publication_date" content="2018">
+  <meta name="citation_conference_title" content="XXXVI Simpósio Brasileiro de Telecomunicações e Processamento de Sinais">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/sbrt-2018-implementacao-em-fpga.pdf">
+  <meta name="citation_language" content="en">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/2018-sbrt-implementacao-em-fpga">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Implementação em FPGA de um Método Recursivo de Deconvolução Aplicado em Calorímetros Operando a Alta Taxa de Eventos",
+    "name": "Implementação em FPGA de um Método Recursivo de Deconvolução Aplicado em Calorímetros Operando a Alta Taxa de Eventos",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Tiago Aparecido Teixeira"
+      },
+      {
+        "@type": "Person",
+        "name": "João Paulo Bittencourt da Silveira Duarte"
+      },
+      {
+        "@type": "Person",
+        "name": "Luciano Manhães de Andrade Filho"
+      },
+      {
+        "@type": "Person",
+        "name": "José Manoel de Seixas"
+      }
+    ],
+    "datePublished": "2018",
+    "inLanguage": "en",
+    "abstract": "The LHC particle accelerator has undergone an update process, leading to the effect known as pile-up (overlapping signals) in the experiment front-end electronics. Since the algorithm currently used for reconstructing the energy generated in these collisions is not tolerant to this effect, this work proposes a hardware implementation of an iterative method based on a variant of Gradient Descent that recovers the amplitude information of superimposed signals within an acquisition window. With this implementation, dozens of channels can be processed in parallel within a single FPGA, while also meeting the required operating latency constraints of the ATLAS acquisition system.",
+    "url": "https://www.nipscern.com/publications/p/2018-sbrt-implementacao-em-fpga",
+    "isPartOf": {
+      "@type": "Event",
+      "name": "XXXVI Simpósio Brasileiro de Telecomunicações e Processamento de Sinais"
+    },
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/sbrt-2018-implementacao-em-fpga.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6b109fbd8f">
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6b109fbd8f">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Conference · 2018</span>
+          </div>
+          <h1 class="display-md" id="pub-title">Implementação em FPGA de um Método Recursivo de Deconvolução Aplicado em Calorímetros Operando a Alta Taxa de Eventos</h1>
+          <p class="pubp-meta">Tiago Aparecido Teixeira, João Paulo Bittencourt da Silveira Duarte, Luciano Manhães de Andrade Filho, José Manoel de Seixas</p>
+          <p class="pubp-meta"><strong>XXXVI Simpósio Brasileiro de Telecomunicações e Processamento de Sinais</strong></p>
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=pub-2018-sbrt-Implementa%C3%A7%C3%A3o-em-FPGA"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body">
+      <h2>Abstract</h2>
+      <p>The LHC particle accelerator has undergone an update process, leading to the effect known as pile-up (overlapping signals) in the experiment front-end electronics. Since the algorithm currently used for reconstructing the energy generated in these collisions is not tolerant to this effect, this work proposes a hardware implementation of an iterative method based on a variant of Gradient Descent that recovers the amplitude information of superimposed signals within an acquisition window. With this implementation, dozens of channels can be processed in parallel within a single FPGA, while also meeting the required operating latency constraints of the ATLAS acquisition system.</p>
+      <div class="pubp-tags"><span class="badge badge-gray"></span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6b109fbd8f"></script>
+  <script src="../../assets/js/analytics.min.js?v=6b109fbd8f" defer></script>
+</body>
+</html>

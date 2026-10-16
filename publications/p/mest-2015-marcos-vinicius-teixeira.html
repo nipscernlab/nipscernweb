@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>Estudos sobre a Implementação Online de uma Técnica de Estimação de Energia no Calorímetro Hadrônico do ATLAS em Cenários de Alta Luminosidade | NIPS-CERN</title>
+  <meta name="description" content="Este trabalho tem como objetivo o estudo de técnicas para estimação da amplitude de sinais no calorímetro de telhas (TileCal) do experimento ATLAS no LHC, considerando cenários de alta…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/mest-2015-marcos-vinicius-teixeira">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/mest-2015-marcos-vinicius-teixeira">
+  <meta property="og:title" content="Estudos sobre a Implementação Online de uma Técnica de Estimação de Energia no Calorímetro Hadrônico do ATLAS em Cenários de Alta Luminosidade">
+  <meta property="og:description" content="Este trabalho tem como objetivo o estudo de técnicas para estimação da amplitude de sinais no calorímetro de telhas (TileCal) do experimento ATLAS no LHC, considerando cenários de alta…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="Estudos sobre a Implementação Online de uma Técnica de Estimação de Energia no Calorímetro Hadrônico do ATLAS em Cenários de Alta Luminosidade">
+  <meta name="citation_author" content="Marcos Vinícius Teixeira">
+  <meta name="citation_publication_date" content="2015">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/mest-2015-marcos-vinicius-teixeira.pdf">
+  <meta name="citation_language" content="pt">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/mest-2015-marcos-vinicius-teixeira">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Thesis",
+    "headline": "Estudos sobre a Implementação Online de uma Técnica de Estimação de Energia no Calorímetro Hadrônico do ATLAS em Cenários de Alta Luminosidade",
+    "name": "Estudos sobre a Implementação Online de uma Técnica de Estimação de Energia no Calorímetro Hadrônico do ATLAS em Cenários de Alta Luminosidade",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Marcos Vinícius Teixeira"
+      }
+    ],
+    "datePublished": "2015",
+    "inLanguage": "pt",
+    "abstract": "Este trabalho tem como objetivo o estudo de técnicas para estimação da amplitude de sinais no calorímetro de telhas (TileCal) do experimento ATLAS no LHC, considerando cenários de alta luminosidade. Em ambientes de alta luminosidade, sinais provenientes de colisões adjacentes podem se sobrepor, causando o efeito de empilhamento de sinais (pile-up). Nesse contexto, o método COF (Constrained Optimal Filter) apresenta desempenho superior ao algoritmo atualmente implementado no sistema. Entretanto, o COF exige a inversão de matrizes para o cálculo da pseudo-inversa de uma matriz de convolução, o que dificulta sua implementação online. Para contornar esse problema, este trabalho propõe métodos iterativos baseados em gradiente descendente, que substituem a inversão matricial por operações matemáticas mais simples. Os resultados demonstram que os algoritmos propostos são capazes de estimar tanto o sinal de interesse quanto sinais empilhados com desempenho semelhante ao COF. Com foco na implementação online, o trabalho também analisa a complexidade computacional desses métodos e propõe uma arquitetura de processamento em FPGA. Baseada em uma estrutura sequencial e em lógica aritmética de ponto fixo, a arquitetura desenvolvida mostrou-se capaz de executar o método iterativo dentro dos requisitos de tempo exigidos pelo TileCal.",
+    "url": "https://www.nipscern.com/publications/p/mest-2015-marcos-vinicius-teixeira",
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/mest-2015-marcos-vinicius-teixeira.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6b109fbd8f">
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6b109fbd8f">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Master's Thesis · 2015</span>
+          </div>
+          <h1 class="display-md" id="pub-title" lang="pt">Estudos sobre a Implementação Online de uma Técnica de Estimação de Energia no Calorímetro Hadrônico do ATLAS em Cenários de Alta Luminosidade</h1>
+          <p class="pubp-meta">Marcos Vinícius Teixeira</p>
+          
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=mest-2015-Marcos-Vin%C3%ADcius-Teixeira"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body" lang="pt">
+      <h2>Abstract</h2>
+      <p>Este trabalho tem como objetivo o estudo de técnicas para estimação da amplitude de sinais no calorímetro de telhas (TileCal) do experimento ATLAS no LHC, considerando cenários de alta luminosidade. Em ambientes de alta luminosidade, sinais provenientes de colisões adjacentes podem se sobrepor, causando o efeito de empilhamento de sinais (pile-up). Nesse contexto, o método COF (Constrained Optimal Filter) apresenta desempenho superior ao algoritmo atualmente implementado no sistema. Entretanto, o COF exige a inversão de matrizes para o cálculo da pseudo-inversa de uma matriz de convolução, o que dificulta sua implementação online. Para contornar esse problema, este trabalho propõe métodos iterativos baseados em gradiente descendente, que substituem a inversão matricial por operações matemáticas mais simples. Os resultados demonstram que os algoritmos propostos são capazes de estimar tanto o sinal de interesse quanto sinais empilhados com desempenho semelhante ao COF. Com foco na implementação online, o trabalho também analisa a complexidade computacional desses métodos e propõe uma arquitetura de processamento em FPGA. Baseada em uma estrutura sequencial e em lógica aritmética de ponto fixo, a arquitetura desenvolvida mostrou-se capaz de executar o método iterativo dentro dos requisitos de tempo exigidos pelo TileCal.</p>
+      <div class="pubp-tags"><span class="badge badge-gray"></span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6b109fbd8f"></script>
+  <script src="../../assets/js/analytics.min.js?v=6b109fbd8f" defer></script>
+</body>
+</html>

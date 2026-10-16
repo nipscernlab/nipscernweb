@@ -6,23 +6,20 @@
  * by default and revealed per item with a toggle.
  */
 
-import { t } from './i18n.js?v=fedd4abe5e';
-import { pubLangFlag } from './main.js?v=fedd4abe5e';
-import { publicationUrl } from './content-links.js?v=fedd4abe5e';
+import { t, getLang } from './i18n.js?v=6b109fbd8f';
+import { pubLangFlag } from './main.js?v=6b109fbd8f';
+import { publicationUrl } from './content-links.js?v=6b109fbd8f';
+import { renderGrouped, renderFlat, renderStats, renderFeaturedStrip, featuredList, publicationPagePath } from './pub-render.js?v=6b109fbd8f';
 
-const TYPE_BADGE = {
-  article:      'badge-blue',
-  journal:      'badge-blue',
-  conference:   'badge-green',
-  revista:      'badge-green',
-  tcc:          'badge-amber',
-  dissertation: 'badge-purple',
-  "master's thesis": 'badge-purple',
-  'undergraduate thesis': 'badge-amber',
-  'doctoral thesis': 'badge-purple',
+/* What the shared renderer needs from this page. The same functions draw the
+   list at build time (tools/build-publications.js), so a reader without
+   JavaScript gets the archive too. */
+const ctx = {
+  t: (key) => t(key),
+  flag: pubLangFlag,
+  pdfUrl: publicationUrl,
+  pageUrl: (pub) => '/' + publicationPagePath(pub),
 };
-
-const THESIS_TYPES = ["master's thesis", 'undergraduate thesis', 'doctoral thesis', 'tcc', 'dissertation'];
 
 // Same author written in different ways across publications.
 // Maps each variant to a single canonical name used in the filter list,
@@ -51,13 +48,6 @@ function cleanAuthorName(author) {
   return AUTHOR_ALIASES[cleaned.toLowerCase()] || cleaned;
 }
 
-// Authors come from the JSON with stray leading/trailing spaces in a few
-// entries; normalise the spacing without rewriting the names. Every author
-// and co-author is shown, no truncation.
-function formatAuthors(authors) {
-  return authors.map(a => String(a).trim()).filter(Boolean).join(', ');
-}
-
 async function loadPublications() {
   const depth = (window.location.pathname.match(/\//g) || []).length - 1;
   const prefix = depth > 1 ? '../'.repeat(depth - 1) : '';
@@ -71,115 +61,6 @@ async function loadPublications() {
 }
 
 const SORT_DEFAULT = 'year';
-
-/**
- * One publication as a row. The title and the Open PDF action carry the
- * weight; the source line (authors, journal, year, type) is muted, and the
- * abstract is tucked behind a toggle that expands with a height animation.
- */
-function renderItem(pub, { showYear } = {}) {
-  const typeLabel = t(`publications.types.${pub.type}`);
-  const doi = pub.doi
-    ? `<a href="https://doi.org/${pub.doi}" target="_blank" rel="noopener" class="pub-item-doi">${pub.doi}</a>`
-    : '';
-  const pdfViewerUrl = pub.pdf ? publicationUrl(pub) : '';
-  const pdfBtn = pdfViewerUrl
-    ? `<a href="${pdfViewerUrl}" class="pub-open glass-btn glass--flat" aria-label="${t('publications.open_pdf')}: ${pub.title}"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>${t('publications.open_pdf')}</span></a>`
-    : '';
-  const venue = (pub.journal && String(pub.journal).trim()) ? `<span class="pub-venue">${pub.journal}</span>` : '';
-  const meta = [showYear ? pub.year : null, typeLabel].filter(Boolean).join(' · ');
-  const source = [venue, meta].filter(Boolean).join(' · ');
-
-  return `
-    <li class="pub-item fade-up" role="listitem">
-      <div class="pub-item-row">
-        <h3 class="pub-item-title" id="pub-${pub.id}-title">${pub.title}</h3>
-        <div class="pub-item-aside">
-          <span class="pub-item-flag">${pubLangFlag(pub.title, pub.abstract)}</span>
-          ${pdfBtn}
-        </div>
-      </div>
-      <p class="pub-item-authors">${formatAuthors(pub.authors)}</p>
-      <p class="pub-item-source">${source}</p>
-      <button class="pub-abstract-toggle" type="button" aria-expanded="false" aria-controls="pub-${pub.id}-abs">
-        <i class="ph ph-caret-right pub-abstract-caret" aria-hidden="true"></i>
-        <span class="pub-abstract-toggle-label">${t('publications.read_abstract')}</span>
-      </button>
-      <div class="pub-abstract-panel" id="pub-${pub.id}-abs">
-        <div class="pub-abstract-inner">
-          <p class="pub-item-abstract">${pub.abstract}</p>
-          ${doi}
-        </div>
-      </div>
-    </li>
-  `;
-}
-
-/** Flat list (used by "Most recent" and "Featured" sorts). */
-function renderFlat(list, showYear) {
-  return `<ol class="pub-flat" role="list">${list.map(p => renderItem(p, { showYear })).join('')}</ol>`;
-}
-
-/** Grouped by year, descending, with a header and count per year. */
-function renderGrouped(list) {
-  const byYear = new Map();
-  list.forEach(p => {
-    if (!byYear.has(p.year)) byYear.set(p.year, []);
-    byYear.get(p.year).push(p);
-  });
-  const years = [...byYear.keys()].sort((a, b) => b - a);
-  return years.map(y => {
-    const items = byYear.get(y);
-    return `
-      <section class="pub-year-group">
-        <header class="pub-year-head">
-          <h2 class="pub-year-label">${y}</h2>
-          <span class="pub-year-count">${items.length}</span>
-        </header>
-        <ol class="pub-year-items" role="list">${items.map(p => renderItem(p, { showYear: false })).join('')}</ol>
-      </section>
-    `;
-  }).join('');
-}
-
-/** A featured publication, rendered as a clickable highlight card. */
-function renderFeaturedCard(pub) {
-  const typeClass = TYPE_BADGE[pub.type] || 'badge-gray';
-  const typeLabel = t(`publications.types.${pub.type}`);
-  const href = pub.pdf ? publicationUrl(pub) : '#';
-  return `
-    <a class="pub-feat-card glass" href="${href}">
-      <div class="pub-feat-meta">
-        <span class="badge ${typeClass}">${typeLabel}</span>
-        <span class="pub-feat-year">${pub.year}</span>
-      </div>
-      <h3 class="pub-feat-title">${pub.title}</h3>
-      <p class="pub-feat-journal">${pub.journal}</p>
-      <span class="pub-feat-cta"><i class="ph ph-file-pdf" aria-hidden="true"></i> ${t('publications.open_pdf')}</span>
-    </a>
-  `;
-}
-
-/** Static overview chips: total, year range, and counts by family of type. */
-function renderStats(pubs) {
-  const total = pubs.length;
-  if (!total) return '';
-  const years = pubs.map(p => Number(p.year)).filter(Boolean);
-  const min = Math.min(...years);
-  const max = Math.max(...years);
-  const journal = pubs.filter(p => p.type === 'journal' || p.type === 'article').length;
-  const conference = pubs.filter(p => p.type === 'conference').length;
-  const theses = pubs.filter(p => THESIS_TYPES.includes(p.type)).length;
-
-  const chip = (n, label) => `<span class="pub-stat"><strong>${n}</strong> ${label}</span>`;
-  return [
-    chip(total, t('publications.count').replace('{n}', '').trim()),
-    `<span class="pub-stat"><strong>${min}</strong>–<strong>${max}</strong></span>`,
-    chip(journal, t('publications.types.journal')),
-    chip(conference, t('publications.types.conference')),
-    chip(theses, t('publications.theses')),
-  ].join('');
-}
 
 export async function initPublications() {
   const listEl      = document.getElementById('pub-list');
@@ -201,8 +82,7 @@ export async function initPublications() {
 
   // Featured strip: explicit `featured` flags if present, otherwise the first
   // three of the manual order (which the editor curates at the top of the JSON).
-  const flagged = publications.filter(p => p.featured);
-  const featList = (flagged.length ? flagged : publications.slice(0, 3)).slice(0, 3);
+  const featList = featuredList(publications);
 
   // Populate year filter
   if (yearEl) {
@@ -364,7 +244,7 @@ export async function initPublications() {
 
   function renderFeatured(active) {
     if (!featuredEl) return;
-    featuredEl.classList.remove('is-pending');
+    if (keepPrerender) return;
     // Hide the showcase while the visitor is searching or filtering
     if (active || featList.length === 0) {
       featuredEl.hidden = true;
@@ -372,13 +252,7 @@ export async function initPublications() {
       return;
     }
     featuredEl.hidden = false;
-    featuredEl.innerHTML = `
-      <div class="pub-featured-head">
-        <i class="ph ph-star" aria-hidden="true"></i>
-        <span>${t('publications.featured_heading')}</span>
-      </div>
-      <div class="pub-featured-grid">${featList.map(renderFeaturedCard).join('')}</div>
-    `;
+    featuredEl.innerHTML = renderFeaturedStrip(featList, ctx);
   }
 
   function render() {
@@ -414,14 +288,17 @@ export async function initPublications() {
     }
     if (noResultsEl) noResultsEl.style.display = 'none';
 
-    if (currentSort === 'recent') {
+    if (keepPrerender) {
+      // The build drew this exact list; the next render, after any filter, draws.
+      keepPrerender = false;
+    } else if (currentSort === 'recent') {
       const ordered = filtered.slice().sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
-      listEl.innerHTML = renderFlat(ordered, true);
+      listEl.innerHTML = renderFlat(ordered, true, ctx);
     } else if (currentSort === 'featured') {
       // `filtered` preserves the manual JSON order
-      listEl.innerHTML = renderFlat(filtered, true);
+      listEl.innerHTML = renderFlat(filtered, true, ctx);
     } else {
-      listEl.innerHTML = renderGrouped(filtered);
+      listEl.innerHTML = renderGrouped(filtered, ctx);
     }
 
     // Entrance animation, with a capped stagger so long lists don't crawl
@@ -432,7 +309,7 @@ export async function initPublications() {
 
   // Re-render when the UI language changes so labels and the count localise
   document.addEventListener('langchange', () => {
-    if (statsEl) statsEl.innerHTML = renderStats(publications);
+    if (statsEl) statsEl.innerHTML = renderStats(publications, ctx);
     render();
   });
 
@@ -444,6 +321,12 @@ export async function initPublications() {
   yearEl?.addEventListener('change', e => { currentYear = e.target.value; render(); });
   sortEl?.addEventListener('change', e => { currentSort = e.target.value; render(); });
 
-  if (statsEl) statsEl.innerHTML = renderStats(publications);
+  /* The archive is already in the page, drawn at build time in English by
+     tools/build-publications.js with these same functions. For a reader in
+     English with the default sort it is exactly what render() would draw, so
+     it stays: replacing it would only make it fade out and in again. In any
+     other language it is drawn over, as the language change always was. */
+  let keepPrerender = listEl.dataset.prerendered === 'en' && (getLang() || 'en') === 'en' && currentSort === SORT_DEFAULT;
+  if (statsEl && !keepPrerender) statsEl.innerHTML = renderStats(publications, ctx);
   render();
 }

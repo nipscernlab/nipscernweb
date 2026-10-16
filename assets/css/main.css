@@ -7400,21 +7400,9 @@ html.fx-no-shimmer .hero-atom { animation: foil-halo-atom 5s ease-in-out infinit
 
 /* Space held for what arrives after the page has painted, so nothing the
    reader is looking at jumps. Measured with Lighthouse in October 2026, these
-   were the largest layout shifts on the site.
-
-   Publications: the stats and featured strips are filled by publications.js
-   once the JSON arrives, above the search plate, which used to drop 240 px on
-   a desktop and 620 px on a phone (CLS 0.54 and 0.38). The heights are the
-   ones the strips end with at each width where the grid changes; a few pixels
-   off is a shift too small to count. */
-.pub-stats:empty { min-height: 31px; }
-.pub-featured.is-pending { min-height: 242px; }
-@media (max-width: 899px) { .pub-featured.is-pending { min-height: 435px; } }
-@media (max-width: 767px) {
-  .pub-stats:empty { min-height: 67px; }
-  .pub-featured.is-pending { min-height: 471px; }
-}
-@media (max-width: 599px) { .pub-featured.is-pending { min-height: 620px; } }
+   were the largest layout shifts on the site. Publications had the worst of
+   them (CLS 0.54), its stats and featured strips filled in above the search
+   plate; they now come drawn in the HTML (tools/build-publications.js). */
 /* Pages whose content is written by JavaScript (a news post, the Noodle
    board) began with the footer in the middle of the screen and pushed it out
    when the content came in (CLS 0.54 to 0.74). With the main column at least
@@ -7482,3 +7470,9 @@ html.fx-no-foil .hero-title.has-glow,
 html.fx-no-foil .hero-title.has-glow > .hero-atom,
 html.fx-no-foil .hero-title.hero-glow { animation: none; }
 html.fx-no-foil .hero-title.hero-glow--high { opacity: 0; }
+
+/* A publication's title leads to its own page (publications/p/), where the
+   abstract, the PDF and the citation data for scholarly search engines are. */
+.pub-item-title a { color: inherit; text-decoration: none; }
+.pub-item-title a:hover,
+.pub-item-title a:focus-visible { text-decoration: underline; text-underline-offset: 3px; }

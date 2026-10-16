@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx, o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>Online energy reconstruction for calorimeters under high pile-up conditions using deconvolutional techniques | NIPS-CERN</title>
+  <meta name="description" content="High-energy calorimeters operating at high data acquisition rates may suffer from signal superposition (pile-up) in their electronic readout. This issue arises when the time interval between two…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/2019-online-energy-reconstruction">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/2019-online-energy-reconstruction">
+  <meta property="og:title" content="Online energy reconstruction for calorimeters under high pile-up conditions using deconvolutional techniques">
+  <meta property="og:description" content="High-energy calorimeters operating at high data acquisition rates may suffer from signal superposition (pile-up) in their electronic readout. This issue arises when the time interval between two…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="Online energy reconstruction for calorimeters under high pile-up conditions using deconvolutional techniques">
+  <meta name="citation_author" content="João Paulo Bittencourt da Silveira Duarte">
+  <meta name="citation_author" content="Luciano Manhães de Andrade Filho">
+  <meta name="citation_author" content="Eduardo Furtado de Simas Filho">
+  <meta name="citation_author" content="Paulo C. M. A. Farias">
+  <meta name="citation_author" content="José Manoel de Seixas">
+  <meta name="citation_publication_date" content="2019">
+  <meta name="citation_journal_title" content="Journal of Instrumentation">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/jinst-2019-online-energy-reconstruction.pdf">
+  <meta name="citation_language" content="en">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/2019-online-energy-reconstruction">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Online energy reconstruction for calorimeters under high pile-up conditions using deconvolutional techniques",
+    "name": "Online energy reconstruction for calorimeters under high pile-up conditions using deconvolutional techniques",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "João Paulo Bittencourt da Silveira Duarte"
+      },
+      {
+        "@type": "Person",
+        "name": "Luciano Manhães de Andrade Filho"
+      },
+      {
+        "@type": "Person",
+        "name": "Eduardo Furtado de Simas Filho"
+      },
+      {
+        "@type": "Person",
+        "name": "Paulo C. M. A. Farias"
+      },
+      {
+        "@type": "Person",
+        "name": "José Manoel de Seixas"
+      }
+    ],
+    "datePublished": "2019",
+    "inLanguage": "en",
+    "abstract": "High-energy calorimeters operating at high data acquisition rates may suffer from signal superposition (pile-up) in their electronic readout. This issue arises when the time interval between two consecutive incoming physics signals is shorter than the front-end electronics latency. Signal pile-up can significantly degrade online energy estimation, and some palliative approaches treat pile-up as an additional noise source to preserve the well-established Optimal Filter theory as the baseline for signal estimation. To enable actual online compensation for pile-up effects, the method proposed in this paper models the front-end electronics as a linear transmission channel whose transfer function can be equalized (deconvolved). For experiments in which the acquisition rate is synchronized with the collision clock, the equalizer output allows direct energy estimation per bunch-crossing (BC). Optimal approximations for the equalizer design are proposed using both FIR (Finite Impulse Response) filters and an iterative method. The latter provides improved reconstruction performance (i.e., smaller errors), but at the cost of higher computational complexity and additional data-flow circuitry for online implementation. Toy simulation data, based on typical calorimeter front-end responses, are used to evaluate the performance of the proposed methods.",
+    "url": "https://www.nipscern.com/publications/p/2019-online-energy-reconstruction",
+    "isPartOf": {
+      "@type": "Periodical",
+      "name": "Journal of Instrumentation"
+    },
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/jinst-2019-online-energy-reconstruction.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6b109fbd8f">
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6b109fbd8f">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Journal Article · 2019</span>
+          </div>
+          <h1 class="display-md" id="pub-title">Online energy reconstruction for calorimeters under high pile-up conditions using deconvolutional techniques</h1>
+          <p class="pubp-meta">João Paulo Bittencourt da Silveira Duarte, Luciano Manhães de Andrade Filho, Eduardo Furtado de Simas Filho, Paulo C. M. A. Farias, José Manoel de Seixas</p>
+          <p class="pubp-meta"><strong>Journal of Instrumentation</strong></p>
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=pub-2019-Online-energy-reconstruction"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body">
+      <h2>Abstract</h2>
+      <p>High-energy calorimeters operating at high data acquisition rates may suffer from signal superposition (pile-up) in their electronic readout. This issue arises when the time interval between two consecutive incoming physics signals is shorter than the front-end electronics latency. Signal pile-up can significantly degrade online energy estimation, and some palliative approaches treat pile-up as an additional noise source to preserve the well-established Optimal Filter theory as the baseline for signal estimation. To enable actual online compensation for pile-up effects, the method proposed in this paper models the front-end electronics as a linear transmission channel whose transfer function can be equalized (deconvolved). For experiments in which the acquisition rate is synchronized with the collision clock, the equalizer output allows direct energy estimation per bunch-crossing (BC). Optimal approximations for the equalizer design are proposed using both FIR (Finite Impulse Response) filters and an iterative method. The latter provides improved reconstruction performance (i.e., smaller errors), but at the cost of higher computational complexity and additional data-flow circuitry for online implementation. Toy simulation data, based on typical calorimeter front-end responses, are used to evaluate the performance of the proposed methods.</p>
+      <div class="pubp-tags"><span class="badge badge-gray"></span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6b109fbd8f"></script>
+  <script src="../../assets/js/analytics.min.js?v=6b109fbd8f" defer></script>
+</body>
+</html>
