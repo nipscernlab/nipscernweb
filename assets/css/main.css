@@ -3306,6 +3306,50 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
     foil-halo-atom 5s ease-in-out infinite;
 }
 
+/* ------------------------------------------------------------------
+   The hero on one axis, and in one proportion
+   ------------------------------------------------------------------
+   The atom is the centre of the page. NIPS stands to its left, set flush
+   against it, and CERN to its right: three columns, the outer two of equal
+   share, so the atom lands on the axis whatever the two words measure. As
+   centred text the lockup was balanced on its ends instead, and because CERN
+   is the wider word the atom sat 28 px left of the axis at 1920.
+
+   The space on each side of the atom is the same, 0.15 of the letter, and it
+   is the same space the phone layout leaves above and below it. The 0.04em of
+   padding after each word gives back the letter spacing the browser also
+   applies after the last letter: without it the box of a word ends before its
+   ink, and the gap to the S came out 5 px narrower than the gap to the C.
+   The atom is nudged up 0.013em so that its centre is the middle of the
+   capitals, measured on the rendered ink, not the middle of the line box.
+
+   Everything under the title takes its width from the title (--hero-t is its
+   font size). On a wide screen the widths fall in one ratio, 0.83: the
+   subtitle is 0.83 of the title, the pair of buttons 0.83 of the subtitle,
+   the two buttons equal. On a phone the stack is one column as wide as its
+   widest line, CERN.
+   Measured with the scratch tool in the commit message: atom on the axis to
+   within 0.5 px, gaps equal to within 1 px, at 820, 1536 and 1920. */
+.hero-content { --hero-t: clamp(4rem, 12vw, 9rem); }
+.hero-title {
+  font-size: var(--hero-t);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.hero-word { padding-right: 0.04em; }
+.hero-word:first-child { justify-self: end; }
+.hero-word:last-child { justify-self: start; }
+.hero-title > .hero-atom { margin: 0 0.07em; top: -0.013em; }
+.hero-content > .hero-subtitle { max-width: calc(4.42 * var(--hero-t)); }
+.hero-content > .hero-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(calc((3.67 * var(--hero-t) - var(--sp-4)) / 2), 1fr));
+  width: fit-content;
+  margin-inline: auto;
+}
+.hero-content > .hero-actions .btn { justify-content: center; }
+
 @media (prefers-reduced-motion: reduce) {
   .hero-title {
     animation: none;
@@ -5989,8 +6033,16 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
      because the hero is centred, so nothing in it aligns to a left edge. */
   .hero-content { padding-left: 12px; padding-right: 12px; }
   .hero-title { font-size: clamp(5rem, 26vw, 8rem); line-height: 0.92; margin-bottom: var(--sp-5); }
-  .hero-title .hero-atom { display: block; width: 0.42em; height: 0.42em; margin: 0.02em auto; top: 0; }
-  .hero-subtitle { font-size: 0.75rem; line-height: 1.5; max-width: 34ch; margin-bottom: var(--sp-6); }
+  .hero-content { --hero-t: clamp(5rem, 26vw, 8rem); }
+  /* Stacked: NIPS, the atom, CERN, each on the axis. The atom's margins are
+     uneven on purpose: the line box of NIPS leaves more room under the
+     capitals than CERN's leaves over them, and these even out the ink, 0.15
+     of the letter above the atom and below it, as on the wide layout. */
+  .hero-title { grid-template-columns: 1fr; justify-items: center; }
+  .hero-word:first-child, .hero-word:last-child { justify-self: center; }
+  .hero-title .hero-atom { display: block; width: 0.42em; height: 0.42em; margin: 0.016em auto 0.0345em; top: 0; }
+  /* One column, as wide as CERN (2.5 of the letter). */
+  .hero-content > .hero-subtitle { font-size: 0.75rem; line-height: 1.5; max-width: calc(2.5 * var(--hero-t)); margin-bottom: var(--sp-6); }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .section { padding-top: var(--sp-12); padding-bottom: var(--sp-12); }
   .cgv-canvas-wrapper { height: 400px; }
@@ -6004,7 +6056,7 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   .ecosystem-grid { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; }
   .stats-card { grid-template-columns: 1fr 1fr; row-gap: var(--sp-6); }
-  .hero-actions { flex-direction: column; }
+  .hero-content > .hero-actions { grid-template-columns: calc(2.5 * var(--hero-t)); }
   .pub-controls { flex-direction: column; }
   /* In column layout the flex-basis (280px) would become a HEIGHT, making
      the author filter a tall empty box. Reset it so each control is sized

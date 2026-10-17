@@ -49,7 +49,7 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="assets/css/icons/index.css?v=3234c0874b" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="assets/css/icons/index.css?v=3234c0874b"></noscript>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="assets/css/icons/index.css?v=f97bf3e082" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="assets/css/icons/index.css?v=f97bf3e082"></noscript>
   <link rel="preconnect" href="https://gc.zgo.at">
   <link rel="preconnect" href="https://cdn.nipscern.com">
 
@@ -139,6 +139,10 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
 @media(prefers-reduced-motion:reduce){.hero-title{animation:none;background:none;-webkit-text-fill-color:var(--text-primary);color:var(--text-primary)}.hero-atom{background:var(--text-primary)}}
 .hero-subtitle{font-size:var(--text-lg);color:var(--text-secondary);line-height:1.7;max-width:640px;margin:0 auto 40px}
 .hero-actions{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+/* O eixo e a proporção do herói: cópia do bloco "The hero on one axis" de main.css (e do trecho dele no @media de 640px abaixo). Mude os dois juntos, senão o título pula de lugar quando main.css chega. */
+.hero-content{--hero-t:clamp(4rem,12vw,9rem)}.hero-title{font-size:var(--hero-t);display:grid;grid-template-columns:1fr auto 1fr;align-items:center}.hero-word{padding-right:.04em}.hero-word:first-child{justify-self:end}.hero-word:last-child{justify-self:start}.hero-title>.hero-atom{margin:0 .07em;top:-.013em}.hero-content>.hero-subtitle{max-width:calc(4.42*var(--hero-t))}.hero-content>.hero-actions{display:grid;grid-template-columns:repeat(2,minmax(calc((3.67*var(--hero-t) - 16px)/2),1fr));width:fit-content;margin-inline:auto}.hero-content>.hero-actions .btn{justify-content:center}
+/* A caixa da seta de rolagem (42 px + 24 de margem), de main.css. Sem ela a cópia desenhava o herói 40 px mais baixo, e como ele é centrado na vertical o bloco inteiro subia 20 px quando main.css chegava. */
+.scroll-hint-wrap{line-height:0}.scroll-hint{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;margin-top:24px;border-radius:9999px}
 .hero-viewcount{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:20px;font-size:12px;font-family:var(--font-mono);color:var(--text-muted);letter-spacing:.02em}
 .hero-viewcount i{font-size:13px;opacity:.7}.hero-viewcount #view-count{color:var(--text-secondary);font-weight:500}
 @media(max-width:640px){
@@ -147,16 +151,19 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
      main.css — the stylesheet loads after this inline copy and wins the
      cascade, so a value that only lives here never takes effect. */
   .hero-title{font-size:clamp(5rem,26vw,8rem);line-height:.92;margin-bottom:20px}
-  .hero-title .hero-atom{display:block;width:.42em;height:.42em;margin:.02em auto;top:0}
-  .hero-subtitle{font-size:.75rem;line-height:1.5;max-width:34ch;margin-bottom:24px}
-  .hero-actions{flex-direction:column}
+  .hero-content{--hero-t:clamp(5rem,26vw,8rem)}
+  .hero-title{grid-template-columns:1fr;justify-items:center}
+  .hero-word:first-child,.hero-word:last-child{justify-self:center}
+  .hero-title .hero-atom{display:block;width:.42em;height:.42em;margin:.016em auto .0345em;top:0}
+  .hero-content>.hero-subtitle{font-size:.75rem;line-height:1.5;max-width:calc(2.5*var(--hero-t));margin-bottom:24px}
+  .hero-content>.hero-actions{grid-template-columns:calc(2.5*var(--hero-t))}
   .hero-actions .btn{padding:11px 22px;font-size:var(--text-sm)}
 }
   </style>
 
   <!-- CSS (async — non-render-blocking) -->
-  <link rel="preload" href="assets/css/main.min.css?v=3234c0874b" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=3234c0874b"></noscript>
+  <link rel="preload" href="assets/css/main.min.css?v=f97bf3e082" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/css/main.min.css?v=f97bf3e082"></noscript>
 
   <!-- Google Fonts (async) -->
 
@@ -218,7 +225,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
         <canvas id="hero-stars" aria-hidden="true"></canvas>
       </div>
       <div class="hero-content">
-        <h1 class="hero-title" id="hero-title">NIPS<span class="hero-atom" aria-hidden="true"></span>CERN</h1>
+        <h1 class="hero-title" id="hero-title"><span class="hero-word">NIPS</span><span class="hero-atom" aria-hidden="true"></span><span class="hero-word">CERN</span></h1>
         <script>/* O halo do título (ver initHeroHold em main.js), montado aqui, logo depois do título e antes do primeiro desenho. Montado depois, pelo main.js, ele era desenhado já na fonte final e maior que o título, que no 4G lento ainda estava na fonte reserva, e o PageSpeed o tomava pelo maior conteúdo da página: LCP de 5,1 s no celular em 16/10/2026. */(function(){var t=document.getElementById('hero-title');if(!t||t.parentNode.className==='hero-title-wrap')return;var w=document.createElement('div');w.className='hero-title-wrap';t.parentNode.insertBefore(w,t);['low','high'].forEach(function(e){var g=document.createElement('div');g.className='hero-title hero-glow hero-glow--'+e;g.setAttribute('aria-hidden','true');g.innerHTML=t.innerHTML;w.appendChild(g)});w.appendChild(t);t.classList.add('has-glow')})();</script>
         <p class="hero-subtitle" data-i18n="home.hero.subtitle">
           High energy physics, scientific computing, 3D visualisation, hardware systems and artificial intelligence. Two laboratories: NIPS at UFJF, in Brazil, and Route Salam, at CERN, in Switzerland.
@@ -460,8 +467,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
            Video by Nicola Narracci, from Pexels. Credited in credits.html. -->
       <div class="cube-rail" aria-hidden="true">
         <video muted loop playsinline preload="none" width="720" height="1280"
-               poster="assets/images/about-light-waves-poster.webp?v=3234c0874b"
-               data-src="assets/videos/about-light-waves-loop.mp4?v=3234c0874b"></video>
+               poster="assets/images/about-light-waves-poster.webp?v=f97bf3e082"
+               data-src="assets/videos/about-light-waves-loop.mp4?v=f97bf3e082"></video>
       </div>
 
       <div class="container">
@@ -629,8 +636,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/sapho" class="pc-card pc-card--dark" style="--pc:var(--accent-sapho)">
             <div class="pc-media pc-media--sapho" aria-hidden="true">
               <video data-media="sapho-loop"
-                     data-src="assets/videos/sapho-circuit-loop.mp4?v=3234c0874b"
-                     poster="assets/images/projects/sapho-circuit-poster.webp?v=3234c0874b"
+                     data-src="assets/videos/sapho-circuit-loop.mp4?v=f97bf3e082"
+                     poster="assets/images/projects/sapho-circuit-poster.webp?v=f97bf3e082"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -685,9 +692,9 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    be indistinguishable — for 435 KB less. The H.264 is what
                    every browser without an AV1 decoder gets, unchanged. -->
               <video data-media="aurora-loop"
-                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=3234c0874b"
-                     data-src="assets/videos/aurora-borealis-loop.mp4?v=3234c0874b"
-                     poster="assets/images/projects/aurora-borealis-poster.webp?v=3234c0874b"
+                     data-av1="assets/videos/aurora-borealis-loop-av1.mp4?v=f97bf3e082"
+                     data-src="assets/videos/aurora-borealis-loop.mp4?v=f97bf3e082"
+                     poster="assets/images/projects/aurora-borealis-poster.webp?v=f97bf3e082"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -745,8 +752,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
                    the old one. v2 is already live and cached, hence v3. -->
               <video data-media="cgv-loop"
                      data-src="https://cdn.nipscern.com/videos/cgv-geometry-loop-v6.mp4"
-                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=3234c0874b"
-                     poster="assets/images/projects/cgv-geometry-poster.webp?v=3234c0874b"
+                     data-fallback="assets/videos/cgv-geometry-loop.mp4?v=f97bf3e082"
+                     poster="assets/images/projects/cgv-geometry-poster.webp?v=f97bf3e082"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -779,8 +786,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
           <a href="projects/ai" class="pc-card" style="--pc:var(--accent-ai)">
             <div class="pc-media pc-media--ai" aria-hidden="true">
               <video data-media="ai-loop"
-                     data-src="assets/videos/ai-hand-loop.mp4?v=3234c0874b"
-                     poster="assets/images/projects/ai-hand-poster.webp?v=3234c0874b"
+                     data-src="assets/videos/ai-hand-loop.mp4?v=f97bf3e082"
+                     poster="assets/images/projects/ai-hand-poster.webp?v=f97bf3e082"
                      muted loop playsinline preload="none"></video>
             </div>
             <div class="pc-top">
@@ -835,7 +842,7 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        when the 30 KB catalogue lands; if that never arrives it falls back to the
        random field this used to be, and says so in the console. -->
   <script type="module">
-    import { sky } from "./assets/js/sky.min.js?v=3234c0874b";
+    import { sky } from "./assets/js/sky.min.js?v=f97bf3e082";
     var c = document.getElementById("hero-stars");
     if (c) sky(c);
   </script>
@@ -964,8 +971,8 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
        114 KB of parsing should not happen for them either. Everything else is
        unchanged — it still arrives well after first paint, because home.js is a
        module and modules run after the document is parsed. -->
-  <script type="module" src="assets/js/main.min.js?v=3234c0874b"></script>
-  <script type="module" src="assets/js/home.min.js?v=3234c0874b"></script>
+  <script type="module" src="assets/js/main.min.js?v=f97bf3e082"></script>
+  <script type="module" src="assets/js/home.min.js?v=f97bf3e082"></script>
 
 <script>
   window.addEventListener('load', function () {
@@ -1013,6 +1020,6 @@ h1,h2,h3,h4,h5,h6{line-height:1.2;font-weight:600;color:var(--text-primary);lett
       .catch(function () {});
   });
   </script>
-  <script src="assets/js/analytics.min.js?v=3234c0874b" defer></script>
+  <script src="assets/js/analytics.min.js?v=f97bf3e082" defer></script>
 </body>
 </html>
