@@ -76,6 +76,11 @@ export function renderItem(pub, { showYear } = {}, ctx) {
   const doi = pub.doi
     ? `<a href="https://doi.org/${pub.doi}" target="_blank" rel="noopener" class="pub-item-doi">${pub.doi}</a>`
     : '';
+  // The work's own page where it was published (proceedings, publisher), for
+  // the papers with no DOI to point at.
+  const official = pub.url
+    ? `<a href="${pub.url}" target="_blank" rel="noopener" class="pub-item-doi">${ctx.t('publications.official_page')}</a>`
+    : '';
   const pdfViewerUrl = pub.pdf ? ctx.pdfUrl(pub) : '';
   const pdfBtn = pdfViewerUrl
     ? `<a href="${pdfViewerUrl}" class="pub-open glass-btn glass--flat" aria-label="${ctx.t('publications.open_pdf')}: ${pub.title}"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>${ctx.t('publications.open_pdf')}</span></a>`
@@ -103,6 +108,7 @@ export function renderItem(pub, { showYear } = {}, ctx) {
         <div class="pub-abstract-inner">
           <p class="pub-item-abstract">${ctx.lazyAbstracts ? '' : pub.abstract}</p>
           ${doi}
+          ${official}
         </div>
       </div>
     </li>

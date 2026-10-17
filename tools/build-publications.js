@@ -124,6 +124,8 @@ function trocaEntre(texto, inicio, fim, novo, arq) {
       ['citation_abstract_html_url', url],
     ].filter(([, v]) => v);
 
+    // The same work elsewhere: its DOI and its official page, when it has them.
+    const mesmos = [p.doi ? 'https://doi.org/' + p.doi : null, p.url || null].filter(Boolean);
     const ld = {
       '@context': 'https://schema.org',
       '@type': tese ? 'Thesis' : 'ScholarlyArticle',
@@ -134,7 +136,7 @@ function trocaEntre(texto, inicio, fim, novo, arq) {
       inLanguage: lang,
       abstract: desc || undefined,
       url,
-      sameAs: p.doi ? 'https://doi.org/' + p.doi : undefined,
+      sameAs: mesmos.length > 1 ? mesmos : mesmos[0],
       isPartOf: venue && !tese ? { '@type': p.type === 'conference' ? 'Event' : 'Periodical', name: venue } : undefined,
       sourceOrganization: tese && venue ? { '@type': 'Organization', name: venue } : undefined,
       encoding: p.pdf ? { '@type': 'MediaObject', contentUrl: p.pdf, encodingFormat: 'application/pdf' } : undefined,
@@ -205,7 +207,8 @@ ${JSON.stringify(ld, null, 2).split('\n').map((l) => '  ' + l).join('\n')}
           ${venue ? `<p class="pubp-meta"><strong>${esc(venue)}</strong></p>` : ''}
           <div class="pubp-actions">
             ${p.pdf ? `<a class="btn btn-primary glass-btn" href="${ctx.pdfUrl(p)}"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>${esc(t('publications.open_pdf'))}</span></a>` : ''}
-            ${p.doi ? `<a class="btn btn-ghost glass-btn" href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener"><i class="ph ph-link" aria-hidden="true"></i><span>DOI ${esc(p.doi)}</span></a>` : ''}
+            ${p.doi ? `<a class="btn btn-ghost glass-btn" href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener"><i class="ph ph-link" aria-hidden="true"></i><span>DOI ${esc(p.doi)}</span></a>` : ''}${p.url ? `
+            <a class="btn btn-ghost glass-btn" href="${esc(p.url)}" target="_blank" rel="noopener"><i class="ph ph-arrow-square-out" aria-hidden="true"></i><span>${esc(t('publications.official_page'))}</span></a>` : ''}
             <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>${esc(t('publications.title'))}</span></a>
           </div>
         </div>

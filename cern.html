@@ -29,8 +29,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="assets/css/icons/cern.css?v=900ca579e9" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="assets/css/icons/cern.css?v=900ca579e9"></noscript>
-  <link rel="stylesheet" href="assets/css/main.min.css?v=900ca579e9">
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="assets/css/icons/cern.css?v=3234c0874b" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="assets/css/icons/cern.css?v=3234c0874b"></noscript>
+  <link rel="stylesheet" href="assets/css/main.min.css?v=3234c0874b">
 
   <style>
     /* LHC Status banner — a pane of glass pulled up over the control-room
@@ -365,8 +365,19 @@
                image already covers, but the moment the drift pushed it down
                the photograph's own straight top edge slid into the rounded
                opening. Half the slack above, half below, and the drift never
-               runs out of picture in either direction. -->
-          <img src="assets/images/cern/atlas-daq.webp" alt="" loading="lazy" decoding="async" data-drift="6" style="height:118%;top:-9%">
+               runs out of picture in either direction.
+               Not lazy: on a phone this band is inside the first screen and
+               the photograph is the largest thing on it, and a lazy image is
+               only asked for after layout has seen it on screen. That wait was
+               most of the 8 s Lighthouse gave this page's largest paint. The
+               sizes are the width the cover actually draws, 18% wider than the
+               frame for the drift: 106vw up to the 1240 cap. -->
+          <img src="assets/images/cern/atlas-daq.webp"
+               srcset="assets/images/cern/atlas-daq-800w.webp 800w,
+                       assets/images/cern/atlas-daq-1600w.webp 1600w,
+                       assets/images/cern/atlas-daq.webp 2560w"
+               sizes="(min-width: 1300px) 1240px, 106vw"
+               alt="" fetchpriority="high" decoding="async" data-drift="6" style="height:118%;top:-9%">
         </figure>
         <div class="lhc-status-banner glass fade-up" id="lhc-status-banner" aria-label="LHC operational status">
           <div style="display:flex;align-items:center;gap:var(--sp-3)">
@@ -1105,8 +1116,8 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="assets/js/main.min.js?v=900ca579e9"></script>
-  <script type="module" src="assets/js/cern.min.js?v=900ca579e9"></script>
+  <script type="module" src="assets/js/main.min.js?v=3234c0874b"></script>
+  <script type="module" src="assets/js/cern.min.js?v=3234c0874b"></script>
 
   <!--
     LHC Status widget — schedule-driven, no external API (a static site can't
@@ -1211,6 +1222,6 @@
     })();
   </script>
 
-  <script src="assets/js/analytics.min.js?v=900ca579e9" defer></script>
+  <script src="assets/js/analytics.min.js?v=3234c0874b" defer></script>
 </body>
 </html>

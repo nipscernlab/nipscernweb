@@ -5861,6 +5861,26 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
 .stagger-children.visible > *:nth-child(8) { transition-delay: 420ms; }
 .stagger-children.visible > *:nth-child(9) { transition-delay: 480ms; }
 
+/* The header of a page is not an entrance. It is on screen from the first
+   frame, and at opacity 0 its heading and lead paragraph waited for main.js to
+   load and for the observer to mark them, which on a slow phone is seconds of
+   a dark band where the page's name should be. Lighthouse took that wait as
+   the page's load: on About the largest paint was the lead paragraph, at
+   4.5 s. Here the text is drawn at once and keeps the rise, which moves it
+   without hiding it, and runs from the stylesheet with no script involved.
+   main.js still marks these .visible; it changes nothing now. */
+.page-hero .fade-up,
+.page-hero .fade-in {
+  opacity: 1;
+  transition: none;
+}
+.page-hero .fade-up {
+  transform: none;
+  animation: hero-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.fx-no-motion .page-hero .fade-up { animation: none; }
+@keyframes hero-rise { from { transform: translateY(16px); } }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
