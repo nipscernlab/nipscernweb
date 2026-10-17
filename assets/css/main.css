@@ -1438,9 +1438,14 @@ a:hover > .frame > [data-drift],
   gap: var(--sp-4);
   margin-top: var(--sp-8);
 }
+/* A column: photograph on top, plate filling the rest. The row stretches every
+   tile to the tallest one, and a button centres its content in the height it
+   is given, so as a block the photograph of a one-line name sat lower than
+   its neighbours'. */
 .tm-card {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
   padding: 0;
   text-align: left;
   border-radius: var(--r-xl);
@@ -1449,9 +1454,12 @@ a:hover > .frame > [data-drift],
   background: var(--bg-card);
   cursor: pointer;
   transition: transform var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
-  /* On the compositor from the first frame, so the tilt does not begin with a
-     layer promotion. This alone did not keep the corners: see .tm-photo. */
-  transform: translateZ(0);
+  /* No layer of its own at rest. Every tile used to sit on the compositor from
+     the first frame, with a mask layer over its photograph: two textures per
+     person, more than eighty on the wall, held in video memory the whole time
+     for a tilt that only one tile at a time is ever doing. The tile under the
+     pointer is promoted when its transform starts, which costs one tile's
+     raster, once. */
 }
 /* The rounded corners live here, not on the card's overflow clip.
 
@@ -1469,14 +1477,16 @@ a:hover > .frame > [data-drift],
    box's own rounded corners baked in and multiplied over the photograph on
    every frame whatever the card's transform is doing, so nothing square can
    reach a corner. The radius is the card's less its one-pixel border, which is
-   the curve the card's own clip draws. */
+   the curve the card's own clip draws. Only the top two: the name sits under
+   the photograph, on the card's own ground, and that ground is painted with
+   the card's radius. */
 .tm-photo {
   display: block;
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   background: var(--bg-elevated);
-  border-radius: calc(var(--r-xl) - 1px);
+  border-radius: calc(var(--r-xl) - 1px) calc(var(--r-xl) - 1px) 0 0;
   -webkit-mask-image: linear-gradient(#000, #000);
   mask-image: linear-gradient(#000, #000);
 }
@@ -1524,24 +1534,23 @@ a:hover > .frame > [data-drift],
 .tm-card:focus-visible,
 .tm-card.is-open { transform: translateY(-3px); }
 
-/* The plate. A real pane: it blurs the photograph behind it, and the radius
-   steps down from the tile's own so the two read as one construction.
+/* The plate: the name and the standing, under the photograph, not on it.
 
-   The ink is the one the captions on the CERN page use, and for the reason
-   written there: glass blurs what is behind it, it does not darken it, and
-   over a photograph taken outdoors at noon a light wash left grey type on a
-   pale ground. At 0.38 this plate was readable on the dark portraits and not
-   on the bright ones. Near-opaque ink, so every plate on the wall reads the
-   same whatever it is lying on, and the same as every caption on the site. */
+   It used to be a pane of glass laid over the bottom of the portrait. Over a
+   4:5 crop that pane took the lower third, which is where the chin and the
+   mouth are in most of these pictures, and it hid them. And every pane was a
+   live backdrop blur: forty of them on one wall, redone for each tile on
+   screen on every frame of a scroll. Under the photograph the text has a
+   ground of its own, needs no ink to be read, and costs nothing to draw.
+   No background here: the ground is the card's, painted with its radius, so a
+   tile leaning in the tilt has no square corner of the plate to show. */
 .tm-plate {
-  position: absolute;
-  left: var(--sp-2);
-  right: var(--sp-2);
-  bottom: var(--sp-2);
-  display: block;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: var(--sp-3) 36px var(--sp-3) var(--sp-4);
-  border-radius: calc(var(--r-xl) - 6px);
-  --glass-tint: rgba(5, 8, 15, 0.82);
 }
 .tm-name {
   display: block;
@@ -3532,7 +3541,9 @@ body.has-top-banner .hero { padding-top: calc(var(--nav-h) + var(--top-banner-h,
   border: 1px solid var(--border-subtle);
   background: var(--bg-0);
 }
-.ln-media::before { content: ''; display: block; padding-top: 62.5%; }
+/* 16:9, the ratio of the news cards: covers are framed for those cards, and at
+   16:10 this one trimmed the sides of every cover, people at the edges too. */
+.ln-media::before { content: ''; display: block; padding-top: 56.25%; }
 /* The same hover zoom the news cards carry, written the same way.
    This cover used to drift with the scroll, which meant an inline transform was
    being rewritten on it every frame and no `transform` rule here could win. The

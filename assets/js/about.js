@@ -31,11 +31,11 @@
  * is the only literal part, and it turns over when the record is open.
  */
 
-import { t, getLang } from './i18n.js?v=e699da6931';
+import { t, getLang } from './i18n.js?v=900ca579e9';
 /* Never scrollIntoView({behavior:'smooth'}) on this site: Lenis is driving the
    scroll position from its own ticker and the two animations fight, which
    reads as no scroll at all. scrollToEl asks the library. */
-import { scrollToEl } from './smooth-scroll.js?v=e699da6931';
+import { scrollToEl } from './smooth-scroll.js?v=900ca579e9';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -201,7 +201,7 @@ function cardHTML(m) {
       ? '<img src="' + esc(ROOT + m.photo) + '" alt="" loading="lazy" decoding="async">'
       : PLACEHOLDER)
     + '</span>'
-    + '<span class="tm-plate glass">'
+    + '<span class="tm-plate">'
     + '<span class="tm-name">' + esc(m.name) + '</span>'
     + roleLine(m, 'span')
     + '<i class="ph ph-caret-down tm-caret" aria-hidden="true"></i>'
@@ -428,12 +428,12 @@ function mountNetwork(net) {
   const start = () => {
     if (started) return;
     started = true;
-    import('./network.js?v=e699da6931').then(({ initNetwork }) =>
+    import('./network.js?v=900ca579e9').then(({ initNetwork }) =>
       initNetwork(canvas, { tip: document.getElementById('net-tip'), data: net })
     ).then((api) => {
       if (!api) { stage.classList.add('is-flat'); return; }
       stage.classList.add('is-live');
-      import('./motion.js?v=e699da6931').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
+      import('./motion.js?v=900ca579e9').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
     }).catch(() => stage.classList.add('is-flat'));
   };
 

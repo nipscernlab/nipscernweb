@@ -171,6 +171,10 @@ function trocaAtributo(html, id, attr, valor) {
       html = html.replace('<div id="post-loading" style="', '<div id="post-loading" style="display:none;');
       if (d.classeBody.trim()) html = html.replace('<body>', `<body class="${esc(d.classeBody.trim())}">`);
       html = html.replace('<!-- The canonical of a post is its static page', '<!-- Gerada por tools/build-news.js a partir de news/post.html e de data/. Não edite à mão. -->\n  <!-- The canonical of a post is its static page');
+      // O navegador devolve endereços absolutos do servidor local (as bandeiras de
+      // idioma, por exemplo). No ar eles não existem: viram caminhos do site.
+      html = html.split(`http://127.0.0.1:${PORTA}/`).join('/');
+      if (/https?:\/\/(127\.0\.0\.1|localhost)[:/]/.test(html)) throw new Error(`${slug}: sobrou endereço do servidor local na página`);
 
       fs.writeFileSync(path.join(ROOT, 'news', slug + '.html'), html);
       console.log(`  news/${slug}.html`);
