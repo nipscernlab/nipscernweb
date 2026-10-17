@@ -102,7 +102,11 @@ Zaraz, Analytics, DNS e Workers Routes, além das de e-mail do romanova).
   vindos sobretudo da Coreia do Sul, Austrália, Índia, Estados Unidos e
   Alemanha, e o resto robôs de busca (o ClaudeBot e o Googlebot lendo
   `robots.txt` e `sitemap.xml`). Como o destino não existe, nada fica exposto.
-  Consertar ou remover espera a decisão do Chrysthofer.
+  O repositório tinha ido para a conta pessoal do Chrysthofer
+  (`chrysthofer.github.io/aleksandrias-bibliotek/`) e o Worker ficou
+  apontando para o endereço antigo. **Removido em 17/10, a pedido dele:** o
+  domínio `alexandria.nipscern.com`, o Worker `alexandria` e o registro DNS,
+  que saiu com o domínio.
 
 ---
 
@@ -455,8 +459,9 @@ imagens são WebP e o pôster do calorímetro agora tem `srcset` em quatro largu
 `includeSubDomains` vale para **todo** subdomínio e o navegador lembra por um
 ano. Ficou desligado até 17/10/2026 porque o token de então não lia o DNS e
 não dava para saber se algum subdomínio ainda respondia em HTTP puro. Lido o
-DNS em 17/10: os seis nomes que servem web (o apex, www, cdn, sapho, alexandria
-e kristoffer) passam pelo proxy e respondem em HTTPS, e foi ligado.
+DNS em 17/10: os seis nomes que serviam web (o apex, www, cdn, sapho, alexandria
+e kristoffer) passavam pelo proxy e respondiam em HTTPS, e foi ligado. O
+`alexandria` saiu no mesmo dia; restam cinco.
 
 **Antes de criar um subdomínio novo**, garanta que ele responda em HTTPS (com
 o proxy do Cloudflare ligado, isso é automático): os navegadores que já
