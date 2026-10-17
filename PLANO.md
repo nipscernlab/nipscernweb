@@ -133,11 +133,9 @@ com o bug de volta não prova nada.
   e nunca rodou, saiu do repositório (fica no histórico do git). A purga
   segue manual, pela API com o token CLAUDE-ACCESS ou pelo painel, e por isso
   o HTML continua com 5 min na borda.
-- [ ] **HSTS `includeSubDomains`** — conferido em 17/10: os seis nomes que
-      servem web (o apex, www, cdn, sapho, alexandria e kristoffer) passam
-      pelo proxy do Cloudflare e respondem em HTTPS, então é seguro ligar.
-      Espera o sim do Chrysthofer. SSL/TLS → Edge Certificates.
-      **Deixe *Preload* desmarcado** — sair da lista leva meses.
+- [x] **HSTS `includeSubDomains`** — ligado em 17/10/2026, depois de
+      conferir que os seis nomes que servem web respondem em HTTPS. Um
+      subdomínio novo precisa nascer em HTTPS. *Preload* segue desmarcado.
 - [ ] **Medir o PageSpeed em `https://www.nipscern.com/`**, não no apex. O
       relatório do apex cobra 1020 ms de um redirect que não tem conserto de
       configuração: o 301 já é da borda, e o custo é o segundo handshake

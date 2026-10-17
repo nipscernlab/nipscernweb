@@ -59,19 +59,31 @@ Zaraz, Analytics, DNS e Workers Routes, além das de e-mail do romanova).
 - **As rotas do CGVWeb são do `cgvweb-proxy`** desde as 10h20 de 17/10 (o
   `publications-redirect` rodava o código do proxy desde 11/06 e voltou a ser
   a tabela dos PDFs antigos). Registro no romanova, commit `e8e0006`.
-- **E-mail: o roteamento estava desligado desde 24/09/2026**, e o registro
-  DKIM que ele exige não estava no DNS. Religado em 17/10 (estado *ready*, o
-  DKIM `cf2024-1._domainkey` voltou). São 27 regras de encaminhamento; duas
-  entraram agora, `carloseduardo.costa@` e `dabson.santos@` (o site mostra
-  esse e a regra antiga era `dabson.ferreira@`; os dois vão ao mesmo
-  destino). Cinco endereços do site não têm destino cadastrado: Heitor
-  Balthazar, Leon Millani, Mateus Hufnagel, Thiago Campos e Tiago Teixeira.
-- **DMARC: dois registros publicados**, e com dois os servidores de e-mail
-  ignoram a política. Fica o da Cloudflare (`p=none`, relatórios no painel de
-  DMARC da Cloudflare); sai o de `p=quarantine`, que mandava os relatórios a
-  `contact@`. O token não edita DNS: a remoção é pelo painel. Com algumas
-  semanas de relatório mostrando que ninguém envia legitimamente como
-  `@nipscern.com`, sobe para `p=quarantine`.
+- **E-mail: a API dizia "desligado, não configurado" desde 24/09/2026, e o
+  encaminhamento funcionava.** O registro de entregas (`emailRoutingAdaptive`
+  no GraphQL) mostra mensagens encaminhadas com sucesso em 15 e 16/10, com
+  SPF, DKIM e DMARC aprovados. O que faltava de fato era o registro DKIM
+  `cf2024-1._domainkey`, que o roteamento exige. Ao habilitar pela API em
+  17/10 o estado passou a *ready* e o DKIM voltou ao DNS. **Para saber se o
+  e-mail chega, olhe o registro de entregas, não o estado.** São 27 regras;
+  duas entraram em 17/10, `carloseduardo.costa@` e `dabson.santos@` (o site
+  mostra esse e a regra antiga era `dabson.ferreira@`; os dois vão ao mesmo
+  destino). Cinco endereços do site ficam sem destino, por decisão do
+  Chrysthofer: Heitor Balthazar, Leon Millani, Mateus Hufnagel, Thiago Campos
+  e Tiago Teixeira.
+- **DMARC: eram dois registros**, e com dois os servidores de e-mail ignoram a
+  política. Ficou o da Cloudflare (`p=none`, relatórios no painel de DMARC da
+  Cloudflare); o de `p=quarantine`, que mandava os relatórios a `contact@`,
+  foi apagado pelo Chrysthofer no painel em 17/10 (o token não edita DNS).
+  Com algumas semanas de relatório mostrando que ninguém envia legitimamente
+  como `@nipscern.com`, sobe para `p=quarantine`.
+- **HSTS com `includeSubDomains`** desde 17/10, sem *preload*: os seis nomes
+  que servem web passam pelo proxy e respondem em HTTPS.
+- **Três Cache Rules desligadas apagadas** em 17/10, que não tinham efeito:
+  *Long-cache static assets* (`.glb`, `.gz`, `.wasm` e outras extensões, um
+  ano), *CGVWEB* (`/projects/cgvweb`, duas horas) e *Cache rules nipscern*
+  (`http.request.uri eq "*"`, que nunca casava com nada). Restam as cinco
+  ativas.
 - **Páginas de erro.** As do próprio Cloudflare (origem fora do ar, 520 a
   527, bloqueios) só se personalizam do plano Pro em diante; no gratuito não
   há *Custom Error Rules* nem *Error Pages*. O que se fez de graça: a
@@ -84,7 +96,13 @@ Zaraz, Analytics, DNS e Workers Routes, além das de e-mail do romanova).
   `cgvweb-proxy` ficou como estava, por cuidado com o CGV.
 - **`alexandria.nipscern.com` está quebrado**: o Worker `alexandria` repassa
   para `nipscernlab.github.io/aleksandrias-bibliotek/`, que responde "Site not
-  found". É o Worker com mais pedidos da semana (3.882). Não mexido.
+  found". É o Worker com mais pedidos da semana, e nenhum é de gente: de 10 a
+  17/10 foram cerca de 4.800 pedidos, 73% sondagens de arquivos `.php` e de
+  WordPress à procura de falha conhecida, 69% sem identificação de navegador,
+  vindos sobretudo da Coreia do Sul, Austrália, Índia, Estados Unidos e
+  Alemanha, e o resto robôs de busca (o ClaudeBot e o Googlebot lendo
+  `robots.txt` e `sitemap.xml`). Como o destino não existe, nada fica exposto.
+  Consertar ou remover espera a decisão do Chrysthofer.
 
 ---
 
@@ -426,24 +444,24 @@ imagens são WebP e o pôster do calorímetro agora tem `srcset` em quatro largu
 | 2 | Cache Rule `/assets/*` sem `?v=` — borda 1 ano, navegador 1 dia | ✅ aplicado |
 | 3 | Cache Rule do HTML — 5 min na borda | ✅ aplicado (era `No Cache` explícito) |
 | 4 | Cabeçalhos de segurança | ✅ aplicado — 4 via Transform Rule |
-| 5 | HSTS | ✅ ligado, 1 ano, **sem** `includeSubDomains` |
+| 5 | HSTS | ✅ ligado, 1 ano; `includeSubDomains` desde 17/10/2026, sem *preload* |
 | 6 | TLS mínimo 1.0 → 1.2 | ✅ aplicado |
 | 7 | Early Hints, 0-RTT, HTTP/3, Speed Brain | ✅ já estavam ligados |
 | 8 | Rocket Loader desligado | ✅ já estava |
 | 9 | Compression Rule (brotli) | ❌ **criada, medida e removida** — piorava (seção 2) |
 
-### Por que o HSTS ficou sem `includeSubDomains`
+### O `includeSubDomains` do HSTS
 
 `includeSubDomains` vale para **todo** subdomínio e o navegador lembra por um
-ano. Os dois hostnames que o repositório usa falam HTTPS, mas não deu para
-enumerar o DNS da zona para saber se existe algum outro — um painel antigo, um
-staging — que ainda responda em HTTP puro. Um desses pararia de abrir e a
-lembrança dura um ano.
+ano. Ficou desligado até 17/10/2026 porque o token de então não lia o DNS e
+não dava para saber se algum subdomínio ainda respondia em HTTP puro. Lido o
+DNS em 17/10: os seis nomes que servem web (o apex, www, cdn, sapho, alexandria
+e kristoffer) passam pelo proxy e respondem em HTTPS, e foi ligado.
 
-Para acrescentar depois: abra a aba **DNS**, confirme que todo registro A, AAAA
-ou CNAME que serve web fala HTTPS, e então marque *Include subdomains* em
-**SSL/TLS → Edge Certificates → HTTP Strict Transport Security**. Deixe
-*Preload* desmarcado — sair da lista de preload leva meses.
+**Antes de criar um subdomínio novo**, garanta que ele responda em HTTPS (com
+o proxy do Cloudflare ligado, isso é automático): os navegadores que já
+visitaram o site recusam HTTP puro em qualquer subdomínio por um ano.
+*Preload* continua desmarcado — sair da lista de preload leva meses.
 
 ### O que falta: a Compression Rule
 
