@@ -1899,7 +1899,12 @@ a:hover > .frame > [data-drift],
 }
 /* Named where the room is, in the corner, on glass. A caption under a full-bleed
    picture would put a line of type in the gap between two bands and reopen the
-   seam the band structure exists to close. */
+   seam the band structure exists to close.
+
+   The ink is the CERN page's, for the reason given there: glass lightens what
+   is behind it, and over the pale floor of this room the pane with no tint
+   came out nearly white, with muted grey type on it. Near-opaque ink and the
+   type at full strength, like every other caption laid on a photograph. */
 .lab-stage-cap {
   position: absolute;
   left: var(--sp-5);
@@ -1909,7 +1914,8 @@ a:hover > .frame > [data-drift],
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   letter-spacing: 0.02em;
-  color: var(--text-secondary);
+  --glass-tint: rgba(5, 8, 15, 0.82);
+  color: var(--text-primary);
 }
 @media (max-width: 640px) {
   /* Shorter, and the caption comes in off the edge with the rails. */
