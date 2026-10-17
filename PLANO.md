@@ -128,16 +128,15 @@ com o bug de volta não prova nada.
       `Cache Rules`, `Transform Rules`, `Zone Settings`, `Config Rules` e
       `Response Compression`. O trabalho dele acabou.
       dash.cloudflare.com → My Profile → API Tokens.
-- [ ] **Criar o segredo `CLOUDFLARE_PURGE_TOKEN`** (Settings → Secrets and
-      variables → Actions), com um token novo de permissão **única**:
-      `Cache Purge: Purge`, restrito a nipscern.com.
-      Isso acorda `.github/workflows/purge-cache.yml`, que hoje avisa e sai.
-- [ ] **Depois disso, subir o TTL de borda do HTML** de 5 min para 2 h.
-      Caching → Cache Rules → *HTML — 5 min na borda*. Os 5 min existem só
-      porque nada avisava a borda quando o Pages publicava.
-- [ ] **HSTS `includeSubDomains`** — deixei desligado de propósito: o token não
-      lia DNS e eu não pude confirmar que todo subdomínio fala HTTPS. Confira a
-      aba DNS; se todos falarem, marque em SSL/TLS → Edge Certificates.
+- **Purga automática no deploy: decidido em 17/10/2026 não fazer agora.** O
+  workflow `purge-cache.yml`, que esperava o segredo `CLOUDFLARE_PURGE_TOKEN`
+  e nunca rodou, saiu do repositório (fica no histórico do git). A purga
+  segue manual, pela API com o token CLAUDE-ACCESS ou pelo painel, e por isso
+  o HTML continua com 5 min na borda.
+- [ ] **HSTS `includeSubDomains`** — conferido em 17/10: os seis nomes que
+      servem web (o apex, www, cdn, sapho, alexandria e kristoffer) passam
+      pelo proxy do Cloudflare e respondem em HTTPS, então é seguro ligar.
+      Espera o sim do Chrysthofer. SSL/TLS → Edge Certificates.
       **Deixe *Preload* desmarcado** — sair da lista leva meses.
 - [ ] **Medir o PageSpeed em `https://www.nipscern.com/`**, não no apex. O
       relatório do apex cobra 1020 ms de um redirect que não tem conserto de

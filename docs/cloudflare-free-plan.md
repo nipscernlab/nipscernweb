@@ -44,6 +44,48 @@ Zaraz, Analytics, DNS e Workers Routes, além das de e-mail do romanova).
   os de `assets/icons/` não têm carimbo nem convenção de nome, e um ícone
   trocado no mesmo nome ficaria velho por um ano.
 
+## Atualização de 17/10/2026
+
+- **Purga no deploy: fica para depois.** O `purge-cache.yml` saiu do
+  repositório; o segredo nunca existiu. A purga é manual, pela API ou pelo
+  painel, e o HTML continua com 5 min na borda.
+- **Worker `servidor` apagado**, com a rota `nipscern.com/servidortop*`. Ele
+  repassava o pedido para `http://umbrel.local`, um nome que só existe na rede
+  de casa, e respondia 530 da nuvem.
+- **`atlas-cors-prox` fica.** É o proxy do modo LIVE WEB do CGVWeb: o
+  `live_poller.js` busca `atlas-live.cern.ch/latest` a cada 5 s por ele, e ele
+  só repassa pedidos a esse host. Poucos pedidos por semana quer dizer pouca
+  gente no modo ao vivo, não Worker abandonado.
+- **As rotas do CGVWeb são do `cgvweb-proxy`** desde as 10h20 de 17/10 (o
+  `publications-redirect` rodava o código do proxy desde 11/06 e voltou a ser
+  a tabela dos PDFs antigos). Registro no romanova, commit `e8e0006`.
+- **E-mail: o roteamento estava desligado desde 24/09/2026**, e o registro
+  DKIM que ele exige não estava no DNS. Religado em 17/10 (estado *ready*, o
+  DKIM `cf2024-1._domainkey` voltou). São 27 regras de encaminhamento; duas
+  entraram agora, `carloseduardo.costa@` e `dabson.santos@` (o site mostra
+  esse e a regra antiga era `dabson.ferreira@`; os dois vão ao mesmo
+  destino). Cinco endereços do site não têm destino cadastrado: Heitor
+  Balthazar, Leon Millani, Mateus Hufnagel, Thiago Campos e Tiago Teixeira.
+- **DMARC: dois registros publicados**, e com dois os servidores de e-mail
+  ignoram a política. Fica o da Cloudflare (`p=none`, relatórios no painel de
+  DMARC da Cloudflare); sai o de `p=quarantine`, que mandava os relatórios a
+  `contact@`. O token não edita DNS: a remoção é pelo painel. Com algumas
+  semanas de relatório mostrando que ninguém envia legitimamente como
+  `@nipscern.com`, sobe para `p=quarantine`.
+- **Páginas de erro.** As do próprio Cloudflare (origem fora do ar, 520 a
+  527, bloqueios) só se personalizam do plano Pro em diante; no gratuito não
+  há *Custom Error Rules* nem *Error Pages*. O que se fez de graça: a
+  `404.html` do site passou a usar só caminhos absolutos (em
+  `/projects/nao-existe` ela saía sem fontes e sem ícones, porque o GitHub
+  Pages a serve em qualquer profundidade); os manuais do SAPHO e do YANC
+  (`workers/sapho-docs-proxy.js` e `yanc-docs-proxy.js`) devolvem essa página,
+  com status 404, quando a página pedida não existe no GitHub; e o
+  `cdn.nipscern.com` ganhou uma `404.html` no repositório nipscern-assets. O
+  `cgvweb-proxy` ficou como estava, por cuidado com o CGV.
+- **`alexandria.nipscern.com` está quebrado**: o Worker `alexandria` repassa
+  para `nipscernlab.github.io/aleksandrias-bibliotek/`, que responde "Site not
+  found". É o Worker com mais pedidos da semana (3.882). Não mexido.
+
 ---
 
 ## O que foi encontrado ao aplicar, e que este documento não previa

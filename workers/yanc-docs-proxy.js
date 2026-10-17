@@ -14,6 +14,7 @@
  */
 const UPSTREAM = 'https://nipscernlab.github.io/yanc';
 const PREFIX = '/library/yanc';
+const PAGINA_404 = 'https://www.nipscern.com/404.html';
 
 export default {
   async fetch(request) {
@@ -32,11 +33,25 @@ export default {
     const rest = url.pathname.slice(PREFIX.length);
     const upstream = UPSTREAM + rest + url.search;
 
-    return fetch(upstream, {
+    const resposta = await fetch(upstream, {
       method: request.method,
       headers: request.headers,
       body: request.body,
       redirect: 'manual',
     });
+
+    // Uma página que não existe no manual mostra a página de erro do site, e
+    // não a do GitHub Pages. Os caminhos dentro dela são absolutos, então ela
+    // se desenha inteira em qualquer profundidade.
+    if (resposta.status === 404 && (request.method === 'GET' || request.method === 'HEAD')) {
+      const pagina = await fetch(PAGINA_404);
+      if (pagina.ok) {
+        return new Response(request.method === 'HEAD' ? null : pagina.body, {
+          status: 404,
+          headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' },
+        });
+      }
+    }
+    return resposta;
   },
 };
