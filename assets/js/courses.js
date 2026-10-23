@@ -10,7 +10,7 @@
 
    O foco vai junto para o destino, como iria num link comum: sem isso, o próximo
    Tab voltaria para o topo da página. */
-import { scrollToEl } from './smooth-scroll.js?v=b76f4fefc4';
+import { scrollToEl } from './smooth-scroll.js?v=346736d6d2';
 
 /* Aberta em localhost, a página troca os links para o CDN pelo /_cdn/ do
    dev-server, que serve o clone do nipscern-assets: o PDF de uma aula nova abre

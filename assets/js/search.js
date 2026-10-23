@@ -11,12 +11,12 @@
    answer: up to eight results, the words that matched marked in the title and
    the description, arrows to move, Enter to go, Esc to leave.
    ============================================================ */
-import { SearchIndex, normalize, pick } from './search-engine.js?v=b76f4fefc4';
-import { t, getLang } from './i18n.js?v=b76f4fefc4';
-import { holdScroll } from './smooth-scroll.js?v=b76f4fefc4';
-import { rememberHit, revealHit } from './search-hit.js?v=b76f4fefc4';
+import { SearchIndex, normalize, pick } from './search-engine.js?v=346736d6d2';
+import { t, getLang } from './i18n.js?v=346736d6d2';
+import { holdScroll } from './smooth-scroll.js?v=346736d6d2';
+import { rememberHit, revealHit } from './search-hit.js?v=346736d6d2';
 
-const INDEX_URL = new URL('../search/search-index.json?v=b76f4fefc4', import.meta.url);
+const INDEX_URL = new URL('../search/search-index.json?v=346736d6d2', import.meta.url);
 
 const ICON = {
   page: 'ph-file-text', section: 'ph-file-text', project: 'ph-cpu', course: 'ph-books',
@@ -28,6 +28,7 @@ let dialog = null;
 let input, list, status;
 let results = [];
 let lastTerms = new Set();
+let shownFor = null;
 let active = -1;
 let returnFocus = null;
 let timer = 0;
@@ -123,6 +124,7 @@ async function run() {
   }
   if (query !== input.value) return; // typed on while the index arrived
   const r = index.search(query);
+  shownFor = query;
   if (r.status === 'short') { draw([]); say(t('search.short')); return; }
   if (r.status === 'none') { draw([]); say(t('search.none').replace('{q}', query.trim())); return; }
   lastTerms = r.terms;
@@ -172,8 +174,13 @@ function onKey(e) {
   if (e.key === 'ArrowUp' && results.length) { e.preventDefault(); setActive((active - 1 + results.length) % results.length); return; }
   if (e.key === 'Enter' && e.target === input) {
     e.preventDefault();
-    const r = results[active >= 0 ? active : 0];
-    if (r) go(r.u);
+    const open = () => { const r = results[active >= 0 ? active : 0]; if (r) go(r.u); };
+    // Typed and pressed Enter inside the 60 ms the list waits before
+    // redrawing: what is on screen is still the previous query's answer, and
+    // opening it would go somewhere the reader never asked for. Answer the
+    // text in the box first.
+    if (shownFor !== input.value) { clearTimeout(timer); run().then(open); }
+    else open();
     return;
   }
   // Keep Tab inside the dialog: the field and the close button.
