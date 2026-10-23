@@ -896,6 +896,244 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--r-sm);
 }
 
+/* ------------------------------------------------------------
+   Search: the glass in the bar and the box it opens (search.js)
+   ------------------------------------------------------------
+   The button is a plain icon, like the CGV and Noodle shortcuts beside it:
+   no glass, because a pane repeated in the bar of every page is the kind of
+   cost the backdrop note at .glass warns about. The box is one pane, on
+   screen only while it is open. */
+.nav-search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.nav-search i { font-size: 19px; }
+.nav-search:hover,
+.nav-search:focus-visible { color: var(--text-primary); background: var(--border-subtle); }
+
+.site-search {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+}
+.site-search[hidden] { display: none; }
+html.site-search-open { overflow: hidden; }
+.site-search-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.62);
+}
+.site-search-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(680px, calc(100vw - 32px));
+  max-height: 76vh;
+  margin: 11vh auto 0;
+  overflow: hidden;
+  border-radius: var(--r-xl);
+  /* Opaque: a box of results is read, and the hero's lit lettering showing
+     through a 94% pane was enough to muddy the titles laid over it. */
+  --glass-tint: rgb(9, 12, 22);
+}
+.site-search-field {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.site-search-field > .ph { font-size: 20px; color: var(--text-muted); flex-shrink: 0; }
+.site-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--sp-2) 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  box-shadow: none;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 17px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* The field is the whole top row, so the row shows focus, not a ring drawn
+   around the text inside it. */
+.site-search-input:focus,
+.site-search-input:focus-visible { outline: none; box-shadow: none; }
+.site-search-field:focus-within { border-bottom-color: color-mix(in srgb, var(--brand) 55%, transparent); }
+.site-search-input::placeholder { color: var(--text-muted); }
+.site-search-input::-webkit-search-cancel-button { display: none; }
+.site-search-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.site-search-close:hover,
+.site-search-close:focus-visible { color: var(--text-primary); background: var(--border-subtle); }
+.site-search-list {
+  margin: 0;
+  padding: var(--sp-2);
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.site-search-list:empty { display: none; }
+.site-search-list a {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: var(--sp-3);
+  align-items: start;
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  color: inherit;
+  text-decoration: none;
+}
+.site-search-list [aria-selected="true"] a { background: color-mix(in srgb, var(--brand) 16%, transparent); }
+.site-search-icon { font-size: 18px; margin-top: 2px; color: var(--text-muted); }
+.site-search-list [aria-selected="true"] .site-search-icon { color: var(--brand); }
+.site-search-title {
+  display: block;
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.35;
+}
+.site-search-desc {
+  display: -webkit-box;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.site-search-list mark {
+  background: none;
+  color: var(--brand-light, #88bdff);
+  font-weight: 700;
+}
+.site-search-kind {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  text-align: right;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.site-search-kind > span { display: block; }
+.site-search-status {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-5);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+.site-search-status[hidden] { display: none; }
+.site-search-keys {
+  display: flex;
+  gap: var(--sp-5);
+  padding: var(--sp-2) var(--sp-4);
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.site-search-keys kbd {
+  margin-right: 2px;
+  padding: 1px 6px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+/* Where a search result led (search-hit.js): a reading line, not a glow.
+
+   A flat band the width of the block, square, with a firm rule in the margin
+   and hairlines above and below, the site's own vocabulary of rules and
+   colour as state. It sweeps in from the left the way a readout line crosses
+   a display, holds, and goes. The first version was a rounded box with a
+   soft halo and screen blending, and it looked like every other highlight on
+   the web; nothing in it said this site.
+
+   The words themselves are marked too, with a stroke of ink under the lower
+   half of each, drawn left to right once the line has crossed, and they stay
+   after the band has gone: the band says where, the ink says which word. */
+.site-search-hit {
+  position: absolute;
+  z-index: 50;
+  pointer-events: none;
+  border-left: 2px solid var(--brand);
+  background: color-mix(in srgb, var(--brand) 9%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--brand) 38%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--brand) 38%, transparent);
+  animation:
+    site-search-sweep 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both,
+    site-search-out 0.7s ease-in 2.6s forwards;
+}
+@keyframes site-search-sweep {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes site-search-out { to { opacity: 0; } }
+mark.site-search-word {
+  color: inherit;
+  background: linear-gradient(transparent 58%, color-mix(in srgb, var(--brand) 45%, transparent) 58%) no-repeat 0 0 / 0% 100%;
+  animation: site-search-ink 0.45s ease-out 0.4s forwards;
+}
+@keyframes site-search-ink { to { background-size: 100% 100%; } }
+/* Reduced motion: the line and the ink are simply there, and search-hit.js
+   takes them away on its own clock. */
+@media (prefers-reduced-motion: reduce) {
+  .site-search-hit { animation: none !important; }
+  mark.site-search-word { animation: none !important; background-size: 100% 100%; }
+}
+@media (max-width: 640px) {
+  /* The whole screen on a phone: the keyboard takes the bottom half, and a
+     floating box would leave the results a strip. */
+  .site-search-panel {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+  }
+  .site-search-keys { display: none; }
+  /* Two columns, not three: the kind and the date go under the text, on one
+     line, so the title has the width of the screen to itself. */
+  .site-search-list a { grid-template-columns: 22px minmax(0, 1fr); row-gap: 4px; }
+  .site-search-kind { grid-column: 2; text-align: left; }
+  .site-search-kind > span { display: inline; }
+  .site-search-kind > span + span::before { content: ' · '; }
+  .site-search-title {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+}
+
 .nav-mobile-cgv { padding-bottom: var(--sp-4); }
 .nav-mobile-cgv-link {
   display: flex;

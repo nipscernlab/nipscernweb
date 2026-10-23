@@ -33,3 +33,11 @@ jobs:
           # A lista em publications.html, as paginas de publications/p/ e o
           # bloco delas no sitemap.xml saem de tools/build-publications.js.
           node tools/build-publications.js --check
+      - name: O indice da busca bate com as paginas e os dados
+        run: |
+          # assets/search/search-index.json sai de tools/build-search.js, que le
+          # as paginas, data/publications.json, data/news*.json, data/team.json
+          # e data/i18n.json. O hook o regenera a cada commit; isto pega quem
+          # commitou sem o hook.
+          node tools/build-search.js --check
+          node tools/test-search.js

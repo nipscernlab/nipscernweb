@@ -3,16 +3,16 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=6be04d4e97';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=b76f4fefc4';
 
-import { newsPostUrl } from './content-links.js?v=6be04d4e97';
-import { detectLang } from './pub-render.js?v=6be04d4e97';
+import { newsPostUrl } from './content-links.js?v=b76f4fefc4';
+import { detectLang } from './pub-render.js?v=b76f4fefc4';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=6be04d4e97';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=b76f4fefc4';
 
 // ============================================================
 // Navigation Template
@@ -141,6 +141,10 @@ function buildNav() {
       </nav>
 
       <div class="nav-right">
+        <button type="button" class="nav-search" id="nav-search" aria-haspopup="dialog"
+                aria-label="Search the site" title="Search the site" data-i18n-aria="search.open" data-i18n-title="search.open">
+          <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+        </button>
         ${langSwitch}
         <a href="/projects/cgvweb" target="_blank" rel="noopener noreferrer" class="nav-cgv-link" aria-label="CGVWEB Project" title="CGVWEB">
           <img src="${ROOT}assets/icons/icon_cgv.svg" alt="" class="nav-cgv-icon">
@@ -187,6 +191,29 @@ function buildNav() {
       </div>
     </div>
   `;
+}
+
+/* The magnifying glass. search.js and its index are fetched the first time
+   they are wanted, never with the page: pointing at the glass starts the
+   download, pressing it (or typing / or Ctrl+K anywhere outside a field)
+   opens the box. */
+function initSearch() {
+  const btn = document.getElementById('nav-search');
+  let mod = null;
+  const load = () => (mod = mod || import('./search.js?v=b76f4fefc4'));
+  const open = () => load().then((m) => m.openSearch(btn)).catch(() => { mod = null; });
+  if (btn) {
+    btn.addEventListener('click', open);
+    const warm = () => load().then((m) => m.preloadSearch()).catch(() => { mod = null; });
+    btn.addEventListener('pointerenter', warm, { once: true });
+    btn.addEventListener('focus', warm, { once: true });
+  }
+  document.addEventListener('keydown', (e) => {
+    const typing = e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]');
+    const slash = e.key === '/' && !typing && !e.ctrlKey && !e.metaKey && !e.altKey;
+    const ctrlK = (e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 'k';
+    if (slash || ctrlK) { e.preventDefault(); open(); }
+  });
 }
 
 function initNav() {
@@ -960,7 +987,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=6be04d4e97">. Each copy would otherwise append its own
+// <script src="main.js?v=b76f4fefc4">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {
@@ -1002,6 +1029,7 @@ if (!window.__nipscernBooted) {
     initTopBanner();
     initHeroHold();
     initNav();
+    initSearch();
     initFooter();
     initSupporters();
     /* After both, because each has to exist before the colour under it can be
@@ -1020,5 +1048,13 @@ if (!window.__nipscernBooted) {
       // Re-apply translations to newly injected elements
       setLanguage(getLang());
     }
+
+    /* Arrived from the site search: scroll to the words and light them. The
+       module is fetched only when search.js left a note for this page. */
+    try {
+      if (sessionStorage.getItem('nipscern_search_hit')) {
+        import('./search-hit.js?v=b76f4fefc4').then((m) => m.revealHit()).catch(() => {});
+      }
+    } catch (e) { /* storage blocked: the page is simply not scrolled */ }
   });
 }

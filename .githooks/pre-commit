@@ -52,6 +52,9 @@ assets/js/analytics.js
 assets/js/slides.js
 assets/js/courses.js
 assets/js/pub-render.js
+assets/js/search.js
+assets/js/search-engine.js
+assets/js/search-hit.js
 assets/css/courses.css
 assets/css/slides.css
 assets/css/vendor/katex.min.css
@@ -93,6 +96,10 @@ assets/js/analytics.min.js
 assets/js/slides.min.js
 assets/js/courses.min.js
 assets/js/pub-render.min.js
+assets/js/search.min.js
+assets/js/search-engine.min.js
+assets/js/search-hit.min.js
+assets/search/search-index.json
 assets/css/courses.min.css
 assets/css/slides.min.css
 assets/css/icons/404.css
@@ -138,7 +145,18 @@ PATHS=$(printf '%s\n' "$ASSETS" | sed 's#\.#\\.#g' | tr '\n' '|' | sed 's/|$//')
 # então um --ph que não existe vira um QUADRADO SÓLIDO no lugar do ícone.
 changed=$(git diff --cached --name-only | grep -E "^($PATHS)$" || true)
 html_changed=$(git diff --cached --name-only | grep -E '\.html$' || true)
-[ -z "$changed" ] && [ -z "$html_changed" ] && exit 0
+# Os dados também: uma notícia, uma publicação ou uma pessoa nova muda o
+# índice da busca, e o índice é um asset com ?v= como os outros.
+data_changed=$(git diff --cached --name-only | grep -E '^data/.*\.json$' || true)
+[ -z "$changed" ] && [ -z "$html_changed" ] && [ -z "$data_changed" ] && exit 0
+
+# O índice da busca (a lupa do menu), derivado das páginas e de data/. Vem
+# antes da minificação e do hash, porque é um dos assets que o hash cobre.
+if ! node --no-warnings tools/build-search.js; then
+  echo "pre-commit: a geração do índice da busca falhou." >&2
+  exit 1
+fi
+git add assets/search/search-index.json
 
 # ------------------------------------------------------------------
 # As cópias minificadas, geradas antes de qualquer hash.

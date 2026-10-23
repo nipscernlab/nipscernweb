@@ -31,11 +31,11 @@
  * is the only literal part, and it turns over when the record is open.
  */
 
-import { t, getLang } from './i18n.js?v=6be04d4e97';
+import { t, getLang } from './i18n.js?v=b76f4fefc4';
 /* Never scrollIntoView({behavior:'smooth'}) on this site: Lenis is driving the
    scroll position from its own ticker and the two animations fight, which
    reads as no scroll at all. scrollToEl asks the library. */
-import { scrollToEl } from './smooth-scroll.js?v=6be04d4e97';
+import { scrollToEl } from './smooth-scroll.js?v=b76f4fefc4';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -370,6 +370,15 @@ function mountRoster(grid, members, records) {
     if (card) open(card, id, true);
   });
 
+  /* So is an address: about#member-<id>, which is where the site search sends
+     a person. Read on arrival and whenever the anchor changes on this page. */
+  const fromHash = () => {
+    const m = location.hash.match(/^#member-(.+)$/);
+    if (m) document.dispatchEvent(new CustomEvent('roster:open', { detail: { id: decodeURIComponent(m[1]) } }));
+  };
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+
   /* The tilt. Five degrees, from where the pointer is inside the tile, written
      on the element itself with its own perspective() so it owes nothing to a
      parent: a perspective declared on the grid takes its vanishing point from
@@ -428,12 +437,12 @@ function mountNetwork(net) {
   const start = () => {
     if (started) return;
     started = true;
-    import('./network.js?v=6be04d4e97').then(({ initNetwork }) =>
+    import('./network.js?v=b76f4fefc4').then(({ initNetwork }) =>
       initNetwork(canvas, { tip: document.getElementById('net-tip'), data: net })
     ).then((api) => {
       if (!api) { stage.classList.add('is-flat'); return; }
       stage.classList.add('is-live');
-      import('./motion.js?v=6be04d4e97').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
+      import('./motion.js?v=b76f4fefc4').then(({ whileVisible }) => whileVisible(stage, api.play, api.hold));
     }).catch(() => stage.classList.add('is-flat'));
   };
 
