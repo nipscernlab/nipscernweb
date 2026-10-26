@@ -3,16 +3,16 @@
  * Navigation, footer injection, animations, shared utilities
  */
 
-import { initI18n, getLang, setLanguage } from './i18n.js?v=346736d6d2';
+import { initI18n, getLang, setLanguage } from './i18n.js?v=ff0c153a5e';
 
-import { newsPostUrl } from './content-links.js?v=346736d6d2';
-import { detectLang } from './pub-render.js?v=346736d6d2';
+import { newsPostUrl } from './content-links.js?v=ff0c153a5e';
+import { detectLang } from './pub-render.js?v=ff0c153a5e';
 
 /* One smooth scroll for the whole site, and nowhere else. Every place that used
    to move the scroll position with a `behavior: 'smooth'` of its own now asks
    this module, so there is a single thing deciding how the page moves and a
    single place to change it. */
-import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=346736d6d2';
+import { initSmoothScroll, scrollToTop, holdScroll } from './smooth-scroll.js?v=ff0c153a5e';
 
 // ============================================================
 // Navigation Template
@@ -200,7 +200,7 @@ function buildNav() {
 function initSearch() {
   const btn = document.getElementById('nav-search');
   let mod = null;
-  const load = () => (mod = mod || import('./search.js?v=346736d6d2'));
+  const load = () => (mod = mod || import('./search.js?v=ff0c153a5e'));
   const open = () => load().then((m) => m.openSearch(btn)).catch(() => { mod = null; });
   if (btn) {
     btn.addEventListener('click', open);
@@ -987,7 +987,7 @@ function initGridOverlay() {
 // A page can end up with more than one instance of this module: the browser
 // keys module identity on the full URL, so importing it as "main.js?v=<other>"
 // (publications.js does) loads a second copy alongside the page's own
-// <script src="main.js?v=346736d6d2">. Each copy would otherwise append its own
+// <script src="main.js?v=ff0c153a5e">. Each copy would otherwise append its own
 // back-to-top button and grid overlay. The flag lives on window, which the
 // copies do share, so only the first one bootstraps.
 if (!window.__nipscernBooted) {
@@ -1053,7 +1053,7 @@ if (!window.__nipscernBooted) {
        module is fetched only when search.js left a note for this page. */
     try {
       if (sessionStorage.getItem('nipscern_search_hit')) {
-        import('./search-hit.js?v=346736d6d2').then((m) => m.revealHit()).catch(() => {});
+        import('./search-hit.js?v=ff0c153a5e').then((m) => m.revealHit()).catch(() => {});
       }
     } catch (e) { /* storage blocked: the page is simply not scrolled */ }
   });

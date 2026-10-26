@@ -26,8 +26,8 @@
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=346736d6d2" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=346736d6d2"></noscript>
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=346736d6d2">
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=ff0c153a5e" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../assets/css/icons/projects-sapho.css?v=ff0c153a5e"></noscript>
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=ff0c153a5e">
 
   <style>
     /* ==================================================================
@@ -733,16 +733,16 @@
 
   <footer id="footer" role="contentinfo"></footer>
 
-  <script type="module" src="../assets/js/main.min.js?v=346736d6d2"></script>
-  <script src="../assets/js/analytics.min.js?v=346736d6d2" defer></script>
+  <script type="module" src="../assets/js/main.min.js?v=ff0c153a5e"></script>
+  <script src="../assets/js/analytics.min.js?v=ff0c153a5e" defer></script>
 
   <script type="module">
     /* Sem JavaScript a pagina fica inteira: o programa padrao esta no HTML,
        o die ja acende as celulas dele, os tracos da onda estao completos.
        O script so troca estados. Bibliotecas: GSAP da casa e anime.js 4,
        ambos vendorizados. */
-    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=346736d6d2';
-    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=346736d6d2';
+    import { revealFailsafe, ensureMotionLibs, initMotion, whileVisible } from '../assets/js/motion.min.js?v=ff0c153a5e';
+    import { animate, stagger } from '../assets/js/vendor/anime.esm.min.js?v=ff0c153a5e';
 
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
     revealFailsafe();
@@ -840,7 +840,7 @@
       const canvas = document.getElementById('die-canvas');
       if (!canvas) return;
       let T;
-      try { T = await import('../assets/js/vendor/three.module.min.js?v=346736d6d2'); }
+      try { T = await import('../assets/js/vendor/three.module.min.js?v=ff0c153a5e'); }
       catch (_) { stage.remove(); return; }
 
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
