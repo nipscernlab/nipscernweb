@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>xCGV (Under construction) | NIPS-CERN</title>
+  <meta name="description" content="xCGV: the next generation of the Calorimeter Geometry Viewer, for the HL-LHC. This page is under construction.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/projects/xcgv">
+  <meta property="og:title" content="xCGV (Under construction) | NIPS-CERN">
+  <meta property="og:description" content="xCGV: the next generation of the Calorimeter Geometry Viewer, for the HL-LHC. This page is under construction.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/projects/xcgv">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <!-- Self-hosted typefaces. Preloaded because the @font-face rules live
+       in main.css, which on some pages loads asynchronously; without this
+       the fetch could not start until that stylesheet parsed. -->
+  <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../assets/css/icons/projects-xcgv.css?v=57ea17fe67" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../assets/css/icons/projects-xcgv.css?v=57ea17fe67"></noscript>
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=57ea17fe67">
+
+  <style>
+    :root { --page-accent: var(--accent-cgv); }
+
+    .xcgv-logo {
+      width: 160px;
+      height: auto;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+
+    <header class="project-hero" style="background: radial-gradient(ellipse 70% 50% at 0% 50%, rgba(29,78,137,0.10) 0%, transparent 70%), var(--bg-0)" aria-labelledby="xcgv-title">
+      <div class="project-hero-inner">
+        <img class="xcgv-logo" src="https://cdn.nipscern.com/images/brand/xcgv-logo-v1.webp" alt="xCGV logo" width="160" height="160">
+        <div class="project-hero-text">
+          <h1 class="project-hero-name fade-up" id="xcgv-title">
+            <span style="color:var(--accent-cgv)">xCGV</span>
+          </h1>
+          <p class="project-hero-desc fade-up">
+            xCGV: the next generation of the Calorimeter Geometry Viewer, for the HL-LHC.
+          </p>
+          <p class="project-hero-desc fade-up">
+            This page is under construction.
+          </p>
+        </div>
+      </div>
+    </header>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../assets/js/main.min.js?v=57ea17fe67"></script>
+  <script src="../assets/js/analytics.min.js?v=57ea17fe67" defer></script>
+</body>
+</html>
