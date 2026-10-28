@@ -33,8 +33,8 @@
   <style>
     :root { --page-accent: var(--accent-cgv); }
 
-    /* The page is one centred, lit block: the logo with a blue light behind
-       it, the name and the two lines, filling the screen under the nav. */
+    /* The page is one centred block on an even, lighter blue: the name on
+       top, its base fading out, then the logo and the two lines. */
     .xcgv-hero {
       min-height: 100vh;
       min-height: 100svh;
@@ -43,24 +43,28 @@
       justify-content: center;
       padding: calc(var(--nav-h) + var(--sp-12)) 0 var(--sp-16);
       text-align: center;
-      background:
-        radial-gradient(circle at 50% 42%, rgba(120, 170, 255, 0.30) 0%, rgba(29, 78, 137, 0.34) 26%, rgba(29, 78, 137, 0.12) 48%, transparent 70%),
-        var(--bg-1);
+      background: color-mix(in srgb, var(--accent-cgv) 32%, var(--bg-1));
     }
     .xcgv-hero-inner {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+    .xcgv-word {
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: clamp(72px, 14vw, 168px);
+      line-height: 0.9;
+      letter-spacing: -0.045em;
+      color: #f2f5fb;
+      margin: 0 0 var(--sp-4);
+      -webkit-mask-image: linear-gradient(to bottom, #000 25%, rgba(0, 0, 0, 0.04) 86%);
+      mask-image: linear-gradient(to bottom, #000 25%, rgba(0, 0, 0, 0.04) 86%);
+    }
     .xcgv-logo {
-      width: min(280px, 60vw);
+      width: min(260px, 56vw);
       height: auto;
       margin-bottom: var(--sp-8);
-      filter: drop-shadow(0 0 36px rgba(140, 185, 255, 0.55)) brightness(1.25);
-    }
-    .xcgv-name {
-      color: color-mix(in srgb, var(--accent-cgv) 12%, #ffffff);
-      text-shadow: 0 0 32px rgba(140, 185, 255, 0.65), 0 0 6px rgba(255, 255, 255, 0.35);
     }
     .xcgv-desc {
       font-size: var(--text-lg);
@@ -80,8 +84,8 @@
 
     <header class="xcgv-hero" aria-labelledby="xcgv-title">
       <div class="container xcgv-hero-inner">
-        <img class="xcgv-logo fade-up" src="https://cdn.nipscern.com/images/brand/xcgv-logo-v1.webp" alt="xCGV logo" width="280" height="280">
-        <h1 class="project-hero-name xcgv-name fade-up" id="xcgv-title">xCGV</h1>
+        <h1 class="xcgv-word fade-up" id="xcgv-title">xCGV</h1>
+        <img class="xcgv-logo fade-up" src="https://cdn.nipscern.com/images/brand/xcgv-logo-v1.webp" alt="xCGV logo" width="260" height="260">
         <p class="xcgv-desc fade-up">xCGV: the next generation of the Calorimeter Geometry Viewer, for the <span style="white-space:nowrap">HL-LHC</span>.</p>
         <p class="xcgv-desc fade-up">This page is under construction.</p>
       </div>
