@@ -19,8 +19,8 @@
    The note lives in sessionStorage, which the browser discards with the tab,
    and is deleted as soon as it is read. privacy.html says so.
    ============================================================ */
-import { normalize } from './search-engine.js?v=57ea17fe67';
-import { scrollToEl } from './smooth-scroll.js?v=57ea17fe67';
+import { normalize } from './search-engine.js?v=0964b83ec3';
+import { scrollToEl } from './smooth-scroll.js?v=0964b83ec3';
 
 const KEY = 'nipscern_search_hit';
 const MAX_AGE = 60000;
