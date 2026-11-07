@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>Integração do Cocotb à IDE AURORA: Cossimulação e Verificação de Modelos de Hardware em Python | NIPS-CERN</title>
+  <meta name="description" content="Verificar um algoritmo embarcado em hardware é, em essência, um problema de modelagem computacional: o mesmo estimador existe como modelo estrutural sintetizável, executado por um simulador de…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/2026-enmc-cocotb-aurora">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/2026-enmc-cocotb-aurora">
+  <meta property="og:title" content="Integração do Cocotb à IDE AURORA: Cossimulação e Verificação de Modelos de Hardware em Python">
+  <meta property="og:description" content="Verificar um algoritmo embarcado em hardware é, em essência, um problema de modelagem computacional: o mesmo estimador existe como modelo estrutural sintetizável, executado por um simulador de…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="Integração do Cocotb à IDE AURORA: Cossimulação e Verificação de Modelos de Hardware em Python">
+  <meta name="citation_author" content="Arthur Araújo Martins">
+  <meta name="citation_author" content="Chrysthofer Arthur Amaro Afonso">
+  <meta name="citation_author" content="Victor Mendes Ribeiro">
+  <meta name="citation_author" content="Nelson Cevidanes Nascimento de Assis">
+  <meta name="citation_author" content="Guilherme Barroso Morett">
+  <meta name="citation_author" content="Luciano Manhães de Andrade Filho">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="XXIX Encontro Nacional de Modelagem Computacional">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/enmc-2026-cocotb-aurora.pdf">
+  <meta name="citation_language" content="pt">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/2026-enmc-cocotb-aurora">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Integração do Cocotb à IDE AURORA: Cossimulação e Verificação de Modelos de Hardware em Python",
+    "name": "Integração do Cocotb à IDE AURORA: Cossimulação e Verificação de Modelos de Hardware em Python",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Arthur Araújo Martins"
+      },
+      {
+        "@type": "Person",
+        "name": "Chrysthofer Arthur Amaro Afonso"
+      },
+      {
+        "@type": "Person",
+        "name": "Victor Mendes Ribeiro"
+      },
+      {
+        "@type": "Person",
+        "name": "Nelson Cevidanes Nascimento de Assis"
+      },
+      {
+        "@type": "Person",
+        "name": "Guilherme Barroso Morett"
+      },
+      {
+        "@type": "Person",
+        "name": "Luciano Manhães de Andrade Filho"
+      }
+    ],
+    "datePublished": "2026",
+    "inLanguage": "pt",
+    "abstract": "Verificar um algoritmo embarcado em hardware é, em essência, um problema de modelagem computacional: o mesmo estimador existe como modelo estrutural sintetizável, executado por um simulador de eventos discretos, e como modelo numérico de referência, e a confiança no circuito nasce do confronto contínuo entre os dois. Este trabalho apresenta a integração do cocotb (coroutine cosimulation testbench) à IDE AURORA, do ecossistema do processador soft-core SAPHO, que permite escrever esse confronto inteiramente em Python, em cossimulação com os simuladores Icarus Verilog e Verilator, com a rotina de teste reconhecida pela interface e executada em um clique. A metodologia é demonstrada na verificação de uma Unidade de Medição Fasorial implementada no SAPHO segundo a norma IEC/IEEE 60255-118-1: gerador de estímulos, modelo de referência em dupla precisão, emulação da aquisição e análise convivem em um único testbench, que valida o hardware em dois níveis, contra o fasor analítico da norma e contra o modelo numérico. O primeiro nível confirmou um Erro Total do Vetor máximo de 0,98%, dentro do limite normativo; o segundo mostra que o float de 24 bits do processador reproduz a referência com desvio de 5×10⁻⁶ no fasor, atribuindo o erro remanescente ao método de estimação, e não à aritmética do hardware.",
+    "url": "https://www.nipscern.com/publications/p/2026-enmc-cocotb-aurora",
+    "isPartOf": {
+      "@type": "Event",
+      "name": "XXIX Encontro Nacional de Modelagem Computacional"
+    },
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/enmc-2026-cocotb-aurora.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "keywords": "Modelagem e verificação de sistemas digitais, Cossimulação, cocotb, Processador soft-core SAPHO, Unidade de Medição Fasorial, ENMC",
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6152f3475c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6152f3475c"></noscript>
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6152f3475c">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Conference · 2026</span>
+          </div>
+          <h1 class="display-md" id="pub-title" lang="pt">Integração do Cocotb à IDE AURORA: Cossimulação e Verificação de Modelos de Hardware em Python</h1>
+          <p class="pubp-meta">Arthur Araújo Martins, Chrysthofer Arthur Amaro Afonso, Victor Mendes Ribeiro, Nelson Cevidanes Nascimento de Assis, Guilherme Barroso Morett, Luciano Manhães de Andrade Filho</p>
+          <p class="pubp-meta"><strong>XXIX Encontro Nacional de Modelagem Computacional</strong></p>
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=pub-2026-enmc-cocotb-aurora"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body" lang="pt">
+      <h2>Abstract</h2>
+      <p>Verificar um algoritmo embarcado em hardware é, em essência, um problema de modelagem computacional: o mesmo estimador existe como modelo estrutural sintetizável, executado por um simulador de eventos discretos, e como modelo numérico de referência, e a confiança no circuito nasce do confronto contínuo entre os dois. Este trabalho apresenta a integração do cocotb (coroutine cosimulation testbench) à IDE AURORA, do ecossistema do processador soft-core SAPHO, que permite escrever esse confronto inteiramente em Python, em cossimulação com os simuladores Icarus Verilog e Verilator, com a rotina de teste reconhecida pela interface e executada em um clique. A metodologia é demonstrada na verificação de uma Unidade de Medição Fasorial implementada no SAPHO segundo a norma IEC/IEEE 60255-118-1: gerador de estímulos, modelo de referência em dupla precisão, emulação da aquisição e análise convivem em um único testbench, que valida o hardware em dois níveis, contra o fasor analítico da norma e contra o modelo numérico. O primeiro nível confirmou um Erro Total do Vetor máximo de 0,98%, dentro do limite normativo; o segundo mostra que o float de 24 bits do processador reproduz a referência com desvio de 5×10⁻⁶ no fasor, atribuindo o erro remanescente ao método de estimação, e não à aritmética do hardware.</p>
+      <div class="pubp-tags"><span class="badge badge-gray">Modelagem e verificação de sistemas digitais</span><span class="badge badge-gray">Cossimulação</span><span class="badge badge-gray">cocotb</span><span class="badge badge-gray">Processador soft-core SAPHO</span><span class="badge badge-gray">Unidade de Medição Fasorial</span><span class="badge badge-gray">ENMC</span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6152f3475c"></script>
+  <script src="../../assets/js/analytics.min.js?v=6152f3475c" defer></script>
+</body>
+</html>
