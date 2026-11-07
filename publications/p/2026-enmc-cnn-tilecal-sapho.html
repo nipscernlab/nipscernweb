@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <!-- Gerada por tools/build-publications.js a partir de data/publications.json. Não edite à mão. -->
+  <title>Implementação de uma Rede Neural Convolucional para Estimativa de Amplitude de Sinais do TileCal no Processador SAPHO em FPGA | NIPS-CERN</title>
+  <meta name="description" content="A estimativa da amplitude de sinais do calorímetro de telhas (TileCal) do experimento ATLAS apoia-se em estimadores lineares, cujo desempenho se degrada sob empilhamento (pile-up). As redes…">
+  <link rel="canonical" href="https://www.nipscern.com/publications/p/2026-enmc-cnn-tilecal-sapho">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.nipscern.com/publications/p/2026-enmc-cnn-tilecal-sapho">
+  <meta property="og:title" content="Implementação de uma Rede Neural Convolucional para Estimativa de Amplitude de Sinais do TileCal no Processador SAPHO em FPGA">
+  <meta property="og:description" content="A estimativa da amplitude de sinais do calorímetro de telhas (TileCal) do experimento ATLAS apoia-se em estimadores lineares, cujo desempenho se degrada sob empilhamento (pile-up). As redes…">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+  <meta name="twitter:card" content="summary">
+
+  <!-- Para o Google Acadêmico: uma publicação por página, nas meta tags que ele lê. -->
+  <meta name="citation_title" content="Implementação de uma Rede Neural Convolucional para Estimativa de Amplitude de Sinais do TileCal no Processador SAPHO em FPGA">
+  <meta name="citation_author" content="Clethie Sediacias Bisseyou Ngatsono">
+  <meta name="citation_author" content="Chrysthofer Arthur Amaro Afonso">
+  <meta name="citation_author" content="Leandro da Graça Ribeiro">
+  <meta name="citation_author" content="Diogo Alves Cardinot">
+  <meta name="citation_author" content="Luciano Manhães de Andrade Filho">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="XXIX Encontro Nacional de Modelagem Computacional">
+  <meta name="citation_pdf_url" content="https://cdn.nipscern.com/publications/enmc-2026-cnn-tilecal-sapho.pdf">
+  <meta name="citation_language" content="pt">
+  <meta name="citation_abstract_html_url" content="https://www.nipscern.com/publications/p/2026-enmc-cnn-tilecal-sapho">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Implementação de uma Rede Neural Convolucional para Estimativa de Amplitude de Sinais do TileCal no Processador SAPHO em FPGA",
+    "name": "Implementação de uma Rede Neural Convolucional para Estimativa de Amplitude de Sinais do TileCal no Processador SAPHO em FPGA",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Clethie Sediacias Bisseyou Ngatsono"
+      },
+      {
+        "@type": "Person",
+        "name": "Chrysthofer Arthur Amaro Afonso"
+      },
+      {
+        "@type": "Person",
+        "name": "Leandro da Graça Ribeiro"
+      },
+      {
+        "@type": "Person",
+        "name": "Diogo Alves Cardinot"
+      },
+      {
+        "@type": "Person",
+        "name": "Luciano Manhães de Andrade Filho"
+      }
+    ],
+    "datePublished": "2026",
+    "inLanguage": "pt",
+    "abstract": "A estimativa da amplitude de sinais do calorímetro de telhas (TileCal) do experimento ATLAS apoia-se em estimadores lineares, cujo desempenho se degrada sob empilhamento (pile-up). As redes neurais convolucionais (Convolutional Neural Networks, CNNs) aproximam essa relação de forma não linear, ao custo de muitas operações aritméticas. Este trabalho porta uma CNN unidimensional (duas camadas convolucionais e três densas, cerca de 11 mil pesos) para o processador soft-core SAPHO, cuja arquitetura é gerada sob demanda em FPGA, com o apoio da Aurora Intelligence, a assistente de IA da IDE AURORA, que propôs inclusive a consolidação da rede, antes repartida em dois processadores, em um único núcleo. O problema central é de fidelidade numérica: o modelo treinado em Python precisa ser reproduzido em uma aritmética de ponto flutuante própria, distinta do padrão IEEE 754. A saída do SAPHO reproduz a da referência com erro médio absoluto de 8,17×10⁻⁵ e coeficiente de determinação R² = 0,9999997 sobre 20 pulsos reais, ocupando 296 instruções e 11.759 palavras de dados. Os resíduos são sistematicamente positivos, revelando um viés de arredondamento da aritmética própria, desprezível frente à resolução do detector. Evidencia-se a viabilidade de embarcar uma CNN complexa em um soft-core mínimo.",
+    "url": "https://www.nipscern.com/publications/p/2026-enmc-cnn-tilecal-sapho",
+    "isPartOf": {
+      "@type": "Event",
+      "name": "XXIX Encontro Nacional de Modelagem Computacional"
+    },
+    "encoding": {
+      "@type": "MediaObject",
+      "contentUrl": "https://cdn.nipscern.com/publications/enmc-2026-cnn-tilecal-sapho.pdf",
+      "encodingFormat": "application/pdf"
+    },
+    "keywords": "Modelagem em hardware reconfigurável, Redes neurais convolucionais, Fidelidade numérica, Processador soft-core SAPHO, TileCal, ENMC",
+    "publisher": {
+      "@type": "ResearchOrganization",
+      "name": "NIPS-CERN",
+      "url": "https://www.nipscern.com/"
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6152f3475c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../assets/css/icons/publications-p.css?v=6152f3475c"></noscript>
+  <link rel="stylesheet" href="../../assets/css/main.min.css?v=6152f3475c">
+  <style>
+    .pubp-meta { color: var(--text-secondary); margin-top: var(--sp-3); }
+    .pubp-meta strong { color: var(--text-primary); font-weight: 500; }
+    .pubp-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
+    .pubp-body { max-width: 760px; margin: var(--sp-10) auto var(--sp-12); padding: 0 var(--container-pad); }
+    .pubp-body h2 { font-size: var(--text-lg); margin-bottom: var(--sp-3); }
+    .pubp-body p { color: var(--text-secondary); line-height: 1.7; }
+    .pubp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-6); }
+  </style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="page-hero page-hero--legal" aria-labelledby="pub-title">
+      <div class="page-hero-inner">
+        <div class="page-hero-text">
+          <div class="eyebrow">
+            <i class="ph ph-book-open" aria-hidden="true"></i>
+            <span>Conference · 2026</span>
+          </div>
+          <h1 class="display-md" id="pub-title" lang="pt">Implementação de uma Rede Neural Convolucional para Estimativa de Amplitude de Sinais do TileCal no Processador SAPHO em FPGA</h1>
+          <p class="pubp-meta">Clethie Sediacias Bisseyou Ngatsono, Chrysthofer Arthur Amaro Afonso, Leandro da Graça Ribeiro, Diogo Alves Cardinot, Luciano Manhães de Andrade Filho</p>
+          <p class="pubp-meta"><strong>XXIX Encontro Nacional de Modelagem Computacional</strong></p>
+          <div class="pubp-actions">
+            <a class="btn btn-primary glass-btn" href="/pdf-viewer.html?id=pub-2026-enmc-cnn-tilecal-sapho"><i class="ph ph-file-pdf" aria-hidden="true"></i><span>Open PDF</span></a>
+            
+            <a class="btn btn-ghost glass-btn" href="../../publications"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Publications</span></a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="pubp-body" lang="pt">
+      <h2>Abstract</h2>
+      <p>A estimativa da amplitude de sinais do calorímetro de telhas (TileCal) do experimento ATLAS apoia-se em estimadores lineares, cujo desempenho se degrada sob empilhamento (pile-up). As redes neurais convolucionais (Convolutional Neural Networks, CNNs) aproximam essa relação de forma não linear, ao custo de muitas operações aritméticas. Este trabalho porta uma CNN unidimensional (duas camadas convolucionais e três densas, cerca de 11 mil pesos) para o processador soft-core SAPHO, cuja arquitetura é gerada sob demanda em FPGA, com o apoio da Aurora Intelligence, a assistente de IA da IDE AURORA, que propôs inclusive a consolidação da rede, antes repartida em dois processadores, em um único núcleo. O problema central é de fidelidade numérica: o modelo treinado em Python precisa ser reproduzido em uma aritmética de ponto flutuante própria, distinta do padrão IEEE 754. A saída do SAPHO reproduz a da referência com erro médio absoluto de 8,17×10⁻⁵ e coeficiente de determinação R² = 0,9999997 sobre 20 pulsos reais, ocupando 296 instruções e 11.759 palavras de dados. Os resíduos são sistematicamente positivos, revelando um viés de arredondamento da aritmética própria, desprezível frente à resolução do detector. Evidencia-se a viabilidade de embarcar uma CNN complexa em um soft-core mínimo.</p>
+      <div class="pubp-tags"><span class="badge badge-gray">Modelagem em hardware reconfigurável</span><span class="badge badge-gray">Redes neurais convolucionais</span><span class="badge badge-gray">Fidelidade numérica</span><span class="badge badge-gray">Processador soft-core SAPHO</span><span class="badge badge-gray">TileCal</span><span class="badge badge-gray">ENMC</span></div>
+    </section>
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../assets/js/main.min.js?v=6152f3475c"></script>
+  <script src="../../assets/js/analytics.min.js?v=6152f3475c" defer></script>
+</body>
+</html>

@@ -176,6 +176,78 @@
     "pdf": "https://cdn.nipscern.com/publications/cba-2026-pzc-wiener-pile-up.pdf",
     "url": "https://ojs.sba.org.br/index.php/cba/article/view/6447"
   },
+  {
+    "id": "pub-2026-enmc-cgvweb-renderizacao",
+    "title": "Renderização em Tempo Real de Eventos do Detector ATLAS: a Reescrita do Mecanismo Gráfico do CGVWeb",
+    "authors": ["Chrysthofer Arthur Amaro Afonso", "Mateus Araujo Carvalho", "Roberta Luchini Leonardo", "Kinn Belarmino Batista Dias", "Gustavo Barbosa Libotte", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "Explorar interativamente o modelo geométrico de um detector de partículas, com centenas de milhares de elementos, é um problema de visualização científica em que a taxa de quadros determina o que o especialista consegue investigar. Este trabalho apresenta as atualizações do CGVWeb, visualizador do modelo do detector ATLAS e dos eventos nele reconstruídos, implantado e validado na ATLAS Control Room. A contribuição principal é uma reescrita do mecanismo de renderização: ao combinar as células estáticas do calorímetro em poucas malhas e ao transferir o corte interativo (slicer) para a unidade de processamento gráfico (GPU), as chamadas de desenho por quadro caíram de cerca de 13.700 para três, elevando a taxa de quadros, no melhor caso, de cerca de 48 para mais de 400 por segundo. Somaram-se modos de qualidade ajustável, reprodução temporal das colisões e exportação em vídeo, além da operação isolada da internet exigida pela sala de controle. Os ensaios mostram que a aceleração é sistematicamente maior no hardware modesto, o que torna a exploração do modelo viável também fora do ambiente do experimento.",
+    "tags": ["CGVWeb", "Visualização científica", "Renderização em tempo real", "Detector ATLAS", "WebGL", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-renderizacao-tempo-real-cgvweb.pdf"
+  },
+  {
+    "id": "pub-2026-enmc-aurora-intelligence",
+    "title": "Aurora Intelligence: a Arquiteta do Processador Soft-Core SAPHO",
+    "authors": ["Chrysthofer Arthur Amaro Afonso", "Leandro da Graça Ribeiro", "Gustavo Barbosa Libotte", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "Projetar um processador soft-core para instrumentação científica é um ciclo de modelagem computacional: o algoritmo é descrito em alto nível, compilado para uma arquitetura gerada sob demanda e validado por simulação antes de chegar ao hardware. Percorrer esse ciclo, porém, exige domínio de linguagens e ferramentas próprias. Este trabalho apresenta a Aurora Intelligence, assistente de inteligência artificial integrada ao ambiente de desenvolvimento AURORA, interface do ecossistema do processador soft-core SAPHO, concebido pelo NIPS-CERN/UFJF. Diferentemente de assistentes genéricas, ela é especializada na linguagem C±, própria do SAPHO, por um system prompt derivado do compilador yanc e por ferramentas de domínio, o que reduz o risco de alucinação sobre as regras do processador. Sua arquitetura é agnóstica ao provedor, opera com modelos de nuvem ou locais e expõe a API do ambiente como um servidor local de Protocolo de Contexto de Modelo (Model Context Protocol, MCP), sob um modelo de permissão. Em estudo de caso, a assistente reconhece de forma autônoma uma redundância semântica no Assembly de um processador de FFT (Fast Fourier Transform) e a elimina dentro do próprio fluxo de compilação, reduzindo o código de 325 para 269 instruções, 17,2% a menos, sem alterar a saída da simulação.",
+    "tags": ["Aurora Intelligence", "Modelos de linguagem", "Modelagem e simulação de hardware", "Processador soft-core SAPHO", "Model Context Protocol", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-aurora-intelligence.pdf"
+  },
+  {
+    "id": "pub-2026-enmc-cnn-tilecal-sapho",
+    "title": "Implementação de uma Rede Neural Convolucional para Estimativa de Amplitude de Sinais do TileCal no Processador SAPHO em FPGA",
+    "authors": ["Clethie Sediacias Bisseyou Ngatsono", "Chrysthofer Arthur Amaro Afonso", "Leandro da Graça Ribeiro", "Diogo Alves Cardinot", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "A estimativa da amplitude de sinais do calorímetro de telhas (TileCal) do experimento ATLAS apoia-se em estimadores lineares, cujo desempenho se degrada sob empilhamento (pile-up). As redes neurais convolucionais (Convolutional Neural Networks, CNNs) aproximam essa relação de forma não linear, ao custo de muitas operações aritméticas. Este trabalho porta uma CNN unidimensional (duas camadas convolucionais e três densas, cerca de 11 mil pesos) para o processador soft-core SAPHO, cuja arquitetura é gerada sob demanda em FPGA, com o apoio da Aurora Intelligence, a assistente de IA da IDE AURORA, que propôs inclusive a consolidação da rede, antes repartida em dois processadores, em um único núcleo. O problema central é de fidelidade numérica: o modelo treinado em Python precisa ser reproduzido em uma aritmética de ponto flutuante própria, distinta do padrão IEEE 754. A saída do SAPHO reproduz a da referência com erro médio absoluto de 8,17×10⁻⁵ e coeficiente de determinação R² = 0,9999997 sobre 20 pulsos reais, ocupando 296 instruções e 11.759 palavras de dados. Os resíduos são sistematicamente positivos, revelando um viés de arredondamento da aritmética própria, desprezível frente à resolução do detector. Evidencia-se a viabilidade de embarcar uma CNN complexa em um soft-core mínimo.",
+    "tags": ["Modelagem em hardware reconfigurável", "Redes neurais convolucionais", "Fidelidade numérica", "Processador soft-core SAPHO", "TileCal", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-cnn-tilecal-sapho.pdf"
+  },
+  {
+    "id": "pub-2026-enmc-cocotb-aurora",
+    "title": "Integração do Cocotb à IDE AURORA: Cossimulação e Verificação de Modelos de Hardware em Python",
+    "authors": ["Arthur Araújo Martins", "Chrysthofer Arthur Amaro Afonso", "Victor Mendes Ribeiro", "Nelson Cevidanes Nascimento de Assis", "Guilherme Barroso Morett", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "Verificar um algoritmo embarcado em hardware é, em essência, um problema de modelagem computacional: o mesmo estimador existe como modelo estrutural sintetizável, executado por um simulador de eventos discretos, e como modelo numérico de referência, e a confiança no circuito nasce do confronto contínuo entre os dois. Este trabalho apresenta a integração do cocotb (coroutine cosimulation testbench) à IDE AURORA, do ecossistema do processador soft-core SAPHO, que permite escrever esse confronto inteiramente em Python, em cossimulação com os simuladores Icarus Verilog e Verilator, com a rotina de teste reconhecida pela interface e executada em um clique. A metodologia é demonstrada na verificação de uma Unidade de Medição Fasorial implementada no SAPHO segundo a norma IEC/IEEE 60255-118-1: gerador de estímulos, modelo de referência em dupla precisão, emulação da aquisição e análise convivem em um único testbench, que valida o hardware em dois níveis, contra o fasor analítico da norma e contra o modelo numérico. O primeiro nível confirmou um Erro Total do Vetor máximo de 0,98%, dentro do limite normativo; o segundo mostra que o float de 24 bits do processador reproduz a referência com desvio de 5×10⁻⁶ no fasor, atribuindo o erro remanescente ao método de estimação, e não à aritmética do hardware.",
+    "tags": ["Modelagem e verificação de sistemas digitais", "Cossimulação", "cocotb", "Processador soft-core SAPHO", "Unidade de Medição Fasorial", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-cocotb-aurora.pdf"
+  },
+  {
+    "id": "pub-2026-enmc-aurora-ide",
+    "title": "Ambiente de Desenvolvimento Integrado AURORA: Compilação e Simulação para o Processador Soft-Core SAPHO",
+    "authors": ["Chrysthofer Arthur Amaro Afonso", "Gabriel de Aquino Torres", "Pedro Henrique Sereno Romeu dos Santos", "Arthur Araújo Martins", "Nelson Cevidanes Nascimento de Assis", "Guilherme Barroso Morett", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "O projeto de sistemas embarcados em FPGA é, em essência, um ciclo de modelagem computacional: descreve-se o algoritmo, sintetiza-se o modelo estrutural e simula-se o resultado antes de comprometê-lo em hardware. O processador dinâmico SAPHO, que sintetiza apenas os recursos exigidos por cada aplicação, dependia de uma interface (IDE V1) que encadeava seis ferramentas à mão. Este trabalho apresenta a AURORA, ambiente de desenvolvimento integrado e multiplataforma, construído sobre Electron e distribuído em código aberto, que unifica o ciclo numa única operação: compilação, simulação com inspeção das formas de onda (Icarus e GTKWave) e visualização do RTL em blocos (Yosys e PRISM), sem software proprietário, requerido apenas na implementação física. A avaliação mostra que a automação reduz o esforço de operação de seis comandos manuais a um, enquanto o custo de máquina da cadeia, abaixo de 0,7 s, é dominado pela etapa de elaboração do modelo, e não pela simulação. Em simulações longas, avaliadas até um sistema de dois processadores, é o tempo simulado que passa a governar esse custo.",
+    "tags": ["Modelagem e simulação de sistemas digitais", "FPGA", "Processador soft-core", "Automação de fluxo de projeto", "AURORA IDE", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-aurora-ide.pdf"
+  },
+  {
+    "id": "pub-2026-enmc-bancada-prometeo",
+    "title": "Bancada de Teste para Certificação da Eletrônica do Calorímetro Hadrônico do ATLAS no CERN",
+    "authors": ["Vinícius Pires Diniz de Oliveira", "Chrysthofer Arthur Amaro Afonso", "Kinn Belarmino Batista Dias", "Diogo Alves Cardinot", "Thiago Campos Acácio Paschoalin", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "A atualização de Fase-II do calorímetro hadrônico de telhas do experimento ATLAS substitui integralmente a eletrônica de leitura de mais de dez mil canais para operação no LHC de alta luminosidade (High Luminosity LHC, HL-LHC). Cada módulo precisa ser declarado apto antes da instalação, o que torna a aceitação uma decisão repetida milhares de vezes, por equipes distintas e ao longo de anos. O PROMETEO (Portable ReadOut ModulE for Tile ElectrOnics) é uma bancada portátil e autônoma que reproduz, fora do detector, alimentação, sincronismo, comunicação óptica e estímulo controlado, o suficiente para exercitar a cadeia completa, do bloco de fotomultiplicadora à transmissão digital. Sobre esse modelo funcional reduzido, uma bateria automatizada de ensaios cobre pedestal, linearidade do conversor, injeção de carga, forma de pulso e excitação. Cada ensaio ajusta os dados medidos a uma resposta de referência, e são os parâmetros do ajuste, e não uma aprovação binária, que sustentam o veredito e separam classes de defeito. Este artigo descreve a cadeia de leitura atualizada e a camada de automação desenvolvida pelos autores, que encadeia os ensaios e registra os resultados no banco de dados do calorímetro, tornando a certificação rastreável.",
+    "tags": ["Calorímetro hadrônico", "TileCal", "Eletrônica de leitura", "HL-LHC", "PROMETEO", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-bancada-prometeo.pdf"
+  },
 {
     "id": "pub-2005-ieee-tdc-detector",
     "title": "A TDC-Based System for X-Ray Imaging Detectors",
