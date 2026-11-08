@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 6: o MNIST em NumPy, com treino, validação e teste | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Study guide of class 6 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-06/study-guide/">
+  <meta property="og:title" content="Aula 6: o MNIST em NumPy, com treino, validação e teste | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Study guide of class 6 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-06/study-guide/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/courses.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/vendor/katex.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero cr-hero--slim">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../"><span data-i18n="courses.class">Class</span> 6</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.study_guide">Study guide</span></span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></p><h1 class="display-md fade-up" lang="pt-BR">Aula 6: o MNIST em NumPy, com treino, validação e teste</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 27/11/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 2</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="../slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="../"><i class="ph ph-arrow-left" aria-hidden="true"></i><span data-i18n="courses.back_to_class">Back to the class</span></a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band cr-band--guide" style="--seam-from:var(--bg-0)">
+      <div class="container cr-guide-grid">
+        <nav class="cr-toc" aria-labelledby="toc-t"><p class="cr-toc-title" id="toc-t"><span data-i18n="courses.on_this_page">On this page</span></p><ol lang="pt-BR"><li><a href="#os-topicos">Os tópicos</a></li><li><a href="#notacao">Notação</a></li><li><a href="#1-revisao-das-aulas-4-e-5">1. Revisão das aulas 4 e 5</a></li><li><a href="#2-o-mnist-e-a-rede">2. O MNIST e a rede</a></li><li><a href="#3-treino-validacao-e-teste">3. Treino, validação e teste</a></li><li><a href="#4-de-onde-vem">4. De onde vem</a></li><li><a href="#5-o-codigo">5. O código</a></li><li><a href="#6-fechamento">6. Fechamento</a></li><li><a href="#perguntas-que-podem-aparecer">Perguntas que podem aparecer</a></li><li><a href="#para-estudar">Para estudar</a></li><li><a href="#fontes-dos-fatos-citados">Fontes dos fatos citados</a></li></ol></nav>
+        <article class="cr-prose cr-guide" lang="pt-BR">
+<p>Material de estudo para acompanhar os slides.</p>
+<p>O objetivo da aula é saber dizer o que entra numa rede que lê dígitos, o que a softmax e a
+entropia cruzada fazem, por que os dados se separam em treino, validação e teste, e reconhecer o
+sobreajuste nas curvas.</p>
+<h2 id="os-topicos">Os tópicos</h2>
+<p>Sem horário marcado: o que não couber hoje entra na aula seguinte.</p>
+<ol>
+<li>Revisão das aulas 4 e 5</li>
+<li>O MNIST e a rede</li>
+<li>Treino, validação e teste</li>
+<li>De onde vem</li>
+<li>O código</li>
+<li>Fechamento</li>
+</ol>
+<h2 id="notacao">Notação</h2>
+<p>Os símbolos novos dos slides, na ordem em que aparecem. Cada um também é definido na
+nota do slide em que aparece primeiro; os das aulas anteriores estão nos roteiros delas.</p>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Lê-se</th>
+<th>Quer dizer</th>
+<th>Slide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover><mo separator="true">,</mo><mtext> </mtext><msub><mi>p</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\vec{p},\ p_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>p, p k</td>
+<td>as dez probabilidades da rede; pₖ é a do dígito k</td>
+<td>6</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">softmax</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\operatorname{softmax}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mop"><span class="mord mathrm">softmax</span></span></span></span></span></td>
+<td>softmax</td>
+<td>a função que leva dez números a dez probabilidades</td>
+<td>6</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi></mrow><annotation encoding="application/x-tex">e</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">e</span></span></span></span></td>
+<td>e</td>
+<td>o número 2,718..., a base da exponencial</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ln</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\ln</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mop">ln</span></span></span></span></td>
+<td>logaritmo natural</td>
+<td>a inversa da exponencial: ln p é o número a que se eleva e para dar p</td>
+<td>9</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">p_t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>p t</td>
+<td>a probabilidade que a rede deu ao dígito certo, t</td>
+<td>9</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>y</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span></td>
+<td>y</td>
+<td>o rótulo como vetor: 1 na posição do dígito certo, 0 nas outras</td>
+<td>10</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mtext>lote</mtext></msub></mrow><annotation encoding="application/x-tex">L_{\text{lote}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">lote</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>L do lote</td>
+<td>a perda média dos exemplos de um lote</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<p>No NumPy, estas peças resolvem quase tudo:</p>
+<ul>
+<li><code>np.exp(Z - Z.max(axis=1, keepdims=True))</code>: a exponencial da softmax, com o maior
+de cada linha subtraído; <code>keepdims=True</code> deixa o máximo como coluna.</li>
+<li><code>E / E.sum(axis=1, keepdims=True)</code>: divide cada linha pela soma dela.</li>
+<li><code>P[np.arange(N), t]</code>: em cada linha, a coluna do dígito certo.</li>
+<li><code>rng.permutation(len(X))</code> e <code>X[i]</code>: uma ordem sorteada e o lote com os índices <code>i</code>.</li>
+<li><code>P.argmax(axis=1) == t</code>: a resposta da rede contra o rótulo; a média é a acurácia.</li>
+<li><code>gzip.open</code> e <code>np.frombuffer(dados, dtype=np.uint8)</code>: a leitura dos arquivos do
+MNIST, em mnist.py.</li>
+</ul>
+<h2 id="1-revisao-das-aulas-4-e-5">1. Revisão das aulas 4 e 5</h2>
+<h3 id="slide-1-a-capa">Slide 1: A capa <a class="cg-slide-link" href="../slides/#1" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A aula 6 leva a retropropagação da aula 5 a um problema de verdade: reconhecer dígitos escritos à mão. O conjunto é o MNIST, com 70 mil imagens. A rede é um perceptron multicamadas, o MLP da aula 3, agora com 784 entradas, uma camada oculta de 256 neurônios e 10 saídas, escrito em NumPy. O assunto novo é o método: separar os dados em treino, validação e teste, para medir o que a rede faz com dígitos que ela nunca viu.</p>
+<p>A imagem da capa é o dígito médio de cada classe: a média, pixel a pixel, de todos os exemplos de treino daquele dígito, uns 5 mil por classe, feita pelo código da aula. Onde quase todos passam o traço, como na haste do 1, a média fica escura; onde cada um escreve de um jeito, como no 4 e no 9, ela se espalha clara. É a primeira conta da aula: um dígito é uma lista de 784 números, e listas de números se somam e se dividem.</p>
+<h3 id="slide-2-revisao-de-memoria">Slide 2: Revisão, de memória <a class="cg-slide-link" href="../slides/#2" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A revisão é de memória: quatro perguntas sobre as aulas 4 e 5, e a turma responde falando.</p>
+<p>O que o Jacobiano de uma camada guarda? As derivadas parciais de cada saída em relação a cada entrada, uma linha por saída. Numa camada com tanh, a linha k é a linha k de W vezes 1 − hₖ².</p>
+<p>Por que o produto dos Jacobianos se calcula de trás para a frente? Porque, começando pela perda, que é um número só, cada passo é uma linha vezes uma matriz. Da frente para trás, seria matriz vezes matriz, muito mais caro.</p>
+<p>O que é o δ de um neurônio? A derivada da perda em relação à soma do neurônio. O de um neurônio oculto é o δ de quem vem depois, vezes o peso da ligação, vezes a inclinação da ativação.</p>
+<p>Como se confere um gradiente? Pela derivada numérica, a diferença central: mexe um peso h para cima e h para baixo e divide a variação da perda por 2h. As duas contas têm de bater.</p>
+<h3 id="slide-3-o-fio-do-curso">Slide 3: O fio do curso <a class="cg-slide-link" href="../slides/#3" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O curso segue um fio, e este slide aparece em todas as aulas, com a aula do dia em destaque.</p>
+<p>Nas aulas 1 a 5, o problema foi o XOR, com quatro exemplos: um neurônio não o separa, duas camadas separam, e a retropropagação acha os pesos sozinha. Nesta aula, a 6, a mesma conta enfrenta 50 mil exemplos de treino e uma pergunta nova: a rede acerta dígitos que nunca viu?</p>
+<p>Na aula 7, o PyTorch faz a retropropagação sozinho, e a mesma rede volta, com a curva do erro final contra a taxa. Na aula 8, os dados do CERN; nas aulas 9 e 10, o projeto, em que o limiar da taxa da aula 2 volta.</p>
+<h2 id="2-o-mnist-e-a-rede">2. O MNIST e a rede</h2>
+<h3 id="slide-4-o-mnist-70-mil-digitos-escritos-a-mao">Slide 4: O MNIST: 70 mil dígitos escritos à mão <a class="cg-slide-link" href="../slides/#4" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O MNIST é um conjunto de 70 mil imagens de dígitos escritos à mão, de 0 a 9: 60 mil marcadas para treino e 10 mil para teste. Cada imagem tem 28 por 28 pixels, 784 ao todo, em tons de cinza. No arquivo, cada pixel é um número de 0 a 255, com 0 o fundo branco e 255 o traço preto; o código divide tudo por 255, e cada pixel vira um número de 0 a 1.</p>
+<p>Cada dígito foi reduzido para caber numa caixa de 20 por 20 pixels, sem mudar a proporção, e centrado no quadro de 28 por 28 pelo centro de massa dos pixels. Os tons de cinza vêm dessa redução, que suaviza as bordas do traço.</p>
+<p>Classe, no curso, é cada uma das respostas possíveis: aqui, os dez dígitos. Rótulo é a classe certa de um exemplo, que vem junto com a imagem. Na programação, classe é outra coisa, o molde de um tipo de objeto, que o curso não usa.</p>
+<p>A figura mostra os quatro primeiros exemplos de cada classe no conjunto de treino: o mesmo dígito aparece com traços grossos e finos, inclinados e retos.</p>
+<h3 id="slide-5-do-digito-as-dez-probabilidades">Slide 5: Do dígito às dez probabilidades <a class="cg-slide-link" href="../slides/#5" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra o que a rede recebe. À esquerda, um dígito do conjunto de teste, um 7, com os 784 pixels em tons de cinza. As linhas da imagem descem uma de cada vez e se enfileiram numa faixa: 784 números, a primeira linha da imagem primeiro. É assim que o código guarda cada dígito, como uma linha da matriz X, com 784 colunas. A rede não sabe que os pixels formam um quadrado: para ela, a entrada é uma lista.</p>
+<p>A faixa entra na rede, e a rede devolve dez probabilidades, uma por dígito. Para o 7, 0,9998 vai para o 7. Depois, outro dígito do teste, um 8 de laço fechado embaixo, e a rede hesita: 0,511 para o 8 e 0,489 para o 2. Ela acerta por pouco.</p>
+<p>As probabilidades são as que a rede da aula, a de 256 neurônios ocultos, deu a esses dois dígitos, lidas do resultado de codigo/mlp.py.</p>
+<h3 id="slide-6-a-rede-784-256-10">Slide 6: A rede: 784, 256, 10 <a class="cg-slide-link" href="../slides/#6" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A rede da aula tem 784 entradas, uma por pixel; uma camada oculta de 256 neurônios com a tangente hiperbólica, a tanh da aula 4; e 10 saídas, uma por dígito. A camada oculta é a da aula 3, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = tanh(W₁ <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>b</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{b}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">b</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>₁), com W₁ de 256 linhas e 784 colunas. A saída é linear, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>z</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{z}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = W₂ <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>b</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{b}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">b</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>₂, com W₂ de 10 por 256, e a softmax, do slide seguinte, transforma os dez números de <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>z</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{z}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> em dez probabilidades, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>.</p>
+<p>São 203.530 números a ajustar: 784 × 256 pesos e 256 vieses na camada oculta, 256 × 10 pesos e 10 vieses na saída. A rede do XOR tinha nove.</p>
+<p>Os pesos começam sorteados de uma normal com média 0 e desvio 1/√n, com n o número de entradas do neurônio, e os vieses começam em zero. O motivo é uma dedução: com n entradas de tamanho perto de 1 e pesos desse tamanho, a soma de cada neurônio fica perto de 1, onde a tanh ainda tem inclinação. Com pesos grandes, a soma passaria de 3, a tanh ficaria achatada em −1 ou 1, a inclinação seria quase zero, e o treino pararia.</p>
+<p>Os 256 neurônios foram escolhidos pela validação, entre 16, 64 e 256, como mostra o slide das larguras.</p>
+<h3 id="slide-7-a-softmax">Slide 7: A softmax <a class="cg-slide-link" href="../slides/#7" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A softmax recebe dez números quaisquer, z₀ a z₉, e devolve dez probabilidades: pₖ = e^{zₖ} / Σⱼ e^{zⱼ}. O e é o número 2,718..., a base da exponencial, o mesmo da fórmula da tanh na aula 4. A exponencial deixa todo número positivo, e a divisão pela soma faz os dez somarem 1. O maior z fica com a maior probabilidade, e a ordem entre eles não muda. Um exemplo com três números: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>z</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{z}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (2; 1; 0) dá <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> = (0,665; 0,245; 0,090).</p>
+<p>Probabilidade, no curso, é um número de 0 a 1 que diz quanto a rede aposta em cada resposta; as dez somam 1, e a rede responde o dígito de maior probabilidade.</p>
+<p>No código, antes da exponencial, subtrai-se o maior z de cada linha. O resultado não muda, porque o fator e elevado a menos o máximo aparece em cima e embaixo da fração, e o computador não estoura: e^z passa do maior número que ele guarda quando z passa de uns 709.</p>
+<p>A figura mostra as dez probabilidades da rede da aula para os dois dígitos do vídeo: o 7, com 0,9998 no 7, e o 8 em que ela hesita, 0,511 contra 0,489 para o 2. A barra azul é a resposta da rede; a laranja, com hachura, a segunda maior.</p>
+<h3 id="slide-8-a-softmax-por-dentro-em-video">Slide 8: A softmax por dentro, em vídeo <a class="cg-slide-link" href="../slides/#8" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo abre a softmax em três quadros, com o exemplo do slide anterior, três somas em vez de dez. À esquerda, as somas <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>z</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{z}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.044em;">z</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (2; 1; 0). No meio, a exponencial de cada uma: e² = 7,389, e¹ = 2,718 e e⁰ = 1, todas positivas, e a maior agora mais de sete vezes a menor. À direita, cada uma dividida pela soma, 11,107: as probabilidades (0,665; 0,245; 0,090), que somam 1.</p>
+<p>Depois, as mesmas somas menos 2, (0; −1; −2): as exponenciais mudam, (1; 0,368; 0,135), com soma 1,503, mas as probabilidades são as mesmas. Somar o mesmo número a todas as somas multiplica todas as exponenciais pelo mesmo fator, que some na divisão. É por isso que o código pode subtrair o maior z antes da exponencial, para o computador não estourar.</p>
+<p>Por fim, as somas vezes 3, (6; 3; 0): as exponenciais vão a 403,4, 20,1 e 1, e as probabilidades a (0,950; 0,047; 0,002). Quanto mais afastadas as somas, mais firme a aposta da rede no maior. O treino com a entropia cruzada empurra a soma da resposta certa para cima e as outras para baixo, e a aposta fica firme.</p>
+<h3 id="slide-9-a-entropia-cruzada">Slide 9: A entropia cruzada <a class="cg-slide-link" href="../slides/#9" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A perda da classificação é a entropia cruzada: L = −ln pₜ, com pₜ a probabilidade que a rede deu ao dígito certo, t. O ln é o logaritmo natural, a operação inversa da exponencial: ln p é o número a que se eleva e para dar p. Para p entre 0 e 1, ln p é negativo, e o sinal de menos deixa a perda positiva.</p>
+<p>A tabela mostra o que a perda faz: 0,010 quando a rede dá 0,99 ao dígito certo, 0,105 com 0,9, 0,693 com 0,5, 2,303 com 0,1 e 4,605 com 0,01. Uma resposta certa e segura custa quase nada; uma aposta baixa no dígito certo custa muito.</p>
+<p>Num lote de N exemplos, a perda é a média das perdas de cada um: L = −(1/N) Σᵢ ln p_{tᵢ}.</p>
+<p>O erro quadrático da aula 5 também funcionaria, e era o que o MLP de 1998 da tabela da página do MNIST usava. A entropia cruzada vem junto com a softmax no livro de Goodfellow, Bengio e Courville, e a derivada das duas juntas fica simples, como mostra o slide seguinte.</p>
+<p>O nome vem da teoria da informação, que o curso não abre. Na física, entropia é outra grandeza, a da termodinâmica.</p>
+<h3 id="slide-10-o-que-muda-na-retropropagacao">Slide 10: O que muda na retropropagação <a class="cg-slide-link" href="../slides/#10" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A retropropagação é a da aula 5, com duas trocas.</p>
+<p>Na saída, com a softmax e a entropia cruzada, a derivada da perda em relação à soma zₖ da saída k é pₖ − yₖ, com <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>y</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> o vetor do rótulo certo: 1 na posição do dígito certo e 0 nas outras. É o δ de cada saída. Se a rede dá 0,9 ao dígito certo, o δ dele é −0,1; para cada dígito errado, o δ é a própria probabilidade dada a ele. Um vetor desse tipo, com um 1 e o resto zero, chama-se one-hot, em inglês.</p>
+<p>Essa derivada fica como caixa-preta: entra a regra da cadeia através da softmax, que mistura as dez saídas, e sai <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> − <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>y</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>. Ela não se abre agora porque pede a derivada da exponencial e do logaritmo; a conta está no livro de Goodfellow, Bengio e Courville, de 2016, capítulo 6, e o código a confere pela derivada numérica.</p>
+<p>Na camada oculta, a inclinação é a da tanh, 1 − h², da aula 4, no lugar da da sigmoide. O resto é igual: o δ de um neurônio oculto é a soma dos δ das saídas vezes os pesos das ligações, vezes a inclinação; cada peso recebe o δ do neurônio aonde chega vezes a entrada que ele multiplica.</p>
+<p>A conferência: em 30 pesos sorteados de uma rede de 16 neurônios, com 20 exemplos, a maior diferença relativa entre a retropropagação e a derivada numérica é 1,5 · 10⁻⁸.</p>
+<h3 id="slide-11-o-gradiente-em-lotes">Slide 11: O gradiente em lotes <a class="cg-slide-link" href="../slides/#11" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Com 50 mil exemplos, calcular o gradiente de todos antes de cada passo seria lento: um passo por passada inteira pelo treino. O treino em lotes sorteia a ordem dos exemplos e anda de 64 em 64: cada lote dá a perda média dos seus 64 exemplos, a retropropagação dá o gradiente dela, e os pesos dão um passo. São 782 passos por época: 781 lotes de 64 e um último de 16.</p>
+<p>Época, no curso, é uma passada por todos os exemplos de treino. Lote é um grupo de exemplos que dá um passo do gradiente; em inglês, batch ou mini-batch. Em português comum, lote é um terreno ou uma remessa de produtos; aqui, só o grupo de exemplos.</p>
+<p>O gradiente de um lote não é o gradiente de todos, mas aponta perto dele, e custa 781 vezes menos. Isso é dedução: a perda média de 64 exemplos sorteados é uma estimativa da perda média dos 50 mil, e a derivada da estimativa é uma estimativa da derivada.</p>
+<p>A taxa é η = 0,1, e as épocas, 20. Os três números, 64, 0,1 e 20, são hiperparâmetros: escolhidos de fora, e não ajustados pelo treino.</p>
+<h2 id="3-treino-validacao-e-teste">3. Treino, validação e teste</h2>
+<h3 id="slide-12-a-rede-aprendeu-ou-decorou">Slide 12: A rede aprendeu ou decorou? <a class="cg-slide-link" href="../slides/#12" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>No treino, a rede chega a 99,21% de acertos depois de 20 épocas, e, com só mil exemplos, chega a 100%. Isso não diz se ela reconhece um dígito que nunca viu. A pergunta desta parte da aula é como medir isso sem se enganar, e a resposta é separar os dados antes de treinar.</p>
+<h3 id="slide-13-treino-validacao-e-teste">Slide 13: Treino, validação e teste <a class="cg-slide-link" href="../slides/#13" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Os 60 mil exemplos de treino do MNIST viram dois conjuntos: 50 mil para o treino e 10 mil para a validação, sorteados com a semente 0. Os 10 mil de teste ficam como vieram.</p>
+<p>Treino, no curso, é o conjunto que ajusta os pesos. Validação é o conjunto que escolhe os hiperparâmetros, como a largura da camada oculta e a época de parar, sem nunca ajustar peso. Teste é o conjunto que mede a rede escolhida, uma vez só, no fim. As definições seguem o verbete da Wikipedia sobre os três conjuntos.</p>
+<p>Hiperparâmetro é um número que o treino não ajusta e que se escolhe de fora: a largura, a taxa, o tamanho do lote, o número de épocas.</p>
+<p>Por que três conjuntos, e não dois: quem escolhe a largura olhando o teste acaba escolhendo a que acerta mais aqueles 10 mil dígitos em particular, e o número do teste deixa de valer para dígitos novos. A validação absorve as escolhas; o teste fica limpo. Isso é dedução do papel de cada conjunto.</p>
+<p>Acurácia é a fração de acertos: a rede acerta quando a maior das dez probabilidades é a do dígito certo.</p>
+<h3 id="slide-14-treino-e-validacao-epoca-a-epoca">Slide 14: Treino e validação, época a época <a class="cg-slide-link" href="../slides/#14" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>As curvas da rede de 256 neurônios, época a época, nas 20 épocas. À esquerda, a perda; à direita, a acurácia; em azul cheio, o treino, e em laranja tracejado, a validação.</p>
+<p>A validação fica sempre um pouco pior que o treino, porque os pesos foram ajustados nos exemplos do treino: na época 20, 99,21% no treino e 97,33% na validação. As duas ainda melhoram na época 20, e a melhor época da validação é a última.</p>
+<p>A época 8 tem um tropeço nas duas curvas, desfeito na época 9; a causa não foi investigada.</p>
+<p>A perda e a acurácia contam coisas diferentes. A acurácia só vê se a maior probabilidade é a do dígito certo; a perda vê quanto a rede apostou nele.</p>
+<h3 id="slide-15-com-mil-exemplos-a-rede-decora">Slide 15: Com mil exemplos, a rede decora <a class="cg-slide-link" href="../slides/#15" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Sobreajuste é quando a rede decora o treino e erra no dado novo. O verbete da Wikipedia diz que o modelo começa a memorizar os dados de treino em vez de aprender a generalizar. Generalizar, no curso, é acertar exemplos que não estavam no treino. Em inglês, overfitting.</p>
+<p>Para ver o sobreajuste, a mesma rede, de 256 neurônios, treinou com só os mil primeiros exemplos do treino, por 300 épocas. O treino chega a 100% de acertos, e a perda dele cai a 0,0037: a rede decorou os mil. A validação para em 87,42%, e a perda dela é mínima na época 23, 0,4393, e depois sobe até 0,6169 na época 300. A linha tracejada cinza marca a época 23: depois dela, o que melhora o treino piora a validação.</p>
+<p>A acurácia da validação fica quase parada enquanto a perda dela sobe. A leitura, que é dedução, é que a rede continua acertando e errando os mesmos dígitos, mas aposta cada vez mais alto nas respostas erradas.</p>
+<p>A época de menor perda na validação é a hora de parar. Com 50 mil exemplos e 20 épocas, a rede da aula não chegou a esse ponto: a validação ainda melhorava na época 20.</p>
+<h3 id="slide-16-a-validacao-escolhe-a-largura">Slide 16: A validação escolhe a largura <a class="cg-slide-link" href="../slides/#16" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Três redes, com 16, 64 e 256 neurônios na camada oculta, treinadas do mesmo jeito, com a mesma semente, por 20 épocas. Na validação, 94,10%, 96,73% e 97,33%, todas na melhor época, a 20. A de 256 ganha e é a escolhida.</p>
+<p>A de 16 fica para trás desde o começo: 16 neurônios não bastam para separar os dez dígitos tão bem. Entre 64 e 256, a diferença é menor, 0,6 ponto.</p>
+<p>Mais neurônios custam mais tempo: 4, 9 e 102 segundos no laptop do professor, na última vez que o mlp.py rodou; o tempo muda de uma vez para outra, com o que mais o computador está fazendo. Num laptop mais fraco, mais. Nenhum desses números olhou o teste.</p>
+<h3 id="slide-17-o-teste-medido-uma-vez">Slide 17: O teste, medido uma vez <a class="cg-slide-link" href="../slides/#17" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O teste, medido uma vez: a rede de 256 neurônios, com os pesos da época 20, acerta 97,59% dos 10 mil dígitos de teste, 241 erros. A perda no teste é 0,0766.</p>
+<p>O número vale junto com a semente, 1, e a versão dos dados, 227111746c19, os doze primeiros caracteres do SHA-256 dos quatro arquivos do MNIST. Com outra semente, sai outro número, perto deste. O artigo de 1998 diz que a incerteza das taxas de erro que ele cita, medidas nos mesmos 10 mil, é de cerca de 0,1 ponto; o teste ficar 0,26 ponto acima da validação cabe nessa ordem de flutuação. Isso é dedução.</p>
+<p>A figura mostra os 16 primeiros erros, na ordem do teste, com o dígito certo e a resposta da rede. Vários são difíceis também para gente: o 4 que parece 9, o 2 que parece 7.</p>
+<h3 id="slide-18-que-digitos-a-rede-confunde">Slide 18: Que dígitos a rede confunde <a class="cg-slide-link" href="../slides/#18" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A matriz de confusão do teste, com as 10 mil respostas da rede da aula. Cada linha é um dígito certo; cada coluna, o que a rede respondeu. Na diagonal, os acertos; fora dela, os erros, com a cor mais forte onde há mais. São 241 erros ao todo, os 2,41% que faltam para os 97,59% de acurácia.</p>
+<p>Os erros não se espalham por igual. Os pares mais confundidos: 15 setes respondidos como 2, 12 quatros como 9 e 11 cincos como 3; e 10 noves como 4. A leitura, que é dedução tirada dos dígitos errados do slide do teste: são pares de formas parecidas, como o 4 e o 9, que muita gente fecha em cima. O dígito de menos acertos é o 9, com 96,3%, 972 de 1.009; o de mais, o 1, com 99,1%, 1.125 de 1.135.</p>
+<p>A matriz é a mesma medida do teste, olhada por dentro: não é um segundo teste, e nada nela volta ao treino. Matriz, aqui, é só a tabela de contagens, no sentido da aula 3.</p>
+<p>Os números saem de codigo/figuras_slides.py, que lê as respostas gravadas em resultados/mlp.json.</p>
+<h3 id="slide-19-o-que-os-neuronios-ocultos-procuram">Slide 19: O que os neurônios ocultos procuram <a class="cg-slide-link" href="../slides/#19" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Cada neurônio oculto tem um peso por pixel, 784 ao todo. Arrumados na forma da imagem, 28 por 28, os pesos mostram o que o neurônio procura. Laranja é peso positivo: tinta ali aumenta a soma do neurônio; azul é negativo: tinta ali diminui. A figura mostra os 16 primeiros dos 256 neurônios da rede da aula, todos na mesma escala, até 0,428 em valor absoluto.</p>
+<p>Alguns têm forma clara: o neurônio 5, uma barra azul no alto com laranja logo acima; o 15, um traço vertical azul com laranja dos lados; o 12, um traço inclinado. Outros parecem ruído: o 4, o 10. É dedução que o ruído seja o resto do sorteio inicial, pesos de desvio 1/√784, uns 0,036, que o treino mexeu pouco.</p>
+<p>Nenhum neurônio sozinho reconhece um dígito. Cada um responde a um pedaço de forma, e a camada de saída combina as 256 respostas para dar as dez probabilidades.</p>
+<p>Os pesos são da rede escolhida pela validação, gravados por mlp.py em resultados/mlp.json.</p>
+<h3 id="slide-20-um-neuronio-oculto-diante-de-uma-imagem-em-video">Slide 20: Um neurônio oculto diante de uma imagem, em vídeo <a class="cg-slide-link" href="../slides/#20" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra o que o neurônio 5 faz com uma imagem. À esquerda, o dígito; no meio, os 784 pesos do neurônio na forma da imagem; à direita, cada pixel vezes o seu peso. Embaixo, a soma dos 784 produtos, Σ wⱼ xⱼ: é o produto escalar da aula 1, entre a imagem e os pesos.</p>
+<p>Com o 7 do índice 0 do teste, o traço de cima do 7 cai sobre a barra azul, e a soma é −2,83. Com o 5 do índice 8, o traço de cima do 5 fica mais alto, sobre o laranja, e a soma é +1,55. O mesmo neurônio dá números de sinais opostos para dígitos diferentes: é assim que ele separa um padrão de outro.</p>
+<p>A soma do vídeo é a dos produtos, antes do viés do neurônio, um número só que se soma a ela; depois vem a tanh, e a saída do neurônio vai para a camada de saída.</p>
+<h2 id="4-de-onde-vem">4. De onde vem</h2>
+<h3 id="slide-21-de-onde-vem">Slide 21: De onde vem <a class="cg-slide-link" href="../slides/#21" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Em 1998, Yann LeCun, Léon Bottou, Yoshua Bengio e Patrick Haffner publicaram nos Proceedings of the IEEE &quot;Gradient-based learning applied to document recognition&quot;. A seção III-A conta de onde vêm os dígitos. O NIST, o National Institute of Standards and Technology dos Estados Unidos, tinha duas bases de dígitos: a Special Database 3, a SD-3, escrita por funcionários do Census Bureau, o escritório do censo dos Estados Unidos, e a Special Database 1, a SD-1, escrita por estudantes do ensino médio. A SD-3 é bem mais limpa. O NIST usava a SD-3 para treino e a SD-1 para teste; os autores misturaram as duas. O MNIST, o Modified NIST, tem 30 mil dígitos de cada base no treino e 5 mil de cada no teste, segundo a página do MNIST, com escritores diferentes no treino e no teste.</p>
+<p>No mesmo artigo, a LeNet-5, uma rede convolucional, erra 0,95% no teste. Rede convolucional é uma rede em que cada neurônio olha uma janela pequena da imagem, com os mesmos pesos em todas as posições; ela fica fora do curso. Um MLP com uma camada oculta de 300 neurônios, treinado com o erro quadrático, erra 4,7%, segundo a página do MNIST. A rede desta aula erra 2,41%, com outra perda, outra ativação e outro treino: a comparação só mostra a ordem de grandeza.</p>
+<p>Em 1998, LeCun trabalhava no AT&amp;T Labs-Research, em Nova Jersey; nasceu na França, em 1960. Em 2018, a ACM, a associação de computação dos Estados Unidos, deu o Prêmio Turing a Yoshua Bengio, Geoffrey Hinton, o da retropropagação de 1986, da aula 5, e Yann LeCun, &quot;pelos avanços conceituais e de engenharia que fizeram das redes neurais profundas um componente crítico da computação&quot;, em tradução livre.</p>
+<p>O retrato, à direita, é de LeCun numa conferência na École polytechnique, na França, em fevereiro de 2025. A foto é da própria École polytechnique, publicada no Wikimedia Commons com a licença CC BY-SA 2.0.</p>
+<h2 id="5-o-codigo">5. O código</h2>
+<h3 id="slide-22-o-codigo">Slide 22: O código <a class="cg-slide-link" href="../slides/#22" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O código da aula fica pronto e testado antes: codigo/mlp.py, a solução de referência da entrega, que não vai para a turma antes do prazo. A turma recebe codigo/mnist.py, que carrega os dados, e codigo/esqueleto.py.</p>
+<p>Os passos do mlp.py: ler os quatro arquivos do MNIST, dividir por 255 e separar a validação; sortear os pesos; a passada para a frente, com a tanh e a softmax; a retropropagação, conferida pela derivada numérica antes de treinar; o laço dos lotes, guardando a perda e a acurácia de cada época e os pesos da melhor época na validação; e, no fim, o teste uma vez e o arquivo resultados/mlp.json, com a semente, a versão dos dados e os números.</p>
+<p>Quatro peças do NumPy. np.exp(Z - Z.max(axis=1, keepdims=True)) é a exponencial da softmax, com o maior de cada linha subtraído; keepdims=True deixa o máximo como coluna, para a subtração valer linha por linha. P[np.arange(N), t] pega, em cada linha, a coluna do dígito certo. rng.permutation(len(X)) sorteia uma ordem dos exemplos, de onde saem os lotes. E P.argmax(axis=1) == t compara a resposta da rede com o rótulo, e a média disso é a acurácia.</p>
+<p>No laptop do professor, o mlp.py inteiro leva cerca de quatro minutos.</p>
+<h3 id="slide-23-o-que-a-entrega-pede">Slide 23: O que a entrega pede <a class="cg-slide-link" href="../slides/#23" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A entrega parte de dois arquivos que vão para a turma: mnist.py, que carrega os dados, e esqueleto.py, com o treino pronto e três funções para escrever: softmax, para_a_frente e retropropagacao. O esqueleto confere a retropropagação pela derivada numérica antes de treinar e para se a diferença passar de 10⁻⁵. Com as três escritas, ele treina uma rede de 64 neurônios por 10 épocas, mede o teste uma vez e grava o gráfico das curvas.</p>
+<p>O que se entrega: a acurácia no teste, a semente e a versão dos dados que o programa imprime, e o gráfico das curvas de treino e de validação. Quem quiser pode mudar a largura, a taxa ou as épocas, escolhendo pela validação, nunca pelo teste.</p>
+<p>Antes, uma vez: python infra/baixar_dados.py, que baixa os quatro arquivos do MNIST para dados/ e confere cada um. No laptop do professor, as 10 épocas levam uns 10 segundos.</p>
+<p>O que se exige é saber dizer o que entra na rede, o que ela aprende e o que significa o número que sai.</p>
+<h2 id="6-fechamento">6. Fechamento</h2>
+<h3 id="slide-24-para-estudar-e-entregar">Slide 24: Para estudar e entregar <a class="cg-slide-link" href="../slides/#24" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O estudo prepara a aula 7. O tutorial &quot;Learn the Basics&quot; do PyTorch percorre a mesma sequência desta aula, dados, rede, perda, treino e teste, com a biblioteca. O vídeo de Andrej Karpathy, &quot;The spelled-out intro to neural networks and backpropagation: building micrograd&quot;, de 2022, com 2 horas e 26 minutos, escreve do zero uma pequena biblioteca que calcula os gradientes sozinha, como o PyTorch faz na aula 7. E o quadro do algoritmo, o Algorithm 1, do artigo de Diederik Kingma e Jimmy Ba, &quot;Adam: A method for stochastic optimization&quot;, de 2014, apresentado na conferência ICLR de 2015: o Adam é outro jeito de dar o passo do gradiente.</p>
+<p>A entrega: o MLP do esqueleto, com as três funções escritas, a acurácia no teste com a semente e a versão dos dados, e as curvas de treino e de validação; e uma pergunta sobre o estudo.</p>
+<p>A seguir, a aula 7 refaz esta rede em PyTorch, que faz a retropropagação sozinho, e mede o erro final contra a taxa; a aula 8 leva um MLP aos dados do CERN.</p>
+<h2 id="perguntas-que-podem-aparecer">Perguntas que podem aparecer</h2>
+<ul>
+<li>Por que não usar o teste para escolher a largura? Porque aí a escolha se ajusta
+àqueles 10 mil dígitos, e o número do teste deixa de valer para dígitos novos. A
+validação existe para receber as escolhas.</li>
+<li>A validação deu 97,33% e o teste 97,59%: o teste não devia dar menos? Não
+necessariamente. São dois conjuntos diferentes de 10 mil, e o artigo de 1998 dá
+uma incerteza de cerca de 0,1 ponto para taxas de erro medidas nesse tamanho de
+conjunto; uma diferença de 0,26 ponto é dessa ordem.</li>
+<li>Por que a rede vê o dígito como lista, e não como imagem? Porque um MLP recebe um
+vetor. A rede convolucional, como a LeNet-5, aproveita a vizinhança dos pixels, e
+por isso erra menos; fica fora do curso.</li>
+<li>Por que a entropia cruzada, e não o erro quadrático da aula 5? Os dois funcionam.
+Com a softmax, a derivada da entropia cruzada é <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> − <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>y</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>, a mais simples possível,
+e a perda cresce muito quando a rede aposta pouco no dígito certo.</li>
+<li>E se eu mudar a semente? A acurácia muda um pouco. Por isso o resultado vai sempre
+com a semente e a versão dos dados.</li>
+</ul>
+<h2 id="para-estudar">Para estudar</h2>
+<p>O estudo da turma, que é também o seu:</p>
+<ul>
+<li>PyTorch, tutorial &quot;Learn the Basics&quot;:
+<a href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html" target="_blank" rel="noopener">docs.pytorch.org/tutorials/beginner/basics/intro.html</a>.</li>
+<li>Andrej Karpathy, 2022, &quot;The spelled-out intro to neural networks and
+backpropagation: building micrograd&quot;, vídeo de 2h26min,
+<a href="https://www.youtube.com/watch?v=VMj-3S1tku0" target="_blank" rel="noopener">youtube.com/watch?v=VMj-3S1tku0</a>.</li>
+<li>Diederik Kingma e Jimmy Ba, 2014, &quot;Adam: A method for stochastic optimization&quot;,
+<a href="https://arxiv.org/abs/1412.6980" target="_blank" rel="noopener">arXiv:1412.6980</a>, apresentado na ICLR de 2015. Só o quadro do algoritmo, o
+Algorithm 1.</li>
+</ul>
+<p>Além dele, para preparar a aula:</p>
+<ul>
+<li>Yann LeCun, Léon Bottou, Yoshua Bengio e Patrick Haffner, 1998, &quot;Gradient-based
+learning applied to document recognition&quot;, Proceedings of the IEEE
+86(11):2278-2324, <a href="https://doi.org/10.1109/5.726791:" target="_blank" rel="noopener">doi:10.1109/5.726791:</a> a seção III-A, sobre o MNIST, e a III-B,
+sobre a LeNet-5.</li>
+<li>Ian Goodfellow, Yoshua Bengio e Aaron Courville, 2016, <em>Deep Learning</em>, capítulo
+6, <a href="https://deeplearningbook.org/contents/mlp.html" target="_blank" rel="noopener">deeplearningbook.org/contents/mlp.html</a>: a softmax, na seção 6.2.2.3.</li>
+</ul>
+<h2 id="fontes-dos-fatos-citados">Fontes dos fatos citados</h2>
+<p>Só para conferência; o estudo é a lista de cima.</p>
+<ul>
+<li>LeCun, Bottou, Bengio e Haffner, 1998, citado acima, na versão dos autores,
+<a href="https://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf" target="_blank" rel="noopener">yann.lecun.com/exdb/publis/pdf/lecun-98.pdf</a>, seção III-A: o SD-3, dos
+funcionários do Census Bureau, e o SD-1, dos estudantes do ensino médio; o SD-3
+mais limpo; o nome Modified NIST; a caixa de 20 por 20 e o centro de massa no
+quadro de 28 por 28; os 250 escritores do SD-1 no treino e os outros 250 no
+teste. Seção III-B e figura 9: a LeNet-5, 0,95% de erro no teste, e a incerteza
+de cerca de 0,1% nas taxas citadas.</li>
+<li>A página do MNIST, <a href="https://yann.lecun.com/exdb/mnist" target="_blank" rel="noopener">yann.lecun.com/exdb/mnist</a>, na cópia do Internet Archive de
+29/09/2023, porque a página de hoje é uma listagem vazia: 60 mil e 10 mil; 30 mil
+de cada base no treino e 5 mil de cada no teste; escritores diferentes no treino
+e no teste; os pixels de 0 a 255, 0 o fundo branco e 255 o traço preto; os nomes
+e os tamanhos dos quatro arquivos; a tabela, com o MLP de 300 ocultos e erro
+quadrático, 4,7%.</li>
+<li>O código do torchvision, torchvision/datasets/mnist.py, no GitHub pytorch/vision:
+o espelho <a href="https://ossci-datasets.s3.amazonaws.com/mnist" target="_blank" rel="noopener">ossci-datasets.s3.amazonaws.com/mnist</a> e o MD5 dos quatro arquivos, que
+conferem com os baixados. O SHA-256 de cada um está em infra/baixar_dados.py.</li>
+<li>Goodfellow, Bengio e Courville, 2016, capítulo 6: a definição da softmax,
+equação 6.29, e a derivada da entropia cruzada em relação às entradas da softmax,
+q − p na notação do livro, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> − <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>y</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1799em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> na da aula, seção 6.5.9.</li>
+<li>Verbete &quot;Training, validation, and test data sets&quot; da Wikipedia em inglês,
+revisão de 02/11/2026: o papel de cada conjunto. Verbete &quot;Overfitting&quot;: a
+definição e a memorização no lugar da generalização.</li>
+<li>Verbete &quot;Yann LeCun&quot; da Wikipedia em inglês, revisão de 02/11/2026: o nascimento
+em 1960, na França; o AT&amp;T Labs-Research desde 1996. A página 1 do artigo de 1998:
+o laboratório em Red Bank, Nova Jersey.</li>
+<li>A página do NIST, <a href="https://nist.gov/about-nist" target="_blank" rel="noopener">nist.gov/about-nist</a>: o nome National Institute of Standards and
+Technology. O artigo de 1998 e a página do MNIST: &quot;NIST's Special Database 3 and
+Special Database 1&quot;.</li>
+<li>A página do Prêmio Turing de 2018 da ACM, na cópia do Internet Archive de
+01/01/2024: Bengio, Hinton e LeCun, e a justificativa.</li>
+<li>Wikimedia Commons, a página do arquivo &quot;Yann LeCun - 2025 (cropped).jpg&quot;: a École
+polytechnique como autora, 11/02/2025, CC BY-SA 2.0.</li>
+<li>O vídeo de Karpathy na página do YouTube: o título, 16/08/2022 e 2h25min52s. O
+Adam na página do arXiv: 22/12/2014, a ICLR de 2015 e o Algorithm 1.</li>
+<li>Os números: codigo/mlp.py, com a semente 1 e a versão 227111746c19 dos dados,
+gravados em resultados/mlp.json.</li>
+</ul>
+
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>

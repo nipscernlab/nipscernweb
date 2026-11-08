@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 7: PyTorch, o que a biblioteca automatiza | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Study guide of class 7 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-07/study-guide/">
+  <meta property="og:title" content="Aula 7: PyTorch, o que a biblioteca automatiza | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Study guide of class 7 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-07/study-guide/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/courses.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/vendor/katex.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero cr-hero--slim">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../"><span data-i18n="courses.class">Class</span> 7</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.study_guide">Study guide</span></span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></p><h1 class="display-md fade-up" lang="pt-BR">Aula 7: PyTorch, o que a biblioteca automatiza</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 27/11/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 2</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="../slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="../"><i class="ph ph-arrow-left" aria-hidden="true"></i><span data-i18n="courses.back_to_class">Back to the class</span></a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band cr-band--guide" style="--seam-from:var(--bg-0)">
+      <div class="container cr-guide-grid">
+        <nav class="cr-toc" aria-labelledby="toc-t"><p class="cr-toc-title" id="toc-t"><span data-i18n="courses.on_this_page">On this page</span></p><ol lang="pt-BR"><li><a href="#os-topicos">Os tópicos</a></li><li><a href="#notacao">Notação</a></li><li><a href="#1-revisao-das-aulas-5-e-6">1. Revisão das aulas 5 e 6</a></li><li><a href="#2-o-que-o-pytorch-automatiza">2. O que o PyTorch automatiza</a></li><li><a href="#3-a-rede-da-aula-6-em-pytorch">3. A rede da aula 6 em PyTorch</a></li><li><a href="#4-o-erro-final-contra-a-taxa">4. O erro final contra a taxa</a></li><li><a href="#5-de-onde-vem">5. De onde vem</a></li><li><a href="#6-o-codigo">6. O código</a></li><li><a href="#7-fechamento">7. Fechamento</a></li><li><a href="#perguntas-que-podem-aparecer">Perguntas que podem aparecer</a></li><li><a href="#para-estudar">Para estudar</a></li><li><a href="#fontes-dos-fatos-citados">Fontes dos fatos citados</a></li></ol></nav>
+        <article class="cr-prose cr-guide" lang="pt-BR">
+<p>Material de estudo para acompanhar os slides.</p>
+<p>O objetivo da aula é saber dizer o que o PyTorch automatiza, o tensor e o autograd, reescrever
+a rede da aula 6 em PyTorch e conferir que o resultado é o mesmo, e ler a curva do erro final
+contra a taxa de aprendizado, com a fronteira quebrada perto do limiar.</p>
+<h2 id="os-topicos">Os tópicos</h2>
+<p>Sem horário marcado: o que não couber hoje entra na aula seguinte.</p>
+<ol>
+<li>Revisão das aulas 5 e 6</li>
+<li>O que o PyTorch automatiza</li>
+<li>A rede da aula 6 em PyTorch</li>
+<li>O erro final contra a taxa</li>
+<li>De onde vem</li>
+<li>O código</li>
+<li>Fechamento</li>
+</ol>
+<h2 id="notacao">Notação</h2>
+<p>Os nomes novos dos slides, na ordem em que aparecem; os das aulas anteriores estão nos roteiros delas.</p>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Lê-se</th>
+<th>Quer dizer</th>
+<th>Slide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="monospace">shape</mtext></mrow><annotation encoding="application/x-tex">\texttt{shape}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.2222em;"></span><span class="mord text"><span class="mord texttt">shape</span></span></span></span></span></td>
+<td>shape, forma</td>
+<td>quantos números o tensor tem em cada eixo</td>
+<td>5</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="monospace">.grad</mtext></mrow><annotation encoding="application/x-tex">\texttt{.grad}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.2222em;"></span><span class="mord text"><span class="mord texttt">.grad</span></span></span></span></span></td>
+<td>ponto grad</td>
+<td>onde o autograd deixa a derivada da perda em relação a um tensor</td>
+<td>6</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi></mrow><annotation encoding="application/x-tex">\eta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span></span></span></span></td>
+<td>eta</td>
+<td>a taxa de aprendizado, como desde a aula 1</td>
+<td>14</td>
+</tr>
+</tbody>
+</table>
+<p>No PyTorch, estas peças resolvem quase tudo:</p>
+<ul>
+<li><code>torch.from_numpy(X)</code>: os dados da aula 6 como tensor, sem copiar os números.</li>
+<li><code>x.requires_grad_(True)</code> e <code>L.backward()</code>: pedir o registro das contas e
+calcular a derivada de L; o resultado fica em <code>x.grad</code>.</li>
+<li><code>torch.nn.Sequential(torch.nn.Linear(784, 256), torch.nn.Tanh(), torch.nn.Linear(256, 10))</code>:
+a rede da aula 6.</li>
+<li><code>torch.nn.CrossEntropyLoss()</code>: a softmax e a entropia cruzada, juntas.</li>
+<li><code>opt.zero_grad()</code>, <code>perda.backward()</code>, <code>opt.step()</code>: o laço de cada lote.</li>
+<li><code>torch.autograd.grad(L, pesos)</code>: o gradiente devolvido, sem ir para <code>.grad</code>.</li>
+<li><code>with torch.no_grad():</code>: contas que não entram no grafo, como o passo feito à mão.</li>
+</ul>
+<h2 id="1-revisao-das-aulas-5-e-6">1. Revisão das aulas 5 e 6</h2>
+<h3 id="slide-1-a-capa">Slide 1: A capa <a class="cg-slide-link" href="../slides/#1" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A aula 7 troca o NumPy pelo PyTorch, a biblioteca de redes neurais que a pesquisa usa. A rede é a mesma da aula 6; a diferença é que a retropropagação, escrita à mão nas aulas 5 e 6, passa a ser feita pela biblioteca. Com o tempo que sobra, a aula olha para a taxa de aprendizado de perto: o erro final contra a taxa, que perto do limiar fica quebrado.</p>
+<p>A imagem da capa é o diagrama de bifurcação da equação logística, x ← r·x·(1 − x), uma conta simples repetida muitas vezes. Para cada valor de r, no eixo horizontal, de 2,4 a 4, o diagrama marca os valores para onde a conta vai depois de muitas repetições. Até r = 3, ela vai para um número só; entre 3 e 3,44949, oscila entre dois; depois entre quatro, oito, e, a partir de r ≈ 3,56995, vira caos, com ilhas de ordem no meio. A ligação com a aula é uma analogia, e não uma conta: o gradiente descendente também é uma conta repetida, e a taxa de aprendizado faz o papel do r, decidindo se o treino converge, oscila ou se perde.</p>
+<p>Diagrama de Jordan Pierce, de 2011, no Wikimedia Commons, com a licença CC0, de domínio público; recortado para tirar os eixos, que tinham ponto decimal.</p>
+<h3 id="slide-2-revisao-de-memoria">Slide 2: Revisão, de memória <a class="cg-slide-link" href="../slides/#2" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A revisão é de memória: quatro perguntas sobre as aulas 5 e 6.</p>
+<p>O que a softmax faz com as dez saídas? Transforma dez números quaisquer em dez probabilidades, positivas e somando 1; a maior saída fica com a maior probabilidade.</p>
+<p>Para que servem a validação e o teste? A validação escolhe o que o treino não ajusta, como a largura e a hora de parar; o teste mede a rede escolhida, uma vez, no fim.</p>
+<p>O que é sobreajuste? A rede decora o treino e erra no dado novo: na aula 6, com mil exemplos, 100% no treino e 87,42% na validação.</p>
+<p>Por que treinar em lotes? Porque um passo a cada 64 exemplos custa muito menos que um passo a cada 50 mil, e o gradiente de um lote aponta perto do gradiente de todos.</p>
+<h3 id="slide-3-o-fio-do-curso">Slide 3: O fio do curso <a class="cg-slide-link" href="../slides/#3" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O curso segue um fio, e este slide aparece em todas as aulas, com a aula do dia em destaque e, à direita, a data e o formato de cada aula já marcada.</p>
+<p>Até a aula 6, toda derivada foi escrita à mão. Nesta aula, a 7, a biblioteca faz a conta, e a mesma rede da aula 6 dá o mesmo resultado, até o último algarismo. Com isso, o curso pode olhar para a taxa de aprendizado de perto. Na aula 8, um MLP vai aos dados do CERN; na 9, a taxa volta, uma por camada, e a fronteira entre o treino que converge e o que diverge vira o fractal do projeto, com a rede do artigo e os dados do CMS.</p>
+<h2 id="2-o-que-o-pytorch-automatiza">2. O que o PyTorch automatiza</h2>
+<h3 id="slide-4-e-se-a-biblioteca-fizesse-a-conta">Slide 4: E se a biblioteca fizesse a conta? <a class="cg-slide-link" href="../slides/#4" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Nas aulas 5 e 6, a retropropagação foi escrita à mão: o δ da saída, o δ de cada neurônio oculto, o gradiente de cada peso. Na aula 6 são sete linhas de conta, e cada rede nova pediria outras, com outra conta. O PyTorch guarda as contas da passada para a frente e faz a de trás para a frente sozinho, para qualquer rede. A pergunta desta parte é o que exatamente ele automatiza, e se o resultado é o mesmo.</p>
+<h3 id="slide-5-o-tensor">Slide 5: O tensor <a class="cg-slide-link" href="../slides/#5" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O tensor é a estrutura de dados do PyTorch. Tensor, no curso, é uma tabela de números com qualquer número de eixos: um número sozinho tem zero eixos; um vetor, um; uma matriz, dois; um lote de imagens de 28 por 28, três. A forma, shape, diz quantos números há em cada eixo: os 50 mil dígitos de treino formam um tensor de forma (50000, 784). Na física, tensor quer dizer outra coisa, um objeto que muda de um jeito determinado quando se trocam as coordenadas; o curso não usa esse sentido.</p>
+<p>As contas são as do NumPy: W @ x multiplica matriz por vetor, torch.tanh vale para cada posição, e <a href="https://torch.fr" target="_blank" rel="noopener">torch.fr</a>om_numpy(X) transforma um array do NumPy num tensor sem copiar os números. A diferença está no que o tensor guarda a mais: se ele pede requires_grad, cada conta feita com ele fica registrada, para a derivada vir depois.</p>
+<h3 id="slide-6-o-autograd-refaz-a-conta-da-aula-4">Slide 6: O autograd refaz a conta da aula 4 <a class="cg-slide-link" href="../slides/#6" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Autograd, no PyTorch, é a diferenciação automática: a biblioteca registra cada conta da passada para a frente e, quando se chama backward(), aplica a regra da cadeia de trás para a frente, o modo reverso da aula 4, e deixa em cada tensor a derivada da perda em relação a ele, no campo .grad.</p>
+<p>O teste é a rede do exemplo da aula 4, com os mesmos números: duas camadas com a tanh, a saída linear e a perda L = (y − t)². Na aula 4, o gradiente da perda em relação à entrada saiu como produto de Jacobianos, linha vezes matriz, de trás para a frente: (1,0940; −4,6074). Com o autograd, x.requires_grad_(True) pede o registro, a passada para a frente se escreve como antes, e L.backward() faz o resto. O resultado é (1,0940; −4,6074), com diferença zero para a conta da aula 4: as duas fazem as mesmas multiplicações, na mesma ordem, em float64, a precisão de 16 algarismos do NumPy.</p>
+<h3 id="slide-7-o-grafo-das-contas">Slide 7: O grafo das contas <a class="cg-slide-link" href="../slides/#7" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Como o autograd faz isso: na passada para a frente, cada conta vira um nó de um grafo, com setas para as contas de que ela depende. Grafo, no curso, é esse desenho das contas, nós ligados por setas; na matemática, grafo é o nome de qualquer conjunto de pontos ligados por linhas.</p>
+<p>Na rede do exemplo, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> entra na primeira camada, sai <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>₁, entra na segunda, sai <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>₂, vira y e vira L. Quando se chama backward(), o PyTorch percorre o grafo de L para trás: em cada nó, multiplica a derivada que chegou pela derivada da própria conta, o Jacobiano da aula 4, e passa adiante. É a conta de trás para a frente, uma linha vezes uma matriz por camada, que a aula 4 mostrou ser a mais barata quando a saída é um número só, a perda.</p>
+<p>O grafo se monta de novo a cada passada para a frente; por isso a rede pode ser escrita como um programa comum, com laços e condições, e o autograd segue o caminho que as contas fizeram.</p>
+<h3 id="slide-8-o-grafo-com-numeros-em-video">Slide 8: O grafo com números, em vídeo <a class="cg-slide-link" href="../slides/#8" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra o grafo do slide anterior com os números da rede da aula 4, no ponto <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (1; 0,25). Grafo, no curso, é o desenho das contas: cada conta um nó, ligado por setas às contas de que depende.</p>
+<p>Para a frente, em azul, o PyTorch faz as contas e guarda cada valor: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>₁ = (0,6351; 0), <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>₂ = (0,8539; −0,1343), y = 0,9882 e a perda L = 0,9766, a mesma da aula 4. Em cima de cada seta, a conta que leva de um nó ao outro.</p>
+<p>Para trás, em laranja, L.backward() começa pela derivada da perda por ela mesma, 1, e volta de nó em nó: por y, 2(y − t) = 1,9764; por <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>₂, a linha (1,9764; −1,9764), que é 1,9764 vezes <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>v</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{v}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (1; −1); por <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>₁, (3,0115; −1,4054); e pela entrada, (1,0940; −4,6074), o gradiente que a aula 4 calculou à mão, de trás para a frente. Em cada passo, a linha que chega vezes o Jacobiano da conta, como no slide do grafo.</p>
+<p>No código, a derivada fica em x.grad depois do backward(). O PyTorch guarda a derivada só dos tensores criados com requires_grad; para mostrar a dos nós do meio, o programa pede retain_grad() a cada um.</p>
+<h2 id="3-a-rede-da-aula-6-em-pytorch">3. A rede da aula 6 em PyTorch</h2>
+<h3 id="slide-9-a-rede-da-aula-6-em-pytorch">Slide 9: A rede da aula 6 em PyTorch <a class="cg-slide-link" href="../slides/#9" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A rede da aula 6 em PyTorch. nn.Linear(784, 256) é a camada W <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>b</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{b}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">b</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>, com os pesos e os vieses dentro dela; nn.Tanh() é a ativação; a segunda nn.Linear dá as dez saídas. nn.Sequential encadeia as três. A softmax não aparece: ela vai junto com a entropia cruzada em nn.CrossEntropyLoss, que recebe as dez saídas e o rótulo.</p>
+<p>O laço do treino tem quatro linhas por lote: zero_grad() apaga os gradientes do lote anterior, que o PyTorch somaria aos novos; a passada para a frente calcula a perda; backward() calcula o gradiente de todos os pesos; e step() dá o passo, w ← w − η ∂L/∂w, para cada peso. O otimizador, torch.optim.SGD, é o gradiente descendente da aula 2, com a taxa 0,1 da aula 6.</p>
+<p>As sete linhas da retropropagação da aula 6 viram uma: perda.backward().</p>
+<h3 id="slide-10-a-mesma-conta-mais-depressa">Slide 10: A mesma conta, mais depressa <a class="cg-slide-link" href="../slides/#10" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O teste da troca: a rede em PyTorch começa com os pesos que o código da aula 6 sorteia, percorre os lotes na mesma ordem, com a mesma taxa, por 20 épocas, e em float64. As duas curvas da acurácia na validação caem uma em cima da outra: a diferença é zero em todas as épocas, e o teste dá os mesmos 97,59%. O PyTorch não aprende diferente; ele faz a mesma conta.</p>
+<p>O que muda é o tempo e o trabalho. No laptop do professor, cada época levou 0,5 s no PyTorch, contra 5,1 s no NumPy da aula 6, na última vez que o mlp.py rodou; o tempo do NumPy já foi 7,2 s, com o computador mais ocupado. A biblioteca usa rotinas de multiplicação de matrizes mais rápidas. Num laptop mais fraco os dois números crescem, mas a proporção deve se manter perto disso; isso é dedução, não medida.</p>
+<p>Na figura, o NumPy em círculos azuis vazados, o PyTorch em xis laranja, por cima.</p>
+<h3 id="slide-11-o-adam-como-caixa-preta">Slide 11: O Adam, como caixa-preta <a class="cg-slide-link" href="../slides/#11" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O Adam é outro jeito de dar o passo. Fica como caixa-preta: o que entra é o gradiente de cada peso, o que sai é o passo de cada peso, e ele ajusta a taxa de cada peso ao longo do treino, em vez de usar uma só para todos. Não se abre agora porque pede médias móveis do gradiente e do quadrado dele; o algoritmo é o quadro Algorithm 1 do artigo de Kingma e Ba, que está no estudo da semana.</p>
+<p>Na rede da aula, com a taxa padrão do Adam no PyTorch, 0,001, a acurácia na validação sai de 93,6% já na primeira época, contra 90,0% do gradiente descendente com taxa 0,1. Nas 20 épocas, os dois terminam perto: 97,16% com o Adam e 97,33% sem ele, na validação; no teste, 97,42% e 97,59%. O Adam chega antes, e não necessariamente mais longe; com outra taxa, o resultado seria outro.</p>
+<h3 id="slide-12-dois-jeitos-de-dar-o-passo-em-video">Slide 12: Dois jeitos de dar o passo, em vídeo <a class="cg-slide-link" href="../slides/#12" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo compara dois jeitos de dar o passo numa tigela alongada, L(a, b) = (a² + 25 b²)/2: rasa na direção a e 25 vezes mais íngreme na direção b. Os dois caminhos saem do mesmo ponto, (−4; 1,2), e dão 40 passos.</p>
+<p>Em cima, o gradiente descendente, com η = 0,075, perto da maior taxa que a direção íngreme aguenta, 2/25 = 0,08. O passo é η vezes a inclinação: grande em b, onde a tigela é íngreme, e pequeno em a. Em b, ele passa do fundo e volta, e o caminho ziguezagueia: os primeiros pontos são (−3,70; −1,05), (−3,42; 0,92) e (−3,17; −0,80). Em a, anda devagar.</p>
+<p>Embaixo, o Adam, com taxa 0,3 e os valores de fábrica do PyTorch para as duas médias, 0,9 e 0,999. O passo de cada peso é dividido por uma média do tamanho do gradiente daquele peso, e sai de tamanho parecido nas duas direções: (−3,70; 0,90), (−3,40; 0,61), (−3,10; 0,32), uma diagonal. Perto do fundo, ele passa e faz uma curva, porque a média do gradiente, o momento, carrega o passo anterior.</p>
+<p>É isso que a caixa-preta do slide anterior quer dizer com a taxa ajustada peso a peso. O Adam não é sempre melhor: nesta tigela, depois de 40 passos, o gradiente descendente chega mais perto do fundo, perda 0,016 contra 0,064; no MNIST, o Adam começou na frente e terminou junto. Os números saem de caminhos(), em codigo/animacoes.py.</p>
+<h2 id="4-o-erro-final-contra-a-taxa">4. O erro final contra a taxa</h2>
+<h3 id="slide-13-o-limiar-da-aula-2-numa-rede-de-verdade">Slide 13: O limiar da aula 2, numa rede de verdade <a class="cg-slide-link" href="../slides/#13" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Na aula 2, a reta treinada pelo gradiente descendente tinha um limiar: abaixo de uma taxa, o treino convergia; acima, divergia. A pergunta agora é o que acontece com esse limiar numa rede de verdade, com camadas e a tanh. A resposta das próximas figuras é que ele deixa de ser um ponto.</p>
+<h3 id="slide-14-o-erro-final-contra-a-taxa">Slide 14: O erro final contra a taxa <a class="cg-slide-link" href="../slides/#14" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A rede pequena da aula: 784 entradas, 16 neurônios com a tanh e 10 saídas, treinada nos 256 primeiros exemplos do treino do MNIST, com todos os exemplos de uma vez, sem lotes, por 200 passos. Sem lotes, nada é sorteado durante o treino, e a mesma taxa dá sempre o mesmo resultado. Os pesos começam da semente 0.</p>
+<p>Cada ponto é uma rede treinada com uma taxa, de 0,01 a 100, e a altura é o erro final, a perda depois do último passo, nos dois eixos em escala logarítmica. Com taxas pequenas, o treino anda pouco em 200 passos; o erro final cai com a taxa até o menor valor, 0,0070, com η = 2,37. Depois, sobe depressa, e a partir de η = 4,47 o treino deixa a rede pior do que estava antes, acima da linha tracejada, a perda de antes do treino, 2,3220. Com taxas perto de 100, a perda passa de 1.000, e o programa marca a rede como explodida.</p>
+<p>A melhor taxa fica logo antes da região em que o treino piora: quem procura a taxa mais rápida anda perto da borda.</p>
+<h3 id="slide-15-perto-do-limiar-de-perto">Slide 15: Perto do limiar, de perto <a class="cg-slide-link" href="../slides/#15" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo refaz a figura anterior ponto a ponto, da taxa menor para a maior: a curva desce, chega ao mínimo e sobe. Depois, a janela de 2 a 10 aparece em laranja, e o vídeo olha para ela de perto, com 601 taxas.</p>
+<p>De perto, os pontos não formam uma curva. Taxas vizinhas dão erros finais muito diferentes, e embaixo uma faixa mostra, para cada taxa, se o treino melhorou a rede, em azul, ou piorou, em laranja. A troca de cor não acontece num ponto só: ela vai e volta.</p>
+<h3 id="slide-16-a-fronteira-quebrada">Slide 16: A fronteira quebrada <a class="cg-slide-link" href="../slides/#16" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A figura do zoom, parada. Em cima, o erro final das 601 taxas de 2 a 10; embaixo, a faixa, uma listra por taxa. Das 601, 383 pioram a rede, e a resposta, melhora ou piora, troca 77 vezes entre taxas vizinhas. Abaixo de 3,86, tudo melhora; acima de 7,55, tudo piora; no meio, as duas cores se misturam.</p>
+<p>Fronteira, aqui, é o conjunto de taxas em que a resposta troca. Na aula 2, a fronteira era um ponto, o limiar. Nesta rede, ela é quebrada, e a causa está no treino de cada taxa da faixa: a perda salta para dezenas nos primeiros passos e fica oscilando, sem se assentar, e o passo 200 pega umas taxas com a perda abaixo da de antes e as vizinhas acima. A aula 9 mostra essas curvas e põe esta rede no plano de duas taxas, uma por camada; o fractal do curso é a fronteira da rede do projeto, a do artigo, com os dados do CMS.</p>
+<h2 id="5-de-onde-vem">5. De onde vem</h2>
+<h3 id="slide-17-de-onde-vem">Slide 17: De onde vem <a class="cg-slide-link" href="../slides/#17" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Quatro datas.</p>
+<p>1970: Seppo Linnainmaa descreve o modo reverso da diferenciação automática, a conta de trás para a frente que o autograd faz, como estava nas aulas 4 e 5.</p>
+<p>2002: Ronan Collobert, Samy Bengio e Johnny Mariéthoz publicam o Torch, uma biblioteca de aprendizado de máquina do Instituto de Pesquisa Idiap, na Suíça, escrita em C, com a linguagem Lua por cima.</p>
+<p>2016: sai a primeira versão do PyTorch, em setembro, o Torch levado para o Python. A página do PyTorch na Wikipedia dá como autores Gregory Chanan, Soumith Chintala, Sam Gross e Adam Paszke, e como desenvolvedora a Meta AI; hoje o desenvolvimento tem apoio da Linux Foundation.</p>
+<p>2017: o desenvolvimento do Torch passa para o PyTorch.</p>
+<p>Os anos de 2002, 2016 e 2017 e os nomes saem da Wikipedia em inglês, verbetes &quot;Torch (machine learning)&quot; e &quot;PyTorch&quot;; o de 1970, do verbete &quot;Backpropagation&quot;, conferido na aula 5.</p>
+<h2 id="6-o-codigo">6. O código</h2>
+<h3 id="slide-18-o-codigo">Slide 18: O código <a class="cg-slide-link" href="../slides/#18" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O código da aula fica pronto e testado antes. codigo/autograd_exemplo.py refaz o gradiente da aula 4 com o autograd. codigo/mlp_torch.py é a solução de referência da entrega, que não vai para a turma antes do prazo: a rede da aula 6 em PyTorch, com os mesmos pesos iniciais e a mesma ordem dos lotes, e o Adam ao lado. codigo/taxa.py faz as duas varreduras da taxa e grava os números; a figura e o vídeo leem dali.</p>
+<p>Quatro peças do PyTorch resolvem quase tudo. <a href="https://torch.fr" target="_blank" rel="noopener">torch.fr</a>om_numpy(X) transforma os dados da aula 6 em tensores. nn.Sequential(nn.Linear(784, 256), nn.Tanh(), nn.Linear(256, 10)) monta a rede. perda.backward() calcula o gradiente de todos os pesos. E torch.autograd.grad(L, pesos) devolve o gradiente sem guardá-lo nos pesos, como na varredura da taxa, em que cada passo é escrito à mão: w ← w − η ∂L/∂w.</p>
+<p>Tempos no laptop do professor: mlp_torch.py, cerca de 30 segundos; taxa.py, cerca de 50.</p>
+<h3 id="slide-19-o-que-a-entrega-pede">Slide 19: O que a entrega pede <a class="cg-slide-link" href="../slides/#19" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A entrega tem duas partes. A primeira é o MNIST em PyTorch: a rede da entrega da aula 6 reescrita com nn.Sequential, CrossEntropyLoss e o laço de quatro linhas, com a acurácia no teste, a semente e a versão dos dados. Quem começar dos mesmos pesos e da mesma ordem dos lotes deve achar a mesma acurácia da aula 6; quem não, um número perto.</p>
+<p>A segunda é a curva do erro final contra a taxa, na rede pequena da aula, sem lotes, a mesma que a aula 9 leva ao plano das duas taxas, com uma figura como a da aula. Ela roda em menos de um minuto em qualquer laptop. Cada um escolhe a faixa de taxas; o que se pede é apontar a melhor taxa e a partir de onde o treino piora a rede. A mesma curva no MNIST inteiro, com lotes, é um extra opcional, para quem quiser.</p>
+<p>O que se exige é saber dizer o que entra na rede, o que ela aprende e o que significa o número que sai.</p>
+<h2 id="7-fechamento">7. Fechamento</h2>
+<h3 id="slide-20-para-estudar-e-entregar">Slide 20: Para estudar e entregar <a class="cg-slide-link" href="../slides/#20" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O estudo prepara a aula 8, os dados do CERN. O registro 303 do portal de dados abertos do CERN, &quot;Events with two muons from 2010&quot;, do CMS, é o conjunto que o projeto usa: cem mil eventos com dois múons. E os dois artigos de 1974 sobre a descoberta do J/psi, de Aubert e colegas e de Augustin e colegas, que saíram no mesmo número da Physical Review Letters, com três páginas cada: a partícula que aparece como o primeiro pico no histograma da aula 8.</p>
+<p>A entrega: o MNIST em PyTorch, com a acurácia no teste, a semente e a versão; a curva do erro final contra a taxa; e uma pergunta sobre o estudo.</p>
+<p>A seguir, a aula 8 leva um MLP aos dados do CERN, para estimar a massa dos dois múons e conferir pela fórmula; a aula 9 desenha a fronteira desta aula em duas dimensões.</p>
+<h2 id="perguntas-que-podem-aparecer">Perguntas que podem aparecer</h2>
+<ul>
+<li>Se o PyTorch faz a conta, por que escrever a retropropagação à mão nas aulas 5 e
+6? Para saber o que a biblioteca faz: quando o treino dá errado, quem sabe a
+conta sabe onde olhar. E a aula 7 mostra que o resultado é o mesmo.</li>
+<li>Por que zero_grad()? Porque o PyTorch soma o gradiente novo ao que já está em
+.grad. Sem zerar, cada passo usaria a soma dos gradientes de todos os lotes.</li>
+<li>O Adam é sempre melhor? Não. Nesta rede ele chega antes, mas termina perto do
+gradiente descendente; a taxa dele também precisa ser escolhida pela validação.</li>
+<li>A fronteira quebrada é um defeito do computador? Não: as contas são em float64,
+e a mesma taxa dá sempre o mesmo resultado. A irregularidade vem do treino
+repetido, como na equação logística da capa.</li>
+</ul>
+<h2 id="para-estudar">Para estudar</h2>
+<p>O estudo da turma, que é também o seu:</p>
+<ul>
+<li>CMS, &quot;Events with two muons from 2010&quot;, registro 303 do portal de dados abertos
+do CERN: opendata.cern.ch/record/303, <a href="https://doi.org/10.7483/OPENDATA.CMS.4M97.3SQ9" target="_blank" rel="noopener">doi:10.7483/OPENDATA.CMS.4M97.3SQ9</a>.</li>
+<li>Jean-Jacques Aubert e colegas, 1974, &quot;Experimental observation of a heavy
+particle J&quot;, Physical Review Letters 33:1404-1406, <a href="https://doi.org/10.1103/PhysRevLett.33.1404" target="_blank" rel="noopener">doi:10.1103/PhysRevLett.33.1404</a>.</li>
+<li>Jean-Eudes Augustin e colegas, 1974, &quot;Discovery of a narrow resonance in e+e-
+annihilation&quot;, Physical Review Letters 33:1406-1408, <a href="https://doi.org/10.1103/PhysRevLett.33.1406" target="_blank" rel="noopener">doi:10.1103/PhysRevLett.33.1406</a>.</li>
+</ul>
+<p>Além dele, para preparar a aula:</p>
+<ul>
+<li>PyTorch, tutorial &quot;Learn the Basics&quot;, as partes de tensores e de autograd:
+<a href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html" target="_blank" rel="noopener">docs.pytorch.org/tutorials/beginner/basics/intro.html</a>.</li>
+<li>Diederik Kingma e Jimmy Ba, 2014, &quot;Adam: A method for stochastic optimization&quot;,
+<a href="https://arxiv.org/abs/1412.6980" target="_blank" rel="noopener">arXiv:1412.6980</a>, o quadro Algorithm 1.</li>
+</ul>
+<h2 id="fontes-dos-fatos-citados">Fontes dos fatos citados</h2>
+<p>Só para conferência; o estudo é a lista de cima.</p>
+<ul>
+<li>Verbete &quot;PyTorch&quot; da Wikipedia em inglês, revisão 1378376798: a primeira
+versão em setembro de 2016, os autores, a Meta AI como desenvolvedora, o apoio
+da Linux Foundation e o Torch como antecessor.</li>
+<li>Verbete &quot;Torch (machine learning)&quot; da Wikipedia em inglês, revisão 1364448378:
+Collobert, Bengio e Mariéthoz, outubro de 2002, o Idiap, C e Lua, e a passagem
+do desenvolvimento para o PyTorch em 2017.</li>
+<li>Verbete &quot;Logistic map&quot; da Wikipedia em inglês, revisão 1382744518: as oscilações
+entre dois valores de r = 3 a 3,44949, entre quatro depois disso, o começo do
+caos em r ≈ 3,56995 e as ilhas de estabilidade.</li>
+<li>Wikimedia Commons, a página do arquivo &quot;Logistic Bifurcation map High
+Resolution.png&quot;: Jordan Pierce, 12/09/2011, trabalho próprio, CC0.</li>
+<li>A taxa padrão do Adam no PyTorch, 0,001: a assinatura de torch.optim.Adam na
+versão 2.15.0.</li>
+<li>Os números: codigo/autograd_exemplo.py; codigo/mlp_torch.py, com a semente 1 e a
+versão 227111746c19 dos dados; codigo/taxa.py, com a semente 0; gravados em
+resultados/.</li>
+</ul>
+
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>

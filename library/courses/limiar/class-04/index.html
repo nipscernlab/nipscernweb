@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 4: Derivadas parciais e o Jacobiano | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Class 4 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-04/">
+  <meta property="og:title" content="Aula 4: Derivadas parciais e o Jacobiano | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Class 4 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-04/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../assets/css/courses.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero ">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.class">Class</span> 4</span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-books" aria-hidden="true"></i>Limiar · <span data-i18n="courses.class">Class</span> 4</p><h1 class="display-md cr-class-h1 fade-up" lang="pt-BR">Derivadas parciais e o Jacobiano</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 13/11/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 1</span></li><li><i class="ph ph-user" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.taught_by">Taught by</span><span lang="pt-BR">Chrysthofer A. A. Afonso</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></a><a class="btn glass-btn btn-ghost" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-04-slides-v1.pdf" target="_blank" rel="noopener"><i class="ph ph-file-pdf" aria-hidden="true"></i><span data-i18n="courses.slides_pdf">Slides as PDF</span></a></div>
+          </div>
+          <div class="cr-hero-side"><a class="cr-cover frame fade-up" href="slides/" aria-label="Open the slides" title="Open the slides" data-i18n-aria="courses.open_slides" data-i18n-title="courses.open_slides"><img src="../../../../library/courses/limiar/media/limiar-aula-04-capa.c7a5a668e8.webp" alt="" width="1280" height="720" decoding="async"><span class="cr-play" aria-hidden="true"><i class="ph ph-play"></i></span><span class="cr-cover-tag" aria-hidden="true"><span><span class="cr-mono">21</span> <span data-i18n="courses.n_slides">slides</span></span><span><span class="cr-mono">3</span> <span data-i18n="courses.n_videos">videos</span></span></span></a><p class="cr-cover-hint fade-up"><span data-i18n="courses.keys_hint">In the slides: → moves on, F is full screen, N shows the notes, H lists every key.</span> <span data-i18n="courses.pdf_no_notes">The PDF has no notes: it is the one handed to the class.</span></p></div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band section--lit cr-band--first" style="--seam-from:var(--bg-0)">
+      <div class="container">
+<div class="cr-duo"><article class="cr-panel cr-plan glass fade-up" aria-labelledby="aula-t"><h2 class="cr-panel-title" id="aula-t"><i class="ph ph-notebook" aria-hidden="true"></i><span data-i18n="courses.the_class">The class</span></h2><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.topic">Topic</span></h3><div class="cr-prose" lang="pt-BR"><p>Revisão de derivada parcial e de gradiente, da aula 2. O Jacobiano, a matriz das
+derivadas parciais de uma função que recebe um vetor e devolve outro: a linha i
+traz as derivadas da saída i em relação a cada entrada. O gradiente é o caso em
+que a saída é um número só. A regra da cadeia com vetores: o Jacobiano de uma
+composição é o produto dos Jacobianos. Uma rede é uma composição de camadas, e a
+retropropagação é esse produto. Por que multiplicar de trás para a frente:
+começando pela perda, que é um número só, cada passo é um vetor vezes uma matriz,
+nunca uma matriz vezes outra, e o gradiente custa pouco mais que uma passada para
+a frente.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.in_class">Practice in class</span></h3><div class="cr-prose" lang="pt-BR"><p>O Jacobiano de uma camada, tanh(Wx + b), calculado à mão para duas entradas e duas
+saídas, e conferido em NumPy pela derivada numérica. Depois, a regra da cadeia
+para duas camadas, como produto de Jacobianos, e a contagem de operações nas duas
+ordens de multiplicação.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.assignment">Assignment</span></h3><div class="cr-prose" lang="pt-BR"><ul>
+<li>Uma função que calcula o Jacobiano numérico de uma camada e o compara com o
+Jacobiano calculado à mão.</li>
+<li>Uma pergunta sobre o estudo da semana.</li>
+</ul>
+</div></section></article><aside class="cr-panel cr-kit glass fade-up" aria-labelledby="material-t"><h2 class="cr-panel-title" id="material-t"><i class="ph ph-package" aria-hidden="true"></i><span data-i18n="courses.class_materials">Class material</span></h2><ul class="cr-rows"><li><a class="cr-row" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.study_guide">Study guide</span></strong><span><span data-i18n="courses.study_guide_desc">The topics of the class, with the study notes under each one and the equations.</span></span></span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-04-folha-de-topicos-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.topic_sheet">Topic sheet</span></strong><span><span data-i18n="courses.topic_sheet_desc">The topics on one page, to print.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-guia-de-instalacao-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.install_guide">Installation guide</span></strong><span><span data-i18n="courses.install_guide_desc">Python, Git, VS Code and Claude Code on each student&#x27;s laptop.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="../../../../library/courses/limiar/materials/requirements.txt" download><i class="ph ph-file-text" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">requirements.txt</strong><span><span data-i18n="courses.requirements_desc">The Python packages of the course, for pip.</span></span></span><i class="ph ph-download-simple cr-row-go" aria-hidden="true"></i></a></li></ul><h3 class="cr-kit-sub"><i class="ph ph-code" aria-hidden="true"></i><span data-i18n="courses.code">Code</span></h3><ul class="cr-rows"><li><a class="cr-row" href="code/#animacoes-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">animacoes.py</strong><span lang="pt-BR">Os vídeos da aula 4, feitos com o Manim Community.</span></span><span class="cr-mono cr-muted cr-row-n">487</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="code/#figuras-slides-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">figuras_slides.py</strong><span lang="pt-BR">Figuras dos slides da aula 4: o Jacobiano.</span></span><span class="cr-mono cr-muted cr-row-n">201</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li></ul><p class="cr-withheld"><i class="ph ph-lock" aria-hidden="true"></i><span data-i18n="courses.withheld">Not published here: the reference solution of an assignment that is still open.</span></p></aside></div>
+      </div>
+    </section>
+    <section class="section seam cr-band" style="--seam-from:var(--bg-0)" aria-labelledby="estudo-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="estudo-t"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.study">Study for the week</span></h2><div class="cr-grid cr-grid--videos fade-up"><a class="cr-video glass glass--flat" href="https://www.youtube.com/watch?v=Ilg3gGewQ5U" target="_blank" rel="noopener"><span class="frame cr-video-thumb"><img src="../../../../library/courses/limiar/media/yt-ilg3ggewq5u.1336835925.webp" alt="" width="600" height="338" loading="lazy" decoding="async"><span class="cr-play cr-play--sm" aria-hidden="true"><i class="ph ph-play"></i></span></span><span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">Série sobre redes neurais, capítulo 3</span><span class="cr-video-title" lang="en">Backpropagation, intuitively | Deep Learning Chapter 3</span><span class="cr-video-channel">3Blue1Brown · <span class="cr-wave"><span data-i18n="courses.watch">Watch on YouTube</span></span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a><a class="cr-video glass glass--flat" href="https://www.youtube.com/watch?v=tIeHLnjs5U8" target="_blank" rel="noopener"><span class="frame cr-video-thumb"><img src="../../../../library/courses/limiar/media/yt-tiehlnjs5u8.4b18e15f2c.webp" alt="" width="600" height="338" loading="lazy" decoding="async"><span class="cr-play cr-play--sm" aria-hidden="true"><i class="ph ph-play"></i></span></span><span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">Série sobre redes neurais, capítulo 4</span><span class="cr-video-title" lang="en">Backpropagation calculus | Deep Learning Chapter 4</span><span class="cr-video-channel">3Blue1Brown · <span class="cr-wave"><span data-i18n="courses.watch">Watch on YouTube</span></span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a><div class="cr-read glass glass--flat"><i class="ph ph-book-open" aria-hidden="true"></i><div class="cr-prose" lang="pt-BR"><p>Michael Nielsen, 2015, <em>Neural Networks and Deep Learning</em>, capítulo 2, &quot;How the backpropagation algorithm works&quot;: <a href="http://neuralnetworksanddeeplearning.com/chap2.html" target="_blank" rel="noopener">http://neuralnetworksanddeeplearning.com/chap2.html</a>, com http, porque o endereço com https não abre. Para ir além: Andreas Griewank, 2012, &quot;Who invented the reverse mode of differentiation?&quot;, Documenta Mathematica, volume extra ISMP, 389-400, doze páginas sobre a história da conta de trás para a frente.</p>
+</div></div></div>
+      </div>
+    </section>
+    <section class="section seam cr-band section--lit" style="--seam-from:var(--bg-0)" aria-labelledby="obras-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="obras-t"><i class="ph ph-books" aria-hidden="true"></i><span data-i18n="courses.papers">Papers and books</span></h2><p class="cr-intro fade-up"><span data-i18n="courses.papers_intro">Every work cited in the class material, with the official link. The first page appears where the PDF is open access.</span></p><ol class="cr-refs fade-up"><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Neural Networks and Deep Learning</span></a></p><p class="cr-ref-by">Michael A. Nielsen · <span class="cr-mono">2015</span></p><p class="cr-ref-venue">Determination Press, livro online; CC BY-NC 3.0</p><p class="cr-ref-note">O endereço só abre em http: o certificado do servidor é de outro domínio.</p><p class="cr-ref-links"><a class="cr-ref-link" href="http://neuralnetworksanddeeplearning.com/chap1.html" target="_blank" rel="noopener"><span class="cr-wave">neuralnetworksanddeeplearning.com</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.4171/DMS/6/38" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Who invented the reverse mode of differentiation?</span></a></p><p class="cr-ref-by">Andreas Griewank · <span class="cr-mono">2012</span></p><p class="cr-ref-venue">Documenta Mathematica, volume extra ISMP, 389-400</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.4171/DMS/6/38" target="_blank" rel="noopener"><span class="cr-wave">doi:10.4171/DMS/6/38</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="la"><a href="https://doi.org/10.1515/crll.1841.22.319" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">De determinantibus functionalibus</span></a></p><p class="cr-ref-by">Carl Gustav Jacob Jacobi · <span class="cr-mono">1841</span></p><p class="cr-ref-venue">Journal für die reine und angewandte Mathematik 22:319-359</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.1515/crll.1841.22.319" target="_blank" rel="noopener"><span class="cr-wave">doi:10.1515/crll.1841.22.319</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li></ol><details class="cr-more glass glass--flat fade-up"><summary><i class="ph ph-link" aria-hidden="true"></i><span data-i18n="courses.other_sources">Other sources</span> <span class="cr-mono cr-muted">10</span><i class="ph ph-caret-down cr-more-caret" aria-hidden="true"></i></summary><ul class="cr-sources" lang="pt-BR"><li><a href="https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant" target="_blank" rel="noopener">Jacobian matrix and determinant</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Carl_Gustav_Jacob_Jacobi" target="_blank" rel="noopener">Carl Gustav Jacob Jacobi</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Chain_rule" target="_blank" rel="noopener">Chain rule</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Automatic_differentiation" target="_blank" rel="noopener">Automatic differentiation</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Backpropagation" target="_blank" rel="noopener">Backpropagation</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Hyperbolic_functions" target="_blank" rel="noopener">Hyperbolic functions</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Activation_function" target="_blank" rel="noopener">Activation function</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://commons.wikimedia.org/wiki/File:Carl_Gustav_Jacob_Jacobi_portrait_1843.jpg" target="_blank" rel="noopener">Carl Gustav Jacob Jacobi portrait 1843.jpg</a> <span class="cr-muted">Wikimedia Commons, o retrato de August Kaselowsky, 1843</span></li><li><a href="https://www.youtube.com/watch?v=Ilg3gGewQ5U" target="_blank" rel="noopener">Backpropagation, intuitively</a> <span class="cr-muted">3Blue1Brown, série sobre redes neurais, no YouTube, capítulo 3</span></li><li><a href="https://www.youtube.com/watch?v=tIeHLnjs5U8" target="_blank" rel="noopener">Backpropagation calculus</a> <span class="cr-muted">3Blue1Brown, série sobre redes neurais, no YouTube, capítulo 4</span></li></ul></details>
+      </div>
+    </section>
+    <section class="section seam cr-band cr-band--last" style="--seam-from:var(--bg-0)" aria-labelledby="creditos-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="creditos-t"><i class="ph ph-images" aria-hidden="true"></i><span data-i18n="courses.credits">Image credits</span></h2><div class="cr-credits fade-up cr-prose" lang="pt-BR"><p>O retrato, no slide da história, é do Wikimedia Commons; as outras imagens, a da
+capa e a das curvas de nível da perda incluídas, saem do código desta pasta.</p>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>O que mostra</th>
+<th>Autor</th>
+<th>Licença</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/jacobi.f9ce6f4e2a.webp">jacobi.jpg</a></td>
+<td>Carl Gustav Jacob Jacobi, retrato de 1843, reproduzido em Leo Koenigsberger, 1904; &quot;Carl Gustav Jacob Jacobi portrait 1843.jpg&quot;, reduzida</td>
+<td>August Kaselowsky; heliogravura de Giesecke &amp; Devrient</td>
+<td>domínio público</td>
+</tr>
+</tbody>
+</table>
+</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>

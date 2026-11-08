@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 7: PyTorch: o que a biblioteca automatiza | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Class 7 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-07/">
+  <meta property="og:title" content="Aula 7: PyTorch: o que a biblioteca automatiza | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Class 7 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-07/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../assets/css/courses.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero ">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.class">Class</span> 7</span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-books" aria-hidden="true"></i>Limiar · <span data-i18n="courses.class">Class</span> 7</p><h1 class="display-md cr-class-h1 fade-up" lang="pt-BR">PyTorch: o que a biblioteca automatiza</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 27/11/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 2</span></li><li><i class="ph ph-user" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.taught_by">Taught by</span><span lang="pt-BR">Chrysthofer A. A. Afonso</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></a><a class="btn glass-btn btn-ghost" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-07-slides-v1.pdf" target="_blank" rel="noopener"><i class="ph ph-file-pdf" aria-hidden="true"></i><span data-i18n="courses.slides_pdf">Slides as PDF</span></a></div>
+          </div>
+          <div class="cr-hero-side"><a class="cr-cover frame fade-up" href="slides/" aria-label="Open the slides" title="Open the slides" data-i18n-aria="courses.open_slides" data-i18n-title="courses.open_slides"><img src="../../../../library/courses/limiar/media/limiar-aula-07-capa.4b3b3cd3d1.webp" alt="" width="1280" height="720" decoding="async"><span class="cr-play" aria-hidden="true"><i class="ph ph-play"></i></span><span class="cr-cover-tag" aria-hidden="true"><span><span class="cr-mono">20</span> <span data-i18n="courses.n_slides">slides</span></span><span><span class="cr-mono">3</span> <span data-i18n="courses.n_videos">videos</span></span></span></a><p class="cr-cover-hint fade-up"><span data-i18n="courses.keys_hint">In the slides: → moves on, F is full screen, N shows the notes, H lists every key.</span> <span data-i18n="courses.pdf_no_notes">The PDF has no notes: it is the one handed to the class.</span></p></div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band section--lit cr-band--first" style="--seam-from:var(--bg-0)">
+      <div class="container">
+<div class="cr-duo"><article class="cr-panel cr-plan glass fade-up" aria-labelledby="aula-t"><h2 class="cr-panel-title" id="aula-t"><i class="ph ph-notebook" aria-hidden="true"></i><span data-i18n="courses.the_class">The class</span></h2><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.topic">Topic</span></h3><div class="cr-prose" lang="pt-BR"><p>O PyTorch, a biblioteca de redes neurais que a pesquisa usa. O tensor, a tabela
+de números do PyTorch. A diferenciação automática, o autograd, que faz sozinha a
+retropropagação escrita à mão na aula 5. O otimizador Adam, que ajusta a taxa de
+cada peso, fica como caixa-preta: o que entra é o gradiente, e o que sai é o
+passo.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.in_class">Practice in class</span></h3><div class="cr-prose" lang="pt-BR"><p>O mesmo MLP no MNIST em PyTorch, comparado com o de NumPy. Depois, o erro final
+contra a taxa de aprendizado: a fronteira entre melhorar e piorar, quebrada, que
+a aula 9 leva ao plano de duas taxas.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.assignment">Assignment</span></h3><div class="cr-prose" lang="pt-BR"><ul>
+<li>O MNIST em PyTorch, com a acurácia no teste, a semente e a versão dos dados, e
+a curva do erro final contra a taxa de aprendizado na rede pequena da aula,
+a mesma que a aula 9 leva ao plano das duas taxas. A mesma curva no MNIST inteiro é um
+extra opcional.</li>
+<li>Uma pergunta sobre o estudo da semana.</li>
+</ul>
+</div></section></article><aside class="cr-panel cr-kit glass fade-up" aria-labelledby="material-t"><h2 class="cr-panel-title" id="material-t"><i class="ph ph-package" aria-hidden="true"></i><span data-i18n="courses.class_materials">Class material</span></h2><ul class="cr-rows"><li><a class="cr-row" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.study_guide">Study guide</span></strong><span><span data-i18n="courses.study_guide_desc">The topics of the class, with the study notes under each one and the equations.</span></span></span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-07-folha-de-topicos-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.topic_sheet">Topic sheet</span></strong><span><span data-i18n="courses.topic_sheet_desc">The topics on one page, to print.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-guia-de-instalacao-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.install_guide">Installation guide</span></strong><span><span data-i18n="courses.install_guide_desc">Python, Git, VS Code and Claude Code on each student&#x27;s laptop.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="../../../../library/courses/limiar/materials/requirements.txt" download><i class="ph ph-file-text" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">requirements.txt</strong><span><span data-i18n="courses.requirements_desc">The Python packages of the course, for pip.</span></span></span><i class="ph ph-download-simple cr-row-go" aria-hidden="true"></i></a></li></ul><h3 class="cr-kit-sub"><i class="ph ph-code" aria-hidden="true"></i><span data-i18n="courses.code">Code</span></h3><ul class="cr-rows"><li><a class="cr-row" href="code/#animacoes-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">animacoes.py</strong><span lang="pt-BR">Os vídeos da aula 7, feitos com o Manim Community.</span></span><span class="cr-mono cr-muted cr-row-n">418</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="code/#autograd-exemplo-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">autograd_exemplo.py</strong><span lang="pt-BR">Aula 7: o autograd do PyTorch refaz a conta da aula 4, sem nenhuma derivada escrita à mão.</span></span><span class="cr-mono cr-muted cr-row-n">46</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="code/#figuras-slides-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">figuras_slides.py</strong><span lang="pt-BR">Figuras dos slides da aula 7: PyTorch.</span></span><span class="cr-mono cr-muted cr-row-n">187</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="code/#taxa-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">taxa.py</strong><span lang="pt-BR">Aula 7: o erro final contra a taxa de aprendizado, numa rede pequena.</span></span><span class="cr-mono cr-muted cr-row-n">125</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li></ul><p class="cr-withheld"><i class="ph ph-lock" aria-hidden="true"></i><span data-i18n="courses.withheld">Not published here: the reference solution of an assignment that is still open.</span></p></aside></div>
+      </div>
+    </section>
+    <section class="section seam cr-band" style="--seam-from:var(--bg-0)" aria-labelledby="estudo-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="estudo-t"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.study">Study for the week</span></h2><div class="cr-grid cr-grid--videos fade-up"><div class="cr-read glass glass--flat"><i class="ph ph-book-open" aria-hidden="true"></i><div class="cr-prose" lang="pt-BR"><p>CMS, &quot;Events with two muons from 2010&quot;, registro 303 do portal de dados abertos do CERN: opendata.cern.ch/record/303, <a href="https://doi.org/10.7483/OPENDATA.CMS.4M97.3SQ9" target="_blank" rel="noopener">doi:10.7483/OPENDATA.CMS.4M97.3SQ9</a>.</p>
+</div></div><div class="cr-read glass glass--flat"><i class="ph ph-book-open" aria-hidden="true"></i><div class="cr-prose" lang="pt-BR"><p>Jean-Jacques Aubert e colegas, 1974, &quot;Experimental observation of a heavy particle J&quot;, Physical Review Letters 33:1404-1406, <a href="https://doi.org/10.1103/PhysRevLett.33.1404" target="_blank" rel="noopener">doi:10.1103/PhysRevLett.33.1404</a>.</p>
+</div></div><div class="cr-read glass glass--flat"><i class="ph ph-book-open" aria-hidden="true"></i><div class="cr-prose" lang="pt-BR"><p>Jean-Eudes Augustin e colegas, 1974, &quot;Discovery of a narrow resonance in e+e- annihilation&quot;, Physical Review Letters 33:1406-1408, <a href="https://doi.org/10.1103/PhysRevLett.33.1406" target="_blank" rel="noopener">doi:10.1103/PhysRevLett.33.1406</a>. Os dois artigos da descoberta do J/psi saíram no mesmo número da revista, em 02/12/1974, e têm três páginas cada.</p>
+</div></div></div>
+      </div>
+    </section>
+    <section class="section seam cr-band section--lit" style="--seam-from:var(--bg-0)" aria-labelledby="obras-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="obras-t"><i class="ph ph-books" aria-hidden="true"></i><span data-i18n="courses.papers">Papers and books</span></h2><p class="cr-intro fade-up"><span data-i18n="courses.papers_intro">Every work cited in the class material, with the official link. The first page appears where the PDF is open access.</span></p><ol class="cr-refs fade-up"><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.7483/OPENDATA.CMS.4M97.3SQ9" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Events with two muons from 2010</span></a></p><p class="cr-ref-by">Colaboração CMS · <span class="cr-mono">2014</span></p><p class="cr-ref-venue">CERN Open Data Portal, registro 303; dados de 2010, publicados em 2014; CC0</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.7483/OPENDATA.CMS.4M97.3SQ9" target="_blank" rel="noopener"><span class="cr-wave">doi:10.7483/OPENDATA.CMS.4M97.3SQ9</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.1103/PhysRevLett.33.1404" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Experimental observation of a heavy particle J</span></a></p><p class="cr-ref-by">Jean-Jacques Aubert e colegas · <span class="cr-mono">1974</span></p><p class="cr-ref-venue">Physical Review Letters 33(23):1404-1406</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.1103/PhysRevLett.33.1404" target="_blank" rel="noopener"><span class="cr-wave">doi:10.1103/PhysRevLett.33.1404</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://doi.org/10.1103/PhysRevLett.33.1406" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Discovery of a narrow resonance in e+e- annihilation</span></a></p><p class="cr-ref-by">Jean-Eudes Augustin e colegas · <span class="cr-mono">1974</span></p><p class="cr-ref-venue">Physical Review Letters 33(23):1406-1408</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://doi.org/10.1103/PhysRevLett.33.1406" target="_blank" rel="noopener"><span class="cr-wave">doi:10.1103/PhysRevLett.33.1406</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li></ol><details class="cr-more glass glass--flat fade-up"><summary><i class="ph ph-link" aria-hidden="true"></i><span data-i18n="courses.other_sources">Other sources</span> <span class="cr-mono cr-muted">6</span><i class="ph ph-caret-down cr-more-caret" aria-hidden="true"></i></summary><ul class="cr-sources" lang="pt-BR"><li><a href="https://en.wikipedia.org/wiki/PyTorch" target="_blank" rel="noopener">PyTorch</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Torch_(machine_learning)" target="_blank" rel="noopener">Torch (machine learning)</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Logistic_map" target="_blank" rel="noopener">Logistic map</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://commons.wikimedia.org/wiki/File:Logistic_Bifurcation_map_High_Resolution.png" target="_blank" rel="noopener">Logistic Bifurcation map High Resolution.png</a> <span class="cr-muted">Wikimedia Commons</span></li><li><a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html" target="_blank" rel="noopener">torch.optim.Adam</a> <span class="cr-muted">a documentação do PyTorch</span></li><li><a href="https://opendata.cern.ch/record/303" target="_blank" rel="noopener">Events with two muons from 2010</a> <span class="cr-muted">CERN Open Data Portal, registro 303</span></li></ul></details>
+      </div>
+    </section>
+    <section class="section seam cr-band cr-band--last" style="--seam-from:var(--bg-0)" aria-labelledby="creditos-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="creditos-t"><i class="ph ph-images" aria-hidden="true"></i><span data-i18n="courses.credits">Image credits</span></h2><div class="cr-credits fade-up cr-prose" lang="pt-BR"><table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>O que mostra</th>
+<th>Autor</th>
+<th>Licença</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/bifurcacao.5065d628ee.webp">bifurcacao.png</a></td>
+<td>o diagrama de bifurcação da equação logística; &quot;Logistic Bifurcation map High Resolution.png&quot;, Wikimedia Commons, 12/09/2011, na largura de 1280 pixels e recortado para tirar os eixos; o original fica em bifurcacao-original.png</td>
+<td>Jordan Pierce</td>
+<td>CC0, domínio público</td>
+</tr>
+</tbody>
+</table>
+<p>As outras imagens saem do código desta pasta.</p>
+</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>

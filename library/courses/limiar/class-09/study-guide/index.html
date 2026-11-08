@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 9: o fractal, pincelado, e o projeto | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Study guide of class 9 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-09/study-guide/">
+  <meta property="og:title" content="Aula 9: o fractal, pincelado, e o projeto | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Study guide of class 9 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-09/study-guide/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/courses.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/vendor/katex.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero cr-hero--slim">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../"><span data-i18n="courses.class">Class</span> 9</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.study_guide">Study guide</span></span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></p><h1 class="display-md fade-up" lang="pt-BR">Aula 9: o fractal, pincelado, e o projeto</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 04/12/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 3</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="../slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="../"><i class="ph ph-arrow-left" aria-hidden="true"></i><span data-i18n="courses.back_to_class">Back to the class</span></a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band cr-band--guide" style="--seam-from:var(--bg-0)">
+      <div class="container cr-guide-grid">
+        <nav class="cr-toc" aria-labelledby="toc-t"><p class="cr-toc-title" id="toc-t"><span data-i18n="courses.on_this_page">On this page</span></p><ol lang="pt-BR"><li><a href="#os-topicos">Os tópicos</a></li><li><a href="#notacao">Notação</a></li><li><a href="#1-revisao-da-aula-8">1. Revisão da aula 8</a></li><li><a href="#2-repetir-uma-conta">2. Repetir uma conta</a></li><li><a href="#3-o-mapa-das-duas-taxas">3. O mapa das duas taxas</a></li><li><a href="#4-o-zoom-e-a-dimensao">4. O zoom e a dimensão</a></li><li><a href="#5-de-onde-vem">5. De onde vem</a></li><li><a href="#6-o-projeto">6. O projeto</a></li><li><a href="#7-fechamento">7. Fechamento</a></li><li><a href="#perguntas-que-podem-aparecer">Perguntas que podem aparecer</a></li><li><a href="#para-estudar">Para estudar</a></li><li><a href="#fontes-dos-fatos-citados">Fontes dos fatos citados</a></li></ol></nav>
+        <article class="cr-prose cr-guide" lang="pt-BR">
+<p>Material de estudo para acompanhar os slides.</p>
+<p>O objetivo da aula é saber dizer o que é cada pixel do mapa das duas taxas, por que a fronteira
+entre convergir e divergir é um fractal, como se mede a dimensão dela pela contagem de caixas, e o
+que cada etapa do projeto entrega para a apresentação da aula 10.</p>
+<h2 id="os-topicos">Os tópicos</h2>
+<p>Sem horário marcado: o que não couber hoje entra na aula seguinte.</p>
+<ol>
+<li>Revisão da aula 8</li>
+<li>Repetir uma conta</li>
+<li>O mapa das duas taxas</li>
+<li>O zoom e a dimensão</li>
+<li>De onde vem</li>
+<li>O projeto</li>
+<li>Fechamento</li>
+</ol>
+<h2 id="notacao">Notação</h2>
+<p>Os símbolos novos dos slides, na ordem em que aparecem; os das aulas anteriores estão nos roteiros delas.</p>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Lê-se</th>
+<th>Quer dizer</th>
+<th>Slide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>←</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">x \leftarrow x^2 + c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></td>
+<td>x recebe x ao quadrado mais c</td>
+<td>a conta repetida; a seta é atribuição</td>
+<td>5</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∇</mi><mi>L</mi><mo stretchy="false">(</mo><mover accent="true"><mi>w</mi><mo>⃗</mo></mover><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\nabla L(\vec{w})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∇</span><span class="mord mathnormal">L</span><span class="mopen">(</span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td>nabla L de w</td>
+<td>o gradiente da perda, o vetor das derivadas parciais</td>
+<td>5</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>η</mi><mn>0</mn></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>η</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\eta_0,\ \eta_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>eta zero, eta um</td>
+<td>as taxas da camada de entrada e da camada de saída</td>
+<td>8</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mn>0</mn></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>W</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">W_0,\ W_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>W zero, W um</td>
+<td>os pesos da camada de entrada, 8 por 8, e da de saída, 8</td>
+<td>8</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>y</mi><mo>^</mo></mover></mrow><annotation encoding="application/x-tex">\hat{y}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1944em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span></td>
+<td>y chapéu</td>
+<td>a saída da rede, a estimativa do alvo y</td>
+<td>8</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>v</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">v_t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>v t</td>
+<td>a perda no passo t dividida pela do começo</td>
+<td>9</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>10</mn></msub></mrow><annotation encoding="application/x-tex">\log_{10}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>logaritmo na base 10</td>
+<td>log₁₀ η = 2 quer dizer η = 100</td>
+<td>10</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">N(s)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mclose">)</span></span></span></span></td>
+<td>N de s</td>
+<td>quantas caixas de lado s a figura toca</td>
+<td>15</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∝</mo></mrow><annotation encoding="application/x-tex">\propto</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mrel">∝</span></span></span></span></td>
+<td>proporcional a</td>
+<td>igual a menos de um fator fixo</td>
+<td>15</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span></td>
+<td>d</td>
+<td>a dimensão: o expoente de N ∝ (1/s)^d</td>
+<td>15</td>
+</tr>
+</tbody>
+</table>
+<p>Para o projeto, estas peças resolvem quase tudo:</p>
+<ul>
+<li><code>python projeto/varredura.py --conferir</code>: confere o gradiente e a versão rápida.</li>
+<li><code>python projeto/varredura.py --resolucao 128 --saida projeto/figuras/janela.png</code>: a janela
+inteira, no laptop.</li>
+<li><code>python projeto/varredura.py --janela X0 X1 Y0 Y1 --resolucao 512 --saida ...</code>: uma
+janela do zoom, em log₁₀ das taxas.</li>
+<li><code>python projeto/varredura.py --redesenhar projeto/figuras/janela.json</code>: refaz a figura
+do .npy, sem treinar.</li>
+<li><code>np.logspace(a, b, n)</code>: n taxas de 10^a a 10^b, iguais em escala logarítmica.</li>
+<li><code>f[:m*s, :m*s].reshape(m, s, m, s).any(axis=(1, 3))</code>: a grade de caixas de lado s que a
+fronteira f toca; <code>.sum()</code> conta as caixas.</li>
+<li><code>np.polyfit(np.log(1/s), np.log(N), 1)[0]</code>: a inclinação, a dimensão.</li>
+</ul>
+<h2 id="1-revisao-da-aula-8">1. Revisão da aula 8</h2>
+<h3 id="slide-1-a-capa">Slide 1: A capa <a class="cg-slide-link" href="../slides/#1" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A aula 9 cumpre a promessa da aula 1: desenha o fractal do projeto, com a turma. A pergunta vem da aula 7: lá, com uma taxa só, a fronteira entre o treino que melhora a rede e o que piora ficou quebrada. Aqui, cada camada tem a sua taxa, e a fronteira vira uma figura no plano. O fractal entra pincelado, só o que o projeto precisa: o que é, como aparece quando se repete uma conta e como se mede o quanto uma fronteira é quebrada.</p>
+<p>A foto da capa é uma couve romanesca, um fractal da natureza: cada broto repete, em ponto menor, a forma da couve inteira. Foi tirada por Ivar Leidus em 3 de janeiro de 2021 e publicada no Wikimedia Commons com a licença CC BY-SA 4.0. A couve se repete igual a si mesma; a fronteira do treino, que a aula desenha, não se repete e continua quebrada em qualquer escala.</p>
+<h3 id="slide-2-revisao-de-memoria">Slide 2: Revisão, de memória <a class="cg-slide-link" href="../slides/#2" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A revisão é de memória: quatro perguntas sobre a aula 8.</p>
+<p>O que é a massa invariante, e por que não depende de quem mede? É a massa da partícula que se desfez nos dois múons, M² = (E₁ + E₂)² − |<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>₁ + <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>₂|². Quem anda em relação à colisão mede outras energias e outros momentos, mas a mesma M.</p>
+<p>Por que o histograma tem picos? Cada pico é uma partícula: o J/ψ, o Υ e o Z se desfazem em dois múons, e a massa invariante desses eventos se junta perto da massa da partícula, sobre um fundo liso.</p>
+<p>Por que as entradas passam pelo asinh antes da rede? Porque a energia e o momento vão de quase zero a centenas de GeV, e a maior parte dos eventos fica perto do zero. O asinh(x/5) comprime os números grandes como um logaritmo, aceita os negativos e espalha os pequenos.</p>
+<p>Onde a rede erra mais? No pico do J/ψ, que ela borra, e no Z, onde há poucos exemplos, 364 no treino. A fórmula erra em milionésimos; a rede, em uns 2%.</p>
+<h3 id="slide-3-o-fio-do-curso">Slide 3: O fio do curso <a class="cg-slide-link" href="../slides/#3" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O curso segue um fio, e este slide aparece em todas as aulas, com a aula do dia em destaque e a data e o formato de cada aula.</p>
+<p>Na aula 2, a reta treinada pelo gradiente descendente tinha um limiar: abaixo de uma taxa, o treino convergia; acima, divergia. Na aula 7, numa rede de verdade, esse limiar deixou de ser um ponto. Na aula 8, os dados do CMS. Nesta aula, a 9, o limiar ganha duas dimensões, uma taxa por camada, com os dados do CMS, e vira o fractal do projeto. A aula 10 é a apresentação do projeto e a revisão do curso inteiro.</p>
+<h2 id="2-repetir-uma-conta">2. Repetir uma conta</h2>
+<h3 id="slide-4-uma-taxa-para-cada-camada">Slide 4: Uma taxa para cada camada <a class="cg-slide-link" href="../slides/#4" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A pergunta da aula. Até a aula 7, a rede inteira usou uma taxa de aprendizado só, o η, o tamanho do passo contra o gradiente. Nada impede que cada camada tenha a sua: η₀ para os pesos da camada de entrada, η₁ para os da camada de saída. Cada par (η₀; η₁) é um ponto do plano, e cada ponto é um treino inteiro, do zero.</p>
+<p>Com uma taxa só, a aula 7 achou, entre 3,86 e 7,55, uma faixa em que taxas vizinhas dão respostas diferentes. A pergunta é que figura a fronteira faz no plano. A resposta da aula, com a rede do projeto: um fractal, a mesma família de figuras do Buddhabrot da capa da aula 1. A faixa da aula 7 também tem resposta, no slide da rede da aula 7 no plano.</p>
+<h3 id="slide-5-repetir-uma-conta">Slide 5: Repetir uma conta <a class="cg-slide-link" href="../slides/#5" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Antes da rede, uma conta de uma linha. Começa-se em x = 0 e repete-se x ← x² + c: o novo x é o quadrado do velho mais c. A seta ← quer dizer que o valor da direita passa a ser o x; é atribuição, como o = do Python. Iterar, no curso, é isso: repetir a mesma conta usando a saída de um passo como entrada do seguinte.</p>
+<p>Com c = −1, o x vai de 0 a −1, volta a 0 e fica alternando: não foge. Com c = 0,25, o x sobe devagar, 0,25, 0,3125, 0,3477, e chega perto de 0,5 sem passar. Com c = 1, o x vai a 1, 2, 5, 26 e não para mais: foge para o infinito.</p>
+<p>O treino é a mesma coisa com muitos números. O passo do gradiente descendente da aula 2, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> ← <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> − η∇L(<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>), pega os pesos de um passo e devolve os do seguinte; repetido, o treino converge ou diverge. O c da conta faz o papel da taxa η: é o número que se escolhe antes e que decide se a conta repetida fica perto ou foge.</p>
+<p>∇L(<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>), lê-se nabla L, é o gradiente da perda, o vetor das derivadas parciais da aula 2. Em física, nabla também aparece no gradiente de um campo, com o mesmo sentido.</p>
+<h3 id="slide-6-fica-perto-ou-foge-em-video">Slide 6: Fica perto ou foge, em vídeo <a class="cg-slide-link" href="../slides/#6" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo faz a conta para quatro valores de c, ao mesmo tempo, cada um numa reta. O ponto azul é o x de cada passo, e o rastro claro mostra por onde passou.</p>
+<p>Com c = −1, o ponto pula entre 0 e −1. Com c = 0,25, anda cada vez menos e se aproxima de 0,5. Com c = 0,3, um pouco maior, anda devagar por 11 passos e, no passo 12, passa de 2 e foge. Com c = 1, foge no passo 3. A diferença entre 0,25 e 0,3 é pequena, e a resposta é outra.</p>
+<p>Passar de 2 basta para saber que fugiu: com c entre −2 e 2, um x maior que 2 em tamanho tem x² maior que 2|x|, e cada passo o afasta mais.</p>
+<p>Depois, a mesma pergunta para cada c da reta, de −2,5 a 1: azul, onde a conta fica perto; laranja, onde foge. Na reta, a fronteira são dois pontos, −2 e 0,25. Quando o c tem dois números, um ponto do plano, a mesma conta, com a multiplicação dos números complexos, desenha o conjunto de Mandelbrot, e a fronteira vira um fractal. Os números complexos ficam de fora do curso: são uma caixa-preta que recebe dois números e devolve dois. No fim, o mapa do treino da rede do projeto, que esta aula constrói: a conta repetida é o passo do gradiente, e o ponto do plano são as duas taxas.</p>
+<h3 id="slide-7-fractal-de-novo">Slide 7: Fractal, de novo <a class="cg-slide-link" href="../slides/#7" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A definição é a da aula 1. Fractal é uma figura com detalhe em qualquer escala: ampliada, continua cheia de detalhe, em vez de virar uma linha lisa. O nome vem do latim fractus, quebrado, e foi criado por Benoit Mandelbrot em 1975.</p>
+<p>O Buddhabrot, a capa da aula 1, é o conjunto de Mandelbrot desenhado pelos caminhos dos pontos que fogem. A nota daquela capa dizia que aquele fractal não era o do projeto, que só aparece em dezembro. É este.</p>
+<p>A imagem do slide é o litoral da Noruega, com os fiordes, visto de satélite pela NASA, em domínio público. O litoral é o fractal clássico: em 5 de maio de 1967, antes de existir a palavra fractal, Mandelbrot publicou &quot;How long is the coast of Britain?&quot;, sobre a ideia, estudada antes por Lewis Fry Richardson, de que o comprimento de um litoral depende do tamanho da régua: quanto menor a régua, mais reentrâncias ela pega, e mais comprido o litoral fica. A contagem de caixas, no fim desta aula, é a mesma ideia.</p>
+<p>O vídeo do 3Blue1Brown do estudo da semana passada tem um título que corrige uma ideia comum: os fractais, em geral, não são iguais a si mesmos. A couve da capa, ampliada, repete a forma inteira; o litoral e a fronteira do treino não repetem, e mesmo assim continuam quebrados em qualquer escala. O que os une é o detalhe sem fim, medido pela dimensão, que esta aula conta no fim.</p>
+<p>Os processos caóticos costumam gerar fractais, como fronteiras entre as regiões que levam a destinos diferentes. Caótico, no curso, é o processo em que uma diferença minúscula no começo vira uma diferença grande no fim. Na linguagem comum, caos é bagunça; aqui, é uma conta determinada, sem sorteio nenhum, que amplifica as diferenças.</p>
+<h2 id="3-o-mapa-das-duas-taxas">3. O mapa das duas taxas</h2>
+<h3 id="slide-8-a-rede-do-projeto">Slide 8: A rede do projeto <a class="cg-slide-link" href="../slides/#8" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A rede do projeto é a do artigo de Sohl-Dickstein, menor: 8 entradas, uma camada oculta de 8 neurônios com a tanh, e uma saída, sem viés. As entradas são a energia e as três componentes do momento dos dois múons, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> com 8 números, padronizadas; a saída é o logaritmo da massa invariante, padronizado. São 64 pesos em W₀ e 8 em W₁, 72 ao todo, e o treino usa 72 eventos do dimuon.csv, sorteados com a semente 0: tantos exemplos quanto pesos, como no artigo.</p>
+<p>Os fatores √(2/8) na entrada e 1/8 na saída são a parametrização de campo médio do artigo: uma escala fixa que mantém a soma dos neurônios num tamanho razoável. Não são pesos e não mudam no treino.</p>
+<p>A perda é o erro quadrático médio, L, a média de (y − ŷ)² nos 72 eventos. O treino é o gradiente descendente da aula 2 com todos os exemplos a cada passo, 100 passos, em float64, e com duas taxas: η₀ multiplica a derivada em relação a W₀, e η₁, a derivada em relação a W₁. Nada é sorteado durante o treino: o mesmo par de taxas dá sempre o mesmo resultado.</p>
+<p>O artigo usa 16 neurônios, 272 exemplos aleatórios e 500 passos. O projeto usa 8, 72 eventos reais e 100 passos, para caber no laptop.</p>
+<h3 id="slide-9-convergiu-ou-divergiu">Slide 9: Convergiu ou divergiu <a class="cg-slide-link" href="../slides/#9" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Cada treino tem de virar uma cor, e a regra é a do notebook do artigo. v_t é a perda no passo t dividida pela perda do começo, L₀: v_t = 1 quer dizer que nada mudou; 0,1, que a perda caiu a um décimo; 1.000, que subiu mil vezes. O treino convergiu se a média de v_t nos 20 últimos passos, de 80 a 99, ficou abaixo de 1: no fim, a perda estava menor que no começo. Senão, divergiu.</p>
+<p>A cor de dentro de cada região diz a rapidez. No treino que convergiu, a soma dos v_t: quanto menor, mais depressa a perda caiu, e mais claro o azul. No que divergiu, a soma de 1/v_t: quanto menor, mais depressa a perda explodiu, e mais claro o laranja.</p>
+<p>Os quatro treinos do vídeo seguinte, com η₀ e η₁ e a perda final sobre a do começo: η₀ = 1 e η₁ = 1, v = 0,74, convergiu devagar; η₀ = 10 e η₁ = 31,6, v = 0,30, convergiu mais rápido; η₀ = 10 e η₁ = 158, a perda chega a 10²⁰⁹, divergiu; η₀ = 10 e η₁ = 31.623, a perda sobe 82 mil vezes no primeiro passo e passa do maior número do float64 no passo 42, divergiu.</p>
+<p>As cores são o azul e o laranja do curso, os dos slides desde a aula 1: azul para convergiu, laranja para divergiu, com todo azul mais claro que todo laranja, para as duas regiões se separarem também em escala de cinza e para quem não distingue vermelho de verde. O projeto/varredura.py pinta assim, e as figuras da aula saem da mesma função.</p>
+<h3 id="slide-10-cada-pixel-e-um-treino-em-video">Slide 10: Cada pixel é um treino, em vídeo <a class="cg-slide-link" href="../slides/#10" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra o que é um pixel do mapa. À esquerda, o plano das taxas, com log₁₀ η₀ na horizontal e log₁₀ η₁ na vertical, de −3 a 6: taxas de 0,001 a 1 milhão. O logaritmo entra porque as taxas boas e ruins se espalham por nove ordens de grandeza; log₁₀ η = 2 quer dizer η = 100.</p>
+<p>À direita, a perda passo a passo de quatro treinos, dividida pela do começo, em escala logarítmica, com a linha tracejada em 1. Cada treino vira um quadradinho na sua posição, com a cor da regra do slide anterior.</p>
+<p>Depois o plano se enche: 8 por 8 treinos, 16 por 16, até 512 por 512, que são 262.144 treinos. A figura fica mais nítida, e a fronteira, mais recortada. No laptop do professor, a janela de 512 por 512 levou 73 segundos, repartida entre 16 processos; com um processo só, como no projeto/varredura.py, a de 256 por 256 leva 85 segundos.</p>
+<h3 id="slide-11-o-mapa-inteiro">Slide 11: O mapa inteiro <a class="cg-slide-link" href="../slides/#11" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O mapa da janela inteira, com as taxas de 0,001 a 1 milhão nas duas camadas, e 512 por 512 treinos.</p>
+<p>Embaixo e à esquerda, o azul: taxas pequenas, o treino converge. O azul mais escuro, à esquerda, é o treino lento: com η₀ pequena, a camada de entrada quase não anda. Em cima, o laranja: com η₁ acima de uns 20 a 80, o treino explode, qualquer que seja η₀. Embaixo à direita, outro laranja: com η₀ acima de uns 4.000 e η₁ abaixo de uns 0,1, também.</p>
+<p>A fronteira de cima é a mais interessante. À direita, de perto, é recortada, com pontos azuis no meio do laranja e o contrário: é dela que sai o zoom.</p>
+<p>À esquerda, ela é quase reta, e aqui a conta da aula 2 explica. Com η₀ muito pequena, a camada de entrada quase não anda, e só a de saída treina: o treino é a regressão linear da aula 2 sobre as saídas fixas da camada oculta, e a perda é uma tigela. O passo diverge acima de η₁ = 2/λ, com λ o maior autovalor da hessiana da perda, a mesma conta do limiar 0,513 da reta. Aqui, λ = 0,0388, e o limiar é 51,5: no mapa, logo acima, em η₁ ≈ 52, há uma linha fina de treinos que divergem. Hessiana é a matriz das derivadas segundas da perda; na aula 2 ela entrou como caixa-preta, e aqui dá o número.</p>
+<p>Acima da linha, até η₁ ≈ 79, outra faixa azul: a perda explode e volta. Com η₁ = 70, ela sobe a 2.291 e termina em 0,82. Na explosão, o gradiente fica tão grande que a camada de entrada se mexe, 35% dos pesos, mesmo com η₀ = 0,001, e o maior autovalor cai para 0,0231, abaixo de 2/70: o passo deixa de explodir, e o treino converge. Com η₁ = 80, a explosão vence, e o treino diverge.</p>
+<p>O artigo observa que nem toda parte da fronteira é fractal: com só a camada de saída treinando, ela é lisa e tem fórmula. É a parte da esquerda.</p>
+<h3 id="slide-12-a-rede-da-aula-7-no-plano">Slide 12: A rede da aula 7 no plano <a class="cg-slide-link" href="../slides/#12" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A aula 7 achou, entre 3,86 e 7,55, uma faixa em que taxas vizinhas dão respostas diferentes, melhora ou piora, e deixou para esta aula a causa da mistura. Aqui, a rede pequena da aula 7, 784 entradas, 16 neurônios com a tanh e 10 saídas, nos 256 primeiros exemplos do MNIST, sem lotes, ganha uma taxa por camada. A taxa única da aula 7 é a diagonal tracejada, η₀ = η₁.</p>
+<p>À esquerda, o plano de 0,01 a 316, com 128 por 128 treinos de 200 passos, como na aula 7. Cada pixel fica numa de três classes no passo 200: voltou, a perda abaixo da de antes do treino, 2,32, o &quot;melhorou a rede&quot; da aula 7; em trânsito, a perda ainda acima dela; explodiu, a perda passou de 1.000 em algum passo. Voltaram 68% dos treinos, estão em trânsito 20% e explodiram 12%. A diagonal cruza a borda da faixa laranja perto de η = 4 a 8, onde a aula 7 achou a mistura.</p>
+<p>À direita, a causa do granulado, em duas taxas vizinhas do quadrado preto, a segunda 0,9% maior que a primeira, treinadas por 600 passos. A perda das duas salta da inicial para dezenas nos primeiros passos e depois fica oscilando, sem se assentar: a de η₀ = 5,93 acima da perda de antes o tempo todo, a de η₀ = 5,99 em volta dela, abaixo pela primeira vez no passo 145. No passo 200, a primeira está em trânsito e a segunda voltou. Na mesma linha, de seis taxas vizinhas, três ficam abaixo pela primeira vez nos passos 145, 269 e 325, e três não ficam até o passo 600. A classe num passo fixo depende de onde a oscilação de cada treino está naquele passo, e isso muda sem ordem de uma taxa para a vizinha: é o granulado.</p>
+<p>Mais passos não desfazem os grãos. No quadrado preto, η₀ de 3,98 a 12,6 e η₁ de 3,55 a 11,2, com 128 por 128 treinos de 600 passos, voltaram 34% no passo 200, 40% no 400 e 43% no 600, e os pares de pixels vizinhos em classes diferentes foram de 15,5% para 18,5%. Nas 601 taxas da diagonal, as da figura do zoom da aula 7, as que pioram a rede caem de 375 no passo 200 para 345 no 600, e a resposta continua trocando entre vizinhas, 81 vezes.</p>
+<p>A oscilação muda sem ordem porque o treino, nessa faixa, é caótico: uma diferença minúscula no começo cresce até mudar o resultado. Com η = 5, a conta da aula 7 dá 11,13 de perda final, e a mesma conta com as somas em outra ordem, a do programa desta aula, 14,99; a diferença começa na 16ª casa decimal. Pelo mesmo motivo, no passo 200 o programa desta aula conta 375 taxas da diagonal que pioram a rede, e o da aula 7, 383.</p>
+<p>A regra do artigo, a média da perda nos 20 últimos passos abaixo da do começo, dá a mesma classe que &quot;voltou&quot; em 99,3% dos pixels: neste mapa, a fronteira do artigo é a mesma faixa granulada.</p>
+<h2 id="4-o-zoom-e-a-dimensao">4. O zoom e a dimensão</h2>
+<h3 id="slide-13-o-zoom-na-fronteira-em-video">Slide 13: O zoom na fronteira, em vídeo <a class="cg-slide-link" href="../slides/#13" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo amplia a fronteira de cima seis vezes seguidas, cada janela quatro vezes menor que a anterior, até 1.024 vezes. Cada janela é um mapa novo, de 512 por 512 treinos, calculado do zero; o quadrado preto marca onde fica a seguinte. Ao lado, o aumento e as taxas da janela: na última, η₀ vai de 11,97 a 12,22 e η₁ de 46,46 a 47,41.</p>
+<p>Em nenhuma escala a fronteira vira uma linha lisa: aparecem filamentos, redemoinhos e ilhas de uma cor dentro da outra. É o que define um fractal. Os centros das janelas foram escolhidos à mão, olhando cada mapa, como o próprio artigo diz que fez.</p>
+<p>Mil vezes são três ordens de grandeza. O artigo foi muito mais longe: sequências de uns 50 mapas, cada um com o dobro do aumento do anterior, e a fronteira continuou fractal por mais de dez ordens de grandeza, até onde o float64 deixa de distinguir taxas vizinhas.</p>
+<p>As cores de cada janela se ajustam ao próprio mapa, como no artigo: o mesmo azul pode ser rápido numa janela e lento na outra. A troca de convergiu para divergiu é a mesma em todas.</p>
+<h3 id="slide-14-seis-janelas-uma-dentro-da-outra">Slide 14: Seis janelas, uma dentro da outra <a class="cg-slide-link" href="../slides/#14" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>As seis janelas do vídeo, paradas, para estudar. Cada uma tem 512 por 512 treinos e levou 73 segundos no laptop do professor, com 16 processos. O quadrado preto de cada uma é a janela seguinte.</p>
+<p>Janela 0: a janela inteira, com a fronteira de cima quase reta. Janela 1, 4 vezes: a fronteira de cima já é dentada. Janela 2, 16 vezes: pontos laranja no azul e faixas inclinadas. Janela 3, 64 vezes: uma língua laranja entra no azul e se enrola. Janela 4, 256 vezes, a da capa: a ponta da língua vira um gancho com filamentos. Janela 5, 1.024 vezes: dentro do gancho, mais redemoinhos.</p>
+<p>Convergiram 46%, 52%, 48%, 53%, 60% e 31% dos treinos de cada janela: o zoom fica sempre em cima da fronteira, com as duas regiões presentes.</p>
+<h3 id="slide-15-a-dimensao-pela-contagem-de-caixas">Slide 15: A dimensão pela contagem de caixas <a class="cg-slide-link" href="../slides/#15" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Dimensão, aqui, é um número que diz o quanto uma figura enche o plano. A ideia é a contagem de caixas. Corta-se a imagem numa grade de caixas de lado s e contam-se as caixas que a figura toca, N(s). Depois, corta-se a caixa pela metade e conta-se de novo.</p>
+<p>Uma linha toca 2 vezes mais caixas quando s cai pela metade: N ∝ (1/s)¹. Uma área, 4 vezes: N ∝ (1/s)². O símbolo ∝, lê-se proporcional a, quer dizer igual a menos de um fator fixo. O expoente d de N ∝ (1/s)^d é a dimensão. Numa fronteira fractal, ele fica entre 1 e 2: quebrada demais para ser linha, magra demais para ser área.</p>
+<p>Tirando o logaritmo, log N = d log(1/s) + constante: os pontos (log(1/s); log N) caem numa reta, e d é a inclinação. É a conta de caixas() e dimensao() em codigo/fractal.py, com caixas de 2, 4, 8 e 16 pixels.</p>
+<p>Na física e na geometria, dimensão costuma ser o número de direções independentes, 1 na linha, 2 no plano, 3 no espaço, sempre inteiro. A contagem de caixas dá o mesmo número para essas figuras e dá números quebrados para as fractais.</p>
+<h3 id="slide-16-contar-caixas-em-video">Slide 16: Contar caixas, em vídeo <a class="cg-slide-link" href="../slides/#16" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo faz a contagem. Primeiro, para calibrar: uma diagonal de 512 pixels toca 4, 8 e 16 caixas de 128, 64 e 32 pixels, sempre o dobro; um quadrado cheio de 256 pixels toca 4, 16 e 64, sempre o quádruplo.</p>
+<p>Depois, a fronteira da janela 3 do zoom, 64 vezes ampliada: os pixels que têm um vizinho do outro lado, convergiu de um lado e divergiu do outro. Com caixas de 16, 8, 4 e 2 pixels, ela toca 836, 2.795, 9.018 e 27.260 caixas. Cada vez que a caixa cai pela metade, a contagem sobe umas 3,2 vezes: 2^1,68. A inclinação da reta é 1,68, a dimensão da fronteira nessa janela.</p>
+<p>As caixas de 32 e 64 pixels ficaram de fora da reta: nessa janela, quase todas tocam a fronteira, a contagem para de crescer e a reta entortaria. O pixel sozinho também: nele, a conta mede a espessura do desenho, não a fronteira.</p>
+<h3 id="slide-17-a-dimensao-da-fronteira">Slide 17: A dimensão da fronteira <a class="cg-slide-link" href="../slides/#17" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A mesma conta nas seis janelas do zoom. A dimensão sobe da janela inteira para as de dentro: 1,39, 1,51, 1,57, 1,68, 1,66 e 1,72. Na janela inteira, boa parte da fronteira é a linha quase reta da esquerda, que não é fractal, e puxa o número para perto de 1. Nas janelas de dentro, a fronteira é toda quebrada.</p>
+<p>O artigo estima a dimensão como a mediana das estimativas de todos os mapas de um zoom. Aqui, a mediana das seis é 1,62. O artigo, com a tanh, o lote completo e dado aleatório, mede 1,66; com a ReLU, 1,20; numa rede linear, 1,17; com um exemplo só, 1,41; com lotes de 16, 1,55.</p>
+<p>O número depende das janelas escolhidas à mão, dos tamanhos de caixa e da resolução, e a variação de uma janela para outra dá a ordem dessa incerteza: de 1,51 a 1,72 nas cinco janelas de dentro. O artigo usa outra ferramenta, a contagem de caixas da biblioteca PoreSpy, e 50 mapas por zoom. A fronteira dos múons tem dimensão perto de 1,6, entre a linha e a área. A diferença para o 1,66 do artigo, 0,04, é menor que a variação entre as janelas: os dois números são compatíveis, com outra rede e outros dados.</p>
+<h2 id="5-de-onde-vem">5. De onde vem</h2>
+<h3 id="slide-18-de-onde-vem">Slide 18: De onde vem <a class="cg-slide-link" href="../slides/#18" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A conta repetida tem mais de cem anos. Em 1918, Gaston Julia publicou, aos 25 anos, o Mémoire sur l'itération des fonctions rationnelles, 199 páginas sobre o que acontece quando se repete uma conta como z² + c; Pierre Fatou trabalhou no mesmo problema, na mesma época. Sem computador, as figuras ficaram na imaginação.</p>
+<p>Em 1975, Benoit Mandelbrot criou a palavra fractal. Em 1978, Robert Brooks e Peter Matelski definiram e desenharam pela primeira vez o conjunto que hoje leva o nome de Mandelbrot, num estudo de grupos de Klein. Em 1980, Mandelbrot obteve imagens de alta qualidade do conjunto no centro de pesquisa Thomas J. Watson, da IBM.</p>
+<p>Em 9 de fevereiro de 2024, Jascha Sohl-Dickstein publicou no arXiv &quot;The boundary of neural network trainability is fractal&quot;, três páginas: a fronteira entre as taxas que treinam e as que não treinam é fractal em todas as configurações que testou. A imagem do slide é a da figura 1 do artigo, a rede com a tanh e o lote completo, de dimensão 1,66, publicada com a licença CC BY 4.0.</p>
+<p>O artigo também diz por que isso importa: as melhores taxas costumam ficar perto da borda da instabilidade, e quem as procura anda em cima de um fractal. É o que a aula 7 já tinha visto, com a melhor taxa logo antes da região em que o treino piora.</p>
+<h2 id="6-o-projeto">6. O projeto</h2>
+<h3 id="slide-19-o-projeto-os-dados-do-cms">Slide 19: O projeto: os dados do CMS <a class="cg-slide-link" href="../slides/#19" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O projeto refaz o artigo com dados reais. A pergunta: com 72 eventos de dois múons do CMS no lugar do dado aleatório, a fronteira continua fractal, e qual é a dimensão dela?</p>
+<p>A figura compara as duas janelas inteiras, com a mesma rede, os mesmos pesos iniciais e 256 por 256 treinos. À esquerda, entradas e alvos sorteados de uma normal, como no artigo; à direita, os 72 eventos. A paisagem é quase a mesma: o azul embaixo, o laranja em cima e embaixo à direita, a fronteira de cima perto de log₁₀ η₁ = 1,2 a 1,9. Com os múons, a região que diverge embaixo à direita começa um pouco mais acima, em η₁ perto de 0,1, e a de cima tem uma faixa mais clara acima de η₁ = 10⁵.</p>
+<p>A resposta da primeira parte já está no zoom desta aula: com os múons, a fronteira é fractal até mil vezes de aumento, com dimensão perto de 1,6. O que falta ao projeto é ir mais fundo, com mais janelas e mais resolução, e medir a dimensão com cuidado.</p>
+<h3 id="slide-20-o-custo-cada-pixel-e-um-treino">Slide 20: O custo: cada pixel é um treino <a class="cg-slide-link" href="../slides/#20" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Cada pixel é um treino de 100 passos, e o custo cresce com o número de pixels: dobrar o lado da imagem quadruplica a conta.</p>
+<p>Medido no laptop do professor, com 16 processos: 128 por 128, 16.384 treinos, 3,6 segundos; 512 por 512, 262.144 treinos, 73 segundos. Com um processo só, como o projeto/varredura.py roda, 256 por 256 levou 85 segundos. A janela do tamanho do artigo, 4.096 por 4.096, tem 16.777.216 treinos: 64 vezes a de 512, perto de 78 minutos no mesmo laptop, uma estimativa pela proporção, não medida. O artigo fez uns 50 mapas desse tamanho para cada zoom.</p>
+<p>O laptop do professor é bem mais forte que o dos alunos, e o tempo dele não vale para a turma. No laptop de cada um, a varredura fica em 128 por 128. As janelas grandes e o zoom fundo vão para o PC do laboratório, o Dell Aurora R15 com o Core i9-13900K e a GeForce RTX 4070 Ti, acessado pelo Chrome Remote Desktop.</p>
+<p>Conta pesada não se repete à toa: cada mapa sai com um .npy, a imagem em números, e um .json com a semente, a janela, a resolução, o SHA-256 do arquivo de dados e o tempo. A figura se refaz do .npy, sem treinar.</p>
+<h3 id="slide-21-o-codigo">Slide 21: O código <a class="cg-slide-link" href="../slides/#21" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O código do projeto está em projeto/varredura.py, e o desta aula, em codigo/fractal.py, que só o chama.</p>
+<p>perda_e_gradientes é a rede escrita para ser lida: a passada para a frente, a perda e a retropropagação da aula 5, para uma rede só. treinar faz a mesma conta para milhares de redes de uma vez, uma por par de taxas, reorganizada em multiplicações de matrizes grandes. medida resume cada treino num número, com a regra do notebook do artigo.</p>
+<p>Antes de qualquer imagem, python projeto/varredura.py --conferir confere as duas versões: o gradiente bate com a derivada numérica, a diferença central da aula 4, até a décima casa, e um passo da versão rápida dá a mesma perda que a de leitura. Conta que não se confere não vira figura.</p>
+<p>fractal.py reparte os pixels entre os núcleos do processador: cada processo treina um pedaço com a função treinar do projeto. O mapa de 256 por 256 que sai dele é igual, pixel a pixel, ao do projeto, feito com um processo só.</p>
+<h3 id="slide-22-cinco-etapas-feitas-pela-turma-inteira">Slide 22: Cinco etapas, feitas pela turma inteira <a class="cg-slide-link" href="../slides/#22" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O projeto se faz junto, pela turma inteira, em cinco etapas, uma depois da outra, como se trabalha no CERN.</p>
+<p>A conferência da rede: rodar o --conferir, entender o que ele confere e saber explicar por que o gradiente da versão rápida é o mesmo da versão de leitura. Sem ela, nenhuma imagem vale.</p>
+<p>A varredura: a janela inteira em 128 por 128 no laptop de cada um, e as janelas grandes no PC do laboratório, cada uma com o .json ao lado.</p>
+<p>As imagens: as figuras finais, com os eixos em log₁₀ da taxa, a vírgula decimal, a legenda fora dos dados e as cores do curso, que se separam em cinza.</p>
+<p>O zoom e a dimensão: a sequência de janelas na fronteira, mais funda que a desta aula, e a dimensão de cada uma pela contagem de caixas.</p>
+<p>Os dados e a história: o que é o dimuon.csv, quais são os 72 eventos, o que é o CMS, o que o artigo fez e o que o projeto muda; é o fio da apresentação.</p>
+<p>Cada etapa usa o que a anterior entregou, e todos passam por todas: na apresentação, qualquer um explica qualquer parte.</p>
+<h3 id="slide-23-a-apresentacao-da-aula-10">Slide 23: A apresentação da aula 10 <a class="cg-slide-link" href="../slides/#23" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A apresentação da aula 10 conta o projeto como um artigo curto, na ordem em que se lê um artigo.</p>
+<p>A pergunta: a fronteira de treinabilidade continua fractal com dados do CMS, e qual é a dimensão dela? O método: a rede, os dados, o treino, a regra de convergência e as cores, com o suficiente para outra pessoa refazer. Os resultados: a janela inteira, o zoom e a dimensão, com o número e a incerteza dele. A comparação com o artigo: o que bate e o que não bate.</p>
+<p>Os limites, ditos como tal: as janelas foram escolhidas à mão, e a dimensão depende dos tamanhos de caixa. Um resultado com o limite dito é mais forte que um sem.</p>
+<p>E como refazer: o repositório, a semente, a versão dos dados e o comando de cada figura. Experimento que não se reproduz não existe.</p>
+<h2 id="7-fechamento">7. Fechamento</h2>
+<h3 id="slide-24-para-estudar-e-entregar">Slide 24: Para estudar e entregar <a class="cg-slide-link" href="../slides/#24" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O estudo da semana é a própria apresentação, e o artigo de Sohl-Dickstein, de três páginas, para a apresentação citar o método com as palavras dele. O texto do blog, do estudo da aula 8, mostra as imagens e os vídeos dos zooms.</p>
+<p>A entrega, até 11/12: as imagens finais do projeto e a apresentação pronta, no repositório de cada um.</p>
+<p>A seguir, a aula 10, a última: a apresentação do projeto e a revisão do curso inteiro, do neurônio da aula 1 ao fractal desta aula.</p>
+<h2 id="perguntas-que-podem-aparecer">Perguntas que podem aparecer</h2>
+<ul>
+<li>O fractal é só um problema? Não só. O artigo lembra que as melhores taxas ficam
+perto da borda da instabilidade, e quem procura a taxa mais rápida anda em cima da
+fronteira. Na prática, isso explica por que uma taxa boa às vezes falha com uma
+mudança pequena.</li>
+<li>Por que float64 e não float32? O artigo usa float64, e o zoom fundo pede: a janela
+do zoom do projeto, em 256 por 256 treinos, dá a mesma classe em 98,7% dos
+pixels nas duas precisões, e os que trocam estão quase todos em cima da fronteira,
+80% deles. Mais fundo, as taxas vizinhas de uma janela ficam mais
+perto uma da outra que o float32 distingue, uns sete algarismos, e o mapa perde o
+sentido; o float64 distingue uns dezesseis.</li>
+<li>A dimensão 1,62 é a dimensão verdadeira? É uma estimativa com caixas de 2 a 16
+pixels, em seis janelas de 512 por 512 escolhidas à mão. Outra escolha daria outro
+número perto deste.</li>
+<li>Os pontos isolados de uma cor no meio da outra são erro? Não: o treino é uma conta
+determinada, sem sorteio, e cada pixel foi calculado. Perto da fronteira, uma
+diferença minúscula na taxa muda o destino do treino.</li>
+<li>Por que a rede da aula 7 deu grãos e não filamentos? Porque, na faixa, a perda
+não se assenta: salta para dezenas nos primeiros passos e fica oscilando, e o mapa
+de um passo fixo pega cada treino num ponto da oscilação. Taxas vizinhas caem em
+classes diferentes sem ordem, e com mais passos o mapa continua granulado. O slide
+da rede da aula 7 no plano mostra as contas.</li>
+<li>Por que 72 eventos e não os 100 mil? Porque o artigo usa tantos exemplos quanto
+pesos, e o projeto refaz o artigo com dados reais. Com 100 mil, cada treino custaria
+mais de mil vezes mais.</li>
+</ul>
+<h2 id="para-estudar">Para estudar</h2>
+<p>O estudo da turma, que é também o seu:</p>
+<ul>
+<li>Preparar a apresentação da aula 10.</li>
+<li>Jascha Sohl-Dickstein, 2024, &quot;The boundary of neural network trainability is
+fractal&quot;, <a href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener">arXiv:2402.06184</a>, três páginas.</li>
+</ul>
+<p>Além dele, para preparar a aula:</p>
+<ul>
+<li>Jascha Sohl-Dickstein, 2024, &quot;Neural network training makes beautiful
+fractals&quot;, sohl-dickstein.github.io/2024/02/12/fractal.html, o texto do estudo
+da aula 8, com os vídeos dos zooms.</li>
+<li>O notebook do artigo, <a href="https://github.com/Sohl-Dickstein/fractal" target="_blank" rel="noopener">github.com/Sohl-Dickstein/fractal</a>, de onde vêm a
+parametrização e a regra de convergência do projeto/varredura.py.</li>
+</ul>
+<h2 id="fontes-dos-fatos-citados">Fontes dos fatos citados</h2>
+<p>Só para conferência; o estudo é a lista de cima.</p>
+<ul>
+<li>Sohl-Dickstein, 2024, <a href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener">arXiv:2402.06184</a>, versão 1 de 09/02/2024, licença CC BY
+4.0, lido no HTML do arXiv: a rede de uma camada oculta com 16 neurônios, a
+parametrização de campo médio, 272 exemplos, 500 passos, float64, as cores, os
+zooms de uns 50 mapas de 4.096 por 4.096, cada um com o dobro do aumento, a dimensão como mediana
+pela contagem de caixas da PoreSpy, as dimensões 1,17, 1,20, 1,41, 1,55, 1,66 e
+1,98, mais de dez ordens de grandeza, a regressão linear quando só a saída
+treina, as melhores taxas perto da borda da instabilidade. A figura do slide da história é a da rede com a tanh e o lote completo.</li>
+<li>Verbete &quot;Mandelbrot set&quot; da Wikipedia em inglês: Fatou e Julia no começo do
+século 20; Brooks e Matelski, 1978, grupos de Klein; Mandelbrot, 1980, o centro
+Thomas J. Watson da IBM.</li>
+<li>Verbete &quot;Gaston Julia&quot;, revisão 1372414589: o Mémoire de 1918, 199 páginas, aos
+25 anos, no Journal de Mathématiques Pures et Appliquées; Fatou.</li>
+<li>Verbete &quot;Fractal&quot;, revisão 1383882391: a palavra criada por Mandelbrot em 1975,
+do latim frāctus, quebrado; os processos caóticos geram fractais como atratores
+ou como fronteiras entre bacias de atração.</li>
+<li>Os números: codigo/fractal.py, com a semente 0 e o dimuon.csv do registro 303,
+gravados em resultados/curvas.json, resolucoes.json, zoom.json e dimensao.json;
+codigo/plano_aula7.py, em resultados/plano-aula7.json; o tempo de 85 segundos de
+projeto/figuras/janela-muons.json.</li>
+</ul>
+
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>

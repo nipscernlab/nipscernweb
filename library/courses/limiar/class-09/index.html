@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 9: O fractal, pincelado, e o projeto | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Class 9 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-09/">
+  <meta property="og:title" content="Aula 9: O fractal, pincelado, e o projeto | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Class 9 of Limiar, the NIPS-CERN neural networks course, in Portuguese: slides, study guide, code and readings.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-09/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../assets/css/courses.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero ">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.class">Class</span> 9</span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-books" aria-hidden="true"></i>Limiar · <span data-i18n="courses.class">Class</span> 9</p><h1 class="display-md cr-class-h1 fade-up" lang="pt-BR">O fractal, pincelado, e o projeto</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 04/12/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 3</span></li><li><i class="ph ph-user" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.taught_by">Taught by</span><span lang="pt-BR">Chrysthofer A. A. Afonso</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></a><a class="btn glass-btn btn-ghost" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-09-slides-v1.pdf" target="_blank" rel="noopener"><i class="ph ph-file-pdf" aria-hidden="true"></i><span data-i18n="courses.slides_pdf">Slides as PDF</span></a></div>
+          </div>
+          <div class="cr-hero-side"><a class="cr-cover frame fade-up" href="slides/" aria-label="Open the slides" title="Open the slides" data-i18n-aria="courses.open_slides" data-i18n-title="courses.open_slides"><img src="../../../../library/courses/limiar/media/limiar-aula-09-capa.7843d558bd.webp" alt="" width="1280" height="720" decoding="async"><span class="cr-play" aria-hidden="true"><i class="ph ph-play"></i></span><span class="cr-cover-tag" aria-hidden="true"><span><span class="cr-mono">24</span> <span data-i18n="courses.n_slides">slides</span></span><span><span class="cr-mono">4</span> <span data-i18n="courses.n_videos">videos</span></span></span></a><p class="cr-cover-hint fade-up"><span data-i18n="courses.keys_hint">In the slides: → moves on, F is full screen, N shows the notes, H lists every key.</span> <span data-i18n="courses.pdf_no_notes">The PDF has no notes: it is the one handed to the class.</span></p></div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band section--lit cr-band--first" style="--seam-from:var(--bg-0)">
+      <div class="container">
+<div class="cr-duo"><article class="cr-panel cr-plan glass fade-up" aria-labelledby="aula-t"><h2 class="cr-panel-title" id="aula-t"><i class="ph ph-notebook" aria-hidden="true"></i><span data-i18n="courses.the_class">The class</span></h2><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.topic">Topic</span></h3><div class="cr-prose" lang="pt-BR"><p>Fractal, em poucas palavras: uma figura com detalhe em qualquer escala; o nome
+vem do latim fractus, quebrado, e foi criado por Benoit Mandelbrot em 1975.
+Treinar uma rede é repetir uma conta, e a fronteira entre o treino que converge e
+o que diverge pode ser fractal. O projeto final, feito junto pela turma, em
+cinco etapas: a conferência da rede, a varredura das taxas, as imagens, o zoom na
+fronteira e a história dos dados para a apresentação.</p>
+<p>A aula parte da conta x ← x² + c, repetida a partir de 0: para uns c o número
+fica perto, para outros foge, e no plano a fronteira é o conjunto de Mandelbrot.
+O passo do gradiente descendente é a mesma coisa com muitos números, e cada par
+de taxas, uma por camada, é um ponto do plano e um treino inteiro. A rede do
+projeto, com 72 eventos do CMS, desenha um mapa cuja fronteira continua cheia de
+detalhe depois de 1.024 vezes de aumento, com dimensão perto de 1,6 pela
+contagem de caixas. A rede da aula 7 também vai ao plano, e a faixa irregular
+dela se explica: a perda oscila sem se assentar, e o passo 200 pega cada treino
+num ponto da oscilação.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.in_class">Practice in class</span></h3><div class="cr-prose" lang="pt-BR"><p>Uma varredura pequena no laptop de cada um. A janela grande roda no PC do
+laboratório, e o zoom na fronteira sai dela.</p>
+</div></section><section class="cr-block"><h3 class="cr-block-title"><span data-i18n="courses.assignment">Assignment</span><span class="cr-due"><i class="ph ph-calendar-check" aria-hidden="true"></i><span data-i18n="courses.due">Due</span> <time datetime="2026-12-11" class="cr-mono">11/12</time></span></h3><div class="cr-prose" lang="pt-BR"><ul>
+<li>As imagens finais e a apresentação pronta.</li>
+</ul>
+</div></section></article><aside class="cr-panel cr-kit glass fade-up" aria-labelledby="material-t"><h2 class="cr-panel-title" id="material-t"><i class="ph ph-package" aria-hidden="true"></i><span data-i18n="courses.class_materials">Class material</span></h2><ul class="cr-rows"><li><a class="cr-row" href="study-guide/"><i class="ph ph-book-open-text" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.study_guide">Study guide</span></strong><span><span data-i18n="courses.study_guide_desc">The topics of the class, with the study notes under each one and the equations.</span></span></span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-aula-09-folha-de-topicos-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.topic_sheet">Topic sheet</span></strong><span><span data-i18n="courses.topic_sheet_desc">The topics on one page, to print.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="https://cdn.nipscern.com/courses/limiar/limiar-guia-de-instalacao-v1.pdf" target=_blank rel=noopener><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="cr-row-text"><strong><span data-i18n="courses.install_guide">Installation guide</span></strong><span><span data-i18n="courses.install_guide_desc">Python, Git, VS Code and Claude Code on each student&#x27;s laptop.</span></span></span><i class="ph ph-arrow-square-out cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="../../../../library/courses/limiar/materials/requirements.txt" download><i class="ph ph-file-text" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">requirements.txt</strong><span><span data-i18n="courses.requirements_desc">The Python packages of the course, for pip.</span></span></span><i class="ph ph-download-simple cr-row-go" aria-hidden="true"></i></a></li></ul><h3 class="cr-kit-sub"><i class="ph ph-code" aria-hidden="true"></i><span data-i18n="courses.code">Code</span></h3><ul class="cr-rows"><li><a class="cr-row" href="code/#animacoes-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">animacoes.py</strong><span lang="pt-BR">Os vídeos da aula 9, feitos com o Manim Community.</span></span><span class="cr-mono cr-muted cr-row-n">671</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="code/#figuras-slides-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">figuras_slides.py</strong><span lang="pt-BR">Figuras dos slides da aula 9: o fractal e o projeto.</span></span><span class="cr-mono cr-muted cr-row-n">212</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="code/#fractal-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">fractal.py</strong><span lang="pt-BR">Aula 9: o mapa das duas taxas, o zoom na fronteira e a dimensão dela.</span></span><span class="cr-mono cr-muted cr-row-n">328</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li><li><a class="cr-row" href="code/#plano-aula7-py"><i class="ph ph-file-code" aria-hidden="true"></i><span class="cr-row-text"><strong class="cr-mono">plano_aula7.py</strong><span lang="pt-BR">Aula 9: a rede pequena da aula 7 no plano das duas taxas, e por que a faixa dela é granulada.</span></span><span class="cr-mono cr-muted cr-row-n">235</span><i class="ph ph-arrow-right cr-row-go" aria-hidden="true"></i></a></li></ul></aside></div>
+      </div>
+    </section>
+    <section class="section seam cr-band" style="--seam-from:var(--bg-0)" aria-labelledby="estudo-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="estudo-t"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.study">Study for the week</span></h2><div class="cr-grid cr-grid--videos fade-up"><div class="cr-read glass glass--flat"><i class="ph ph-book-open" aria-hidden="true"></i><div class="cr-prose" lang="pt-BR"><p>Preparar a apresentação.</p>
+</div></div><div class="cr-read glass glass--flat"><i class="ph ph-book-open" aria-hidden="true"></i><div class="cr-prose" lang="pt-BR"><p>Jascha Sohl-Dickstein, 2024, &quot;The boundary of neural network trainability is fractal&quot;, <a href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener">arXiv:2402.06184</a>, três páginas, para a apresentação citar o método.</p>
+</div></div></div>
+      </div>
+    </section>
+    <section class="section seam cr-band section--lit" style="--seam-from:var(--bg-0)" aria-labelledby="obras-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="obras-t"><i class="ph ph-books" aria-hidden="true"></i><span data-i18n="courses.papers">Papers and books</span></h2><p class="cr-intro fade-up"><span data-i18n="courses.papers_intro">Every work cited in the class material, with the official link. The first page appears where the PDF is open access.</span></p><ol class="cr-refs fade-up"><li class="cr-ref" lang="pt-BR"><a class="cr-ref-cover" href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="../../../../library/courses/limiar/media/capa-sohl-dickstein-2024.acf21d8bd9.webp" alt="" width="240" height="320" loading="lazy" decoding="async"></a><div class="cr-ref-body"><p class="cr-ref-title" lang="en"><a href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">The boundary of neural network trainability is fractal</span></a></p><p class="cr-ref-by">Jascha Sohl-Dickstein · <span class="cr-mono">2024</span></p><p class="cr-ref-venue">arXiv:2402.06184; CC BY 4.0</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://arxiv.org/abs/2402.06184" target="_blank" rel="noopener"><span class="cr-wave">arXiv:2402.06184</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a><a class="cr-ref-link" href="https://arxiv.org/pdf/2402.06184" target="_blank" rel="noopener"><span class="cr-wave">PDF</span><i class="ph ph-file-pdf" aria-hidden="true"></i></a></p></div></li><li class="cr-ref cr-ref--sem-capa" lang="pt-BR"><div class="cr-ref-body"><p class="cr-ref-title" lang="fr"><a href="https://www.numdam.org/item/JMPA_1918_8_1__47_0/" target="_blank" rel="noopener"><span class="cr-wave cr-wave--quiet">Mémoire sur l&#x27;itération des fonctions rationnelles</span></a></p><p class="cr-ref-by">Gaston Julia · <span class="cr-mono">1918</span></p><p class="cr-ref-venue">Journal de Mathématiques Pures et Appliquées, série 8, tomo 1, 47-245</p><p class="cr-ref-links"><a class="cr-ref-link" href="https://www.numdam.org/item/JMPA_1918_8_1__47_0/" target="_blank" rel="noopener"><span class="cr-wave">numdam.org</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></a></p></div></li></ol><details class="cr-more glass glass--flat fade-up"><summary><i class="ph ph-link" aria-hidden="true"></i><span data-i18n="courses.other_sources">Other sources</span> <span class="cr-mono cr-muted">3</span><i class="ph ph-caret-down cr-more-caret" aria-hidden="true"></i></summary><ul class="cr-sources" lang="pt-BR"><li><a href="https://en.wikipedia.org/wiki/Mandelbrot_set" target="_blank" rel="noopener">Mandelbrot set</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Gaston_Julia" target="_blank" rel="noopener">Gaston Julia</a> <span class="cr-muted">Wikipedia, verbete</span></li><li><a href="https://en.wikipedia.org/wiki/Fractal" target="_blank" rel="noopener">Fractal</a> <span class="cr-muted">Wikipedia, verbete</span></li></ul></details>
+      </div>
+    </section>
+    <section class="section seam cr-band cr-band--last" style="--seam-from:var(--bg-0)" aria-labelledby="creditos-t">
+      <div class="container">
+<h2 class="cr-h2 fade-up" id="creditos-t"><i class="ph ph-images" aria-hidden="true"></i><span data-i18n="courses.credits">Image credits</span></h2><div class="cr-credits fade-up cr-prose" lang="pt-BR"><table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>O que mostra</th>
+<th>Autor</th>
+<th>Licença</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/artigo-tanh.b8c0e79ac3.webp">artigo-tanh.png</a></td>
+<td>a figura 1 do artigo, a rede com a tanh e o lote completo, dimensão 1,66; do HTML do arXiv, versão 1</td>
+<td>Jascha Sohl-Dickstein</td>
+<td>CC BY 4.0</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/romanesco.7cc344131f.webp">romanesco.jpg</a></td>
+<td>uma couve romanesca, na capa; arquivo &quot;Romanesco broccoli (Brassica oleracea).jpg&quot;, Wikimedia Commons, foto de 03/01/2021, reduzida a 1.500 por 1.200 pixels</td>
+<td>Ivar Leidus</td>
+<td>CC BY-SA 4.0</td>
+</tr>
+<tr>
+<td><a href="../../../../library/courses/limiar/media/fiordes.fcdcee36b2.webp">fiordes.jpg</a></td>
+<td>os fiordes de Nordmøre e Romsdal, na Noruega, no slide do fractal; arquivo &quot;Kysten av Romsdal og Nordmøre 8.01767E 63.02936N.png&quot;, Wikimedia Commons, tirado do NASA World Wind</td>
+<td>NASA, imagem do Landsat</td>
+<td>domínio público</td>
+</tr>
+</tbody>
+</table>
+<p>As outras imagens saem do código desta pasta. O Buddhabrot, a capa da aula 1,
+esteve no slide do fractal até 08/11/2026; saiu para nenhuma imagem se repetir
+no curso.</p>
+</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>
