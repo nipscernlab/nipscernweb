@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 10: revisão do curso e apresentação | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Study guide of class 10 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-10/study-guide/">
+  <meta property="og:title" content="Aula 10: revisão do curso e apresentação | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Study guide of class 10 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-10/study-guide/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/courses.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/vendor/katex.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero cr-hero--slim">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../"><span data-i18n="courses.class">Class</span> 10</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.study_guide">Study guide</span></span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></p><h1 class="display-md fade-up" lang="pt-BR">Aula 10: revisão do curso e apresentação</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 11/12/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 4</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="../slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="../"><i class="ph ph-arrow-left" aria-hidden="true"></i><span data-i18n="courses.back_to_class">Back to the class</span></a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band cr-band--guide" style="--seam-from:var(--bg-0)">
+      <div class="container cr-guide-grid">
+        <nav class="cr-toc" aria-labelledby="toc-t"><p class="cr-toc-title" id="toc-t"><span data-i18n="courses.on_this_page">On this page</span></p><ol lang="pt-BR"><li><a href="#os-topicos">Os tópicos</a></li><li><a href="#notacao">Notação</a></li><li><a href="#1-revisao-da-aula-9">1. Revisão da aula 9</a></li><li><a href="#2-o-curso-inteiro">2. O curso inteiro</a></li><li><a href="#3-a-apresentacao">3. A apresentação</a></li><li><a href="#4-depois-do-mlp">4. Depois do MLP</a></li><li><a href="#5-fechamento">5. Fechamento</a></li><li><a href="#perguntas-que-podem-aparecer">Perguntas que podem aparecer</a></li><li><a href="#para-estudar">Para estudar</a></li><li><a href="#fontes-dos-fatos-citados">Fontes dos fatos citados</a></li></ol></nav>
+        <article class="cr-prose cr-guide" lang="pt-BR">
+<p>Material de estudo para acompanhar os slides.</p>
+<p>O objetivo da aula é saber contar o curso inteiro como um laço de quatro peças, apresentar o
+projeto dizendo o que entra, o que a rede aprende e o que significa o número que sai, e saber o que
+a convolução e a atenção acrescentam ao MLP.</p>
+<h2 id="os-topicos">Os tópicos</h2>
+<p>Sem horário marcado: o que não couber hoje fica para o estudo.</p>
+<ol>
+<li>Revisão da aula 9</li>
+<li>O curso inteiro</li>
+<li>A apresentação</li>
+<li>Depois do MLP</li>
+<li>Fechamento</li>
+</ol>
+<h2 id="notacao">Notação</h2>
+<p>Os símbolos novos dos slides, na ordem em que aparecem; os das aulas anteriores estão nos roteiros delas.</p>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Lê-se</th>
+<th>Quer dizer</th>
+<th>Slide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>i</mi></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>a</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">S_i,\ a_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>S i, a i</td>
+<td>a amostra i do pulso e o peso dela no filtro ótimo</td>
+<td>13</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></td>
+<td>A</td>
+<td>a amplitude do pulso, proporcional à energia</td>
+<td>13</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo separator="true">,</mo><mtext> </mtext><mi>K</mi><mo separator="true">,</mo><mtext> </mtext><mi>V</mi></mrow><annotation encoding="application/x-tex">Q,\ K,\ V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span></td>
+<td>Q, K, V</td>
+<td>as matrizes da pergunta, da chave e do valor de cada palavra</td>
+<td>16</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>K</mi><mi mathvariant="normal">⊤</mi></msup></mrow><annotation encoding="application/x-tex">K^\top</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span></span></span></span></td>
+<td>K transposta</td>
+<td>K com as linhas trocadas pelas colunas</td>
+<td>16</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span></td>
+<td>d</td>
+<td>o número de coordenadas de cada vetor de palavra</td>
+<td>16</td>
+</tr>
+</tbody>
+</table>
+<p>Para o que vem depois do MLP, estas peças do PyTorch são a porta de entrada:</p>
+<ul>
+<li><code>torch.nn.Conv2d(1, 32, kernel_size=3)</code>: uma camada convolucional com 32 filtros de 3 por 3.</li>
+<li><code>torch.nn.MaxPool2d(2)</code>: o pooling, que fica com o maior de cada quadradinho de 2 por 2.</li>
+<li><code>torch.nn.Conv1d(1, 8, kernel_size=3)</code>: a convolução em uma dimensão, como sobre as amostras de um pulso.</li>
+<li><code>torch.softmax(Q @ K.T / d**0.5, dim=1) @ V</code>: a atenção numa linha.</li>
+</ul>
+<h2 id="1-revisao-da-aula-9">1. Revisão da aula 9</h2>
+<h3 id="slide-1-a-capa">Slide 1: A capa <a class="cg-slide-link" href="../slides/#1" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A aula 10 fecha o curso. Tem três partes: a revisão do curso inteiro, numa figura só, o laço do treino; a apresentação do projeto, feito pela turma inteira; e, para fechar, para onde as redes vão depois do MLP: as redes convolucionais, o Transformer e o problema do SIENA, no TileCal.</p>
+<p>A foto da capa é a instalação do calorímetro do ATLAS, em 4 de novembro de 2005, na caverna do detector: no meio, o cilindro do calorímetro, com o TileCal, o calorímetro de telhas, por fora; em volta, os oito ímãs toroidais. Depois da foto, o calorímetro foi levado para o centro do detector. A foto é de Maximilien Brice, do CERN, registro CERN-EX-0511013, com a licença CC BY 4.0. O TileCal apareceu na aula 1; o curso começa e termina no detector em que o NIPS-CERN trabalha.</p>
+<h3 id="slide-2-revisao-de-memoria">Slide 2: Revisão, de memória <a class="cg-slide-link" href="../slides/#2" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A revisão é de memória: quatro perguntas sobre a aula 9.</p>
+<p>O que é cada pixel do mapa das duas taxas? Um treino inteiro da rede do projeto, do zero, com um par de taxas, η₀ na camada de entrada e η₁ na de saída, pintado de azul se convergiu e de laranja se divergiu.</p>
+<p>Por que a fronteira é um fractal, e não uma linha? Porque, ampliada mil vezes, continua cheia de detalhe: filamentos, redemoinhos e ilhas de uma cor dentro da outra.</p>
+<p>Como a contagem de caixas mede a dimensão? Conta as caixas que a fronteira toca e vê quantas vezes a contagem cresce quando a caixa cai pela metade: 2 vezes numa linha, 4 numa área, 2^d na fronteira. Nos múons, d deu perto de 1,6.</p>
+<p>O que a rede da aula 7 mostrou no plano? Uma faixa granulada, e a causa dela: a perda oscila sem se assentar, e o passo 200 pega cada treino num ponto da oscilação. A diagonal do plano é a curva da aula 7, com uma taxa só.</p>
+<h3 id="slide-3-o-fio-do-curso">Slide 3: O fio do curso <a class="cg-slide-link" href="../slides/#3" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O fio do curso, com a aula 10 em destaque, a última, em 11/12/2026, no último encontro on-line.</p>
+<p>O fio tem dois lados. Um é a rede: o neurônio da aula 1, as camadas da aula 3, a retropropagação da aula 5, o MNIST da aula 6, o PyTorch da aula 7 e os dados do CMS da aula 8. O outro é o limiar: a taxa grande demais da aula 2, a faixa quebrada da aula 7 e o fractal da aula 9. O vídeo seguinte junta os dois.</p>
+<h2 id="2-o-curso-inteiro">2. O curso inteiro</h2>
+<h3 id="slide-4-o-curso-numa-figura-em-video">Slide 4: O curso numa figura, em vídeo <a class="cg-slide-link" href="../slides/#4" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O curso inteiro cabe num laço de quatro peças, e o vídeo mostra cada uma com a aula em que entrou.</p>
+<p>Para a frente: a rede calcula a saída, ŷ = f(W <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>b</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{b}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">b</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>), camada a camada; o neurônio é da aula 1, a camada como matriz, da aula 3. A perda: um número que mede o erro; o erro quadrático médio da aula 2 e a entropia cruzada da aula 6, L = −ln pₜ. Para trás: a derivada da perda em relação a cada peso, pela regra da cadeia de trás para a frente; o Jacobiano da aula 4 e a retropropagação da aula 5. O passo: W ← W − η∇L, o gradiente descendente da aula 2, e o Adam da aula 7. De fora entram os dados, o MNIST da aula 6 e os múons do CMS da aula 8, e a taxa η, das aulas 2, 7 e 9.</p>
+<p>Depois o laço gira: cada volta do ponto é uma época do MLP da aula 6, e ao lado cresce a curva da perda no treino, de 0,33 na primeira época a 0,034 na vigésima, com 97,59% de acerto no teste no fim.</p>
+<p>A segunda parte é o limiar, três vezes. Na aula 2, a reta treinada com uma taxa só tinha um limiar, um ponto: abaixo de 0,513 convergia, acima divergia. Na aula 7, a rede pequena com uma taxa só tinha uma faixa, de 3,86 a 7,55, em que melhorar e piorar se alternavam 77 vezes entre taxas vizinhas. Na aula 9, com duas taxas, uma por camada, a fronteira virou um fractal, de dimensão perto de 1,6.</p>
+<h3 id="slide-5-do-neuronio-as-camadas">Slide 5: Do neurônio às camadas <a class="cg-slide-link" href="../slides/#5" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A primeira metade do fio, de novo, com os números de cada aula.</p>
+<p>Aula 1: o neurônio de McCulloch e Pitts, de 1943, soma as entradas com pesos, z = <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>·<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + b, e dispara se a soma passa do limiar, y = degrau(z). Com <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = (1; 1) e b = −1,5, faz o E. A regra do perceptron, de Rosenblatt, de 1958, acha os pesos sozinha, mas nenhuma reta separa o XOR, e um neurônio só não basta.</p>
+<p>Aula 3: neurônios lado a lado são uma camada, uma matriz W, e camadas empilhadas separam o XOR: com os pesos escolhidos à mão, h₁ é o OU, h₂ é o E, e a saída é degrau(h₁ − h₂ − 0,5). Sem ativação, duas camadas valem uma, W₂W₁; a ativação, o degrau, a sigmoide ou a tanh, é o que dá às camadas o poder de dobrar o plano.</p>
+<h3 id="slide-6-como-a-rede-aprende">Slide 6: Como a rede aprende <a class="cg-slide-link" href="../slides/#6" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A segunda parte do fio: como a rede acha os pesos sozinha.</p>
+<p>Aula 2: a derivada diz para que lado a perda cresce, e o passo vai para o outro, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> ← <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>w</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> − η∇L. A taxa η é o tamanho do passo: na reta, acima de 0,513 o treino diverge.</p>
+<p>Aula 4: quando a saída é um vetor, as derivadas formam o Jacobiano, e a regra da cadeia vira um produto de Jacobianos. A ordem importa: de trás para a frente, a conta custa 3m² em vez de 2m³ + m², com m neurônios por camada.</p>
+<p>Aula 5: a retropropagação é esse produto de trás para a frente. Cada neurônio recebe o seu δ, o quanto a perda muda com a soma dele, e a derivada em cada peso é δ vezes a entrada. Com ela, o XOR aprendeu em 200 passos, perda 0,0359, e o gradiente bateu com a derivada numérica até 2,8 · 10⁻¹¹.</p>
+<h3 id="slide-7-com-dados-de-verdade">Slide 7: Com dados de verdade <a class="cg-slide-link" href="../slides/#7" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A terceira parte: a rede com dados de verdade, e três números que resumem cada aula.</p>
+<p>97,59%: o acerto no teste do MNIST, na aula 6, com a rede 784, 256, 10 escrita em NumPy, medido uma vez, no fim, depois de a validação escolher a época.</p>
+<p>Zero: a diferença entre o NumPy da aula 6 e o PyTorch da aula 7, com os mesmos pesos iniciais e a mesma ordem dos lotes. O PyTorch faz a mesma conta; o que muda é que a retropropagação sai sozinha, do autograd.</p>
+<p>1,88%: o erro mediano da rede que estima a massa invariante dos dois múons no teste, na aula 8. A fórmula erra em milionésimos; a rede aprende a conta por exemplos e erra mais, sobretudo no pico do J/ψ e no Z, onde há poucos exemplos.</p>
+<h2 id="3-a-apresentacao">3. A apresentação</h2>
+<h3 id="slide-8-o-que-a-apresentacao-exige">Slide 8: O que a apresentação exige <a class="cg-slide-link" href="../slides/#8" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A apresentação do projeto, feito pela turma inteira, na ordem do artigo curto da aula 9: a pergunta, o método, os resultados, a comparação com o artigo, os limites e como refazer.</p>
+<p>O critério é o mesmo do curso inteiro e vale para qualquer rede, daqui em diante: saber dizer o que entra na rede, o que ela aprende e o que significa o número que sai. No projeto: entram duas taxas e 72 eventos do CMS; a rede aprende o logaritmo da massa; e cada número do mapa diz se aquele treino convergiu ou divergiu, e quão depressa.</p>
+<h3 id="slide-9-perguntas-que-a-apresentacao-deve-aguentar">Slide 9: Perguntas que a apresentação deve aguentar <a class="cg-slide-link" href="../slides/#9" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Perguntas que a apresentação deve aguentar, com a resposta que o projeto sustenta.</p>
+<p>Por que 72 eventos? Porque o artigo usa tantos exemplos quanto pesos, e a rede tem 72 pesos.</p>
+<p>Por que float64? O artigo usa float64. Na janela do zoom do projeto, 256 por 256 treinos, float32 e float64 dão a mesma classe em 98,7% dos pixels, e 80% dos que trocam estão em cima da fronteira: de perto, a fronteira depende do arredondamento, e o zoom fundo pede a precisão maior.</p>
+<p>A dimensão 1,62 é a mesma do artigo, 1,66? As duas são compatíveis: nas cinco janelas de dentro do zoom, a dimensão vai de 1,51 a 1,72, uma variação maior que a diferença entre 1,62 e 1,66. É uma estimativa, com janelas escolhidas à mão e caixas de 2 a 16 pixels, e o artigo mediu com outra rede e outros dados.</p>
+<p>O que é cada pixel? Um treino inteiro, do zero, com o seu par de taxas.</p>
+<p>Por que a rede da aula 7 deu granulado? Porque, na faixa, a perda oscila sem se assentar, e o passo 200 pega cada treino num ponto da oscilação: duas taxas vizinhas, 0,9% uma da outra, caem em classes diferentes.</p>
+<p>Como alguém refaz a figura? Com o repositório, a semente, a versão dos dados e o comando ao lado de cada figura, no .json que ela grava.</p>
+<h2 id="4-depois-do-mlp">4. Depois do MLP</h2>
+<h3 id="slide-10-depois-do-mlp">Slide 10: Depois do MLP <a class="cg-slide-link" href="../slides/#10" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A última parte da aula: para onde as redes vão depois do MLP.</p>
+<p>O MLP da aula 6 liga cada neurônio da primeira camada aos 784 pixels, cada pixel com o seu peso. Se o 7 andar dois pixels para o lado, a tinta cai em outros pixels e passa por outros pesos, e a rede precisa ter visto 7 em todas as posições para reconhecer todos. O olho não funciona assim: um traço é um traço em qualquer lugar da imagem. A rede convolucional parte dessa ideia.</p>
+<h3 id="slide-11-a-convolucao-em-video">Slide 11: A convolução, em vídeo <a class="cg-slide-link" href="../slides/#11" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo usa o primeiro dígito do teste do MNIST, um 7, e um filtro de 3 por 3, nove pesos: −1 na coluna da esquerda, 0 no meio, 1 na direita.</p>
+<p>Filtro, no curso, é uma pequena matriz de pesos que desliza sobre a imagem. Em cada posição, a conta é a da aula 1: cada pixel vezes o seu peso, tudo somado. Na posição do vídeo, na borda esquerda do traço, os três pixels da direita somam 0,93 + 0,99 + 1,00 = 2,92 e os da esquerda, 0,23 + 0 + 0,09 = 0,32: a soma é 2,60. Onde o fundo é liso, as duas colunas se cancelam e a soma é perto de zero.</p>
+<p>A janela varre as 26 por 26 = 676 posições, e cada soma vira um pixel do mapa: azul onde há tinta à direita, a borda esquerda do traço; laranja na borda direita. Outro filtro, com 1 em cima e −1 embaixo, acha as bordas de cima e de baixo. Os mesmos nove pesos servem em todas as posições: isso é o compartilhar pesos. Numa rede convolucional, o treino escolhe os nove números de cada filtro, pela mesma retropropagação da aula 5. O nome convolução vem da matemática, onde a conta inverte o filtro; a das redes, sem inverter, se chama correlação, mas o nome que ficou foi convolução.</p>
+<h3 id="slide-12-a-camada-convolucional">Slide 12: A camada convolucional <a class="cg-slide-link" href="../slides/#12" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A camada convolucional em números. A primeira camada do MLP da aula 6 tem 784 × 256 = 200.704 pesos. Uma camada convolucional com 32 filtros de 3 por 3 tem 32 × 9 = 288 pesos, mais 32 vieses, e cada filtro olha a imagem inteira, um pedaço de cada vez.</p>
+<p>O capítulo 6 do livro de Michael Nielsen resume as redes convolucionais em três ideias: o campo receptivo local, cada neurônio olha um pedaço pequeno da imagem; os pesos compartilhados, o mesmo filtro em toda posição; e o pooling, que resume um quadradinho do mapa num número só, como o maior deles, e encolhe o mapa. No mesmo capítulo, um conjunto de redes convolucionais acerta 99,67% do teste do MNIST, 33 erros em 10 mil, contra os 97,59% do MLP da aula 6.</p>
+<p>De onde vem: o neocognitron de Kunihiko Fukushima, de 1980, já tinha camadas de pesos compartilhados, sem retropropagação. Em 1989, Yann LeCun e colegas, na Bell Labs, treinaram uma rede assim pela retropropagação para ler códigos postais escritos à mão. A LeNet-5, de 1998, do mesmo grupo, é a da aula 6, com 0,95% de erro no MNIST, e foi usada para ler cheques.</p>
+<h3 id="slide-13-no-tilecal-sete-amostras-uma-soma-ponderada">Slide 13: No TileCal: sete amostras, uma soma ponderada <a class="cg-slide-link" href="../slides/#13" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O TileCal é o calorímetro de hádrons da região central do ATLAS: telhas de plástico cintilante entre placas de aço, e uns 10 mil fotomultiplicadores que transformam a luz das telhas em sinal elétrico. Calorímetro, na física de partículas, é o detector que mede a energia; no dia a dia, a palavra lembra o aparelho que mede calor, e a raiz é a mesma.</p>
+<p>O sinal de cada canal tem a forma do pulso da figura, a de referência, tirada da média dos pulsos no teste em feixe. A eletrônica tira uma amostra a cada 25 ns, no ritmo de 40 MHz do LHC, e guarda sete, em volta do pico, a quarta no pico. A altura do pulso é proporcional à energia depositada.</p>
+<p>O filtro ótimo, o método usado no Run 1 e descrito pela colaboração, calcula a amplitude como uma soma ponderada das sete amostras, A = Σ aᵢSᵢ, com os pesos aᵢ escolhidos para a resolução ser a melhor possível diante do ruído eletrônico. A conta é a do neurônio da aula 1, sem a ativação: sete entradas, sete pesos e uma soma. A diferença está nos pesos: no filtro ótimo, eles são calculados a partir da forma do pulso e do ruído; numa rede, seriam aprendidos de exemplos. Essa comparação é do curso, não da colaboração.</p>
+<p>A figura é a figura 2 do artigo da colaboração ATLAS de 2018 sobre o TileCal no Run 1, publicado com a licença CC BY 4.0: o eixo vertical é a altura normalizada, o horizontal, o tempo em ns, e as duas curvas são os dois ganhos da eletrônica, alto e baixo, quase iguais.</p>
+<h3 id="slide-14-o-problema-do-siena">Slide 14: O problema do SIENA <a class="cg-slide-link" href="../slides/#14" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Quando colisões vizinhas se somam ao pulso, o empilhamento, a soma ponderada de pesos fixos erra, porque o pulso deixa de ter a forma de referência. Ocupação, no artigo do grupo, é a probabilidade de um canal receber sinal de uma colisão; quanto maior a ocupação, mais pulsos se empilham.</p>
+<p>Em 2026, Diogo Cardinot, Bernardo Peralva, Gustavo Libotte e Luciano Manhães de Andrade Filho compararam o filtro ótimo com redes convolucionais de uma dimensão, que deslizam um filtro sobre as amostras do pulso, como o filtro do vídeo deslizava sobre o 7. Os pulsos vêm de um gerador que simula um canal só, sem a geometria do detector, com ocupação de 10% a 100%. Somando todas as ocupações, as redes melhoraram em uns 79% o RMS da amplitude em relação ao filtro ótimo. A rede de filtro maior foi melhor com ocupação de 80% ou mais; a de camada densa maior, até 50%.</p>
+<p>O problema do SIENA é o da aula 1, a generalização: a rede que estima a energia no TileCal acerta nas condições em que foi treinada e erra quando elas mudam, por exemplo quando muda a célula ou o empilhamento. Levar a rede a outras condições e a outros calorímetros é o projeto. É o mesmo tropeço das folhas da aula 1, que caíram de 99,35% para 31% de acerto em fotos de outro tipo.</p>
+<h3 id="slide-15-a-atencao-em-video">Slide 15: A atenção, em vídeo <a class="cg-slide-link" href="../slides/#15" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra a atenção, a peça central do Transformer, com cinco palavras, &quot;o múon atravessa a câmara&quot;, cada uma um vetor de dois números. Os números são inventados para o exemplo; num modelo de verdade, cada palavra é um vetor de centenas ou milhares de números aprendidos no treino.</p>
+<p>A palavra &quot;atravessa&quot; se compara com cada uma pelo produto escalar da aula 1, dividido por √2, a raiz do número de coordenadas: 0,47, 0,95, 0,69, 1,07 e 1,52. A softmax da aula 6 vira essas notas em pesos positivos que somam 1: 0,12, 0,19, 0,15, 0,21 e 0,33. A palavra nova é a soma dos vetores das cinco, cada um com o seu peso: (0,99; 1,25), em vez de (0,4; 0,9). Ela mudou com as vizinhas: é o contexto entrando no vetor.</p>
+<p>No exemplo, a pergunta, a comparação e o valor usam o mesmo vetor de cada palavra. O Transformer de verdade aprende três matrizes, uma para a pergunta, Q, uma para a chave com que cada palavra é comparada, K, e uma para o valor que ela passa adiante, V. É o treino que decide o que cada palavra pergunta às outras.</p>
+<h3 id="slide-16-o-transformer">Slide 16: O Transformer <a class="cg-slide-link" href="../slides/#16" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A atenção numa linha, como no artigo de 2017. Q, K e V são matrizes com uma linha por palavra: a pergunta, a chave e o valor de cada uma. QKᵀ faz todos os produtos escalares de uma vez, uma linha por palavra que pergunta e uma coluna por palavra comparada; a divisão por √d, com d o número de coordenadas, segura o tamanho dos números; a softmax, linha a linha, vira as notas em pesos; e a multiplicação por V faz as médias ponderadas.</p>
+<p>Cada peça é do curso: o produto escalar da aula 1, o produto de matrizes da aula 3, a softmax da aula 6. Entre um bloco de atenção e o seguinte, o Transformer tem um MLP, o da aula 3.</p>
+<p>De onde vem: &quot;Attention Is All You Need&quot;, de 2017, de oito autores, então no Google, Ashish Vaswani e colegas, apresentou o Transformer, sobre o mecanismo de atenção proposto em 2014 por Bahdanau e colegas. É a peça central dos grandes modelos de linguagem, como explica a série do 3Blue1Brown do estudo.</p>
+<h2 id="5-fechamento">5. Fechamento</h2>
+<h3 id="slide-17-limiar-os-tres-sentidos">Slide 17: Limiar, os três sentidos <a class="cg-slide-link" href="../slides/#17" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O nome do curso tem três sentidos, ditos na aula 1, e cada um apareceu.</p>
+<p>O limiar do neurônio: o neurônio de McCulloch e Pitts, de 1943, dispara quando a soma das entradas passa de um limiar, o degrau da aula 1.</p>
+<p>O limiar do treino: a taxa a partir da qual o treino deixa de convergir. Na aula 2, um ponto; na aula 7, uma faixa; na aula 9, um fractal.</p>
+<p>O limiar da pesquisa: para quem acabou de entrar na graduação, o curso é a porta da pesquisa. O projeto refez um artigo de 2024 com dados reais do CERN, e a apresentação de hoje é a primeira de um trabalho de pesquisa. Os objetivos do curso estão no README: o método e a colaboração, a autonomia para estudar e ler artigo, o MLP e o vocabulário da área, a rede como ferramenta, e confiança para apresentar.</p>
+<h3 id="slide-18-para-continuar-estudando">Slide 18: Para continuar estudando <a class="cg-slide-link" href="../slides/#18" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Para continuar, cada leitura parte de onde o curso parou.</p>
+<p>As redes convolucionais: o capítulo 6 do livro de Michael Nielsen, &quot;Neural Networks and Deep Learning&quot;, com o mesmo MNIST e o mesmo jeito de escrever as contas.</p>
+<p>O Transformer: os capítulos 5 e 6 da série de redes neurais do 3Blue1Brown, &quot;Transformers, the tech behind LLMs&quot; e &quot;Attention in transformers, step-by-step&quot;, que continuam os capítulos 1 a 4 estudados nas aulas 1 a 5.</p>
+<p>O calorímetro: o artigo do grupo de 2026, sobre as redes convolucionais e o filtro ótimo, e o artigo da colaboração ATLAS de 2018 sobre o TileCal no Run 1, para a física do sinal.</p>
+<p>E o próprio projeto, que não acabou: o zoom mais fundo, mais janelas e a dimensão medida com cuidado.</p>
+<h3 id="slide-19-a-entrega-final-e-o-que-fica">Slide 19: A entrega final e o que fica <a class="cg-slide-link" href="../slides/#19" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A entrega final, na aula final, sexta, 11/12/2026: o repositório de cada um, reproduzível. Quem clona o repositório e roda os comandos do README tem de chegar às mesmas figuras e aos mesmos números: o código, a semente, a versão dos dados e o .json ao lado de cada figura. Experimento que não se reproduz não existe.</p>
+<p>Depois do curso, o SIENA: a rede de reconstrução de energia do TileCal em outras condições e em outros calorímetros, com o que o curso deu, saber o que a rede aprende, e não só quanto ela acerta.</p>
+<p>O material fica: os decks das dez aulas, com as notas de estudo em cada slide, os roteiros, as folhas de tópicos e o código, para esta turma e para as seguintes.</p>
+<h2 id="perguntas-que-podem-aparecer">Perguntas que podem aparecer</h2>
+<ul>
+<li>A rede convolucional serve para o projeto do fractal? Não diretamente: a rede do
+projeto é um MLP pequeno, de propósito, como no artigo. Mas a pergunta do fractal
+vale para qualquer rede treinada por passos, e o artigo testou outras.</li>
+<li>O filtro ótimo é uma rede neural? É a conta de um neurônio linear, uma soma
+ponderada, mas os pesos não são aprendidos de exemplos: são calculados a partir da
+forma do pulso e do ruído. A comparação é do curso.</li>
+<li>Os 79% do artigo do grupo valem no detector? O artigo usa pulsos simulados de um
+canal só, sem a geometria do detector. Levar o resultado ao detector é outra
+pergunta, a do SIENA.</li>
+<li>O Transformer é um MLP? Tem MLPs dentro, entre os blocos de atenção. A atenção é
+a parte nova: faz cada palavra olhar as outras.</li>
+</ul>
+<h2 id="para-estudar">Para estudar</h2>
+<p>O estudo da turma, que é também o seu:</p>
+<ul>
+<li>Michael Nielsen, &quot;Neural Networks and Deep Learning&quot;, capítulo 6, as redes
+convolucionais, <a href="http://neuralnetworksanddeeplearning.com/chap6.html" target="_blank" rel="noopener">neuralnetworksanddeeplearning.com/chap6.html</a>.</li>
+<li>3Blue1Brown, série de redes neurais, capítulos 5 e 6: &quot;Transformers, the tech
+behind LLMs&quot; e &quot;Attention in transformers, step-by-step&quot;,
+<a href="https://3blue1brown.com/lessons/attention" target="_blank" rel="noopener">3blue1brown.com/lessons/attention</a>.</li>
+</ul>
+<p>Além dele, para preparar a aula:</p>
+<ul>
+<li>Diogo Cardinot, Bernardo Peralva, Gustavo Libotte e Luciano Manhães de Andrade
+Filho, 2026, &quot;Convolutional neural networks for signal reconstruction in
+high-energy calorimetry&quot;, Applied Sciences 16(13):6414.</li>
+<li>Colaboração ATLAS, 2018, &quot;Operation and performance of the ATLAS Tile
+Calorimeter in Run 1&quot;, <a href="https://arxiv.org/abs/1806.02129" target="_blank" rel="noopener">arXiv:1806.02129</a>.</li>
+<li>Ashish Vaswani e colegas, 2017, &quot;Attention Is All You Need&quot;, <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">arXiv:1706.03762</a>.</li>
+</ul>
+<h2 id="fontes-dos-fatos-citados">Fontes dos fatos citados</h2>
+<p>Só para conferência; o estudo é a lista de cima.</p>
+<ul>
+<li>Colaboração ATLAS, 2018, <a href="https://arxiv.org/abs/1806.02129" target="_blank" rel="noopener">arXiv:1806.02129</a>, licença CC BY 4.0: o calorímetro de
+hádrons da região central, uns 10 mil fotomultiplicadores, telhas cintilantes
+entre placas de aço; amostras a cada 25 ns por ADCs de 10 bits, sete em volta do
+pico, a quarta no pico, no ritmo de 40 MHz do LHC; o filtro ótimo, A = Σ aᵢSᵢ,
+com pesos que minimizam a resolução, só com o ruído eletrônico no Run 1; o pulso
+de referência da figura 2, a média dos pulsos do teste em feixe.</li>
+<li>Cardinot, Peralva, Libotte e Andrade Filho, 2026, Applied Sciences 16(13):6414,
+na página da revista: a comparação do filtro ótimo com redes convolucionais de
+uma dimensão; o gerador de pulsos de um canal só, sem geometria; a ocupação, de
+10% a 100%; a melhora média de uns 79% no RMS da amplitude; a rede de filtro
+maior melhor a partir de 80% de ocupação, a de camada densa maior até 50%.</li>
+<li>Nielsen, &quot;Neural Networks and Deep Learning&quot;, capítulo 6: campo receptivo local,
+pesos compartilhados e pooling; 99,67% no teste do MNIST, 33 erros.</li>
+<li>Verbetes &quot;LeNet&quot;, &quot;Convolutional neural network&quot; e &quot;Attention Is All You Need&quot;
+da Wikipedia em inglês: a Bell Labs, 1989, os códigos postais; a LeNet-5, de
+1998, nos cheques; o neocognitron de Fukushima, de 1980; o artigo de 2017, oito
+autores no Google, a atenção de Bahdanau e colegas, de 2014.</li>
+<li>3Blue1Brown, &quot;Attention in transformers, step-by-step&quot;: os capítulos 5 e 6 da
+série; o Transformer, a peça central dos grandes modelos de linguagem; as
+matrizes da chave, da pergunta e do valor.</li>
+<li>O problema do SIENA e o trabalho do grupo de 2026: as notas da aula 1, com as
+fontes conferidas lá.</li>
+<li>Os números das aulas anteriores: aulas/06-mnist-numpy/resultados/mlp.json,
+aulas/07-pytorch/resultados/taxa.json e torch.json,
+aulas/08-dados-do-cern/resultados/massa.json, aulas/09-projeto/resultados/, e
+as notas das aulas 1 a 5.</li>
+<li>A foto da capa: a instalação do calorímetro do ATLAS, 04/11/2005, registro
+CERN-EX-0511013 do CERN Document Server, arquivo &quot;Installing the ATLAS
+Calorimeter.jpg&quot; do Wikimedia Commons; foto de Maximilien Brice, CERN, CC BY 4.0.</li>
+</ul>
+
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>

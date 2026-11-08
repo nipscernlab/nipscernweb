@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 8: os dados do CERN, múons e massa invariante | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Study guide of class 8 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-08/study-guide/">
+  <meta property="og:title" content="Aula 8: os dados do CERN, múons e massa invariante | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Study guide of class 8 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-08/study-guide/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/courses.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/vendor/katex.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero cr-hero--slim">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../"><span data-i18n="courses.class">Class</span> 8</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.study_guide">Study guide</span></span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></p><h1 class="display-md fade-up" lang="pt-BR">Aula 8: os dados do CERN, múons e massa invariante</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 04/12/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 3</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="../slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="../"><i class="ph ph-arrow-left" aria-hidden="true"></i><span data-i18n="courses.back_to_class">Back to the class</span></a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band cr-band--guide" style="--seam-from:var(--bg-0)">
+      <div class="container cr-guide-grid">
+        <nav class="cr-toc" aria-labelledby="toc-t"><p class="cr-toc-title" id="toc-t"><span data-i18n="courses.on_this_page">On this page</span></p><ol lang="pt-BR"><li><a href="#os-topicos">Os tópicos</a></li><li><a href="#notacao">Notação</a></li><li><a href="#1-revisao-das-aulas-6-e-7">1. Revisão das aulas 6 e 7</a></li><li><a href="#2-o-lhc-o-cms-e-o-muon">2. O LHC, o CMS e o múon</a></li><li><a href="#3-os-dados-e-a-massa-invariante">3. Os dados e a massa invariante</a></li><li><a href="#4-de-onde-vem">4. De onde vem</a></li><li><a href="#5-uma-rede-aprende-a-formula">5. Uma rede aprende a fórmula?</a></li><li><a href="#6-o-codigo">6. O código</a></li><li><a href="#7-fechamento">7. Fechamento</a></li><li><a href="#perguntas-que-podem-aparecer">Perguntas que podem aparecer</a></li><li><a href="#para-estudar">Para estudar</a></li><li><a href="#fontes-dos-fatos-citados">Fontes dos fatos citados</a></li></ol></nav>
+        <article class="cr-prose cr-guide" lang="pt-BR">
+<p>Material de estudo para acompanhar os slides.</p>
+<p>O objetivo da aula é saber dizer o que tem em cada coluna do dimuon.csv, calcular a massa
+invariante à mão e conferir com o arquivo, reconhecer os picos do histograma e treinar uma rede que
+estima a massa, medindo o erro dela contra a fórmula e vendo onde ela erra.</p>
+<h2 id="os-topicos">Os tópicos</h2>
+<p>Sem horário marcado: o que não couber hoje entra na aula seguinte.</p>
+<ol>
+<li>Revisão das aulas 6 e 7</li>
+<li>O LHC, o CMS e o múon</li>
+<li>Os dados e a massa invariante</li>
+<li>De onde vem</li>
+<li>Uma rede aprende a fórmula?</li>
+<li>O código</li>
+<li>Fechamento</li>
+</ol>
+<h2 id="notacao">Notação</h2>
+<p>Os símbolos novos dos slides, na ordem em que aparecem; os das aulas anteriores estão nos roteiros delas.</p>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Lê-se</th>
+<th>Quer dizer</th>
+<th>Slide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>GeV</mtext></mrow><annotation encoding="application/x-tex">\text{GeV}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">GeV</span></span></span></span></span></td>
+<td>giga-elétron-volt</td>
+<td>um bilhão de elétron-volts; energia, momento e massa</td>
+<td>5</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span></td>
+<td>teta</td>
+<td>o ângulo entre o momento do múon e o feixe</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>T</mi></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>p</mi><mi>z</mi></msub></mrow><annotation encoding="application/x-tex">p_T,\ p_z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.044em;">z</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>p T, p z</td>
+<td>o momento transversal, perpendicular ao feixe, e o momento ao longo dele</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi></mrow><annotation encoding="application/x-tex">\eta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span></span></span></span></td>
+<td>eta</td>
+<td>a pseudorrapidez, −ln tan(θ/2); nesta aula, não é a taxa de aprendizado</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϕ</mi></mrow><annotation encoding="application/x-tex">\phi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">ϕ</span></span></span></span></td>
+<td>fi</td>
+<td>o ângulo do momento em volta do feixe, em radianos</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">senh</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\operatorname{senh}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mop"><span class="mord mathrm">senh</span></span></span></span></span></td>
+<td>seno hiperbólico</td>
+<td>senh x = (eˣ − e⁻ˣ)/2</td>
+<td>8</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo separator="true">,</mo><mtext> </mtext><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">E,\ \vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span></td>
+<td>E, p</td>
+<td>a energia e o momento de um múon</td>
+<td>9</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span></td>
+<td>M</td>
+<td>a massa invariante dos dois múons</td>
+<td>9</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><mover accent="true"><mi>p</mi><mo>⃗</mo></mover><mi mathvariant="normal">∣</mi></mrow><annotation encoding="application/x-tex">\vert \vec{p}\vert </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="mord">∣</span></span></span></span></td>
+<td>módulo de p</td>
+<td>o tamanho do vetor momento</td>
+<td>9</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">asinh</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\operatorname{asinh}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mop"><span class="mord mathrm">asinh</span></span></span></span></span></td>
+<td>arco seno hiperbólico</td>
+<td>comprime os números grandes como um logaritmo</td>
+<td>19</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo separator="true">,</mo><mtext> </mtext><mi>σ</mi></mrow><annotation encoding="application/x-tex">\mu,\ \sigma</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span></span></span></span></td>
+<td>mi, sigma</td>
+<td>a média e o desvio padrão de uma entrada, calculados no treino</td>
+<td>21</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ln</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\ln</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mop">ln</span></span></span></span></td>
+<td>logaritmo natural</td>
+<td>o logaritmo na base e; a rede aprende ln M</td>
+<td>21</td>
+</tr>
+</tbody>
+</table>
+<p>Para os dados do CMS, estas peças resolvem quase tudo:</p>
+<ul>
+<li><code>csv.reader(arquivo)</code>: as linhas do dimuon.csv, como listas de textos.</li>
+<li><code>np.array(valores, dtype=np.float64)</code>: uma coluna como números.</li>
+<li><code>np.sqrt((E1 + E2)**2 - (px1 + px2)**2 - (py1 + py2)**2 - (pz1 + pz2)**2)</code>: a fórmula.</li>
+<li><code>np.histogram(M, bins=np.logspace(np.log10(2), np.log10(110), 301))</code>: os eventos por
+faixa, com 300 faixas iguais em escala logarítmica.</li>
+<li><code>np.arcsinh(X / 5)</code>: a compressão das entradas da rede.</li>
+<li><code>(X - X[treino].mean(axis=0)) / X[treino].std(axis=0)</code>: a padronização, com a média
+e o desvio só do treino.</li>
+<li><code>torch.nn.MSELoss()</code>: o erro quadrático médio, para a rede que estima um número.</li>
+</ul>
+<h2 id="1-revisao-das-aulas-6-e-7">1. Revisão das aulas 6 e 7</h2>
+<h3 id="slide-1-a-capa">Slide 1: A capa <a class="cg-slide-link" href="../slides/#1" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A aula 8 leva o curso aos dados do CERN. São 100 mil eventos com dois múons, registrados pelo CMS em 2010 e publicados pela colaboração para ensino e divulgação. A física entra no que precisa: o que é um múon, como o detector descreve a direção dele, o que é a massa invariante e por que o histograma dela tem picos. A rede neural entra na segunda metade: um MLP em PyTorch que estima a massa a partir da energia e do momento dos dois múons, conferido pela fórmula, e o que ele erra.</p>
+<p>A foto da capa é o CMS aberto, cheio de cabos e câmaras, tirada por Simon Waldherr em 15 de setembro de 2019 e publicada no Wikimedia Commons com a licença CC BY 4.0.</p>
+<h3 id="slide-2-revisao-de-memoria">Slide 2: Revisão, de memória <a class="cg-slide-link" href="../slides/#2" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A revisão é de memória: quatro perguntas sobre as aulas 6 e 7.</p>
+<p>O que o autograd faz? Guarda as contas da passada para a frente e, com backward(), aplica a regra da cadeia de trás para a frente, deixando a derivada em cada peso.</p>
+<p>Por que o PyTorch deu o mesmo resultado que o NumPy? Porque faz as mesmas contas: mesmos pesos iniciais, mesma ordem dos lotes, mesma precisão. A diferença foi zero em todas as épocas.</p>
+<p>O que acontece com o erro final quando a taxa passa do limiar? O treino passa a piorar a rede, e perto do limiar a fronteira entre melhorar e piorar é quebrada.</p>
+<p>Para que servem treino, validação e teste? O treino ajusta os pesos, a validação escolhe o que o treino não ajusta, e o teste mede uma vez, no fim.</p>
+<h3 id="slide-3-o-fio-do-curso">Slide 3: O fio do curso <a class="cg-slide-link" href="../slides/#3" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O curso segue um fio, e este slide aparece em todas as aulas, com a aula do dia em destaque e a data e o formato de cada aula já marcada.</p>
+<p>Até a aula 7, os dados foram de exemplo: o XOR e os dígitos do MNIST. Nesta aula, a 8, o curso chega aos dados de física de partículas, os do projeto. Na aula 9, a fronteira da taxa da aula 7 vira o fractal, em duas dimensões; na 10, a apresentação.</p>
+<h2 id="2-o-lhc-o-cms-e-o-muon">2. O LHC, o CMS e o múon</h2>
+<h3 id="slide-4-o-lhc-e-o-cms">Slide 4: O LHC e o CMS <a class="cg-slide-link" href="../slides/#4" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O LHC, o Grande Colisor de Hádrons, é o maior acelerador de partículas do mundo, num túnel de 27 km de circunferência, até 175 m abaixo da fronteira entre a França e a Suíça, perto de Genebra. Prótons dão voltas em sentidos opostos e colidem dentro dos detectores. Acelerador, no curso, é a máquina que dá energia às partículas e as faz colidir; detector é o instrumento que registra o que sai da colisão. Em 30 de março de 2010, o LHC fez as primeiras colisões de prótons a 7 TeV, 3,5 TeV em cada feixe; os eventos desta aula são desse ano.</p>
+<p>O CMS, o Solenoide Compacto de Múons, é um dos dois grandes detectores de uso geral do LHC: 21 m de comprimento, 15 m de diâmetro, cerca de 14 mil toneladas. Como o nome diz, detectar múons é uma das tarefas mais importantes dele, e as câmaras de múons formam a camada mais de fora.</p>
+<p>O NIPS-CERN trabalha no ATLAS, o outro detector de uso geral do LHC, e faz o CGVWeb, o visualizador tridimensional da geometria e dos eventos do ATLAS, que opera na sala de controle do experimento. Os dados desta aula são do CMS porque foram abertos ao público, com a licença CC0.</p>
+<h3 id="slide-5-o-muon">Slide 5: O múon <a class="cg-slide-link" href="../slides/#5" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O múon é uma partícula elementar parecida com o elétron: tem a mesma carga, −1, ou +1 no antimúon. A diferença é a massa: 105,66 MeV, cerca de 207 vezes a do elétron. Partícula elementar, no curso, é uma que não se sabe dividir em partes menores. Antipartícula é a partícula de mesma massa e carga oposta.</p>
+<p>O elétron-volt, eV, é uma unidade de energia: a energia que um elétron ganha ao passar por uma diferença de potencial de 1 volt. MeV é um milhão de eV, GeV um bilhão e TeV um trilhão. Na física de partículas, massa e momento também se medem em eV, nas unidades em que a velocidade da luz vale 1: é por isso que o arquivo dá tudo em GeV.</p>
+<p>Os eventos do arquivo são colisões em que o CMS viu dois múons. Muitos vêm de uma partícula que viveu muito pouco e se desfez nos dois; é essa partícula que a massa invariante revela.</p>
+<h2 id="3-os-dados-e-a-massa-invariante">3. Os dados e a massa invariante</h2>
+<h3 id="slide-6-o-arquivo-100-mil-eventos">Slide 6: O arquivo: 100 mil eventos <a class="cg-slide-link" href="../slides/#6" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O registro 303 do portal de dados abertos do CERN, &quot;Events with two muons from 2010&quot;, tem 100 mil eventos com dois múons cuja massa invariante fica entre 2 e 110 GeV, publicados em 2014 com a licença CC0. A página avisa que os dados são uma seleção para ensino e divulgação e não servem para uma análise física completa.</p>
+<p>As colunas, como a página as descreve: Type, o tipo dos dois múons, combinações de T, tracker muon, e G, global muon, dois jeitos de o CMS reconhecer um múon; Run, a corrida, e Event, o número do evento. Para cada múon, 1 e 2: E, a energia; px, py e pz, as componentes do momento; pt, o momento transversal, perpendicular ao feixe; eta, a pseudorrapidez, uma medida do ângulo com o feixe; phi, o ângulo em volta do feixe, em radianos; e Q, a carga. Energia e momento estão em GeV. A última coluna, M, é a massa invariante dos dois múons, em GeV.</p>
+<p>Nos 100 mil eventos, 60.062 são do tipo GT e 39.938 do tipo GG, e eles vêm de 3 corridas.</p>
+<h3 id="slide-7-a-direcao-do-muon-em-video">Slide 7: A direção do múon, em vídeo <a class="cg-slide-link" href="../slides/#7" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra de onde vêm três colunas do arquivo: pt, eta e phi.</p>
+<p>De lado, com o feixe na horizontal, o múon sai do ponto da colisão num ângulo θ com o feixe. O momento dele se divide em duas partes: p_z, ao longo do feixe, e p_T, o momento transversal, perpendicular ao feixe. Momento, no curso, é o vetor da quantidade de movimento, que aponta para onde a partícula vai; para uma partícula lenta, é a massa vezes a velocidade. Na mecânica, momento também quer dizer o momento de uma força, o torque; aqui, não.</p>
+<p>A pseudorrapidez, η, é outro jeito de dar o ângulo θ: η = −ln tan(θ/2). Vale 0 quando o múon sai perpendicular ao feixe e cresce quando ele sai perto do feixe: θ = 40° dá η perto de 1, e θ = 15°, perto de 2. O leque do vídeo mostra as linhas de η = 0, 1, 2 e 3: passos iguais de η ficam cada vez mais juntos perto do feixe. Nesta aula, η é a pseudorrapidez, e não a taxa de aprendizado das aulas anteriores; a taxa, aqui, aparece só como lr, no código.</p>
+<p>De frente, olhando ao longo do feixe, só se vê p_T, e o ângulo dele em volta do feixe é φ, em radianos: π rad são 180 graus.</p>
+<p>As setas do vídeo são retas. No detector, o caminho do múon se curva no campo magnético, e quanto mais momento, menos curva: é assim que o CMS mede o momento. A seta é a direção do momento no ponto da colisão.</p>
+<h3 id="slide-8-da-direcao-ao-momento">Slide 8: Da direção ao momento <a class="cg-slide-link" href="../slides/#8" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Com p_T, η e φ, o momento sai inteiro. De frente, p_x = p_T cos φ e p_y = p_T sen φ: é a projeção do vetor nos dois eixos, como na trigonometria do ensino médio. Ao longo do feixe, p_z = p_T senh η, com senh, o seno hiperbólico: senh x = (eˣ − e⁻ˣ)/2.</p>
+<p>A terceira linha é dedução feita a partir da definição de η. De lado, p_z/p_T = cos θ / sen θ. Com η = −ln tan(θ/2), vale eᶯ = 1/tan(θ/2), e a conta de senh η dá cos θ / sen θ. Por isso p_z = p_T senh η.</p>
+<p>A energia vem de E² = |<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>|² + m², com m = 0,10566 GeV, a massa do múon.</p>
+<p>O exemplo do slide é o múon 1 do evento 3 do arquivo: p_T = 4,09095, η = 1,24634 e φ = 1,63164. As contas dão p_x = −0,2488, p_y = 4,0834 e p_z = 6,5251, os números das colunas px1, py1 e pz1 até a quarta casa.</p>
+<p>O arquivo traz as duas formas, E, px, py, pz e pt, eta, phi. Com a segunda e a massa do múon, a fórmula da massa reproduz a coluna M nos 100 mil eventos, como mostra o slide da conferência.</p>
+<h3 id="slide-9-a-massa-invariante">Slide 9: A massa invariante <a class="cg-slide-link" href="../slides/#9" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A massa invariante dos dois múons é a massa da partícula que teria se desfeito neles. Pela relatividade especial, a energia E e o momento <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span> de uma partícula de massa m obedecem a E² = |<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>|² + m², nas unidades em que a velocidade da luz vale 1. Somando os dois múons, energia com energia e momento com momento, a massa do par sai de M² = (E₁ + E₂)² − |<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>₁ + <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>₂|².</p>
+<p>Invariante, aqui, quer dizer que o número não depende de quem mede: energia e momento mudam de um referencial para outro, a massa não. Fora da física, invariante é o que não muda numa transformação, e é esse o sentido.</p>
+<p>Se os dois múons vieram mesmo de uma partícula, M é a massa dela. Se não vieram, M é só um número, e esses eventos formam o fundo liso do histograma.</p>
+<h3 id="slide-10-um-evento-a-mao">Slide 10: Um evento, à mão <a class="cg-slide-link" href="../slides/#10" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A conta de um evento inteiro, o 3 do arquivo, um par de múons de cargas opostas.</p>
+<p>Primeiro, as somas: E₁ + E₂ = 7,70222 + 6,90202 = 14,60424 GeV. O momento se soma componente a componente: p_x = −0,24877 − 3,02439 = −3,27316; p_y = 4,08338 + 3,75129 = 7,83467; p_z = 6,52511 + 4,94041 = 11,46552.</p>
+<p>Depois, os quadrados: (E₁ + E₂)² = 213,284 e |<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>₁ + <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>p</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9084em;vertical-align:-0.1944em;"></span><span class="mord katex-accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1522em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span></span></span></span>₂|² = 3,27316² + 7,83467² + 11,46552² = 203,554.</p>
+<p>Por fim, M² = 213,284 − 203,554 = 9,730, e M = 3,119 GeV. A coluna M do arquivo diz 3,11929: confere.</p>
+<p>O número cai no pico do J/ψ. Um evento sozinho, porém, não diz se veio de um J/ψ ou do fundo: só o histograma, com muitos eventos, mostra o excesso.</p>
+<p>A conta tem um detalhe que volta no fim da aula: a massa sai da diferença de dois números grandes, 213 menos 204. Um erro de 1% em (E₁ + E₂)², 2,1 unidades, mudaria M² em mais de 20%, e M em cerca de 10%. Quem aprende a conta por exemplos, como a rede, sente esse detalhe.</p>
+<h3 id="slide-11-a-massa-nao-depende-de-quem-mede-em-video">Slide 11: A massa não depende de quem mede, em vídeo <a class="cg-slide-link" href="../slides/#11" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra o que quer dizer invariante. Com o J/ψ parado, os dois múons saem em sentidos opostos, cada um com metade da energia, 1,548 GeV, e momento de 1,545 GeV; a soma dos momentos é zero, e a massa é a soma das energias, 3,097 GeV.</p>
+<p>Quando o J/ψ anda, com momento de 9 GeV, as energias dos múons mudam muito: uma vai a 7,00 GeV e a outra cai para 2,51 GeV, e a soma dos momentos passa a ser 9 GeV. A massa continua 3,097. Muda o ângulo em que os múons saem, e a massa continua a mesma.</p>
+<p>As contas do vídeo são a transformação de Lorentz, a regra da relatividade especial que diz como a energia e o momento mudam de um referencial para outro. Ela fica como caixa-preta: entram a energia e o momento medidos por um observador e a velocidade de outro, e saem a energia e o momento que o outro mede. Não se abre aqui porque o curso só precisa do resultado: M não muda.</p>
+<p>No CMS, cada J/ψ sai da colisão com um momento diferente. Se a massa dependesse disso, os J/ψ se espalhariam por todo o histograma; como não depende, todos caem no mesmo lugar, e o pico aparece.</p>
+<h3 id="slide-12-a-formula-confere-com-o-arquivo">Slide 12: A fórmula confere com o arquivo <a class="cg-slide-link" href="../slides/#12" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Antes de usar a coluna M, a fórmula confere. Com a energia e o momento do próprio arquivo, a fórmula reproduz a coluna M em 99,6% dos eventos, com diferença relativa menor que 0,1%. Em 413 eventos, não: num deles, a fórmula dá 247 GeV e a coluna, 56. Em outro, a energia de um múon é de 184 mil GeV, 26 vezes os 7 mil GeV da colisão inteira em 2010: um número impossível.</p>
+<p>A causa, que é dedução tirada dos próprios dados: a coluna M foi calculada com pt, eta e phi, e a energia refeita pela massa do múon. Refeita assim, a fórmula bate em todos os 100 mil eventos. Nos 413, a energia de um dos múons não combina com o momento dele. A página do registro não diz como M foi calculada.</p>
+<p>A lição vale para o projeto inteiro: dado real se confere antes de usar, e uma diferença em 0,4% dos eventos só aparece para quem conta.</p>
+<h3 id="slide-13-do-evento-ao-histograma-em-video">Slide 13: Do evento ao histograma, em vídeo <a class="cg-slide-link" href="../slides/#13" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra o caminho do evento ao histograma. Primeiro, três eventos do arquivo, um a um: o quadrado da soma das energias, o da soma dos momentos e a conta da massa; o número vira um quadrado que cai na faixa da sua massa. Os três foram escolhidos por caírem perto dos três picos: o evento 3, o primeiro do arquivo perto do J/ψ; o 48, o primeiro perto do Υ; o 2.103, o primeiro perto do Z. Na tela, a conta usa os quadrados com duas casas, como no slide da conta à mão, e confere com a coluna M até a terceira casa.</p>
+<p>Depois, os 40 primeiros eventos do arquivo caem depressa, e as pilhas ainda não dizem nada. Com milhares de eventos, os quadrados viram barras, e a altura passa a ser contada em escala logarítmica: cada marca vale dez vezes a de baixo, para o fundo de milhares e o Z de dezenas caberem no mesmo desenho. O histograma se enche com 500, 2 mil, 10 mil, 30 mil e 100 mil eventos. Com 500, só ruído; com 10 mil, o J/ψ e o Υ; com 100 mil, até o Z se destaca.</p>
+<p>É a razão de a física de partículas precisar de tantos eventos: um pico raro só aparece quando há eventos bastantes para ele se separar do fundo.</p>
+<h3 id="slide-14-os-picos-sao-particulas">Slide 14: Os picos são partículas <a class="cg-slide-link" href="../slides/#14" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O histograma conta quantos eventos caem em cada faixa de massa. As faixas são 300, iguais em escala logarítmica, de 2 a 110 GeV, e o eixo vertical também é logarítmico: o fundo cai de milhares para dezenas de eventos por faixa.</p>
+<p>Sobre o fundo liso aparecem picos: massas em que há muito mais eventos do que o fundo explicaria. Cada pico é uma partícula que se desfez em dois múons. O mais alto, perto de 3,1 GeV, é o J/ψ, com massa de 3,0969 GeV; perto de 9,5 GeV, o Υ, o upsilon, com 9,46 GeV; perto de 91 GeV, o Z, com 91,1880 GeV. As massas são as da Wikipedia, que cita o Particle Data Group, a colaboração que reúne as medidas da física de partículas. Outros picos menores aparecem no histograma, e ficam de fora da aula.</p>
+<p>O pico não é uma linha fina: tem largura, e o slide seguinte mostra de onde ela vem.</p>
+<h3 id="slide-15-os-picos-de-perto">Slide 15: Os picos de perto <a class="cg-slide-link" href="../slides/#15" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>De perto e em escala linear: o pico do J/ψ, em faixas de 10 MeV, e o do Υ, em faixas de 25 MeV. O fundo segue por baixo dos dois picos; no Υ, o fundo é alto, e o pico sobe só uns 100 eventos por faixa acima dele.</p>
+<p>A seta mede a largura do pico do J/ψ à meia altura, descontado o fundo: 67 MeV. É uma conta simples, feita em codigo/figuras_slides.py, sem ajuste de curva. A largura natural do J/ψ, a que ele teria com um detector perfeito, é de 93 keV, mais de 700 vezes menor. Quase toda a largura do pico vem do erro de medida do detector, no momento de cada múon.</p>
+<p>A largura natural e o tempo de vida são a mesma informação: a largura natural de 93 keV corresponde a uma vida de uns 7 × 10⁻²¹ s, e quanto menos a partícula vive, mais largo o pico.</p>
+<p>Perto de 10 GeV, à direita do Υ, há um excesso menor, que fica de fora da aula.</p>
+<h2 id="4-de-onde-vem">4. De onde vem</h2>
+<h3 id="slide-16-o-que-e-cada-pico">Slide 16: O que é cada pico <a class="cg-slide-link" href="../slides/#16" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O que é cada pico, em uma linha. O J/ψ é um méson, uma partícula feita de um quark e um antiquark, unidos pela força forte: um quark charm e um antiquark charm. Vive 7,2 × 10⁻²¹ s. O Υ é um quark bottom e o seu antiquark, e vive 1,21 × 10⁻²⁰ s. O Z é uma das partículas que carregam a força fraca, a interação responsável pelo decaimento beta, um tipo de radioatividade; não tem carga, é a sua própria antipartícula e vive cerca de 3 × 10⁻²⁵ s.</p>
+<p>Quark, no curso, é a partícula elementar que forma os prótons e os nêutrons; nunca aparece sozinho, só dentro de partículas compostas, como os mésons. Charm e bottom são dois dos seis tipos de quark.</p>
+<p>Nenhuma das três chega ao detector: as três se desfazem antes, e o CMS vê os múons. A massa invariante é o jeito de ver a partícula que não se vê.</p>
+<p>Os fatos vêm da Wikipedia em inglês, verbetes &quot;J/psi meson&quot;, &quot;Upsilon meson&quot;, &quot;W and Z bosons&quot;, &quot;Meson&quot;, &quot;Quark&quot; e &quot;Weak interaction&quot;.</p>
+<h3 id="slide-17-de-onde-vem">Slide 17: De onde vem <a class="cg-slide-link" href="../slides/#17" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Três descobertas, as três vistas em pares de léptons, a família do elétron e do múon.</p>
+<p>1974: o J/ψ foi descoberto por dois grupos, independentemente: um no SLAC, o Centro do Acelerador Linear de Stanford, chefiado por Burton Richter, e outro no Laboratório Nacional de Brookhaven, chefiado por Samuel Ting. Os dois anunciaram em 11 de novembro de 1974, e por isso a partícula tem dois nomes, J e ψ. Richter e Ting dividiram o Nobel de Física de 1976. Os dois artigos estão no estudo da aula 7.</p>
+<p>1977: o Υ foi descoberto pela equipe do experimento E288, chefiada por Leon Lederman, no Fermilab, já no modo de dois múons.</p>
+<p>1983: o Z foi visto no CERN, no colisor SPS, pelos experimentos UA1 e UA2; o UA1 era liderado por Carlo Rubbia, e o UA2, por Pierre Darriulat. O artigo do UA1 sobre pares de léptons perto de 95 GeV está na referência da história do README.</p>
+<p>Os fatos vêm da Wikipedia em inglês, verbetes &quot;J/psi meson&quot;, &quot;Upsilon meson&quot; e &quot;W and Z bosons&quot;.</p>
+<h2 id="5-uma-rede-aprende-a-formula">5. Uma rede aprende a fórmula?</h2>
+<h3 id="slide-18-uma-rede-aprende-a-formula">Slide 18: Uma rede aprende a fórmula? <a class="cg-slide-link" href="../slides/#18" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A fórmula da massa é conhecida. A pergunta é se uma rede, que não a conhece, aprende a fazer a conta só a partir de exemplos: oito números entram, a energia e as três componentes do momento de cada múon, e a massa sai. É um teste do que um MLP consegue aprender, com uma resposta certa para conferir cada evento.</p>
+<h3 id="slide-19-a-rede">Slide 19: A rede <a class="cg-slide-link" href="../slides/#19" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A rede tem oito entradas, duas camadas ocultas de 256 neurônios com a tanh e uma saída. Os eventos se dividem como na aula 6: 80 mil para o treino, 10 mil para a validação e 10 mil para o teste, sorteados com a semente 0. O treino usa o Adam, com taxa 0,001, em lotes de 256, por 100 épocas, e a perda é o erro quadrático médio da aula 2.</p>
+<p>Dois cuidados com os números. Nos eventos em que a fórmula confere, a energia de um múon vai de 2,5 GeV a quase 900 GeV, com mediana de 9; sem cuidado, os valores grandes saturam a tanh. Cada entrada passa por asinh(x/5), o arco seno hiperbólico, que trata os números pequenos quase em proporção, como x/5, e comprime os grandes como um logaritmo, sem perder o sinal; depois é padronizada pelo treino. E a rede aprende o logaritmo da massa, ln M, que vai de ln 2 a ln 110, uma faixa estreita.</p>
+<p>A compressão fez diferença: em 30 épocas, o erro mediano na validação caiu de 10,6% sem ela para 3,4% com ela. Isso foi medido no laptop do professor, antes de fixar a configuração.</p>
+<h3 id="slide-20-a-compressao-das-entradas-em-video">Slide 20: A compressão das entradas, em vídeo <a class="cg-slide-link" href="../slides/#20" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra a compressão em 300 eventos, os primeiros do arquivo, com a energia do múon 1. Na linha de cima, em GeV, de 0 a 350, quase todos os pontos se amontoam perto do zero: a metade fica abaixo de 13,5 GeV, em 4% da linha, e uns poucos passam de 100.</p>
+<p>Depois de asinh(E₁/5), na linha de baixo, a mesma metade ocupa 34% da linha. O leque final liga cada valor à sua imagem: os primeiros 50 GeV ganham 60% da linha de baixo, e os 300 seguintes ficam com o resto.</p>
+<p>Perto de zero, asinh(x/5) é quase x/5, uma reta; longe, cresce como o logaritmo, ln(2x/5). Para a rede, números de escalas muito diferentes viram números de uma escala só, e a tanh das camadas não satura. asinh é a função inversa do seno hiperbólico: asinh(x) = ln(x + √(x² + 1)). O logaritmo puro não serviria, porque px, py e pz podem ser negativos; o asinh aceita os dois sinais.</p>
+<h3 id="slide-21-padronizar-e-o-logaritmo-da-massa">Slide 21: Padronizar, e o logaritmo da massa <a class="cg-slide-link" href="../slides/#21" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Depois da compressão, cada uma das oito entradas é padronizada: menos a média e dividida pelo desvio padrão, μ e σ, os dois calculados só no treino. Padronizar, no curso, é levar uma coluna a média 0 e desvio 1. O teste não entra nessas contas: o que vem do teste ensinaria alguma coisa à rede, e a medida final deixaria de ser honesta.</p>
+<p>A saída não é M, e sim ln M, o logaritmo natural da massa, também padronizado. Duas razões. A faixa: M vai de 2 a 110, um fator de 55; ln M vai de 0,69 a 4,70. E o erro: para erros pequenos, ln M_rede − ln M é quase o erro relativo, (M_rede − M)/M, porque ln(1 + u) é quase u para u pequeno. Com o erro quadrático médio sobre ln M, a rede é cobrada pelo erro em porcentagem: errar 0,1 GeV num J/ψ de 3,1 pesa como errar 3 GeV num Z de 91.</p>
+<p>O exemplo do slide: M = 3,10 e a rede dá 3,16. A diferença dos logaritmos é 0,0192, e o erro relativo é 0,0194, quase o mesmo número.</p>
+<p>Sem o logaritmo, o erro quadrático médio sobre M seria dominado pelos eventos de massa grande, onde um erro de 2% são 2 GeV, e o J/ψ, com erros de centésimos, quase não pesaria.</p>
+<h3 id="slide-22-a-curva-do-treino">Slide 22: A curva do treino <a class="cg-slide-link" href="../slides/#22" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A curva do treino: o erro relativo mediano no treino, em azul com círculos, e na validação, em laranja com quadrados, época a época, em escala logarítmica.</p>
+<p>As duas descem juntas, de 13% na primeira época para cerca de 2%. Quase não se separam: a rede não decora o treino. Quando o treino fica bem melhor que a validação, a rede decorou os exemplos, o sobreajuste da aula 6; com 80 mil eventos e 68 mil pesos, isso não acontece aqui.</p>
+<p>A curva tem dentes: com o Adam e lotes de 256, cada época termina num ponto um pouco diferente, e o erro sobe e desce de uma para a outra. Por isso a última época não é a escolhida. A melhor pela validação é a 80, com 1,91%, e os pesos dela são os que vão para o teste. O treino inteiro, 100 épocas, levou 37 segundos no laptop do professor.</p>
+<p>Os 68 mil pesos: 8 × 256 + 256 na primeira camada, 256 × 256 + 256 na segunda e 256 + 1 na saída, 68.353 ao todo.</p>
+<h3 id="slide-23-o-treino-epoca-a-epoca-em-video">Slide 23: O treino, época a época, em vídeo <a class="cg-slide-link" href="../slides/#23" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra a rede aprendendo em 2 mil eventos do teste, os mesmos em todas as épocas. Cada ponto é um evento: a massa pela fórmula no eixo horizontal e a da rede no vertical, os dois em escala logarítmica. Onde a rede acerta, o ponto fica na diagonal tracejada.</p>
+<p>Antes do treino, com os pesos sorteados, a rede dá entre 5,1 e 8,0 GeV a todos os eventos: os pontos formam uma faixa horizontal, e o erro mediano é de 61%. Depois de uma época, os pontos já seguem a diagonal, com erro de 14%; na época 10, 4,6%; na 80, 1,9%. A nuvem aperta, e os picos viram manchas sobre a diagonal: o J/ψ perto de 3, o Υ perto de 9,5 e o Z perto de 91.</p>
+<p>Os retratos das oito épocas, 0, 1, 2, 5, 10, 20, 40 e 80, foram gravados por mlp_massa.py sem mudar o treino: a rede só é avaliada, sem gradiente e sem sorteio, e o resultado do teste é o mesmo com e sem eles.</p>
+<h3 id="slide-24-a-rede-contra-a-formula">Slide 24: A rede contra a fórmula <a class="cg-slide-link" href="../slides/#24" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>No teste, medido uma vez com os pesos da melhor época pela validação, a 80: o erro relativo mediano é 1,88%, 90% dos eventos ficam abaixo de 5,26% e 88,5% abaixo de 5%.</p>
+<p>À esquerda, cada ponto é um evento do teste: a massa pela fórmula no eixo horizontal, a da rede no vertical. Os pontos ficam em volta da diagonal tracejada, onde as duas são iguais. À direita, os dois histogramas do teste, um sobre o outro: os picos do J/ψ e do Υ aparecem nos dois, um pouco mais largos na rede.</p>
+<p>A rede aprende a conta, mas não com a precisão da fórmula: a fórmula erra em milionésimos, e a rede, em porcentos. Para medir massas, a fórmula; a rede serve para aprender, e o curso usa o caso para conferir o que ela aprende.</p>
+<h3 id="slide-25-onde-a-rede-erra">Slide 25: Onde a rede erra <a class="cg-slide-link" href="../slides/#25" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Onde a rede erra. À esquerda, o pico do J/ψ no teste, em faixas de 20 MeV: pela fórmula, em azul, alto e estreito; pela rede, em laranja tracejado, mais baixo, mais largo e um pouco à esquerda. Nos 660 eventos do teste com a massa entre 3,05 e 3,15 GeV, a rede dá, na mediana, 0,9% a menos que a fórmula. Um erro de 2% numa massa de 3,1 GeV são 60 MeV, quase a largura inteira do pico, 67 MeV: a rede borra o pico que o detector mediu.</p>
+<p>À direita, o erro mediano da rede em cada faixa de massa, com o número de eventos do teste em cima da barra. Fica entre 1,8% e 2,1% em quase todas. No Z, de 80 a 100 GeV, sobe a 3,0%, com só 46 eventos no teste e 364 no treino, menos de 0,5% dos exemplos. A leitura, que é dedução: onde há poucos exemplos, a rede aprende menos. Com 46 eventos, o número do Z é o menos firme da figura.</p>
+<p>Para melhorar a rede no Z, há dois caminhos: mais eventos de massa alta, ou dar a esses eventos mais peso na perda. Os dois ficam como extra da entrega.</p>
+<h2 id="6-o-codigo">6. O código</h2>
+<h3 id="slide-26-o-codigo">Slide 26: O código <a class="cg-slide-link" href="../slides/#26" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O código da aula fica pronto e testado antes. codigo/dimuon.py lê o arquivo e calcula a fórmula, pelos dois caminhos, e vai para a turma. codigo/mlp_massa.py é a solução de referência da entrega, que não vai para a turma antes do prazo: a rede, o treino com a validação e o teste uma vez, com os números gravados em resultados/massa.json. codigo/figuras_slides.py desenha as figuras, e codigo/animacoes.py, os cinco vídeos.</p>
+<p>Quatro peças resolvem quase tudo. csv.reader lê o arquivo, e np.array(valores, dtype=float) transforma cada coluna em números. A fórmula é uma linha: np.sqrt((E1 + E2)**2 - (px1 + px2)**2 - (py1 + py2)**2 - (pz1 + pz2)**2). np.histogram(M, bins=np.logspace(...)) conta os eventos por faixa. E np.arcsinh(X / 5) comprime as entradas da rede.</p>
+<h3 id="slide-27-o-treino-em-pytorch">Slide 27: O treino em PyTorch <a class="cg-slide-link" href="../slides/#27" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O treino em PyTorch é o da aula 7, com outra rede e outra perda. modelo = rede() monta as camadas; torch.optim.Adam recebe os pesos do modelo e a taxa, lr=1e-3; torch.nn.MSELoss() é o erro quadrático médio, a perda de quem estima um número.</p>
+<p>A cada época, os índices do treino se embaralham numa ordem nova, sorteada por um gerador com semente fixa, e andam de 256 em 256. Para cada lote, quatro linhas: opt.zero_grad() zera as derivadas do lote anterior, que o PyTorch acumularia; perda_fn(modelo(Xp[i]), yp[i]) faz a passada para a frente e mede a perda; perda.backward() faz a retropropagação, a da aula 5, sozinha; opt.step() dá o passo do Adam em cada peso.</p>
+<p>No fim de cada época, o erro no treino e na validação; se a validação melhorou, os pesos são copiados. No fim, os pesos da melhor época voltam ao modelo, e o teste é medido uma vez.</p>
+<p>Xp e yp são as entradas e a saída já comprimidas e padronizadas, como tensores, e i é o lote de índices.</p>
+<h3 id="slide-28-o-que-a-entrega-pede">Slide 28: O que a entrega pede <a class="cg-slide-link" href="../slides/#28" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A entrega tem duas partes. A primeira é o histograma da massa, com os picos identificados pelo nome da partícula e a massa de cada uma. A segunda é o erro da rede contra a fórmula, num conjunto de teste separado antes do treino: o erro relativo mediano e uma figura que compare as duas.</p>
+<p>Cada um escolhe a rede, as entradas e o treino, escolhendo pela validação, nunca pelo teste. Quem quiser pode testar outras entradas, como pt, eta e phi, e dizer se a rede aprende melhor com elas, ou tentar melhorar o erro no Z.</p>
+<p>O que se exige é saber dizer o que entra na rede, o que ela aprende e o que significa o número que sai.</p>
+<h2 id="7-fechamento">7. Fechamento</h2>
+<h3 id="slide-29-para-estudar-e-entregar">Slide 29: Para estudar e entregar <a class="cg-slide-link" href="../slides/#29" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O estudo prepara a aula 9, o fractal. O vídeo do 3Blue1Brown &quot;Fractals are typically not self-similar&quot;, de 2017, mostra o que é um fractal e como se mede a dimensão dele. O texto de Jascha Sohl-Dickstein, &quot;Neural network training makes beautiful fractals&quot;, de 2024, mostra que a fronteira entre as taxas de aprendizado que convergem e as que divergem é um fractal: é o projeto do curso.</p>
+<p>A entrega: o histograma com os picos identificados, o erro da rede contra a fórmula e uma pergunta sobre o estudo.</p>
+<p>A seguir, a aula 9 desenha a fronteira em duas dimensões, uma taxa por camada, e faz o projeto com a turma; a aula 10 tem a apresentação e a revisão do curso inteiro.</p>
+<h2 id="perguntas-que-podem-aparecer">Perguntas que podem aparecer</h2>
+<ul>
+<li>Por que os dados são do CMS, se o NIPS-CERN está no ATLAS? Porque o CMS abriu
+esses eventos ao público, com a licença CC0, para ensino. Dado não publicado do
+ATLAS segue a política da colaboração e não entra no curso.</li>
+<li>Todo evento do pico é a partícula? Não. O pico é o excesso sobre o fundo: na
+faixa do J/ψ há eventos do fundo também. Separar um do outro é análise física,
+que os dados avisam não suportar por inteiro.</li>
+<li>Por que a rede erra mais que a fórmula? Porque aprende a conta por exemplos, com
+um número finito de pesos, e a massa sai da diferença entre números grandes, a
+energia e o momento: um erro pequeno neles vira um erro grande na massa. A
+fórmula é exata; a rede, uma aproximação.</li>
+<li>Por que asinh, e não o logaritmo? Porque o momento tem sinal: px pode ser
+negativo, e o logaritmo de um negativo não existe. O asinh aceita os dois sinais.</li>
+<li>O η desta aula é o da taxa de aprendizado? Não. Aqui, η é a pseudorrapidez, o
+nome que a física de partículas usa; a taxa aparece como lr no código.</li>
+<li>Por que o pico tem 67 MeV de largura, se o J/ψ tem 93 keV? Porque o detector
+mede o momento de cada múon com erro, e esse erro alarga o pico mais de 700
+vezes.</li>
+</ul>
+<h2 id="para-estudar">Para estudar</h2>
+<p>O estudo da turma, que é também o seu:</p>
+<ul>
+<li>3Blue1Brown, 2017, &quot;Fractals are typically not self-similar&quot;,
+<a href="https://www.youtube.com/watch?v=gB9n2gHsHN4" target="_blank" rel="noopener">youtube.com/watch?v=gB9n2gHsHN4</a>.</li>
+<li>Jascha Sohl-Dickstein, 2024, &quot;Neural network training makes beautiful
+fractals&quot;, sohl-dickstein.github.io/2024/02/12/fractal.html.</li>
+</ul>
+<p>Além dele, para preparar a aula:</p>
+<ul>
+<li>CMS, &quot;Events with two muons from 2010&quot;, registro 303 do portal de dados abertos
+do CERN, <a href="https://opendata.cern.ch/record/303" target="_blank" rel="noopener">opendata.cern.ch/record/303</a>, a descrição das colunas.</li>
+<li>UA1, George Arnison e colegas, 1983, &quot;Experimental observation of lepton pairs
+of invariant mass around 95 GeV/c² at the CERN SPS collider&quot;, Physics Letters B
+126(5):398-410, <a href="https://doi.org/10.1016/0370-2693(83)90188-0" target="_blank" rel="noopener">doi:10.1016/0370-2693(83)90188-0</a>.</li>
+</ul>
+<h2 id="fontes-dos-fatos-citados">Fontes dos fatos citados</h2>
+<p>Só para conferência; o estudo é a lista de cima.</p>
+<ul>
+<li>O registro 303 do portal de dados abertos do CERN, pela API do portal: o
+título, os 100 mil eventos de 2 a 110 GeV, 2010, a publicação em 2014, a
+licença CC0, o aviso de que não servem para análise completa e a descrição de
+cada coluna.</li>
+<li>Verbete &quot;Muon&quot; da Wikipedia em inglês, revisão 1380042360: 105,66 MeV e
+206,77 vezes a massa do elétron.</li>
+<li>Verbete &quot;Large Hadron Collider&quot;, revisão 1383402210: o maior acelerador, 27 km,
+até 175 m de profundidade, a fronteira franco-suíça perto de Genebra; as
+colisões a 7 TeV, 3,5 TeV por feixe, em 30/03/2010.</li>
+<li>Verbete &quot;Compact Muon Solenoid&quot;, revisão 1376671040: um dos dois detectores de
+uso geral, 21 m, 15 m, 14 mil toneladas, os detectores de múons na camada 5; o
+momento medido pela curvatura do caminho no campo magnético.</li>
+<li>Verbete &quot;Pseudorapidity&quot;: η = −ln tan(θ/2), com θ o ângulo entre o momento e o
+eixo do feixe.</li>
+<li>Verbete &quot;J/psi meson&quot;, revisão 1378448498: 3,0969 GeV, um quark charm e um
+antiquark charm, 7,2 × 10⁻²¹ s, a largura de 92,9 keV, SLAC e Brookhaven,
+Richter e Ting, 11/11/1974, o Nobel de 1976.</li>
+<li>Verbete &quot;Upsilon meson&quot;, revisão 1347609677: um quark bottom e o seu
+antiquark, 1,21 × 10⁻²⁰ s, o E288, Lederman, Fermilab, 1977, cerca de 9,46 GeV.</li>
+<li>Verbete &quot;W and Z bosons&quot;, revisão 1382785335: 91,1880 GeV; carregam a força
+fraca, o Z sem carga e a sua própria antipartícula, cerca de 3 × 10⁻²⁵ s; o SPS,
+o UA1 de Rubbia e o UA2 de Darriulat.</li>
+<li>Verbetes &quot;Meson&quot;, &quot;Quark&quot; e &quot;Weak interaction&quot;: o méson, um quark e um
+antiquark; o quark, que forma prótons e nêutrons e não aparece sozinho; a força
+fraca e o decaimento beta.</li>
+<li>As instruções da organização NIPS-CERN: o ATLAS e o CGVWeb.</li>
+<li>Wikimedia Commons, &quot;CMS-Experiment (LHC).jpg&quot;: Simon Waldherr, 15/09/2019,
+CC BY 4.0.</li>
+<li>Os números: codigo/dimuon.py, codigo/mlp_massa.py e codigo/figuras_slides.py,
+com a semente 0, gravados em resultados/massa.json.</li>
+</ul>
+
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>

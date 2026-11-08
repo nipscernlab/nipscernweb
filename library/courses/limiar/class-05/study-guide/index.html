@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<!-- Gerado por tools/courses/build.py. Não edite: rode a ferramenta de novo. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>try{var l=localStorage.getItem('nipscern_lang');if(l&&['en','pt','fr','no'].indexOf(l)>-1)document.documentElement.lang=l;}catch(e){}</script>
+  <script>/* Efeitos: ?fx=full, ?fx=lite, ?fx=min ou ?fx=no-sky,no-foil,no-glass,no-lenis,no-motion,no-video; sem ?fx nem a escolha do rodapé (localStorage nipscern_fx), o celular abre com o céu parado e economia de dados ou até 2 GB de memória abrem no lite (docs/perf/README.md) */(function(){var d=document.documentElement,N={lite:'sky foil glass lenis',min:'sky foil glass lenis motion video'},v='',n='full',o=[];try{v=new URLSearchParams(location.search).get('fx')||localStorage.getItem('nipscern_fx')||''}catch(e){}if(!v){var c=navigator.connection,m=navigator.deviceMemory;if((c&&c.saveData)||(m&&m<=2))n='lite';else if(matchMedia('(pointer: coarse)').matches)o.push('sky')}v.split(',').forEach(function(t){if(N[t]||t=='full')n=t;else if(t.slice(0,3)=='no-')o.push(t.slice(3))});if(N[n])o=o.concat(N[n].split(' '));d.setAttribute('data-fx',n);o.forEach(function(f){d.classList.add('fx-no-'+f)})})();</script>
+  <title>Aula 5: retropropagação | Limiar | NIPS-CERN</title>
+  <meta name="description" content="Study guide of class 5 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+
+  <meta property="og:type"  content="website">
+  <meta property="og:url"   content="https://www.nipscern.com/library/courses/limiar/class-05/study-guide/">
+  <meta property="og:title" content="Aula 5: retropropagação | Limiar | NIPS-CERN">
+  <meta property="og:description" content="Study guide of class 5 of Limiar, the NIPS-CERN neural networks course, in Portuguese.">
+  <meta property="og:image" content="https://www.nipscern.com/assets/images/og-default.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://www.nipscern.com/library/courses/limiar/class-05/study-guide/">
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/assets/icons/icon_home_nipscern.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="../../../../../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../../../../../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../../../../../assets/css/icons/library-courses.css?v=d17bebd61c"></noscript>
+  <link rel="stylesheet" href="../../../../../assets/css/main.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/courses.min.css?v=d17bebd61c">
+  <link rel="stylesheet" href="../../../../../assets/css/vendor/katex.min.css?v=d17bebd61c">
+</head>
+<body>
+
+  <a href="#main" class="skip-link" data-i18n="nav.skip">Skip to content</a>
+  <nav id="nav" role="navigation" aria-label="Main navigation"></nav>
+
+  <main id="main">
+    <header class="cr-hero cr-hero--slim">
+      <div class="cr-hero-bg" aria-hidden="true"><img src="../../../../../library/courses/limiar/media/limiar-fundo.14b6515368.webp" alt="" decoding="async"></div>
+      <div class="page-hero-inner cr-hero-inner">
+        <nav class="cr-crumbs fade-up" aria-label="Breadcrumb"><a href="../../../../../library/courses/"><span data-i18n="courses.title">Courses</span></a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../../">Limiar</a><i class="ph ph-caret-right" aria-hidden="true"></i><a href="../"><span data-i18n="courses.class">Class</span> 5</a><i class="ph ph-caret-right" aria-hidden="true"></i><span aria-current="page"><span data-i18n="courses.study_guide">Study guide</span></span></nav>
+        <div class="cr-hero-grid">
+          <div class="cr-hero-text">
+            <p class="eyebrow fade-up"><i class="ph ph-book-open-text" aria-hidden="true"></i><span data-i18n="courses.study_guide">Study guide</span></p><h1 class="display-md fade-up" lang="pt-BR">Aula 5: retropropagação</h1><ul class="cr-facts fade-up"><li><i class="ph ph-calendar-blank" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.when">When</span><span lang="pt-BR">Sexta, 13/11/2026, das 12h às 14h</span></li><li><i class="ph ph-map-pin" aria-hidden="true"></i><span class="sr-only" data-i18n="courses.where">Where</span><span lang="pt-BR">On-line, no encontro 1</span></li><li class="cr-facts-lang"><span class="content-lang-badge" data-content-lang="pt"></span></li></ul><div class="cr-actions fade-up"><a class="btn glass-btn btn-primary" href="../slides/"><i class="ph ph-monitor-play" aria-hidden="true"></i><span data-i18n="courses.open_slides">Open the slides</span></a><a class="btn glass-btn btn-ghost" href="../"><i class="ph ph-arrow-left" aria-hidden="true"></i><span data-i18n="courses.back_to_class">Back to the class</span></a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="section seam cr-band cr-band--guide" style="--seam-from:var(--bg-0)">
+      <div class="container cr-guide-grid">
+        <nav class="cr-toc" aria-labelledby="toc-t"><p class="cr-toc-title" id="toc-t"><span data-i18n="courses.on_this_page">On this page</span></p><ol lang="pt-BR"><li><a href="#os-topicos">Os tópicos</a></li><li><a href="#notacao">Notação</a></li><li><a href="#1-revisao-das-aulas-3-e-4">1. Revisão das aulas 3 e 4</a></li><li><a href="#2-a-regra-da-cadeia-na-rede">2. A regra da cadeia na rede</a></li><li><a href="#3-conferir-e-treinar">3. Conferir e treinar</a></li><li><a href="#4-de-onde-vem">4. De onde vem</a></li><li><a href="#5-o-codigo">5. O código</a></li><li><a href="#6-fechamento">6. Fechamento</a></li><li><a href="#perguntas-que-podem-aparecer">Perguntas que podem aparecer</a></li><li><a href="#para-estudar">Para estudar</a></li><li><a href="#fontes-dos-fatos-citados">Fontes dos fatos citados</a></li></ol></nav>
+        <article class="cr-prose cr-guide" lang="pt-BR">
+<p>Material de estudo para acompanhar os slides. Dada no encontro on-line de 13/11/2026,
+depois da aula 3, por tela compartilhada.</p>
+<p>O objetivo da aula é aplicar a regra da cadeia num neurônio, dizer o que é o δ de um
+neurônio e como ele volta pela rede, conferir as derivadas pela derivada numérica e explicar
+por que o resultado de um treino depende da semente.</p>
+<h2 id="os-topicos">Os tópicos</h2>
+<p>Sem horário marcado: o que não couber hoje entra na aula seguinte.</p>
+<ol>
+<li>Revisão das aulas 3 e 4</li>
+<li>A regra da cadeia na rede</li>
+<li>Conferir e treinar</li>
+<li>De onde vem</li>
+<li>O código</li>
+<li>Fechamento</li>
+</ol>
+<h2 id="notacao">Notação</h2>
+<p>Os símbolos novos dos slides, na ordem em que aparecem. Cada um também é definido na
+nota do slide em que aparece primeiro; os das aulas anteriores estão nos roteiros delas.</p>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Lê-se</th>
+<th>Quer dizer</th>
+<th>Slide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>δ</mi><mo separator="true">,</mo><mtext> </mtext><msub><mi>δ</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\delta,\ \delta_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0379em;">δ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0379em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>delta, delta k</td>
+<td>o δ de um neurônio: a derivada da perda em relação à soma z dele</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>k</mi></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>h</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">z_k,\ h_k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>z k, h k</td>
+<td>a soma e a saída do neurônio oculto k</td>
+<td>7</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>w</mi><mo separator="true">,</mo><mtext> </mtext><mi mathvariant="normal">Δ</mi><mi>z</mi><mo separator="true">,</mo><mtext> </mtext><mi mathvariant="normal">Δ</mi><mi>L</mi></mrow><annotation encoding="application/x-tex">\Delta w,\ \Delta z,\ \Delta L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">Δ</span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">Δ</span><span class="mord mathnormal" style="margin-right:0.044em;">z</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">Δ</span><span class="mord mathnormal">L</span></span></span></span></td>
+<td>delta w, delta z, delta L</td>
+<td>quanto cada número andou, num passo</td>
+<td>6</td>
+</tr>
+<tr>
+<td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∂</mi><mi>L</mi><mi mathvariant="normal">/</mi><mi mathvariant="normal">∂</mi><msub><mi>w</mi><mn>11</mn></msub></mrow><annotation encoding="application/x-tex">\partial L/\partial w_{11}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord mathnormal">L</span><span class="mord">/</span><span class="mord" style="margin-right:0.0556em;">∂</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">11</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td>derivada parcial de L em relação a w um um</td>
+<td>a mesma derivada parcial da aula 2, escrita com a barra, numa linha só</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
+<p>No NumPy, estas peças resolvem quase tudo:</p>
+<ul>
+<li><code>X @ W.T + b</code>: a camada oculta para todos os exemplos de uma vez, um por linha
+de X; <code>W.T</code> é a transposta, W com linhas e colunas trocadas.</li>
+<li><code>1 / (1 + np.exp(-z))</code>: a sigmoide, posição por posição.</li>
+<li><code>s * (1 - s)</code>: a derivada da sigmoide, a partir da saída <code>s</code> já calculada.</li>
+<li><code>np.outer(a, b)</code>: o produto externo, a tabela de todos os produtos <code>a[i] * b[j]</code>.</li>
+<li><code>H.T @ delta</code>: soma, nos exemplos, o δ vezes a entrada de cada peso da saída.</li>
+<li><code>rng = np.random.default_rng(1)</code> e <code>rng.normal(size=(2, 2))</code>: os pesos
+iniciais, sorteados com a semente 1.</li>
+</ul>
+<h2 id="1-revisao-das-aulas-3-e-4">1. Revisão das aulas 3 e 4</h2>
+<h3 id="slide-1-a-capa">Slide 1: A capa <a class="cg-slide-link" href="../slides/#1" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A aula 5 trata da retropropagação: a regra da cadeia aplicada à rede inteira, de trás para a frente, que dá a derivada da perda em relação a cada peso numa passada só. Com ela, o gradiente descendente da aula 2 acha sozinho os nove pesos da rede do XOR, que na aula 3 foram escolhidos à mão.</p>
+<p>A imagem da capa é o plano do XOR como cada uma de 20 redes iguais o deixou, uma por semente, da 0 à 19, depois de 2.000 épocas com a taxa 2: do fundo claro, saída 0, ao azul, saída 1. Os círculos cheios marcam as entradas em que a resposta certa é 1, e os quadrados vazados, as de resposta 0. Em 16 quadros, o azul cobre os dois círculos e deixa os quadrados de fora, numa faixa diagonal ou em dois cantos opostos. Nos 4 de moldura laranja, as sementes 0, 10, 11 e 19, o treino parou no patamar, com a saída perto de 0,5 em parte do plano. É o resultado do slide das sementes, visto no plano das entradas. A foto de Paul Werbos está no slide da história, com as de Rumelhart e Hinton.</p>
+<h3 id="slide-2-revisao-de-memoria">Slide 2: Revisão, de memória <a class="cg-slide-link" href="../slides/#2" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A revisão é de memória: quatro perguntas sobre as aulas 3 e 4, e a turma responde falando.</p>
+<p>O que uma camada calcula, escrita como matriz? <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>h</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{h}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">h</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> = ativação(W <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>x</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{x}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.714em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2077em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> + <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>b</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\vec{b}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9774em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9774em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">b</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="katex-overlay" style="height:0.714em;width:0.471em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span>): cada linha de W guarda os pesos de um neurônio e faz o produto escalar com as entradas, e a ativação vale para cada posição.</p>
+<p>Por que a camada oculta precisa de uma ativação que não seja linear? Sem ela, duas camadas seguidas valem uma, com a matriz W₂ W₁, e uma camada só desenha de novo uma reta por neurônio: o XOR volta a não ter solução.</p>
+<p>O que diz a regra da cadeia? A derivada de uma função dentro de outra é o produto das derivadas: as taxas de variação se multiplicam.</p>
+<p>Que pesos à mão calculam o XOR? Na camada oculta, um neurônio que calcula o OU e outro que calcula o E, os dois com pesos (1; 1) e vieses −0,5 e −1,5; na saída, pesos (1; −1) e viés −0,5, que dispara com o OU sem o E.</p>
+<h3 id="slide-3-o-fio-do-curso">Slide 3: O fio do curso <a class="cg-slide-link" href="../slides/#3" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O curso segue um fio, e este slide aparece em todas as aulas, com a aula do dia em destaque.</p>
+<p>Na aula 1, um neurônio desenha uma reta, e nenhuma reta separa o XOR. Na aula 2, o gradiente descendente acha os pesos de um neurônio sem o degrau, e a taxa de aprendizado tem um limiar. Na aula 3, duas camadas separam o XOR, com pesos escolhidos à mão. Na aula 4, a regra da cadeia ganha vetores, uma camada de cada vez. Nesta aula, a 5, a retropropagação junta as duas coisas: calcula as derivadas da perda em relação a todos os pesos, e o gradiente descendente acha os pesos do XOR sozinho.</p>
+<p>A seguir, a mesma conta treina um MLP no MNIST, na aula 6; o PyTorch, na 7, faz a retropropagação sozinho; e os dados do CERN, na 8, levam ao projeto da aula 9, em que o limiar da taxa da aula 2 volta, com uma taxa por camada.</p>
+<h2 id="2-a-regra-da-cadeia-na-rede">2. A regra da cadeia na rede</h2>
+<h3 id="slide-4-como-achar-os-nove-numeros">Slide 4: Como achar os nove números? <a class="cg-slide-link" href="../slides/#4" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A pergunta que fechou a aula 3. Os pesos do XOR foram escolhidos à mão porque a rede é pequena e o problema é conhecido. Com nove parâmetros, testar valores ao acaso já é loteria, e uma rede de hoje tem milhões de pesos. O gradiente descendente da aula 2 resolve, desde que se saiba a derivada da perda em relação a cada parâmetro. Com a reta, eram duas derivadas, feitas à mão. Com camadas, cada peso da primeira camada mexe na perda através da camada seguinte, e a derivada passa pela regra da cadeia.</p>
+<h3 id="slide-5-a-regra-da-cadeia">Slide 5: A regra da cadeia <a class="cg-slide-link" href="../slides/#5" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A regra da cadeia deriva uma função dentro de outra. Se L depende de z, e z depende de w, a derivada de L em relação a w é o produto das duas derivadas: ∂L/∂w = ∂L/∂z · ∂z/∂w. Em palavras, as taxas de variação se multiplicam: se z anda 3 vezes mais depressa que w, e L anda 2z vezes mais depressa que z, então L anda 2z · 3 vezes mais depressa que w.</p>
+<p>O exemplo: z = 3w e L = z². A derivada de L em relação a z é 2z, pela regra de w² da aula 2; a de z em relação a w é 3. A regra da cadeia dá 2z · 3 = 6z = 18w. Sem ela, substituindo, L = 9w², e a derivada é 18w: o mesmo.</p>
+<p>Para um neurônio com a sigmoide e um exemplo, L = (y − t)², y = σ(z) e z = w x + b. A cadeia tem três elos: ∂L/∂y = 2(y − t), ∂y/∂z = σ′(z) e ∂z/∂w = x. O produto é ∂L/∂w = 2(y − t) σ′(z) x: o erro, vezes a inclinação da sigmoide, vezes a entrada. Sem a sigmoide, o elo do meio vale 1, e sobra a derivada da aula 2 para um exemplo, 2(y − t) x. A sigmoide, σ(z) = 1/(1 + e⁻ᶻ), e a inclinação dela, σ′(z) = σ(z)(1 − σ(z)), são as da aula 3.</p>
+<p>A versão com vetores, em que cada elo é uma matriz de derivadas, o Jacobiano, é a da aula 4. Aqui bastam as derivadas de um número em relação a outro.</p>
+<h3 id="slide-6-as-taxas-se-multiplicam-em-video">Slide 6: As taxas se multiplicam, em vídeo <a class="cg-slide-link" href="../slides/#6" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo mostra a regra da cadeia com o exemplo do slide anterior, z = 3w e L = z², em três retas com a mesma escala: uma marca vale uma unidade nas três. O ponto começa em w = 1, z = 3 e L = 9.</p>
+<p>Um passo Δw = 0,1, em laranja, vira Δz = 0,3, três vezes maior, e ΔL = 1,89, perto de seis vezes Δz. As razões ficam à direita: Δz/Δw = 3, ΔL/Δz = 6,3 e ΔL/Δw = 18,9. A razão total é o produto das duas: 3 vezes 6,3 dá 18,9. Δ, delta maiúsculo, é a variação: o quanto o número andou.</p>
+<p>Com o passo menor, 0,03 e depois 0,01, a razão de L para z chega a 6,03, perto de 2z = 6, a derivada de z² em z = 3; e a razão total, a 18,09, perto de 18. No limite, com o passo indo a zero, as razões viram as derivadas, e a regra da cadeia diz que elas se multiplicam: ∂L/∂w = 2z · 3 = 18w, que em w = 1 dá 18.</p>
+<p>Na rede, a cadeia é mais comprida: peso, soma, saída do neurônio, soma do neurônio seguinte, saída da rede, perda. Cada elo tem a sua taxa, e a derivada da perda pelo peso é o produto delas.</p>
+<h3 id="slide-7-para-a-frente-os-valores-para-tras-as-derivadas">Slide 7: Para a frente, os valores; para trás, as derivadas <a class="cg-slide-link" href="../slides/#7" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A retropropagação aplica a regra da cadeia à rede inteira, de trás para a frente, e reaproveita as contas. Primeiro, a passada para a frente: das entradas às somas z₁ e z₂ e às saídas h₁ e h₂ da camada oculta, daí à soma z e à saída y do neurônio de saída, e à perda L. Cada valor fica guardado.</p>
+<p>Depois, a passada para trás. O δ, delta minúsculo, de um neurônio é a derivada da perda em relação à soma z dele: quanto a perda muda quando a soma daquele neurônio muda um pouco. Para um exemplo, com L = (y − t)², o δ da saída sai da cadeia de dois elos: δ = 2(y − t) σ′(z).</p>
+<p>Com o δ de um neurônio, a derivada de cada peso que chega nele é uma conta só: o δ vezes a entrada que o peso multiplica. Na saída, ∂L/∂vₖ = δ hₖ, e ∂L/∂c = δ, porque c multiplica a entrada fixa 1. É o padrão do slide da regra da cadeia, com hₖ no lugar de x.</p>
+<p>O δ de um neurônio oculto vem do δ da saída, pelo peso que liga os dois: δₖ = δ vₖ σ′(zₖ). A soma da saída depende de hₖ através de vₖ, e hₖ depende de zₖ através da sigmoide: dois elos a mais na cadeia. Com δₖ, ∂L/∂wₖⱼ = δₖ xⱼ e ∂L/∂bₖ = δₖ.</p>
+<p>O que faz a conta ser barata é a ordem. As derivadas dos pesos da camada oculta começam todas pelo mesmo pedaço da cadeia, o δ da saída; de trás para a frente, esse pedaço se calcula uma vez e se reaproveita. Com mais camadas, cada δ sai do δ da camada seguinte, e uma passada para trás dá as derivadas de todos os pesos.</p>
+<p>Com N exemplos e a perda média, cada derivada é a média das derivadas de cada exemplo; o código calcula o δ dos quatro exemplos de uma vez, com o 2/N dentro dele, e soma. A mesma conta em matrizes é a da aula 4.</p>
+<h3 id="slide-8-a-retropropagacao-com-numeros-em-video">Slide 8: A retropropagação com números, em vídeo <a class="cg-slide-link" href="../slides/#8" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo faz a retropropagação com números, na rede do XOR. Os pesos são os da aula 3, escolhidos à mão para o degrau: todos os pesos da camada oculta valem 1, os vieses −0,5 e −1,5, os pesos da saída 1 e −1 e o viés da saída −0,5. Aqui, com a sigmoide no lugar do degrau, a mesma rede erra: no slide da aula 3 com k = 1, a saída fica abaixo de 0,5 nas quatro entradas.</p>
+<p>A entrada é (0; 1), de resposta certa t = 1, e a perda é a de um exemplo, L = (y − t)².</p>
+<p>Para a frente, em azul: z₁ = 0,5 e h₁ = σ(0,5) = 0,622; z₂ = −0,5 e h₂ = 0,378; z = 0,622 − 0,378 − 0,5 = −0,255 e y = 0,437; L = (0,437 − 1)² = 0,317. Cada valor fica guardado, porque a volta usa todos.</p>
+<p>Para trás, em laranja. O δ da saída: 2(y − t) σ′(z) = 2(0,437 − 1) · 0,246 = −0,277, com σ′(z) = y(1 − y). Os pesos da saída: δ vezes a entrada que cada um multiplica, −0,277 · 0,622 = −0,173 para v₁ e −0,105 para v₂; o viés c, que multiplica 1, fica com −0,277. O δ volta pelo peso: δ₁ = v₁ δ σ′(z₁) = 1 · (−0,277) · 0,235 = −0,065, e δ₂ = (−1) · (−0,277) · 0,235 = +0,065. Por fim, a primeira camada: δₖ vezes xⱼ. Como x₁ = 0, as derivadas dos pesos que saem de x₁ são zero: mexer nesses pesos não muda nada para esta entrada.</p>
+<p>Os sinais dizem o que fazer. A derivada de v₁ é negativa: aumentar v₁ diminui a perda, e o passo do gradiente, contra a derivada, aumenta v₁. O código confere as nove derivadas com a derivada numérica.</p>
+<h3 id="slide-9-um-passo-com-um-exemplo-so">Slide 9: Um passo com um exemplo só <a class="cg-slide-link" href="../slides/#9" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A tabela do vídeo, com os nove parâmetros: o valor de cada um, a derivada da perda do exemplo (0; 1) por ele e o valor depois de um passo do gradiente descendente, com η = 2: novo = velho − η · derivada. v₁ vai de 1 a 1,345, c de −0,5 a 0,054, e os pesos de x₁ ficam onde estavam, com derivada zero.</p>
+<p>Depois do passo, a saída em (0; 1) sobe de 0,437 para 0,672: o passo fez o que devia. Mas a saída sobe também nas outras três entradas, em (0; 0) de 0,424 para 0,616 e em (1; 1) de 0,424 para 0,681, onde a resposta certa é 0. A perda dos quatro exemplos piora, de 0,2488 para 0,2670.</p>
+<p>A lição: um exemplo só puxa a rede inteira na direção dele, e ignora os outros. Por isso o treino da aula usa os quatro exemplos de uma vez, o assunto do slide seguinte.</p>
+<h2 id="3-conferir-e-treinar">3. Conferir e treinar</h2>
+<h3 id="slide-10-os-quatro-exemplos-de-uma-vez">Slide 10: Os quatro exemplos de uma vez <a class="cg-slide-link" href="../slides/#10" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Com os quatro exemplos, a perda é a média, L = (1/4) Σ (yᵢ − tᵢ)², e a derivada de cada parâmetro é a média das derivadas dos quatro: cada exemplo puxa para o seu lado, e o passo segue a soma dos puxões.</p>
+<p>Partindo dos mesmos pesos à mão, um passo com os quatro muda pouco a saída, de (0,424; 0,437; 0,437; 0,424) para (0,449; 0,468; 0,468; 0,459), mas a perda cai, de 0,2488 para 0,2448. As entradas de resposta 1 sobem um pouco mais que as de resposta 0.</p>
+<p>Com 200 passos, a saída fica (0,188; 0,816; 0,816; 0,202), e a perda, 0,0359: a rede acerta as quatro entradas, lendo y ≥ 0,5 como resposta 1. Os pesos da aula 3, que erravam com a sigmoide, aprenderam o XOR.</p>
+<p>Usar os exemplos todos de uma vez é o que o código da aula faz em cada época. Na aula 6, com 50 mil imagens, o passo usa um lote de 64 de cada vez, um meio-termo entre um exemplo e todos.</p>
+<p>Os números saem das funções de retropropagacao.py, com estes pesos no lugar dos sorteados.</p>
+<h3 id="slide-11-a-retropropagacao-confere-com-a-derivada-numerica">Slide 11: A retropropagação confere com a derivada numérica <a class="cg-slide-link" href="../slides/#11" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Antes de treinar, a retropropagação se confere: cada uma das nove derivadas, calculada de trás para a frente, tem de bater com a derivada numérica da aula 2, que mexe um parâmetro de cada vez, h = 10⁻⁶ para cima e para baixo, e divide a variação da perda por 2h.</p>
+<p>A tabela sai do retropropagacao.py, nos pesos iniciais da semente 1, sorteados da distribuição normal com média 0 e desvio 1. As duas colunas são iguais até a sexta casa; a maior diferença entre as nove é 2,8 · 10⁻¹¹. Um erro de conta, como um sinal trocado ou um índice errado, aparece aqui como números diferentes, antes de o treino falhar sem dizer por quê.</p>
+<p>A comparação de custo é a razão de a retropropagação existir. A derivada numérica pede duas passadas para a frente por parâmetro: 18 nesta rede. A retropropagação dá as nove derivadas com uma passada para a frente e uma para trás. Com um milhão de pesos, seriam dois milhões de passadas contra duas. Que a passada para trás custe da mesma ordem que a da frente é dedução da conta: ela faz multiplicações do mesmo tamanho, na ordem contrária.</p>
+<p>Por isso a derivada numérica serve para conferir, num ponto, e a retropropagação, para treinar.</p>
+<h3 id="slide-12-a-retropropagacao-acha-os-pesos-do-xor">Slide 12: A retropropagação acha os pesos do XOR <a class="cg-slide-link" href="../slides/#12" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O vídeo é o treino do retropropagacao.py: semente 1, η = 2, 2.000 épocas, cada época um passo do gradiente descendente com os quatro exemplos de uma vez. À esquerda, o plano das entradas: em azul claro, onde a rede responde 1, isto é, y ≥ 0,5; a linha escura é a fronteira, y = 0,5. À direita, a perda a cada época, em escala logarítmica, em que cada marca vale dez vezes a de baixo.</p>
+<p>Com os pesos sorteados, a rede responde 1 em quase todo o plano, e a perda começa em 0,2547. Nas primeiras 400 épocas, a perda fica perto de 0,25, e o vídeo passa depressa; a fronteira se inclina e atravessa o plano. Entre as épocas 600 e 900, a perda cai mais de dez vezes, e uma segunda fronteira aparece. No fim, a perda é 0,0021, e a saída nas quatro entradas, (0; 0), (0; 1), (1; 0) e (1; 1), é 0,044; 0,950; 0,951 e 0,040: perto de 0, 1, 1 e 0.</p>
+<p>A solução achada não é a dos pesos à mão da aula 3. Lá, a rede dispara na faixa do meio, entre as duas retas; aqui, responde 1 fora da faixa, nos dois cantos, e 0 dentro dela, onde ficam (0; 0) e (1; 1). As duas resolvem o XOR, e a retropropagação acha uma delas, a que o sorteio inicial e o caminho do gradiente levarem.</p>
+<p>O patamar do começo fica perto de 0,25, que é a perda de responder 0,5 em tudo, porque (0,5)² = 0,25: a rede ainda não separa nada.</p>
+<h3 id="slide-13-nem-toda-semente-chega">Slide 13: Nem toda semente chega <a class="cg-slide-link" href="../slides/#13" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Semente é o número que fixa o sorteio dos pesos iniciais: vinte sementes, vinte sorteios. A figura treina a mesma rede, com a mesma taxa, η = 2, e as mesmas 2.000 épocas, a partir de 20 sorteios, as sementes de 0 a 19, e desenha a perda de cada treino, em escala logarítmica.</p>
+<p>Dezesseis acertam o XOR. As outras quatro, as sementes 0, 10, 11 e 19, param num patamar, com a perda perto de 0,126: a rede acerta duas entradas e responde 0,5 nas outras duas, e mais épocas não mudam isso; o teste foi até 20 mil. Várias das que chegam passam um tempo no mesmo patamar antes de cair, como a que só cai perto da época 1.150.</p>
+<p>Duas lições. O resultado de um treino depende do sorteio inicial, e um experimento só se refaz com a semente registrada: por isso o código guarda a semente, e a entrega também. E o gradiente descendente acha um caminho que desce, não necessariamente o fundo: numa perda com camadas, há regiões quase planas em que ele quase para.</p>
+<p>Se o patamar é um mínimo local, um vale de onde não se sai descendo, é assunto com resultados diferentes na literatura. Hamey, em 1998, provou que a perda do XOR não tem mínimos locais. Sprinkhuizen-Kuyper e Boers, em 1999, mostraram que a perda da rede 2-2-1 do XOR tem regiões de mínimos locais com pontos de sela nas bordas, e que de todo ponto existe um caminho que desce até perda zero. A figura não decide a questão: mostra o que o gradiente descendente faz com esta rede, esta taxa e estas épocas.</p>
+<h2 id="4-de-onde-vem">4. De onde vem</h2>
+<h3 id="slide-14-1986-rumelhart-hinton-e-williams">Slide 14: 1986: Rumelhart, Hinton e Williams <a class="cg-slide-link" href="../slides/#14" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>Em 9 de outubro de 1986, David Rumelhart, Geoffrey Hinton e Ronald Williams publicaram na Nature, em quatro páginas, &quot;Learning representations by back-propagating errors&quot;. O artigo descreve a retropropagação, back-propagation, para redes de unidades parecidas com neurônios: o procedimento ajusta os pesos repetidamente para diminuir a diferença entre a saída da rede e a saída desejada. A frase do slide é do resumo, em tradução livre: com os ajustes, as unidades ocultas, que não são entrada nem saída, passam a representar características importantes da tarefa. É o que o vídeo da camada oculta da aula 3 mostrou, com pesos à mão. O resumo termina dizendo que essa capacidade de criar características novas distingue a retropropagação de métodos anteriores, como a regra do perceptron.</p>
+<p>A conta de trás para a frente é mais antiga. Seppo Linnainmaa a publicou em 1970, na dissertação de mestrado na Universidade de Helsinque, como o modo reverso da diferenciação automática, para funções encadeadas em geral. Paul Werbos, na primeira foto do slide, descreveu o treino de redes neurais pela retropropagação dos erros na tese de doutorado de 1974, em Harvard, e em 1982 a aplicou ao MLP do jeito que virou o padrão.</p>
+<p>Geoffrey Hinton dividiu o Nobel de Física de 2024 com John Hopfield, como estava na aula 1.</p>
+<p>As fotos são do Wikimedia Commons, da esquerda para a direita: Werbos e Rumelhart em 8 de julho de 1991, numa conferência internacional de redes neurais em Seattle, fotos de Rolf Kickuth, CC BY-SA 4.0; Hinton em 2013, na Universidade da Colúmbia Britânica, foto de Eviatar Bach, CC BY-SA 3.0. Não há foto de licença livre de Ronald Williams no Commons.</p>
+<h2 id="5-o-codigo">5. O código</h2>
+<h3 id="slide-15-o-codigo-passo-a-passo">Slide 15: O código, passo a passo <a class="cg-slide-link" href="../slides/#15" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O código da aula fica pronto e testado antes: codigo/retropropagacao.py, a solução de referência da entrega, que não vai para a turma antes do prazo. Na tela, aparece só o que ele imprime.</p>
+<p>Os passos dele são os da entrega: os quatro exemplos e a semente; a passada para a frente, guardando as saídas de cada camada; a retropropagação, com o δ da saída, o δ de cada neurônio oculto e as nove derivadas; a conferência pela derivada numérica; e o laço do gradiente descendente, guardando a perda de cada época.</p>
+<p>Quatro peças do NumPy resolvem quase tudo. X @ W.T + b faz a camada oculta para os quatro exemplos de uma vez: cada linha de X é um exemplo, e W.T é a transposta de W, a matriz com linhas e colunas trocadas, que deixa o produto na forma certa. 1 / (1 + np.exp(-z)) é a sigmoide, posição por posição. s * (1 - s) é a derivada dela, a partir da saída s, já guardada. E H.T @ delta soma, nos exemplos, o δ vezes a entrada de cada peso da saída.</p>
+<h3 id="slide-16-o-que-a-entrega-pede">Slide 16: O que a entrega pede <a class="cg-slide-link" href="../slides/#16" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>A entrega é o XOR treinado com a própria retropropagação, em NumPy. A figura é a do código de referência, com a semente 1: à esquerda, a perda a cada época, em escala logarítmica; à direita, o que a rede responde no plano, com a fronteira y = 0,5.</p>
+<p>O que conferir antes de entregar: as nove derivadas da retropropagação batem com a derivada numérica, em pesos sorteados; a perda cai, depois de um patamar perto de 0,25; e no fim a rede acerta as quatro entradas, lendo y ≥ 0,5 como 1. Se o treino parar perto de 0,126, a semente caiu num dos patamares do slide das sementes: outra semente resolve; mais épocas, não. A semente, a taxa e o número de épocas vão junto com o resultado, para o experimento se refazer.</p>
+<p>Cada um escolhe a própria semente, a taxa e o número de épocas, e os números não precisam bater com os da figura. O que se pede é saber dizer o que entra, o que a rede aprende e o que significa o número que sai.</p>
+<h2 id="6-fechamento">6. Fechamento</h2>
+<h3 id="slide-17-para-estudar-e-entregar">Slide 17: Para estudar e entregar <a class="cg-slide-link" href="../slides/#17" data-i18n-title="courses.open_in_slides" title="Open in the slides"><i class="ph ph-monitor-play" aria-hidden="true"></i></a></h3>
+<p>O estudo tem três partes. Os capítulos 3 e 4 da série sobre redes neurais do 3Blue1Brown, &quot;Backpropagation, intuitively&quot; e &quot;Backpropagation calculus&quot;, ambos de 2017, com legenda e dublagem em português: o 3 mostra a ideia da retropropagação, e o 4, a mesma ideia com o cálculo, pela regra da cadeia. E o tutorial &quot;Learn the Basics&quot; do PyTorch, a biblioteca da aula 7, em oito partes: o começo rápido, os tensores, os conjuntos de dados, as transformações, o modelo, a diferenciação automática, o laço do treino e como salvar o modelo. O exemplo do tutorial usa o FashionMNIST, um conjunto de imagens de roupas.</p>
+<p>A entrega: o XOR treinado com a própria retropropagação, em NumPy; o gradiente conferido pela derivada numérica; e uma pergunta sobre o estudo.</p>
+<p>A seguir, a aula 6 treina um MLP com a mesma conta em 70 mil dígitos escritos à mão, o MNIST, separando treino, validação e teste; e a aula 7 passa para o PyTorch, que faz a retropropagação sozinho.</p>
+<h2 id="perguntas-que-podem-aparecer">Perguntas que podem aparecer</h2>
+<ul>
+<li>Por que não começar com todos os pesos em zero? Os dois neurônios ocultos
+começariam iguais, receberiam a mesma correção e ficariam iguais para sempre:
+seria um neurônio só, repetido. O sorteio quebra essa simetria. É dedução das
+fórmulas do δ.</li>
+<li>Por que η = 2, se na aula 2 a reta divergia a partir de 0,513? O limiar da taxa
+depende da perda: na reta, vinha da curvatura da tigela. Aqui, a inclinação da
+sigmoide, no máximo 0,25, encolhe as derivadas, e passos maiores ainda
+convergem. É dedução; o código mostra que η = 2 leva 16 das 20 sementes ao XOR.</li>
+<li>A retropropagação é o mesmo que o gradiente descendente? Não. A retropropagação
+calcula as derivadas; o gradiente descendente usa as derivadas para dar o
+passo. O PyTorch, da aula 7, faz a primeira sozinho, e um otimizador faz o
+segundo.</li>
+<li>A rede treinada sempre acha a solução dos pesos à mão? Não: a da semente 1
+responde 1 fora da faixa, e não dentro. O XOR tem muitas soluções, e o sorteio
+inicial decide aonde o gradiente leva.</li>
+</ul>
+<h2 id="para-estudar">Para estudar</h2>
+<p>O estudo da turma, que é também o seu:</p>
+<ul>
+<li>3Blue1Brown, série sobre redes neurais, capítulo 3, &quot;Backpropagation,
+intuitively&quot;, 2017, <a href="https://www.youtube.com/watch?v=Ilg3gGewQ5U" target="_blank" rel="noopener">youtube.com/watch?v=Ilg3gGewQ5U</a>. Tem legenda e dublagem em
+português.</li>
+<li>3Blue1Brown, série sobre redes neurais, capítulo 4, &quot;Backpropagation calculus&quot;,
+2017, <a href="https://www.youtube.com/watch?v=tIeHLnjs5U8" target="_blank" rel="noopener">youtube.com/watch?v=tIeHLnjs5U8</a>. Tem legenda e dublagem em português.</li>
+<li>PyTorch, tutorial &quot;Learn the Basics&quot;, <a href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html" target="_blank" rel="noopener">docs.pytorch.org/tutorials/beginner/basics/intro.html</a>.</li>
+</ul>
+<p>Além dele, para preparar a aula:</p>
+<ul>
+<li>David Rumelhart, Geoffrey Hinton e Ronald Williams, 1986, &quot;Learning
+representations by back-propagating errors&quot;, Nature 323:533-536,
+<a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">doi:10.1038/323533a0</a>. Quatro páginas.</li>
+<li>Michael Nielsen, 2015, <em>Neural Networks and Deep Learning</em>, capítulo 2, &quot;How the
+backpropagation algorithm works&quot;: <a href="http://neuralnetworksanddeeplearning.com/chap2.html" target="_blank" rel="noopener">http://neuralnetworksanddeeplearning.com/chap2.html</a>,
+com http, porque o endereço com https não abre. A retropropagação com matrizes,
+a mesma conta da aula 4.</li>
+</ul>
+<h2 id="fontes-dos-fatos-citados">Fontes dos fatos citados</h2>
+<p>Só para conferência; o estudo é a lista de cima.</p>
+<ul>
+<li>David E. Rumelhart, Geoffrey E. Hinton e Ronald J. Williams, 1986, &quot;Learning
+representations by back-propagating errors&quot;, Nature 323(6088):533-536,
+<a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">doi:10.1038/323533a0</a>, publicado em 09/10/1986: a data, as quatro páginas e o
+resumo, com as unidades &quot;hidden&quot; e a comparação com o perceptron.</li>
+<li>Verbete &quot;Backpropagation&quot; da Wikipedia em inglês, seção History, revisão de
+24/10/2026: Linnainmaa, 1970, o modo reverso da diferenciação automática, numa
+dissertação de mestrado em finlandês na Universidade de Helsinque; Werbos, 1982,
+a aplicação ao MLP. Verbete &quot;Paul Werbos&quot;: a tese de doutorado de 1974, em
+Harvard, &quot;Beyond Regression&quot;.</li>
+<li>Leonard G. C. Hamey, 1998, &quot;XOR has no local minima: A case study in neural
+network error surface analysis&quot;, Neural Networks 11(4):669-681,
+<a href="https://doi.org/10.1016/S0893-6080(97)00134-2" target="_blank" rel="noopener">doi:10.1016/S0893-6080(97)00134-2</a>, o resumo. Ida Sprinkhuizen-Kuyper e Egbert
+Boers, 1999, &quot;The local minima of the error surface of the 2-2-1 XOR network&quot;,
+Annals of Mathematics and Artificial Intelligence 25(1):107-136, o resumo.</li>
+<li>Wikimedia Commons, as páginas dos arquivos &quot;PaulWerbos-IJCNNseattle1991-07-08.jpg&quot;,
+&quot;DavidRumelhart-IJCNNseattle1991-07-08.jpg&quot; e &quot;Geoffrey Hinton at UBC.jpg&quot;, com
+autor, data, descrição e licença.</li>
+<li>Nobel de Física de 2024, <a href="https://NobelPrize.org" target="_blank" rel="noopener">NobelPrize.org</a>, como na aula 1.</li>
+<li>As páginas dos dois vídeos do 3Blue1Brown, com título, data e as faixas de
+legenda e de áudio em português; a página do tutorial &quot;Learn the Basics&quot; do
+PyTorch, com as oito partes e o FashionMNIST.</li>
+<li>Os números: codigo/retropropagacao.py, semente 1, η = 2 e 2.000 épocas, e as
+sementes de 0 a 19.</li>
+</ul>
+
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" role="contentinfo"></footer>
+
+  <script type="module" src="../../../../../assets/js/main.min.js?v=d17bebd61c"></script>
+  <script type="module" src="../../../../../assets/js/courses.min.js?v=d17bebd61c"></script>
+  <script src="../../../../../assets/js/analytics.min.js?v=d17bebd61c" defer></script>
+</body>
+</html>
