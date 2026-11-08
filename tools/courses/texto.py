@@ -303,6 +303,9 @@ def secao(lista, prefixo):
 
 
 _VIDEO = re.compile(r"capítulo (\d+), \"([^\"]+)\", (?:https?://)?(?:www\.)?youtube\.com/watch\?v=([\w-]{11})")
+# O vídeo solto, que não é capítulo de uma série: "Autor, ano, "Título", [duração, ]youtube.com/watch?v=..."
+# (o Karpathy da aula 6, o 3Blue1Brown dos fractais da aula 8). A série fica com o ano.
+_VIDEO_SOLTO = re.compile(r"^(.+?), \"([^\"]+)\", (?:[^,\"]+, )?(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([\w-]{11})")
 
 
 def estudo_da_semana(corpo):
@@ -323,6 +326,12 @@ def estudo_da_semana(corpo):
         linha = " ".join(bruto.split())
         videos = list(_VIDEO.finditer(linha))
         ids = re.findall(r"youtube\.com/watch\?v=([\w-]{11})", linha)
+        solto = _VIDEO_SOLTO.match(linha) if not videos and len(ids) == 1 else None
+        if solto:
+            canal, _, serie = solto.group(1).partition(", ")
+            itens.append({"tipo": "video", "id": solto.group(3), "canal_citado": canal, "serie": serie,
+                          "capitulo": None, "titulo_citado": solto.group(2)})
+            continue
         if len(videos) != len(ids):
             raise SystemExit(f"não entendi o vídeo em: {linha}")
         if videos:

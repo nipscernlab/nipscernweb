@@ -732,7 +732,8 @@ class Curso:
                     f'<a class="cr-video glass glass--flat" href="{e(it["url"])}" target="_blank" rel="noopener">'
                     f'<span class="frame cr-video-thumb"><img src="{it["miniatura"]}" alt="" width="600" height="338" loading="lazy" decoding="async">'
                     f'<span class="cr-play cr-play--sm" aria-hidden="true"><i class="ph ph-play"></i></span></span>'
-                    f'<span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">{e(it["serie"][0].upper() + it["serie"][1:])}, capítulo {e(it["capitulo"])}</span>'
+                    f'<span class="cr-video-body"><span class="cr-video-meta" lang="pt-BR">{e(it["serie"][0].upper() + it["serie"][1:])}'
+                    f'{", capítulo " + e(it["capitulo"]) if it["capitulo"] else ""}</span>'
                     f'<span class="cr-video-title" lang="en">{e(it["titulo"])}</span>'
                     f'<span class="cr-video-channel">{e(it["canal"])} · <span class="cr-wave">{rotulo("watch")}</span><i class="ph ph-arrow-square-out" aria-hidden="true"></i></span></span></a>')
             elif it["tipo"] == "leitura":
