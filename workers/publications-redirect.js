@@ -45,7 +45,7 @@ const MAPA = {
   "articles/CPC_2012_Three_dimensional_event.pdf": "https://cdn.nipscern.com/publications/cpc-2012-three-dimensional-event.pdf",
   "articles/DOUT_2016_Leandro_Manso.pdf": "https://cdn.nipscern.com/publications/dout-2016-leandro-manso.pdf",
   "articles/DOUT_2017_Davis_Pereira.pdf": "https://cdn.nipscern.com/publications/dout-2017-davis-pereira.pdf",
-  "articles/DOUT_2019_João_Paulo_Bittencourt.pdf": "https://cdn.nipscern.com/publications/dout-2019-joao-paulo-bittencourt.pdf",
+  "articles/DOUT_2019_João_Paulo_Bittencourt.pdf": "https://cdn.nipscern.com/publications/dout-2019-joao-paulo-bittencourt-v2.pdf",
   "articles/DOUT_2021_Dayane_Oliveira.pdf": "https://cdn.nipscern.com/publications/dout-2021-dayane-oliveira.pdf",
   "articles/DOUT_2021_Tiago_Aparecido_Teixeira.pdf": "https://cdn.nipscern.com/publications/dout-2021-tiago-aparecido-teixeira.pdf",
   "articles/DOUT_2022_Tiago_Motta_Quirino.pdf": "https://cdn.nipscern.com/publications/dout-2022-tiago-motta-quirino.pdf",
