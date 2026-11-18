@@ -31,8 +31,8 @@
        the fetch could not start until that stylesheet parsed. -->
   <link rel="preload" href="../assets/fonts/geist-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/bodoni-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../assets/css/icons/news-post.css?v=514572d87f" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../assets/css/icons/news-post.css?v=514572d87f"></noscript>
-  <link rel="stylesheet" href="../assets/css/main.min.css?v=514572d87f">
+  <style>.ph{display:inline-block;width:1em;height:1em;flex-shrink:0;vertical-align:-0.125em}</style><link rel="stylesheet" href="../assets/css/icons/news-post.css?v=b7ee435529" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="../assets/css/icons/news-post.css?v=b7ee435529"></noscript>
+  <link rel="stylesheet" href="../assets/css/main.min.css?v=b7ee435529">
 </head>
 <body>
 
@@ -81,7 +81,7 @@
     <div class="post-stage seam section--lit" style="--seam-from:var(--bg-0)">
 
       <!-- Cover image (populated by JS) — negative margin-top overlaps the header bg -->
-      <div id="post-cover" style="display:block;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/ichep-2026-paschoalin-proceedings.webp" alt="NIPS-CERN Pulse Simulator Reaches the ICHEP 2026 Proceedings on Behalf of ATLAS" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 2.2%) translate3d(0px, 0px, 0px);"></div></div>
+      <div id="post-cover" style="display:block;max-width:720px;margin:0 auto var(--sp-8);margin-top:-80px;padding:0 var(--container-pad);position:relative;z-index:1"><div class="frame post-cover-frame" data-drift-frame=""><img src="../assets/images/news/ichep-2026-paschoalin-proceedings-v2.webp" alt="NIPS-CERN Pulse Simulator Reaches the ICHEP 2026 Proceedings on Behalf of ATLAS" loading="eager" data-drift="6" style="translate: none; rotate: none; scale: none; transform: translate(0%, 2.2%) translate3d(0px, 0px, 0px);"></div></div>
 
       <!-- Post body (and TOC injected alongside it for featured posts) -->
       <div class="post-body" id="post-body" style="display:block"><p>At ICHEP 2026, the 43rd International Conference on High Energy Physics, held in Natal from 30 July to 5 August, Thiago C. A. Paschoalin, professor at CEFET-MG and postdoctoral researcher at NIPS-CERN (UFJF), presented on behalf of the ATLAS Collaboration the real-time pulse simulator for the Tile Calorimeter developed by the group. He was one of seven speakers from Brazilian institutions to present ATLAS results at the conference (<a href="/news/ichep-brazilian-atlas-speakers">see the news</a>).</p><p>The written version of the talk has now completed its path. The proceedings <em>Real-Time FPGA-Based Pulse Simulator for the ATLAS Tile Calorimeter Readout Chain at the HL-LHC</em> was approved by ATLAS as ATL-TILECAL-PROC-2026-022 and, on 4 November, submitted to the conference proceedings, published in Proceedings of Science (PoS).</p><p>In a collaboration of thousands of members, a text signed on behalf of ATLAS speaks for all of them. Before it leaves, it is read and approved by the collaboration itself. Having a work of the group go through that process and reach the proceedings of the main conference of the field, under the name of the whole experiment, is a recognition of the work done at NIPS-CERN.</p><p>The simulator generates, at every LHC bunch crossing (40.08 MHz), the energy deposited in a TileCal cell according to its statistical distribution, adds realistic electronic noise, reproduces the FENICS front-end shaper with an IIR filter and emulates the 12-bit ADC of the Phase-II electronics. On a Kintex UltraScale FPGA it uses about 1% of the logic and closes timing with about 3% of margin over the bunch-crossing frequency. It serves to validate and stress-test the energy reconstruction firmware of the HL-LHC upgrade under realistic and repeatable conditions.</p><span style="font-size:0.9em"><a href="https://cds.cern.ch/record/2974349" target="_blank" rel="noopener">Proceedings in the CERN Document Server</a> · <a href="/publications/p/2026-ichep-tilecal-pulse-simulator-fpga">Proceedings on our site</a></span><div class="pub-tags" style="margin-top:var(--sp-8)"><span class="pub-tag">ICHEP</span><span class="pub-tag">ATLAS</span><span class="pub-tag">TileCal</span><span class="pub-tag">HL-LHC</span><span class="pub-tag">FPGA</span><span class="pub-tag">Pulse simulator</span><span class="pub-tag">CEFET-MG</span><span class="pub-tag">UFJF</span></div></div>
@@ -157,11 +157,11 @@
   </script>
 
   <script type="module">
-    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=514572d87f';
-    import { getLang, t } from '../assets/js/i18n.min.js?v=514572d87f';
-    import { newsPostUrl } from '../assets/js/content-links.min.js?v=514572d87f';
-    import { mountPostHeart } from '../assets/js/hearts.min.js?v=514572d87f';
-    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=514572d87f';
+    import { formatDate, newsLangFlag } from '../assets/js/main.min.js?v=b7ee435529';
+    import { getLang, t } from '../assets/js/i18n.min.js?v=b7ee435529';
+    import { newsPostUrl } from '../assets/js/content-links.min.js?v=b7ee435529';
+    import { mountPostHeart } from '../assets/js/hearts.min.js?v=b7ee435529';
+    import { ensureMotionLibs, initMotion, revealFailsafe } from '../assets/js/motion.min.js?v=b7ee435529';
 
     /* The cover drifts inside the frame it is clipped by, and nothing else on
        this page moves: a story is running text, and running text is the case
@@ -916,8 +916,8 @@
     });
   </script>
 
-  <script type="module" src="../assets/js/main.min.js?v=514572d87f"></script>
+  <script type="module" src="../assets/js/main.min.js?v=b7ee435529"></script>
 
-  <script src="../assets/js/analytics.min.js?v=514572d87f" defer></script>
+  <script src="../assets/js/analytics.min.js?v=b7ee435529" defer></script>
 </body>
 </html>
