@@ -1,10 +1,10 @@
 # Eletrônica Analógica I na library: o que se achou
 
-Estado em 16/10/2026: publicado, com a apostila do Prof. Victor Mendes Ribeiro
-nas versões 1 da parte 1 (25/09/2026), 2 da parte 2 (16/10/2026) e 1 da parte 3
-(29/09/2026). A versão 1 das três entrou no site no commit `eee115e`, com os
-PDFs no nipscern-assets pelo PR #2; o que mudou na versão 2 da parte 2 está em
-"A versão 2 da parte 2", abaixo. Endereço:
+Estado em 23/11/2026: publicado, com a apostila do Prof. Victor Mendes Ribeiro
+nas versões 1 da parte 1 (25/09/2026), 2 da parte 2 (16/10/2026) e 2 da parte 3
+(23/11/2026). A versão 1 das três entrou no site no commit `eee115e`, com os
+PDFs no nipscern-assets pelo PR #2; o que mudou na versão 2 da parte 2 e na
+versão 2 da parte 3 está nas seções de cada uma, abaixo. Endereço:
 https://www.nipscern.com/library/courses/eletronica-analogica-1/
 
 Este arquivo registra o que apareceu ao montar o curso: o que vale levar ao
@@ -132,6 +132,33 @@ página do Limiar mudou. O que a rodada completa faria além disso se fez à mã
 o `lastmod` do sitemap, que vai a 2026-10-16 na coletânea e nas quatro páginas
 da apostila. A coletânea não tem nada que dependa da parte 2, e nenhum arquivo
 de `media/` mudou de nome, então não sobrou arquivo para a limpeza apagar.
+
+## A versão 2 da parte 3
+
+O professor mandou a parte 3 atualizada em 23/11/2026, com essa data nos
+metadados do PDF. Comparada com a versão 1, de 29/09/2026:
+
+- tem 54 páginas, eram 35, e 0,6 MB, eram 0,3 MB;
+- o capítulo 4, do TBJ, cresceu: as seções 4.1 a 4.9 continuam com os mesmos
+  títulos, em páginas novas (a Prática 5 foi da 16 para a 26), e entrou a seção
+  4.10, "Prática de laboratório 6: amplificador emissor comum", na página 28;
+- os exercícios do capítulo 4 passaram de 7 para 15, e os do capítulo 5
+  continuam 5;
+- no capítulo 5, do MOSFET, as seções 5.4 e 5.5 trocaram de lugar: "O MOSFET
+  como chave" veio antes de "Pequenos sinais e o amplificador fonte comum"; o
+  gabarito foi da página 29 para a 47;
+- as citações do Sedra passaram de 3 para 4, e a parte continua sem licença nem
+  nota de direitos.
+
+A página da parte 3 se refez a partir do PDF novo, com a prática nova no
+cartão das práticas, e a figura do cartão da parte saiu com outro conteúdo e
+outro nome no `media/`; a de antes, sem referência em página nenhuma, saiu do
+repositório. O PDF novo está no CDN como
+`eletronica-analogica-1-apostila-parte-3-v2.pdf`, e o `-v1` continua no lugar.
+
+A rodada foi só deste curso, com `--course eletronica-analogica-1`, como na
+versão 2 da parte 2, e o `lastmod` do sitemap foi à mão para 2026-11-23 na
+página do curso e na da parte 3, as duas que mudaram.
 
 ## Na ferramenta e no repositório do site
 
