@@ -18,6 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # O passo do arquivo trocado no mesmo nome compara com o commit de
+          # antes, que precisa estar aqui.
+          fetch-depth: 0
       - name: Token ?v= bate com o hash do conteudo
         run: |
           set -euo pipefail
@@ -73,3 +77,30 @@ jobs:
             exit 1
           fi
           echo "Todos os tokens ?v= batem com $ver."
+
+      # Arquivo de assets/ sem ?v= que muda de conteudo e guarda o nome. A
+      # borda da Cloudflare guarda /assets/ por um ano e o navegador por ate um
+      # dia, pelo endereco: quem ja visitou continua vendo a versao velha, e a
+      # limpeza da borda (purge-cache.yml) nao alcanca o navegador. Foi o caso
+      # da capa do ICHEP 2026 em 18/11/2026 (#32 e #33). O que tem ?v= fica de
+      # fora: e a lista ASSETS do hook, e o passo de cima confere o token dela.
+      - name: Arquivo sem ?v= trocado com o mesmo nome
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BASE:-}" ] || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            echo "Sem o commit de antes para comparar (ramo novo ou disparo manual)."
+            exit 0
+          fi
+          ASSETS=$(sed -n '/^ASSETS="/,/"$/p' .githooks/pre-commit \
+                   | sed 's/^ASSETS="//; s/"$//' | grep -v '^$')
+          trocados=$(git -c core.quotePath=false diff --diff-filter=M --name-only "$BASE" HEAD -- assets/ \
+                     | grep -v -x -F "$ASSETS" || true)
+          if [ -n "$trocados" ]; then
+            while read -r f; do
+              echo "::error file=$f::$f mudou de conteudo com o mesmo nome, e quem ja visitou o site continua vendo a versao velha. Publique com outro nome, como o site faz com -v2 e -v3, e troque as referencias; se ele e pedido com ?v=, ponha-o na lista ASSETS de .githooks/pre-commit."
+            done <<< "$trocados"
+            exit 1
+          fi
+          echo "Nenhum arquivo sem ?v= trocado com o mesmo nome."

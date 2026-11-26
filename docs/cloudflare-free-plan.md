@@ -7,6 +7,35 @@ tempo procurando.
 > **Estado em 2026-08-10: 13 de 13 conferidos, nada pendente.**
 > `bash tools/check-edge.sh` dá o estado atual a qualquer momento.
 
+## Atualização de 26/11/2026
+
+- **O "não encontrado" ficava na borda por até um ano.** As três Cache Rules
+  de `/assets/` (com `?v=`, sem `?v=` e a das fontes) guardavam também o 404.
+  Um arquivo pedido antes de a publicação terminar ficava "não encontrado"
+  para todo visitante até alguém limpar o cache: a capa do Workshop
+  ATLAS-Brasil 2026, pedida cedo em 24/11 (#38), seguia na borda em 26/11 com
+  51 horas de idade (`Age: 184943`), e não um dia. **No painel, nas três
+  regras, o 404 fica sem cache na borda**, como já era na regra do
+  `cdn.nipscern.com`. A seção 7 do `tools/check-edge.sh` confere. O navegador
+  de quem pediu cedo ainda recebe com o 404 o Browser TTL da regra, um dia sem
+  `?v=` e um ano com `?v=` e nas fontes, e isso a borda não resolve.
+- **A limpeza no deploy voltou**, em `.github/workflows/purge-cache.yml`, com
+  o segredo `CLOUDFLARE_PURGE_TOKEN`. Espera o GitHub Pages publicar o commit,
+  limpa da borda só os endereços que o push mudou, inclusive os apagados, e
+  confere que a borda devolve os mesmos bytes do repositório. Sem o segredo,
+  falha, em vez de avisar e sair verde como antes.
+- **Arquivo sem `?v=` trocado com o mesmo nome reprova o PR**, num passo novo
+  do `cache-guard.yml`. A limpeza da borda não alcança o navegador de quem já
+  visitou, que guarda o arquivo por um dia, então quem troca uma imagem troca o
+  nome, como a capa do ICHEP 2026 em 18/11 (#32 e #33). O
+  `assets/css/icons/code-signing.css` é a única das 27 folhas de ícones fora
+  da lista `ASSETS` do `.githooks/pre-commit` e é pedido com um `?v=` próprio,
+  que nunca muda: a próxima troca dele reprova até ele entrar na lista.
+- **O gancho de commit liga sozinho.** O `npm ci` e o `npm install` rodam o
+  `prepare` do `package.json`, que faz `git config core.hooksPath .githooks`.
+  Em 23/11 o #35 saiu com o índice da busca desatualizado, que o gancho refaz
+  a cada commit, e parou na conferência das fatias de dados.
+
 ## Atualização de 16/10/2026
 
 Lido pela API, com o token CLAUDE-ACCESS (o valor fica em

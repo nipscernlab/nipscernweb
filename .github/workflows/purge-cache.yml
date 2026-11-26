@@ -1,0 +1,187 @@
+name: Purga o cache do Cloudflare
+
+# Depois de cada publicacao do site, limpa da borda da Cloudflare os enderecos
+# que o push mudou. A borda guarda os arquivos de /assets/ por um ano, pelas
+# Cache Rules (docs/cloudflare-free-plan.md), e sem esta limpeza duas coisas
+# ficavam presas la:
+#
+# - o arquivo trocado com o mesmo nome, servido na versao antiga, como a capa
+#   do ICHEP 2026 em 18/11/2026 (#32 e #33);
+# - o "nao encontrado" de um arquivo novo pedido antes de a publicacao
+#   terminar, como a capa do Workshop ATLAS-Brasil 2026 em 24/11/2026 (#38),
+#   que em 26/11 seguia guardado na borda com 51 horas de idade.
+#
+# Este arquivo saiu em 17/10/2026, porque o segredo nunca existiu, e voltou em
+# 26/11/2026 com tres mudancas:
+#
+# 1. Espera o GitHub Pages publicar este commit, pela API das publicacoes, em
+#    vez de dormir 90 s. Limpar antes de publicar e pior que nao limpar: a borda
+#    vai a origem, acha a versao velha e a guarda de novo por um ano.
+# 2. Sem o segredo, falha. Antes avisava e saia verde, e foi assim que a purga
+#    passou dois meses sem rodar uma vez sem ninguem ver (atualizacao de
+#    16/10/2026 em docs/cloudflare-free-plan.md).
+# 3. Os pushes entram em fila, sem cancelar o anterior: cada execucao limpa so o
+#    que o seu push mudou, e cancelar uma perdia a limpeza dela.
+#
+# Para ligar, uma vez:
+# 1. dash.cloudflare.com -> My Profile -> API Tokens -> Create Token, com a
+#    permissao de zona "Cache Purge: Purge", so em nipscern.com, e nada mais.
+#    Ela nao le nem escreve configuracao nenhuma, so esvazia cache.
+# 2. Aqui, Settings -> Secrets and variables -> Actions -> New repository
+#    secret, com o nome CLOUDFLARE_PURGE_TOKEN e o valor do token.
+#
+# O ZONE abaixo e o identificador da zona nipscern.com: aparece no painel e nao
+# e segredo.
+#
+# A limpeza e por endereco, so o que o push mudou. Limpar a zona inteira
+# esvaziaria tambem o cdn.nipscern.com, que esta na mesma zona, e todo asset
+# carimbado com ?v=, que nao mudaram.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: read
+
+concurrency:
+  group: purge-cache
+  cancel-in-progress: false
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SITE: https://www.nipscern.com/
+    steps:
+      - name: O segredo existe
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+        run: |
+          if [ -z "${TOKEN:-}" ]; then
+            echo "::error::Falta o segredo CLOUDFLARE_PURGE_TOKEN, e a borda segue servindo a versao velha do que este push mudou. Veja o topo de .github/workflows/purge-cache.yml."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Os enderecos que o push mudou
+        id: urls
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+
+          # Sem o commit anterior (disparo manual, primeiro push), compara com o pai.
+          if [ -z "${BEFORE:-}" ] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            BEFORE=$(git rev-parse HEAD~1)
+          fi
+
+          # purgar.txt: tudo o que mudou, inclusive o apagado, porque a borda
+          # tambem guarda o que saiu. conferir.txt: o que existe neste commit,
+          # para o passo final conferir que a borda serve a versao nova. A
+          # pagina entra nas formas limpa, com barra e com .html; o resto, pelo
+          # caminho. O que tem ?v= ja e endereco novo; o caminho sem carimbo,
+          # nao, e entra.
+          git -c core.quotePath=false diff --name-status --no-renames "$BEFORE" HEAD | python3 -c '
+          import os, sys, urllib.parse
+          site = os.environ["SITE"]
+          fora = ("tools/", "docs/", ".github/", ".githooks/", "node_modules/")
+          purgar, conferir = [], []
+          for linha in sys.stdin.read().splitlines():
+              estado, p = linha.split("\t", 1)
+              if p.startswith(fora) or p.startswith(".") or "/." in p or p.endswith(".md"):
+                  continue
+              q = urllib.parse.quote(p)
+              if p == "index.html":
+                  formas = [site, site + "index.html"]
+              elif p.endswith("/index.html"):
+                  d = q[: -len("index.html")]
+                  formas = [site + d, site + d.rstrip("/"), site + q]
+              elif p.endswith(".html"):
+                  formas = [site + q[:-5], site + q]
+              else:
+                  formas = [site + q]
+              purgar += formas
+              if estado != "D":
+                  conferir.append(p + "\t" + formas[0])
+          open("purgar.txt", "w", newline="\n").write("".join(u + "\n" for u in dict.fromkeys(purgar)))
+          open("conferir.txt", "w", newline="\n").write("".join(c + "\n" for c in dict.fromkeys(conferir)))
+          '
+          n=$(wc -l < purgar.txt)
+          echo "$n endereco(s) para limpar"
+          echo "n=$n" >> "$GITHUB_OUTPUT"
+
+      - name: Espera o GitHub Pages publicar este commit
+        if: steps.urls.outputs.n != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Um push logo depois deste pode fazer o Pages publicar direto o commit
+          # seguinte; vale entao a publicacao de um commit que descende deste.
+          for i in $(seq 1 60); do
+            git fetch -q origin main
+            builds=$(gh api "repos/${GITHUB_REPOSITORY}/pages/builds?per_page=10" --jq '.[] | "\(.commit) \(.status)"')
+            while read -r commit status; do
+              [ -n "${commit:-}" ] || continue
+              if [ "$commit" = "$GITHUB_SHA" ] || git merge-base --is-ancestor "$GITHUB_SHA" "$commit" 2>/dev/null; then
+                case "$status" in
+                  built) echo "Publicado no Pages: $commit"; exit 0 ;;
+                  errored) echo "::error::A publicacao do Pages falhou em $commit."; exit 1 ;;
+                esac
+              fi
+            done <<< "$builds"
+            sleep 10
+          done
+          echo "::error::O Pages nao publicou este commit em 10 minutos."
+          exit 1
+
+      - name: Limpa da borda os enderecos que mudaram
+        if: steps.urls.outputs.n != '0'
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+          ZONE: 1020c6fd80f416f40f78f4721be81adf
+        run: |
+          set -euo pipefail
+          # O plano gratuito aceita 30 enderecos por pedido.
+          split -l 30 purgar.txt lote_
+          for f in lote_*; do
+            corpo=$(python3 -c 'import json,sys; print(json.dumps({"files": [l for l in open(sys.argv[1]).read().split() if l]}))' "$f")
+            resposta=$(curl -sS -X POST \
+              "https://api.cloudflare.com/client/v4/zones/${ZONE}/purge_cache" \
+              -H "Authorization: Bearer ${TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data "$corpo")
+            if ! echo "$resposta" | grep -q '"success":true'; then
+              echo "$resposta"
+              echo "::error::A limpeza falhou. Confira se o token tem 'Cache Purge: Purge' na zona nipscern.com."
+              exit 1
+            fi
+          done
+          echo "::notice::$(wc -l < purgar.txt) endereco(s) limpos da borda."
+
+      - name: Confere que a borda serve a versao nova
+        if: steps.urls.outputs.n != '0'
+        run: |
+          set -euo pipefail
+          # Pagina: responde 200. Outro arquivo: a borda devolve os mesmos bytes
+          # do repositorio. O HTML nao se compara byte a byte, porque a Cloudflare
+          # pode acrescentar o script do Web Analytics.
+          ruins=0
+          while IFS=$'\t' read -r p u; do
+            if [[ "$p" == *.html ]]; then
+              codigo=$(curl -sS -L -o /dev/null -w '%{http_code}' -A 'nipscernweb-purge-cache' "$u")
+              [ "$codigo" = "200" ] && echo "ok   $u" || { echo "::error::$u respondeu $codigo"; ruins=$((ruins+1)); }
+            else
+              borda=$(curl -sS -A 'nipscernweb-purge-cache' "$u" | sha256sum | cut -c1-64)
+              repo=$(git cat-file blob "HEAD:$p" | sha256sum | cut -c1-64)
+              [ "$borda" = "$repo" ] && echo "ok   $u" || { echo "::error::$u na borda difere do repositorio"; ruins=$((ruins+1)); }
+            fi
+          done < conferir.txt
+          [ "$ruins" = 0 ]
