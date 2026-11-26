@@ -83,5 +83,22 @@ else
 fi
 
 echo
+echo "-- 7. O 404 de um endereço novo não fica na borda (#38)"
+# Um arquivo pedido antes de a publicação terminar responde 404. Se a borda
+# guardar esse 404, todo visitante segue sem o arquivo até alguém limpar o
+# cache: foi a capa do Workshop ATLAS-Brasil 2026 em 24/11/2026, que em 26/11
+# seguia guardada na borda com 51 horas de idade. Um endereço novo a cada
+# execução, pedido duas vezes: a segunda resposta não pode vir da borda. A regra
+# do cdn.nipscern.com já não guardava o 404; aqui se conferem as três de
+# /assets/. O navegador de quem pediu ainda guarda o 404 pelo Browser TTL da
+# regra, e isso a borda não resolve.
+M="teste-borda-$R-$(date +%s)"
+for par in "sem ?v=|/assets/images/$M.webp" "com ?v=|/assets/images/$M.webp?v=$M" "fontes|/assets/fonts/$M.woff2"; do
+  p="${par#*|}"; hdr "$p" >/dev/null; N=$(hdr "$p")
+  check "404 fora da borda, ${par%%|*}" '^404 (MISS|EXPIRED|BYPASS|DYNAMIC)$' \
+        "$(printf '%s' "$N" | head -1 | cut -d' ' -f2) $(val "$N" cf-cache-status)"
+done
+
+echo
 echo "  $PASS ok, $FAIL pendente(s)"
 [ "$FAIL" -eq 0 ]
