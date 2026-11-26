@@ -48,8 +48,8 @@
  *   O SDK do Firebase vem do CDN do Google, por import() dinâmico, só quando a
  *   página está configurada.
  */
-import { t, getLang } from './i18n.js?v=ab5d45b9e8';
-import { scrollToTop } from './smooth-scroll.js?v=ab5d45b9e8';
+import { t, getLang } from './i18n.js?v=5c85c5c503';
+import { scrollToTop } from './smooth-scroll.js?v=5c85c5c503';
 
 const FB_VERSION = '12.19.0';
 const fbUrl = (m) => `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-${m}.js`;
