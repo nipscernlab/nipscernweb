@@ -11,12 +11,12 @@
    answer: up to eight results, the words that matched marked in the title and
    the description, arrows to move, Enter to go, Esc to leave.
    ============================================================ */
-import { SearchIndex, normalize, pick } from './search-engine.js?v=985e6586fe';
-import { t, getLang } from './i18n.js?v=985e6586fe';
-import { holdScroll } from './smooth-scroll.js?v=985e6586fe';
-import { rememberHit, revealHit } from './search-hit.js?v=985e6586fe';
+import { SearchIndex, normalize, pick } from './search-engine.js?v=8cda18d655';
+import { t, getLang } from './i18n.js?v=8cda18d655';
+import { holdScroll } from './smooth-scroll.js?v=8cda18d655';
+import { rememberHit, revealHit } from './search-hit.js?v=8cda18d655';
 
-const INDEX_URL = new URL('../search/search-index.json?v=985e6586fe', import.meta.url);
+const INDEX_URL = new URL('../search/search-index.json?v=8cda18d655', import.meta.url);
 
 const ICON = {
   page: 'ph-file-text', section: 'ph-file-text', project: 'ph-cpu', course: 'ph-books',

@@ -203,6 +203,42 @@
     "url": "https://ojs.sba.org.br/index.php/cba/article/view/6447"
   },
   {
+    "id": "pub-2026-enmc-reconstrucao-fase-cnn",
+    "title": "Reconstrução de Fase no Calorímetro de Telhas do ATLAS: Redes Neurais Convolucionais versus Filtro Ótimo",
+    "authors": ["Diogo Alves Cardinot", "Bernardo Sotto Maior Peralva", "Gustavo Barbosa Libotte", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "A reconstrução de sinais é essencial na calorimetria de altas energias, pois permite determinar com precisão a energia e o tempo (fase) de chegada das partículas produzidas pelas colisões. Neste sentido, este trabalho compara abordagens de estimação de fase de sinais no Calorímetro de Telhas Cintilantes (TileCal) do experimento ATLAS no acelerador de partículas LHC. São avaliadas quatro estratégias: reconstrução indireta via amplitude estimada pelo Filtro Ótimo (OF), pela CNN e pela amplitude real; e reconstrução direta da fase por CNN. Os experimentos cobrem diversos níveis de empilhamento de sinais, refletindo a próxima fase de operação do LHC. A abordagem via amplitude estimada pela CNN alcançou melhora média de aproximadamente 26% no RMS e dispersão em relação ao OF tradicional, enquanto a reconstrução direta da fase pela CNN atingiu em torno de 98% de melhora para as mesmas métricas.",
+    "tags": ["TileCal", "ATLAS", "Filtro Ótimo", "Redes Neurais Convolucionais", "Calorimetria", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-reconstrucao-fase-cnn-tilecal.pdf"
+  },
+  {
+    "id": "pub-2026-enmc-conformador-digital",
+    "title": "Conformador Digital de Pulsos de Alta Velocidade para Síntese em Tempo Real de Sinais Impulsivos em FPGA",
+    "authors": ["Fábio Cardani Luna", "Thiago Campos Acácio Paschoalin", "Tiago Motta Quirino", "Guilherme Barroso Morett", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "A conformação de pulsos é operação padrão na eletrônica de front-end de detectores de radiação e de outros instrumentos de sinais impulsivos. O estágio conformador limita a banda de ruído, define tempo de pico e largura do pulso, controla a recuperação da linha de base e produz forma de onda compatível com a conversão analógico-digital e a estimação digital de amplitude. Em implementações analógicas, porém, tolerâncias de componentes, parasitas de placa, temperatura, envelhecimento e radiação podem fazer a resposta realizada diferir da especificada no projeto. Em sistemas multicanais, isso produz variações canal a canal de ganho, tempo de pico e cauda do pulso, elevando o esforço de calibração e manutenção. Este trabalho apresenta um conformador digital de pulsos em tempo real para FPGA, obtido da função de transferência em tempo contínuo de um pré-amplificador sensível à carga seguido de rede CR-4RC. O modelo analógico é decomposto em termos de primeira e segunda ordem, discretizado por mapeamento invariante ao impulso e implementado como seções de resposta ao impulso infinita em paralelo. O circuito destina-se ao condicionamento online e à síntese de pulsos digitalizados de detector para calibração, verificação de firmware, estudos de empilhamento e testes de algoritmos de reconstrução.",
+    "tags": ["Conformação digital de pulsos", "FPGA", "Instrumentação nuclear", "Síntese de sinais", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-conformador-digital-pulsos-fpga.pdf"
+  },
+  {
+    "id": "pub-2026-enmc-pzc-dados-reais",
+    "title": "Validação de um Algoritmo Digital de Cancelamento Polo-Zero Utilizando Dados Reais do LHC",
+    "authors": ["Fábio Cardani Luna", "Thiago Campos Acácio Paschoalin", "Tiago Motta Quirino", "Diogo Alves Cardinot", "Luciano Manhães de Andrade Filho"],
+    "journal": "XXIX Encontro Nacional de Modelagem Computacional",
+    "year": 2026,
+    "type": "conference",
+    "doi": null,
+    "abstract": "A conformação do sinal no calorímetro hadrônico de telhas (TileCal) do experimento ATLAS, realizada pelo shaper, introduz uma cauda negativa (undershoot) decorrente do comportamento passa-alta do capacitor de acoplamento. Em alta taxa de eventos, isso provoca um deslocamento cumulativo da linha de base (baseline shift), degradando a precisão da reconstrução de energia. Para corrigi-lo, técnicas de cancelamento polo-zero (PZC) têm sido propostas, entre elas uma realização digital que substitui o circuito por um modelo recursivo em tempo discreto, combinando o unfolding com um acumulador para a retirada do pedestal rastreado, validada até então apenas com streaming simulado. Este trabalho valida esse modelo com dados reais do módulo Demonstrator do TileCal, da run 520451 do LHC, com pile-up médio de cerca de 60. Os resultados mostram que o PZC corrige o deslocamento da linha de base e rastreia o pedestal, preservando as características estatísticas do sinal e mantendo relação linear com a entrada. Observou-se, contudo, que o acumulador retém resíduos negativos do sinal, limitação menor em células de maior pile-up. A constante de tempo adotada é a do shaper 3-in-1 isolado, sem convolução com o pulso da fotomultiplicadora, de modo que se valida o mecanismo do modelo, e não a sua sintonia final.",
+    "tags": ["TileCal", "Cancelamento polo-zero", "Linha de base", "Processamento digital de sinais", "LHC", "ENMC"],
+    "pdf": "https://cdn.nipscern.com/publications/enmc-2026-pzc-dados-reais-lhc.pdf"
+  },
+  {
     "id": "pub-2026-enmc-cgvweb-renderizacao",
     "title": "Renderização em Tempo Real de Eventos do Detector ATLAS: a Reescrita do Mecanismo Gráfico do CGVWeb",
     "authors": ["Chrysthofer Arthur Amaro Afonso", "Mateus Araujo Carvalho", "Roberta Luchini Leonardo", "Kinn Belarmino Batista Dias", "Gustavo Barbosa Libotte", "Luciano Manhães de Andrade Filho"],
